@@ -148,6 +148,21 @@ namespace fan
 	}
 
 	//================================================================================================================================
+	// returns the perfect frame index timing for something to spawn immediately when sent from the server to the client
+	//================================================================================================================================
+	FrameIndex HostConnection::CalculatePerfectSpawnTiming( const HostConnection& _connection, const Time& _time )
+	{
+		int averageFrameDelta = 0;
+		for( int delta : _connection.framesDelta )
+		{
+			averageFrameDelta += delta;
+		}
+		averageFrameDelta /= (int)_connection.framesDelta.size();
+
+		return FrameIndex( -averageFrameDelta ) + FrameIndex( _connection.rtt / _time.logicDelta ) + 3;
+	}
+
+	//================================================================================================================================
 	// Editor gui helper
 	//================================================================================================================================
 	std::string GetStateName( const HostConnection::State _clientState )

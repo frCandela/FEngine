@@ -51,13 +51,22 @@ namespace fan
 				_data >> velocity[0] >> velocity[2];
 				_data >> owner;
 
+
+
+				Instanciate( _world, owner, position, velocity );
+			}
+
+			//================================================================
+			//================================================================
+			static void Instanciate( EcsWorld& _world, const NetID _owner, const btVector3& _position, const btVector3& _velocity )
+			{
 				Scene& scene = _world.GetSingleton<Scene>();
 				PhysicsWorld& physicsWorld = _world.GetSingleton<PhysicsWorld>();
 				CollisionManager& collisionManager = _world.GetSingleton<CollisionManager>();
 				const LinkingContext& linkingContext = _world.GetSingleton<LinkingContext>();
 
 				// spawn the bullet now
-				const EcsHandle ownerHandle = linkingContext.netIDToEcsHandle.at( owner );
+				const EcsHandle ownerHandle = linkingContext.netIDToEcsHandle.at( _owner );
 				const EcsEntity ownerEntity = _world.GetEntity( ownerHandle );
 				const Weapon& ownerWeapon = _world.GetComponent<Weapon>( ownerEntity );
 				const Rigidbody& ownerRigidbody = _world.GetComponent<Rigidbody>( ownerEntity );
@@ -69,12 +78,12 @@ namespace fan
 					EcsEntity bulletID = _world.GetEntity( node.handle );
 
 					Transform& bulletTransform = _world.GetComponent<Transform>( bulletID );
-					bulletTransform.SetPosition( position );
+					bulletTransform.SetPosition( _position );
 
 					Rigidbody& bulletRigidbody = _world.GetComponent<Rigidbody>( bulletID );
 					bulletRigidbody.onContactStarted.Connect( &CollisionManager::OnBulletContact, &collisionManager );
 					bulletRigidbody.SetIgnoreCollisionCheck( ownerRigidbody, true );
-					bulletRigidbody.SetVelocity( velocity );
+					bulletRigidbody.SetVelocity( _velocity );
 					bulletRigidbody.SetMotionState( _world.GetComponent<MotionState>( bulletID ).motionState );
 					bulletRigidbody.SetCollisionShape( _world.GetComponent<SphereShape>( bulletID ).sphereShape );
 					bulletRigidbody.SetTransform( bulletTransform.transform );

@@ -1,6 +1,7 @@
 #include "ecs/fanEcsSystem.hpp"
 #include "scene/components/fanTransform.hpp"
 #include "scene/components/fanRigidbody.hpp"
+#include "network/components/fanHostPersistentHandle.hpp"
 #include "network/systems/fanHostReplication.hpp"
 #include "network/singletons/fanTime.hpp"
 #include "game/components/fanPlayerInput.hpp"
@@ -19,10 +20,10 @@ namespace fan
 		static EcsSignature GetSignature( const EcsWorld& _world )
 		{
 			return
-				_world.GetSignature<Transform>() |
-				_world.GetSignature<PlayerInput>() |
-				_world.GetSignature<Battery>() |
-				_world.GetSignature<Rigidbody>() |
+				_world.GetSignature<Transform>()	|
+				_world.GetSignature<PlayerInput>()	|
+				_world.GetSignature<Battery>()		|
+				_world.GetSignature<Rigidbody>()	|
 				_world.GetSignature<Weapon>();
 		}
 		static void Run( EcsWorld& _world, const EcsView& _view, const float _delta )
@@ -31,7 +32,6 @@ namespace fan
 
 			const Time& time = _world.GetSingleton<Time>();
 			const Game& game = _world.GetSingleton<Game>();
-			SpawnManager& spawnManager = _world.GetSingleton<SpawnManager>();
 			const LinkingContext& linkingContext = _world.GetSingleton<LinkingContext>();
 
 			auto transformIt = _view.begin<Transform>();
@@ -55,20 +55,20 @@ namespace fan
 					--weapon.bulletsAccumulator;
 					battery.currentEnergy -= weapon.bulletEnergyCost;
 
+					const EcsEntity spaceshipEntity = transformIt.GetEntity();
+					const EcsHandle ownerHandle = _world.GetHandle( spaceshipEntity );
+					const NetID ownerID = linkingContext.EcsHandleToNetID.at( ownerHandle );
+					const btVector3 bulletPosition = transform.GetPosition() + transform.TransformDirection( weapon.originOffset );
+					const btVector3 bulletVelocity = rigidbody.GetVelocity() + weapon.bulletSpeed * transform.Forward();
+					spawn::SpawnBullet::Instanciate( _world, ownerID, bulletPosition, bulletVelocity );
+
 					// Adds bullet to the spawn manager for spawning on hosts
 					if( game.IsServer() )
 					{
-						const EcsHandle ownerHandle = _world.GetHandle( transformIt.GetEntity() );
-						const NetID ownerID = linkingContext.EcsHandleToNetID.at( ownerHandle );
-						const btVector3 bulletPosition = transform.GetPosition() + transform.TransformDirection( weapon.originOffset );
-						const btVector3 bulletVelocity = rigidbody.GetVelocity() + weapon.bulletSpeed * transform.Forward();
-						const SpawnInfo info = spawn::SpawnBullet::GenerateInfo( time.frameIndex + 5, ownerID, bulletPosition, bulletVelocity );
-
-						// spawn on server
-						spawnManager.spawns.push_back( info );
-
 						// spawn on all hosts
-						_world.Run<S_ReplicateOnAllHosts>( ClientRPC::RPCSpawn( info ), HostReplication::ResendUntilReplicated );
+						const EcsHandle hostHandle = _world.GetComponent<HostPersistentHandle>( spaceshipEntity ).handle;
+						const SpawnInfo info = spawn::SpawnBullet::GenerateInfo( time.frameIndex, ownerID, bulletPosition, bulletVelocity );
+						_world.Run<S_ReplicateOnAllHosts>( ClientRPC::RPCSpawn( info ), HostReplication::ResendUntilReplicated, hostHandle );
 					}
 				}
 			}

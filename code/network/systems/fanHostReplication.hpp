@@ -6,7 +6,8 @@
 namespace fan
 {
 	//==============================================================================================================================================================
-	// Sends a replication packet on all hosts
+	// Sends a replication packet on all hosts,
+	// one host can be excluded using the _excludeHandle parameter
 	//==============================================================================================================================================================
 	struct S_ReplicateOnAllHosts : EcsSystem
 	{
@@ -16,13 +17,17 @@ namespace fan
 				_world.GetSignature<HostReplication>();
 		}
 
-		static void Run( EcsWorld& /*_world*/, const EcsView& _view, const PacketReplication& _packet, const HostReplication::ReplicationFlags _flags )
+		static void Run( EcsWorld& _world, const EcsView& _view, const PacketReplication& _packet, const HostReplication::ReplicationFlags _flags, const EcsHandle _excludeHandle = 0 )
 		{
 			auto hostReplicationIt = _view.begin<HostReplication>();
 			for( ; hostReplicationIt != _view.end<HostReplication>(); ++hostReplicationIt )
 			{
-				HostReplication& hostReplication = *hostReplicationIt;
-				hostReplication.Replicate( _packet, _flags );
+				const EcsHandle handle = _world.GetHandle( hostReplicationIt.GetEntity() );
+				if( handle != _excludeHandle )
+				{
+					HostReplication& hostReplication = *hostReplicationIt;
+					hostReplication.Replicate( _packet, _flags );
+				}
 			}
 		}
 	};

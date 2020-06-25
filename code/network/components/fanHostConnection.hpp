@@ -5,6 +5,7 @@
 
 namespace fan
 {
+	struct Time;
 	//==============================================================================================================================================================
 	// [Server]
 	//==============================================================================================================================================================
@@ -15,6 +16,7 @@ namespace fan
 		static void SetInfo( EcsComponentInfo& _info );
 		static void Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component );
 		static void OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component );
+		static FrameIndex CalculatePerfectSpawnTiming( const HostConnection& _connection, const Time& _time );
 
 		enum State
 		{

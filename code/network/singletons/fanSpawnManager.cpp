@@ -61,7 +61,9 @@ namespace fan
 			{
 				if( time.frameIndex > spawnInfo.spawnFrameIndex )
 				{
-					Debug::Warning() << "missed spawning for frame" << spawnInfo.spawnFrameIndex << Debug::Endl();
+
+					Debug::Warning() << "missed spawning for frame" << spawnInfo.spawnFrameIndex;
+					Debug::Get() << " ,delta is " << time.frameIndex - spawnInfo.spawnFrameIndex << Debug::Endl();
 				}
 
 				spawnManager.spawnMethods.at( spawnInfo.spawnID )( _world, spawnInfo.data );
