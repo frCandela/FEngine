@@ -37,6 +37,7 @@ namespace fan
 	{
 		enum Mode{ CLIENT, SERVER};
 
+		std::string windowName = "FEngine";		// sets the name of the application window
 		std::string	loadScene = "";				// loads a scene at startup
 		bool		autoPlay = false;			// auto play the scene loaded at startup
 		bool		enableLivepp = false;		// enables Live++ hot reload

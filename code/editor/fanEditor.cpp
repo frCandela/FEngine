@@ -158,7 +158,7 @@ namespace fan
 		Input::Get().Manager().CreateJoystickButtons( "gamejs_axis_stop", 0, Joystick::A );
 
 		// renderer
-		m_window = new Window( "FEngine", windowSize, windowPosition );
+		m_window = new Window( _settings.windowName.c_str(), windowSize, windowPosition );
 		m_renderer = new Renderer( *m_window );
 
 		Color clearColor;

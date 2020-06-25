@@ -23,6 +23,8 @@ namespace fan
 
 			if( _settings.launchMode == LaunchSettings::SERVER )
 			{
+				_settings.windowName = _settings.windowName + "_server";
+
 				// attaches an editor to a game server and runs it
 				fan::GameServer server( "server" );
 				fan::Editor editor( _settings, server.world );
@@ -34,6 +36,8 @@ namespace fan
 			}
 			else if( _settings.launchMode == LaunchSettings::CLIENT )
 			{
+				_settings.windowName = _settings.windowName + "_client";
+
 				// attaches an editor to a game client and runs it
 				fan::GameClient client( "client" );
 				fan::Editor editor( _settings, client.world );
