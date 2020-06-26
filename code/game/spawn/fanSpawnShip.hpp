@@ -29,6 +29,8 @@ namespace fan
 			//================================================================
 			static SpawnInfo GenerateInfo( const PlayerID _owner, const FrameIndex _spawnFrameIndex, const NetID _spaceshipID, const  btVector3 _position )
 			{
+				assert( _spaceshipID != 0 );
+
 				SpawnInfo info;
 				info.spawnFrameIndex = _spawnFrameIndex;
 				info.spawnID = s_id;
@@ -106,6 +108,14 @@ namespace fan
 					SceneNode& spaceshipNode = *game.spaceshipPrefab->Instanciate( scene.GetRootNode() );
 					EcsEntity spaceshipID = _world.GetEntity( spaceshipNode.handle );
 
+					if( _hasPlayerController )
+					{
+						spaceshipNode.name = "spaceship_player";
+					}
+					else if( _persistentHandle )
+					{
+						spaceshipNode.name = "spaceship" + std::to_string( _persistentHandle );
+					}
 
 					if( _persistentHandle != 0 ) // server only
 					{						

@@ -66,14 +66,16 @@ namespace fan
 							continue;
 						}	
 
-						// replicate
+						// replicate all other ships that are already spawned
 						HostGameData& otherHostData = _world.GetComponent< HostGameData >( _world.GetEntity( otherHostHandle ) );
-						const SpawnInfo otherHostspawnInfo = spawn::SpawnShip::GenerateInfo( otherHostHandle, spawnFrame, otherHostData.spaceshipID, btVector3::Zero() );
-						hostReplication.Replicate(
-							ClientRPC::RPCSpawn( otherHostspawnInfo )
-							, HostReplication::ResendUntilReplicated
-						);
-						
+						if( otherHostData.spaceshipID != 0 )
+						{
+							const SpawnInfo otherHostspawnInfo = spawn::SpawnShip::GenerateInfo( otherHostHandle, spawnFrame, otherHostData.spaceshipID, btVector3::Zero() );
+							hostReplication.Replicate(
+								ClientRPC::RPCSpawn( otherHostspawnInfo )
+								, HostReplication::ResendUntilReplicated
+							);
+						}						
 					}
 
 					// replicates solar eruption spawn

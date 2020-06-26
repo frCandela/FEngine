@@ -250,7 +250,7 @@ namespace fan
 				const HostGameData& hostData = world.GetComponent<HostGameData>( hostID );
 				if( hostData.spaceshipHandle != 0 )
 				{
-					const PacketReplication packet = HostReplication::BuildEntityPacket( world, hostData.spaceshipHandle, { Transform::Info::s_type/*,Rigidbody::s_typeInfo*/ } );
+					const PacketReplication packet = HostReplication::BuildEntityPacket( world, hostData.spaceshipHandle, { Transform::Info::s_type,Rigidbody::Info::s_type } );
 
 					for( const std::pair<HostManager::IPPort, EcsHandle>& otherPair : hostManager.hostHandles )
 					{

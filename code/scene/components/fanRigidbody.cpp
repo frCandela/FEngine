@@ -84,8 +84,10 @@ namespace fan
 	{
 		const Rigidbody& rb = static_cast<const Rigidbody&>( _component );
 		const btVector3 velocity = rb.GetVelocity();
+		const btVector3 angularVelocity = rb.GetAngularVelocity();
 
 		_packet << velocity[0] << velocity[2];
+		_packet << angularVelocity[1];
 	}
 
 	//================================================================================================================================
@@ -94,8 +96,11 @@ namespace fan
 	{
 		Rigidbody& rb = static_cast<Rigidbody&>( _component );
 		btVector3 velocity( 0.f, 0.f, 0.f );
+		btVector3 angularVelocity( 0.f, 0.f, 0.f );
 		_packet >> velocity[0] >> velocity[2];
+		_packet >> angularVelocity[1] ;
 		rb.SetVelocity( velocity );
+		rb.SetAngularVelocity( angularVelocity );
 	}
 
 	//================================================================================================================================
@@ -104,13 +109,9 @@ namespace fan
 	{
 		const Rigidbody&	rb = static_cast<const Rigidbody&>( _component );
 
-		const btVector3		position = rb.GetPosition();
-		const btQuaternion	rotation = rb.GetRotation();
 		const btVector3&	velocity = rb.GetVelocity();
 		const btVector3&	angularVelocity = rb.GetAngularVelocity();
-		_packet << position[0] << position[2];
 		_packet << velocity[0] << velocity[2];
-		_packet << rotation[0] << rotation[1] << rotation[2] << rotation[3];
 		_packet << angularVelocity[1];
 	}
 
@@ -118,19 +119,14 @@ namespace fan
 	//================================================================================================================================	
 	void Rigidbody::RollbackLoad( EcsComponent& _component, sf::Packet& _packet )
 	{
-		btVector3		position( 0, 0, 0 );
-		btQuaternion	rotation = btQuaternion::getIdentity();
 		btVector3		velocity( 0, 0, 0 );
 		btVector3		angularVelocity( 0, 0, 0 );
 
-		_packet >> position[0] >> position[2];
 		_packet >> velocity[0] >> velocity[2];
-		_packet >> rotation[0] >> rotation[1] >> rotation[2] >> rotation[3];
 		_packet >> angularVelocity[1];
 
 		Rigidbody& rb = static_cast<Rigidbody&>( _component );
 		rb.ClearForces();
-		rb.SetTransform( btTransform( rotation, position ) );
 		rb.SetVelocity( velocity );
 		rb.SetAngularVelocity( angularVelocity );
 	}
@@ -340,6 +336,18 @@ namespace fan
 			{
 				rb.SetVelocity( velocity );
 			}
+
+			// Angular velocity
+			if( ImGui::Button( "##AngularVelocity" ) )
+			{
+				rb.SetAngularVelocity( btVector3( 0, 0, 0 ) );
+			} ImGui::SameLine();
+			btVector3 angularVelocity = rb.GetAngularVelocity();
+			if( ImGui::DragFloat3( "angular velocity", &angularVelocity[0], 1.f, -1000.f, 1000.f ) )
+			{
+				rb.SetAngularVelocity( angularVelocity );
+			}
+
 		} ImGui::PopItemWidth();
 	}
 }
