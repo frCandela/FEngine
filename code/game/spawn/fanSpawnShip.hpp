@@ -5,6 +5,7 @@
 #include "network/components/fanHostGameData.hpp"
 #include "network/components/fanClientRollback.hpp"
 #include "network/components/fanHostPersistentHandle.hpp"
+#include "network/components/fanEntityReplication.hpp"
 #include "scene/components/fanTransform.hpp"
 #include "scene/components/fanRigidbody.hpp"
 #include "scene/components/fanMotionState.hpp"
@@ -120,6 +121,9 @@ namespace fan
 					if( _persistentHandle != 0 ) // server only
 					{						
 						_world.AddComponent<HostPersistentHandle>( spaceshipID ).handle = _persistentHandle;
+						EntityReplication& entityReplication = _world.AddComponent<EntityReplication>( spaceshipID );
+						entityReplication.componentTypes = { Transform::Info::s_type, Rigidbody::Info::s_type };
+						entityReplication.exclude = _persistentHandle;
 					}
 
 					if( _hasPlayerInput )

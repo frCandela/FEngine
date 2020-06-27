@@ -43,6 +43,7 @@
 #include "network/components/fanHostReplication.hpp"
 #include "network/components/fanReliabilityLayer.hpp"
 #include "network/components/fanHostPersistentHandle.hpp"
+#include "network/components/fanEntityReplication.hpp"
 #include "network/systems/fanServerUpdates.hpp"
 #include "network/systems/fanServerSendReceive.hpp"
 #include "network/systems/fanTimeout.hpp"
@@ -118,6 +119,7 @@ namespace fan
 		world.AddComponentType<HostReplication>();
 		world.AddComponentType<ReliabilityLayer>();
 		world.AddComponentType<HostPersistentHandle>();
+		world.AddComponentType<EntityReplication>();
 
 		// base singleton components
 		world.AddSingletonType<Scene>();
@@ -241,29 +243,7 @@ namespace fan
 			}
 
 			world.Run<S_HostSaveState>( _delta );
-
-			HostManager& hostManager = world.GetSingleton<HostManager>();
-			for( const std::pair<HostManager::IPPort, EcsHandle>& pair : hostManager.hostHandles )
-			{
-				const EcsHandle hostHandle = pair.second;
-				const EcsEntity hostID = world.GetEntity( hostHandle );
-				const HostGameData& hostData = world.GetComponent<HostGameData>( hostID );
-				if( hostData.spaceshipHandle != 0 )
-				{
-					const PacketReplication packet = HostReplication::BuildEntityPacket( world, hostData.spaceshipHandle, { Transform::Info::s_type,Rigidbody::Info::s_type } );
-
-					for( const std::pair<HostManager::IPPort, EcsHandle>& otherPair : hostManager.hostHandles )
-					{
-						const EcsHandle otherHostHandle = otherPair.second;
-						if( otherHostHandle != hostHandle )
-						{
-							const EcsEntity otherHostID = world.GetEntity( otherHostHandle );
-							HostReplication& hostReplication = world.GetComponent<HostReplication>( otherHostID );
-							hostReplication.Replicate( packet, HostReplication::None );
-						}
-					}
-				}
-			}
+			world.Run<S_UpdateReplication>();
 			world.Run<S_ServerSend>( _delta );
 		}
 	}
