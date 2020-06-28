@@ -35,6 +35,7 @@ if(MSVC)
   endif()
 endif()
 
+set( CMAKE_PDB_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin )
 set( COMPILATION_FLAGS /W4 /WX  )
 set( MIDDLEWARE_COMPILATION_FLAGS /W0 )
 add_compile_options( /FUNCTIONPADMIN )
