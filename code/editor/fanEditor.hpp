@@ -35,43 +35,45 @@ namespace fan
 	//================================================================================================================================
 	struct LaunchSettings
 	{
-		enum Mode{ CLIENT, SERVER};
+		enum Mode{ Client, Server, ClientServer };
 
 		std::string windowName = "FEngine";		// sets the name of the application window
 		std::string	loadScene = "";				// loads a scene at startup
 		bool		autoPlay = false;			// auto play the scene loaded at startup
 		bool		enableLivepp = false;		// enables Live++ hot reload
 		bool		mainLoopSleep = false;		// enables sleeping instead of busy waiting in the main loop ( causes frame drops )
-		Mode		launchMode = CLIENT;		// launch as server or client
+		Mode		launchMode = ClientServer;	// launch as server or client
 		glm::ivec2  window_position = {-1,-1};	// forces the position of the window
 		glm::ivec2  window_size = { -1,-1 };	// forces the size of the window
 	};
 
 	//================================================================================================================================
 	// base class that contains everything
-	// contains a game, a renderer, editions windows/ui and an editor ecs world (@wip)
+	// contains a game, a renderer, editions windows/ui and references on EcsWorld
+	// One EcsWorld is and instance of the game, there can be multiple EcsWorlds for client and server to run in the same process
+	// The m_currentWorld variable is the index of the world that is currently edited
 	//================================================================================================================================	
 	class Editor
 	{
 	public:
 		Signal <> onLPPSynch;
 
-		Editor( const LaunchSettings _settings, EcsWorld& _gameWorld );
+		Editor( const LaunchSettings _settings, std::vector<EcsWorld*>  _gameWorlds );
 		~Editor();
 
 		void Run();
 		void Exit();
 			   
 	private:		
-		EcsWorld& m_world;		
 		Renderer* m_renderer;
 		Window*   m_window;
+		std::vector<EcsWorld*> m_worlds; 
+		int m_currentWorld = 0;
 
 		const LaunchSettings m_launchSettings;
 
 		// UI elements
 		MainMenuBar* m_mainMenuBar;
-
 		PreferencesWindow* m_preferencesWindow;
 		SingletonsWindow* m_singletonsWindow;
 		InspectorWindow* m_inspectorWindow;
@@ -86,20 +88,31 @@ namespace fan
 		bool m_applicationShouldExit;
 		bool m_showUI = true;
 
-		void UpdateRenderWorld();
-		void SwitchPlayStop();
-		void UseEditorCamera();
-		void UseGameCamera();
+		EcsWorld& GetCurrentWorld() { return *m_worlds[ m_currentWorld ]; }
+		
+		
+		static void UseEditorCamera( EcsWorld& _world );
+		static void UseGameCamera( EcsWorld& _world );
 
-		void GameStart();
-		void GameStop();
-		void GamePause();
-		void GameResume();
-		void GameStep( const float _delta );
+		void OnCurrentGameSwitchPlayStop();
+		void OnCurrentGameStart() { GameStart( GetCurrentWorld() ); }
+		void OnCurrentGameStop() { GameStop( GetCurrentWorld() ); }
+		void OnCurrentGamePause() { GamePause( GetCurrentWorld() ); }
+		void OnCurrentGameResume() { GameResume( GetCurrentWorld() ); }
+		void OnCurrentGameStep( const float _delta ) { GameStep( GetCurrentWorld(), _delta ); }
+		void OnCurrentGameStep();
+		void OnCurrentGameToogleCamera();
+
+		static void GameStart( EcsWorld& _world );
+		static void GameStop( EcsWorld& _world );
+		static void GamePause( EcsWorld& _world );
+		static void GameResume( EcsWorld& _world );
+		static void GameStep( EcsWorld& _world, const float _delta );		
+		static void UpdateRenderWorld( Renderer& _renderer, EcsWorld& _world, const glm::vec2 _size );
 
 		void OnSceneLoad( Scene& _scene );
 		void OnToogleShowUI() { m_showUI = !m_showUI; }
-		void OnToogleCamera();
-		void OnEditorStep();
+		
+		
 	};
 }

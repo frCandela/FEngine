@@ -31,6 +31,7 @@ namespace fan
 		gameTime.logicDelta = 1.f / 60.f;
 		gameTime.timeScaleDelta = 0.f;
 		gameTime.timeScaleIncrement = gameTime.logicDelta / 20.f; // it takes 20 frames to time scale one frame ( 5% faster/slower )
+		gameTime.lastLogicTime = 0.;
 	}
 
 	//================================================================================================================================

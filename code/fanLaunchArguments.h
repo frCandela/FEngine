@@ -32,6 +32,7 @@ namespace fan
 		static bool CMD_AutoPlay( const std::vector < std::string >& _args, LaunchSettings& _settings );
 		static bool CMD_RunClient( const std::vector < std::string >& _args, LaunchSettings& _settings );
 		static bool CMD_RunServer( const std::vector < std::string >& _args, LaunchSettings& _settings );
+		static bool CMD_RunClientServer( const std::vector < std::string >& _args, LaunchSettings& _settings );
 		static bool CMD_MainLoopSleep( const std::vector < std::string >& _args, LaunchSettings& _settings );
 	};
 
@@ -46,6 +47,7 @@ namespace fan
 			{ &LaunchArguments::CMD_AutoPlay,		"-autoplay",		"usage: -autoplay <0-1>" },
 			{ &LaunchArguments::CMD_RunClient,		"-client",			"usage: -client" },
 			{ &LaunchArguments::CMD_RunServer,		"-server",			"usage: -server" },
+			{ &LaunchArguments::CMD_RunClientServer,"-client_server",	"usage: -client_server" },
 			{ &LaunchArguments::CMD_MainLoopSleep,	"-main_loop_sleep", "usage: -main_loop_sleep <0-1>" },
 		} )
 	{}
@@ -185,7 +187,7 @@ namespace fan
 	{
 		if( _args.size() != 0 ) { return false; }
 
-		_settings.launchMode = LaunchSettings::CLIENT;
+		_settings.launchMode = LaunchSettings::Client;
 
 		std::cout << "cmd : launch client" << std::endl;
 		return true;
@@ -199,9 +201,23 @@ namespace fan
 	{
 		if( _args.size() != 0 ) { return false; }
 
-		_settings.launchMode = LaunchSettings::SERVER;
+		_settings.launchMode = LaunchSettings::Server;
 
 		std::cout << "cmd : launch server" << std::endl;
+		return true;
+	}
+
+	//==============================================================================================================================================================
+	// command: -client_server"
+	// runs two instances of the game in client and server mode
+	//==============================================================================================================================================================
+	bool LaunchArguments::CMD_RunClientServer( const std::vector < std::string >& _args, LaunchSettings& _settings )
+	{
+		if( _args.size() != 0 ) { return false; }
+
+		_settings.launchMode = LaunchSettings::ClientServer;
+
+		std::cout << "cmd : launch client_server" << std::endl;
 		return true;
 	}
 

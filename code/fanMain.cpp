@@ -21,26 +21,40 @@ namespace fan
 				lpp::lppEnableAllCallingModulesSync( livePP );
 			}
 
-			if( _settings.launchMode == LaunchSettings::SERVER )
+			if( _settings.launchMode == LaunchSettings::Server )
 			{
 				_settings.windowName = _settings.windowName + "_server";
 
 				// attaches an editor to a game server and runs it
 				fan::GameServer server( "server" );
-				fan::Editor editor( _settings, server.world );
+				fan::Editor editor( _settings, { &server.world } );
 				if( _settings.enableLivepp )
 				{
 					editor.onLPPSynch.Connect( &LPPMain::OnSync, this );
 				}
 				editor.Run();				
 			}
-			else if( _settings.launchMode == LaunchSettings::CLIENT )
+			else if( _settings.launchMode == LaunchSettings::Client )
 			{
 				_settings.windowName = _settings.windowName + "_client";
 
 				// attaches an editor to a game client and runs it
 				fan::GameClient client( "client" );
-				fan::Editor editor( _settings, client.world );
+				fan::Editor editor( _settings, { &client.world } );
+				if( _settings.enableLivepp )
+				{
+					editor.onLPPSynch.Connect( &LPPMain::OnSync, this );
+				}
+				editor.Run();
+			}
+			else if( _settings.launchMode == LaunchSettings::ClientServer )
+			{
+				_settings.windowName = _settings.windowName + "_clientServer";
+
+				// attaches an editor to a game client and runs it
+				fan::GameClient client( "client" );
+				fan::GameServer server( "server" );
+				fan::Editor editor( _settings, { &client.world, &server.world } );
 				if( _settings.enableLivepp )
 				{
 					editor.onLPPSynch.Connect( &LPPMain::OnSync, this );

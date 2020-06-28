@@ -28,7 +28,8 @@ namespace fan
 		float		logicDelta;			// time between two frames in seconds
 		float		timeScaleDelta;		// (seconds) accelerate, decelerates the logic frame rate to resync frame index with server
 		float		timeScaleIncrement; // the maximum amount that can be added to each frame
-		
+		double		lastLogicTime;		// last time the logic step was called
+
 		static const int	s_maxFrameDeltaBeforeShift = 20; // if the server/client frame delta > this, shift frameIndex. Otherwise use timescale
 		static float		s_renderDelta;
 		static float		s_logicDelta;
