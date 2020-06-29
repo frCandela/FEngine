@@ -8,6 +8,7 @@ WARNINGS_POP()
 #include "ecs/fanEcsWorld.hpp"
 #include "game/fanGameClient.hpp"
 #include "game/fanGameServer.hpp"
+#include "editor/fanLaunchSettings.hpp"
 
 namespace fan
 {
@@ -31,23 +32,6 @@ namespace fan
 	struct Scene;
 
 	//================================================================================================================================
-	// the launch parameters of the engine
-	//================================================================================================================================
-	struct LaunchSettings
-	{
-		enum Mode{ Client, Server, ClientServer };
-
-		std::string windowName = "FEngine";		// sets the name of the application window
-		std::string	loadScene = "";				// loads a scene at startup
-		bool		autoPlay = false;			// auto play the scene loaded at startup
-		bool		enableLivepp = false;		// enables Live++ hot reload
-		bool		mainLoopSleep = false;		// enables sleeping instead of busy waiting in the main loop ( causes frame drops )
-		Mode		launchMode = ClientServer;	// launch as server or client
-		glm::ivec2  window_position = {-1,-1};	// forces the position of the window
-		glm::ivec2  window_size = { -1,-1 };	// forces the size of the window
-	};
-
-	//================================================================================================================================
 	// base class that contains everything
 	// contains a game, a renderer, editions windows/ui and references on EcsWorld
 	// One EcsWorld is and instance of the game, there can be multiple EcsWorlds for client and server to run in the same process
@@ -63,13 +47,14 @@ namespace fan
 
 		void Run();
 		void Exit();
+		void Step();
 			   
 	private:		
 		Renderer* m_renderer;
 		Window*   m_window;
 		std::vector<EcsWorld*> m_worlds; 
 		int m_currentWorld = 0;
-
+		double m_lastRenderTime = 0.;
 		const LaunchSettings m_launchSettings;
 
 		// UI elements
@@ -94,6 +79,7 @@ namespace fan
 		static void UseEditorCamera( EcsWorld& _world );
 		static void UseGameCamera( EcsWorld& _world );
 
+		void OnCycleCurrentGame();
 		void OnCurrentGameSwitchPlayStop();
 		void OnCurrentGameStart() { GameStart( GetCurrentWorld() ); }
 		void OnCurrentGameStop() { GameStop( GetCurrentWorld() ); }
@@ -102,6 +88,11 @@ namespace fan
 		void OnCurrentGameStep( const float _delta ) { GameStep( GetCurrentWorld(), _delta ); }
 		void OnCurrentGameStep();
 		void OnCurrentGameToogleCamera();
+		void OnCurrentGameOpen();
+		void OnCurrentGameReload();
+		void OnCurrentGameSave();
+		void OnCurrentGameCopy();
+		void OnCurrentGamePaste();
 
 		static void GameStart( EcsWorld& _world );
 		static void GameStop( EcsWorld& _world );

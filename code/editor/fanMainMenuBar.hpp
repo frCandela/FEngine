@@ -34,14 +34,12 @@ namespace fan
 		Signal<> onReloadIcons;
 		Signal<> onExit;
 
-		MainMenuBar( EcsWorld& _world );
+		MainMenuBar();
 		~MainMenuBar();
-
-		void SetGrid( EditorGrid* _editorGrid ) { m_editorGrid = _editorGrid; }
 
 		void SetWindows( std::vector< EditorWindow* > _editorWindows );
 
-		void Draw();
+		void Draw( EcsWorld& _world );
 
 		bool ShowHull() const { return m_showHull; }
 		bool ShowAABB() const { return m_showAABB; }
@@ -49,11 +47,10 @@ namespace fan
 		bool ShowNormals() const { return m_showNormals; }
 		bool ShowLights() const { return m_showLights; }
 
+		void Open( EcsWorld& _world );
+		void Reload( EcsWorld& _world );
+		void Save( EcsWorld& _world );
 	private:
-		EcsWorld* m_world;
-		EditorGrid* m_editorGrid;
-		EditorSelection& m_editorSelection;
-
 		std::vector< EditorWindow* > m_editorWindows;
 
 		bool m_showImguiDemoWindow;
@@ -73,11 +70,9 @@ namespace fan
 		std::filesystem::path m_pathBuffer;
 		std::set < std::string > m_sceneExtensionFilter;
 
-		void DrawModals();
-		void New();
-		void Open();
-		void Reload();
-		void Save();
+		void DrawModals( EcsWorld& _world );
+		void New( EcsWorld& _world );
+
 		void SaveAs();
 	};
 }

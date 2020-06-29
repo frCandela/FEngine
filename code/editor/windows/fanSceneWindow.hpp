@@ -17,29 +17,26 @@ namespace fan
 	public:
 		Signal< SceneNode* > onSelectSceneNode;
 
-		SceneWindow( Scene& _scene );
+		SceneWindow();
 		~SceneWindow();
 
 		// Callbacks
 		void OnExpandHierarchy( Scene& /*_scene*/ ) { m_expandSceneHierarchy = true; }
 
 	protected:
-		void OnGui() override;
+		void OnGui( EcsWorld& _world ) override;
 
 	private:
-		Scene* m_scene;
-
-
 		std::filesystem::path m_pathBuffer;
 		char m_textBuffer[ 32 ];
 		SceneNode* m_lastSceneNodeRightClicked = nullptr;
 		bool m_expandSceneHierarchy = false;
 
-		void NewGameobjectModal();
+		void NewGameobjectModal( EcsWorld& _world );
 		void RenameGameobjectModal();
 		void ExportPrefabModal();
 		void ImportPrefabModal();
-		void PopupRightClick();
+		void PopupRightClick( EcsWorld& _world );
 
 		void R_DrawSceneTree( SceneNode& _node, SceneNode*& _nodeRightClicked );
 	};

@@ -22,24 +22,16 @@ namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	MainMenuBar::MainMenuBar( EcsWorld& _world )
-		: m_editorSelection( _world.GetSingleton<EditorSelection>() )
-		, m_showImguiDemoWindow( true )
+	MainMenuBar::MainMenuBar() 
+		: m_showImguiDemoWindow( true )
 		, m_showAABB( false )
 		, m_showHull( false )
 		, m_showWireframe( false )
 		, m_showNormals( false )
 		, m_showLights( false )
 		, m_sceneExtensionFilter( RenderGlobal::s_sceneExtensions )
-		, m_world( &_world )
 	{
-
 		SerializedValues::Get().GetBool( "show_imguidemo", m_showImguiDemoWindow );
-
-		Input::Get().Manager().FindEvent( "open_scene" )->Connect( &MainMenuBar::Open, this );
-		Input::Get().Manager().FindEvent( "save_scene" )->Connect( &MainMenuBar::Save, this );
-		Input::Get().Manager().FindEvent( "reload_scene" )->Connect( &MainMenuBar::Reload, this );
-		Input::Get().Manager().FindEvent( "reload_icons" )->Connect( &Signal<>::Emmit, &this->onReloadIcons );
 	}
 
 	//================================================================================================================================
@@ -47,18 +39,18 @@ namespace fan
 	MainMenuBar::~MainMenuBar()
 	{
 		SerializedValues::Get().SetBool( "show_imguidemo", m_showImguiDemoWindow );
-		SerializedValues::Get().SetBool( "editor_grid_show", m_editorGrid->isVisible );
-		SerializedValues::Get().SetFloat( "editor_grid_spacing", m_editorGrid->spacing );
-		SerializedValues::Get().SetInt( "editor_grid_linesCount", m_editorGrid->linesCount );
-		SerializedValues::Get().SetColor( "editor_grid_color", m_editorGrid->color );
-		SerializedValues::Get().SetVec3( "editor_grid_offset", m_editorGrid->offset );
+
+		// @todo fix this
+// 		SerializedValues::Get().SetBool( "editor_grid_show", m_editorGrid->isVisible );
+// 		SerializedValues::Get().SetFloat( "editor_grid_spacing", m_editorGrid->spacing );
+// 		SerializedValues::Get().SetInt( "editor_grid_linesCount", m_editorGrid->linesCount );
+// 		SerializedValues::Get().SetColor( "editor_grid_color", m_editorGrid->color );
+// 		SerializedValues::Get().SetVec3( "editor_grid_offset", m_editorGrid->offset );
 
 		for ( int windowIndex = 0; windowIndex < m_editorWindows.size(); windowIndex++ )
 		{
 			delete m_editorWindows[ windowIndex ];
 		}
-
-
 	}
 
 	//================================================================================================================================
@@ -72,10 +64,9 @@ namespace fan
 	//================================================================================================================================
 	// Draws the main menu bar and the editor windows
 	//================================================================================================================================
-	void MainMenuBar::Draw()
+	void MainMenuBar::Draw( EcsWorld& _world )
 	{
 		SCOPED_PROFILE( main_bar );
-
 
 		ImGuiViewport* viewport = ImGui::GetMainViewport();
 		ImGui::SetNextWindowPos( viewport->Pos );
@@ -83,7 +74,7 @@ namespace fan
 
 		ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
 
-		//fillscreen
+		// fullscreen
 		{
 			ImGui::SetNextWindowPos( viewport->Pos );
 			ImGui::SetNextWindowSize( viewport->Size );
@@ -106,7 +97,7 @@ namespace fan
 		// Draw editor windows
 		for ( int windowIndex = 0; windowIndex < m_editorWindows.size(); windowIndex++ )
 		{
-			m_editorWindows[ windowIndex ]->Draw();
+			m_editorWindows[ windowIndex ]->Draw( _world );
 		}
 
 		// Draw imgui demo
@@ -123,19 +114,19 @@ namespace fan
 			{
 				if ( ImGui::MenuItem( "New" ) )
 				{
-					New();
+					New( _world );
 				}
 				if ( ImGui::MenuItem( "Open", "Ctrl+O" ) )
 				{
-					Open();
+					Open( _world );
 				}
 				if ( ImGui::MenuItem( "Reload", "Ctrl+R" ) )
 				{
-					Reload();
+					Reload( _world );
 				}
 				if ( ImGui::MenuItem( "Save", "Ctrl+S" ) )
 				{
-					Save();
+					Save( _world );
 				}
 				if ( ImGui::MenuItem( "Save as" ) )
 				{
@@ -199,11 +190,12 @@ namespace fan
 			if ( ImGui::BeginMenu( "Grid" ) )
 			{
 				ImGui::PushItemWidth( 150.f );
-				ImGui::MenuItem( "visible", nullptr, &m_editorGrid->isVisible );
-				ImGui::DragFloat( "spacing", &m_editorGrid->spacing, 0.25f, 0.f, 100.f );
-				ImGui::DragInt( "lines count", &m_editorGrid->linesCount, 1.f, 0, 1000 );
-				ImGui::ColorEdit3( "color", &m_editorGrid->color[ 0 ], ImGui::fanColorEditFlags );
-				ImGui::DragFloat3( "offset", &m_editorGrid->offset[ 0 ] );
+				ImGui::Text( "fixme" );
+// 				ImGui::MenuItem( "visible", nullptr, &m_editorGrid->isVisible ); // @todo fixme
+// 				ImGui::DragFloat( "spacing", &m_editorGrid->spacing, 0.25f, 0.f, 100.f );
+// 				ImGui::DragInt( "lines count", &m_editorGrid->linesCount, 1.f, 0, 1000 );
+// 				ImGui::ColorEdit3( "color", &m_editorGrid->color[ 0 ], ImGui::fanColorEditFlags );
+// 				ImGui::DragFloat3( "offset", &m_editorGrid->offset[ 0 ] );
 				ImGui::PopItemWidth();
 
 				ImGui::EndMenu();
@@ -222,7 +214,7 @@ namespace fan
 			// Framerate set popup
 			if ( ImGui::BeginPopup( "main_menu_bar_set_fps" ) )
 			{
-				Time& time = m_world->GetSingleton<Time>();
+				Time& time = _world.GetSingleton<Time>();
 
 				ImGui::PushItemWidth( 80.f );
 				float maxFps = 1.f / Time::s_renderDelta;
@@ -268,15 +260,14 @@ namespace fan
 			ImGui::OpenPopup( "Save scene" );
 		}
 
-		DrawModals();
-
+		DrawModals( _world );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void MainMenuBar::DrawModals()
+	void MainMenuBar::DrawModals( EcsWorld& _world )
 	{
-		Scene& scene = m_world->GetSingleton<Scene>();
+		Scene& scene = _world.GetSingleton<Scene>();
 
 		// New scene
 		if ( ImGui::FanSaveFileModal( "New scene", RenderGlobal::s_sceneExtensions, m_pathBuffer ) )
@@ -303,9 +294,9 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void MainMenuBar::New()
+	void MainMenuBar::New( EcsWorld& _world )
 	{
-		Game& game = m_world->GetSingleton<Game>();
+		Game& game = _world.GetSingleton<Game>();
 		if( game.state != Game::STOPPED )
 		{
 			Debug::Warning() << "creating scenes is disabled in play mode" << Debug::Endl();
@@ -318,9 +309,9 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void MainMenuBar::Open()
+	void MainMenuBar::Open( EcsWorld& _world )
 	{
-		Game& game = m_world->GetSingleton<Game>();
+		Game& game = _world.GetSingleton<Game>();
 		if( game.state != Game::STOPPED )
 		{
 			Debug::Warning() << "loading scenes is disabled in play mode" << Debug::Endl();
@@ -334,10 +325,10 @@ namespace fan
 	//================================================================================================================================
 	// reload the scene
 	//================================================================================================================================
-	void MainMenuBar::Reload()
+	void MainMenuBar::Reload( EcsWorld& _world )
 	{
-		Game& game = m_world->GetSingleton<Game>();
-		Scene& scene = m_world->GetSingleton<Scene>();
+		Game& game = _world.GetSingleton<Game>();
+		Scene& scene = _world.GetSingleton<Scene>();
 
 		if( scene.path.empty() )
 		{
@@ -347,26 +338,28 @@ namespace fan
 
 		if( game.state == Game::STOPPED )
 		{
+			EditorSelection& editorSelection = _world.GetSingleton<EditorSelection>();
+
 			// save old camera transform
-			const EcsEntity oldCameraID = m_world->GetEntity( scene.mainCameraHandle );
-			btTransform oldCameraTransform = m_world->GetComponent<Transform>( oldCameraID ).transform;
+			const EcsEntity oldCameraID = _world.GetEntity( scene.mainCameraHandle );
+			btTransform oldCameraTransform = _world.GetComponent<Transform>( oldCameraID ).transform;
 
 			// save old selection
-			SceneNode* prevSelectionNode = m_editorSelection.GetSelectedSceneNode();
+			SceneNode* prevSelectionNode = editorSelection.GetSelectedSceneNode();
 			const EcsHandle prevSelectionHandle= prevSelectionNode != nullptr ? prevSelectionNode->handle : 0;
 
 			Debug::Get() << Debug::Severity::log << "loading scene: " << scene.path << Debug::Endl();
 			scene.LoadFrom( scene.path );
 
 			// restore camera
-			const EcsEntity newCameraID = m_world->GetEntity( scene.mainCameraHandle );
-			m_world->GetComponent<Transform>( newCameraID ).transform = oldCameraTransform;
+			const EcsEntity newCameraID = _world.GetEntity( scene.mainCameraHandle );
+			_world.GetComponent<Transform>( newCameraID ).transform = oldCameraTransform;
 
 			// restore selection
 			if( prevSelectionHandle != 0 && scene.nodes.find(prevSelectionHandle) != scene.nodes.end() )
 			{
-				fan::SceneNode& node = m_world->GetComponent<fan::SceneNode>( m_world->GetEntity( prevSelectionHandle ) );
-				m_editorSelection.SetSelectedSceneNode( &node );				
+				fan::SceneNode& node = _world.GetComponent<fan::SceneNode>( _world.GetEntity( prevSelectionHandle ) );
+				editorSelection.SetSelectedSceneNode( &node );				
 			}
 		}
 		else
@@ -377,10 +370,10 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void MainMenuBar::Save()
+	void MainMenuBar::Save( EcsWorld& _world )
 	{
-		Game& game = m_world->GetSingleton<Game>();
-		Scene& scene = m_world->GetSingleton<Scene>();
+		Game& game = _world.GetSingleton<Game>();
+		Scene& scene = _world.GetSingleton<Scene>();
 
 		if( game.state != Game::STOPPED )
 		{

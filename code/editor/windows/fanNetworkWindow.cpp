@@ -11,18 +11,15 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	NetworkWindow::NetworkWindow( EcsWorld& _world )
+	NetworkWindow::NetworkWindow()
 		: EditorWindow( "network", ImGui::IconType::NETWORK16 )
-		, m_world( &_world )
-	{
-
-	}
+	{}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void NetworkWindow::OnGui()
+	void NetworkWindow::OnGui( EcsWorld& _world )
 	{
-		Game& game = m_world->GetSingleton<Game>();
+		Game& game = _world.GetSingleton<Game>();
 		if( game.gameClient != nullptr )
 		{
 			OnGuiClient( *game.gameClient ); 

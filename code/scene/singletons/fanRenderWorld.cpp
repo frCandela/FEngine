@@ -1,4 +1,5 @@
 #include "scene/singletons/fanRenderWorld.hpp"
+#include "editor/fanModals.hpp"
 
 namespace fan
 {
@@ -28,6 +29,7 @@ namespace fan
 		renderWorld.particlesMesh.SetHostVisible( true );
 		renderWorld.particlesMesh.SetOptimizeVertices( false );
 		renderWorld.particlesMesh.SetAutoUpdateHull( false );
+		renderWorld.isHeadless = false;
 	}
 
 	//================================================================================================================================
@@ -44,6 +46,11 @@ namespace fan
 			ImGui::Text( "directionalLights:  %d", renderWorld.directionalLights.size() );
 			ImGui::Text( "particles vertices: %d", renderWorld.particlesMesh.GetVertices().size() );
 			ImGui::Text( "target size:        %d x %d", (int)renderWorld.targetSize.x, (int)renderWorld.targetSize.y );
+
+
+			ImGui::PushReadOnly();
+			ImGui::Checkbox( "is headless",&renderWorld.isHeadless );
+			ImGui::PopReadOnly();
 		}
 		ImGui::Unindent(); ImGui::Unindent();
 	}

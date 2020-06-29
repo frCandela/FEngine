@@ -10,18 +10,27 @@ namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	GameViewWindow::GameViewWindow( EcsWorld& _world ) : EditorWindow( "game view", ImGui::IconType::JOYSTICK16 )
-		, m_world( &_world )
-		,m_isHovered( false )
+	GameViewWindow::GameViewWindow( const LaunchSettings::Mode _launchMode )
+		: EditorWindow( "game view", ImGui::IconType::JOYSTICK16 )
+		, m_isHovered( false )
 	{
 		AddFlag( ImGuiWindowFlags_MenuBar );
+
+		// compute game world str for
+		switch( _launchMode )
+		{
+		case LaunchSettings::Client:		memcpy( m_gameWorldsStr, "client\0\0", 8 );			break;
+		case LaunchSettings::Server:		memcpy( m_gameWorldsStr, "server\0\0", 8 );			break;
+		case LaunchSettings::ClientServer:	memcpy( m_gameWorldsStr, "client\0server\0\0,", 16 );	break;
+		default: assert( false ); break;
+		}
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void GameViewWindow::OnGui()
+	void GameViewWindow::OnGui( EcsWorld& _world )
 	{
-		Game& game = m_world->GetSingleton<Game>();
+		Game& game = _world.GetSingleton<Game>();
 
 		// update window size
 		const ImVec2 imGuiSize = ImGui::GetContentRegionAvail();
@@ -75,6 +84,11 @@ namespace fan
 			{
 				onStep.Emmit();
 			}
+
+			// combo current world			
+			ImGui::Spacing();
+			ImGui::SetNextItemWidth( 200.f );
+			ImGui::Combo( "##current game", &m_currentGameSelected, m_gameWorldsStr );
 
 			ImGui::EndMenuBar();
 		}

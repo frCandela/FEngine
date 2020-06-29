@@ -22,9 +22,9 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void RenderWindow::OnGui()
+	void RenderWindow::OnGui( EcsWorld& /*_world*/ )
 	{
-		SCOPED_PROFILE( render )
+		SCOPED_PROFILE( render );
 
 		ImGui::Icon( GetIconType(), { 16,16 } ); ImGui::SameLine();
 		ImGui::Text( "Renderer" );

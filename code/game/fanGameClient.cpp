@@ -289,14 +289,18 @@ namespace fan
 			world.Run<S_PlayerDeath>(			 _delta );
 
 			// late update
-			world.Run<S_ParticlesOcclusion>(		_delta );
-			world.Run<S_UpdateParticles>(			_delta );
-			world.Run<S_EmitParticles>(				_delta );
-			world.Run<S_GenerateParticles>(			_delta );
-			world.Run<S_UpdateBoundsFromRigidbody>(	_delta );
-			world.Run<S_UpdateBoundsFromModel>();
-			world.Run<S_UpdateBoundsFromTransform>();
-			world.Run<S_UpdateGameCamera>(			_delta );
+			const RenderWorld& renderWorld = world.GetSingleton<RenderWorld>();
+			if( !renderWorld.isHeadless )
+			{
+				world.Run<S_ParticlesOcclusion>( _delta );
+				world.Run<S_UpdateParticles>( _delta );
+				world.Run<S_EmitParticles>( _delta );
+				world.Run<S_GenerateParticles>( _delta );
+				world.Run<S_UpdateBoundsFromRigidbody>( _delta );
+				world.Run<S_UpdateBoundsFromModel>();
+				world.Run<S_UpdateBoundsFromTransform>();
+				world.Run<S_UpdateGameCamera>( _delta );
+			}
 
 			world.Run<S_ClientSaveState>(	_delta );
 			world.Run<S_RollbackStateSave>( _delta );

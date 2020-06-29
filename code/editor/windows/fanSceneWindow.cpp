@@ -30,9 +30,7 @@ namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	SceneWindow::SceneWindow( Scene& _scene ) :
-		EditorWindow( "scene", ImGui::IconType::SCENE16 )
-		, m_scene( &_scene )
+	SceneWindow::SceneWindow() : EditorWindow( "scene", ImGui::IconType::SCENE16 )
 	{
 		m_textBuffer[0] = '\0';
 	}
@@ -43,17 +41,19 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void SceneWindow::OnGui()
+	void SceneWindow::OnGui( EcsWorld& _world )
 	{
-		SCOPED_PROFILE( scene );
+		//SCOPED_PROFILE( scene );
+
+		Scene& scene = _world.GetSingleton<Scene>();
 
 		ImGui::Icon( GetIconType(), { 16,16 } ); ImGui::SameLine();
-		ImGui::Text( m_scene->path.c_str() );
+		ImGui::Text( scene.path.c_str() );
  		ImGui::Separator();
 
 		// Draws all scene nodes
 		SceneNode* nodeRightClicked = nullptr;
-		R_DrawSceneTree( m_scene->GetRootNode(), nodeRightClicked );
+		R_DrawSceneTree( scene.GetRootNode(), nodeRightClicked );
 
  		m_expandSceneHierarchy = false;
  
@@ -63,12 +63,12 @@ namespace fan
 			m_lastSceneNodeRightClicked = nodeRightClicked;
  		}
  
-		PopupRightClick();
+		PopupRightClick( _world );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void SceneWindow::PopupRightClick()
+	void SceneWindow::PopupRightClick( EcsWorld& _world )
 	{
 		// Popup set gameobject when right click
 		bool newNodePopup = false;
@@ -215,7 +215,7 @@ namespace fan
 			ImGui::Separator();
 			if( ImGui::Selectable( "Delete" ) && m_lastSceneNodeRightClicked != nullptr )
 			{
-				EcsWorld& world = *m_scene->world;
+				EcsWorld& world = *m_lastSceneNodeRightClicked->scene->world;
 				world.Kill( world.GetEntity( m_lastSceneNodeRightClicked->handle ) );
 			}
 			ImGui::EndPopup();
@@ -225,7 +225,7 @@ namespace fan
 		if( newNodePopup )
 		{
 			ImGui::OpenPopup( "new_scenenode" );
-		} NewGameobjectModal();
+		} NewGameobjectModal( _world );
 
 		// rename modal
 		if( renameNodePopup )
@@ -253,6 +253,7 @@ namespace fan
 	void SceneWindow::R_DrawSceneTree( SceneNode& _node, SceneNode*& _nodeRightClicked )
 	{
 		EcsWorld& world = *_node.scene->world;
+		Scene& scene = world.GetSingleton<Scene>();
 
 		std::stringstream ss;
 		ss << "##" << _node.name; // @ todo create some sort of unique id not based on name
@@ -268,7 +269,7 @@ namespace fan
 		if( payload.handle != 0 )
 		{
 			assert( payload.type == SceneNode::Info::s_type );
-			SceneNode& nodeDrop1 = m_scene->world->GetComponent<SceneNode>( m_scene->world->GetEntity( payload.handle) );
+			SceneNode& nodeDrop1 = scene.world->GetComponent<SceneNode>( scene.world->GetEntity( payload.handle) );
 			if( &nodeDrop1 != &_node )
 			{
 				nodeDrop1.InsertBelow( _node );
@@ -276,7 +277,7 @@ namespace fan
 		}
 
 		ImGui::SameLine();
-		const EcsHandle handleSelected = m_scene->world->GetSingleton<EditorSelection>().m_selectedNodeHandle;
+		const EcsHandle handleSelected = world.GetSingleton<EditorSelection>().m_selectedNodeHandle;
 		bool selected = ( _node.handle == handleSelected );
 
 		// Draw scene node empty selectable to display a hierarchy
@@ -292,14 +293,14 @@ namespace fan
 		}
 
 		// SceneNode dragndrop source = selectable -^
-		ImGui::FanBeginDragDropSourceComponent( *m_scene->world, _node.handle, SceneNode::Info::s_type );
+		ImGui::FanBeginDragDropSourceComponent( world, _node.handle, SceneNode::Info::s_type );
 
 		// SceneNode dragndrop target scene node name -> place as child
 		ImGui::ComponentPayload payload2 = ImGui::FanBeginDragDropTargetComponent<SceneNode>( world );
 		if( payload2.handle != 0 )
 		{
 			assert( payload2.type == SceneNode::Info::s_type );
-			SceneNode& nodeDrop2 = m_scene->world->GetComponent<SceneNode>( m_scene->world->GetEntity( payload2.handle ) );
+			SceneNode& nodeDrop2 = world.GetComponent<SceneNode>( world.GetEntity( payload2.handle ) );
 			nodeDrop2.SetParent( &_node );
 		}
 
@@ -317,7 +318,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void SceneWindow::NewGameobjectModal()
+	void SceneWindow::NewGameobjectModal( EcsWorld& _world )
 	{
 		ImGui::SetNextWindowSize( ImVec2( 200, 200 ) );
 		if( ImGui::BeginPopupModal( "new_scenenode" ) )
@@ -342,7 +343,8 @@ namespace fan
 				if( std::string( m_textBuffer ) != "" )
 				{
 					//Create new scene node 
-					SceneNode& newNode = m_scene->CreateSceneNode( m_textBuffer, m_lastSceneNodeRightClicked );
+					Scene& scene = _world.GetSingleton<Scene>();
+					SceneNode& newNode = scene.CreateSceneNode( m_textBuffer, m_lastSceneNodeRightClicked );
 					onSelectSceneNode.Emmit( &newNode );
 					m_lastSceneNodeRightClicked = nullptr;
 					m_textBuffer[0] = '\0';

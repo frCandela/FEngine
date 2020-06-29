@@ -27,7 +27,7 @@ namespace fan
 		~ConsoleWindow() override;
 
 	protected:
-		void OnGui() override;
+		void OnGui( EcsWorld& _world ) override;
 
 	private:
 		static const uint32_t s_inputBufferSize = 256;

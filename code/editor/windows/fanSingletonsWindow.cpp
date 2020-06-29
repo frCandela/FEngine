@@ -1,5 +1,6 @@
 #include "editor/windows/fanSingletonsWindow.hpp"
 
+#include "core/fanDebug.hpp"
 #include "core/time/fanProfiler.hpp"
 #include "ecs/fanEcsWorld.hpp"
 
@@ -7,20 +8,18 @@ namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	SingletonsWindow::SingletonsWindow( EcsWorld& _world ) :
+	SingletonsWindow::SingletonsWindow() :
 		EditorWindow( "singletons", ImGui::IconType::SINGLETON16 )
-		, m_world( &_world )
-	{
-	}
+	{}
 
 	//================================================================================================================================
 	// draw all singletons of the ecs world
 	//================================================================================================================================
-	void SingletonsWindow::OnGui()
+	void SingletonsWindow::OnGui( EcsWorld& _world )
 	{
-		SCOPED_PROFILE( singleton_win );
-		
-		const std::vector< EcsSingletonInfo >& infos = m_world->GetVectorSingletonInfo();
+		SCOPED_PROFILE( singleton_win );		
+
+		const std::vector< EcsSingletonInfo >& infos = _world.GetVectorSingletonInfo();
 		for( const EcsSingletonInfo& info : infos )
 		{
 			ImGui::SetCursorPosY( ImGui::GetCursorPosY() + 3);		// moves cursor lower to center the icon
@@ -31,7 +30,7 @@ namespace fan
 				// draws gui 
 				if( info.onGui != nullptr )
 				{
-					info.onGui( *m_world, m_world->GetSingleton( info.type) );
+					info.onGui( _world, _world.GetSingleton( info.type ) );
 				}
 			}			
 		}

@@ -129,9 +129,9 @@ namespace fan
 	//================================================================================================================================	
 	void Renderer::DrawFrame()
 	{
-		SCOPED_PROFILE( draw_frame )
+		SCOPED_PROFILE( draw_frame );
 
-			const VkResult result = m_window.GetSwapChain().AcquireNextImage();
+		const VkResult result = m_window.GetSwapChain().AcquireNextImage();
 		if ( result == VK_ERROR_OUT_OF_DATE_KHR )
 		{
 

@@ -18,8 +18,9 @@ namespace fan
 		~PreferencesWindow();
 
 		void SetRenderer( Renderer* _renderer ) { m_renderer = _renderer; }
+	
 	protected:
-		void OnGui() override;
+		void OnGui( EcsWorld& _world ) override;
 
 	private:
 		Renderer* m_renderer;

@@ -17,15 +17,13 @@ namespace fan
 	class InspectorWindow : public EditorWindow
 	{
 	public:
-		InspectorWindow( EcsWorld& _world );
+		InspectorWindow();
 	protected:
-		void OnGui() override;
+		void OnGui( EcsWorld& _world ) override;
 
 	private:
-		EcsWorld& m_world;
-
-		void NewComponentPopup();
-		void R_NewComponentPopup( std::set< std::filesystem::path >& _componentsPathSet, std::set< std::filesystem::path >::iterator& _current, const std::vector<EcsComponentInfo>& _components, const std::vector<std::filesystem::path>& _componentsPath );
-		void NewComponentItem( const EcsComponentInfo& _info );
+		static void NewComponentPopup( EcsWorld& _world );
+		static void R_NewComponentPopup( EcsWorld& _world, std::set< std::filesystem::path >& _componentsPathSet, std::set< std::filesystem::path >::iterator& _current, const std::vector<EcsComponentInfo>& _components, const std::vector<std::filesystem::path>& _componentsPath );
+		static void NewComponentItem( EcsWorld& _world,  const EcsComponentInfo& _info );
 	};
 }

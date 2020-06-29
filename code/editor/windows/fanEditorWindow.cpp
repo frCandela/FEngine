@@ -34,13 +34,13 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void EditorWindow::Draw()
+	void EditorWindow::Draw( EcsWorld& _world )
 	{
 		if ( m_isVisible == true )
 		{
 			if ( ImGui::Begin( m_name.c_str(), &m_isVisible, m_flags ) )
 			{
-				OnGui();
+				OnGui( _world );
 			} ImGui::End();
 			SetVisible( m_isVisible );
 		}

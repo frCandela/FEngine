@@ -19,6 +19,6 @@ namespace fan
 	protected:
 		Renderer* m_renderer;
 
-		void OnGui() override;
+		void OnGui( EcsWorld& _world ) override;
 	};
 }

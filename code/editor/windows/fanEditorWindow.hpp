@@ -5,6 +5,8 @@
 
 namespace fan
 {
+	class EcsWorld;
+
 	//================================================================================================================================
 	// base class for editor windows
 	// automagic hide/show & show buttons in the tools main menu bar
@@ -15,7 +17,7 @@ namespace fan
 		EditorWindow( const std::string _name, const ImGui::IconType _iconType );
 		virtual ~EditorWindow();
 
-		void Draw();
+		void Draw( EcsWorld& _world );
 
 		void SetVisible( bool _value ) { m_isVisible = _value; }
 		bool IsVisible() const { return  m_isVisible; }
@@ -25,7 +27,7 @@ namespace fan
 		ImGui::IconType	GetIconType() const { return m_iconType; }
 
 	protected:
-		virtual void OnGui() = 0;
+		virtual void OnGui( EcsWorld& _world ) = 0;
 
 	private:
 		bool m_isVisible;

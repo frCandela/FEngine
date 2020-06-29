@@ -14,9 +14,8 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	EcsWindow::EcsWindow( EcsWorld& _world ) :
+	EcsWindow::EcsWindow() :
 		EditorWindow( "ecs", ImGui::IconType::ECS16 )
-		, m_world( &_world )
 	{
 	}
 
@@ -32,7 +31,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void EcsWindow::OnGui()
+	void EcsWindow::OnGui( EcsWorld& _world )
 	{
 		// Global
 		if( ImGui::CollapsingHeader( "Global" ) )
@@ -51,11 +50,11 @@ namespace fan
 			ImGui::Separator();
 
 			std::vector<const EcsArchetype*> archetypes;
-			const std::unordered_map< EcsSignature, EcsArchetype* >& archetypesRef = m_world->GetArchetypes();
+			const std::unordered_map< EcsSignature, EcsArchetype* >& archetypesRef = _world.GetArchetypes();
 			for( auto it = archetypesRef.begin(); it != archetypesRef.end(); ++it )
 			{
 				archetypes.push_back( it->second );
-			} archetypes.push_back( &m_world->GetTransitionArchetype() );
+			} archetypes.push_back( &_world.GetTransitionArchetype() );
 
 			for( const EcsArchetype* archetype : archetypes )
 			{
@@ -79,8 +78,8 @@ namespace fan
 
 
 				// chunks
-				const std::vector< EcsComponentInfo >& infos = m_world->GetComponentInfos();
-				for( int componentIndex = 0; componentIndex < m_world->NumComponents(); componentIndex++ )
+				const std::vector< EcsComponentInfo >& infos = _world.GetComponentInfos();
+				for( int componentIndex = 0; componentIndex < _world.NumComponents(); componentIndex++ )
 				{
 					if( archetype->GetSignature()[componentIndex] )
 					{
@@ -124,7 +123,7 @@ namespace fan
 			ImGui::Separator();
 
 			int i = 0;
-			for( const auto& pair : m_world->GetHandles() )
+			for( const auto& pair : _world.GetHandles() )
 			{
 				const EcsHandle handle = pair.first;
 				EcsEntity entity = pair.second;

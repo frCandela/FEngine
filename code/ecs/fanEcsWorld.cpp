@@ -1,6 +1,5 @@
-#pragma once
-
 #include "ecs/fanEcsWorld.hpp"
+#include "core/time/fanProfiler.hpp"
 
 namespace fan
 {
@@ -23,8 +22,10 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void EcsWorld::ApplyTransitions()
+	void EcsWorld::ApplyTransitions() 
 	{
+		SCOPED_PROFILE( transitions );
+	
 		// calls destructors
 		while( !m_destroyedComponents.empty() )
 		{

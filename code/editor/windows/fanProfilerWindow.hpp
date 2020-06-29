@@ -14,7 +14,7 @@ namespace fan
 	public:
 		ProfilerWindow();
 	protected:
-		void OnGui() override;
+		void OnGui( EcsWorld& _world ) override;
 
 		void OnProfilerEnd();
 	private:

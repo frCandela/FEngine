@@ -23,7 +23,7 @@ namespace fan
 		std::vector<DrawDirectionalLight>	directionalLights;
 
 		Mesh particlesMesh;
-
 		glm::vec2 targetSize; // render target size in pixels
+		bool isHeadless;
 	};
 }

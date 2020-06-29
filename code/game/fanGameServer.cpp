@@ -186,7 +186,7 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	void  GameServer::Step( const float _delta )
-	{	
+	{		
 		Time& time = world.GetSingleton<Time>();
 
 		if( _delta > 0.f )
@@ -229,9 +229,10 @@ namespace fan
 			world.Run<S_PlayerDeath>(			_delta );
 
 			// late update
+			const RenderWorld& renderWorld = world.GetSingleton<RenderWorld>();
+			if( ! renderWorld.isHeadless )
 			{
 				SCOPED_PROFILE( game_late );
-
 				world.Run<S_ParticlesOcclusion>(		_delta );
 				world.Run<S_UpdateParticles>(			_delta );
 				world.Run<S_EmitParticles>(				_delta );

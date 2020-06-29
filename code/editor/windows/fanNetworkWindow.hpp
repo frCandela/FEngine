@@ -17,14 +17,12 @@ namespace fan
 	class NetworkWindow : public EditorWindow
 	{
 	public:
-		NetworkWindow( EcsWorld& _world );
+		NetworkWindow();
 
 	protected:
-		void OnGui() override;
+		void OnGui( EcsWorld& _world ) override;
 
 	private:
-		EcsWorld* m_world = nullptr;
-
 		void OnGuiServer( GameServer& _game );
 		void OnGuiClient( GameClient& _game );
 	};

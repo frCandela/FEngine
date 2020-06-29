@@ -12,12 +12,9 @@ namespace fan
 	class EcsWindow : public EditorWindow
 	{
 	public:
-		EcsWindow( EcsWorld& _world );
+		EcsWindow();
 
 	protected:
-		void OnGui() override;
-
-	private:
-		EcsWorld* m_world = nullptr;
+		void OnGui( EcsWorld& _world ) override;
 	};
 }

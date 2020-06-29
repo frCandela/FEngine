@@ -33,11 +33,11 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ProfilerWindow::OnGui()
+	void ProfilerWindow::OnGui( EcsWorld& /*_world*/ )
 	{
-		SCOPED_PROFILE( profiler )
+		SCOPED_PROFILE( profiler );
 
-			// UI
+		// UI
 		{
 
 			ImGui::Checkbox( "freeze capture", &m_freezeCapture );

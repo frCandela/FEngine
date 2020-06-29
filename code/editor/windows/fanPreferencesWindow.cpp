@@ -48,7 +48,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void PreferencesWindow::OnGui()
+	void PreferencesWindow::OnGui( EcsWorld& /*_world*/ )
 	{
 		SCOPED_PROFILE( preferences )
 
@@ -82,7 +82,6 @@ namespace fan
 				ImGui::PopID();
 			}
 		}
-
 
 		DrawJoysticks();
 		DrawShortcuts();

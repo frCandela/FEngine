@@ -13,12 +13,9 @@ namespace fan
 	class SingletonsWindow : public EditorWindow
 	{
 	public:
-		SingletonsWindow( EcsWorld& _world );
+		SingletonsWindow();
 		
 	protected:
-		void OnGui() override;
-
-	private:
-		EcsWorld* m_world;
+		void OnGui( EcsWorld& _world ) override;
 	};
 }
