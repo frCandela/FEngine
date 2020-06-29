@@ -137,6 +137,11 @@ namespace fan
 					{
 						const EcsHandle replicatedHandle = it->second;
 						const EcsEntity replicatedID = _world.GetEntity( replicatedHandle );
+						if( _world.HasComponent<SceneNode>( replicatedID ) )
+						{
+							_world.GetComponent<SceneNode>( replicatedID ).AddFlag( SceneNode::Flags::BoundsOutdated );
+						}
+
 
 						for( int i = 0; i < numComponents; i++ )
 						{
