@@ -128,7 +128,7 @@ namespace fan
 // 		{
 // 			OrbitData orbit = m_orbits[ orbitIndex ];
 // 
-// 			RendererDebug::Get().DebugCircle( transform.GetPosition(), orbit.radius, transform.Up(), 32, Color::Cyan );
+// 			_world.GetSingleton<RenderDebug>().DebugCircle( transform.GetPosition(), orbit.radius, transform.Up(), 32, Color::Cyan );
 // 
 // 			float const time = -orbit.speed * GameTime::ElapsedSinceStartup();
 // 			for ( int planetIndex = 0; planetIndex < orbit.planets.size(); planetIndex++ )
@@ -136,7 +136,7 @@ namespace fan
 // 				PlanetData& planet = orbit.planets[ planetIndex ];
 // 				btVector3 position( std::cosf( time + planet.phase ), 0, std::sinf( time + planet.phase ) );
 // 
-// 				RendererDebug::Get().DebugCircle( orbit.radius * position, std::fabs( orbit.maxScale ), transform.Up(), 16, Color::Cyan );
+// 				_world.GetSingleton<RenderDebug>().DebugCircle( orbit.radius * position, std::fabs( orbit.maxScale ), transform.Up(), 16, Color::Cyan );
 // 			}
 // 
 // 		}

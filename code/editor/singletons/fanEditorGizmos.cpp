@@ -1,15 +1,16 @@
 #include "editor/singletons/fanEditorGizmos.hpp"
 
-#include "editor/fanEditorDebug.hpp"
 #include "core/math/shapes/fanRay.hpp"
 #include "core/math/fanBasicModels.hpp"
 #include "core/input/fanMouse.hpp"
+#include "ecs/fanEcsWorld.hpp"
 #include "scene/components/fanSceneNode.hpp"
 #include "scene/components/fanTransform.hpp"
 #include "scene/components/fanCamera.hpp"
 #include "scene/singletons/fanScene.hpp"
+#include "scene/singletons/fanRenderDebug.hpp"
 #include "render/fanRendererDebug.hpp"
-#include "ecs/fanEcsWorld.hpp"
+#include "editor/fanEditorDebug.hpp"
 
 namespace fan
 {
@@ -94,10 +95,10 @@ namespace fan
 			}
 
 			// Draw the gizmo cone & lines
-			RendererDebug::Get().DebugLine( origin, origin + size * ( _transform * axisDirection[ axisIndex ] - origin ), opaqueColor, false );
+			world.GetSingleton<RenderDebug>().DebugLine( origin, origin + size * ( _transform * axisDirection[ axisIndex ] - origin ), opaqueColor, false );
 			for ( int triangleIndex = 0; triangleIndex < coneTris.size() / 3; triangleIndex++ )
 			{
-				RendererDebug::Get().DebugTriangle( coneTris[ 3 * triangleIndex + 0 ], coneTris[ 3 * triangleIndex + 1 ], coneTris[ 3 * triangleIndex + 2 ], clickedColor );
+				world.GetSingleton<RenderDebug>().DebugTriangle( coneTris[ 3 * triangleIndex + 0 ], coneTris[ 3 * triangleIndex + 1 ], coneTris[ 3 * triangleIndex + 2 ], clickedColor );
 			}
 
 			// Calculate closest point between the mouse ray and the axis selected

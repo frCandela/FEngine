@@ -24,6 +24,6 @@ namespace fan
 		int			linesCount;
 		bool		isVisible;
 
-		static void Draw( const EditorGrid& _grid );
+		static void Draw( EcsWorld& _world );
 	};
 }

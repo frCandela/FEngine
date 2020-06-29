@@ -1,5 +1,7 @@
 #include "game/components/fanPlanet.hpp"
 
+#include "ecs/fanEcsWorld.hpp"
+#include "scene/singletons/fanRenderDebug.hpp"
 #include "scene/fanSceneSerializable.hpp"
 #include "render/fanRendererDebug.hpp"
 
@@ -29,7 +31,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Planet::OnGui( EcsWorld& /*_world*/, EcsEntity /*_entityID*/, EcsComponent& _component )
+	void Planet::OnGui( EcsWorld& _world, EcsEntity /*_entityID*/, EcsComponent& _component )
 	{
 		Planet& planet = static_cast<Planet&>( _component );
 		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() );
@@ -39,7 +41,7 @@ namespace fan
 			ImGui::DragFloat( "phase", &planet.phase, SIMD_PI / 3, 0.f, 2 * SIMD_PI );
 		}
 
-		RendererDebug::Get().DebugCircle( btVector3::Zero(), planet.radius, btVector3::Up(), 32, Color::Cyan );
+		_world.GetSingleton<RenderDebug>().DebugCircle( btVector3::Zero(), planet.radius, btVector3::Up(), 32, Color::Cyan );
 	}
 
 	//================================================================================================================================

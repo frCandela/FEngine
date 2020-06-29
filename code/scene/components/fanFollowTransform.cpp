@@ -1,9 +1,10 @@
 #include "scene/components/fanFollowTransform.hpp"
 
 #include "ecs/fanEcsWorld.hpp"
-#include "editor/fanModals.hpp"
-#include "scene/systems/fanUpdateTransforms.hpp"
 #include "render/fanRendererDebug.hpp"
+#include "scene/systems/fanUpdateTransforms.hpp"
+#include "scene/singletons/fanRenderDebug.hpp"
+#include "editor/fanModals.hpp"
 
 namespace fan
 {
@@ -80,7 +81,8 @@ namespace fan
 			btTransform& target = followTransform.targetTransform->transform;
 			btTransform& local = followTransform.localTransform;
 			btTransform t = target * local;
-			RendererDebug::Get().DebugLine( target.getOrigin(), t.getOrigin(), Color::Red );
+			
+			_world.GetSingleton<RenderDebug>().DebugLine( target.getOrigin(), t.getOrigin(), Color::Red );
 		}
 	}
 

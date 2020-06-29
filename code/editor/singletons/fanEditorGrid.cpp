@@ -1,6 +1,8 @@
 #include "editor/singletons/fanEditorGrid.hpp"
 
 #include "core/fanSerializedValues.hpp"
+#include "ecs/fanEcsWorld.hpp"
+#include "scene/singletons/fanRenderDebug.hpp"
 #include "render/fanRendererDebug.hpp"
 
 namespace fan
@@ -33,17 +35,18 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void EditorGrid::Draw( const EditorGrid& _grid )
+	void EditorGrid::Draw( EcsWorld& _world )
 	{
-		if( _grid.isVisible == true )
+		EditorGrid& grid = _world.GetSingleton<EditorGrid>();
+		if( grid.isVisible == true )
 		{
-			const float size = _grid.spacing;
-			const int count = _grid.linesCount;
+			const float size = grid.spacing;
+			const int count = grid.linesCount;
 
-			for( int coord = -_grid.linesCount; coord <= _grid.linesCount; coord++ )
+			for( int coord = -grid.linesCount; coord <= grid.linesCount; coord++ )
 			{
-				RendererDebug::Get().DebugLine( _grid.offset + btVector3( -count * size, 0.f, coord * size ), _grid.offset + btVector3( count * size, 0.f, coord * size ), _grid.color );
-				RendererDebug::Get().DebugLine( _grid.offset + btVector3( coord * size, 0.f, -count * size ), _grid.offset + btVector3( coord * size, 0.f, count * size ), _grid.color );
+				_world.GetSingleton<RenderDebug>().DebugLine( grid.offset + btVector3( -count * size, 0.f, coord * size ), grid.offset + btVector3( count * size, 0.f, coord * size ), grid.color );
+				_world.GetSingleton<RenderDebug>().DebugLine( grid.offset + btVector3( coord * size, 0.f, -count * size ), grid.offset + btVector3( coord * size, 0.f, count * size ), grid.color );
 			}
 		}
 	}

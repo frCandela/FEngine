@@ -58,9 +58,9 @@ namespace fan
 // 			for( int offsetIndex = 0; offsetIndex < 5; offsetIndex++ )
 // 			{
 // 				const btVector3 offset = offsets[offsetIndex];
-// 				RendererDebug::Get().DebugLine( pos + offset, pos + offset + length * dir, color );
+// 				_world.GetSingleton<RenderDebug>().DebugLine( pos + offset, pos + offset + length * dir, color );
 // 			}
-// 			RendererDebug::Get().DebugSphere( transform.GetBtTransform(), radius, 0, color );
+// 			_world.GetSingleton<RenderDebug>().DebugSphere( transform.GetBtTransform(), radius, 0, color );
 		} ImGui::PopItemWidth();
 	}
 

@@ -4,6 +4,7 @@
 #include "scene/components/fanMeshRenderer.hpp"
 #include "scene/components/fanBoxShape.hpp"
 #include "scene/components/fanSphereShape.hpp"
+#include "scene/singletons/fanRenderDebug.hpp"
 #include "render/fanRendererDebug.hpp"
 
 namespace fan
@@ -19,14 +20,14 @@ namespace fan
 		{
 			return	_world.GetSignature<Bounds>() | _world.GetSignature<SceneNode>();
 		}
-		static void Run( EcsWorld& /*_world*/, const EcsView& _view )
+		static void Run( EcsWorld& _world, const EcsView& _view )
 		{
 			auto boundsIt = _view.begin<Bounds>();
 			auto sceneNodeIt = _view.begin<SceneNode>();
 			for( ; boundsIt != _view.end<Bounds>(); ++boundsIt, ++sceneNodeIt )
 			{
 				const Bounds& bounds = *boundsIt;
-				RendererDebug::Get().DebugAABB( bounds.aabb, Color::Red );
+				_world.GetSingleton<RenderDebug>().DebugAABB( bounds.aabb, Color::Red );
 			}
 		}
 	};
@@ -40,7 +41,7 @@ namespace fan
 		{
 			return _world.GetSignature<MeshRenderer>() | _world.GetSignature<Transform>();
 		}
-		static void Run( EcsWorld& /*_world*/, const EcsView& _view )
+		static void Run( EcsWorld& _world, const EcsView& _view )
 		{
 			auto meshRendererIt = _view.begin<MeshRenderer>();
 			auto transformIt = _view.begin<Transform>();
@@ -61,7 +62,7 @@ namespace fan
 						const Vertex& vertex = vertices[indices[index]];
 						const btVector3 position = ToBullet( modelMat * glm::vec4( vertex.pos, 1.f ) );
 						const btVector3 normal = ToBullet( normalMat * glm::vec4( vertex.normal, 1.f ) );
-						RendererDebug::Get().DebugLine( position, position + 0.1f * normal, Color::Green );
+						_world.GetSingleton<RenderDebug>().DebugLine( position, position + 0.1f * normal, Color::Green );
 					}
 				}
 			}
@@ -77,7 +78,7 @@ namespace fan
 		{
 			return _world.GetSignature<MeshRenderer>() | _world.GetSignature<Transform>();
 		}
-		static void Run( EcsWorld& /*_world*/, const EcsView& _view )
+		static void Run( EcsWorld& _world, const EcsView& _view )
 		{
 			auto meshRendererIt = _view.begin<MeshRenderer>();
 			auto transformIt = _view.begin<Transform>();
@@ -97,9 +98,9 @@ namespace fan
 						const btVector3 v0 = ToBullet( modelMat * glm::vec4( vertices[indices[3 * index + 0]].pos, 1.f ) );
 						const btVector3 v1 = ToBullet( modelMat * glm::vec4( vertices[indices[3 * index + 1]].pos, 1.f ) );
 						const btVector3 v2 = ToBullet( modelMat * glm::vec4( vertices[indices[3 * index + 2]].pos, 1.f ) );
-						RendererDebug::Get().DebugLine( v0, v1, Color::Yellow );
-						RendererDebug::Get().DebugLine( v1, v2, Color::Yellow );
-						RendererDebug::Get().DebugLine( v2, v0, Color::Yellow );
+						_world.GetSingleton<RenderDebug>().DebugLine( v0, v1, Color::Yellow );
+						_world.GetSingleton<RenderDebug>().DebugLine( v1, v2, Color::Yellow );
+						_world.GetSingleton<RenderDebug>().DebugLine( v2, v0, Color::Yellow );
 					}
 				}
 			}
@@ -115,7 +116,7 @@ namespace fan
 		{
 			return _world.GetSignature<MeshRenderer>() | _world.GetSignature<Transform>();
 		}
-		static void Run( EcsWorld& /*_world*/, const EcsView& _view )
+		static void Run( EcsWorld& _world, const EcsView& _view )
 		{
 			auto meshRendererIt = _view.begin<MeshRenderer>();
 			auto transformIt = _view.begin<Transform>();
@@ -146,10 +147,9 @@ namespace fan
 							const btVector3 worldVec1 = ToBullet( modelMat * glm::vec4( vec1[0], vec1[1], vec1[2], 1.f ) );
 							const btVector3 worldVec2 = ToBullet( modelMat * glm::vec4( vec2[0], vec2[1], vec2[2], 1.f ) );
 
-							RendererDebug::Get().DebugLine( worldVec0, worldVec1, color );
-							RendererDebug::Get().DebugLine( worldVec1, worldVec2, color );
-							RendererDebug::Get().DebugLine( worldVec2, worldVec0, color );
-
+							_world.GetSingleton<RenderDebug>().DebugLine( worldVec0, worldVec1, color );
+							_world.GetSingleton<RenderDebug>().DebugLine( worldVec1, worldVec2, color );
+							_world.GetSingleton<RenderDebug>().DebugLine( worldVec2, worldVec0, color );
 						}
 					}
 
@@ -170,24 +170,25 @@ namespace fan
 		{
 			return _world.GetSignature<PointLight>() | _world.GetSignature<Transform>();
 		}
-		static void Run( EcsWorld& /*_world*/, const EcsView& _view )
+		static void Run( EcsWorld& _world, const EcsView& _view )
 		{
 			auto lightIt = _view.begin<PointLight>();
 			auto transformIt = _view.begin<Transform>();
+			RenderDebug& renderDebug = _world.GetSingleton<RenderDebug>();
 			for( ; lightIt != _view.end<PointLight>(); ++lightIt, ++transformIt )
 			{
 				const PointLight& light = *lightIt;
 				const Transform& transform = *transformIt;
-				DrawPointLight( transform, light );
+				DrawPointLight( renderDebug, transform, light );
 			}
 		}
 
-		static void DrawPointLight( const Transform& _transform, const PointLight& _light )
+		static void DrawPointLight( RenderDebug& _renderDebug, const Transform& _transform, const PointLight& _light )
 		{
 			const float lightRange = PointLight::GetLightRange( _light );
 			if( lightRange > 0 )
 			{
-				RendererDebug::Get().DebugSphere( _transform.transform, lightRange, _light.diffuse );
+				_renderDebug.DebugSphere( _transform.transform, lightRange, _light.diffuse );
 			}
 		}
 	};
@@ -203,19 +204,21 @@ namespace fan
 		{
 			return _world.GetSignature<DirectionalLight>() | _world.GetSignature<Transform>();
 		}
-		static void Run( EcsWorld& /*_world*/, const EcsView& _view )
+
+		static void Run( EcsWorld& _world, const EcsView& _view )
 		{
 			auto lightIt = _view.begin<DirectionalLight>();
 			auto transformIt = _view.begin<Transform>();
+			RenderDebug& renderDebug = _world.GetSingleton<RenderDebug>();
 			for( ; lightIt != _view.end<DirectionalLight>(); ++lightIt, ++transformIt )
 			{
 				const DirectionalLight& light = *lightIt;
 				const Transform& transform = *transformIt;
-				DrawDirectionalLight( transform, light );
+				DrawDirectionalLight( renderDebug, transform, light );
 			}
 		}
 
-		static void DrawDirectionalLight( const Transform& _transform, const DirectionalLight& /*_light*/ )
+		static void DrawDirectionalLight( RenderDebug& _renderDebug, const Transform& _transform, const DirectionalLight& /*_light*/ )
 		{
 			const btVector3 pos = _transform.GetPosition();
 			const btVector3 dir = _transform.Forward();
@@ -228,9 +231,9 @@ namespace fan
 			for( int offsetIndex = 0; offsetIndex < 5; offsetIndex++ )
 			{
 				const btVector3 offset = offsets[offsetIndex];
-				RendererDebug::Get().DebugLine( pos + offset, pos + offset + length * dir, color, false );
+				_renderDebug.DebugLine( pos + offset, pos + offset + length * dir, color, false );
 			}
-			RendererDebug::Get().DebugIcoSphere( _transform.transform, radius, 0, color, false );
+			_renderDebug.DebugIcoSphere( _transform.transform, radius, 0, color, false );
 		}
 	};
 
@@ -264,14 +267,14 @@ namespace fan
 			if( _world.HasComponent<BoxShape>( _entity ) )
 			{
 				const BoxShape& shape = _world.GetComponent<BoxShape>( _entity );
-				RendererDebug::Get().DebugCube( transform.transform, 0.5f * shape.GetScaling(), Color::Green, false );
+				_world.GetSingleton<RenderDebug>().DebugCube( transform.transform, 0.5f * shape.GetScaling(), Color::Green, false );
 			}
 
 			// sphere shape
 			if( _world.HasComponent<SphereShape>( _entity ) )
 			{
 				const SphereShape& shape = _world.GetComponent<SphereShape>( _entity );
-				RendererDebug::Get().DebugSphere( transform.transform, shape.GetRadius(), Color::Green, false );
+				_world.GetSingleton<RenderDebug>().DebugSphere( transform.transform, shape.GetRadius(), Color::Green, false );
 			}
 		}
 	};

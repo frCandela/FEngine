@@ -48,7 +48,7 @@ namespace fan
 			{
 				boxShape.SetScaling( extent );
 			}
-			//RendererDebug::Get().DebugCube( m_gameobject->GetTransform().GetBtTransform(), 0.5f * extent, Color::Green );
+			//_world.GetSingleton<RenderDebug>().DebugCube( m_gameobject->GetTransform().GetBtTransform(), 0.5f * extent, Color::Green );
 		} ImGui::PopItemWidth();
 	}
 

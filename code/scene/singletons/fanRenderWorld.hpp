@@ -1,5 +1,7 @@
 #pragma once
 
+#include "bullet/LinearMath/btTransform.h"
+#include "core/math/shapes/fanAABB.hpp"
 #include "ecs/fanEcsSingleton.hpp"
 #include "render/fanRenderer.hpp"
 #include "render/fanMesh.hpp"

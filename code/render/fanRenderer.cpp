@@ -170,8 +170,8 @@ namespace fan
 		const uint32_t currentFrame = m_window.GetSwapChain().GetCurrentFrame();
 		UpdateUniformBuffers( currentFrame );
 		{
-			SCOPED_PROFILE( record_cmd )
-				RecordCommandBufferGeometry( currentFrame );
+			SCOPED_PROFILE( record_cmd );
+			RecordCommandBufferGeometry( currentFrame );
 			m_rendererDebug->RecordCommandBufferDebug( currentFrame );
 			RecordCommandBufferUI( currentFrame );
 			RecordCommandBufferImgui( currentFrame );
@@ -179,8 +179,8 @@ namespace fan
 		}
 
 		{
-			SCOPED_PROFILE( submit )
-				SubmitCommandBuffers();
+			SCOPED_PROFILE( submit );
+			SubmitCommandBuffers();
 			m_window.GetSwapChain().PresentImage();
 			m_window.GetSwapChain().StartNextFrame();
 		}

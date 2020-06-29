@@ -155,20 +155,20 @@ namespace fan
 
 			if( world.HasComponent<Transform>( selectedEntity ) ) 
 			{
+				RenderDebug& renderDebug = world.GetSingleton<RenderDebug>();
 				const Transform& transform = world.GetComponent<Transform>( selectedEntity );
 				if( world.HasComponent<DirectionalLight>( selectedEntity ) )
 				{
 					const DirectionalLight& directionalLight = world.GetComponent<DirectionalLight>( selectedEntity );
-					S_DrawDebugDirectionalLights::DrawDirectionalLight( transform , directionalLight );
+					S_DrawDebugDirectionalLights::DrawDirectionalLight( renderDebug, transform , directionalLight );
 				} 
 				if( world.HasComponent<PointLight>( selectedEntity ) )
 				{
 					const PointLight& pointLight = world.GetComponent<PointLight>( selectedEntity );
-					S_DrawDebugPointLights::DrawPointLight( transform, pointLight );
+					S_DrawDebugPointLights::DrawPointLight( renderDebug, transform, pointLight );
 				}
 			}
 		}	
-
 	}
 
 	//================================================================================================================================

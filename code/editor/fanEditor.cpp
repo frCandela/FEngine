@@ -156,7 +156,6 @@ namespace fan
 			m_renderer->SetClearColor( clearColor.ToGLM() );
 		}
 
-		RendererDebug::Init( &m_renderer->GetRendererDebug() );
 		Prefab::s_resourceManager.Init();
 
 		// Initialize editor components		
@@ -320,14 +319,13 @@ namespace fan
 		for( int worldIndex = 0; worldIndex < m_worlds.size(); worldIndex++ )
 		{
 			EcsWorld& world = *m_worlds[worldIndex];
-			const bool isCurrentWorld = ( &world == &GetCurrentWorld() );
-			
+			const bool isCurrentWorld = ( &world == &GetCurrentWorld() );			
 
 			// runs logic, renders ui
 			Time& time = world.GetSingleton<Time>();
 			if( currentTime > time.lastLogicTime + time.logicDelta )
 			{
-				m_renderer->GetRendererDebug().ClearDebug();
+				world.GetSingleton<RenderDebug>().Clear();
 
 				if( isCurrentWorld )
 				{
@@ -394,7 +392,7 @@ namespace fan
 							world.Run<S_DrawDebugPointLights>();
 							world.Run<S_DrawDebugDirectionalLights>();
 						}
-						EditorGrid::Draw( GetCurrentWorld().GetSingleton<EditorGrid>() );
+						EditorGrid::Draw( GetCurrentWorld() );
 
 						// ImGui render
 						ImGui::NewFrame();
@@ -416,7 +414,9 @@ namespace fan
 			Time::RegisterFrameDrawn();	// used for stats
 			
 			UpdateRenderWorld( *m_renderer, GetCurrentWorld(), ToGLM( m_gameViewWindow->GetSize() ) );
+			const RenderDebug& renderDebug = GetCurrentWorld().GetSingleton<RenderDebug>();
 
+			m_renderer->GetRendererDebug().UpdateDebugBuffer( renderDebug.m_debugLines, renderDebug.m_debugLinesNoDepthTest, renderDebug.m_debugTriangles );
 			m_renderer->DrawFrame();
 			Profiler::Get().End();
 			Profiler::Get().Begin();
