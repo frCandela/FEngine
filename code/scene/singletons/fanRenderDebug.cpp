@@ -27,9 +27,9 @@ namespace fan
 	//================================================================================================================================
 	void RenderDebug::Clear()
 	{
-		m_debugLines.clear();
-		m_debugLinesNoDepthTest.clear();
-		m_debugTriangles.clear();		
+		debugLines.clear();
+		debugLinesNoDepthTest.clear();
+		debugTriangles.clear();		
 	}
 
 	//================================================================================================================================
@@ -48,13 +48,13 @@ namespace fan
 	{
 		if( _depthTestEnable )
 		{
-			m_debugLines.push_back( DebugVertex( ToGLM( _start ), glm::vec3( 0, 0, 0 ), _color.ToGLM() ) );
-			m_debugLines.push_back( DebugVertex( ToGLM( _end ), glm::vec3( 0, 0, 0 ), _color.ToGLM() ) );
+			debugLines.push_back( DebugVertex( ToGLM( _start ), glm::vec3( 0, 0, 0 ), _color.ToGLM() ) );
+			debugLines.push_back( DebugVertex( ToGLM( _end ), glm::vec3( 0, 0, 0 ), _color.ToGLM() ) );
 		}
 		else
 		{
-			m_debugLinesNoDepthTest.push_back( DebugVertex( ToGLM( _start ), glm::vec3( 0, 0, 0 ), _color.ToGLM() ) );
-			m_debugLinesNoDepthTest.push_back( DebugVertex( ToGLM( _end ), glm::vec3( 0, 0, 0 ), _color.ToGLM() ) );
+			debugLinesNoDepthTest.push_back( DebugVertex( ToGLM( _start ), glm::vec3( 0, 0, 0 ), _color.ToGLM() ) );
+			debugLinesNoDepthTest.push_back( DebugVertex( ToGLM( _end ), glm::vec3( 0, 0, 0 ), _color.ToGLM() ) );
 		}
 
 	}
@@ -69,7 +69,7 @@ namespace fan
 		assert( _triangles.size() % 3 == 0 );
 		assert( _colors.size() == _triangles.size() / 3 );
 
-		m_debugTriangles.resize( m_debugTriangles.size() + _triangles.size() );
+		debugTriangles.resize( debugTriangles.size() + _triangles.size() );
 		for( int triangleIndex = 0; triangleIndex < _triangles.size() / 3; triangleIndex++ )
 		{
 			const btVector3 v0 = _triangles[3 * triangleIndex + 0];
@@ -77,9 +77,9 @@ namespace fan
 			const btVector3 v2 = _triangles[3 * triangleIndex + 2];
 			const glm::vec3 normal = glm::normalize( ToGLM( ( v1 - v2 ).cross( v0 - v2 ) ) );
 
-			m_debugTriangles[3 * triangleIndex + 0] = DebugVertex( ToGLM( v0 ), normal, _colors[triangleIndex].ToGLM() );
-			m_debugTriangles[3 * triangleIndex + 1] = DebugVertex( ToGLM( v1 ), normal, _colors[triangleIndex].ToGLM() );
-			m_debugTriangles[3 * triangleIndex + 2] = DebugVertex( ToGLM( v2 ), normal, _colors[triangleIndex].ToGLM() );
+			debugTriangles[3 * triangleIndex + 0] = DebugVertex( ToGLM( v0 ), normal, _colors[triangleIndex].ToGLM() );
+			debugTriangles[3 * triangleIndex + 1] = DebugVertex( ToGLM( v1 ), normal, _colors[triangleIndex].ToGLM() );
+			debugTriangles[3 * triangleIndex + 2] = DebugVertex( ToGLM( v2 ), normal, _colors[triangleIndex].ToGLM() );
 		}
 	}
 
@@ -93,7 +93,7 @@ namespace fan
 		btVector3 orthogonal = _radius * _axis.cross( other ).normalized();
 		const float angle = 2.f * SIMD_PI / (float)_nbSegments;
 
-		std::vector<DebugVertex>& lines = _depthTestEnable ? m_debugLines : m_debugLinesNoDepthTest;
+		std::vector<DebugVertex>& lines = _depthTestEnable ? debugLines : debugLinesNoDepthTest;
 		for( uint32_t segmentIndex = 0; segmentIndex < _nbSegments; segmentIndex++ )
 		{
 
@@ -111,9 +111,9 @@ namespace fan
 	void RenderDebug::DebugTriangle( const btVector3 _v0, const btVector3 _v1, const btVector3 _v2, const Color _color )
 	{
 		const glm::vec3 normal = glm::normalize( ToGLM( ( _v1 - _v2 ).cross( _v0 - _v2 ) ) );
-		m_debugTriangles.push_back( DebugVertex( ToGLM( _v0 ), normal, _color.ToGLM() ) );
-		m_debugTriangles.push_back( DebugVertex( ToGLM( _v1 ), normal, _color.ToGLM() ) );
-		m_debugTriangles.push_back( DebugVertex( ToGLM( _v2 ), normal, _color.ToGLM() ) );
+		debugTriangles.push_back( DebugVertex( ToGLM( _v0 ), normal, _color.ToGLM() ) );
+		debugTriangles.push_back( DebugVertex( ToGLM( _v1 ), normal, _color.ToGLM() ) );
+		debugTriangles.push_back( DebugVertex( ToGLM( _v2 ), normal, _color.ToGLM() ) );
 	}
 
 	//================================================================================================================================
@@ -129,7 +129,7 @@ namespace fan
 
 		glm::vec4 glmColor = _color.ToGLM();
 
-		std::vector<DebugVertex>& lines = _depthTestEnable ? m_debugLines : m_debugLinesNoDepthTest;
+		std::vector<DebugVertex>& lines = _depthTestEnable ? debugLines : debugLinesNoDepthTest;
 
 		lines.push_back( DebugVertex( ToGLM( cube[0] ), glm::vec3( 0, 0, 0 ), glmColor ) );
 		lines.push_back( DebugVertex( ToGLM( cube[1] ), glm::vec3( 0, 0, 0 ), glmColor ) );
@@ -243,7 +243,9 @@ namespace fan
 
 		ImGui::Indent(); ImGui::Indent();
 		{
-			(void)renderDebug;
+			ImGui::Text( "debugLines:            %u", renderDebug.debugLines.size() );
+			ImGui::Text( "debugLinesNoDepthTest: %u", renderDebug.debugLinesNoDepthTest.size() );
+			ImGui::Text( "debugTriangles:        %u", renderDebug.debugTriangles.size() );
 		}
 		ImGui::Unindent(); ImGui::Unindent();
 	}

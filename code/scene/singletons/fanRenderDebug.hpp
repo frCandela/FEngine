@@ -21,9 +21,9 @@ namespace fan
 		static void OnGui( EcsWorld&, EcsSingleton& _component );
 
 		// vertex data
-		std::vector<DebugVertex>	m_debugLines;
-		std::vector<DebugVertex>	m_debugLinesNoDepthTest;
-		std::vector<DebugVertex>	m_debugTriangles;
+		std::vector<DebugVertex> debugLines;
+		std::vector<DebugVertex> debugLinesNoDepthTest;
+		std::vector<DebugVertex> debugTriangles;
 
 		void Clear();
 		void DebugPoint( const btVector3 _pos, const Color _color );

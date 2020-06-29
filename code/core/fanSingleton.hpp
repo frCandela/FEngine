@@ -5,7 +5,7 @@ namespace fan
 	//================================================================================================================================
 	// static singleton class
 	// 99% of the time you don't need this
-	// Better use singletons components int the game/editor ecs
+	// Better use ecs singletons in the game/editor ecs
 	//================================================================================================================================
 	template < typename TypeName >
 	class Singleton

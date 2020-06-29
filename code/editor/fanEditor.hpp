@@ -75,7 +75,6 @@ namespace fan
 
 		EcsWorld& GetCurrentWorld() { return *m_worlds[ m_currentWorld ]; }
 		
-		
 		static void UseEditorCamera( EcsWorld& _world );
 		static void UseGameCamera( EcsWorld& _world );
 
@@ -93,6 +92,7 @@ namespace fan
 		void OnCurrentGameSave();
 		void OnCurrentGameCopy();
 		void OnCurrentGamePaste();
+		void OnCurrentGameSelect( const int _index );
 
 		static void GameStart( EcsWorld& _world );
 		static void GameStop( EcsWorld& _world );

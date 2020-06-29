@@ -88,7 +88,10 @@ namespace fan
 			// combo current world			
 			ImGui::Spacing();
 			ImGui::SetNextItemWidth( 200.f );
-			ImGui::Combo( "##current game", &m_currentGameSelected, m_gameWorldsStr );
+			if( ImGui::Combo( "##current game", &m_currentGameSelected, m_gameWorldsStr ) )
+			{
+				onSelectGame.Emmit( m_currentGameSelected );
+			}
 
 			ImGui::EndMenuBar();
 		}

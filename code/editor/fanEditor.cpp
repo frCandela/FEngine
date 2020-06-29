@@ -209,6 +209,7 @@ namespace fan
 		m_gameViewWindow->onResume.Connect( &Editor::OnCurrentGameResume, this );
 		m_gameViewWindow->onStop.Connect( &Editor::OnCurrentGameStop, this );
 		m_gameViewWindow->onStep.Connect( &Editor::OnCurrentGameStep, this );
+		m_gameViewWindow->onSelectGame.Connect( &Editor::OnCurrentGameSelect, this );
 
 		// Loop over all worlds to initialize them
 		for (int worldIndex = 0; worldIndex < m_worlds.size() ; worldIndex++)
@@ -416,7 +417,7 @@ namespace fan
 			UpdateRenderWorld( *m_renderer, GetCurrentWorld(), ToGLM( m_gameViewWindow->GetSize() ) );
 			const RenderDebug& renderDebug = GetCurrentWorld().GetSingleton<RenderDebug>();
 
-			m_renderer->GetRendererDebug().UpdateDebugBuffer( renderDebug.m_debugLines, renderDebug.m_debugLinesNoDepthTest, renderDebug.m_debugTriangles );
+			m_renderer->GetRendererDebug().UpdateDebugBuffer( renderDebug.debugLines, renderDebug.debugLinesNoDepthTest, renderDebug.debugTriangles );
 			m_renderer->DrawFrame();
 			Profiler::Get().End();
 			Profiler::Get().Begin();
@@ -602,15 +603,7 @@ namespace fan
 	//================================================================================================================================
 	void Editor::OnCycleCurrentGame()
 	{
-		m_currentWorld = ( m_currentWorld + 1 ) % ( m_worlds.size() );
-		
-		// Set all to headless except the current
-		for (int worldIndex = 0; worldIndex < m_worlds.size(); worldIndex++)
-		{
-			EcsWorld& world = *m_worlds[worldIndex];
-			RenderWorld& renderWorld = world.GetSingleton<RenderWorld>();
-			renderWorld.isHeadless = ( worldIndex != m_currentWorld );
-		}
+		OnCurrentGameSelect( ( m_currentWorld + 1 ) % ( m_worlds.size() ) );
 	}
 
 	//================================================================================================================================
@@ -654,6 +647,26 @@ namespace fan
 	void Editor::OnCurrentGameSave() { m_mainMenuBar->Save( GetCurrentWorld() ); }
 	void Editor::OnCurrentGameCopy() { GetCurrentWorld().GetSingleton<EditorCopyPaste>().OnCopy(); }
 	void Editor::OnCurrentGamePaste() { GetCurrentWorld().GetSingleton<EditorCopyPaste>().OnPaste(); }
+
+	//================================================================================================================================
+	// sets which ecs world will be displayed in the editor
+	//================================================================================================================================
+	void Editor::OnCurrentGameSelect( const int _index )
+	{
+		assert( _index < m_worlds.size() );
+
+		m_currentWorld = _index;
+
+		// Set all to headless except the current
+		for( int worldIndex = 0; worldIndex < m_worlds.size(); worldIndex++ )
+		{
+			EcsWorld& world = *m_worlds[worldIndex];
+			RenderWorld& renderWorld = world.GetSingleton<RenderWorld>();
+			renderWorld.isHeadless = ( worldIndex != m_currentWorld );
+		}
+
+		m_gameViewWindow->SetCurrentGameSelected( m_currentWorld );
+	}
 
 	//================================================================================================================================
 	// toogle the camera between editor and game
