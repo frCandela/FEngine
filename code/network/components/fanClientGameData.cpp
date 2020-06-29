@@ -9,7 +9,7 @@ namespace fan
 	//================================================================================================================================
 	void ClientGameData::SetInfo( EcsComponentInfo& _info )
 	{
-		_info.icon = ImGui::IconType::NETWORK16;
+		_info.icon = ImGui::GAME_DATA16;
 		_info.onGui = &ClientGameData::OnGui;
 		_info.name = "client game data";
 	}

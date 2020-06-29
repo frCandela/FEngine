@@ -29,6 +29,7 @@ namespace fan
 	void EditorSelection::SetInfo( EcsSingletonInfo& _info )
 	{
 		_info.name = "editor selection";
+		_info.icon = ImGui::SELECTION16;
 	}
 
 	//================================================================================================================================

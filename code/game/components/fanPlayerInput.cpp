@@ -12,7 +12,7 @@ namespace fan
 	//================================================================================================================================
 	void PlayerInput::SetInfo( EcsComponentInfo& _info )
 	{
-		_info.icon = ImGui::IconType::JOYSTICK16;
+		_info.icon = ImGui::IconType::INPUT16;
 		_info.onGui = &PlayerInput::OnGui;
 		_info.save = &PlayerInput::Save;
 		_info.load = &PlayerInput::Load;

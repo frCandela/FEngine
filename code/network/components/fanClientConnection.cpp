@@ -11,7 +11,7 @@ namespace fan
 	//================================================================================================================================
 	void ClientConnection::SetInfo( EcsComponentInfo& _info )
 	{
-		_info.icon = ImGui::NETWORK16;
+		_info.icon = ImGui::SOCKET16;
 		_info.destroy = &ClientConnection::Destroy;
 		_info.onGui = &ClientConnection::OnGui;
 		_info.name = "client connection";
@@ -172,19 +172,16 @@ namespace fan
 	//================================================================================================================================
 	void ClientConnection::OnGui( EcsWorld& /*_world*/, EcsEntity /*_entityID*/, EcsComponent& _component )
 	{
-		ImGui::Indent(); ImGui::Indent();
-		{
-			ClientConnection& connection = static_cast<ClientConnection&>( _component );
+		ClientConnection& connection = static_cast<ClientConnection&>( _component );
 
-			ImGui::DragFloat( "timeout time", &connection.timeoutDelay, 0.1f, 0.f, 10.f );
-			ImGui::Text( "state:               " ); ImGui::SameLine();
-			ImGui::TextColored( GetStateColor( connection.state ), "%s", GetStateName( connection.state ).c_str() );
-			ImGui::Text( "client port           %u", connection.clientPort );
-			ImGui::Text( "server adress         %s::%u", connection.serverIP.toString().c_str(), connection.serverPort );			
-			ImGui::Text( "rtt                  "); ImGui::SameLine();
-			ImGui::TextColored( GetRttColor( connection.rtt ), "%.1f", 1000.f * connection.rtt );
-			ImGui::Text( "bandwidth:            %.1f Ko/s", connection.bandwidth );
-			ImGui::Text( "server last response: %.1f", Time::ElapsedSinceStartup() - connection.serverLastResponse );
-		}ImGui::Unindent(); ImGui::Unindent();
+		ImGui::DragFloat( "timeout time", &connection.timeoutDelay, 0.1f, 0.f, 10.f );
+		ImGui::Text( "state:               " ); ImGui::SameLine();
+		ImGui::TextColored( GetStateColor( connection.state ), "%s", GetStateName( connection.state ).c_str() );
+		ImGui::Text( "client port           %u", connection.clientPort );
+		ImGui::Text( "server adress         %s::%u", connection.serverIP.toString().c_str(), connection.serverPort );
+		ImGui::Text( "rtt                  " ); ImGui::SameLine();
+		ImGui::TextColored( GetRttColor( connection.rtt ), "%.1f", 1000.f * connection.rtt );
+		ImGui::Text( "bandwidth:            %.1f Ko/s", connection.bandwidth );
+		ImGui::Text( "server last response: %.1f", Time::ElapsedSinceStartup() - connection.serverLastResponse );
 	}
 }

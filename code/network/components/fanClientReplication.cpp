@@ -44,11 +44,7 @@ namespace fan
 	{
 		ClientReplication& replicationManager = static_cast<ClientReplication&>( _component );
 
-		ImGui::Indent(); ImGui::Indent();
-		{
-			ImGui::Text( "singletons: %d", replicationManager.replicationListSingletons.size() );
-			ImGui::Text( "rpc:        %d", replicationManager.replicationListRPC.size() );
-		}
-		ImGui::Unindent(); ImGui::Unindent();
+		ImGui::Text( "singletons: %d", replicationManager.replicationListSingletons.size() );
+		ImGui::Text( "rpc:        %d", replicationManager.replicationListRPC.size() );
 	}
 }

@@ -8,7 +8,7 @@ namespace fan
 	//================================================================================================================================
 	void ExpirationTime::SetInfo( EcsComponentInfo& _info )
 	{
-		_info.icon = ImGui::IconType::STOP16;
+		_info.icon = ImGui::IconType::EXPIRATION16;
 		_info.onGui = &ExpirationTime::OnGui;
 		_info.load  = &ExpirationTime::Load;
 		_info.save  = &ExpirationTime::Save;

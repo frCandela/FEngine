@@ -12,7 +12,7 @@ namespace fan
 	//================================================================================================================================
 	void SpawnManager::SetInfo( EcsSingletonInfo& _info )
 	{
-		_info.icon = ImGui::NONE;
+		_info.icon = ImGui::SPAWN16;
 		_info.name = "spawn manager";
 		_info.onGui = &SpawnManager::OnGui;
 	}

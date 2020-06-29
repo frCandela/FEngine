@@ -19,6 +19,7 @@ namespace fan
 	void EditorGizmos::SetInfo( EcsSingletonInfo& _info )
 	{
 		_info.name = "editor gizmo";
+		_info.icon = ImGui::GIZMOS16;
 	}
 
 	//================================================================================================================================

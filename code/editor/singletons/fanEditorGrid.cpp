@@ -11,7 +11,7 @@ namespace fan
 	//================================================================================================================================
 	void EditorGrid::SetInfo( EcsSingletonInfo& _info )
 	{
-		_info.icon = ImGui::NONE;
+		_info.icon = ImGui::GRID16;
 		_info.name = "editor grid";
 	}
 

@@ -60,6 +60,22 @@ namespace ImGui
 		,DECL_ICON( 16.f, 12, 8 ) // UI_TRANSFORM16,
 		,DECL_ICON( 16.f, 13, 8 ) // UI_PROGRESS_BAR16,
 		,DECL_ICON( 16.f, 14, 8 ) // FOLLOW_TRANSFORM
+		,DECL_ICON( 16.f, 15, 8 ) // INPUT16
+		,DECL_ICON( 16.f, 16, 8 ) // FOLLOW_TRANSFORM_UI16
+		,DECL_ICON( 16.f, 17, 8 ) // EXPIRATION16
+
+		,DECL_ICON( 16.f, 0, 2 ) // TIME16
+		,DECL_ICON( 16.f, 1, 2 ) // SPAWN16
+		,DECL_ICON( 16.f, 2, 2 ) // CONNECTION16
+		,DECL_ICON( 16.f, 3, 2 ) // SOCKET16
+		,DECL_ICON( 16.f, 4, 2 ) // PTR16
+		,DECL_ICON( 16.f, 5, 2 ) // GRID16
+		,DECL_ICON( 16.f, 6, 2 ) // SELECTION16
+		,DECL_ICON( 16.f, 7, 2 ) // GIZMOS16
+		,DECL_ICON( 16.f, 8, 2 ) // COPY_PASTE16
+		,DECL_ICON( 16.f, 9, 2 ) // LINK16
+		,DECL_ICON( 16.f, 10, 2 ) // CLIENT_NET16
+		,DECL_ICON( 16.f, 11, 2 ) // RENDER_DEBUG16
 
 		// generics	
 		,DECL_ICON( 16.f, 0, 10 )  // SOLAR_SYSTEM16,
@@ -68,6 +84,12 @@ namespace ImGui
 		,DECL_ICON( 16.f, 3, 10 )  // JOYSTICK16,
 		,DECL_ICON( 16.f, 4, 10 )  // SPACE_SHIP16,
 		,DECL_ICON( 16.f, 5, 10 )  // PLANET16,		
-		,DECL_ICON( 16.f, 6, 10 )  // SUN16,		
+		,DECL_ICON( 16.f, 6, 10 )  // SUN16,	
+		,DECL_ICON( 16.f, 7, 10 )  // SUN_RED16,	
+
+		//network
+		,DECL_ICON( 16.f, 0, 12 )  // RELIABILITY_LAYER16,	
+		,DECL_ICON( 16.f, 1, 12 )  // GAME_DATA16,
 	};
+
 }

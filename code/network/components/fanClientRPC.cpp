@@ -12,7 +12,7 @@ namespace fan
 	{
 		_info.icon = ImGui::NETWORK16;
 		_info.onGui = &ClientRPC::OnGui;
-		_info.name = "RPC manager";
+		_info.name = "Client RPC";
 	}
 
 	//================================================================================================================================
@@ -124,16 +124,12 @@ namespace fan
 	void ClientRPC::OnGui( EcsWorld& /*_world*/, EcsEntity /*_entityID*/, EcsComponent& _component )
 	{
 		ClientRPC& rpc = static_cast<ClientRPC&>( _component );
-
-		ImGui::Indent(); ImGui::Indent();
+		ImGui::Text( "rpc list: " );
+		ImGui::Indent();
+		for( std::pair<RpcID, RpcUnwrapMethod> pair : rpc.nameToRPCTable )
 		{
-			ImGui::Text( "rpc list: " );
-			ImGui::Indent();
-			for ( std::pair<RpcID, RpcUnwrapMethod> pair : rpc.nameToRPCTable )
-			{
-				ImGui::Text( "%d", pair.first );
-			}
-			ImGui::Unindent();
-		}ImGui::Unindent(); ImGui::Unindent();
+			ImGui::Text( "%d", pair.first );
+		}
+		ImGui::Unindent();
 	}
 }

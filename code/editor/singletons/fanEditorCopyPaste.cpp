@@ -13,6 +13,7 @@ namespace fan
 	void EditorCopyPaste::SetInfo( EcsSingletonInfo& _info )
 	{
 		_info.name = "editor copy/paste";
+		_info.icon = ImGui::COPY_PASTE16;
 	}
 
 	//================================================================================================================================
