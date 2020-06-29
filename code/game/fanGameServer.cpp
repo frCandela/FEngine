@@ -38,6 +38,7 @@
 #include "network/singletons/fanHostManager.hpp"
 #include "network/singletons/fanTime.hpp"
 #include "network/singletons/fanSpawnManager.hpp"
+#include "network/components/fanLinkingContextUnregisterer.hpp"
 #include "network/components/fanHostGameData.hpp"
 #include "network/components/fanHostConnection.hpp"
 #include "network/components/fanHostReplication.hpp"
@@ -119,6 +120,7 @@ namespace fan
 		world.AddComponentType<ReliabilityLayer>();
 		world.AddComponentType<HostPersistentHandle>();
 		world.AddComponentType<EntityReplication>();
+		world.AddComponentType<LinkingContextUnregisterer>();
 
 		// base singleton components
 		world.AddSingletonType<Scene>();

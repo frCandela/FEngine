@@ -73,11 +73,14 @@ namespace fan
 				const EntityReplication& entityReplication = *replicationIt;
 				assert( handle != 0 );
 				const PacketReplication packet = HostReplication::BuildEntityPacket( _world, handle, entityReplication.componentTypes );
-				for( HostManagerHandlePair& pair : hostReplications )
+				if( packet.packetData.getDataSize() > 0 )
 				{
-					if( pair.handle != entityReplication.exclude ) // do not replicate on this host
+					for( HostManagerHandlePair& pair : hostReplications )
 					{
-						pair.hostReplication.Replicate( packet, HostReplication::None );
+						if( pair.handle != entityReplication.exclude ) // do not replicate on this host
+						{
+							pair.hostReplication.Replicate( packet, HostReplication::None );
+						}
 					}
 				}
 			}

@@ -39,7 +39,9 @@ namespace fan
 	//================================================================================================================================
 	void LinkingContext::RemoveEntity( const EcsHandle _handle )
 	{
-		const NetID netID = EcsHandleToNetID[ _handle ];
+		auto it = EcsHandleToNetID.find( _handle );
+		assert( it != EcsHandleToNetID.end() );
+		const NetID netID = it->second;
 		netIDToEcsHandle.erase( netID );
 		EcsHandleToNetID.erase( _handle );
 	}

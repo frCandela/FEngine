@@ -6,6 +6,7 @@
 #include "network/components/fanClientRollback.hpp"
 #include "network/components/fanHostPersistentHandle.hpp"
 #include "network/components/fanEntityReplication.hpp"
+#include "network/components/fanLinkingContextUnregisterer.hpp"
 #include "scene/components/fanTransform.hpp"
 #include "scene/components/fanRigidbody.hpp"
 #include "scene/components/fanMotionState.hpp"
@@ -68,6 +69,7 @@ namespace fan
 						HostGameData& hostData = _world.GetComponent<HostGameData>( _world.GetEntity( playerID ) );
 						hostData.spaceshipHandle = SpawnShip::SpawnSpaceship( _world, true, false, playerID );
 						linkingContext.AddEntity( hostData.spaceshipHandle, spaceshipID );
+
 					}
 					else
 					{
@@ -109,6 +111,9 @@ namespace fan
 					SceneNode& spaceshipNode = *game.spaceshipPrefab->Instanciate( scene.GetRootNode() );
 					EcsEntity spaceshipID = _world.GetEntity( spaceshipNode.handle );
 
+					_world.AddComponent<LinkingContextUnregisterer>( spaceshipID );
+
+					// set name
 					if( _hasPlayerController )
 					{
 						spaceshipNode.name = "spaceship_player";
@@ -130,6 +135,7 @@ namespace fan
 					{
 						_world.AddComponent<PlayerInput>( spaceshipID );
 					}
+
 					if( _hasPlayerController )
 					{
 						_world.AddComponent<PlayerController>( spaceshipID );

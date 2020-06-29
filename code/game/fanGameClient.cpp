@@ -36,7 +36,9 @@
 
 #include "network/fanPacket.hpp"
 #include "network/singletons/fanLinkingContext.hpp"
+#include "network/singletons/fanSpawnManager.hpp"
 #include "network/singletons/fanTime.hpp"
+#include "network/components/fanLinkingContextUnregisterer.hpp"
 #include "network/components/fanClientReplication.hpp"
 #include "network/components/fanClientRPC.hpp"
 #include "network/components/fanClientGameData.hpp"
@@ -47,7 +49,6 @@
 #include "network/systems/fanClientSendReceive.hpp"
 #include "network/systems/fanTimeout.hpp"
 #include "network/systems/fanRollback.hpp"
-#include "network/singletons/fanSpawnManager.hpp"
 
 #include "game/fanGameTags.hpp"
 #include "game/singletons/fanClientNetworkManager.hpp"
@@ -122,6 +123,7 @@ namespace fan
 		world.AddComponentType<ClientRPC>();
 		world.AddComponentType<ClientGameData>();
 		world.AddComponentType<ClientRollback>();
+		world.AddComponentType<LinkingContextUnregisterer>();
 
 		// base singleton components
 		world.AddSingletonType<Scene>();

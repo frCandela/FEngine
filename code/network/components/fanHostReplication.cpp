@@ -59,29 +59,31 @@ namespace fan
 	//================================================================================================================================
 	PacketReplication HostReplication::BuildEntityPacket( EcsWorld& _world, const EcsHandle _handle, const std::vector<uint32_t>& _componentTypeInfo )
 	{
+		const LinkingContext& linkingContext = _world.GetSingleton< LinkingContext> ();
+		const EcsEntity entity = _world.GetEntity( _handle );
+
 		PacketReplication packet;
 		packet.replicationType = PacketReplication::ReplicationType::Entity;
 		packet.packetData.clear();
 
-		const LinkingContext& linkingContext = _world.GetSingleton< LinkingContext> ();
-		const EcsEntity entity = _world.GetEntity( _handle );
-
 		// Serializes net id
 		 const auto it = linkingContext.EcsHandleToNetID.find( _handle );
-		 const NetID netID = it->second;
-		 packet.packetData << netID;
-		 packet.packetData << sf::Uint8( _componentTypeInfo.size() );
 		 if( it != linkingContext.EcsHandleToNetID.end() )
 		 {
-			 for( const uint32_t typeInfo : _componentTypeInfo )
+			 const NetID netID = it->second;
+			 packet.packetData << netID;
+			 packet.packetData << sf::Uint8( _componentTypeInfo.size() );
+			 if( it != linkingContext.EcsHandleToNetID.end() )
 			 {
-				 const EcsComponentInfo& info = _world.GetComponentInfo( typeInfo );
-				 EcsComponent& component = _world.GetComponent( entity, typeInfo );
-				 packet.packetData << sf::Uint32( info.type);
-				 info.netSave( component, packet.packetData );
+				 for( const uint32_t typeInfo : _componentTypeInfo )
+				 {
+					 const EcsComponentInfo& info = _world.GetComponentInfo( typeInfo );
+					 EcsComponent& component = _world.GetComponent( entity, typeInfo );
+					 packet.packetData << sf::Uint32( info.type );
+					 info.netSave( component, packet.packetData );
+				 }
 			 }
 		 }
-
 		 return packet;
 	}
 

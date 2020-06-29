@@ -324,7 +324,7 @@ namespace fan
 
 			// runs logic, renders ui
 			Time& time = world.GetSingleton<Time>();
-			if( currentTime > time.lastLogicTime + time.logicDelta )
+			while ( currentTime > time.lastLogicTime + time.logicDelta )
 			{
 				world.GetSingleton<RenderDebug>().Clear();
 
