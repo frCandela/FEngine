@@ -30,6 +30,7 @@ namespace fan
 	{
 		_info.name = "editor selection";
 		_info.icon = ImGui::SELECTION16;
+		_info.group = EngineGroups::Editor;
 	}
 
 	//================================================================================================================================

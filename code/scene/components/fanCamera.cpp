@@ -13,6 +13,7 @@ namespace fan
 	void Camera::SetInfo( EcsComponentInfo& _info )
 	{
 		_info.icon = ImGui::IconType::CAMERA16;
+		_info.group = EngineGroups::Scene;
 		_info.onGui = &Camera::OnGui;
 		_info.load = &Camera::Load;
 		_info.save = &Camera::Save;

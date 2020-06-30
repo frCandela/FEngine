@@ -125,6 +125,11 @@ namespace fan
 	//================================================================================================================================
 	bool InputManager::Load( const Json& _json )
 	{
+		if( _json.is_null() )
+		{
+			return false;
+		}
+
 		{// Events
 			size_t index = 0;
 			const Json& jEvents = _json[ "events" ];

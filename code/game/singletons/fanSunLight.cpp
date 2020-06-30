@@ -10,6 +10,7 @@ namespace fan
 	void SunLight::SetInfo( EcsSingletonInfo& _info )
 	{
 		_info.icon = ImGui::SUN16;
+		_info.group = EngineGroups::Game;
 		_info.onGui = &SunLight::OnGui;
 		_info.save = &SunLight::Save;
 		_info.load = &SunLight::Load;

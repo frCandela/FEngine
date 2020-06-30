@@ -15,6 +15,7 @@ namespace fan
 	void PhysicsWorld::SetInfo( EcsSingletonInfo& _info )
 	{
 		_info.icon = ImGui::RIGIDBODY16;
+		_info.group = EngineGroups::ScenePhysics;
 		_info.onGui = &PhysicsWorld::OnGui;
 		_info.save = &PhysicsWorld::Save;
 		_info.load = &PhysicsWorld::Load;

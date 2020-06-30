@@ -27,6 +27,7 @@ namespace fan
 	void ClientNetworkManager::SetInfo( EcsSingletonInfo& _info )
 	{
 		_info.icon = ImGui::CLIENT_NET16;
+		_info.group = EngineGroups::GameNetwork;
 		_info.onGui = &ClientNetworkManager::OnGui;
 		_info.name = "client network manager";
 	}

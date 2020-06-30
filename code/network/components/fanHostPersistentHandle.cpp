@@ -9,6 +9,7 @@ namespace fan
 	void HostPersistentHandle::SetInfo( EcsComponentInfo& _info )
 	{
 		_info.icon = ImGui::NETWORK16;
+		_info.group = EngineGroups::Network;
 		_info.onGui = &HostPersistentHandle::OnGui;
 		_info.name = "network handle";
 		_info.editorPath = "network/";

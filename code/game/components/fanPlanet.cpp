@@ -12,6 +12,7 @@ namespace fan
 	void Planet::SetInfo( EcsComponentInfo& _info )
 	{
 		_info.icon = ImGui::IconType::PLANET16;
+		_info.group = EngineGroups::Game;
 		_info.onGui = &Planet::OnGui;
 		_info.load = &Planet::Load;
 		_info.save = &Planet::Save;

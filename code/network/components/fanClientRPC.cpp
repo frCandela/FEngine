@@ -11,6 +11,7 @@ namespace fan
 	void ClientRPC::SetInfo( EcsComponentInfo& _info )
 	{
 		_info.icon = ImGui::NETWORK16;
+		_info.group = EngineGroups::Network;
 		_info.onGui = &ClientRPC::OnGui;
 		_info.name = "Client RPC";
 	}

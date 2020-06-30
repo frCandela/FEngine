@@ -11,6 +11,7 @@ namespace fan
 	void PlayerController::SetInfo( EcsComponentInfo& _info )
 	{
 		_info.icon = ImGui::IconType::JOYSTICK16;
+		_info.group = EngineGroups::Game;
 		_info.onGui = &PlayerController::OnGui;
 		_info.load = &PlayerController::Load;
 		_info.save = &PlayerController::Save;

@@ -9,6 +9,7 @@ namespace fan
 	void TransformUI::SetInfo( EcsComponentInfo& _info )
 	{
 		_info.icon = ImGui::IconType::UI_TRANSFORM16;
+		_info.group = EngineGroups::SceneUI;
 		_info.onGui = &TransformUI::OnGui;
 		_info.load = &TransformUI::Load;
 		_info.save = &TransformUI::Save;

@@ -13,6 +13,7 @@ namespace fan
 	{
 		_info.icon = ImGui::GRID16;
 		_info.name = "editor grid";
+		_info.group = EngineGroups::Editor;
 	}
 
 	//================================================================================================================================

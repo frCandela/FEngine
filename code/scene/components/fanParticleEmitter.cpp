@@ -11,6 +11,7 @@ namespace fan
 	void ParticleEmitter::SetInfo( EcsComponentInfo& _info )
 	{
 		_info.icon = ImGui::IconType::PARTICLES16;
+		_info.group = EngineGroups::Scene;
 		_info.onGui = &ParticleEmitter::OnGui;
 		_info.load = &ParticleEmitter::Load;
 		_info.save = &ParticleEmitter::Save;

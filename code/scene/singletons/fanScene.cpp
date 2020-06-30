@@ -27,6 +27,7 @@ namespace fan
 	void Scene::SetInfo( EcsSingletonInfo& _info )
 	{
 		_info.icon = ImGui::SCENE16;
+		_info.group = EngineGroups::Scene;
 		_info.onGui = &Scene::OnGui;
 		_info.name = "scene";
 	}

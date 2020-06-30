@@ -9,6 +9,7 @@ namespace fan
 	void LinkingContext::SetInfo( EcsSingletonInfo& _info )
 	{
 		_info.icon = ImGui::LINK16;
+		_info.group = EngineGroups::Network;
 		_info.onGui = &LinkingContext::OnGui;
 		_info.name = "linking context";
 	}

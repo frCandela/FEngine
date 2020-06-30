@@ -13,6 +13,7 @@ namespace fan
 	void SceneNode::SetInfo( EcsComponentInfo& _info )
 	{
 		_info.icon  = ImGui::IconType::GAMEOBJECT16;
+		_info.group = EngineGroups::Scene;
 		_info.onGui = &SceneNode::OnGui;
 		_info.destroy = &SceneNode::Destroy;
 		_info.editorPath = "/";

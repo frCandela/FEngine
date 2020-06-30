@@ -10,6 +10,7 @@ namespace fan
 	void Material::SetInfo( EcsComponentInfo& _info )
 	{
 		_info.icon = ImGui::IconType::MATERIAL16;
+		_info.group = EngineGroups::SceneRender;
 		_info.onGui = &Material::OnGui;
 		_info.load  = &Material::Load;
 		_info.save  = &Material::Save;

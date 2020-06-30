@@ -8,6 +8,7 @@
 #include "ecs/fanEcsTag.hpp"
 #include "scene/fanSceneTags.hpp"
 #include "editor/fanModals.hpp"
+#include "editor/fanGroupsColors.hpp"
 
 namespace fan
 {
@@ -85,7 +86,7 @@ namespace fan
 					{
 						const EcsComponentInfo& info = infos[componentIndex];
 						std::stringstream ss;
-						ImGui::Icon( info.icon, { 16,16 } ); ImGui::SameLine();
+						ImGui::Icon( info.icon, { 16,16 }, GroupsColors::GetColor( info.group ) ); ImGui::SameLine();
 						ss << info.name.c_str();
 						for( int i = 0; i < 19 - info.name.size(); i++ )
 						{

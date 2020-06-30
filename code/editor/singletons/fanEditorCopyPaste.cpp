@@ -14,6 +14,7 @@ namespace fan
 	{
 		_info.name = "editor copy/paste";
 		_info.icon = ImGui::COPY_PASTE16;
+		_info.group = EngineGroups::Editor;
 	}
 
 	//================================================================================================================================

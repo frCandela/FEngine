@@ -31,11 +31,12 @@ namespace fan
 		static EcsComponent& Instanciate( void* _buffer ) { return *new( _buffer ) T(); }			\
 	    static void* Memcpy( void* _dst, const void* _src, size_t /*_count*/ ){	new( _dst )T( *static_cast<const T*>( _src ) ); return _dst; } \
 	};																								\
-	using Info = EcsComponentInfoImpl< _ComponentType >;											\
+	using Info = EcsComponentInfoImpl< _ComponentType >;											
 	
 
 
 	class EcsWorld;
+
 	//================================
 	//================================
 	struct EcsComponentInfo
@@ -45,14 +46,15 @@ namespace fan
 			RollbackNoOverwrite = 1 // when a rollback happen, the old rollback states are not overwritten with the resimulated ones
 		};
 
-		std::string name;
+		std::string		name;
 		ImGui::IconType icon = ImGui::IconType::NONE;	// editor icon
-		const char* editorPath = "";					// editor path ( for the addComponent ) popup of the inspector
-		uint32_t	type;
-		int			index;
-		uint32_t	size;
-		uint32_t	alignment;
-		int			flags = ComponentFlags::None;
+		EngineGroups		group = EngineGroups::None;		// editor group
+		const char*		editorPath = "";				// editor path ( for the addComponent ) popup of the inspector
+		uint32_t		type;		
+		int				index;
+		uint32_t		size;
+		uint32_t		alignment;
+		int				flags = ComponentFlags::None;
 
 		void ( *init )( EcsWorld&, EcsEntity, EcsComponent& ) = nullptr;			// called at the creation of the component
 		void ( *destroy )( EcsWorld&, EcsEntity, EcsComponent& ) = nullptr;			// called at the destruction of the component

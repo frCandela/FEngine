@@ -1,7 +1,6 @@
 #include "editor/windows/fanInspectorWindow.hpp"
 
 #include <sstream>
-#include "editor/singletons/fanEditorSelection.hpp"
 #include "scene/fanDragnDrop.hpp"
 #include "scene/singletons/fanScene.hpp"
 #include "scene/singletons/fanPhysicsWorld.hpp"
@@ -16,6 +15,8 @@
 #include "render/core/fanTexture.hpp"
 #include "render/core/fanTexture.hpp"
 #include "render/fanMesh.hpp"
+#include "editor/singletons/fanEditorSelection.hpp"
+#include "editor/fanGroupsColors.hpp"
 
 
 namespace fan
@@ -54,7 +55,7 @@ namespace fan
  				ImGui::Separator();
 				 
  				// Icon
-				ImGui::Icon( info.icon, { 16,16 } ); ImGui::SameLine();
+				ImGui::Icon( info.icon, { 16,16 }, GroupsColors::GetColor( info.group ) ); ImGui::SameLine();
 				ImGui::FanBeginDragDropSourceComponent( _world, node.handle, info.type, ImGuiDragDropFlags_SourceAllowNullID );
 				ImGui::Text( "%s", info.name.c_str() );
  				ImGui::FanBeginDragDropSourceComponent( _world, node.handle, info.type, ImGuiDragDropFlags_SourceAllowNullID );
@@ -87,7 +88,7 @@ namespace fan
 	//================================================================================================================================
 	void InspectorWindow::NewComponentItem( EcsWorld& _world, const EcsComponentInfo& _info )
 	{
-		ImGui::Icon( _info.icon, { 16,16 } ); ImGui::SameLine();
+		ImGui::Icon( _info.icon, { 16,16 }, GroupsColors::GetColor( _info.group ) ); ImGui::SameLine();
 		if( ImGui::MenuItem( _info.name.c_str() ) )
 		{
 			// Create new EcsComponent 

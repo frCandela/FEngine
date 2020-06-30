@@ -1,6 +1,5 @@
 #include "editor/windows/fanPreferencesWindow.hpp"
 
-#include "editor/fanModals.hpp"
 #include "render/pipelines/fanPostprocessPipeline.hpp"
 #include "render/fanRenderer.hpp"
 #include "core/fanColor.hpp"
@@ -11,14 +10,25 @@
 #include "core/fanSerializedValues.hpp"
 #include "core/time/fanProfiler.hpp"
 #include "core/input/fanAxis.hpp"
+#include "editor/fanModals.hpp"
+#include "editor/fanGroupsColors.hpp"
 
 namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	PreferencesWindow::PreferencesWindow() :
-		EditorWindow( "preferences", ImGui::IconType::PREFERENCES16 )
+	PreferencesWindow::PreferencesWindow( Renderer& _renderer )
+		: EditorWindow( "preferences", ImGui::IconType::PREFERENCES16 )
+		, m_renderer( _renderer )
 	{
+		// loads clear color
+		Color clearColor;
+		if( SerializedValues::Get().GetColor( "clear_color", clearColor ) )
+		{
+			m_renderer.SetClearColor( clearColor.ToGLM() );
+		}
+
+		// loads imgui colors
 		ImGuiStyle& style = ImGui::GetStyle();
 		for ( int i = 0; i < ImGuiCol_COUNT; i++ )
 		{
@@ -26,17 +36,29 @@ namespace fan
 			Color color;
 			if ( SerializedValues::Get().GetColor( name.c_str(), color ) )
 			{
-				style.Colors[ i ] = ImVec4( color[ 0 ], color[ 1 ], color[ 2 ], color[ 3 ] );
+				style.Colors[ i ] = color.ToImGui();
 			}
 		}
+
+		// loads groups colors
+		for( int i = 0; i < GroupsColors::s_count; i++ )
+		{
+			std::string name = "imgui_" + std::string( GetEngineGroupName( EngineGroups( i ) ) );
+			Color color;
+			if( SerializedValues::Get().GetColor( name.c_str(), color ) )
+			{
+				GroupsColors::s_colors[i] = color.ToImGui();
+			}
+		}		
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	PreferencesWindow::~PreferencesWindow()
 	{
-		SerializedValues::Get().SetColor( "clear_color", m_renderer->GetClearColor() );
+		SerializedValues::Get().SetColor( "clear_color", m_renderer.GetClearColor() );
 
+		// saves imgui colors
 		ImGuiStyle& style = ImGui::GetStyle();
 		for ( int i = 0; i < ImGuiCol_COUNT; i++ )
 		{
@@ -44,35 +66,44 @@ namespace fan
 			SerializedValues::Get().SetColor( name.c_str(), style.Colors[ i ] );
 		}
 
+		// saves groups colors
+		for( int i = 0; i < GroupsColors::s_count; i++ )
+		{
+			std::string name = "imgui_" + std::string( GetEngineGroupName( EngineGroups( i ) ) );
+			SerializedValues::Get().SetColor( name.c_str(), GroupsColors::s_colors[i] );
+		}
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void PreferencesWindow::OnGui( EcsWorld& /*_world*/ )
 	{
-		SCOPED_PROFILE( preferences )
+		SCOPED_PROFILE( preferences );
 
-			ImGui::Icon( GetIconType(), { 16,16 } ); ImGui::SameLine();
+		ImGui::Icon( GetIconType(), { 16,16 } ); ImGui::SameLine();
 		ImGui::Text( "Preferences" );
 
 		// RENDERING
 		if ( ImGui::CollapsingHeader( "Rendering" ) )
 		{
+			ImGui::Indent();
 			// Filter color
-			glm::vec4& color = m_renderer->GetPostprocessPipeline()->uniforms.color;
+			glm::vec4& color = m_renderer.GetPostprocessPipeline()->uniforms.color;
 			ImGui::ColorEdit3( "Filter##1", &color[ 0 ], ImGui::fanColorEditFlags );
 
 			// Clear color
-			glm::vec4 clearColor = m_renderer->GetClearColor();
+			glm::vec4 clearColor = m_renderer.GetClearColor();
 			if ( ImGui::ColorEdit3( "Clear color", &clearColor.r, ImGui::fanColorEditFlags ) )
 			{
-				m_renderer->SetClearColor( clearColor );
+				m_renderer.SetClearColor( clearColor );
 			}
+			ImGui::Unindent();
 		}
 
 		// IMGUI COLORS
 		if ( ImGui::CollapsingHeader( "Imgui Colors" ) )
 		{
+			ImGui::Indent();
 			ImGuiStyle& style = ImGui::GetStyle();
 			for ( int i = 0; i < ImGuiCol_COUNT; i++ )
 			{
@@ -81,6 +112,21 @@ namespace fan
 				ImGui::ColorEdit4( name, ( float* ) &style.Colors[ i ], ImGui::fanColorEditFlags );
 				ImGui::PopID();
 			}
+			ImGui::Unindent();
+		}
+
+		// Groups colors
+		if( ImGui::CollapsingHeader( "Groups Colors" ) )
+		{
+			ImGui::Indent();
+			for (int i = 0; i < GroupsColors::s_count; i++)
+			{
+				const char* name = GetEngineGroupName( EngineGroups(i) );
+				ImGui::PushID( i );
+				ImGui::ColorEdit4( name, (float*)&GroupsColors::s_colors[i], ImGui::fanColorEditFlags );
+				ImGui::PopID();
+			}
+			ImGui::Unindent();
 		}
 
 		DrawJoysticks();

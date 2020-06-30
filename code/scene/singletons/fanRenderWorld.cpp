@@ -8,6 +8,7 @@ namespace fan
 	void RenderWorld::SetInfo( EcsSingletonInfo& _info )
 	{
 		_info.icon = ImGui::RENDERER16;
+		_info.group = EngineGroups::SceneRender;
 		_info.onGui = &RenderWorld::OnGui;
 		_info.name = "render world";
 	}

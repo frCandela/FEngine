@@ -9,6 +9,7 @@ namespace fan
 	void Health::SetInfo( EcsComponentInfo& _info )
 	{
 		_info.icon = ImGui::IconType::HEART16;
+		_info.group = EngineGroups::Game;
 		_info.onGui = &Health::OnGui;
 		_info.load = &Health::Load;
 		_info.save = &Health::Save;

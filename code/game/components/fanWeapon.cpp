@@ -10,6 +10,7 @@ namespace fan
 	void Weapon::SetInfo( EcsComponentInfo& _info )
 	{
 		_info.icon = ImGui::IconType::JOYSTICK16;
+		_info.group = EngineGroups::Game;
 		_info.onGui = &Weapon::OnGui;
 		_info.load = &Weapon::Load;
 		_info.save = &Weapon::Save;

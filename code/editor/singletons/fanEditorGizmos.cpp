@@ -20,6 +20,7 @@ namespace fan
 	{
 		_info.name = "editor gizmo";
 		_info.icon = ImGui::GIZMOS16;
+		_info.group = EngineGroups::Editor;
 	}
 
 	//================================================================================================================================

@@ -11,6 +11,7 @@ namespace fan
 	void UIRenderer::SetInfo( EcsComponentInfo& _info )
 	{
 		_info.icon = ImGui::IconType::UI_MESH_RENDERER16;
+		_info.group = EngineGroups::SceneUI;
 		_info.onGui = &UIRenderer::OnGui;
 		_info.load = &UIRenderer::Load;
 		_info.save = &UIRenderer::Save;

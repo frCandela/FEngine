@@ -11,6 +11,7 @@ namespace fan
 	void ScenePointers::SetInfo( EcsSingletonInfo& _info )
 	{
 		_info.icon = ImGui::PTR16;
+		_info.group = EngineGroups::Scene;
 		_info.onGui = &ScenePointers::OnGui;
 		_info.name = "scene pointers";
 	}

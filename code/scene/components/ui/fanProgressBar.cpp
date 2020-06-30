@@ -9,6 +9,7 @@ namespace fan
 	void ProgressBar::SetInfo( EcsComponentInfo& _info )
 	{
 		_info.icon = ImGui::IconType::UI_PROGRESS_BAR16;
+		_info.group = EngineGroups::SceneUI;
 		_info.onGui = &ProgressBar::OnGui;
 		_info.load = &ProgressBar::Load;
 		_info.save = &ProgressBar::Save;

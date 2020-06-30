@@ -18,6 +18,7 @@ namespace fan
 	void Time::SetInfo( EcsSingletonInfo& _info )
 	{ 
 		_info.icon = ImGui::TIME16;
+		_info.group = EngineGroups::Network;
 		_info.onGui = &Time::OnGui;
 		_info.name = "time";
 	}

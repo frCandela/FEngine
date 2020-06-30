@@ -15,6 +15,7 @@ namespace fan
 	void HostManager::SetInfo( EcsSingletonInfo& _info )
 	{
 		_info.icon = ImGui::NETWORK16;
+		_info.group = EngineGroups::Network;
 		_info.onGui = &HostManager::OnGui;
 		_info.name = "host manager";
 	}

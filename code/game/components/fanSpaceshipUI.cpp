@@ -7,6 +7,7 @@ namespace fan
 	void SpaceshipUI::SetInfo( EcsComponentInfo& _info )
 	{
 		_info.icon = ImGui::IconType::SPACE_SHIP16;
+		_info.group = EngineGroups::Game;
 		_info.onGui = &SpaceshipUI::OnGui;
 		_info.load = &SpaceshipUI::Load;
 		_info.save = &SpaceshipUI::Save;

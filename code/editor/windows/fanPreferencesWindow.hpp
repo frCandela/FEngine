@@ -14,16 +14,14 @@ namespace fan
 	class PreferencesWindow : public EditorWindow
 	{
 	public:
-		PreferencesWindow();
+		PreferencesWindow( Renderer& _renderer );
 		~PreferencesWindow();
-
-		void SetRenderer( Renderer* _renderer ) { m_renderer = _renderer; }
 	
 	protected:
 		void OnGui( EcsWorld& _world ) override;
 
 	private:
-		Renderer* m_renderer;
+		Renderer& m_renderer;
 
 		void DrawJoysticks();
 		void DrawShortcuts();

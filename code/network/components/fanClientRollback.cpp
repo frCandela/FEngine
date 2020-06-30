@@ -9,6 +9,7 @@ namespace fan
 	void ClientRollback::SetInfo( EcsComponentInfo& _info )
 	{
 		_info.icon = ImGui::NETWORK16;
+		_info.group = EngineGroups::Network;
 		_info.onGui = &ClientRollback::OnGui;
 		_info.save = &ClientRollback::Save;
 		_info.load = &ClientRollback::Load;

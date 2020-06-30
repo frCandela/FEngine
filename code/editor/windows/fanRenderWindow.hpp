@@ -13,11 +13,10 @@ namespace fan
 	class RenderWindow : public EditorWindow
 	{
 	public:
-		RenderWindow();
-		void SetRenderer( Renderer* _renderer ) { m_renderer = _renderer; }
+		RenderWindow( Renderer& _renderer );
 
 	protected:
-		Renderer* m_renderer;
+		Renderer& m_renderer;
 
 		void OnGui( EcsWorld& _world ) override;
 	};

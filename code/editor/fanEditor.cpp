@@ -150,23 +150,17 @@ namespace fan
 		m_window = new Window( _settings.windowName.c_str(), windowSize, windowPosition );
 		m_renderer = new Renderer( *m_window );
 
-		Color clearColor;
-		if( SerializedValues::Get().GetColor( "clear_color", clearColor ) )
-		{
-			m_renderer->SetClearColor( clearColor.ToGLM() );
-		}
-
 		Prefab::s_resourceManager.Init();
 
 		// Initialize editor components		
 		m_gameViewWindow	= new GameViewWindow( _settings.launchMode );
-		m_renderWindow		= new RenderWindow();
+		m_renderWindow		= new RenderWindow( *m_renderer );
 		m_sceneWindow		= new SceneWindow();
 		m_inspectorWindow	= new InspectorWindow();
 		m_consoleWindow		= new ConsoleWindow();
 		m_ecsWindow			= new EcsWindow();
 		m_profilerWindow	= new ProfilerWindow();
-		m_preferencesWindow = new PreferencesWindow();
+		m_preferencesWindow = new PreferencesWindow( *m_renderer );
 		m_networkWindow		= new NetworkWindow();
 		m_singletonsWindow	= new SingletonsWindow();
 		m_mainMenuBar		= new MainMenuBar();
@@ -182,8 +176,6 @@ namespace fan
 			, m_networkWindow
 			, m_preferencesWindow
 			} );
-		m_renderWindow->SetRenderer( m_renderer );
-		m_preferencesWindow->SetRenderer( m_renderer );
 
 		// Instance messages				
 		m_mainMenuBar->onReloadShaders.Connect( &Renderer::ReloadShaders, m_renderer );

@@ -16,8 +16,9 @@ namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	RenderWindow::RenderWindow() :
-		EditorWindow( "renderer", ImGui::IconType::RENDERER16 )
+	RenderWindow::RenderWindow( Renderer& _renderer )
+		: EditorWindow( "renderer", ImGui::IconType::RENDERER16 )
+		, m_renderer( _renderer )
 	{}
 
 	//================================================================================================================================
@@ -60,7 +61,7 @@ namespace fan
 
 		if ( ImGui::CollapsingHeader( "Rendered Mesh : " ) )
 		{
-			const std::vector<DrawData>& meshArray = m_renderer->GetMeshArray();
+			const std::vector<DrawData>& meshArray = m_renderer.GetMeshArray();
 			for ( uint32_t meshIndex = 0; meshIndex < meshArray.size(); meshIndex++ )
 			{
 				const DrawData& drawData = meshArray[ meshIndex ];
@@ -75,7 +76,7 @@ namespace fan
 			}
 		}
 
-		LightsUniforms& lights = m_renderer->GetForwardPipeline()->m_lightUniforms;
+		LightsUniforms& lights = m_renderer.GetForwardPipeline()->m_lightUniforms;
 		if ( ImGui::CollapsingHeader( "Directional lights : " ) )
 		{
 			ImGui::PushItemWidth( 150 );
@@ -104,9 +105,9 @@ namespace fan
 		{
 			ImGui::PushItemWidth( 150 );
 
-			const VkExtent2D gameExtent = m_renderer->GetGameFrameBuffers()->GetExtent();
-			const VkExtent2D postprocessExtent = m_renderer->GetPostProcessFramebuffers()->GetExtent();
-			const VkExtent2D swapchainExtent = m_renderer->GetSwapchainFramebuffers()->GetExtent();
+			const VkExtent2D gameExtent = m_renderer.GetGameFrameBuffers()->GetExtent();
+			const VkExtent2D postprocessExtent = m_renderer.GetPostProcessFramebuffers()->GetExtent();
+			const VkExtent2D swapchainExtent = m_renderer.GetSwapchainFramebuffers()->GetExtent();
 
 			ImGui::Text( "%d x %d game", gameExtent.width, gameExtent.height );
 			ImGui::Text( "%d x %d postprocess", postprocessExtent.width, postprocessExtent.height );
