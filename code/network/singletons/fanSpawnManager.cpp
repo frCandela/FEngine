@@ -49,7 +49,7 @@ namespace fan
 	//================================================================================================================================
 	// Iterates over the spawns list to find trigger spawns with the correct timing
 	//================================================================================================================================
-	void SpawnManager::Spawn( EcsWorld& _world )
+	void SpawnManager::Update( EcsWorld& _world )
 	{
 		const Time& time = _world.GetSingleton<Time>();
 		SpawnManager& spawnManager = _world.GetSingleton<SpawnManager>();
@@ -62,7 +62,6 @@ namespace fan
 			{
 				if( time.frameIndex > spawnInfo.spawnFrameIndex )
 				{
-
 					Debug::Warning() << "missed spawning for frame" << spawnInfo.spawnFrameIndex;
 					Debug::Get() << " ,delta is " << time.frameIndex - spawnInfo.spawnFrameIndex << Debug::Endl();
 				}
@@ -71,6 +70,24 @@ namespace fan
 				spawnManager.spawns.erase( spawnManager.spawns.begin() + spawnIndex );
 			}
  		}
+
+		// despawn
+		LinkingContext& linkingContext = _world.GetSingleton<LinkingContext>();
+		for ( const NetID netID : spawnManager.despawns )
+		{
+			auto it = linkingContext.netIDToEcsHandle.find( netID );
+			if( it != linkingContext.netIDToEcsHandle.end() )
+			{
+				const EcsHandle handle = it->second;
+				linkingContext.RemoveEntity( handle );
+				_world.Kill( _world.GetEntity( handle ) );
+			}
+			else
+			{
+				Debug::Warning() << "spawn manager despawn failed for net ID " << netID << Debug::Endl();
+			}			
+		}
+		spawnManager.despawns.clear();
 	}
 
 	//================================================================================================================================
@@ -79,6 +96,13 @@ namespace fan
 	void SpawnManager::OnSpawn( const sf::Uint32 _spawnID, const FrameIndex _frameIndex, sf::Packet _data )
 	{
 		spawns.push_back( { _spawnID, _frameIndex , _data } );
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void SpawnManager::OnDespawn( const NetID _netID )
+	{
+		despawns.push_back( _netID );
 	}
 
 	//================================================================================================================================

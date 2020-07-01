@@ -20,7 +20,7 @@ namespace fan
 	{
 		LinkingContext& linkingContext = static_cast<LinkingContext&>( _component );
 		linkingContext.netIDToEcsHandle.clear();
-		linkingContext.EcsHandleToNetID.clear();
+		linkingContext.ecsHandleToNetID.clear();
 		linkingContext.nextNetID = 1;
 	}
 
@@ -30,21 +30,23 @@ namespace fan
 	{
 		assert( _handle != 0 );
 		assert( _netID != 0 );
-		assert( EcsHandleToNetID.find( _handle ) == EcsHandleToNetID.end() );
+		assert( ecsHandleToNetID.find( _handle ) == ecsHandleToNetID.end() );
 		assert( netIDToEcsHandle.find( _netID ) == netIDToEcsHandle.end() );		
 		netIDToEcsHandle[_netID] = _handle;
-		EcsHandleToNetID[_handle] = _netID;
+		ecsHandleToNetID[_handle] = _netID;
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void LinkingContext::RemoveEntity( const EcsHandle _handle )
 	{
-		auto it = EcsHandleToNetID.find( _handle );
-		assert( it != EcsHandleToNetID.end() );
-		const NetID netID = it->second;
-		netIDToEcsHandle.erase( netID );
-		EcsHandleToNetID.erase( _handle );
+		auto it = ecsHandleToNetID.find( _handle );
+		if( it != ecsHandleToNetID.end() )
+		{
+			const NetID netID = it->second;
+			netIDToEcsHandle.erase( netID );
+			ecsHandleToNetID.erase( _handle );
+		}
 	}
 
 	//================================================================================================================================

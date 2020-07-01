@@ -160,6 +160,11 @@ namespace fan
 							PacketDisconnect packetDisconnect;
 							packetDisconnect.Read( packet );
 							hostManager.DeleteHost( _world, clientHandle );
+							const HostGameData& hostGameData = _world.GetComponent< HostGameData>( _world.GetEntity( clientHandle ) );
+							if( hostGameData.spaceshipID != 0 )
+							{
+								_world.Run<S_ReplicateOnAllHosts>( ClientRPC::RPCDespawn( hostGameData.spaceshipID ), HostReplication::ResendUntilReplicated, clientHandle );
+							}
 						} break;
 						case PacketType::Ping:
 						{

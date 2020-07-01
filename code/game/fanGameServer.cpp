@@ -204,7 +204,7 @@ namespace fan
 			world.Run<S_DetectHostTimout>		();
 			world.Run<S_HostSpawnShip>			( _delta );
 			world.Run<S_HostSyncFrame>			( _delta );
-			SpawnManager			::Spawn( world );
+			SpawnManager			::Update( world );
 
 			// update	
 			world.Run<S_HostUpdateInput>( _delta );

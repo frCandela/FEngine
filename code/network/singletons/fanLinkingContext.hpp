@@ -19,7 +19,7 @@ namespace fan
 		static void OnGui( EcsWorld&, EcsSingleton& _component );
 
 		std::unordered_map<NetID, EcsHandle > netIDToEcsHandle;
-		std::unordered_map<EcsHandle, NetID > EcsHandleToNetID;
+		std::unordered_map<EcsHandle, NetID > ecsHandleToNetID;
 		NetID nextNetID;
 
 		void AddEntity( const EcsHandle _handle, const NetID _netID );

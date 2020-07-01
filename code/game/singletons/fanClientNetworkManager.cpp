@@ -63,8 +63,10 @@ namespace fan
 		SpawnManager& spawnManager = _world.GetSingleton<SpawnManager>();
 		rpcManager.onShiftFrameIndex.Connect( &ClientGameData::OnShiftFrameIndex, _world, persistentHandle );
 		rpcManager.onShiftFrameIndex.Connect( &Time::OnShiftFrameIndex, &time );
-		connection.onLoginSuccess.Connect( &ClientGameData::OnLoginSuccess, _world, persistentHandle );
 		rpcManager.onSpawn.Connect( &SpawnManager::OnSpawn, &spawnManager );
+		rpcManager.onDespawn.Connect( &SpawnManager::OnDespawn, &spawnManager );
+		connection.onLoginSuccess.Connect( &ClientGameData::OnLoginSuccess, _world, persistentHandle );
+
 
 		// Bind socket
 		sf::Socket::Status socketStatus = sf::Socket::Disconnected;

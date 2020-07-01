@@ -57,7 +57,7 @@ namespace fan
 
 					const EcsEntity spaceshipEntity = transformIt.GetEntity();
 					const EcsHandle ownerHandle = _world.GetHandle( spaceshipEntity );
-					const NetID ownerID = linkingContext.EcsHandleToNetID.at( ownerHandle );
+					const NetID ownerID = linkingContext.ecsHandleToNetID.at( ownerHandle );
 					const btVector3 bulletPosition = transform.GetPosition() + transform.TransformDirection( weapon.originOffset );
 					const btVector3 bulletVelocity = rigidbody.GetVelocity() + weapon.bulletSpeed * transform.Forward();
 					spawn::SpawnBullet::Instanciate( _world, ownerID, bulletPosition, bulletVelocity );

@@ -45,6 +45,7 @@ namespace fan
 		nameToRPCTable.clear(); 
 		RegisterUnwrapMethod( s_rpcIdShiftFrame, &ClientRPC::UnwrapShiftClientFrame );
 		RegisterUnwrapMethod( s_rpcIdSpawn, &ClientRPC::UnwrapSpawn );
+		RegisterUnwrapMethod( s_rpcIdDespawn, &ClientRPC::UnwrapDespawn );
 	}
 
 	//================================================================================================================================
@@ -89,23 +90,46 @@ namespace fan
 	//================================================================================================================================
 	// Generate a RPC replication packet for spawning entities
 	//================================================================================================================================
-	PacketReplication ClientRPC::RPCSpawn( const SpawnInfo& spawnInfo )
+	PacketReplication ClientRPC::RPCSpawn( const SpawnInfo& _spawnInfo )
 	{
 		PacketReplication packet;
 		packet.replicationType = PacketReplication::ReplicationType::RPC;
 
 		packet.packetData.clear();
 		packet.packetData << s_rpcIdSpawn;
-		packet.packetData << spawnInfo.spawnID;
-		packet.packetData << spawnInfo.spawnFrameIndex;
+		packet.packetData << _spawnInfo.spawnID;
+		packet.packetData << _spawnInfo.spawnFrameIndex;
 
-		sf::Packet dataCpy = spawnInfo.data;
+		sf::Packet dataCpy = _spawnInfo.data;
 		while( !dataCpy.endOfPacket() )
 		{
 			uint8_t dataByte;
 			dataCpy >> dataByte;
 			packet.packetData << dataByte;
 		}
+
+		return packet;
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void ClientRPC::UnwrapDespawn( sf::Packet& _packet )
+	{
+		NetID netId;
+		_packet >> netId;
+		onDespawn.Emmit( netId );
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	PacketReplication  ClientRPC::RPCDespawn( const NetID _netID )
+	{
+		PacketReplication packet;
+		packet.replicationType = PacketReplication::ReplicationType::RPC;
+
+		packet.packetData.clear();
+		packet.packetData << s_rpcIdDespawn;
+		packet.packetData << _netID;
 
 		return packet;
 	}

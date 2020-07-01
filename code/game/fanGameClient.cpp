@@ -263,7 +263,7 @@ namespace fan
 			world.Run<S_ProcessTimedOutPackets>();
 			world.Run<S_ClientDetectServerTimeout>( _delta );
 			world.Run<S_ClientRunReplication>(		_delta );
-			SpawnManager::Spawn( world );
+			SpawnManager::Update( world );
 
 			// update
 			world.Run<S_RefreshPlayerInput>( _delta );

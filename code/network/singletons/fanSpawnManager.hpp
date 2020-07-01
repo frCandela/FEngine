@@ -34,13 +34,15 @@ namespace fan
 		static void Init( EcsWorld& _world, EcsSingleton& _component );
 		static void OnGui( EcsWorld&, EcsSingleton& _component );
 
-		static void Spawn( EcsWorld& _world );	
+		static void Update( EcsWorld& _world );	
 
 		void RegisterSpawnMethods();
 		void RegisterSpawnMethod( const SpawnID _spawnID, const SpawnMethod _spawnMethod );
 		void OnSpawn( const SpawnID _spawnID, const FrameIndex _frameIndex, sf::Packet _data );
+		void OnDespawn( const NetID _netID );
 
 		std::vector< SpawnInfo > spawns;
+		std::vector< NetID > despawns;
 		std::unordered_map< SpawnID, SpawnMethod > spawnMethods;
 	};
 }

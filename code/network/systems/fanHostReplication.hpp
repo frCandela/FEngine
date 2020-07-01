@@ -9,7 +9,7 @@ namespace fan
 {
 	//==============================================================================================================================================================
 	// Sends a replication packet on all hosts,
-	// one host can be excluded using the _excludeHandle parameter
+	// one host can be excluded using the _excludeHandle parameter. Pass it the handle of the 
 	//==============================================================================================================================================================
 	struct S_ReplicateOnAllHosts : EcsSystem
 	{

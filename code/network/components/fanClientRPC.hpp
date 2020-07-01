@@ -40,6 +40,12 @@ namespace fan
 		Signal< SpawnID, FrameIndex, sf::Packet >	 onSpawn;
 		static const RpcID		 s_rpcIdSpawn = SSID( "RPCSpawn" );
 		void					 UnwrapSpawn( sf::Packet& _packet );
-		static PacketReplication RPCSpawn( const SpawnInfo& spawnInfo );
+		static PacketReplication RPCSpawn( const SpawnInfo& _spawnInfo );
+
+		Signal< NetID >	 onDespawn;
+		static const RpcID		 s_rpcIdDespawn = SSID( "RPCDespawn" );
+		void					 UnwrapDespawn( sf::Packet& _packet );
+		static PacketReplication RPCDespawn( const NetID _netID );
+
 	};
 }

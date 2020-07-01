@@ -3,6 +3,9 @@
 #include "network/singletons/fanHostManager.hpp"
 #include "network/components/fanHostConnection.hpp"
 #include "network/components/fanReliabilityLayer.hpp"
+#include "network/components/fanHostGameData.hpp"
+#include "network/components/fanClientRPC.hpp"
+#include "network/systems/fanHostReplication.hpp"
 
 namespace fan
 {
@@ -12,7 +15,9 @@ namespace fan
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world )
 		{
-			return _world.GetSignature<HostConnection>() | _world.GetSignature<SceneNode>();
+			return _world.GetSignature<HostConnection>() 
+				| _world.GetSignature<SceneNode>() 
+				| _world.GetSignature<HostGameData>();
 		}
 
 		static void Run( EcsWorld& _world, const EcsView& _view )
@@ -22,18 +27,25 @@ namespace fan
 
 			auto sceneNodeIt = _view.begin<SceneNode>();
 			auto hostConnectionit = _view.begin<HostConnection>();
-			for( ; hostConnectionit != _view.end<HostConnection>(); ++hostConnectionit, ++sceneNodeIt )
+			auto hostGameDataIt = _view.begin<HostGameData>();
+			for( ; hostConnectionit != _view.end<HostConnection>(); ++hostConnectionit, ++sceneNodeIt, ++hostGameDataIt )
 			{
 				const HostConnection& connection = *hostConnectionit;
 				const SceneNode& sceneNode = *sceneNodeIt;
 
-				//packets are sorted, so all timed out packets must be at front
+				// packets are sorted, so all timed out packets must be at front
 				if( connection.state == HostConnection::Connected )
 				{
 					if( connection.lastResponseTime + connection.timeoutDelay < currentTime )
 					{
 						Debug::Log() << "client timeout " << Debug::Endl();
+
 						hostManager.DeleteHost( _world, sceneNode.handle );
+						const HostGameData& hostGameData = *hostGameDataIt;
+						if( hostGameData.spaceshipID != 0 )
+						{
+							_world.Run<S_ReplicateOnAllHosts>( ClientRPC::RPCDespawn( hostGameData.spaceshipID ), HostReplication::ResendUntilReplicated, sceneNode.handle );
+						}
 					}
 				}
 			}
