@@ -48,6 +48,45 @@ namespace fan
 		Input::Get().Manager().Load( m_json[ m_keysBindingsName ] );
 	}
 
+	//================================================================================================================================
+	//================================================================================================================================
+	void SerializedValues::SaveWindowSizeAndPosition( const glm::ivec2 _position, const glm::ivec2 _size )
+	{
+		SerializedValues::Get().SetUInt( "renderer_extent_width", _size.x );
+		SerializedValues::Get().SetUInt( "renderer_extent_height", _size.y );
+		SerializedValues::Get().SetInt( "renderer_position_x", _position.x );
+		SerializedValues::Get().SetInt( "renderer_position_y", _position.y );
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void SerializedValues::LoadWindowSizeAndPosition( const LaunchSettings& _settings, glm::ivec2& _outPosition, glm::ivec2& _outSize )
+	{
+		// window position
+		_outPosition = { 0,23 };
+		if( _settings.window_position != glm::ivec2( -1, -1 ) )
+		{
+			_outPosition = _settings.window_position;
+		}
+		else
+		{
+			SerializedValues::Get().GetInt( "renderer_position_x", _outPosition.x );
+			SerializedValues::Get().GetInt( "renderer_position_y", _outPosition.y );
+		}
+
+		// window size
+		_outSize = { 1280,720 };
+		if( _settings.window_size != glm::ivec2( -1, -1 ) )
+		{
+			_outSize = { (uint32_t)_settings.window_size.x, (uint32_t)_settings.window_size.y };
+		}
+		else
+		{
+			SerializedValues::Get().GetInt( "renderer_extent_width", _outSize.x );
+			SerializedValues::Get().GetInt( "renderer_extent_height", _outSize.y );
+		}
+	}
+
 	void SerializedValues::SetVec2	( const char * _name, const btVector2&	 _vec2 )	{ Serializable::SaveVec2( m_json[m_valuesName], _name, _vec2 ); }
 	void SerializedValues::SetVec3	( const char * _name, const btVector3&	 _vec3 )	{ Serializable::SaveVec3( m_json[m_valuesName], _name, _vec3 ); }
 	void SerializedValues::SetQuat	( const char * _name, const btQuaternion&_quat )	{ Serializable::SaveQuat( m_json[m_valuesName], _name, _quat ); }

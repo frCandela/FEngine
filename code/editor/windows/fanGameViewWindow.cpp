@@ -19,9 +19,9 @@ namespace fan
 		// compute game world str for
 		switch( _launchMode )
 		{
-		case LaunchSettings::Client:		memcpy( m_gameWorldsStr, "client\0\0", 8 );			break;
-		case LaunchSettings::Server:		memcpy( m_gameWorldsStr, "server\0\0", 8 );			break;
-		case LaunchSettings::ClientServer:	memcpy( m_gameWorldsStr, "client\0server\0\0,", 16 );	break;
+		case LaunchSettings::Mode::EditorClient:		memcpy( m_gameWorldsStr, "client\0\0", 8 );			break;
+		case LaunchSettings::Mode::EditorServer:		memcpy( m_gameWorldsStr, "server\0\0", 8 );			break;
+		case LaunchSettings::Mode::EditorClientServer:	memcpy( m_gameWorldsStr, "client\0server\0\0,", 16 );	break;
 		default: assert( false ); break;
 		}
 	}

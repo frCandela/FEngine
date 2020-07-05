@@ -18,7 +18,7 @@ namespace fan
 	class Window
 	{
 	public:
-		Window( const char* _name, const VkExtent2D size, const glm::ivec2 _position );
+		Window( const char* _name, const glm::ivec2 _size, const glm::ivec2 _position );
 		~Window();
 
 		GLFWwindow*			GetWindow()			  { return m_window; }

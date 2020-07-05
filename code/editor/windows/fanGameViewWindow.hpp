@@ -3,7 +3,7 @@
 #include "core/math/fanVector2.hpp"
 #include "ecs/fanSignal.hpp"
 #include "editor/windows/fanEditorWindow.hpp"
-#include "editor/fanLaunchSettings.hpp"
+#include "game/fanLaunchSettings.hpp"
 
 namespace fan
 {

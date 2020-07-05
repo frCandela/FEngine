@@ -8,13 +8,11 @@ WARNINGS_POP()
 #include "ecs/fanEcsWorld.hpp"
 #include "game/fanGameClient.hpp"
 #include "game/fanGameServer.hpp"
-#include "editor/fanLaunchSettings.hpp"
+#include "game/fanLaunchSettings.hpp"
 
 namespace fan
 {
-	class EditorGameWindowCallbacks;
 	class PreferencesWindow;
-	class SceneInstantiate;
 	class InspectorWindow;
 	class SingletonsWindow;
 	class ProfilerWindow;
@@ -24,8 +22,8 @@ namespace fan
 	class RenderWindow;
 	class EditorWindow;
 	class SceneWindow;
-	class MainMenuBar;
 	class EcsWindow;
+	class MainMenuBar;
 	class EcsWorld;
 	class Renderer;
 	class Window;
@@ -37,13 +35,13 @@ namespace fan
 	// One EcsWorld is and instance of the game, there can be multiple EcsWorlds for client and server to run in the same process
 	// The m_currentWorld variable is the index of the world that is currently edited
 	//================================================================================================================================	
-	class Editor
+	class EditorHolder
 	{
 	public:
 		Signal <> onLPPSynch;
 
-		Editor( const LaunchSettings _settings, std::vector<EcsWorld*>  _gameWorlds );
-		~Editor();
+		EditorHolder( const LaunchSettings _settings, std::vector<EcsWorld*>  _gameWorlds );
+		~EditorHolder();
 
 		void Run();
 		void Exit();

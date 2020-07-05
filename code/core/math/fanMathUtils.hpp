@@ -1,5 +1,6 @@
 #pragma once
 
+#include "glfw/glfw3.h"
 #include "bullet/LinearMath/btVector3.h"
 #include "bullet/LinearMath/btQuaternion.h"
 #include "fanDisableWarnings.hpp"
@@ -24,6 +25,7 @@ namespace fan
 		rotation.w = _quat[ 3 ];
 		return rotation;
 	}
+	inline glm::ivec2 ToGLM( const VkExtent2D _extent ) { return glm::ivec2( _extent.width, _extent.height ); }
 
 	inline btVector3 btDegrees3( const  btVector3 _radians ) { return btVector3( btDegrees( _radians[ 0 ] ), btDegrees( _radians[ 1 ] ), btDegrees( _radians[ 2 ] ) ); }
 	inline btVector3 btRadians3( const  btVector3 _degrees ) { return btVector3( btRadians( _degrees[ 0 ] ), btRadians( _degrees[ 1 ] ), btRadians( _degrees[ 2 ] ) ); }

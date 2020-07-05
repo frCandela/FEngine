@@ -10,21 +10,21 @@ namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	Window::Window( const char* _name, const VkExtent2D _size, const glm::ivec2 _position )
+	Window::Window( const char* _name, const glm::ivec2 _size, const glm::ivec2 _position )
 	{
 
 		m_instance = new Instance();
 
 		glfwWindowHint( GLFW_CLIENT_API, GLFW_NO_API );
 		glfwWindowHint( GLFW_RESIZABLE, GLFW_TRUE );
-		m_window = glfwCreateWindow( _size.width, _size.height, _name, nullptr/* fullscreen monitor */, nullptr );
+		m_window = glfwCreateWindow( _size.x, _size.y, _name, nullptr/* fullscreen monitor */, nullptr );
 		glfwCreateWindowSurface( m_instance->vkInstance, m_window, nullptr, &m_surface );
 		Debug::Get() << Debug::Severity::log << std::hex << "VkSurfaceKHR          " << m_surface << std::dec << Debug::Endl();
 
 		glfwSetWindowPos( m_window, _position.x, _position.y );
 
 		m_device = new Device( m_instance, m_surface );
-		m_swapchain = new SwapChain( *m_device, m_surface, _size );
+		m_swapchain = new SwapChain( *m_device, m_surface, { (uint32_t)_size.x, (uint32_t)_size.y } );
 
 		Input::Get().Setup( m_window );
 	}

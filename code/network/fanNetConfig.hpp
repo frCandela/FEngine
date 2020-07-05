@@ -1,5 +1,12 @@
 #pragma once
 
+// remove old macro to remove warning with std::numeric_limits>>::max() 
+#ifdef max
+#undef max
+#endif
+
+#include <limits>
+#include <type_traits>
 #include "SFML/System.hpp"
 #include "SFML/Network.hpp"
 #include "ecs/fanEcsTypes.hpp"
@@ -33,5 +40,5 @@ namespace fan
 		, PlayerGameState	// the game state of one player at a specific frame
 		, COUNT
 	};
-	static_assert( int( PacketType::COUNT ) < std::numeric_limits<PacketTypeInt>::max() );
+	static_assert( (int)PacketType::COUNT < std::numeric_limits<PacketTypeInt>::max() );
 }

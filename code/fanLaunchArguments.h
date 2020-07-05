@@ -1,6 +1,8 @@
 #pragma once
 
-#include "editor/fanEditor.hpp"
+#include <vector>
+#include <iostream>
+#include "game/fanLaunchSettings.hpp"
 
 namespace fan
 {
@@ -30,9 +32,11 @@ namespace fan
 		static bool CMD_OpenScene( const std::vector < std::string >& _args, LaunchSettings& _settings );
 		static bool CMD_SetWindow( const std::vector < std::string >& _args, LaunchSettings& _settings );
 		static bool CMD_AutoPlay( const std::vector < std::string >& _args, LaunchSettings& _settings );
-		static bool CMD_RunClient( const std::vector < std::string >& _args, LaunchSettings& _settings );
-		static bool CMD_RunServer( const std::vector < std::string >& _args, LaunchSettings& _settings );
-		static bool CMD_RunClientServer( const std::vector < std::string >& _args, LaunchSettings& _settings );
+		static bool CMD_RunEditorClient( const std::vector < std::string >& _args, LaunchSettings& _settings );
+		static bool CMD_RunEditorServer( const std::vector < std::string >& _args, LaunchSettings& _settings );
+		static bool CMD_RunEditorClientServer( const std::vector < std::string >& _args, LaunchSettings& _settings );
+		static bool CMD_RunGameClient( const std::vector < std::string >& _args, LaunchSettings& _settings );
+		static bool CMD_RunGameServer( const std::vector < std::string >& _args, LaunchSettings& _settings );
 		static bool CMD_MainLoopSleep( const std::vector < std::string >& _args, LaunchSettings& _settings );
 	};
 
@@ -41,14 +45,16 @@ namespace fan
 	//==============================================================================================================================================================
 	LaunchArguments::LaunchArguments() :
 		commands( {
-			{ &LaunchArguments::CMD_EnableLivePP,	"-livepp",			"usage: -livepp <0-1>" },
-			{ &LaunchArguments::CMD_OpenScene,		"-scene",			"usage: -scene \"scene/path.scene\"" },
-			{ &LaunchArguments::CMD_SetWindow,		"-window",			"usage: -window <x> <y> <width> <height>" },
-			{ &LaunchArguments::CMD_AutoPlay,		"-autoplay",		"usage: -autoplay <0-1>" },
-			{ &LaunchArguments::CMD_RunClient,		"-client",			"usage: -client" },
-			{ &LaunchArguments::CMD_RunServer,		"-server",			"usage: -server" },
-			{ &LaunchArguments::CMD_RunClientServer,"-client_server",	"usage: -client_server" },
-			{ &LaunchArguments::CMD_MainLoopSleep,	"-main_loop_sleep", "usage: -main_loop_sleep <0-1>" },
+			{ &LaunchArguments::CMD_EnableLivePP,			"-livepp",				"usage: -livepp <0-1>" },
+			{ &LaunchArguments::CMD_OpenScene,				"-scene",				"usage: -scene \"scene/path.scene\"" },
+			{ &LaunchArguments::CMD_SetWindow,				"-window",				"usage: -window <x> <y> <width> <height>" },
+			{ &LaunchArguments::CMD_AutoPlay,				"-autoplay",			"usage: -autoplay <0-1>" },
+			{ &LaunchArguments::CMD_RunEditorClient,		"-editor_client",		"usage: -editor_client" },
+			{ &LaunchArguments::CMD_RunEditorServer,		"-editor_server",		"usage: -editor_server" },
+			{ &LaunchArguments::CMD_RunEditorClientServer,	"-editor_client_server","usage: -editor_client_server" },
+			{ &LaunchArguments::CMD_RunGameClient,			"-client",				"usage: -client" },
+			{ &LaunchArguments::CMD_RunGameServer,			"-server",				"usage: -client" },
+			{ &LaunchArguments::CMD_MainLoopSleep,			"-main_loop_sleep",		"usage: -main_loop_sleep <0-1>" },
 		} )
 	{}
 
@@ -180,44 +186,72 @@ namespace fan
 	}
 
 	//==============================================================================================================================================================
-	// command: -client"
-	// runs the game in client mode
+	// command: -editor_client"
+	// runs the game in client mode with the editor
 	//==============================================================================================================================================================
-	bool LaunchArguments::CMD_RunClient( const std::vector < std::string >& _args, LaunchSettings& _settings )
+	bool LaunchArguments::CMD_RunEditorClient( const std::vector < std::string >& _args, LaunchSettings& _settings )
 	{
 		if( _args.size() != 0 ) { return false; }
 
-		_settings.launchMode = LaunchSettings::Client;
+		_settings.launchMode = LaunchSettings::Mode::EditorClient;
 
-		std::cout << "cmd : launch client" << std::endl;
+		std::cout << "cmd : launch editor client" << std::endl;
+		return true;
+	}
+
+	//==============================================================================================================================================================
+	// command: -editor_server"
+	// runs the game in server mode with the editor
+	//==============================================================================================================================================================
+	bool LaunchArguments::CMD_RunEditorServer( const std::vector < std::string >& _args, LaunchSettings& _settings )
+	{
+		if( _args.size() != 0 ) { return false; }
+
+		_settings.launchMode = LaunchSettings::Mode::EditorServer;
+
+		std::cout << "cmd : launch editor server" << std::endl;
+		return true;
+	}
+
+	//==============================================================================================================================================================
+	// command: -editor_client_server"
+	// runs two instances of the game in client and server mode with the editor
+	//==============================================================================================================================================================
+	bool LaunchArguments::CMD_RunEditorClientServer( const std::vector < std::string >& _args, LaunchSettings& _settings )
+	{
+		if( _args.size() != 0 ) { return false; }
+
+		_settings.launchMode = LaunchSettings::Mode::EditorClientServer;
+
+		std::cout << "cmd : launch editor client_server" << std::endl;
 		return true;
 	}
 
 	//==============================================================================================================================================================
 	// command: -server"
-	// runs the game in server mode
+	// runs the game in server mode with the editor
 	//==============================================================================================================================================================
-	bool LaunchArguments::CMD_RunServer( const std::vector < std::string >& _args, LaunchSettings& _settings )
+	bool LaunchArguments::CMD_RunGameServer( const std::vector < std::string >& _args, LaunchSettings& _settings )
 	{
 		if( _args.size() != 0 ) { return false; }
 
-		_settings.launchMode = LaunchSettings::Server;
+		_settings.launchMode = LaunchSettings::Mode::Server;
 
-		std::cout << "cmd : launch server" << std::endl;
+		std::cout << "cmd : launch game server" << std::endl;
 		return true;
 	}
 
 	//==============================================================================================================================================================
-	// command: -client_server"
-	// runs two instances of the game in client and server mode
+	// command: -client"
+	// runs the game in server mode with the editor
 	//==============================================================================================================================================================
-	bool LaunchArguments::CMD_RunClientServer( const std::vector < std::string >& _args, LaunchSettings& _settings )
+	bool LaunchArguments::CMD_RunGameClient( const std::vector < std::string >& _args, LaunchSettings& _settings )
 	{
 		if( _args.size() != 0 ) { return false; }
 
-		_settings.launchMode = LaunchSettings::ClientServer;
+		_settings.launchMode = LaunchSettings::Mode::Client;
 
-		std::cout << "cmd : launch client_server" << std::endl;
+		std::cout << "cmd : launch game client" << std::endl;
 		return true;
 	}
 
