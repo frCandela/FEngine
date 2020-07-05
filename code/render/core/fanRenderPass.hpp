@@ -16,12 +16,14 @@ namespace fan
 		RenderPass( Device& _device );
 		~RenderPass();
 		bool Create();
-		VkRenderPass GetRenderPass() const { return m_renderPass; }
+		VkRenderPass Get() const { return m_renderPass; }
 
 		VkAttachmentDescription& AddInputAttachment();
 		VkAttachmentDescription& AddColorAttachment( const VkFormat _format, const VkImageLayout _finalLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL );
 		VkAttachmentDescription& AddDepthAttachment( const VkFormat _format );
-		VkSubpassDependency& AddDependency();
+		VkSubpassDependency&	 AddDependency();
+
+		static VkRenderPassBeginInfo GetBeginInfo( VkRenderPass _renderPass, VkFramebuffer _frameBuffer, VkExtent2D _extent, const VkClearValue* _clearValue, uint32_t _clearCount );
 
 		VkRenderPassCreateInfo m_renderPassCreateInfo;
 

@@ -25,9 +25,9 @@ namespace fan
 		bool Create( const size_t _count, VkRenderPass _renderPass );
 		void Resize( const VkExtent2D _extent );
 
-		VkFramebuffer	GetFrameBuffer( const size_t _index ) { return m_frameBuffers[ _index ]; }
-		Sampler* GetColorAttachmentSampler() { return m_colorSampler; }
-		ImageView* GetColorAttachmentImageView() { return m_colorImageView; }
+		VkFramebuffer	Get( const size_t _index ) { return m_frameBuffers[ _index ]; }
+		Sampler*		GetColorAttachmentSampler() { return m_colorSampler; }
+		ImageView*		GetColorAttachmentImageView() { return m_colorImageView; }
 		VkExtent2D		GetExtent() const { return m_extent; }
 	private:
 		Device& m_device;

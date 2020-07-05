@@ -9,6 +9,7 @@ WARNINGS_POP()
 #include "glfw/glfw3.h"
 #include "core/math/fanVector2.hpp"
 #include "render/fanVertex.hpp"
+#include "render/core/fanCommandBuffer.hpp"
 
 namespace fan
 {
@@ -29,6 +30,7 @@ namespace fan
 	class UIPipeline;
 	class RenderPass;
 	class DebugPipeline;
+	
 
 	// Used to set uniforms
 	struct DrawDirectionalLight
@@ -84,7 +86,7 @@ namespace fan
 	};
 
 	//================================================================================================================================
-	// Contains all the rendering stuff
+	// Contains all the rendering data
 	//================================================================================================================================
 	class Renderer
 	{
@@ -148,12 +150,12 @@ namespace fan
 		RenderPass* m_renderPassImgui = VK_NULL_HANDLE;
 
 		// command buffers
-		std::vector<VkCommandBuffer> m_primaryCommandBuffers;
-		std::vector<VkCommandBuffer> m_geometryCommandBuffers;
-		std::vector<VkCommandBuffer> m_imguiCommandBuffers;
-		std::vector<VkCommandBuffer> m_uiCommandBuffers;
-		std::vector<VkCommandBuffer> m_postprocessCommandBuffers;
-		std::vector<VkCommandBuffer> m_debugCommandBuffers;
+		CommandBuffer m_primaryCommandBuffers;
+		CommandBuffer m_geometryCommandBuffers;
+		CommandBuffer m_imguiCommandBuffers;
+		CommandBuffer m_uiCommandBuffers;
+		CommandBuffer m_postprocessCommandBuffers;
+		CommandBuffer m_debugCommandBuffers;
 
 		// frame buffers
 		FrameBuffer* m_gameFrameBuffers = VK_NULL_HANDLE;

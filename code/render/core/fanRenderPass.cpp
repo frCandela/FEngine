@@ -102,6 +102,24 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
+	VkRenderPassBeginInfo RenderPass::GetBeginInfo( VkRenderPass _renderPass, VkFramebuffer _frameBuffer, VkExtent2D _extent, const VkClearValue* _clearValue, uint32_t _clearCount )
+	{
+		VkRenderPassBeginInfo beginInfo = {};
+		beginInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+		beginInfo.pNext = nullptr;
+		beginInfo.renderPass = _renderPass;
+		beginInfo.framebuffer = _frameBuffer;
+		beginInfo.renderArea.offset = { 0,0 };
+		beginInfo.renderArea.extent.width = _extent.width;
+		beginInfo.renderArea.extent.height = _extent.height;
+		beginInfo.clearValueCount = _clearCount;
+		beginInfo.pClearValues = _clearValue;
+
+		return beginInfo;
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
 	bool RenderPass::Create()
 	{
 		assert( m_depthAttachmentsRef.size() == 0 || m_depthAttachmentsRef.size() == 1 );
