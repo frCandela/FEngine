@@ -61,7 +61,7 @@ namespace fan
 
 		if ( ImGui::CollapsingHeader( "Rendered Mesh : " ) )
 		{
-			const std::vector<DrawData>& meshArray = m_renderer.GetMeshArray();
+			const std::vector<DrawData>& meshArray = m_renderer.GetDrawData();
 			for ( uint32_t meshIndex = 0; meshIndex < meshArray.size(); meshIndex++ )
 			{
 				const DrawData& drawData = meshArray[ meshIndex ];

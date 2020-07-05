@@ -41,7 +41,7 @@ namespace fan
 		void ConfigurePipeline() override;
 
 	private:
-		Descriptor* m_descriptor;
+		Descriptor*			m_descriptor;
 		VkPrimitiveTopology m_primitiveTopology;
 		bool				m_depthTestEnable;
 	};

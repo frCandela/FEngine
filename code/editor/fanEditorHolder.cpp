@@ -335,9 +335,7 @@ namespace fan
 			Time::RegisterFrameDrawn();	// used for stats
 			
 			UpdateRenderWorld( *m_renderer, GetCurrentWorld(), ToGLM( m_gameViewWindow->GetSize() ) );
-			const RenderDebug& renderDebug = GetCurrentWorld().GetSingleton<RenderDebug>();
 
-			m_renderer->GetRendererDebug().UpdateDebugBuffer( renderDebug.debugLines, renderDebug.debugLinesNoDepthTest, renderDebug.debugTriangles );
 			m_renderer->DrawFrame();
 			Profiler::Get().End();
 			Profiler::Get().Begin();
@@ -483,6 +481,7 @@ namespace fan
 	void EditorHolder::UpdateRenderWorld( Renderer& _renderer, EcsWorld& _world, const glm::vec2 _size )
 	{
 		RenderWorld& renderWorld = _world.GetSingleton<RenderWorld>();
+		const RenderDebug& renderDebug = _world.GetSingleton<RenderDebug>();
 		renderWorld.targetSize = _size;
 
 		// update render data
@@ -505,7 +504,8 @@ namespace fan
 		_renderer.SetUIDrawData( renderWorld.uiDrawData );
 		_renderer.SetPointLights( renderWorld.pointLights );
 		_renderer.SetDirectionalLights( renderWorld.directionalLights );
-
+		_renderer.SetDebugDrawData( renderDebug.debugLines, renderDebug.debugLinesNoDepthTest, renderDebug.debugTriangles );
+		
 		// Camera
 		Scene& scene = _world.GetSingleton<Scene>();
 		EcsEntity cameraID = _world.GetEntity( scene.mainCameraHandle );

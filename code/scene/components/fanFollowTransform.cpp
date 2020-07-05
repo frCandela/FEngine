@@ -1,7 +1,6 @@
 #include "scene/components/fanFollowTransform.hpp"
 
 #include "ecs/fanEcsWorld.hpp"
-#include "render/fanRendererDebug.hpp"
 #include "scene/systems/fanUpdateTransforms.hpp"
 #include "scene/singletons/fanRenderDebug.hpp"
 #include "editor/fanModals.hpp"

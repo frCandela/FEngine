@@ -5,7 +5,6 @@
 #include "scene/components/fanBoxShape.hpp"
 #include "scene/components/fanSphereShape.hpp"
 #include "scene/singletons/fanRenderDebug.hpp"
-#include "render/fanRendererDebug.hpp"
 
 namespace fan
 {

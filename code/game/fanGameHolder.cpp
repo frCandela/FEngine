@@ -8,7 +8,6 @@
 #include "network/singletons/fanTime.hpp"
 #include "render/util/fanWindow.hpp"
 #include "render/fanRenderer.hpp"
-#include "render/fanRendererDebug.hpp"
 #include "scene/singletons/fanRenderWorld.hpp"
 #include "scene/components/fanCamera.hpp"
 #include "scene/systems/fanUpdateTransforms.hpp"
@@ -182,9 +181,6 @@ namespace fan
 			Time::RegisterFrameDrawn();	// used for stats
 			
 			UpdateRenderWorld( *m_renderer, m_world, { m_window->GetExtent().width, m_window->GetExtent().height } );
-			const RenderDebug& renderDebug = m_world.GetSingleton<RenderDebug>();
-
-			m_renderer->GetRendererDebug().UpdateDebugBuffer( renderDebug.debugLines, renderDebug.debugLinesNoDepthTest, renderDebug.debugTriangles );
 			m_renderer->DrawFrame();
 			Profiler::Get().End();
 			Profiler::Get().Begin();
@@ -284,6 +280,7 @@ namespace fan
 	void GameHolder::UpdateRenderWorld( Renderer& _renderer, EcsWorld& _world, const glm::vec2 _size )
 	{
 		RenderWorld& renderWorld = _world.GetSingleton<RenderWorld>();
+		const RenderDebug& renderDebug = _world.GetSingleton<RenderDebug>();
 		renderWorld.targetSize = _size;
 
 		// update render data
@@ -306,6 +303,7 @@ namespace fan
 		_renderer.SetUIDrawData( renderWorld.uiDrawData );
 		_renderer.SetPointLights( renderWorld.pointLights );
 		_renderer.SetDirectionalLights( renderWorld.directionalLights );
+		_renderer.SetDebugDrawData( renderDebug.debugLines, renderDebug.debugLinesNoDepthTest, renderDebug.debugTriangles );
 
 		// Camera
 		Scene& scene = _world.GetSingleton<Scene>();

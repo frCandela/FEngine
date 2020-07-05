@@ -1,6 +1,5 @@
 #include "game/singletons/fanSunLight.hpp"
 
-#include "render/fanRendererDebug.hpp"
 #include "scene/fanSceneSerializable.hpp"
 
 namespace fan

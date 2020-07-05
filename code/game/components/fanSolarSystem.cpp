@@ -1,7 +1,6 @@
 #include "game/components/fanSolarSystem.hpp"
 #include "game/components/fanPlanet.hpp"
 #include "network/singletons/fanTime.hpp"
-#include "render/fanRendererDebug.hpp"
 
 namespace fan
 {

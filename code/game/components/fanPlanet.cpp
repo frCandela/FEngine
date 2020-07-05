@@ -3,7 +3,6 @@
 #include "ecs/fanEcsWorld.hpp"
 #include "scene/singletons/fanRenderDebug.hpp"
 #include "scene/fanSceneSerializable.hpp"
-#include "render/fanRendererDebug.hpp"
 
 namespace fan
 {

@@ -138,8 +138,8 @@ int main( int _argc, char* _argv[] )
 	args.push_back( "1" );
   	args.push_back( "-scene" );
   	args.push_back( "content/scenes/game00.scene" );
-	args.push_back( "-editor_client" );
-	args.push_back( "-server" );
+	args.push_back( "-editor_client_server" );
+	//args.push_back( "-server" );
 
 	// generates a list of strings from the command line arguments
 	for( int i = 1; i < _argc; i++ ){	args.push_back( _argv[i] );	}

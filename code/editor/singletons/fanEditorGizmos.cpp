@@ -1,16 +1,15 @@
 #include "editor/singletons/fanEditorGizmos.hpp"
 
 #include "core/math/shapes/fanRay.hpp"
+#include "core/math/shapes/fanTriangle.hpp"
 #include "core/math/fanBasicModels.hpp"
 #include "core/input/fanMouse.hpp"
 #include "ecs/fanEcsWorld.hpp"
 #include "scene/components/fanSceneNode.hpp"
 #include "scene/components/fanTransform.hpp"
 #include "scene/components/fanCamera.hpp"
-#include "scene/singletons/fanScene.hpp"
 #include "scene/singletons/fanRenderDebug.hpp"
-#include "render/fanRendererDebug.hpp"
-#include "editor/fanEditorDebug.hpp"
+#include "scene/singletons/fanScene.hpp"
 
 namespace fan
 {

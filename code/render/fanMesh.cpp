@@ -1,13 +1,13 @@
 #include "render/fanMesh.hpp"
 
-#include "core/fanDebug.hpp"
-#include "render/fanRendererDebug.hpp"
 #include "render/fanGLTFImporter.hpp"
 #include "render/fanMeshManager.hpp"
 #include "render/core/fanDevice.hpp"
 #include "render/core/fanBuffer.hpp"
+#include "core/fanDebug.hpp"
 #include "core/math/fanMathUtils.hpp"
 #include "core/math/shapes/fanConvexHull.hpp"
+#include "core/math/shapes/fanTriangle.hpp"
 
 namespace fan
 {
