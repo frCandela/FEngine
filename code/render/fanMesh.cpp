@@ -6,8 +6,8 @@
 #include "render/core/fanBuffer.hpp"
 #include "core/fanDebug.hpp"
 #include "core/math/fanMathUtils.hpp"
-#include "core/math/shapes/fanConvexHull.hpp"
-#include "core/math/shapes/fanTriangle.hpp"
+#include "core/shapes/fanConvexHull.hpp"
+#include "core/shapes/fanTriangle.hpp"
 
 namespace fan
 {

@@ -11,7 +11,7 @@
 #include "render/descriptors/fanDescriptor.hpp"
 #include "render/descriptors/fanDescriptorTexture.hpp"
 #include "render/descriptors/fanDescriptorSampler.hpp"
-#include "render/util/fanVertex.hpp"
+#include "render/fanVertex.hpp"
 #include "render/fanMesh.hpp"
 
 namespace fan

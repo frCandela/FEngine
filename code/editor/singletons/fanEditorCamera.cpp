@@ -3,7 +3,7 @@
 #include "core/input/fanMouse.hpp"
 #include "core/input/fanInput.hpp"
 #include "core/input/fanInputManager.hpp"
-#include "core/math/shapes/fanRay.hpp"
+#include "core/shapes/fanRay.hpp"
 #include "scene/components/fanTransform.hpp"
 #include "scene/components/fanCamera.hpp"
 #include "scene/components/fanSceneNode.hpp"

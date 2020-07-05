@@ -8,7 +8,7 @@ WARNINGS_GLM_PUSH()
 WARNINGS_POP()
 #include "glfw/glfw3.h"
 #include "core/math/fanVector2.hpp"
-#include "render/util/fanVertex.hpp"
+#include "render/fanVertex.hpp"
 
 namespace fan
 {
@@ -135,11 +135,10 @@ namespace fan
 		DebugPipeline*			m_debugLinesPipelineNoDepthTest;
 		DebugPipeline*			m_debugTrianglesPipeline;
 
-		// descriptors
+		// global descriptors
 		DescriptorTextures* m_imagesDescriptor = nullptr;
 		DescriptorSampler*	m_samplerDescriptorTextures = nullptr;
 		Sampler*			m_samplerTextures = nullptr;
-
 		DescriptorSampler*	m_samplerDescriptorUI = nullptr;
 		Sampler*			m_samplerUI = nullptr;
 

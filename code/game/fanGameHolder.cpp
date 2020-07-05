@@ -6,7 +6,7 @@
 #include "core/input/fanMouse.hpp"
 #include "core/input/fanInput.hpp"
 #include "network/singletons/fanTime.hpp"
-#include "render/util/fanWindow.hpp"
+#include "render/fanWindow.hpp"
 #include "render/fanRenderer.hpp"
 #include "scene/singletons/fanRenderWorld.hpp"
 #include "scene/components/fanCamera.hpp"

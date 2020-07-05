@@ -1,11 +1,11 @@
 #pragma once
 
 #include "bullet/LinearMath/btTransform.h"
-#include "core/math/shapes/fanAABB.hpp"
+#include "core/shapes/fanAABB.hpp"
 #include "ecs/fanEcsSingleton.hpp"
 #include "render/fanRenderer.hpp"
 #include "render/fanMesh.hpp"
-#include "render/util/fanVertex.hpp"
+#include "render/fanVertex.hpp"
 
 namespace fan
 {

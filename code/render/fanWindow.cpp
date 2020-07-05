@@ -1,4 +1,4 @@
-#include "render/util/fanWindow.hpp"
+#include "render/fanWindow.hpp"
 
 #include "core/fanDebug.hpp"
 #include "render/core/fanSwapChain.hpp"

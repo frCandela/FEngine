@@ -1,7 +1,7 @@
 #include "editor/singletons/fanEditorGizmos.hpp"
 
-#include "core/math/shapes/fanRay.hpp"
-#include "core/math/shapes/fanTriangle.hpp"
+#include "core/shapes/fanRay.hpp"
+#include "core/shapes/fanTriangle.hpp"
 #include "core/math/fanBasicModels.hpp"
 #include "core/input/fanMouse.hpp"
 #include "ecs/fanEcsWorld.hpp"

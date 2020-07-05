@@ -1,6 +1,6 @@
 #include "ecs/fanEcsSystem.hpp"
 #include "core/input/fanMouse.hpp"
-#include "core/math/shapes/fanRay.hpp"
+#include "core/shapes/fanRay.hpp"
 #include "core/input/fanInputManager.hpp"
 #include "core/input/fanInput.hpp"
 #include "scene/components/fanTransform.hpp"

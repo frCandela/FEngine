@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/math/shapes/fanShape.hpp"
+#include "core/shapes/fanShape.hpp"
 #include <vector>
 #include <cstdint>
 

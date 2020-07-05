@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/math/shapes/fanTriangle.hpp"
+#include "core/shapes/fanTriangle.hpp"
 #include <array>
 
 namespace fan

@@ -1,4 +1,4 @@
-#include "core/math/shapes/fanRay.hpp"
+#include "core/shapes/fanRay.hpp"
 
 namespace fan
 {

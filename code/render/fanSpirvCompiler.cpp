@@ -1,4 +1,4 @@
-#include "render/util/fanSpirvCompiler.hpp"
+#include "render/fanSpirvCompiler.hpp"
 
 #include "shaderc/shaderc.hpp"
 #include "core/fanDebug.hpp"

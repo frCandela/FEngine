@@ -4,7 +4,7 @@
 #include <fstream>
 #include "core/fanDebug.hpp"
 #include "render/core/fanDevice.hpp"
-#include "render/util/fanSpirvCompiler.hpp"
+#include "render/fanSpirvCompiler.hpp"
 
 namespace fan
 {

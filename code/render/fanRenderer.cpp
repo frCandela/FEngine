@@ -21,8 +21,8 @@
 #include "render/pipelines/fanDebugPipeline.hpp"
 #include "render/pipelines/fanImguiPipeline.hpp"
 #include "render/pipelines/fanUIPipeline.hpp"
-#include "render/util/fanVertex.hpp"
-#include "render/util/fanWindow.hpp"
+#include "render/fanVertex.hpp"
+#include "render/fanWindow.hpp"
 #include "render/descriptors/fanDescriptorTexture.hpp"
 #include "render/descriptors/fanDescriptorSampler.hpp"
 
@@ -845,7 +845,7 @@ namespace fan
 		}
 	}
 
-	//================================================== = VK_NULL_HANDLE;==============================================================================
+	//================================================================================================================================
 	//================================================================================================================================
 	bool Renderer::SubmitCommandBuffers()
 	{

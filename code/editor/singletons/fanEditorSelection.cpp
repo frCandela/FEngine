@@ -5,7 +5,7 @@
 #include "core/input/fanInputManager.hpp"
 #include "core/time/fanProfiler.hpp"
 #include "core/input/fanMouse.hpp"
-#include "core/math/shapes/fanRay.hpp"
+#include "core/shapes/fanRay.hpp"
 #include "core/fanDebug.hpp"
 #include "scene/components/fanSceneNode.hpp"
 #include "scene/components/fanTransform.hpp"

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <vector>
-#include "core/math/shapes/fanTriangle.hpp"
+#include "core/shapes/fanTriangle.hpp"
 #include "fanDisableWarnings.hpp"
 WARNINGS_GLM_PUSH()
 #include "glm/glm.hpp"

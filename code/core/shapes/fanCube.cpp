@@ -1,4 +1,4 @@
-#include "core/math/shapes/fanCube.hpp"
+#include "core/shapes/fanCube.hpp"
 
 namespace fan
 {

@@ -1,7 +1,7 @@
 #pragma  once
 
 #include "ecs/fanEcsComponent.hpp"
-#include "core/math/shapes/fanAABB.hpp"
+#include "core/shapes/fanAABB.hpp"
 
 namespace fan
 {

@@ -1,4 +1,4 @@
-#include "core/math/shapes/fanTriangle.hpp"
+#include "core/shapes/fanTriangle.hpp"
 
 namespace fan
 {

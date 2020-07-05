@@ -1,9 +1,9 @@
 #pragma once
 
-#include "core/math/shapes/fanConvexHull.hpp"
+#include "core/shapes/fanConvexHull.hpp"
 #include "core/resources/fanResource.hpp"
 #include "core/resources/fanResource.hpp"
-#include "render/util/fanVertex.hpp"
+#include "render/fanVertex.hpp"
 #include "render/fanMeshManager.hpp"
 
 namespace fan

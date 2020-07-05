@@ -1,4 +1,4 @@
-#include "render/util/fanVertex.hpp"
+#include "render/fanVertex.hpp"
 
 namespace fan
 {

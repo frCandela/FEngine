@@ -4,7 +4,7 @@
 #include "core/math/fanMathUtils.hpp"
 #include "scene/components/fanTransform.hpp"
 #include "render/fanRenderSerializable.hpp"
-#include "core/math/shapes/fanRay.hpp"
+#include "core/shapes/fanRay.hpp"
 
 namespace fan
 {

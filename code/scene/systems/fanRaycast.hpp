@@ -1,5 +1,5 @@
 #include "ecs/fanEcsSystem.hpp"
-#include "core/math/shapes/fanRay.hpp"
+#include "core/shapes/fanRay.hpp"
 #include "scene/components/fanSceneNode.hpp"
 #include "scene/components/fanBounds.hpp"
 #include "scene/components/fanMeshRenderer.hpp"

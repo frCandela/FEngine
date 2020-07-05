@@ -7,7 +7,7 @@
 #include "render/core/fanImageView.hpp" 
 #include "render/core/fanBuffer.hpp"
 #include "render/descriptors/fanDescriptor.hpp"
-#include "render/util/fanVertex.hpp"
+#include "render/fanVertex.hpp"
 
 namespace fan
 {
