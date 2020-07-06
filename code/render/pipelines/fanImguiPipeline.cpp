@@ -347,7 +347,7 @@ namespace fan
 
 		VkDescriptorImageInfo view3DDescriptorImageInfo{};
 		view3DDescriptorImageInfo.sampler = m_iconsSampler->GetSampler();
-		view3DDescriptorImageInfo.imageView = m_gameImageView->GetImageView();
+		view3DDescriptorImageInfo.imageView = m_gameImageView->imageView;
 		view3DDescriptorImageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 
 		VkWriteDescriptorSet writeDescriptorSet{};
@@ -385,7 +385,7 @@ namespace fan
 	{
 		VkDescriptorImageInfo viewGameDescriptorImageInfo{};
 		viewGameDescriptorImageInfo.sampler = m_iconsSampler->GetSampler();
-		viewGameDescriptorImageInfo.imageView = m_gameImageView->GetImageView();
+		viewGameDescriptorImageInfo.imageView = m_gameImageView->imageView;
 		viewGameDescriptorImageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 
 		VkWriteDescriptorSet writeDescriptorSet3DView{};

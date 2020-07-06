@@ -43,8 +43,9 @@ namespace fan
 		CreateSwapChain();
 		for ( int imageIndex = 0; imageIndex < m_imageViews.size(); imageIndex++ )
 		{
-			m_imageViews[ imageIndex ]->SetImage( m_images[ imageIndex ] );
+			m_imageViews[imageIndex].Destroy( m_device );
 		}
+		CreateImageViews();
 	}
 
 	//================================================================================================================================
@@ -63,13 +64,6 @@ namespace fan
 
 		vkDestroySwapchainKHR( m_device.vkDevice, m_swapchain, nullptr );
 		m_swapchain = VK_NULL_HANDLE;
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	std::vector< ImageView* > SwapChain::GetImageViews()
-	{
-		return m_imageViews;
 	}
 
 	//================================================================================================================================
@@ -288,8 +282,7 @@ namespace fan
 		m_imageViews.resize( m_images.size() );
 		for ( int imageIndex = 0; imageIndex < m_imageViews.size(); imageIndex++ )
 		{
-			m_imageViews[ imageIndex ] = new ImageView( m_device );
-			m_imageViews[ imageIndex ]->Create( m_images[ imageIndex ], m_surfaceFormat.format, VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_VIEW_TYPE_2D );
+			m_imageViews[ imageIndex ].Create( m_device, m_images[ imageIndex ], m_surfaceFormat.format, VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_VIEW_TYPE_2D );
 		}
 	}
 
@@ -299,7 +292,7 @@ namespace fan
 	{
 		for ( int imageIndex = 0; imageIndex < m_imageViews.size(); imageIndex++ )
 		{
-			delete m_imageViews[ imageIndex ];
+			m_imageViews[imageIndex].Destroy( m_device );
 		}
 		m_imageViews.clear();
 	}

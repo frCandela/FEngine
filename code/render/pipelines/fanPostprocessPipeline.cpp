@@ -36,7 +36,7 @@ namespace fan
 	void PostprocessPipeline::Resize( const VkExtent2D _extent )
 	{
 		Pipeline::Resize( _extent );
-		m_descriptorImageSampler->Set( 0, m_imageView->GetImageView() );
+		m_descriptorImageSampler->Set( 0, m_imageView->imageView );
 		m_descriptorImageSampler->UpdateRange( 0, 0 );
 
 		// 		std::vector<VkImageView> views = { m_imageView->GetImageView() };
@@ -86,7 +86,7 @@ namespace fan
 
 		delete m_descriptorImageSampler;
 		m_descriptorImageSampler = new DescriptorTextures( m_device, 1, m_sampler->GetSampler() );
-		m_descriptorImageSampler->Append( m_imageView->GetImageView() );
+		m_descriptorImageSampler->Append( m_imageView->imageView );
 		m_descriptorImageSampler->UpdateRange( 0, 0 );
 	}
 
