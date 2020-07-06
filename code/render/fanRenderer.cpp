@@ -814,7 +814,9 @@ namespace fan
 			VkAttachmentReference	depthAttRef = RenderPass::GetDepthAttachmentReference( 1 );
 			VkSubpassDescription	subpassDescription = RenderPass::GetSubpassDescription( &colorAttRef, 1, &depthAttRef );
 			VkSubpassDependency		subpassDependency = RenderPass::GetDependency();
-			result &= m_renderPassGame.Create( device, { colorAtt, depthAtt }, { subpassDescription }, { subpassDependency } );
+			
+			VkAttachmentDescription attachmentDescriptions[2] = { colorAtt, depthAtt };
+			result &= m_renderPassGame.Create( device, attachmentDescriptions, 2, &subpassDescription, 1, &subpassDependency, 1 );
 		}
 
 		// postprocess
@@ -823,7 +825,7 @@ namespace fan
 			VkAttachmentReference	colorAttRef = RenderPass::GetColorAttachmentReference( 0 );
 			VkSubpassDescription	subpassDescription = RenderPass::GetSubpassDescription( &colorAttRef, 1, VK_NULL_HANDLE );
 			VkSubpassDependency		subpassDependency = RenderPass::GetDependency();
-			result &= m_renderPassPostprocess.Create( device, { colorAtt }, { subpassDescription }, { subpassDependency } );
+			result &= m_renderPassPostprocess.Create( device, &colorAtt, 1, &subpassDescription, 1, &subpassDependency, 1 );
 		}
 
 		// imgui
@@ -832,7 +834,7 @@ namespace fan
 			VkAttachmentReference	colorAttRef = RenderPass::GetColorAttachmentReference( 0 );
 			VkSubpassDescription	subpassDescription = RenderPass::GetSubpassDescription( &colorAttRef, 1, VK_NULL_HANDLE );
 			VkSubpassDependency		subpassDependency = RenderPass::GetDependency();
-			result &= m_renderPassImgui.Create( device, { colorAtt }, { subpassDescription }, { subpassDependency } );
+			result &= m_renderPassImgui.Create( device, &colorAtt, 1, &subpassDescription, 1, &subpassDependency, 1);
 		}
 
 		return result;

@@ -13,7 +13,9 @@ namespace fan
 	class RenderPass
 	{
 	public:
-		bool Create( VkDevice _device, std::vector<VkAttachmentDescription> _attachmentdescriptions, std::vector<VkSubpassDescription> _subpassDescriptions, std::vector<VkSubpassDependency> _dependencies );
+		bool Create( VkDevice _device, 	VkAttachmentDescription* _attachmentdescriptions,	uint32_t _countAttachments,  
+										VkSubpassDescription*	 _subpassDescriptions,		uint32_t _countSubpasses,
+										VkSubpassDependency*	 _dependencies,				uint32_t _countDependencies );
 		void Destroy( VkDevice _device );
 
 		static VkAttachmentDescription	GetColorAttachment( const VkFormat _format, const VkImageLayout _finalLayout );
