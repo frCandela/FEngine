@@ -10,6 +10,7 @@ WARNINGS_POP()
 #include "core/math/fanVector2.hpp"
 #include "render/fanVertex.hpp"
 #include "render/core/fanCommandBuffer.hpp"
+#include "render/core/fanRenderPass.hpp"
 
 namespace fan
 {
@@ -145,9 +146,9 @@ namespace fan
 		Sampler*			m_samplerUI = nullptr;
 
 		// render passes
-		RenderPass* m_renderPassGame = VK_NULL_HANDLE;
-		RenderPass* m_renderPassPostprocess = VK_NULL_HANDLE;
-		RenderPass* m_renderPassImgui = VK_NULL_HANDLE;
+		RenderPass m_renderPassGame;
+		RenderPass m_renderPassPostprocess;
+		RenderPass m_renderPassImgui;
 
 		// command buffers
 		CommandBuffer m_primaryCommandBuffers;
@@ -186,9 +187,7 @@ namespace fan
 		void CreateQuadVertexBuffer();
 		bool CreateCommandBuffers();
 		void CreateFramebuffers();
-		bool CreateRenderPass();
-		bool CreateRenderPassPostprocess();
-		bool CreateRenderPassImGui();
+		bool CreateRenderPasses();
 		bool CreateTextureDescriptor();
 		
 		void UpdateUniformBuffers( const size_t _index );

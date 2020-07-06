@@ -13,28 +13,17 @@ namespace fan
 	class RenderPass
 	{
 	public:
-		RenderPass( Device& _device );
-		~RenderPass();
-		bool Create();
-		VkRenderPass Get() const { return m_renderPass; }
+		bool Create( VkDevice _device, std::vector<VkAttachmentDescription> _attachmentdescriptions, std::vector<VkSubpassDescription> _subpassDescriptions, std::vector<VkSubpassDependency> _dependencies );
+		void Destroy( VkDevice _device );
 
-		VkAttachmentDescription& AddInputAttachment();
-		VkAttachmentDescription& AddColorAttachment( const VkFormat _format, const VkImageLayout _finalLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL );
-		VkAttachmentDescription& AddDepthAttachment( const VkFormat _format );
-		VkSubpassDependency&	 AddDependency();
+		static VkAttachmentDescription	GetColorAttachment( const VkFormat _format, const VkImageLayout _finalLayout );
+		static VkAttachmentDescription	GetDepthAttachment( const VkFormat _format );
+		static VkAttachmentReference	GetColorAttachmentReference( const uint32_t _index );
+		static VkAttachmentReference	GetDepthAttachmentReference( const uint32_t _index );
+		static VkSubpassDependency		GetDependency();
+		static VkSubpassDescription		GetSubpassDescription( VkAttachmentReference* _colorReferences, uint32_t _count, VkAttachmentReference* _depthReference );
+		static VkRenderPassBeginInfo	GetBeginInfo( VkRenderPass _renderPass, VkFramebuffer _frameBuffer, VkExtent2D _extent, const VkClearValue* _clearValue, uint32_t _clearCount );
 
-		static VkRenderPassBeginInfo GetBeginInfo( VkRenderPass _renderPass, VkFramebuffer _frameBuffer, VkExtent2D _extent, const VkClearValue* _clearValue, uint32_t _clearCount );
-
-		VkRenderPassCreateInfo m_renderPassCreateInfo;
-
-	private:
-		Device& m_device;
-		VkRenderPass	m_renderPass = VK_NULL_HANDLE;
-
-		std::vector<VkAttachmentDescription> m_attachments;
-		std::vector<VkAttachmentReference>	 m_depthAttachmentsRef;
-		std::vector<VkAttachmentReference>	 m_colorAttachmentsRef;
-		std::vector<VkAttachmentReference>	 m_inputAttachmentsRef;
-		std::vector<VkSubpassDependency> m_dependencies;
+		VkRenderPass renderPass = VK_NULL_HANDLE;
 	};
 }

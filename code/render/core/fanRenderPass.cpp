@@ -4,46 +4,58 @@
 #include "render/core/fanDevice.hpp"
 #include "core/fanDebug.hpp"
 
-
 namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	RenderPass::RenderPass( Device& _device ) :
-		m_device( _device )
-	{}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	RenderPass::~RenderPass()
+	bool RenderPass::Create( VkDevice _device, std::vector<VkAttachmentDescription> _attachmentdescriptions, std::vector<VkSubpassDescription> _subpassDescriptions, std::vector<VkSubpassDependency> _dependencies )
 	{
-		vkDestroyRenderPass( m_device.vkDevice, m_renderPass, nullptr );
+		VkRenderPassCreateInfo renderPassCreateInfo;
+		renderPassCreateInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+		renderPassCreateInfo.pNext = nullptr;
+		renderPassCreateInfo.flags = 0;
+		renderPassCreateInfo.attachmentCount = static_cast<uint32_t>( _attachmentdescriptions.size() );
+		renderPassCreateInfo.pAttachments = _attachmentdescriptions.data();
+		renderPassCreateInfo.subpassCount = static_cast<uint32_t>( _subpassDescriptions.size() );
+		renderPassCreateInfo.pSubpasses = _subpassDescriptions.data();
+		renderPassCreateInfo.dependencyCount = static_cast<uint32_t>( _dependencies.size() );
+		renderPassCreateInfo.pDependencies = _dependencies.data();
+
+		if( vkCreateRenderPass( _device, &renderPassCreateInfo, nullptr, &renderPass ) != VK_SUCCESS )
+		{
+			Debug::Error( "Could not create render pass" );
+			return false;
+		}
+		Debug::Get() << Debug::Severity::log << std::hex << "VkRenderPass          " << renderPass << std::dec << Debug::Endl();
+
+		return true;
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	VkAttachmentDescription& RenderPass::AddInputAttachment()
+	void RenderPass::Destroy( VkDevice _device )
 	{
-		VkAttachmentReference inputAttachmentRef;
-		inputAttachmentRef.attachment = static_cast< uint32_t >( m_attachments.size() );
-		inputAttachmentRef.layout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
-		m_inputAttachmentsRef.push_back( inputAttachmentRef );
-
-		VkAttachmentDescription inputAttachment;
-
-		m_attachments.push_back( inputAttachment );
-		return  m_attachments[ m_attachments.size() - 1 ];
+		if( renderPass != VK_NULL_HANDLE )
+		{
+			vkDestroyRenderPass( _device, renderPass, VK_NULL_HANDLE );
+		}
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	VkAttachmentDescription& RenderPass::AddColorAttachment( const VkFormat _format, const VkImageLayout _finalLayout )
+	VkAttachmentReference RenderPass::GetColorAttachmentReference( const uint32_t _index )
 	{
 		VkAttachmentReference colorAttachmentRef;
-		colorAttachmentRef.attachment = static_cast< uint32_t >( m_attachments.size() );
+		colorAttachmentRef.attachment = _index;
 		colorAttachmentRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-		m_colorAttachmentsRef.push_back( colorAttachmentRef );
 
+		return colorAttachmentRef;
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	VkAttachmentDescription RenderPass::GetColorAttachment( const VkFormat _format, const VkImageLayout _finalLayout )
+	{
 		VkAttachmentDescription colorAttachment;
 		colorAttachment.flags = 0;
 		colorAttachment.format = _format;
@@ -55,19 +67,24 @@ namespace fan
 		colorAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 		colorAttachment.finalLayout = _finalLayout;
 
-		m_attachments.push_back( colorAttachment );
-		return  m_attachments[ m_attachments.size() - 1 ];
+		return colorAttachment;
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	VkAttachmentDescription& RenderPass::AddDepthAttachment( const VkFormat _format )
+	VkAttachmentReference RenderPass::GetDepthAttachmentReference( const uint32_t _index )
 	{
 		VkAttachmentReference depthAttachmentRef;
-		depthAttachmentRef.attachment = static_cast< uint32_t >( m_attachments.size() );
+		depthAttachmentRef.attachment = _index;
 		depthAttachmentRef.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
-		m_depthAttachmentsRef.push_back( depthAttachmentRef );
 
+		return depthAttachmentRef;
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	VkAttachmentDescription RenderPass::GetDepthAttachment( const VkFormat _format )
+	{
 		VkAttachmentDescription depthAttachment;
 		depthAttachment.flags = 0;
 		depthAttachment.format = _format;
@@ -79,13 +96,12 @@ namespace fan
 		depthAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 		depthAttachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
 
-		m_attachments.push_back( depthAttachment );
-		return  m_attachments[ m_attachments.size() - 1 ];
+		return depthAttachment;
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	VkSubpassDependency& RenderPass::AddDependency()
+	VkSubpassDependency RenderPass::GetDependency()
 	{
 		VkSubpassDependency dependency;
 		dependency.srcSubpass = 0;
@@ -96,8 +112,26 @@ namespace fan
 		dependency.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
 		dependency.dependencyFlags = 0;
 
-		m_dependencies.push_back( dependency );
-		return  m_dependencies[ m_dependencies.size() - 1 ];
+		return dependency;
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	VkSubpassDescription RenderPass::GetSubpassDescription( VkAttachmentReference* _colorReferences, uint32_t _count , VkAttachmentReference* _depthReference )
+	{
+		VkSubpassDescription subpassDescription;
+		subpassDescription.flags = 0;
+		subpassDescription.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
+		subpassDescription.inputAttachmentCount = 0;
+		subpassDescription.pInputAttachments = VK_NULL_HANDLE;
+		subpassDescription.colorAttachmentCount = _count;
+		subpassDescription.pColorAttachments = _colorReferences;
+		subpassDescription.pResolveAttachments = VK_NULL_HANDLE;
+		subpassDescription.pDepthStencilAttachment = _depthReference;
+		subpassDescription.preserveAttachmentCount = 0;
+		subpassDescription.pPreserveAttachments = VK_NULL_HANDLE;
+
+		return subpassDescription;
 	}
 
 	//================================================================================================================================
@@ -116,46 +150,5 @@ namespace fan
 		beginInfo.pClearValues = _clearValue;
 
 		return beginInfo;
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	bool RenderPass::Create()
-	{
-		assert( m_depthAttachmentsRef.size() == 0 || m_depthAttachmentsRef.size() == 1 );
-
-		VkSubpassDescription subpassDescription;
-		subpassDescription.flags = 0;
-		subpassDescription.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
-		subpassDescription.inputAttachmentCount = static_cast< uint32_t >( m_inputAttachmentsRef.size() );
-		subpassDescription.pInputAttachments = m_inputAttachmentsRef.data();
-		subpassDescription.colorAttachmentCount = static_cast< uint32_t >( m_colorAttachmentsRef.size() );
-		subpassDescription.pColorAttachments = m_colorAttachmentsRef.data();
-		subpassDescription.pResolveAttachments = nullptr;
-		subpassDescription.pDepthStencilAttachment = m_depthAttachmentsRef.empty() ? nullptr : &m_depthAttachmentsRef[ 0 ];
-		subpassDescription.preserveAttachmentCount = 0;
-		subpassDescription.pPreserveAttachments = nullptr;
-
-		std::vector<VkSubpassDescription> subpassDescriptions = { subpassDescription };
-
-		VkRenderPassCreateInfo renderPassCreateInfo;
-		renderPassCreateInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
-		renderPassCreateInfo.pNext = nullptr;
-		renderPassCreateInfo.flags = 0;
-		renderPassCreateInfo.attachmentCount = static_cast< uint32_t >( m_attachments.size() );
-		renderPassCreateInfo.pAttachments = m_attachments.data();
-		renderPassCreateInfo.subpassCount = static_cast< uint32_t >( subpassDescriptions.size() );;
-		renderPassCreateInfo.pSubpasses = subpassDescriptions.data();
-		renderPassCreateInfo.dependencyCount = static_cast< uint32_t >( m_dependencies.size() );;
-		renderPassCreateInfo.pDependencies = m_dependencies.data();
-
-		if ( vkCreateRenderPass( m_device.vkDevice, &renderPassCreateInfo, nullptr, &m_renderPass ) != VK_SUCCESS )
-		{
-			Debug::Error( "Could not create render pass" );
-			return false;
-		}
-		Debug::Get() << Debug::Severity::log << std::hex << "VkRenderPass          " << m_renderPass << std::dec << Debug::Endl();
-
-		return true;
 	}
 }

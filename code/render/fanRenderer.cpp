@@ -9,7 +9,6 @@
 #include "render/fanUIMesh.hpp"
 #include "render/fanMesh.hpp"
 #include "render/core/fanFrameBuffer.hpp"
-#include "render/core/fanRenderPass.hpp"
 #include "render/core/fanSwapChain.hpp"
 #include "render/core/fanInstance.hpp"
 #include "render/core/fanSampler.hpp"
@@ -42,10 +41,7 @@ namespace fan
 		Texture::s_resourceManager.Init( m_window.GetDevice() );
 		UIMesh::s_resourceManager.Init( m_window.GetDevice() );
 
-		CreateRenderPass();
-		CreateRenderPassPostprocess();
-		CreateRenderPassImGui();
-
+		CreateRenderPasses();
 		CreateQuadVertexBuffer();
 		CreateFramebuffers();
 
@@ -55,22 +51,22 @@ namespace fan
 		CreateTextureDescriptor();
 
 		m_debugLinesPipeline = new DebugPipeline( m_window.GetDevice(), VK_PRIMITIVE_TOPOLOGY_LINE_LIST, true );
-		m_debugLinesPipeline->Init( m_renderPassGame->Get(), m_window.GetSwapChain().GetExtent(), "code/shaders/debugLines.vert", "code/shaders/debugLines.frag" );
+		m_debugLinesPipeline->Init( m_renderPassGame.renderPass, m_window.GetSwapChain().GetExtent(), "code/shaders/debugLines.vert", "code/shaders/debugLines.frag" );
 		m_debugLinesPipeline->CreateDescriptors( m_window.GetSwapChain().GetSwapchainImagesCount() );
 		m_debugLinesPipeline->Create();
 
 		m_debugLinesPipelineNoDepthTest = new DebugPipeline( m_window.GetDevice(), VK_PRIMITIVE_TOPOLOGY_LINE_LIST, false );
-		m_debugLinesPipelineNoDepthTest->Init( m_renderPassGame->Get(), m_window.GetSwapChain().GetExtent(), "code/shaders/debugLines.vert", "code/shaders/debugLines.frag" );
+		m_debugLinesPipelineNoDepthTest->Init( m_renderPassGame.renderPass, m_window.GetSwapChain().GetExtent(), "code/shaders/debugLines.vert", "code/shaders/debugLines.frag" );
 		m_debugLinesPipelineNoDepthTest->CreateDescriptors( m_window.GetSwapChain().GetSwapchainImagesCount() );
 		m_debugLinesPipelineNoDepthTest->Create();
 
 		m_debugTrianglesPipeline = new DebugPipeline( m_window.GetDevice(), VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, false );
-		m_debugTrianglesPipeline->Init( m_renderPassGame->Get(), m_window.GetSwapChain().GetExtent(), "code/shaders/debugTriangles.vert", "code/shaders/debugTriangles.frag" );
+		m_debugTrianglesPipeline->Init( m_renderPassGame.renderPass, m_window.GetSwapChain().GetExtent(), "code/shaders/debugTriangles.vert", "code/shaders/debugTriangles.frag" );
 		m_debugTrianglesPipeline->CreateDescriptors( m_window.GetSwapChain().GetSwapchainImagesCount() );
 		m_debugTrianglesPipeline->Create();
 
 		m_forwardPipeline = new ForwardPipeline( m_window.GetDevice(), m_imagesDescriptor, m_samplerDescriptorTextures );
-		m_forwardPipeline->Init( m_renderPassGame->Get(), m_window.GetSwapChain().GetExtent(), "code/shaders/forward.vert", "code/shaders/forward.frag" );
+		m_forwardPipeline->Init( m_renderPassGame.renderPass, m_window.GetSwapChain().GetExtent(), "code/shaders/forward.vert", "code/shaders/forward.frag" );
 		m_forwardPipeline->CreateDescriptors( m_window.GetSwapChain().GetSwapchainImagesCount() );
 		m_forwardPipeline->Create();
 
@@ -78,19 +74,19 @@ namespace fan
 		m_samplerUI->CreateSampler( 0, 1, VK_FILTER_NEAREST );
 		m_samplerDescriptorUI = new DescriptorSampler( m_window.GetDevice(), m_samplerUI->GetSampler() );
 		m_uiPipeline = new UIPipeline( m_window.GetDevice(), m_imagesDescriptor, m_samplerDescriptorUI );
-		m_uiPipeline->Init( m_renderPassPostprocess->Get(), m_window.GetSwapChain().GetExtent(), "code/shaders/ui.vert", "code/shaders/ui.frag" );
+		m_uiPipeline->Init( m_renderPassPostprocess.renderPass, m_window.GetSwapChain().GetExtent(), "code/shaders/ui.vert", "code/shaders/ui.frag" );
 		m_uiPipeline->CreateDescriptors( m_window.GetSwapChain().GetSwapchainImagesCount() );
 		m_uiPipeline->Create();
 
 		m_postprocessPipeline = new PostprocessPipeline( m_window.GetDevice() );
 		m_postprocessPipeline->SetGameImageView( m_gameFrameBuffers->GetColorAttachmentImageView() );
 		m_postprocessPipeline->CreateDescriptors( m_window.GetSwapChain().GetSwapchainImagesCount() );
-		m_postprocessPipeline->Init( m_renderPassPostprocess->Get(), m_window.GetSwapChain().GetExtent(), "code/shaders/postprocess.vert", "code/shaders/postprocess.frag" );
+		m_postprocessPipeline->Init( m_renderPassPostprocess.renderPass, m_window.GetSwapChain().GetExtent(), "code/shaders/postprocess.vert", "code/shaders/postprocess.frag" );
 		m_postprocessPipeline->Create();
 
 		m_imguiPipeline = new ImguiPipeline( m_window.GetDevice(), m_window.GetSwapChain().GetSwapchainImagesCount() );
 		m_imguiPipeline->SetGameView( m_postProcessFramebuffers->GetColorAttachmentImageView() );
-		m_imguiPipeline->Create( m_renderPassImgui->Get(), m_window.GetWindow(), m_window.GetSwapChain().GetExtent() );
+		m_imguiPipeline->Create( m_renderPassImgui.renderPass, m_window.GetWindow(), m_window.GetSwapChain().GetExtent() );
 
 		CreateCommandBuffers();
 		RecordAllCommandBuffers();
@@ -105,7 +101,9 @@ namespace fan
 	//================================================================================================================================	
 	Renderer::~Renderer()
 	{
-		vkDeviceWaitIdle( m_window.GetDevice().vkDevice );
+		VkDevice device = m_window.GetDevice().vkDevice;
+
+		vkDeviceWaitIdle( device );
 
 		delete m_imguiPipeline;
 		delete m_forwardPipeline;
@@ -145,9 +143,10 @@ namespace fan
 
 		delete m_gameFrameBuffers;
 		delete m_postProcessFramebuffers;
-		delete m_renderPassGame;
-		delete m_renderPassPostprocess;
-		delete m_renderPassImgui;
+
+		m_renderPassGame.Destroy( device );
+		m_renderPassPostprocess.Destroy( device );
+		m_renderPassImgui.Destroy( device );
 
 		delete m_swapchainFramebuffers;
 
@@ -510,9 +509,9 @@ namespace fan
 		clearValues[ 0 ].color = { m_clearColor.r, m_clearColor.g, m_clearColor.b, m_clearColor.a };
 		clearValues[ 1 ].depthStencil = { 1.0f, 0 };
 
-		VkRenderPassBeginInfo renderPassInfo =			  RenderPass::GetBeginInfo(	m_renderPassGame->Get(),		m_gameFrameBuffers->Get( _index ),		  m_gameExtent, clearValues.data(), (uint32_t)clearValues.size() );
-		VkRenderPassBeginInfo renderPassInfoPostprocess = RenderPass::GetBeginInfo( m_renderPassPostprocess->Get(), m_postProcessFramebuffers->Get( _index ), m_gameExtent, clearValues.data(), (uint32_t)clearValues.size() );
-		VkRenderPassBeginInfo renderPassInfoImGui =		  RenderPass::GetBeginInfo( m_renderPassImgui->Get(),		m_swapchainFramebuffers->Get( _index ),	  m_window.GetSwapChain().GetExtent(), clearValues.data(), (uint32_t)clearValues.size() );
+		VkRenderPassBeginInfo renderPassInfo =			  RenderPass::GetBeginInfo(	m_renderPassGame.renderPass,		m_gameFrameBuffers->Get( _index ),		  m_gameExtent, clearValues.data(), (uint32_t)clearValues.size() );
+		VkRenderPassBeginInfo renderPassInfoPostprocess = RenderPass::GetBeginInfo( m_renderPassPostprocess.renderPass, m_postProcessFramebuffers->Get( _index ), m_gameExtent, clearValues.data(), (uint32_t)clearValues.size() );
+		VkRenderPassBeginInfo renderPassInfoImGui =		  RenderPass::GetBeginInfo( m_renderPassImgui.renderPass,		m_swapchainFramebuffers->Get( _index ),	  m_window.GetSwapChain().GetExtent(), clearValues.data(), (uint32_t)clearValues.size() );
 
 		if ( vkBeginCommandBuffer( commandBuffer, &commandBufferBeginInfo ) == VK_SUCCESS )
 		{
@@ -555,7 +554,7 @@ namespace fan
 	{
 
 		VkCommandBuffer commandBuffer = m_postprocessCommandBuffers.buffers[ _index ];
-		VkCommandBufferInheritanceInfo commandBufferInheritanceInfo = CommandBuffer::GetInheritanceInfo( m_renderPassPostprocess->Get(), m_postProcessFramebuffers->Get( _index ) );
+		VkCommandBufferInheritanceInfo commandBufferInheritanceInfo = CommandBuffer::GetInheritanceInfo( m_renderPassPostprocess.renderPass, m_postProcessFramebuffers->Get( _index ) );
 		VkCommandBufferBeginInfo commandBufferBeginInfo = CommandBuffer::GetBeginInfo( &commandBufferInheritanceInfo );
 
 		if ( vkBeginCommandBuffer( commandBuffer, &commandBufferBeginInfo ) == VK_SUCCESS )
@@ -582,7 +581,7 @@ namespace fan
 	void Renderer::RecordCommandBufferUI( const size_t _index )
 	{
 		VkCommandBuffer commandBuffer = m_uiCommandBuffers.buffers[ _index ];
-		VkCommandBufferInheritanceInfo commandBufferInheritanceInfo = CommandBuffer::GetInheritanceInfo( m_renderPassPostprocess->Get(), m_postProcessFramebuffers->Get( _index ) );
+		VkCommandBufferInheritanceInfo commandBufferInheritanceInfo = CommandBuffer::GetInheritanceInfo( m_renderPassPostprocess.renderPass, m_postProcessFramebuffers->Get( _index ) );
 		VkCommandBufferBeginInfo commandBufferBeginInfo = CommandBuffer::GetBeginInfo( &commandBufferInheritanceInfo );
 
 		if ( vkBeginCommandBuffer( commandBuffer, &commandBufferBeginInfo ) == VK_SUCCESS )
@@ -622,7 +621,7 @@ namespace fan
 		m_imguiPipeline->UpdateBuffer( _index );
 
 		VkCommandBuffer commandBuffer = m_imguiCommandBuffers.buffers[ _index ];
-		VkCommandBufferInheritanceInfo commandBufferInheritanceInfo = CommandBuffer::GetInheritanceInfo( m_renderPassImgui->Get(), m_swapchainFramebuffers->Get( _index ) );
+		VkCommandBufferInheritanceInfo commandBufferInheritanceInfo = CommandBuffer::GetInheritanceInfo( m_renderPassImgui.renderPass, m_swapchainFramebuffers->Get( _index ) );
 		VkCommandBufferBeginInfo commandBufferBeginInfo = CommandBuffer::GetBeginInfo( &commandBufferInheritanceInfo );
 
 		if ( vkBeginCommandBuffer( commandBuffer, &commandBufferBeginInfo ) == VK_SUCCESS )
@@ -646,7 +645,7 @@ namespace fan
 	{
 		SCOPED_PROFILE( geometry );
 		VkCommandBuffer commandBuffer = m_geometryCommandBuffers.buffers[ _index ];
-		VkCommandBufferInheritanceInfo commandBufferInheritanceInfo = CommandBuffer::GetInheritanceInfo( m_renderPassGame->Get(), m_gameFrameBuffers->Get( _index ) );
+		VkCommandBufferInheritanceInfo commandBufferInheritanceInfo = CommandBuffer::GetInheritanceInfo( m_renderPassGame.renderPass, m_gameFrameBuffers->Get( _index ) );
 		VkCommandBufferBeginInfo commandBufferBeginInfo = CommandBuffer::GetBeginInfo( &commandBufferInheritanceInfo );
 
 		if ( vkBeginCommandBuffer( commandBuffer, &commandBufferBeginInfo ) == VK_SUCCESS )
@@ -684,7 +683,7 @@ namespace fan
 		if( ! m_hasNoDebugToDraw )
 		{
 			VkCommandBuffer commandBuffer = m_debugCommandBuffers.buffers[_index];
-			VkCommandBufferInheritanceInfo commandBufferInheritanceInfo = CommandBuffer::GetInheritanceInfo( m_renderPassGame->Get(), m_gameFrameBuffers->Get( _index ) );
+			VkCommandBufferInheritanceInfo commandBufferInheritanceInfo = CommandBuffer::GetInheritanceInfo( m_renderPassGame.renderPass, m_gameFrameBuffers->Get( _index ) );
 			VkCommandBufferBeginInfo commandBufferBeginInfo = CommandBuffer::GetBeginInfo( &commandBufferInheritanceInfo );
 
 			if( vkBeginCommandBuffer( commandBuffer, &commandBufferBeginInfo ) == VK_SUCCESS )
@@ -802,33 +801,41 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool Renderer::CreateRenderPass()
+	bool Renderer::CreateRenderPasses()
 	{
-		m_renderPassGame = new RenderPass( m_window.GetDevice() );
-		m_renderPassGame->AddColorAttachment( m_window.GetSwapChain().GetSurfaceFormat().format );
-		m_renderPassGame->AddDepthAttachment( m_window.GetDevice().FindDepthFormat() );
-		m_renderPassGame->AddDependency();
-		return m_renderPassGame->Create();
-	}
+		VkDevice device = m_window.GetDevice().vkDevice;
+		bool result = true;
 
-	//================================================================================================================================
-	//================================================================================================================================
-	bool Renderer::CreateRenderPassPostprocess()
-	{
-		m_renderPassPostprocess = new RenderPass( m_window.GetDevice() );
-		m_renderPassPostprocess->AddColorAttachment( m_window.GetSwapChain().GetSurfaceFormat().format );
-		m_renderPassPostprocess->AddDependency();
-		return m_renderPassPostprocess->Create();
-	}
+		// game
+		{
+			VkAttachmentDescription colorAtt = RenderPass::GetColorAttachment( m_window.GetSwapChain().GetSurfaceFormat().format, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL );
+			VkAttachmentReference	colorAttRef = RenderPass::GetColorAttachmentReference( 0 );
+			VkAttachmentDescription depthAtt = RenderPass::GetDepthAttachment( m_window.GetDevice().FindDepthFormat() );
+			VkAttachmentReference	depthAttRef = RenderPass::GetDepthAttachmentReference( 1 );
+			VkSubpassDescription	subpassDescription = RenderPass::GetSubpassDescription( &colorAttRef, 1, &depthAttRef );
+			VkSubpassDependency		subpassDependency = RenderPass::GetDependency();
+			result &= m_renderPassGame.Create( device, { colorAtt, depthAtt }, { subpassDescription }, { subpassDependency } );
+		}
 
-	//================================================================================================================================
-	//================================================================================================================================
-	bool Renderer::CreateRenderPassImGui()
-	{
-		m_renderPassImgui = new RenderPass( m_window.GetDevice() );
-		m_renderPassImgui->AddColorAttachment( m_window.GetSwapChain().GetSurfaceFormat().format, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR );
-		m_renderPassImgui->AddDependency();
-		return m_renderPassImgui->Create();
+		// postprocess
+		{
+			VkAttachmentDescription colorAtt = RenderPass::GetColorAttachment( m_window.GetSwapChain().GetSurfaceFormat().format, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL );
+			VkAttachmentReference	colorAttRef = RenderPass::GetColorAttachmentReference( 0 );
+			VkSubpassDescription	subpassDescription = RenderPass::GetSubpassDescription( &colorAttRef, 1, VK_NULL_HANDLE );
+			VkSubpassDependency		subpassDependency = RenderPass::GetDependency();
+			result &= m_renderPassPostprocess.Create( device, { colorAtt }, { subpassDescription }, { subpassDependency } );
+		}
+
+		// imgui
+		{
+			VkAttachmentDescription colorAtt = RenderPass::GetColorAttachment( m_window.GetSwapChain().GetSurfaceFormat().format, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR );
+			VkAttachmentReference	colorAttRef = RenderPass::GetColorAttachmentReference( 0 );
+			VkSubpassDescription	subpassDescription = RenderPass::GetSubpassDescription( &colorAttRef, 1, VK_NULL_HANDLE );
+			VkSubpassDependency		subpassDependency = RenderPass::GetDependency();
+			result &= m_renderPassImgui.Create( device, { colorAtt }, { subpassDescription }, { subpassDependency } );
+		}
+
+		return result;
 	}
 
 	//================================================================================================================================
@@ -838,15 +845,15 @@ namespace fan
 		m_gameFrameBuffers = new FrameBuffer( m_window.GetDevice(), m_window.GetSwapChain().GetExtent() );
 		m_gameFrameBuffers->AddColorAttachment( m_window.GetSwapChain().GetSurfaceFormat().format );
 		m_gameFrameBuffers->AddDepthAttachment();
-		m_gameFrameBuffers->Create( m_window.GetSwapChain().GetSwapchainImagesCount(), m_renderPassGame->Get() );
+		m_gameFrameBuffers->Create( m_window.GetSwapChain().GetSwapchainImagesCount(), m_renderPassGame.renderPass );
 
 		m_postProcessFramebuffers = new FrameBuffer( m_window.GetDevice(), m_window.GetSwapChain().GetExtent() );
 		m_postProcessFramebuffers->AddColorAttachment( m_window.GetSwapChain().GetSurfaceFormat().format );
-		m_postProcessFramebuffers->Create( m_window.GetSwapChain().GetSwapchainImagesCount(), m_renderPassPostprocess->Get() );
+		m_postProcessFramebuffers->Create( m_window.GetSwapChain().GetSwapchainImagesCount(), m_renderPassPostprocess.renderPass );
 
 		m_swapchainFramebuffers = new FrameBuffer( m_window.GetDevice(), m_window.GetSwapChain().GetExtent() );
 		m_swapchainFramebuffers->SetExternalAttachment( m_window.GetSwapChain().GetImageViews() );
-		m_swapchainFramebuffers->Create( m_window.GetSwapChain().GetSwapchainImagesCount(), m_renderPassImgui->Get() );
+		m_swapchainFramebuffers->Create( m_window.GetSwapChain().GetSwapchainImagesCount(), m_renderPassImgui.renderPass );
 	}
 
 	//================================================================================================================================
