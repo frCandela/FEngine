@@ -2,102 +2,79 @@
 
 #include "render/core/fanDevice.hpp"
 #include "core/fanDebug.hpp"
+
 namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	Image::Image( Device& _device ) :
-		m_device( _device )
-	{}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void Image::DestroyImage()
+	void Image::Destroy( Device& _device )
 	{
-		if ( m_image != VK_NULL_HANDLE )
+		if ( image != VK_NULL_HANDLE )
 		{
-			vkDestroyImage( m_device.vkDevice, m_image, nullptr );
-			m_image = VK_NULL_HANDLE;
-
+			vkDestroyImage( _device.vkDevice, image, VK_NULL_HANDLE );
+			image = VK_NULL_HANDLE;
 		}
 
-		if ( m_imageMemory != VK_NULL_HANDLE )
+		if ( memory != VK_NULL_HANDLE )
 		{
-			vkFreeMemory( m_device.vkDevice, m_imageMemory, nullptr );
-			m_imageMemory = VK_NULL_HANDLE;
+			vkFreeMemory( _device.vkDevice, memory, VK_NULL_HANDLE );
+			memory = VK_NULL_HANDLE;
 		}
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	Image::~Image()
+	bool Image::Create( Device& _device, const VkFormat _format, const VkExtent2D _size, const VkImageUsageFlags _usage, const VkMemoryPropertyFlags _memoryProperties )
 	{
-		DestroyImage();
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void Image::Resize( const VkExtent2D _size )
-	{
-		DestroyImage();
-		Create( m_format, _size, m_usage, m_memoryProperties );
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	bool Image::Create( const VkFormat _format, const VkExtent2D _size, const VkImageUsageFlags _usage, const VkMemoryPropertyFlags _memoryProperties )
-	{
-		m_size = _size;
-		m_format = _format;
-		m_usage = _usage;
-		m_memoryProperties = _memoryProperties;
+		assert( image == VK_NULL_HANDLE );
+		assert( memory == VK_NULL_HANDLE );		
 
 		VkImageCreateInfo imageCreateInfo;
-		imageCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
-		imageCreateInfo.pNext = nullptr;
-		imageCreateInfo.flags = 0;
-		imageCreateInfo.imageType = VK_IMAGE_TYPE_2D;
-		imageCreateInfo.format = _format;
-		imageCreateInfo.extent.width = _size.width;
-		imageCreateInfo.extent.height = _size.height;
-		imageCreateInfo.extent.depth = 1;
-		imageCreateInfo.mipLevels = 1;
-		imageCreateInfo.arrayLayers = 1;
-		imageCreateInfo.samples = VK_SAMPLE_COUNT_1_BIT;
-		imageCreateInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
-		imageCreateInfo.usage = _usage;
-		imageCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-		imageCreateInfo.queueFamilyIndexCount = 0;
-		imageCreateInfo.pQueueFamilyIndices = nullptr;
-		imageCreateInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+		imageCreateInfo.sType					= VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+		imageCreateInfo.pNext					= nullptr;
+		imageCreateInfo.flags					= 0;
+		imageCreateInfo.imageType				= VK_IMAGE_TYPE_2D;
+		imageCreateInfo.format					= _format;
+		imageCreateInfo.extent.width			= _size.width;
+		imageCreateInfo.extent.height			= _size.height;
+		imageCreateInfo.extent.depth			= 1;
+		imageCreateInfo.mipLevels				= 1;
+		imageCreateInfo.arrayLayers				= 1;
+		imageCreateInfo.samples					= VK_SAMPLE_COUNT_1_BIT;
+		imageCreateInfo.tiling					= VK_IMAGE_TILING_OPTIMAL;
+		imageCreateInfo.usage					= _usage;
+		imageCreateInfo.sharingMode				= VK_SHARING_MODE_EXCLUSIVE;
+		imageCreateInfo.queueFamilyIndexCount	= 0;
+		imageCreateInfo.pQueueFamilyIndices		= nullptr;
+		imageCreateInfo.initialLayout			= VK_IMAGE_LAYOUT_UNDEFINED;
 
-		if ( vkCreateImage( m_device.vkDevice, &imageCreateInfo, nullptr, &m_image ) != VK_SUCCESS )
+		if ( vkCreateImage( _device.vkDevice, &imageCreateInfo, VK_NULL_HANDLE, &image ) != VK_SUCCESS )
 		{
 			Debug::Error( "Could not allocate image" );
 			return false;
 		}
 		VkMemoryRequirements memoryRequirements;
-		vkGetImageMemoryRequirements( m_device.vkDevice, m_image, &memoryRequirements );
+		vkGetImageMemoryRequirements( _device.vkDevice, image, &memoryRequirements );
 
 		VkMemoryAllocateInfo bufferMemoryAllocateInfo;
-		bufferMemoryAllocateInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-		bufferMemoryAllocateInfo.pNext = nullptr;
-		bufferMemoryAllocateInfo.allocationSize = memoryRequirements.size;
-		bufferMemoryAllocateInfo.memoryTypeIndex = m_device.FindMemoryType( memoryRequirements.memoryTypeBits, _memoryProperties );
+		bufferMemoryAllocateInfo.sType				= VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+		bufferMemoryAllocateInfo.pNext				= nullptr;
+		bufferMemoryAllocateInfo.allocationSize		= memoryRequirements.size;
+		bufferMemoryAllocateInfo.memoryTypeIndex	= _device.FindMemoryType( memoryRequirements.memoryTypeBits, _memoryProperties );
 
-		if ( vkAllocateMemory( m_device.vkDevice, &bufferMemoryAllocateInfo, nullptr, &m_imageMemory ) != VK_SUCCESS )
+		if ( vkAllocateMemory( _device.vkDevice, &bufferMemoryAllocateInfo, nullptr, &memory ) != VK_SUCCESS )
 		{
 			Debug::Error( "Could not allocate buffer" );
 			return false;
 		}
 
-		if ( vkBindImageMemory( m_device.vkDevice, m_image, m_imageMemory, 0 ) != VK_SUCCESS )
+		if ( vkBindImageMemory( _device.vkDevice, image, memory, 0 ) != VK_SUCCESS )
 		{
 			Debug::Error( "Could not bind memory to image" );
 			return false;
 		}
-		Debug::Get() << Debug::Severity::log << std::hex << "VkImage               " << m_image << std::dec << Debug::Endl();
-		Debug::Get() << Debug::Severity::log << "VkDeviceMemory        " << m_imageMemory << std::dec << Debug::Endl();
+		Debug::Get() << Debug::Severity::log << std::hex << "VkImage               " << image << std::dec << Debug::Endl();
+		Debug::Get() << Debug::Severity::log << "VkDeviceMemory        " << memory << std::dec << Debug::Endl();
 
 		return true;
 	}
@@ -108,27 +85,30 @@ namespace fan
 	{
 		// Synchronize access to resources
 		VkImageMemoryBarrier barrier = {};
-		barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-		barrier.oldLayout = _oldLayout;
-		barrier.newLayout = _newLayout;
-		barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-		barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-		barrier.image = m_image;
+		barrier.sType				= VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+		barrier.oldLayout			= _oldLayout;
+		barrier.newLayout			= _newLayout;
+		barrier.srcQueueFamilyIndex	= VK_QUEUE_FAMILY_IGNORED;
+		barrier.dstQueueFamilyIndex	= VK_QUEUE_FAMILY_IGNORED;
+		barrier.image				= image;
 
 		// Use the right subresource aspect
 		if ( _newLayout == VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL )
 		{
 			barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
-			if ( HasStencilComponent( _format ) )
+			const bool hasStencilComponent = _format == VK_FORMAT_D32_SFLOAT_S8_UINT || _format == VK_FORMAT_D24_UNORM_S8_UINT;
+			if( hasStencilComponent )
+			{
 				barrier.subresourceRange.aspectMask |= VK_IMAGE_ASPECT_STENCIL_BIT;
+			}
 		}
 		else
 			barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
 
-		barrier.subresourceRange.baseMipLevel = 0;
-		barrier.subresourceRange.levelCount = _mipLevels;
+		barrier.subresourceRange.baseMipLevel	= 0;
+		barrier.subresourceRange.levelCount		= _mipLevels;
 		barrier.subresourceRange.baseArrayLayer = 0;
-		barrier.subresourceRange.layerCount = 1;
+		barrier.subresourceRange.layerCount		= 1;
 
 		// Set the access masks and pipeline stages based on the layouts in the transition.
 		VkPipelineStageFlags sourceStage;
@@ -139,7 +119,7 @@ namespace fan
 			barrier.srcAccessMask = 0;
 			barrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
 
-			sourceStage = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
+			sourceStage		 = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
 			destinationStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
 		}
 		else if ( _oldLayout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL && _newLayout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL )

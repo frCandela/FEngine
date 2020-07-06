@@ -844,16 +844,18 @@ namespace fan
 	//================================================================================================================================
 	void Renderer::CreateFramebuffers()
 	{
-		m_gameFrameBuffers = new FrameBuffer( m_window.GetDevice(), m_window.GetSwapChain().GetExtent() );
-		m_gameFrameBuffers->AddColorAttachment( m_window.GetSwapChain().GetSurfaceFormat().format );
+		const VkExtent2D extent = m_window.GetSwapChain().GetExtent();
+
+		m_gameFrameBuffers = new FrameBuffer( m_window.GetDevice(), extent );
+		m_gameFrameBuffers->AddColorAttachment( m_window.GetSwapChain().GetSurfaceFormat().format, extent );
 		m_gameFrameBuffers->AddDepthAttachment();
 		m_gameFrameBuffers->Create( m_window.GetSwapChain().GetSwapchainImagesCount(), m_renderPassGame.renderPass );
 
-		m_postProcessFramebuffers = new FrameBuffer( m_window.GetDevice(), m_window.GetSwapChain().GetExtent() );
-		m_postProcessFramebuffers->AddColorAttachment( m_window.GetSwapChain().GetSurfaceFormat().format );
+		m_postProcessFramebuffers = new FrameBuffer( m_window.GetDevice(), extent );
+		m_postProcessFramebuffers->AddColorAttachment( m_window.GetSwapChain().GetSurfaceFormat().format, extent );
 		m_postProcessFramebuffers->Create( m_window.GetSwapChain().GetSwapchainImagesCount(), m_renderPassPostprocess.renderPass );
 
-		m_swapchainFramebuffers = new FrameBuffer( m_window.GetDevice(), m_window.GetSwapChain().GetExtent() );
+		m_swapchainFramebuffers = new FrameBuffer( m_window.GetDevice(), extent );
 		m_swapchainFramebuffers->SetExternalAttachment( m_window.GetSwapChain().GetImageViews() );
 		m_swapchainFramebuffers->Create( m_window.GetSwapChain().GetSwapchainImagesCount(), m_renderPassImgui.renderPass );
 	}

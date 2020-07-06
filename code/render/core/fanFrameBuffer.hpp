@@ -2,6 +2,7 @@
 
 #include "glfw/glfw3.h"
 #include <vector>
+#include "render/core/fanImage.hpp"
 
 namespace fan
 {
@@ -20,7 +21,7 @@ namespace fan
 		~FrameBuffer();
 
 		void AddDepthAttachment();
-		void AddColorAttachment( const VkFormat _format );
+		void AddColorAttachment( const VkFormat _format, const VkExtent2D _extent );
 		void SetExternalAttachment( const std::vector< ImageView* > _perFramebufferViews );
 		bool Create( const size_t _count, VkRenderPass _renderPass );
 		void Resize( const VkExtent2D _extent );
@@ -40,18 +41,19 @@ namespace fan
 		std::vector< ImageView* > m_externalAttachments;
 
 		// Depth attachment
-		Image* m_depthImage = nullptr;
+		Image m_depthImage;
 		ImageView* m_depthImageView = nullptr;
 
 		// Color attachment
 		VkFormat	m_colorFormat;
 		VkExtent2D	m_extent;
 		Sampler* m_colorSampler = nullptr;
-		Image* m_colorImage = nullptr;
+		Image m_colorImage;
 		ImageView* m_colorImageView = nullptr;
 
-		void CreateColorResources( const VkFormat _format );
-		bool CreateDepthResources();
+		void CreateColorImage( Device& _device, const VkFormat _format, const VkExtent2D _extent );
+		void CreateDepthImage( Device& _device, const VkFormat _format, const VkExtent2D _extent );
+		bool CreateDepthResources( Device& _device );
 		void DestroyFrameBuffers();
 	};
 }

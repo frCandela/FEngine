@@ -32,6 +32,9 @@ namespace fan
 		const VkPhysicalDeviceProperties& GetDeviceProperties() const { return m_deviceProperties; }
 
 	private:
+		Device( Device const& ) = delete;
+		Device& operator=( Device const& ) = delete;
+
 		Instance*		m_instance;
 		VkSurfaceKHR	m_surface;
 		VkCommandPool	m_commandPool;
