@@ -6,7 +6,6 @@
 namespace fan
 {
 	class Device;
-	class Image;
 	struct ImageView;
 	class FrameBuffer;
 

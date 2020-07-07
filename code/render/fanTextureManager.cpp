@@ -1,9 +1,11 @@
 #include "render/fanTextureManager.hpp"
 
 #include <filesystem>
+#include "core/fanDebug.hpp"
 #include "render/fanRenderResourcePtr.hpp"
-#include "render/core/fanTexture.hpp"
 #include "render/fanRenderGlobal.hpp"
+#include "render/core/fanTexture.hpp"
+#include "render/core/fanDevice.hpp"
 
 namespace fan
 {
@@ -21,9 +23,13 @@ namespace fan
 	//================================================================================================================================
 	void TextureManager::Clear()
 	{
+		vkDeviceWaitIdle( m_device->vkDevice );
+		Debug::Highlight( "Renderer idle texture manager" );
 		while ( !m_textureList.empty() ) 
 		{ 
-			delete m_textureList[ m_textureList.size() - 1]; 
+			Texture* texture = m_textureList[m_textureList.size() - 1];
+			texture->Destroy( *m_device );
+			delete texture;
 			m_textureList.pop_back();
 		}
 		m_device = nullptr;
@@ -63,9 +69,9 @@ namespace fan
 		{
 			// Load
 			texture = new Texture();			
-			if ( texture->LoadFromFile( cleanPath ) )
+			if ( texture->CreateFromFile( cleanPath ) )
 			{	
-				texture->SetRenderID( static_cast< int >( m_textureList.size() ) );
+				texture->renderID =  static_cast< int >( m_textureList.size() );
 				m_textureList.push_back( texture );
 				m_modified = true;
 				return texture;
@@ -83,7 +89,7 @@ namespace fan
 		for (int textureIndex = 0; textureIndex < m_textureList.size() ; textureIndex++)
 		{
 			Texture& texture = *m_textureList[ textureIndex ];
-			if ( texture.GetPath() == cleanPath )
+			if ( texture.path == cleanPath )
 			{
 				return &texture;
 			}

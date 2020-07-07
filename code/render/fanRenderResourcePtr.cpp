@@ -18,7 +18,7 @@ namespace ImGui
 		bool returnValue = false;
 
 		fan::Texture* texture = *_ptr;
-		const std::string name = texture == nullptr ? "null" : std::filesystem::path( texture->GetPath() ).filename().string();
+		const std::string name = texture == nullptr ? "null" : std::filesystem::path( texture->path ).filename().string();
 
 		// Set button icon & modal
 		const std::string modalName = std::string( "Find texture (" ) + _label + ")";
@@ -51,12 +51,11 @@ namespace ImGui
 				ImGui::BeginTooltip();
 
 				// path
-				ImGui::Text( texture->GetPath().c_str() );
+				ImGui::Text( texture->path.c_str() );
 
 				// size
-				const glm::uvec3 size = texture->GetSize();
 				std::stringstream ss;
-				ss << size.x << " x " << size.y << " x " << size.z;
+				ss << texture->extent.width << " x " << texture->extent.height << " x " << texture->layerCount;
 				ImGui::Text( ss.str().c_str() );
 
 				ImGui::EndTooltip();

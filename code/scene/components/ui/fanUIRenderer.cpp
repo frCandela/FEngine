@@ -84,6 +84,6 @@ namespace fan
 	//================================================================================================================================
 	glm::ivec2	UIRenderer::GetTextureSize() const 
 	{ 
-		return *texture != nullptr ? texture->GetSize() : glm::ivec2( 0, 0 ); 
+		return *texture != nullptr ? glm::ivec2( texture->extent.width, texture->extent.height ) : glm::ivec2( 0, 0 );
 	}
 }

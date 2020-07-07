@@ -16,46 +16,32 @@ namespace fan
 	//================================================================================================================================
 	// like an Image but generated from a png file
 	//================================================================================================================================
-	class Texture : public Resource
+	struct Texture : public Resource
 	{
-	public:
-		static TextureManager s_resourceManager;
+		static TextureManager s_resourceManager;		
 
-		~Texture();
+		VkImage			image = VK_NULL_HANDLE;
+		VkImageView		imageView = VK_NULL_HANDLE;
+		VkDeviceMemory	deviceMemory = VK_NULL_HANDLE;
 
-		void SetData( const unsigned char* _data, const uint32_t _width, const uint32_t _height, const uint32_t _mipLevels );
-		bool LoadFromFile( const std::string& _path );
-		void GenerateGpuData( Device& _device );
-		void DeleteGpuData( Device& _device );
+		uint32_t	mipLevels = 1;
+		VkExtent2D	extent;
+		uint32_t	layerCount = 1;
 
-		std::string GetPath() const { return m_path; }
-		glm::ivec3	GetSize() const { return glm::ivec3( m_width, m_height, m_layerCount ); }
-		VkImageView GetImageView() { return m_imageView; }
+		std::string	   path;
+		int renderID = -1;
 
-		int		GetRenderID() const { return m_renderID; }
-		void	SetRenderID( const int _renderID ) { m_renderID = _renderID; }
+		bool CreateFromFile( const std::string& _path );
+		void CreateFromData( const unsigned char* _data, const VkExtent2D _extent, const uint32_t _mipLevels );
+		void Destroy( Device& _device );
 
 	private:
-		VkImage			m_image = VK_NULL_HANDLE;
-		VkDeviceMemory	m_deviceMemory = VK_NULL_HANDLE;
-		VkImageView		m_imageView = VK_NULL_HANDLE;
-
-		uint32_t m_mipLevels = 1;
-		uint32_t m_width;
-		uint32_t m_height;
-		uint32_t m_layerCount = 1;
-
-		unsigned char* m_data;
-		std::string	   m_path;
-
-		int m_renderID = -1;
-
+		void GenerateGpuData( Device& _device, const void* _data );
+		void DeleteGpuData( Device& _device );
 		void CreateImage( Device& _device, VkExtent2D _extent, uint32_t _mipLevels, VkFormat _format, VkImageTiling _tiling, VkImageUsageFlags _usage, VkMemoryPropertyFlags _properties );
 		void CreateImageView( Device& _device, VkFormat _format, VkImageViewType _viewType, VkImageSubresourceRange _subresourceRange );
-
-		void CopyBufferToImage( VkCommandBuffer _commandBuffer, VkBuffer _buffer, uint32_t _width, uint32_t _height );
-		void GenerateMipmaps( Device& _device, VkCommandBuffer _commandBuffer, VkFormat _imageFormat, int32_t _texWidth, int32_t _texHeight, uint32_t _mipLevels );
+		void CopyBufferToImage( VkCommandBuffer _commandBuffer, VkBuffer _buffer, VkExtent2D _extent );
+		void GenerateMipmaps( Device& _device, VkCommandBuffer _commandBuffer, VkFormat _imageFormat, VkExtent2D _extent, uint32_t _mipLevels );
 		void TransitionImageLayout( VkCommandBuffer _commandBuffer, VkImageLayout _oldLayout, VkImageLayout _newLayout, VkImageSubresourceRange _subresourceRange );
-
 	};
 }

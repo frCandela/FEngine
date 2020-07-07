@@ -72,11 +72,11 @@ namespace fan
 
 		delete ( m_iconsTexture );
 		m_iconsTexture = new Texture();
-		m_iconsTexture->LoadFromFile( RenderGlobal::s_defaultIcons );
+		m_iconsTexture->CreateFromFile( RenderGlobal::s_defaultIcons );
 
 		VkDescriptorImageInfo iconsDescriptorImageInfo{};
 		iconsDescriptorImageInfo.sampler = m_iconsSampler.sampler;
-		iconsDescriptorImageInfo.imageView = m_iconsTexture->GetImageView();
+		iconsDescriptorImageInfo.imageView = m_iconsTexture->imageView;
 		iconsDescriptorImageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 
 		VkWriteDescriptorSet writeDescriptorSetIcons{};
@@ -278,8 +278,8 @@ namespace fan
 		int texWidth, texHeight;
 		ImGui::GetIO().Fonts->GetTexDataAsRGBA32( &fontData, &texWidth, &texHeight );
 
-		m_fontTexture->SetData( fontData, texWidth, texHeight, 1 );
-		m_iconsTexture->LoadFromFile( RenderGlobal::s_defaultIcons );
+		m_fontTexture->CreateFromData( fontData, { (uint32_t)texWidth, (uint32_t)texHeight }, 1 );
+		m_iconsTexture->CreateFromFile( RenderGlobal::s_defaultIcons );
 		m_sampler.Create( m_device, 0, 1.f, VK_FILTER_LINEAR );
 		m_iconsSampler.Create( m_device, 0, 0.f, VK_FILTER_NEAREST );
 	}
@@ -333,12 +333,12 @@ namespace fan
 
 		VkDescriptorImageInfo fontDescriptorImageInfo{};
 		fontDescriptorImageInfo.sampler = m_sampler.sampler;
-		fontDescriptorImageInfo.imageView = m_fontTexture->GetImageView();
+		fontDescriptorImageInfo.imageView = m_fontTexture->imageView;
 		fontDescriptorImageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 
 		VkDescriptorImageInfo iconsDescriptorImageInfo{};
 		iconsDescriptorImageInfo.sampler = m_iconsSampler.sampler;
-		iconsDescriptorImageInfo.imageView = m_iconsTexture->GetImageView();
+		iconsDescriptorImageInfo.imageView = m_iconsTexture->imageView;
 		iconsDescriptorImageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 
 		VkDescriptorImageInfo view3DDescriptorImageInfo{};

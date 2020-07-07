@@ -47,7 +47,7 @@ namespace fan
 					data.mesh = *meshRenderer.mesh;
 					data.modelMatrix = transform.GetModelMatrix();
 					data.normalMatrix = transform.GetNormalMatrix();
-					data.textureIndex = material.texture.IsValid() ? material.texture->GetRenderID() : 0;
+					data.textureIndex = material.texture.IsValid() ? material.texture->renderID : 0;
 					data.color = material.color.ToGLM();
 					data.shininess = material.shininess;
 
@@ -83,7 +83,7 @@ namespace fan
 
 				if( renderer.GetTexture() == nullptr ) { continue; }
 
-				const glm::vec2 textureSize = renderer.GetTexture()->GetSize();
+				const glm::vec2 textureSize ( renderer.GetTexture()->extent.width, renderer.GetTexture()->extent.height );
 				const glm::vec2 imageRatio = textureSize / renderWorld.targetSize;
 				const glm::vec2 positionRatio = 2.f * transform.position / renderWorld.targetSize;
 
@@ -92,7 +92,7 @@ namespace fan
 				data.scale = transform.scale * imageRatio;
 				data.position = positionRatio - glm::vec2( 1, 1 );
 				data.color = renderer.color.ToGLM();
-				data.textureIndex = renderer.GetTexture() != nullptr ? renderer.GetTexture()->GetRenderID() : 0;
+				data.textureIndex = renderer.GetTexture() != nullptr ? renderer.GetTexture()->renderID : 0;
 
 				renderWorld.uiDrawData.push_back( data );
 			}

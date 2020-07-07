@@ -12,7 +12,6 @@ namespace fan
 	//================================================================================================================================
 	struct RenderPass
 	{
-	public:
 		bool Create( VkDevice _device, 	VkAttachmentDescription* _attachmentdescriptions,	uint32_t _countAttachments,  
 										VkSubpassDescription*	 _subpassDescriptions,		uint32_t _countSubpasses,
 										VkSubpassDependency*	 _dependencies,				uint32_t _countDependencies );

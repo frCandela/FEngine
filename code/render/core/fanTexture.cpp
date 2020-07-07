@@ -11,25 +11,20 @@
 #include "render/core/fanDevice.hpp"
 #include "render/core/fanBuffer.hpp"
 
-
-
 namespace fan
 {
 	TextureManager Texture::s_resourceManager;
 
 	//================================================================================================================================
 	//================================================================================================================================
-	Texture::~Texture() 
+	void Texture::Destroy( Device& _device )
 	{ 
-		if( !s_resourceManager.IsCleared() ) // @hack
-		{
-			DeleteGpuData( s_resourceManager.GetDevice() );
-		}
+		DeleteGpuData( _device );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Texture::CopyBufferToImage( VkCommandBuffer _commandBuffer, VkBuffer _buffer, uint32_t _width, uint32_t _height )
+	void Texture::CopyBufferToImage( VkCommandBuffer _commandBuffer, VkBuffer _buffer, VkExtent2D _extent )
 	{
 
 		// Specify which part of the buffer is going to be copied to which part of the image
@@ -45,8 +40,8 @@ namespace fan
 
 		region.imageOffset = { 0, 0, 0 };
 		region.imageExtent = {
-			_width,
-			_height,
+			_extent.width,
+			_extent.height,
 			1
 		};
 
@@ -54,7 +49,7 @@ namespace fan
 		vkCmdCopyBufferToImage(
 			_commandBuffer,
 			_buffer,
-			m_image,
+			image,
 			VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
 			1,
 			&region
@@ -63,7 +58,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Texture::GenerateMipmaps( Device& _device, VkCommandBuffer _commandBuffer, VkFormat _imageFormat, int32_t _texWidth, int32_t _texHeight, uint32_t _mipLevels )
+	void Texture::GenerateMipmaps( Device& _device, VkCommandBuffer _commandBuffer, VkFormat _imageFormat, VkExtent2D _extent, uint32_t _mipLevels )
 	{
 		// Check if image format supports linear bitting
 		VkFormatProperties formatProperties;
@@ -75,7 +70,7 @@ namespace fan
 
 		VkImageMemoryBarrier barrier = {};
 		barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-		barrier.image = m_image;
+		barrier.image = image;
 		barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
 		barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
 		barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
@@ -84,8 +79,8 @@ namespace fan
 		barrier.subresourceRange.levelCount = 1;
 
 		// Record each of the VkCmdBlitImage commands
-		int32_t mipWidth = _texWidth;
-		int32_t mipHeight = _texHeight;
+		int32_t mipWidth = _extent.width;
+		int32_t mipHeight = _extent.height;
 
 		for ( uint32_t i = 1; i < _mipLevels; ++i )
 		{
@@ -119,8 +114,8 @@ namespace fan
 
 			// Record the blit command
 			vkCmdBlitImage( _commandBuffer,
-							m_image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
-							m_image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+							image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
+							image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
 							1, &blit,
 							VK_FILTER_LINEAR );
 
@@ -158,25 +153,22 @@ namespace fan
 	//================================================================================================================================
 	void Texture::DeleteGpuData( Device& _device )
 	{
-		vkDeviceWaitIdle( _device.vkDevice );
-		Debug::Highlight( "Renderer idle1" );
-
-		if ( m_deviceMemory != VK_NULL_HANDLE )
+		if ( deviceMemory != VK_NULL_HANDLE )
 		{
-			vkFreeMemory( _device.vkDevice, m_deviceMemory, nullptr );
-			m_deviceMemory = VK_NULL_HANDLE;
+			vkFreeMemory( _device.vkDevice, deviceMemory, nullptr );
+			deviceMemory = VK_NULL_HANDLE;
 		}
 
-		if ( m_imageView != VK_NULL_HANDLE )
+		if ( imageView != VK_NULL_HANDLE )
 		{
-			vkDestroyImageView( _device.vkDevice, m_imageView, nullptr );
-			m_imageView = VK_NULL_HANDLE;
+			vkDestroyImageView( _device.vkDevice, imageView, nullptr );
+			imageView = VK_NULL_HANDLE;
 		}
 
-		if ( m_image != VK_NULL_HANDLE )
+		if ( image != VK_NULL_HANDLE )
 		{
-			vkDestroyImage( _device.vkDevice, m_image, nullptr );
-			m_image = VK_NULL_HANDLE;
+			vkDestroyImage( _device.vkDevice, image, nullptr );
+			image = VK_NULL_HANDLE;
 		}
 	}
 
@@ -184,7 +176,7 @@ namespace fan
 	//================================================================================================================================
 	void Texture::CreateImage( Device& _device, VkExtent2D _extent, uint32_t _mipLevels, VkFormat _format, VkImageTiling _tiling, VkImageUsageFlags _usage, VkMemoryPropertyFlags _properties )
 	{
-		m_mipLevels = _mipLevels;
+		mipLevels = _mipLevels;
 
 		// VK image info struct
 		VkImageCreateInfo imageInfo = {};
@@ -202,25 +194,25 @@ namespace fan
 		imageInfo.samples = VK_SAMPLE_COUNT_1_BIT;
 		imageInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
-		if ( vkCreateImage( _device.vkDevice, &imageInfo, nullptr, &m_image ) != VK_SUCCESS )
+		if ( vkCreateImage( _device.vkDevice, &imageInfo, nullptr, &image ) != VK_SUCCESS )
 			throw std::runtime_error( "failed to create image!" );
 
-		Debug::Get() << Debug::Severity::log << std::hex << "VkImage               " << m_image << std::dec << Debug::Endl();
+		Debug::Get() << Debug::Severity::log << std::hex << "VkImage               " << image << std::dec << Debug::Endl();
 
 		// Allocate memory for the image
 		VkMemoryRequirements memRequirements;
-		vkGetImageMemoryRequirements( _device.vkDevice, m_image, &memRequirements );
+		vkGetImageMemoryRequirements( _device.vkDevice, image, &memRequirements );
 
 		VkMemoryAllocateInfo allocInfo = {};
 		allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
 		allocInfo.allocationSize = memRequirements.size;
 		allocInfo.memoryTypeIndex = _device.FindMemoryType( memRequirements.memoryTypeBits, _properties );
 
-		if ( vkAllocateMemory( _device.vkDevice, &allocInfo, nullptr, &m_deviceMemory ) != VK_SUCCESS )
+		if ( vkAllocateMemory( _device.vkDevice, &allocInfo, nullptr, &deviceMemory ) != VK_SUCCESS )
 			throw std::runtime_error( "failed to allocate image memory!" );
-		Debug::Get() << Debug::Severity::log << std::hex << "VkDeviceMemory        " << m_deviceMemory << std::dec << Debug::Endl();
+		Debug::Get() << Debug::Severity::log << std::hex << "VkDeviceMemory        " << deviceMemory << std::dec << Debug::Endl();
 
-		vkBindImageMemory( _device.vkDevice, m_image, m_deviceMemory, 0 );
+		vkBindImageMemory( _device.vkDevice, image, deviceMemory, 0 );
 	}
 
 	//================================================================================================================================
@@ -229,15 +221,15 @@ namespace fan
 	{
 		VkImageViewCreateInfo viewInfo = {};
 		viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-		viewInfo.image = m_image;
+		viewInfo.image = image;
 		viewInfo.viewType = _viewType;
 		viewInfo.format = _format;
 		viewInfo.subresourceRange = _subresourceRange;
 
-		if ( vkCreateImageView( _device.vkDevice, &viewInfo, nullptr, &m_imageView ) != VK_SUCCESS )
+		if ( vkCreateImageView( _device.vkDevice, &viewInfo, nullptr, &imageView ) != VK_SUCCESS )
 			throw std::runtime_error( "failed to create texture image view!" );
 
-		Debug::Get() << Debug::Severity::log << std::hex << "VkImageView           " << m_imageView << std::dec << Debug::Endl();
+		Debug::Get() << Debug::Severity::log << std::hex << "VkImageView           " << imageView << std::dec << Debug::Endl();
 
 	}
 
@@ -252,7 +244,7 @@ namespace fan
 		barrier.newLayout = _newLayout;
 		barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
 		barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-		barrier.image = m_image;
+		barrier.image = image;
 		barrier.subresourceRange = _subresourceRange;
 
 		// Set the access masks and pipeline stages based on the layouts in the transition.
@@ -299,9 +291,9 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool Texture::LoadFromFile( const std::string& _path )
+	bool Texture::CreateFromFile( const std::string& _path )
 	{
-		m_path = _path;
+		path = _path;
 
 		// Load image from disk
 		int texWidth, texHeight, texChannels;
@@ -313,10 +305,10 @@ namespace fan
 			return false;
 		}
 
-		m_mipLevels = static_cast< uint32_t >( std::floor( std::log2( std::max( texWidth, texHeight ) ) ) ) + 1;
-		m_mipLevels = 1;
+		mipLevels = static_cast< uint32_t >( std::floor( std::log2( std::max( texWidth, texHeight ) ) ) ) + 1;
+		mipLevels = 1;
 
-		SetData( pixels, texWidth, texHeight, m_mipLevels );
+		CreateFromData( pixels, { (uint32_t)texWidth, (uint32_t)texHeight }, mipLevels );
 
 		stbi_image_free( pixels );
 
@@ -325,41 +317,37 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Texture::SetData( const unsigned char* _data, const uint32_t _width, const uint32_t _height, const uint32_t _mipLevels )
+	void Texture::CreateFromData( const unsigned char* _data, const VkExtent2D _extent, const uint32_t _mipLevels )
 	{
-		m_mipLevels = _mipLevels;
-		m_width = _width;
-		m_height = _height;
-		m_data = new unsigned char[ _width * _height * 4 ];
-		memcpy( m_data, _data, _width * _height * 4 * sizeof( unsigned char ) );
-		GenerateGpuData( s_resourceManager.GetDevice() );
+		mipLevels = _mipLevels;
+		extent = _extent;
+		GenerateGpuData( s_resourceManager.GetDevice(), _data );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Texture::GenerateGpuData( Device& _device )
+	void Texture::GenerateGpuData( Device& _device, const void* _data )
 	{
-		VkDeviceSize imageSize = m_width * m_height * 4 * sizeof( unsigned char );
+		VkDeviceSize imageSize = extent.width * extent.height * 4 * sizeof( unsigned char );
 
 		// Create a buffer in host visible memory
 		Buffer stagingBuffer( _device );
 		stagingBuffer.Create( imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT );
-		stagingBuffer.SetData( m_data, imageSize );
+		stagingBuffer.SetData( _data, imageSize );
 
 		// Create the image in Vulkan
-		VkExtent2D extent = { m_width, m_height };
-		CreateImage( _device, extent, m_mipLevels, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT );
+		CreateImage( _device, extent, mipLevels, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT );
 
 		// Transitioned to VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL while generating mipmaps
-		VkImageSubresourceRange subresourceRange = { VK_IMAGE_ASPECT_COLOR_BIT , 0, m_mipLevels, 0, 1 };
+		VkImageSubresourceRange subresourceRange = { VK_IMAGE_ASPECT_COLOR_BIT , 0, mipLevels, 0, 1 };
 
 		VkCommandBuffer cmd = _device.BeginSingleTimeCommands();
 		TransitionImageLayout( cmd, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, subresourceRange );
-		CopyBufferToImage( cmd, stagingBuffer.GetBuffer(), static_cast< uint32_t >( m_width ), static_cast< uint32_t >( m_height ) );
+		CopyBufferToImage( cmd, stagingBuffer.GetBuffer(), extent );
 
-		if ( m_mipLevels > 1 )
+		if ( mipLevels > 1 )
 		{
-			GenerateMipmaps( _device, cmd, VK_FORMAT_R8G8B8A8_UNORM, m_width, m_height, m_mipLevels );
+			GenerateMipmaps( _device, cmd, VK_FORMAT_R8G8B8A8_UNORM, extent, mipLevels );
 		}
 		else
 		{
@@ -367,7 +355,7 @@ namespace fan
 		}
 
 		// Creates the image View
-		CreateImageView( _device, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_VIEW_TYPE_2D, { VK_IMAGE_ASPECT_COLOR_BIT, 0, m_mipLevels, 0, 1 } );
+		CreateImageView( _device, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_VIEW_TYPE_2D, { VK_IMAGE_ASPECT_COLOR_BIT, 0, mipLevels, 0, 1 } );
 
 		_device.EndSingleTimeCommands( cmd );
 	}

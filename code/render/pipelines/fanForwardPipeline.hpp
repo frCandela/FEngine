@@ -14,9 +14,7 @@ namespace fan
 	struct Vertex;
 	class Device;
 	class Shader;
-	class Image;
 	class Buffer;
-	class Texture;
 	class Descriptor;
 	class DescriptorTextures;
 	class DescriptorSampler;

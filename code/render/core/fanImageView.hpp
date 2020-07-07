@@ -11,7 +11,6 @@ namespace fan
 	//================================================================================================================================
 	struct ImageView
 	{
-	public:
 		bool Create( Device& _device, VkImage _image, const VkFormat _format, const VkImageAspectFlags _aspectFlags, const VkImageViewType _viewType );
 		void Destroy( Device& _device );
 

@@ -380,7 +380,6 @@ namespace fan
 			m_uiPipeline->m_dynamicUniformsVert[ meshIndex ].position = uiData.position;
 			m_uiPipeline->m_dynamicUniformsVert[ meshIndex ].scale = uiData.scale;
 			m_uiPipeline->m_dynamicUniformsVert[ meshIndex ].color = uiData.color;
-
 		}
 	}
 
@@ -900,7 +899,7 @@ namespace fan
 		std::vector< VkImageView > imageViews( texture.size() );
 		for ( int textureIndex = 0; textureIndex < texture.size(); textureIndex++ )
 		{
-			m_imagesDescriptor->Append( texture[ textureIndex ]->GetImageView() );
+			m_imagesDescriptor->Append( texture[ textureIndex ]->imageView );
 		}
 
 		m_imagesDescriptor->UpdateRange( 0, m_imagesDescriptor->Count() - 1 );

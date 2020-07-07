@@ -4,7 +4,7 @@
 
 namespace fan
 {
-	class Texture;
+	struct Texture;
 	class Mesh;
 }
 

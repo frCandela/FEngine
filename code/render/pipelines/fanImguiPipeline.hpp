@@ -13,7 +13,7 @@ namespace fan
 	class Device;
 	class Shader;
 	class Buffer;
-	class Texture;
+	struct Texture;
 	struct ImageView;
 
 	//================================================================================================================================

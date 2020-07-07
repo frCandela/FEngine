@@ -6,7 +6,6 @@
 namespace fan
 {
 	class Device;
-	class Texture;
 
 	//================================================================================================================================
 	// utility for making texture descriptors

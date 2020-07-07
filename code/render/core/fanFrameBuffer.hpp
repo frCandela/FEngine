@@ -9,7 +9,6 @@
 namespace fan
 {
 	class Device;
-	class Image;
 
 	//================================================================================================================================
 	// render target with attachments (color, depth, etc. )

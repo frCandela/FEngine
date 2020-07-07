@@ -46,7 +46,7 @@ namespace fan
 			for ( int textureIndex = 0; textureIndex < textures.size(); textureIndex++ )
 			{
 				const Texture* tex = textures[ textureIndex ];
-				ImGui::Text( "ref: %d size: %d x %d name: %s", tex->GetRefCount(), tex->GetSize().x, tex->GetSize().y, tex->GetPath().c_str() );
+				ImGui::Text( "ref: %d size: %u x %u name: %s", tex->GetRefCount(), tex->extent.width, tex->extent.height, tex->path.c_str() );
 			}
 		}
 
