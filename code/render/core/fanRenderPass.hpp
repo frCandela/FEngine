@@ -10,7 +10,7 @@ namespace fan
 	//================================================================================================================================
 	// abstraction of a vulkan render pass
 	//================================================================================================================================
-	class RenderPass
+	struct RenderPass
 	{
 	public:
 		bool Create( VkDevice _device, 	VkAttachmentDescription* _attachmentdescriptions,	uint32_t _countAttachments,  

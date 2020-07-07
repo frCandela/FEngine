@@ -6,6 +6,7 @@
 WARNINGS_GLM_PUSH()
 #include "glm/glm.hpp"
 WARNINGS_POP()
+#include "render/core/fanSampler.hpp"
 
 namespace fan
 {
@@ -13,8 +14,7 @@ namespace fan
 	class Shader;
 	class Buffer;
 	class Texture;
-	class Sampler;
-	class ImageView;
+	struct ImageView;
 
 	//================================================================================================================================
 	// imgui backend
@@ -35,8 +35,8 @@ namespace fan
 	private:
 		Device& m_device;
 
-		Sampler* m_sampler;
-		Sampler* m_iconsSampler;
+		Sampler m_sampler;
+		Sampler m_iconsSampler;
 		Texture* m_fontTexture;
 		Texture* m_iconsTexture;
 		ImageView* m_gameImageView = nullptr;

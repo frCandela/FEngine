@@ -15,10 +15,8 @@ namespace fan
 	class Device;
 	class Shader;
 	class Image;
-	class ImageView;
 	class Buffer;
 	class Texture;
-	class Sampler;
 	class Descriptor;
 	class DescriptorTextures;
 	class DescriptorSampler;

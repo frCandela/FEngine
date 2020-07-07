@@ -4,13 +4,12 @@
 #include <vector>
 #include "render/core/fanImage.hpp"
 #include "render/core/fanImageView.hpp" 
+#include "render/core/fanSampler.hpp"
 
 namespace fan
 {
 	class Device;
-	class Sampler;
 	class Image;
-	class ImageView;
 
 	//================================================================================================================================
 	// render target with attachments (color, depth, etc. )
@@ -28,7 +27,7 @@ namespace fan
 		void Resize( const VkExtent2D _extent );
 
 		VkFramebuffer	Get( const size_t _index ) { return m_frameBuffers[ _index ]; }
-		Sampler*		GetColorAttachmentSampler() { return m_colorSampler; }
+		Sampler*		GetColorAttachmentSampler() { return &m_colorSampler; }
 		ImageView*		GetColorAttachmentImageView() { return &m_colorImageView; }
 		VkExtent2D		GetExtent() const { return m_extent; }
 	private:
@@ -49,9 +48,9 @@ namespace fan
 		// Color attachment
 		VkFormat	m_colorFormat;
 		VkExtent2D	m_extent;
-		Sampler* m_colorSampler = nullptr;
-		Image m_colorImage;
-		ImageView m_colorImageView;
+		Sampler		m_colorSampler;
+		Image		m_colorImage;
+		ImageView	m_colorImageView;
 
 		void CreateColorImageAndView( Device& _device, const VkFormat _format, const VkExtent2D _extent );
 		void CreateDepthImageAndView( Device& _device, const VkFormat _format, const VkExtent2D _extent );

@@ -8,7 +8,6 @@ namespace fan
 {
 	class DescriptorTextures;
 	class DescriptorSampler;
-	class Sampler;
 	class Descriptor;
 
 	//================================================================

@@ -7,7 +7,6 @@
 #include "render/descriptors/fanDescriptorTexture.hpp"
 #include "render/descriptors/fanDescriptor.hpp"
 #include "render/core/fanImageView.hpp"
-#include "render/core/fanSampler.hpp"
 
 namespace fan
 {
@@ -18,8 +17,7 @@ namespace fan
 	{
 		uniforms.color = glm::vec4( 1, 1, 1, 1 );
 
-		m_sampler = new Sampler( _device );
-		m_sampler->CreateSampler( 0, 0.f, VK_FILTER_NEAREST );
+		m_sampler.Create( _device, 0, 0.f, VK_FILTER_NEAREST );
 	}
 
 	//================================================================================================================================
@@ -28,7 +26,7 @@ namespace fan
 	{
 		delete m_descriptorImageSampler;
 		delete m_descriptorUniforms;
-		delete m_sampler;
+		m_sampler.Destroy( m_device );
 	}
 
 	//================================================================================================================================
@@ -38,11 +36,6 @@ namespace fan
 		Pipeline::Resize( _extent );
 		m_descriptorImageSampler->Set( 0, m_imageView->imageView );
 		m_descriptorImageSampler->UpdateRange( 0, 0 );
-
-		// 		std::vector<VkImageView> views = { m_imageView->GetImageView() };
-		// 		m_descriptorImageSampler->
-		// 		m_descriptorImageSampler->SetImageSamplerBinding( VK_SHADER_STAGE_FRAGMENT_BIT, views, m_sampler->GetSampler(), 0 );
-		// 		m_descriptorImageSampler->Update();
 	}
 
 	//================================================================================================================================
@@ -85,7 +78,7 @@ namespace fan
 		UpdateUniformBuffers();
 
 		delete m_descriptorImageSampler;
-		m_descriptorImageSampler = new DescriptorTextures( m_device, 1, m_sampler->GetSampler() );
+		m_descriptorImageSampler = new DescriptorTextures( m_device, 1, m_sampler.sampler );
 		m_descriptorImageSampler->Append( m_imageView->imageView );
 		m_descriptorImageSampler->UpdateRange( 0, 0 );
 	}
@@ -94,7 +87,6 @@ namespace fan
 	//================================================================================================================================
 	void PostprocessPipeline::ConfigurePipeline()
 	{
-
 		m_bindingDescription.resize( 1 );
 		m_bindingDescription[ 0 ].binding = 0;
 		m_bindingDescription[ 0 ].stride = sizeof( glm::vec3 );
@@ -110,12 +102,5 @@ namespace fan
 		m_attachmentBlendStates[ 0 ].srcColorBlendFactor = VK_BLEND_FACTOR_ONE;
 		m_attachmentBlendStates[ 0 ].dstColorBlendFactor = VK_BLEND_FACTOR_ZERO;
 		m_descriptorSetLayouts = { m_descriptorImageSampler->GetLayout(), m_descriptorUniforms->GetLayout() };
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void PostprocessPipeline::SetGameImageView( ImageView* _imageView )
-	{
-		m_imageView = _imageView;
 	}
 }

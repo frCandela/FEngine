@@ -6,7 +6,6 @@ namespace fan
 {
 	class Device;
 	class Texture;
-	class Sampler;
 
 	//================================================================================================================================
 	// Utility for making sampler descriptors

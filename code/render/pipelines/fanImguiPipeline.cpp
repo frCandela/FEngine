@@ -7,7 +7,6 @@
 #include "render/core/fanDevice.hpp"
 #include "render/core/fanShader.hpp"
 #include "render/core/fanBuffer.hpp"
-#include "render/core/fanSampler.hpp"
 #include "render/core/fanTexture.hpp"
 #include "render/core/fanImageView.hpp"
 
@@ -19,8 +18,6 @@ namespace fan
 		m_device( _device )
 		, m_fontTexture( new Texture() )
 		, m_iconsTexture( new Texture() )
-		, m_sampler( new Sampler( _device ) )
-		, m_iconsSampler( new Sampler( _device ) )
 	{
 		m_vertexBuffers.reserve( _swapchainImagesCount );
 		m_indexBuffers.reserve( _swapchainImagesCount );
@@ -39,8 +36,8 @@ namespace fan
 	{
 		delete( m_fontTexture );
 		delete ( m_iconsTexture );
-		delete( m_sampler );
-		delete( m_iconsSampler );
+		m_sampler.Destroy( m_device );
+		m_iconsSampler.Destroy( m_device );
 		delete( m_fragShader );
 		delete( m_vertShader );
 
@@ -57,7 +54,6 @@ namespace fan
 	//================================================================================================================================
 	void ImguiPipeline::Create( VkRenderPass _renderPass, GLFWwindow* _window, VkExtent2D _extent )
 	{
-
 		ImGui::CreateContext();
 
 		ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_DockingEnable;
@@ -79,7 +75,7 @@ namespace fan
 		m_iconsTexture->LoadFromFile( RenderGlobal::s_defaultIcons );
 
 		VkDescriptorImageInfo iconsDescriptorImageInfo{};
-		iconsDescriptorImageInfo.sampler = m_iconsSampler->GetSampler();
+		iconsDescriptorImageInfo.sampler = m_iconsSampler.sampler;
 		iconsDescriptorImageInfo.imageView = m_iconsTexture->GetImageView();
 		iconsDescriptorImageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 
@@ -284,8 +280,8 @@ namespace fan
 
 		m_fontTexture->SetData( fontData, texWidth, texHeight, 1 );
 		m_iconsTexture->LoadFromFile( RenderGlobal::s_defaultIcons );
-		m_sampler->CreateSampler( 0, 1.f, VK_FILTER_LINEAR );
-		m_iconsSampler->CreateSampler( 0, 0.f, VK_FILTER_NEAREST );
+		m_sampler.Create( m_device, 0, 1.f, VK_FILTER_LINEAR );
+		m_iconsSampler.Create( m_device, 0, 0.f, VK_FILTER_NEAREST );
 	}
 
 	//================================================================================================================================
@@ -336,17 +332,17 @@ namespace fan
 		vkAllocateDescriptorSets( m_device.vkDevice, &descriptorSetAllocateInfo, m_descriptorSets );
 
 		VkDescriptorImageInfo fontDescriptorImageInfo{};
-		fontDescriptorImageInfo.sampler = m_sampler->GetSampler();
+		fontDescriptorImageInfo.sampler = m_sampler.sampler;
 		fontDescriptorImageInfo.imageView = m_fontTexture->GetImageView();
 		fontDescriptorImageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 
 		VkDescriptorImageInfo iconsDescriptorImageInfo{};
-		iconsDescriptorImageInfo.sampler = m_iconsSampler->GetSampler();
+		iconsDescriptorImageInfo.sampler = m_iconsSampler.sampler;
 		iconsDescriptorImageInfo.imageView = m_iconsTexture->GetImageView();
 		iconsDescriptorImageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 
 		VkDescriptorImageInfo view3DDescriptorImageInfo{};
-		view3DDescriptorImageInfo.sampler = m_iconsSampler->GetSampler();
+		view3DDescriptorImageInfo.sampler = m_iconsSampler.sampler;
 		view3DDescriptorImageInfo.imageView = m_gameImageView->imageView;
 		view3DDescriptorImageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 
@@ -384,7 +380,7 @@ namespace fan
 	void ImguiPipeline::UpdateGameImageDescriptor()
 	{
 		VkDescriptorImageInfo viewGameDescriptorImageInfo{};
-		viewGameDescriptorImageInfo.sampler = m_iconsSampler->GetSampler();
+		viewGameDescriptorImageInfo.sampler = m_iconsSampler.sampler;
 		viewGameDescriptorImageInfo.imageView = m_gameImageView->imageView;
 		viewGameDescriptorImageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 

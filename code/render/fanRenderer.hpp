@@ -11,6 +11,7 @@ WARNINGS_POP()
 #include "render/fanVertex.hpp"
 #include "render/core/fanCommandBuffer.hpp"
 #include "render/core/fanRenderPass.hpp"
+#include "render/core/fanSampler.hpp"
 
 namespace fan
 {
@@ -23,15 +24,12 @@ namespace fan
 	class ImguiPipeline;
 	class FrameBuffer;
 	class Buffer;
-	class Sampler;
 	class DescriptorTextures;
 	class DescriptorSampler;
 	class PostprocessPipeline;
 	class ForwardPipeline;
 	class UIPipeline;
-	class RenderPass;
-	class DebugPipeline;
-	
+	class DebugPipeline;	
 
 	// Used to set uniforms
 	struct DrawDirectionalLight
@@ -141,9 +139,9 @@ namespace fan
 		// global descriptors
 		DescriptorTextures* m_imagesDescriptor = nullptr;
 		DescriptorSampler*	m_samplerDescriptorTextures = nullptr;
-		Sampler*			m_samplerTextures = nullptr;
+		Sampler				m_samplerTextures;
 		DescriptorSampler*	m_samplerDescriptorUI = nullptr;
-		Sampler*			m_samplerUI = nullptr;
+		Sampler				m_samplerUI;
 
 		// render passes
 		RenderPass m_renderPassGame;

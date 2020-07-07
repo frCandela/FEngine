@@ -5,12 +5,12 @@
 WARNINGS_GLM_PUSH()
 #include "glm/glm.hpp"
 WARNINGS_POP()
+#include "render/core/fanSampler.hpp"
 
 namespace fan
 {
-	class Sampler;
 	class Image;
-	class ImageView;
+	struct ImageView;
 	class Buffer;
 	class DescriptorTextures;
 	class Descriptor;
@@ -31,7 +31,7 @@ namespace fan
 		PostprocessPipeline( Device& _device );
 		~PostprocessPipeline() override;
 
-		void SetGameImageView( ImageView* _imageView );
+		void SetGameImageView( ImageView* _imageView ) { m_imageView = _imageView; }
 		void CreateDescriptors( const size_t _numSwapchainImages );
 		void Resize( const VkExtent2D _extent ) override;
 		void Bind( VkCommandBuffer _commandBuffer, const size_t _index ) override;
@@ -45,6 +45,6 @@ namespace fan
 		DescriptorTextures* m_descriptorImageSampler = nullptr;
 		Descriptor* m_descriptorUniforms = nullptr;
 		ImageView* m_imageView;
-		Sampler* m_sampler;
+		Sampler m_sampler;
 	};
 }

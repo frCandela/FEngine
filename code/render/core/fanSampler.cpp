@@ -7,23 +7,21 @@ namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	Sampler::Sampler( Device& _device ) :
-		m_device( _device )
+	void Sampler::Destroy( Device& _device )
 	{
-
+		if( sampler != VK_NULL_HANDLE )
+		{
+			vkDestroySampler( _device.vkDevice, sampler, VK_NULL_HANDLE );
+			sampler = VK_NULL_HANDLE;
+		}
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	Sampler::~Sampler()
+	void Sampler::Create( Device& _device, const float _maxLod, const float _maxAnisotropy, const VkFilter _filter )
 	{
-		vkDestroySampler( m_device.vkDevice, m_sampler, nullptr );
-	}
+		assert( sampler == VK_NULL_HANDLE );
 
-	//================================================================================================================================
-	//================================================================================================================================
-	void Sampler::CreateSampler( const float _maxLod, const float _maxAnisotropy, const VkFilter _filter )
-	{
 		VkSamplerCreateInfo samplerInfo = {};
 		samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
 		samplerInfo.magFilter = _filter;
@@ -44,7 +42,7 @@ namespace fan
 		samplerInfo.maxLod = _maxLod;
 		samplerInfo.mipLodBias = 0;
 
-		if( vkCreateSampler( m_device.vkDevice, &samplerInfo, nullptr, &m_sampler ) != VK_SUCCESS )
+		if( vkCreateSampler( _device.vkDevice, &samplerInfo, VK_NULL_HANDLE, &sampler ) != VK_SUCCESS )
 		{
 			Debug::Error() << "sampler creation failed" << Debug::Endl();
 		}

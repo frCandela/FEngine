@@ -3,7 +3,6 @@
 #include <cassert>
 #include "core/fanDebug.hpp"
 #include "render/core/fanDevice.hpp"
-#include "render/core/fanSampler.hpp"
 
 namespace fan
 {
@@ -21,7 +20,7 @@ namespace fan
 		// color attachment
 		m_colorImageView.Destroy( m_device );
 		m_colorImage.Destroy( m_device );
-		delete m_colorSampler;
+		m_colorSampler.Destroy( m_device );
 
 		// depth attachment
 		m_depthImageView.Destroy( m_device );
@@ -134,9 +133,7 @@ namespace fan
 
 		m_colorFormat = _format;
 
-		//Sampler
-		m_colorSampler = new Sampler( m_device );
-		m_colorSampler->CreateSampler( 0, 1.f, VK_FILTER_LINEAR );
+		m_colorSampler.Create( m_device, 0, 1.f, VK_FILTER_LINEAR );
 
 		CreateColorImageAndView( m_device, _format, _extent );
 	}

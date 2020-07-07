@@ -9,20 +9,11 @@ namespace fan
 	//================================================================================================================================
 	// for setting sampling of images
 	//================================================================================================================================
-	class Sampler
+	struct Sampler
 	{
-	public:
-		Sampler( Device& _device );
-		~Sampler();
+		void Destroy( Device& _device );
+		void Create( Device& _device, const float _maxLod, const float _maxAnisotropy, const VkFilter _filter );
 
-		// Create a Sampler
-		void CreateSampler( const float _maxLod, const float _maxAnisotropy, const VkFilter _filter );
-
-		VkSampler GetSampler() { return m_sampler; }
-
-	private:
-		Device& m_device;
-
-		VkSampler m_sampler;
+		VkSampler sampler = VK_NULL_HANDLE;
 	};
 }

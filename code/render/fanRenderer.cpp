@@ -11,7 +11,6 @@
 #include "render/core/fanFrameBuffer.hpp"
 #include "render/core/fanSwapChain.hpp"
 #include "render/core/fanInstance.hpp"
-#include "render/core/fanSampler.hpp"
 #include "render/core/fanTexture.hpp"
 #include "render/core/fanDevice.hpp"
 #include "render/core/fanBuffer.hpp"
@@ -45,9 +44,8 @@ namespace fan
 		CreateQuadVertexBuffer();
 		CreateFramebuffers();
 
-		m_samplerTextures = new Sampler( m_window.GetDevice() );
-		m_samplerTextures->CreateSampler( 0, 8, VK_FILTER_LINEAR );
-		m_samplerDescriptorTextures = new DescriptorSampler( m_window.GetDevice(), m_samplerTextures->GetSampler() );
+		m_samplerTextures.Create( m_window.GetDevice(), 0, 8, VK_FILTER_LINEAR );
+		m_samplerDescriptorTextures = new DescriptorSampler( m_window.GetDevice(), m_samplerTextures.sampler );
 		CreateTextureDescriptor();
 
 		m_debugLinesPipeline = new DebugPipeline( m_window.GetDevice(), VK_PRIMITIVE_TOPOLOGY_LINE_LIST, true );
@@ -70,9 +68,8 @@ namespace fan
 		m_forwardPipeline->CreateDescriptors( m_window.GetSwapChain().GetSwapchainImagesCount() );
 		m_forwardPipeline->Create();
 
-		m_samplerUI = new Sampler( m_window.GetDevice() );
-		m_samplerUI->CreateSampler( 0, 1, VK_FILTER_NEAREST );
-		m_samplerDescriptorUI = new DescriptorSampler( m_window.GetDevice(), m_samplerUI->GetSampler() );
+		m_samplerUI.Create( m_window.GetDevice(), 0, 1, VK_FILTER_NEAREST );
+		m_samplerDescriptorUI = new DescriptorSampler( m_window.GetDevice(), m_samplerUI.sampler );
 		m_uiPipeline = new UIPipeline( m_window.GetDevice(), m_imagesDescriptor, m_samplerDescriptorUI );
 		m_uiPipeline->Init( m_renderPassPostprocess.renderPass, m_window.GetSwapChain().GetExtent(), "code/shaders/ui.vert", "code/shaders/ui.frag" );
 		m_uiPipeline->CreateDescriptors( m_window.GetSwapChain().GetSwapchainImagesCount() );
@@ -101,9 +98,9 @@ namespace fan
 	//================================================================================================================================	
 	Renderer::~Renderer()
 	{
-		VkDevice device = m_window.GetDevice().vkDevice;
+		Device& device = m_window.GetDevice();
 
-		vkDeviceWaitIdle( device );
+		vkDeviceWaitIdle( device.vkDevice );
 
 		delete m_imguiPipeline;
 		delete m_forwardPipeline;
@@ -117,8 +114,8 @@ namespace fan
 		delete m_samplerDescriptorUI;
 		delete m_imagesDescriptor;
 
-		delete m_samplerTextures;
-		delete m_samplerUI;
+		m_samplerTextures.Destroy( device );
+		m_samplerUI.Destroy( device );
 
 		delete m_quadVertexBuffer;
 
@@ -144,9 +141,9 @@ namespace fan
 		delete m_gameFrameBuffers;
 		delete m_postProcessFramebuffers;
 
-		m_renderPassGame.Destroy( device );
-		m_renderPassPostprocess.Destroy( device );
-		m_renderPassImgui.Destroy( device );
+		m_renderPassGame.Destroy( device.vkDevice );
+		m_renderPassPostprocess.Destroy( device.vkDevice );
+		m_renderPassImgui.Destroy( device.vkDevice );
 
 		delete m_swapchainFramebuffers;
 
