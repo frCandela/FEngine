@@ -35,7 +35,7 @@ namespace fan
 		{
 			for ( int bufferIndex = 0; bufferIndex < m_bindingData[ bindingIndex ].buffers.size(); bufferIndex++ )
 			{
-				delete m_bindingData[ bindingIndex ].buffers[ bufferIndex ];
+				m_bindingData[ bindingIndex ].buffers[ bufferIndex ].Destroy( m_device );
 			}
 		}
 	}
@@ -68,7 +68,7 @@ namespace fan
 			assert( _index < m_bindingData.size() );
 			for ( int bufferIndex = 0; bufferIndex < m_bindingData[ _index ].buffers.size(); bufferIndex++ )
 			{
-				delete m_bindingData[ _index ].buffers[ bufferIndex ];
+				m_bindingData[ _index ].buffers[ bufferIndex ].Destroy( m_device );
 			} m_bindingData[ _index ].buffers.clear();
 			m_bindingData[ _index ].SetBuffers( m_device, m_numDescriptors, _bufferSize * _alignment, _alignment );
 		}
@@ -81,7 +81,7 @@ namespace fan
 	{
 		assert( _indexBinding >= 0 && _indexBinding < m_bindingData.size() );
 		assert( _indexBuffer < m_bindingData[ _indexBinding ].buffers.size() );
-		m_bindingData[ _indexBinding ].buffers[ _indexBuffer ]->SetData( _data, _size, _offset );
+		m_bindingData[ _indexBinding ].buffers[ _indexBuffer ].SetData( m_device, _data, _size, _offset );
 	}
 
 	//================================================================================================================================
@@ -217,16 +217,16 @@ namespace fan
 		writeDescriptorSets.resize( _count );
 		for ( int bufferIndex = 0; bufferIndex < _count; bufferIndex++ )
 		{
-			buffers[ bufferIndex ] = new Buffer( _device );
-			buffers[ bufferIndex ]->Create(
+			buffers[ bufferIndex ].Create(
+				_device,
 				_sizeBuffer,
 				VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
 				VK_MEMORY_PROPERTY_HOST_COHERENT_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT,
 				_alignment
 			);
-			descriptorBufferInfos[ bufferIndex ].buffer = buffers[ bufferIndex ]->GetBuffer();
+			descriptorBufferInfos[ bufferIndex ].buffer = buffers[ bufferIndex ].buffer;
 			descriptorBufferInfos[ bufferIndex ].offset = 0;
-			descriptorBufferInfos[ bufferIndex ].range = buffers[ bufferIndex ]->GetAlignment() > 1 ? buffers[ bufferIndex ]->GetAlignment() : buffers[ bufferIndex ]->GetSize();
+			descriptorBufferInfos[ bufferIndex ].range = buffers[ bufferIndex ].alignment > 1 ? buffers[ bufferIndex ].alignment : buffers[ bufferIndex ].size;
 		}
 	}
 

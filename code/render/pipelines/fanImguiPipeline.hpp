@@ -9,11 +9,11 @@ WARNINGS_POP()
 #include "render/core/fanSampler.hpp"
 #include "render/core/fanShader.hpp"
 #include "render/core/fanTexture.hpp"
+#include "render/core/fanBuffer.hpp"
 
 namespace fan
 {
 	class Device;
-	class Buffer;
 	struct ImageView;
 
 	//================================================================================================================================

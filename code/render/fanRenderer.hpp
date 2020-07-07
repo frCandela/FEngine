@@ -12,6 +12,7 @@ WARNINGS_POP()
 #include "render/core/fanCommandBuffer.hpp"
 #include "render/core/fanRenderPass.hpp"
 #include "render/core/fanSampler.hpp"
+#include "render/core/fanBuffer.hpp"
 
 namespace fan
 {
@@ -23,7 +24,6 @@ namespace fan
 	class SwapChain;
 	class ImguiPipeline;
 	class FrameBuffer;
-	class Buffer;
 	class DescriptorTextures;
 	class DescriptorSampler;
 	class PostprocessPipeline;
@@ -162,14 +162,14 @@ namespace fan
 		FrameBuffer* m_swapchainFramebuffers = VK_NULL_HANDLE;
 
 		// data
-		Buffer*		m_quadVertexBuffer;
+		Buffer		m_quadVertexBuffer;
 		glm::vec4	m_clearColor;
 
 		// debug data
 		bool m_hasNoDebugToDraw = true;
-		std::vector<Buffer*>		m_debugLinesvertexBuffers;
-		std::vector<Buffer*>		m_debugLinesNoDepthTestVertexBuffers;
-		std::vector<Buffer*>		m_debugTrianglesvertexBuffers;
+		std::vector<Buffer>		m_debugLinesvertexBuffers;
+		std::vector<Buffer>		m_debugLinesNoDepthTestVertexBuffers;
+		std::vector<Buffer>		m_debugTrianglesvertexBuffers;
 		int m_numDebugLines = 0;
 		int m_numDebugLinesNoDepthTest = 0;
 		int m_numDebugTriangle = 0;	

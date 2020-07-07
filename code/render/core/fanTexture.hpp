@@ -11,7 +11,6 @@ WARNINGS_POP()
 namespace fan
 {
 	class Device;
-	class Buffer;
 
 	//================================================================================================================================
 	// like an Image but generated from a png file

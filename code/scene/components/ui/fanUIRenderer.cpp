@@ -25,7 +25,7 @@ namespace fan
 	{
 		UIRenderer& uiRenderer = static_cast<UIRenderer&>( _component );
 
-		if( uiRenderer.uiMesh.GetVertexBuffer() == nullptr )
+		if( uiRenderer.uiMesh.GetVertexBuffer().buffer == VK_NULL_HANDLE )
 		{
 			std::vector<UIVertex> vertices = { // tmp make a 2D quad
 				UIVertex( glm::vec2( +2.f, +0.f ), glm::vec2( +1.f, +0.f ) )

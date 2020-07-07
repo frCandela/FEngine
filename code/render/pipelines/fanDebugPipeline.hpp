@@ -8,7 +8,6 @@ WARNINGS_POP()
 
 namespace fan
 {
-	class Buffer;
 	class Descriptor;
 	struct DebugUniforms;
 

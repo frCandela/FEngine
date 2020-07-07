@@ -18,8 +18,6 @@ namespace fan
 	Mesh::Mesh()
 		: m_vertices( 0 )
 		, m_indices( 0 )
-		, m_vertexBuffer{ nullptr ,nullptr ,nullptr }
-		, m_indexBuffer{ nullptr ,nullptr ,nullptr }
 	{}
 
 	//================================================================================================================================
@@ -139,26 +137,24 @@ namespace fan
 														 VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT :
 														 VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT );
 
-		Buffer*& vertexBuffer = m_vertexBuffer[ m_currentBuffer ];
+		Buffer& vertexBuffer = m_vertexBuffer[ m_currentBuffer ];
 		const VkDeviceSize requiredVertexSize = sizeof( m_vertices[ 0 ] ) * m_vertices.size();
-		if ( vertexBuffer == nullptr || vertexBuffer->GetSize() < requiredVertexSize )
+		if ( vertexBuffer.buffer == VK_NULL_HANDLE || vertexBuffer.size < requiredVertexSize )
 		{
-			delete vertexBuffer;
-			vertexBuffer = new Buffer( _device );
-			m_vertexBuffer[ m_currentBuffer ]->Create(
+			vertexBuffer.Destroy( _device );
+			m_vertexBuffer[ m_currentBuffer ].Create( _device,
 				requiredVertexSize,
 				VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
 				memPropertyFlags
 			);
 		}
 
-		Buffer*& indexBuffer = m_indexBuffer[ m_currentBuffer ];
+		Buffer& indexBuffer = m_indexBuffer[ m_currentBuffer ];
 		const VkDeviceSize requiredIndexSize = sizeof( m_indices[ 0 ] ) * m_indices.size();
-		if ( indexBuffer == nullptr || indexBuffer->GetSize() < requiredIndexSize )
+		if ( indexBuffer.buffer == VK_NULL_HANDLE || indexBuffer.size < requiredIndexSize )
 		{
-			delete indexBuffer;
-			indexBuffer = new Buffer( _device );
-			indexBuffer->Create(
+			indexBuffer.Destroy( _device );
+			indexBuffer.Create( _device,
 				requiredIndexSize,
 				VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
 				memPropertyFlags
@@ -167,36 +163,38 @@ namespace fan
 
 		if ( m_hostVisible )
 		{
-			indexBuffer->SetData( m_indices.data(), requiredIndexSize );
-			vertexBuffer->SetData( m_vertices.data(), requiredVertexSize );
+			indexBuffer.SetData( _device, m_indices.data(), requiredIndexSize );
+			vertexBuffer.SetData( _device, m_vertices.data(), requiredVertexSize );
 		}
 		else
 		{
 			{
-				Buffer stagingBuffer( _device );
+				Buffer stagingBuffer;
 				stagingBuffer.Create(
+					_device,
 					requiredIndexSize,
 					VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
 					VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
 				);
-				stagingBuffer.SetData( m_indices.data(), requiredIndexSize );
+				stagingBuffer.SetData( _device, m_indices.data(), requiredIndexSize );
 				VkCommandBuffer cmd = _device.BeginSingleTimeCommands();
-				stagingBuffer.CopyBufferTo( cmd, indexBuffer->GetBuffer(), requiredIndexSize );
+				stagingBuffer.CopyBufferTo( cmd, indexBuffer.buffer, requiredIndexSize );
 				_device.EndSingleTimeCommands( cmd );
+				stagingBuffer.Destroy( _device );
 			}
 			{
-
-
-				Buffer stagingBuffer2( _device );
+				Buffer stagingBuffer2;
 				stagingBuffer2.Create(
+					_device,
 					requiredVertexSize,
 					VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
 					VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
 				);
-				stagingBuffer2.SetData( m_vertices.data(), requiredVertexSize );
+				stagingBuffer2.SetData( _device, m_vertices.data(), requiredVertexSize );
 				VkCommandBuffer cmd2 = _device.BeginSingleTimeCommands();
-				stagingBuffer2.CopyBufferTo( cmd2, vertexBuffer->GetBuffer(), requiredVertexSize );
+				stagingBuffer2.CopyBufferTo( cmd2, vertexBuffer.buffer, requiredVertexSize );
 				_device.EndSingleTimeCommands( cmd2 );
+				stagingBuffer2.Destroy( _device );
 			}
 		}
 	}
@@ -210,8 +208,8 @@ namespace fan
 
 		for ( int bufferIndex = 0; bufferIndex < 3; bufferIndex++ )
 		{
-			delete m_indexBuffer[ bufferIndex ];
-			delete m_vertexBuffer[ bufferIndex ];
+			m_indexBuffer[bufferIndex].Destroy( _device );
+			m_vertexBuffer[bufferIndex].Destroy( _device );
 		}
 	}
 

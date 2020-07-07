@@ -3,11 +3,11 @@
 #include "glfw/glfw3.h"
 #include <vector>
 #include "core/memory/fanAlignedMemory.hpp"
+#include "render/core/fanBuffer.hpp"
 
 namespace fan
 {
 	class Device;
-	class Buffer;
 
 	//================================================================================================================================
 	// @todo simplify this
@@ -20,10 +20,10 @@ namespace fan
 		//================================================================
 		struct BindingData
 		{
-			VkDescriptorSetLayoutBinding		 layoutBinding;
-			std::vector < VkWriteDescriptorSet>	 writeDescriptorSets;
-			std::vector<VkDescriptorBufferInfo>  descriptorBufferInfos;
-			std::vector<Buffer* >				 buffers;
+			VkDescriptorSetLayoutBinding		layoutBinding;
+			std::vector < VkWriteDescriptorSet>	writeDescriptorSets;
+			std::vector<VkDescriptorBufferInfo>	descriptorBufferInfos;
+			std::vector<Buffer>					buffers;
 
 			void SetBuffers( Device& _device, const size_t _count, VkDeviceSize _sizeBuffer, VkDeviceSize _alignment = 1 );
 			void UpdateLayoutBinding( const size_t _index, const VkShaderStageFlags _stage, const VkDescriptorType _descriptorType, const size_t _descriptorCount );

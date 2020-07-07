@@ -5,10 +5,11 @@
 #include "core/resources/fanResource.hpp"
 #include "render/fanVertex.hpp"
 #include "render/fanMeshManager.hpp"
+#include "render/core/fanBuffer.hpp"
 
 namespace fan
 {
-	class Buffer;
+
 	class Device;
 	class MeshManager;
 
@@ -30,8 +31,8 @@ namespace fan
 		const std::vector<Vertex>& GetVertices() const { return m_vertices; }
 		std::vector<uint32_t>& GetIndices() { return m_indices; }
 		const std::vector<uint32_t>& GetIndices() const { return m_indices; }
-		Buffer* GetIndexBuffer() { return m_indexBuffer[ m_currentBuffer ]; }
-		Buffer* GetVertexBuffer() { return m_vertexBuffer[ m_currentBuffer ]; }
+		Buffer& GetIndexBuffer() { return m_indexBuffer[ m_currentBuffer ]; }
+		Buffer& GetVertexBuffer() { return m_vertexBuffer[ m_currentBuffer ]; }
 		const ConvexHull& GetHull() { return m_convexHull; }
 		std::string						GetPath() const { return m_path; }
 
@@ -57,8 +58,8 @@ namespace fan
 		bool m_autoUpdateHull = true;
 
 		uint32_t m_currentBuffer = 0;
-		Buffer* m_indexBuffer[ 3 ];
-		Buffer* m_vertexBuffer[ 3 ];
+		Buffer m_indexBuffer[ 3 ];
+		Buffer m_vertexBuffer[ 3 ];
 		ConvexHull m_convexHull;
 
 		void OptimizeVertices();

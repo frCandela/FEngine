@@ -10,7 +10,6 @@ WARNINGS_POP()
 namespace fan
 {
 	struct ImageView;
-	class Buffer;
 	class DescriptorTextures;
 	class Descriptor;
 

@@ -331,9 +331,9 @@ namespace fan
 		VkDeviceSize imageSize = extent.width * extent.height * 4 * sizeof( unsigned char );
 
 		// Create a buffer in host visible memory
-		Buffer stagingBuffer( _device );
-		stagingBuffer.Create( imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT );
-		stagingBuffer.SetData( _data, imageSize );
+		Buffer stagingBuffer;
+		stagingBuffer.Create( _device, imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT );
+		stagingBuffer.SetData( _device, _data, imageSize );
 
 		// Create the image in Vulkan
 		CreateImage( _device, extent, mipLevels, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT );
@@ -343,7 +343,7 @@ namespace fan
 
 		VkCommandBuffer cmd = _device.BeginSingleTimeCommands();
 		TransitionImageLayout( cmd, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, subresourceRange );
-		CopyBufferToImage( cmd, stagingBuffer.GetBuffer(), extent );
+		CopyBufferToImage( cmd, stagingBuffer.buffer, extent );
 
 		if ( mipLevels > 1 )
 		{
@@ -358,5 +358,6 @@ namespace fan
 		CreateImageView( _device, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_VIEW_TYPE_2D, { VK_IMAGE_ASPECT_COLOR_BIT, 0, mipLevels, 0, 1 } );
 
 		_device.EndSingleTimeCommands( cmd );
+		stagingBuffer.Destroy( _device );
 	}
 }

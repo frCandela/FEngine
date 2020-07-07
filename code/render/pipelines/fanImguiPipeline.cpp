@@ -18,13 +18,8 @@ namespace fan
 	ImguiPipeline::ImguiPipeline( Device& _device, const int _swapchainImagesCount ) :
 		m_device( _device )
 	{
-		m_vertexBuffers.reserve( _swapchainImagesCount );
-		m_indexBuffers.reserve( _swapchainImagesCount );
-		for ( int imageIndex = 0; imageIndex < _swapchainImagesCount; imageIndex++ )
-		{
-			m_vertexBuffers.push_back( Buffer( _device ) );
-			m_indexBuffers.push_back( Buffer( _device ) );
-		}
+		m_vertexBuffers.resize( _swapchainImagesCount );
+		m_indexBuffers.resize( _swapchainImagesCount );
 		m_vertexCount.resize( _swapchainImagesCount, 0 );
 		m_indexCount.resize( _swapchainImagesCount, 0 );
 	}
@@ -105,29 +100,29 @@ namespace fan
 
 			// Vertex buffer
 			Buffer& vertexBuffer = m_vertexBuffers[ _index ];
-			if ( ( vertexBuffer.GetBuffer() == VK_NULL_HANDLE ) || ( m_vertexCount[ _index ] != imDrawData->TotalVtxCount ) )
+			if ( ( vertexBuffer.buffer == VK_NULL_HANDLE ) || ( m_vertexCount[ _index ] != imDrawData->TotalVtxCount ) )
 			{
-				vertexBuffer.Unmap();
-				vertexBuffer.Destroy();
-				vertexBuffer.Create( vertexBufferSize, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT );
+				vertexBuffer.Unmap( m_device );
+				vertexBuffer.Destroy( m_device  );
+				vertexBuffer.Create( m_device, vertexBufferSize, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT );
 				m_vertexCount[ _index ] = imDrawData->TotalVtxCount;
-				vertexBuffer.Map();
+				vertexBuffer.Map( m_device );
 			}
 
 			// Index buffer
 			Buffer& indexBuffer = m_indexBuffers[ _index ];
-			if ( ( indexBuffer.GetBuffer() == VK_NULL_HANDLE ) || ( m_indexCount[ _index ] < imDrawData->TotalIdxCount ) )
+			if ( ( indexBuffer.buffer == VK_NULL_HANDLE ) || ( m_indexCount[ _index ] < imDrawData->TotalIdxCount ) )
 			{
-				indexBuffer.Unmap();
-				indexBuffer.Destroy();
-				indexBuffer.Create( indexBufferSize, VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT );
+				indexBuffer.Unmap( m_device );
+				indexBuffer.Destroy( m_device );
+				indexBuffer.Create( m_device, indexBufferSize, VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT );
 				m_indexCount[ _index ] = imDrawData->TotalIdxCount;
-				indexBuffer.Map();
+				indexBuffer.Map( m_device );
 			}
 
 			// Upload data
-			ImDrawVert* vtxDst = ( ImDrawVert* ) vertexBuffer.GetMappedData();
-			ImDrawIdx* idxDst = ( ImDrawIdx* ) indexBuffer.GetMappedData();
+			ImDrawVert* vtxDst = ( ImDrawVert* ) vertexBuffer.mappedData;
+			ImDrawIdx* idxDst = ( ImDrawIdx* ) indexBuffer.mappedData;
 
 			for ( int n = 0; n < imDrawData->CmdListsCount; n++ )
 			{
@@ -139,8 +134,8 @@ namespace fan
 			}
 
 			// Flush to make writes visible to GPU
-			vertexBuffer.Flush();
-			indexBuffer.Flush();
+			vertexBuffer.Flush( m_device );
+			indexBuffer.Flush( m_device );
 		}
 	}
 
@@ -157,10 +152,10 @@ namespace fan
 
 			// Bind vertex and index buffer
 			VkDeviceSize offsets[ 1 ] = { 0 };
-			std::vector<VkBuffer> buffers = { m_vertexBuffers[ _index ].GetBuffer() };
+			std::vector<VkBuffer> buffers = { m_vertexBuffers[ _index ].buffer };
 
 			vkCmdBindVertexBuffers( _commandBuffer, 0, static_cast< uint32_t >( buffers.size() ), buffers.data(), offsets );
-			vkCmdBindIndexBuffer( _commandBuffer, m_indexBuffers[ _index ].GetBuffer(), 0, VK_INDEX_TYPE_UINT16 );
+			vkCmdBindIndexBuffer( _commandBuffer, m_indexBuffers[ _index ].buffer, 0, VK_INDEX_TYPE_UINT16 );
 
 			// Viewport
 			VkViewport viewport{};

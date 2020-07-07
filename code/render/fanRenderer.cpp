@@ -116,8 +116,7 @@ namespace fan
 
 		m_samplerTextures.Destroy( device );
 		m_samplerUI.Destroy( device );
-
-		delete m_quadVertexBuffer;
+		m_quadVertexBuffer.Destroy( device );
 
 		delete m_debugLinesPipeline;
 		delete m_debugLinesPipelineNoDepthTest;
@@ -125,17 +124,17 @@ namespace fan
 
 		for( int bufferIndex = 0; bufferIndex < m_debugLinesvertexBuffers.size(); bufferIndex++ )
 		{
-			delete m_debugLinesvertexBuffers[bufferIndex];
+			m_debugLinesvertexBuffers[bufferIndex].Destroy( device );
 		} m_debugLinesvertexBuffers.clear();
 
 		for( int bufferIndex = 0; bufferIndex < m_debugLinesNoDepthTestVertexBuffers.size(); bufferIndex++ )
 		{
-			delete m_debugLinesNoDepthTestVertexBuffers[bufferIndex];
+			m_debugLinesNoDepthTestVertexBuffers[bufferIndex].Destroy( device );;
 		} m_debugLinesNoDepthTestVertexBuffers.clear();
 
 		for( int bufferIndex = 0; bufferIndex < m_debugTrianglesvertexBuffers.size(); bufferIndex++ )
 		{
-			delete m_debugTrianglesvertexBuffers[bufferIndex];
+			m_debugTrianglesvertexBuffers[bufferIndex].Destroy( device );;
 		} m_debugTrianglesvertexBuffers.clear();
 
 		delete m_gameFrameBuffers;
@@ -387,6 +386,8 @@ namespace fan
 	//================================================================================================================================
 	void Renderer::SetDebugDrawData( const std::vector<DebugVertex>& _debugLines, const std::vector<DebugVertex>& _debugLinesNoDepthTest, const std::vector<DebugVertex>& _debugTriangles )
 	{
+		Device& device = m_window.GetDevice();
+
 		m_hasNoDebugToDraw = _debugLinesNoDepthTest.empty() && _debugLines.empty() && _debugTriangles.empty();
 		m_numDebugLines = (int)_debugLines.size();
 		m_numDebugLinesNoDepthTest = (int)_debugLinesNoDepthTest.size();
@@ -398,10 +399,10 @@ namespace fan
 		if( _debugLines.size() > 0 )
 		{
 			SCOPED_PROFILE( lines );
-			delete m_debugLinesvertexBuffers[currentFrame];	// TODO update instead of delete
+			m_debugLinesvertexBuffers[currentFrame].Destroy( device );	// TODO update instead of delete
 			const VkDeviceSize size = sizeof( DebugVertex ) * _debugLines.size();
-			m_debugLinesvertexBuffers[currentFrame] = new Buffer( m_window.GetDevice() );
-			m_debugLinesvertexBuffers[currentFrame]->Create(
+			m_debugLinesvertexBuffers[currentFrame].Create( 
+				device,
 				size,
 				VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
 				VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT
@@ -409,26 +410,28 @@ namespace fan
 
 			if( size > 0 )
 			{
-				Buffer stagingBuffer( m_window.GetDevice() );
+				Buffer stagingBuffer;
 				stagingBuffer.Create(
+					device,
 					size,
 					VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
 					VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
 				);
-				stagingBuffer.SetData( _debugLines.data(), size );
-				VkCommandBuffer cmd = m_window.GetDevice().BeginSingleTimeCommands();
-				stagingBuffer.CopyBufferTo( cmd, m_debugLinesvertexBuffers[currentFrame]->GetBuffer(), size );
-				m_window.GetDevice().EndSingleTimeCommands( cmd );
+				stagingBuffer.SetData( device, _debugLines.data(), size );
+				VkCommandBuffer cmd = device.BeginSingleTimeCommands();
+				stagingBuffer.CopyBufferTo( cmd, m_debugLinesvertexBuffers[currentFrame].buffer, size );
+				device.EndSingleTimeCommands( cmd );
+				stagingBuffer.Destroy( device );
 			}
 		}
 
 		if( _debugLinesNoDepthTest.size() > 0 )
 		{
 			SCOPED_PROFILE( lines_no_depth );
-			delete m_debugLinesNoDepthTestVertexBuffers[currentFrame];
+			m_debugLinesNoDepthTestVertexBuffers[currentFrame].Destroy( device );
 			const VkDeviceSize size = sizeof( DebugVertex ) * _debugLinesNoDepthTest.size();
-			m_debugLinesNoDepthTestVertexBuffers[currentFrame] = new Buffer( m_window.GetDevice() );
-			m_debugLinesNoDepthTestVertexBuffers[currentFrame]->Create(
+			m_debugLinesNoDepthTestVertexBuffers[currentFrame].Create(
+				device,
 				size,
 				VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
 				VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT
@@ -436,26 +439,28 @@ namespace fan
 
 			if( size > 0 )
 			{
-				Buffer stagingBuffer( m_window.GetDevice() );
+				Buffer stagingBuffer;
 				stagingBuffer.Create(
+					device,
 					size,
 					VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
 					VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
 				);
-				stagingBuffer.SetData( _debugLinesNoDepthTest.data(), size );
-				VkCommandBuffer cmd = m_window.GetDevice().BeginSingleTimeCommands();
-				stagingBuffer.CopyBufferTo( cmd, m_debugLinesNoDepthTestVertexBuffers[currentFrame]->GetBuffer(), size );
-				m_window.GetDevice().EndSingleTimeCommands( cmd );
+				stagingBuffer.SetData( device, _debugLinesNoDepthTest.data(), size );
+				VkCommandBuffer cmd = device.BeginSingleTimeCommands();
+				stagingBuffer.CopyBufferTo( cmd, m_debugLinesNoDepthTestVertexBuffers[currentFrame].buffer, size );
+				device.EndSingleTimeCommands( cmd );
+				stagingBuffer.Destroy( device );
 			}
 		}
 
 		if( _debugTriangles.size() > 0 )
 		{
 			SCOPED_PROFILE( triangles );
-			delete m_debugTrianglesvertexBuffers[currentFrame];
+			m_debugTrianglesvertexBuffers[currentFrame].Destroy( device );
 			const VkDeviceSize size = sizeof( DebugVertex ) * _debugTriangles.size();
-			m_debugTrianglesvertexBuffers[currentFrame] = new Buffer( m_window.GetDevice() );
-			m_debugTrianglesvertexBuffers[currentFrame]->Create(
+			m_debugTrianglesvertexBuffers[currentFrame].Create(
+				device,
 				size,
 				VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
 				VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT
@@ -463,16 +468,18 @@ namespace fan
 
 			if( size > 0 )
 			{
-				Buffer stagingBuffer( m_window.GetDevice() );
+				Buffer stagingBuffer;
 				stagingBuffer.Create(
+					device,
 					size,
 					VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
 					VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
 				);
-				stagingBuffer.SetData( _debugTriangles.data(), size );
-				VkCommandBuffer cmd = m_window.GetDevice().BeginSingleTimeCommands();
-				stagingBuffer.CopyBufferTo( cmd, m_debugTrianglesvertexBuffers[currentFrame]->GetBuffer(), size );
-				m_window.GetDevice().EndSingleTimeCommands( cmd );
+				stagingBuffer.SetData( device, _debugTriangles.data(), size );
+				VkCommandBuffer cmd = device.BeginSingleTimeCommands();
+				stagingBuffer.CopyBufferTo( cmd, m_debugTrianglesvertexBuffers[currentFrame].buffer, size );
+				device.EndSingleTimeCommands( cmd );
+				stagingBuffer.Destroy( device );
 			}
 		}
 	}
@@ -556,7 +563,7 @@ namespace fan
 		if ( vkBeginCommandBuffer( commandBuffer, &commandBufferBeginInfo ) == VK_SUCCESS )
 		{
 			m_postprocessPipeline->Bind( commandBuffer, _index );
-			VkBuffer vertexBuffers[] = { m_quadVertexBuffer->GetBuffer() };
+			VkBuffer vertexBuffers[] = { m_quadVertexBuffer.buffer };
 			VkDeviceSize offsets[] = { 0 };
 			vkCmdBindVertexBuffers( commandBuffer, 0, 1, vertexBuffers, offsets );
 			vkCmdDraw( commandBuffer, static_cast< uint32_t >( 4 ), 1, 0, 0 );
@@ -569,7 +576,6 @@ namespace fan
 		{
 			Debug::Get() << Debug::Severity::error << "Could not record command buffer " << commandBuffer << "." << Debug::Endl();
 		}
-
 	}
 
 	//================================================================================================================================
@@ -591,7 +597,7 @@ namespace fan
 			{
 				UIDrawData drawData = m_uiMeshDrawArray[ meshIndex ];
 				UIMesh* mesh = drawData.mesh;
-				VkBuffer vertexBuffers[] = { mesh->GetVertexBuffer()->GetBuffer() };
+				VkBuffer vertexBuffers[] = { mesh->GetVertexBuffer().buffer };
 				m_uiPipeline->BindDescriptors( commandBuffer, _index, meshIndex );
 				vkCmdBindVertexBuffers( commandBuffer, 0, 1, vertexBuffers, offsets );
 				BindTexture( commandBuffer, drawData.textureIndex, m_samplerDescriptorUI, m_uiPipeline->GetLayout() );
@@ -654,9 +660,9 @@ namespace fan
 				BindTexture( commandBuffer, drawData.textureIndex, m_samplerDescriptorTextures, m_forwardPipeline->GetLayout() );
 				m_forwardPipeline->BindDescriptors( commandBuffer, _index, meshIndex );
 				VkDeviceSize offsets[] = { 0 };
-				VkBuffer vertexBuffers[] = { drawData.mesh->GetVertexBuffer()->GetBuffer() };
+				VkBuffer vertexBuffers[] = { drawData.mesh->GetVertexBuffer().buffer };
 				vkCmdBindVertexBuffers( commandBuffer, 0, 1, vertexBuffers, offsets );
-				vkCmdBindIndexBuffer( commandBuffer, drawData.mesh->GetIndexBuffer()->GetBuffer(), 0, VK_INDEX_TYPE_UINT32 );
+				vkCmdBindIndexBuffer( commandBuffer, drawData.mesh->GetIndexBuffer().buffer, 0, VK_INDEX_TYPE_UINT32 );
 				vkCmdDrawIndexed( commandBuffer, static_cast< uint32_t >( drawData.mesh->GetIndices().size() ), 1, 0, 0, 0 );
 			}
 
@@ -688,21 +694,21 @@ namespace fan
 				if( m_numDebugLines > 0 )
 				{
 					m_debugLinesPipeline->Bind( commandBuffer, _index );
-					VkBuffer vertexBuffers[] = { m_debugLinesvertexBuffers[_index]->GetBuffer() };
+					VkBuffer vertexBuffers[] = { m_debugLinesvertexBuffers[_index].buffer };
 					vkCmdBindVertexBuffers( commandBuffer, 0, 1, vertexBuffers, offsets );
 					vkCmdDraw( commandBuffer, static_cast<uint32_t>( m_numDebugLines ), 1, 0, 0 );
 				}
 				if( m_numDebugLinesNoDepthTest > 0 )
 				{
 					m_debugLinesPipelineNoDepthTest->Bind( commandBuffer, _index );
-					VkBuffer vertexBuffers[] = { m_debugLinesNoDepthTestVertexBuffers[_index]->GetBuffer() };
+					VkBuffer vertexBuffers[] = { m_debugLinesNoDepthTestVertexBuffers[_index].buffer };
 					vkCmdBindVertexBuffers( commandBuffer, 0, 1, vertexBuffers, offsets );
 					vkCmdDraw( commandBuffer, static_cast<uint32_t>( m_numDebugLinesNoDepthTest ), 1, 0, 0 );
 				}
 				if( m_numDebugTriangle > 0 )
 				{
 					m_debugTrianglesPipeline->Bind( commandBuffer, _index );
-					VkBuffer vertexBuffers[] = { m_debugTrianglesvertexBuffers[_index]->GetBuffer() };
+					VkBuffer vertexBuffers[] = { m_debugTrianglesvertexBuffers[_index].buffer };
 					vkCmdBindVertexBuffers( commandBuffer, 0, 1, vertexBuffers, offsets );
 					vkCmdDraw( commandBuffer, static_cast<uint32_t>( m_numDebugTriangle ), 1, 0, 0 );
 				}
@@ -861,6 +867,8 @@ namespace fan
 	//================================================================================================================================
 	void Renderer::CreateQuadVertexBuffer()
 	{
+		Device& device = m_window.GetDevice();
+
 		// Vertex quad
 		glm::vec3 v0 = { -1.0f, -1.0f, 0.0f };
 		glm::vec3 v1 = { -1.0f, 1.0f, 0.0f };
@@ -869,22 +877,24 @@ namespace fan
 		std::vector<glm::vec3> vertices = { v0, v1 ,v2 ,v3 };
 
 		const VkDeviceSize size = sizeof( vertices[ 0 ] ) * vertices.size();
-		m_quadVertexBuffer = new Buffer( m_window.GetDevice() );
-		m_quadVertexBuffer->Create(
+		m_quadVertexBuffer.Create(
+			device,
 			size,
 			VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
 			VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT
 		);
-		Buffer stagingBuffer( m_window.GetDevice() );
+		Buffer stagingBuffer;
 		stagingBuffer.Create(
+			device,
 			size,
 			VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
 			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
 		);
-		stagingBuffer.SetData( vertices.data(), size );
-		VkCommandBuffer cmd = m_window.GetDevice().BeginSingleTimeCommands();
-		stagingBuffer.CopyBufferTo( cmd, m_quadVertexBuffer->GetBuffer(), size );
-		m_window.GetDevice().EndSingleTimeCommands( cmd );
+		stagingBuffer.SetData( device, vertices.data(), size );
+		VkCommandBuffer cmd = device.BeginSingleTimeCommands();
+		stagingBuffer.CopyBufferTo( cmd, m_quadVertexBuffer.buffer, size );
+		device.EndSingleTimeCommands( cmd );
+		stagingBuffer.Destroy( device );
 	}
 
 	//================================================================================================================================
