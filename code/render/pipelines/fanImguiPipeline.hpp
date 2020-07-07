@@ -7,13 +7,13 @@ WARNINGS_GLM_PUSH()
 #include "glm/glm.hpp"
 WARNINGS_POP()
 #include "render/core/fanSampler.hpp"
+#include "render/core/fanShader.hpp"
+#include "render/core/fanTexture.hpp"
 
 namespace fan
 {
 	class Device;
-	class Shader;
 	class Buffer;
-	struct Texture;
 	struct ImageView;
 
 	//================================================================================================================================
@@ -37,12 +37,12 @@ namespace fan
 
 		Sampler m_sampler;
 		Sampler m_iconsSampler;
-		Texture* m_fontTexture;
-		Texture* m_iconsTexture;
-		ImageView* m_gameImageView = nullptr;
+		Texture m_fontTexture;
+		Texture m_iconsTexture;
+		ImageView * m_gameImageView;
 
-		Shader* m_fragShader;
-		Shader* m_vertShader;
+		Shader m_fragShader;
+		Shader m_vertShader;
 
 		std::vector<Buffer>		m_vertexBuffers;
 		std::vector<Buffer>		m_indexBuffers;

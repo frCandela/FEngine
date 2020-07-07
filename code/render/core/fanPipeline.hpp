@@ -3,11 +3,11 @@
 #include "glfw/glfw3.h"
 #include <string>
 #include <vector>
+#include "render/core/fanShader.hpp"
 
 namespace fan
 {
 	class Device;
-	class Shader;
 
 	//================================================================================================================================
 	// base class for render pipelines
@@ -61,11 +61,10 @@ namespace fan
 		std::string m_fragShaderPath;
 		std::string m_vertShaderPath;
 
-		Shader* m_fragmentShader = nullptr;
-		Shader* m_vertexShader = nullptr;
+		Shader m_fragmentShader;
+		Shader m_vertexShader;
 
 		void CreateShaders();
 		void PreConfigurePipeline();
-
 	};
 }

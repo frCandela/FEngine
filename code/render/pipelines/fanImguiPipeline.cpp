@@ -4,6 +4,7 @@
 #include "imgui/imgui.h"
 #include "core/fanDebug.hpp"
 #include "render/fanRenderGlobal.hpp"
+#include "render/fanRenderGlobal.hpp"
 #include "render/core/fanDevice.hpp"
 #include "render/core/fanShader.hpp"
 #include "render/core/fanBuffer.hpp"
@@ -16,8 +17,6 @@ namespace fan
 	//================================================================================================================================
 	ImguiPipeline::ImguiPipeline( Device& _device, const int _swapchainImagesCount ) :
 		m_device( _device )
-		, m_fontTexture( new Texture() )
-		, m_iconsTexture( new Texture() )
 	{
 		m_vertexBuffers.reserve( _swapchainImagesCount );
 		m_indexBuffers.reserve( _swapchainImagesCount );
@@ -34,12 +33,12 @@ namespace fan
 	//================================================================================================================================
 	ImguiPipeline::~ImguiPipeline()
 	{
-		delete( m_fontTexture );
-		delete ( m_iconsTexture );
+		m_fontTexture.Destroy(m_device);
+		m_iconsTexture.Destroy( m_device );
 		m_sampler.Destroy( m_device );
 		m_iconsSampler.Destroy( m_device );
-		delete( m_fragShader );
-		delete( m_vertShader );
+		m_fragShader.Destroy( m_device );
+		m_vertShader.Destroy( m_device );
 
 		vkDestroyPipelineCache( m_device.vkDevice, m_pipelineCache, nullptr );
 		vkDestroyPipeline( m_device.vkDevice, m_pipeline, nullptr );
@@ -70,13 +69,12 @@ namespace fan
 	{
 		Debug::Log( "reloading icons" );
 
-		delete ( m_iconsTexture );
-		m_iconsTexture = new Texture();
-		m_iconsTexture->CreateFromFile( RenderGlobal::s_defaultIcons );
+		m_iconsTexture.Destroy( m_device );
+		m_iconsTexture.CreateFromFile( RenderGlobal::s_defaultIcons );
 
 		VkDescriptorImageInfo iconsDescriptorImageInfo{};
 		iconsDescriptorImageInfo.sampler = m_iconsSampler.sampler;
-		iconsDescriptorImageInfo.imageView = m_iconsTexture->imageView;
+		iconsDescriptorImageInfo.imageView = m_iconsTexture.imageView;
 		iconsDescriptorImageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 
 		VkWriteDescriptorSet writeDescriptorSetIcons{};
@@ -231,10 +229,8 @@ namespace fan
 		ImGuiIO& io = ImGui::GetIO();
 		io.DisplaySize = ImVec2( static_cast< float >( _extent.width ), static_cast< float >( _extent.height ) );
 		io.DisplayFramebufferScale = ImVec2( 1.0f, 1.0f );
-		m_vertShader = new Shader( m_device );
-		m_vertShader->Create( "code/shaders/imgui.vert" );
-		m_fragShader = new Shader( m_device );
-		m_fragShader->Create( "code/shaders/imgui.frag" );
+		m_vertShader.Create( m_device, RenderGlobal::s_imguiVertexShader );
+		m_fragShader.Create( m_device, RenderGlobal::s_imguiFragmentShader );
 
 		// Setup back-end capabilities flags
 		io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;         // We can honor GetMouseCursor() values (optional)
@@ -278,8 +274,8 @@ namespace fan
 		int texWidth, texHeight;
 		ImGui::GetIO().Fonts->GetTexDataAsRGBA32( &fontData, &texWidth, &texHeight );
 
-		m_fontTexture->CreateFromData( fontData, { (uint32_t)texWidth, (uint32_t)texHeight }, 1 );
-		m_iconsTexture->CreateFromFile( RenderGlobal::s_defaultIcons );
+		m_fontTexture.CreateFromData( fontData, { (uint32_t)texWidth, (uint32_t)texHeight }, 1 );
+		m_iconsTexture.CreateFromFile( RenderGlobal::s_defaultIcons );
 		m_sampler.Create( m_device, 0, 1.f, VK_FILTER_LINEAR );
 		m_iconsSampler.Create( m_device, 0, 0.f, VK_FILTER_NEAREST );
 	}
@@ -333,12 +329,12 @@ namespace fan
 
 		VkDescriptorImageInfo fontDescriptorImageInfo{};
 		fontDescriptorImageInfo.sampler = m_sampler.sampler;
-		fontDescriptorImageInfo.imageView = m_fontTexture->imageView;
+		fontDescriptorImageInfo.imageView = m_fontTexture.imageView;
 		fontDescriptorImageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 
 		VkDescriptorImageInfo iconsDescriptorImageInfo{};
 		iconsDescriptorImageInfo.sampler = m_iconsSampler.sampler;
-		iconsDescriptorImageInfo.imageView = m_iconsTexture->imageView;
+		iconsDescriptorImageInfo.imageView = m_iconsTexture.imageView;
 		iconsDescriptorImageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 
 		VkDescriptorImageInfo view3DDescriptorImageInfo{};
@@ -488,14 +484,14 @@ namespace fan
 		VkPipelineShaderStageCreateInfo vertShaderStageInfo = {};
 		vertShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
 		vertShaderStageInfo.stage = VK_SHADER_STAGE_VERTEX_BIT;
-		vertShaderStageInfo.module = m_vertShader->GetModule();
+		vertShaderStageInfo.module = m_vertShader.shaderModule;
 		vertShaderStageInfo.pName = "main";
 
 		// Fragment shader
 		VkPipelineShaderStageCreateInfo fragShaderStageInfo = {};
 		fragShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
 		fragShaderStageInfo.stage = VK_SHADER_STAGE_FRAGMENT_BIT;
-		fragShaderStageInfo.module = m_fragShader->GetModule();
+		fragShaderStageInfo.module = m_fragShader.shaderModule;
 		fragShaderStageInfo.pName = "main";
 
 		std::array<VkPipelineShaderStageCreateInfo, 2> shaderStages = { vertShaderStageInfo, fragShaderStageInfo };

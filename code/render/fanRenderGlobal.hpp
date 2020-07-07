@@ -33,6 +33,11 @@ namespace fan
 		static const char* s_textureUVCheck;
 		static const char* s_textureWhite;
 
+		static const char* s_defaultVertexShader;
+		static const char* s_defaultFragmentShader;
+		static const char* s_imguiVertexShader;
+		static const char* s_imguiFragmentShader;
+
 		// rendering
 		static const uint32_t s_maximumNumPointLights = 16;
 		static const uint32_t s_maximumNumDirectionalLight = 4;

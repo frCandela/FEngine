@@ -13,7 +13,6 @@ namespace fan
 	class Mesh;
 	struct Vertex;
 	class Device;
-	class Shader;
 	class Buffer;
 	class Descriptor;
 	class DescriptorTextures;

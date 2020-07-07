@@ -5,30 +5,14 @@
 #include "core/fanDebug.hpp"
 #include "render/core/fanDevice.hpp"
 #include "render/fanSpirvCompiler.hpp"
+#include "render/fanRenderGlobal.hpp"
 
 namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	Shader::Shader( Device& _device ) :
-		m_device( _device )
+	bool Shader::Create( Device& _device, const std::string _path )
 	{
-
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	Shader::~Shader()
-	{
-		Destroy();
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	bool Shader::Create( const std::string _path )
-	{
-		m_path = _path;
-
 		std::vector<unsigned int> spirvCode = SpirvCompiler::Compile( _path );
 		if ( spirvCode.empty() )
 		{
@@ -36,7 +20,7 @@ namespace fan
 
 			std::filesystem::directory_entry path( _path );
 			std::string extension = path.path().extension().generic_string();
-			std::string tmpPath = ( extension == ".frag" ? defaultFragmentShader : defaultVertexShader );
+			std::string tmpPath = ( extension == ".frag" ? RenderGlobal::s_defaultFragmentShader : RenderGlobal::s_defaultVertexShader );
 			Debug::Get() << Debug::Severity::log << "loading default shader " << tmpPath << Debug::Endl();
 			spirvCode = SpirvCompiler::Compile( tmpPath );
 
@@ -46,7 +30,6 @@ namespace fan
 			}
 		}
 
-
 		VkShaderModuleCreateInfo shaderModuleCreateInfo;
 		shaderModuleCreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
 		shaderModuleCreateInfo.pNext = nullptr;
@@ -54,22 +37,25 @@ namespace fan
 		shaderModuleCreateInfo.codeSize = spirvCode.size() * sizeof( unsigned int );
 		shaderModuleCreateInfo.pCode = spirvCode.data();
 
-		if ( vkCreateShaderModule( m_device.vkDevice, &shaderModuleCreateInfo, nullptr, &m_shaderModule ) != VK_SUCCESS )
+		if ( vkCreateShaderModule( _device.vkDevice, &shaderModuleCreateInfo, nullptr, &shaderModule ) != VK_SUCCESS )
 		{
 			Debug::Get() << Debug::Severity::error << "Could not create shader module: " << _path << Debug::Endl();
 			return false;
 		}
-		Debug::Get() << Debug::Severity::log << std::hex << "VkShaderModule        " << m_shaderModule << std::dec << Debug::Endl();
+		Debug::Get() << Debug::Severity::log << std::hex << "VkShaderModule        " << shaderModule << std::dec << Debug::Endl();
 
 		return true;
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Shader::Reload()
+	void Shader::Destroy( Device& _device )
 	{
-		Destroy();
-		Create( m_path );
+		if( shaderModule != VK_NULL_HANDLE )
+		{
+			vkDestroyShaderModule( _device.vkDevice, shaderModule, nullptr );
+			shaderModule = VK_NULL_HANDLE;
+		}
 	}
 
 	//================================================================================================================================
@@ -95,14 +81,5 @@ namespace fan
 		file.close();
 
 		return buffer;
-	}
-
-	void Shader::Destroy()
-	{
-		if ( m_shaderModule != VK_NULL_HANDLE )
-		{
-			vkDestroyShaderModule( m_device.vkDevice, m_shaderModule, nullptr );
-			m_shaderModule = VK_NULL_HANDLE;
-		}
 	}
 }

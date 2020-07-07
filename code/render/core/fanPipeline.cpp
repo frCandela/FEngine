@@ -2,7 +2,6 @@
 
 #include "core/fanDebug.hpp"
 #include "render/core/fanDevice.hpp"
-#include "render/core/fanShader.hpp"
 
 namespace fan
 {
@@ -18,8 +17,8 @@ namespace fan
 	//================================================================================================================================
 	Pipeline::~Pipeline()
 	{
-		delete m_fragmentShader;
-		delete m_vertexShader;
+		m_fragmentShader.Destroy( m_device );
+		m_vertexShader.Destroy( m_device );
 		DeletePipeline();
 	}
 
@@ -96,8 +95,8 @@ namespace fan
 		Debug::Get() << Debug::Severity::log << std::hex << "VkPipelineLayout      " << m_pipelineLayout << std::dec << Debug::Endl();
 
 
-		m_fragShaderStageCreateInfos.module = m_fragmentShader->GetModule();
-		m_vertshaderStageCreateInfos.module = m_vertexShader->GetModule();
+		m_fragShaderStageCreateInfos.module = m_fragmentShader.shaderModule;
+		m_vertshaderStageCreateInfos.module = m_vertexShader.shaderModule;
 		std::vector<VkPipelineShaderStageCreateInfo> shaderStages = { m_vertshaderStageCreateInfos, m_fragShaderStageCreateInfos };
 
 		VkGraphicsPipelineCreateInfo graphicsPipelineCreateInfo = {};
@@ -146,7 +145,7 @@ namespace fan
 		m_vertshaderStageCreateInfos.pNext = nullptr;
 		m_vertshaderStageCreateInfos.flags = 0;
 		m_vertshaderStageCreateInfos.stage = VK_SHADER_STAGE_VERTEX_BIT;
-		m_vertshaderStageCreateInfos.module = m_vertexShader->GetModule();
+		m_vertshaderStageCreateInfos.module = m_vertexShader.shaderModule;
 		m_vertshaderStageCreateInfos.pName = "main";
 		m_vertshaderStageCreateInfos.pSpecializationInfo = nullptr;
 
@@ -154,7 +153,7 @@ namespace fan
 		m_fragShaderStageCreateInfos.pNext = nullptr;
 		m_fragShaderStageCreateInfos.flags = 0;
 		m_fragShaderStageCreateInfos.stage = VK_SHADER_STAGE_FRAGMENT_BIT;
-		m_fragShaderStageCreateInfos.module = m_fragmentShader->GetModule();
+		m_fragShaderStageCreateInfos.module = m_fragmentShader.shaderModule;
 		m_fragShaderStageCreateInfos.pName = "main";
 		m_fragShaderStageCreateInfos.pSpecializationInfo = nullptr;
 
@@ -255,8 +254,10 @@ namespace fan
 	void Pipeline::ReloadShaders()
 	{
 		DeletePipeline();
-		m_vertexShader->Reload();
-		m_fragmentShader->Reload();
+		m_vertexShader.Destroy( m_device );
+		m_fragmentShader.Destroy( m_device );
+		m_vertexShader.Create( m_device, m_vertShaderPath);
+		m_fragmentShader.Create( m_device, m_fragShaderPath );
 		CreatePipeline();
 	}
 
@@ -286,14 +287,8 @@ namespace fan
 		assert( m_fragShaderPath != "" );
 		assert( m_vertShaderPath != "" );
 
-		delete m_fragmentShader;
-		delete m_vertexShader;
-
-		m_fragmentShader = new Shader( m_device );
-		m_fragmentShader->Create( m_fragShaderPath );
-
-		m_vertexShader = new Shader( m_device );
-		m_vertexShader->Create( m_vertShaderPath );
+		m_fragmentShader.Create( m_device, m_fragShaderPath );
+		m_vertexShader.Create( m_device, m_vertShaderPath );
 	}
 
 	//================================================================================================================================
