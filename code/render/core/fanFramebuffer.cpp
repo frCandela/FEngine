@@ -55,10 +55,9 @@ namespace fan
 		for ( int frameIndex = 0; frameIndex < _count; frameIndex++ )
 		{
 			std::vector<VkImageView> attachments = commonAttachments;
-			if ( m_externalAttachments != nullptr && !m_externalAttachments->empty() )
+			if ( m_externalAttachments != nullptr )
 			{
-				assert( m_externalAttachments->size() == _count );
-				attachments.push_back( (*m_externalAttachments)[ frameIndex ].imageView );
+				attachments.push_back( m_externalAttachments[ frameIndex ].imageView );
 			}
 
 			VkFramebufferCreateInfo framebufferCreateInfo;
@@ -104,15 +103,6 @@ namespace fan
 		DestroyFrameBuffers();
 		Create( m_count, m_renderPass );
 	}
-
-	//================================================================================================================================
-	// Only one color attachment needed for all swapchain images
-	//================================================================================================================================
-	void FrameBuffer::SetExternalAttachment( std::vector< ImageView > * _perFramebufferViews )
-	{
-		m_externalAttachments = _perFramebufferViews;
-	}
-
 
 	//================================================================================================================================
 	// Only one depth attachment needed for all swapchain images

@@ -21,7 +21,7 @@ namespace fan
 
 		void AddDepthAttachment();
 		void AddColorAttachment( const VkFormat _format, const VkExtent2D _extent );
-		void SetExternalAttachment( std::vector< ImageView > * _perFramebufferViews );
+		void SetExternalAttachment( ImageView* _perFramebufferViews ) { m_externalAttachments = _perFramebufferViews; }
 		bool Create( const size_t _count, VkRenderPass _renderPass );
 		void Resize( const VkExtent2D _extent );
 
@@ -37,7 +37,7 @@ namespace fan
 		size_t m_count;
 
 		// External attachment
-		std::vector< ImageView > * m_externalAttachments = nullptr;
+		ImageView* m_externalAttachments = nullptr;
 
 		// Depth attachment
 		VkFormat depthFormat;

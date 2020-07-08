@@ -1,7 +1,6 @@
 #include "render/fanWindow.hpp"
 
 #include "core/fanDebug.hpp"
-#include "render/core/fanSwapChain.hpp"
 #include "render/core/fanInstance.hpp"
 #include "render/core/fanDevice.hpp"
 #include "core/input/fanInput.hpp"
@@ -24,7 +23,7 @@ namespace fan
 		glfwSetWindowPos( m_window, _position.x, _position.y );
 
 		m_device = new Device( m_instance, m_surface );
-		m_swapchain = new SwapChain( *m_device, m_surface, { (uint32_t)_size.x, (uint32_t)_size.y } );
+		m_swapchain.Create( *m_device, m_surface, { (uint32_t)_size.x, (uint32_t)_size.y } );
 
 		Input::Get().Setup( m_window );
 	}
@@ -33,7 +32,7 @@ namespace fan
 	//================================================================================================================================
 	Window::~Window()
 	{
-		delete m_swapchain;
+		m_swapchain.Destroy( *m_device );
 		delete m_device;
 
 		vkDestroySurfaceKHR( m_instance->vkInstance, m_surface, nullptr );

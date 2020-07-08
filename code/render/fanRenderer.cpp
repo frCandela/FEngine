@@ -30,9 +30,9 @@ namespace fan
 	//================================================================================================================================
 	Renderer::Renderer( Window& _window ) : m_window( _window )
 	{
-		m_debugLinesvertexBuffers.resize( m_window.GetSwapChain().GetSwapchainImagesCount() );
-		m_debugLinesNoDepthTestVertexBuffers.resize( m_window.GetSwapChain().GetSwapchainImagesCount() );
-		m_debugTrianglesvertexBuffers.resize( m_window.GetSwapChain().GetSwapchainImagesCount() );
+		m_debugLinesvertexBuffers.resize( m_window.GetSwapChain().imagesCount );
+		m_debugLinesNoDepthTestVertexBuffers.resize( m_window.GetSwapChain().imagesCount );
+		m_debugTrianglesvertexBuffers.resize( m_window.GetSwapChain().imagesCount );
 
 		m_clearColor = glm::vec4( 0.f, 0.f, 0.2f, 1.f );
 
@@ -49,41 +49,41 @@ namespace fan
 		CreateTextureDescriptor();
 
 		m_debugLinesPipeline = new DebugPipeline( m_window.GetDevice(), VK_PRIMITIVE_TOPOLOGY_LINE_LIST, true );
-		m_debugLinesPipeline->Init( m_renderPassGame.renderPass, m_window.GetSwapChain().GetExtent(), "code/shaders/debugLines.vert", "code/shaders/debugLines.frag" );
-		m_debugLinesPipeline->CreateDescriptors( m_window.GetSwapChain().GetSwapchainImagesCount() );
+		m_debugLinesPipeline->Init( m_renderPassGame.renderPass, m_window.GetSwapChain().extent, "code/shaders/debugLines.vert", "code/shaders/debugLines.frag" );
+		m_debugLinesPipeline->CreateDescriptors( m_window.GetSwapChain().imagesCount );
 		m_debugLinesPipeline->Create();
 
 		m_debugLinesPipelineNoDepthTest = new DebugPipeline( m_window.GetDevice(), VK_PRIMITIVE_TOPOLOGY_LINE_LIST, false );
-		m_debugLinesPipelineNoDepthTest->Init( m_renderPassGame.renderPass, m_window.GetSwapChain().GetExtent(), "code/shaders/debugLines.vert", "code/shaders/debugLines.frag" );
-		m_debugLinesPipelineNoDepthTest->CreateDescriptors( m_window.GetSwapChain().GetSwapchainImagesCount() );
+		m_debugLinesPipelineNoDepthTest->Init( m_renderPassGame.renderPass, m_window.GetSwapChain().extent, "code/shaders/debugLines.vert", "code/shaders/debugLines.frag" );
+		m_debugLinesPipelineNoDepthTest->CreateDescriptors( m_window.GetSwapChain().imagesCount );
 		m_debugLinesPipelineNoDepthTest->Create();
 
 		m_debugTrianglesPipeline = new DebugPipeline( m_window.GetDevice(), VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, false );
-		m_debugTrianglesPipeline->Init( m_renderPassGame.renderPass, m_window.GetSwapChain().GetExtent(), "code/shaders/debugTriangles.vert", "code/shaders/debugTriangles.frag" );
-		m_debugTrianglesPipeline->CreateDescriptors( m_window.GetSwapChain().GetSwapchainImagesCount() );
+		m_debugTrianglesPipeline->Init( m_renderPassGame.renderPass, m_window.GetSwapChain().extent, "code/shaders/debugTriangles.vert", "code/shaders/debugTriangles.frag" );
+		m_debugTrianglesPipeline->CreateDescriptors( m_window.GetSwapChain().imagesCount );
 		m_debugTrianglesPipeline->Create();
 
 		m_forwardPipeline = new ForwardPipeline( m_window.GetDevice(), m_imagesDescriptor, m_samplerDescriptorTextures );
-		m_forwardPipeline->Init( m_renderPassGame.renderPass, m_window.GetSwapChain().GetExtent(), "code/shaders/forward.vert", "code/shaders/forward.frag" );
-		m_forwardPipeline->CreateDescriptors( m_window.GetSwapChain().GetSwapchainImagesCount() );
+		m_forwardPipeline->Init( m_renderPassGame.renderPass, m_window.GetSwapChain().extent, "code/shaders/forward.vert", "code/shaders/forward.frag" );
+		m_forwardPipeline->CreateDescriptors( m_window.GetSwapChain().imagesCount );
 		m_forwardPipeline->Create();
 
 		m_samplerUI.Create( m_window.GetDevice(), 0, 1, VK_FILTER_NEAREST );
 		m_samplerDescriptorUI = new DescriptorSampler( m_window.GetDevice(), m_samplerUI.sampler );
 		m_uiPipeline = new UIPipeline( m_window.GetDevice(), m_imagesDescriptor, m_samplerDescriptorUI );
-		m_uiPipeline->Init( m_renderPassPostprocess.renderPass, m_window.GetSwapChain().GetExtent(), "code/shaders/ui.vert", "code/shaders/ui.frag" );
-		m_uiPipeline->CreateDescriptors( m_window.GetSwapChain().GetSwapchainImagesCount() );
+		m_uiPipeline->Init( m_renderPassPostprocess.renderPass, m_window.GetSwapChain().extent, "code/shaders/ui.vert", "code/shaders/ui.frag" );
+		m_uiPipeline->CreateDescriptors( m_window.GetSwapChain().imagesCount );
 		m_uiPipeline->Create();
 
 		m_postprocessPipeline = new PostprocessPipeline( m_window.GetDevice() );
 		m_postprocessPipeline->SetGameImageView( m_gameFrameBuffers->GetColorAttachmentImageView() );
-		m_postprocessPipeline->CreateDescriptors( m_window.GetSwapChain().GetSwapchainImagesCount() );
-		m_postprocessPipeline->Init( m_renderPassPostprocess.renderPass, m_window.GetSwapChain().GetExtent(), "code/shaders/postprocess.vert", "code/shaders/postprocess.frag" );
+		m_postprocessPipeline->CreateDescriptors( m_window.GetSwapChain().imagesCount );
+		m_postprocessPipeline->Init( m_renderPassPostprocess.renderPass, m_window.GetSwapChain().extent, "code/shaders/postprocess.vert", "code/shaders/postprocess.frag" );
 		m_postprocessPipeline->Create();
 
-		m_imguiPipeline = new ImguiPipeline( m_window.GetDevice(), m_window.GetSwapChain().GetSwapchainImagesCount() );
+		m_imguiPipeline = new ImguiPipeline( m_window.GetDevice(), m_window.GetSwapChain().imagesCount );
 		m_imguiPipeline->SetGameView( m_postProcessFramebuffers->GetColorAttachmentImageView() );
-		m_imguiPipeline->Create( m_renderPassImgui.renderPass, m_window.GetWindow(), m_window.GetSwapChain().GetExtent() );
+		m_imguiPipeline->Create( m_renderPassImgui.renderPass, m_window.GetWindow(), m_window.GetSwapChain().extent );
 
 		CreateCommandBuffers();
 		RecordAllCommandBuffers();
@@ -157,7 +157,7 @@ namespace fan
 	{
 		SCOPED_PROFILE( draw_frame );
 
-		const VkResult result = m_window.GetSwapChain().AcquireNextImage();
+		const VkResult result = m_window.GetSwapChain().AcquireNextImage( m_window.GetDevice() );
 		if ( result == VK_ERROR_OUT_OF_DATE_KHR )
 		{
 
@@ -183,7 +183,7 @@ namespace fan
 			vkResetFences( m_window.GetDevice().vkDevice, 1, m_window.GetSwapChain().GetCurrentInFlightFence() );
 		}
 
-		ImGui::GetIO().DisplaySize = ImVec2( static_cast< float >( m_window.GetSwapChain().GetExtent().width ), static_cast< float >( m_window.GetSwapChain().GetExtent().height ) );
+		ImGui::GetIO().DisplaySize = ImVec2( static_cast< float >( m_window.GetSwapChain().extent.width ), static_cast< float >( m_window.GetSwapChain().extent.height ) );
 
 		if ( Texture::s_resourceManager.IsModified() )
 		{
@@ -193,7 +193,7 @@ namespace fan
 			Texture::s_resourceManager.SetUnmodified();
 		}
 
-		const uint32_t currentFrame = m_window.GetSwapChain().GetCurrentFrame();
+		const uint32_t currentFrame = m_window.GetSwapChain().currentFrame;
 		UpdateUniformBuffers( currentFrame );
 		{
 			SCOPED_PROFILE( record_cmd );
@@ -207,7 +207,7 @@ namespace fan
 		{
 			SCOPED_PROFILE( submit );
 			SubmitCommandBuffers();
-			m_window.GetSwapChain().PresentImage();
+			m_window.GetSwapChain().PresentImage( m_window.GetDevice() );
 			m_window.GetSwapChain().StartNextFrame();
 		}
 	}
@@ -242,7 +242,7 @@ namespace fan
 		WaitIdle();
 		const VkExtent2D extent = m_window.GetExtent();
 		Debug::Get() << Debug::Severity::highlight << "Resize renderer: " << extent.width << "x" << extent.height << Debug::Endl();
-		m_window.GetSwapChain().Resize( extent );
+		m_window.GetSwapChain().Resize( m_window.GetDevice(), extent );
 		m_swapchainFramebuffers->Resize( extent );
 
 
@@ -273,7 +273,7 @@ namespace fan
 	//================================================================================================================================
 	float  Renderer::GetWindowAspectRatio() const
 	{
-		return static_cast< float >( m_window.GetSwapChain().GetExtent().width ) / m_window.GetSwapChain().GetExtent().height;
+		return static_cast< float >( m_window.GetSwapChain().extent.width ) / m_window.GetSwapChain().extent.height;
 	}
 
 	//================================================================================================================================
@@ -393,7 +393,7 @@ namespace fan
 		m_numDebugLinesNoDepthTest = (int)_debugLinesNoDepthTest.size();
 		m_numDebugTriangle = (int)_debugTriangles.size();
 
-		const uint32_t currentFrame = m_window.GetSwapChain().GetCurrentFrame();
+		const uint32_t currentFrame = m_window.GetSwapChain().currentFrame;
 
 		SCOPED_PROFILE( update_buffer );
 		if( _debugLines.size() > 0 )
@@ -488,7 +488,7 @@ namespace fan
 	//================================================================================================================================
 	void Renderer::RecordAllCommandBuffers()
 	{
-		for( size_t i = 0; i < m_window.GetSwapChain().GetSwapchainImagesCount(); i++ )
+		for( size_t i = 0; i < m_window.GetSwapChain().imagesCount; i++ )
 		{
 			RecordCommandBufferImgui( i );
 			RecordCommandBufferGeometry( i );
@@ -514,7 +514,7 @@ namespace fan
 
 		VkRenderPassBeginInfo renderPassInfo =			  RenderPass::GetBeginInfo(	m_renderPassGame.renderPass,		m_gameFrameBuffers->Get( _index ),		  m_gameExtent, clearValues.data(), (uint32_t)clearValues.size() );
 		VkRenderPassBeginInfo renderPassInfoPostprocess = RenderPass::GetBeginInfo( m_renderPassPostprocess.renderPass, m_postProcessFramebuffers->Get( _index ), m_gameExtent, clearValues.data(), (uint32_t)clearValues.size() );
-		VkRenderPassBeginInfo renderPassInfoImGui =		  RenderPass::GetBeginInfo( m_renderPassImgui.renderPass,		m_swapchainFramebuffers->Get( _index ),	  m_window.GetSwapChain().GetExtent(), clearValues.data(), (uint32_t)clearValues.size() );
+		VkRenderPassBeginInfo renderPassInfoImGui =		  RenderPass::GetBeginInfo( m_renderPassImgui.renderPass,		m_swapchainFramebuffers->Get( _index ),	  m_window.GetSwapChain().extent, clearValues.data(), (uint32_t)clearValues.size() );
 
 		if ( vkBeginCommandBuffer( commandBuffer, &commandBufferBeginInfo ) == VK_SUCCESS )
 		{
@@ -731,7 +731,7 @@ namespace fan
 		std::vector<VkPipelineStageFlags> waitSemaphoreStages = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
 
 		std::vector< VkCommandBuffer> commandBuffers = {
-			m_primaryCommandBuffers.buffers[ m_window.GetSwapChain().GetCurrentImageIndex() ]
+			m_primaryCommandBuffers.buffers[ m_window.GetSwapChain().currentImageIndex ]
 			//, m_imguiCommandBuffers[m_window.GetSwapChain().GetCurrentImageIndex()]
 		};
 
@@ -787,7 +787,7 @@ namespace fan
 	//================================================================================================================================
 	bool Renderer::CreateCommandBuffers()
 	{
-		const uint32_t count = m_window.GetSwapChain().GetSwapchainImagesCount();
+		const uint32_t count = m_window.GetSwapChain().imagesCount;
 
 		bool result = true;
 
@@ -810,7 +810,7 @@ namespace fan
 
 		// game
 		{
-			VkAttachmentDescription colorAtt = RenderPass::GetColorAttachment( m_window.GetSwapChain().GetSurfaceFormat().format, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL );
+			VkAttachmentDescription colorAtt = RenderPass::GetColorAttachment( m_window.GetSwapChain().surfaceFormat.format, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL );
 			VkAttachmentReference	colorAttRef = RenderPass::GetColorAttachmentReference( 0 );
 			VkAttachmentDescription depthAtt = RenderPass::GetDepthAttachment( m_window.GetDevice().FindDepthFormat() );
 			VkAttachmentReference	depthAttRef = RenderPass::GetDepthAttachmentReference( 1 );
@@ -823,7 +823,7 @@ namespace fan
 
 		// postprocess
 		{
-			VkAttachmentDescription colorAtt = RenderPass::GetColorAttachment( m_window.GetSwapChain().GetSurfaceFormat().format, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL );
+			VkAttachmentDescription colorAtt = RenderPass::GetColorAttachment( m_window.GetSwapChain().surfaceFormat.format, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL );
 			VkAttachmentReference	colorAttRef = RenderPass::GetColorAttachmentReference( 0 );
 			VkSubpassDescription	subpassDescription = RenderPass::GetSubpassDescription( &colorAttRef, 1, VK_NULL_HANDLE );
 			VkSubpassDependency		subpassDependency = RenderPass::GetDependency();
@@ -832,7 +832,7 @@ namespace fan
 
 		// imgui
 		{
-			VkAttachmentDescription colorAtt = RenderPass::GetColorAttachment( m_window.GetSwapChain().GetSurfaceFormat().format, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR );
+			VkAttachmentDescription colorAtt = RenderPass::GetColorAttachment( m_window.GetSwapChain().surfaceFormat.format, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR );
 			VkAttachmentReference	colorAttRef = RenderPass::GetColorAttachmentReference( 0 );
 			VkSubpassDescription	subpassDescription = RenderPass::GetSubpassDescription( &colorAttRef, 1, VK_NULL_HANDLE );
 			VkSubpassDependency		subpassDependency = RenderPass::GetDependency();
@@ -846,20 +846,20 @@ namespace fan
 	//================================================================================================================================
 	void Renderer::CreateFramebuffers()
 	{
-		const VkExtent2D extent = m_window.GetSwapChain().GetExtent();
+		const VkExtent2D extent = m_window.GetSwapChain().extent;
 
 		m_gameFrameBuffers = new FrameBuffer( m_window.GetDevice(), extent );
-		m_gameFrameBuffers->AddColorAttachment( m_window.GetSwapChain().GetSurfaceFormat().format, extent );
+		m_gameFrameBuffers->AddColorAttachment( m_window.GetSwapChain().surfaceFormat.format, extent );
 		m_gameFrameBuffers->AddDepthAttachment();
-		m_gameFrameBuffers->Create( m_window.GetSwapChain().GetSwapchainImagesCount(), m_renderPassGame.renderPass );
+		m_gameFrameBuffers->Create( m_window.GetSwapChain().imagesCount, m_renderPassGame.renderPass );
 
 		m_postProcessFramebuffers = new FrameBuffer( m_window.GetDevice(), extent );
-		m_postProcessFramebuffers->AddColorAttachment( m_window.GetSwapChain().GetSurfaceFormat().format, extent );
-		m_postProcessFramebuffers->Create( m_window.GetSwapChain().GetSwapchainImagesCount(), m_renderPassPostprocess.renderPass );
+		m_postProcessFramebuffers->AddColorAttachment( m_window.GetSwapChain().surfaceFormat.format, extent );
+		m_postProcessFramebuffers->Create( m_window.GetSwapChain().imagesCount, m_renderPassPostprocess.renderPass );
 
 		m_swapchainFramebuffers = new FrameBuffer( m_window.GetDevice(), extent );
-		m_swapchainFramebuffers->SetExternalAttachment( m_window.GetSwapChain().GetImageViews() );
-		m_swapchainFramebuffers->Create( m_window.GetSwapChain().GetSwapchainImagesCount(), m_renderPassImgui.renderPass );
+		m_swapchainFramebuffers->SetExternalAttachment( m_window.GetSwapChain().imageViews );
+		m_swapchainFramebuffers->Create( m_window.GetSwapChain().imagesCount, m_renderPassImgui.renderPass );
 	}
 
 	//================================================================================================================================

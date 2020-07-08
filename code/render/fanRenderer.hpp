@@ -21,7 +21,6 @@ namespace fan
 	class UIMesh;
 	class Instance;
 	class Device;
-	class SwapChain;
 	class ImguiPipeline;
 	class FrameBuffer;
 	class DescriptorTextures;

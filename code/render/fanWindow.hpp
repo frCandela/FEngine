@@ -6,10 +6,11 @@ WARNINGS_GLM_PUSH()
 #include "glm/glm.hpp"
 WARNINGS_POP()
 
+#include "render/core/fanSwapChain.hpp"
+
 namespace fan
 {
 	class Device;
-	class SwapChain;
 	class Instance;
 
 	//================================================================================================================================
@@ -23,9 +24,9 @@ namespace fan
 
 		GLFWwindow*			GetWindow()			  { return m_window; }
 		const GLFWwindow*	GetWindow()		const { return m_window; }
+		SwapChain&			GetSwapChain() { return m_swapchain; }
 		Instance*			GetInstance()	const { return m_instance; }
 		Device&				GetDevice()		const { return *m_device; }
-		SwapChain&			GetSwapChain()	const { return *m_swapchain; }
 		VkSurfaceKHR		GetSurface()	const { return m_surface; }
 		VkExtent2D			GetExtent()		const;
 		glm::ivec2			GetPosition()	const;
@@ -36,7 +37,7 @@ namespace fan
 		GLFWwindow*		m_window = nullptr;
 		Instance*		m_instance;
 		Device*			m_device = nullptr;
-		SwapChain*		m_swapchain;
+		SwapChain		m_swapchain;
 		VkSurfaceKHR	m_surface;
 	};
 }

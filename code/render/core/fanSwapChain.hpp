@@ -2,75 +2,54 @@
 
 #include "glfw/glfw3.h"
 #include <vector>
+#include "render/core/fanImageView.hpp"
 
 namespace fan
 {
 	class Device;
-	struct ImageView;
 	class FrameBuffer;
 
 	//================================================================================================================================
 	// Abstraction of the vulkan swapchain
 	//================================================================================================================================
-	class SwapChain
+	struct SwapChain
 	{
-	public:
-		SwapChain( Device& _device, VkSurfaceKHR _surface, VkExtent2D _desiredSize );
-		~SwapChain();
+		void Create( Device& _device, VkSurfaceKHR _surface, VkExtent2D _desiredSize );
+		void Destroy( Device& _device );
+		void Resize( Device& _device, VkExtent2D _desiredSize );
 
-		void Create( VkSurfaceKHR _surface, VkExtent2D _desiredSize );
-		void Resize( VkExtent2D _desiredSize );
+		void			StartNextFrame() { currentFrame = ( currentFrame + 1 ) % s_maxFramesInFlight; }
+		VkResult		AcquireNextImage( Device& _device );
+		bool			PresentImage( Device& _device );
+		VkSemaphore*	GetCurrentImageAvailableSemaphore() { return &imagesAvailableSemaphores[ currentFrame ]; }
+		VkSemaphore*	GetCurrentRenderFinishedSemaphore() { return &renderFinishedSemaphores[ currentFrame ]; }
+		VkFence*		GetCurrentInFlightFence()			{ return &inFlightFences[ currentFrame ]; }
 
-		void		StartNextFrame() { m_currentFrame = ( m_currentFrame + 1 ) % MAX_FRAMES_IN_FLIGHT; }
-		VkResult	AcquireNextImage();
-		bool		PresentImage();
+		static const uint32_t s_maxFramesInFlight = 3;
 
-		uint32_t					GetCurrentFrame() const { return m_currentFrame; }
-		uint32_t					GetSwapchainImagesCount() const { return m_imagesCount; }
-		uint32_t					GetCurrentImageIndex() const { return m_currentImageIndex; }
-		VkSemaphore*				GetCurrentImageAvailableSemaphore() { return &m_imagesAvailableSemaphores[ m_currentFrame ]; }
-		VkSemaphore*				GetCurrentRenderFinishedSemaphore() { return &m_renderFinishedSemaphores[ m_currentFrame ]; }
-		VkFence*					GetCurrentInFlightFence() { return &m_inFlightFences[ m_currentFrame ]; }
-		VkSwapchainKHR				GetVkSwapChain() { return m_swapchain; }
-		VkSurfaceFormatKHR			GetSurfaceFormat() const { return m_surfaceFormat; }
-		VkExtent2D					GetExtent() const { return m_size; }
-		std::vector< ImageView >*	GetImageViews() { return &m_imageViews; }
+		VkSurfaceKHR		surface = VK_NULL_HANDLE;
+		VkSwapchainKHR		swapchain = VK_NULL_HANDLE;
+		uint32_t			currentImageIndex;
+		uint32_t			currentFrame = 0;
+		uint32_t			imagesCount;
+		VkSurfaceFormatKHR	surfaceFormat;
+		VkExtent2D			extent;		
 
-		const int MAX_FRAMES_IN_FLIGHT = 3;
+		VkImage 	 images						[ s_maxFramesInFlight ] = { VK_NULL_HANDLE, VK_NULL_HANDLE, VK_NULL_HANDLE };
+		ImageView	 imageViews					[ s_maxFramesInFlight ] = { VK_NULL_HANDLE, VK_NULL_HANDLE, VK_NULL_HANDLE };
+		VkSemaphore  imagesAvailableSemaphores	[ s_maxFramesInFlight ] = { VK_NULL_HANDLE, VK_NULL_HANDLE, VK_NULL_HANDLE };
+		VkSemaphore  renderFinishedSemaphores	[ s_maxFramesInFlight ] = { VK_NULL_HANDLE, VK_NULL_HANDLE, VK_NULL_HANDLE };
+		VkFence		 inFlightFences				[ s_maxFramesInFlight ] = { VK_NULL_HANDLE, VK_NULL_HANDLE, VK_NULL_HANDLE };
+
 	private:
+		VkPresentModeKHR	FindDesiredPresentMode( Device& _device, const VkPresentModeKHR _desiredPresentMode ) const;
+		VkSurfaceFormatKHR	FindDesiredSurfaceFormat( Device& _device, VkSurfaceFormatKHR _desiredSurfaceFormat ) const;
+		VkImageUsageFlags	FindDesiredImageUsage( const VkSurfaceCapabilitiesKHR _surfaceCapabilities, VkImageUsageFlagBits _desiredBits ) const;
+		VkExtent2D			FindDesiredImagesSize( const VkSurfaceCapabilitiesKHR _surfaceCapabilities, const VkExtent2D _desiredSize ) const;
+		uint32_t			FindDesiredNumberOfImages( const VkSurfaceCapabilitiesKHR _surfaceCapabilities, const uint32_t _desiredCount ) const;
 
-		Device& m_device;
-
-		VkSurfaceKHR	m_surface;
-		std::vector<VkPresentModeKHR>	m_supportedPresentModes;
-		std::vector<VkSurfaceFormatKHR> m_supportedSurfaceFormats;
-
-		std::vector< VkImage >		m_images;
-		std::vector< ImageView >	m_imageViews;
-
-		std::vector<VkSemaphore> m_imagesAvailableSemaphores;
-		std::vector<VkSemaphore> m_renderFinishedSemaphores;
-		std::vector<VkFence>	 m_inFlightFences;
-
-		uint32_t m_currentImageIndex;
-		uint32_t m_currentFrame = 0;
-
-		VkSwapchainKHR				m_swapchain = VK_NULL_HANDLE;
-		VkPresentModeKHR			m_presentMode;
-		VkSurfaceCapabilitiesKHR	m_surfaceCapabilities;
-		uint32_t					m_imagesCount;
-		VkExtent2D					m_size;
-		VkImageUsageFlags			m_imageUsage;
-		VkSurfaceFormatKHR			m_surfaceFormat;
-
-		void SetDesiredPresentMode( const VkPresentModeKHR _desiredPresentMode );
-		void SetNumberOfImages();
-		void SetImagesSize( const VkExtent2D _desiredSize );
-		void SetImagesUsage();
-		void SetDesiredSurfaceFormat( VkSurfaceFormatKHR _desiredSurfaceFormat );
-		void CreateSwapChain();
-		void CreateSemaphores();
-		void CreateImageViews();
-		void DestroyImageViews();
+		void				CreateSwapChain( Device& _device, VkExtent2D _desiredSize );
+		void				CreateSemaphores( Device& _device );
+		void				CreateImageViews( Device& _device );
 	};
 }
