@@ -12,6 +12,8 @@ namespace fan
 												VkSubpassDescription* _subpassDescriptions,			uint32_t _countSubpasses,
 												VkSubpassDependency* _dependencies,					uint32_t _countDependencies ) 
 	{
+		assert( renderPass == VK_NULL_HANDLE );
+
 		VkRenderPassCreateInfo renderPassCreateInfo;
 		renderPassCreateInfo.sType				= VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
 		renderPassCreateInfo.pNext				= nullptr;

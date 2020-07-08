@@ -15,7 +15,7 @@ namespace fan
 		static VkCommandBufferInheritanceInfo GetInheritanceInfo( VkRenderPass _renderPass, VkFramebuffer _framebuffer );
 		static VkCommandBufferBeginInfo GetBeginInfo( VkCommandBufferInheritanceInfo* _inheritanceInfo );
 
-		VkCommandBuffer buffers[3];
+		VkCommandBuffer buffers[3] = { VK_NULL_HANDLE, VK_NULL_HANDLE,VK_NULL_HANDLE };
 		int size;
 	};
 }

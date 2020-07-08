@@ -69,7 +69,7 @@ namespace fan
 		{
 			// Load
 			texture = new Texture();			
-			if ( texture->CreateFromFile( cleanPath ) )
+			if ( texture->CreateFromFile( Texture::s_resourceManager.GetDevice(), cleanPath ) )
 			{	
 				texture->renderID =  static_cast< int >( m_textureList.size() );
 				m_textureList.push_back( texture );

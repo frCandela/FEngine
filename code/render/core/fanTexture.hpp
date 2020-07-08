@@ -30,13 +30,11 @@ namespace fan
 		std::string	   path;
 		int renderID = -1;
 
-		bool CreateFromFile( const std::string& _path );
-		void CreateFromData( const unsigned char* _data, const VkExtent2D _extent, const uint32_t _mipLevels );
+		bool CreateFromFile( Device& _device, const std::string& _path );
+		void CreateFromData( Device& _device, const unsigned char* _data, const VkExtent2D _extent, const uint32_t _mipLevels );
 		void Destroy( Device& _device );
 
 	private:
-		void GenerateGpuData( Device& _device, const void* _data );
-		void DeleteGpuData( Device& _device );
 		void CreateImage( Device& _device, VkExtent2D _extent, uint32_t _mipLevels, VkFormat _format, VkImageTiling _tiling, VkImageUsageFlags _usage, VkMemoryPropertyFlags _properties );
 		void CreateImageView( Device& _device, VkFormat _format, VkImageViewType _viewType, VkImageSubresourceRange _subresourceRange );
 		void CopyBufferToImage( VkCommandBuffer _commandBuffer, VkBuffer _buffer, VkExtent2D _extent );

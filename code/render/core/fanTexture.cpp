@@ -19,7 +19,23 @@ namespace fan
 	//================================================================================================================================
 	void Texture::Destroy( Device& _device )
 	{ 
-		DeleteGpuData( _device );
+		if( deviceMemory != VK_NULL_HANDLE )
+		{
+			vkFreeMemory( _device.vkDevice, deviceMemory, nullptr );
+			deviceMemory = VK_NULL_HANDLE;
+		}
+
+		if( imageView != VK_NULL_HANDLE )
+		{
+			vkDestroyImageView( _device.vkDevice, imageView, nullptr );
+			imageView = VK_NULL_HANDLE;
+		}
+
+		if( image != VK_NULL_HANDLE )
+		{
+			vkDestroyImage( _device.vkDevice, image, nullptr );
+			image = VK_NULL_HANDLE;
+		}
 	}
 
 	//================================================================================================================================
@@ -151,29 +167,6 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Texture::DeleteGpuData( Device& _device )
-	{
-		if ( deviceMemory != VK_NULL_HANDLE )
-		{
-			vkFreeMemory( _device.vkDevice, deviceMemory, nullptr );
-			deviceMemory = VK_NULL_HANDLE;
-		}
-
-		if ( imageView != VK_NULL_HANDLE )
-		{
-			vkDestroyImageView( _device.vkDevice, imageView, nullptr );
-			imageView = VK_NULL_HANDLE;
-		}
-
-		if ( image != VK_NULL_HANDLE )
-		{
-			vkDestroyImage( _device.vkDevice, image, nullptr );
-			image = VK_NULL_HANDLE;
-		}
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
 	void Texture::CreateImage( Device& _device, VkExtent2D _extent, uint32_t _mipLevels, VkFormat _format, VkImageTiling _tiling, VkImageUsageFlags _usage, VkMemoryPropertyFlags _properties )
 	{
 		mipLevels = _mipLevels;
@@ -291,7 +284,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool Texture::CreateFromFile( const std::string& _path )
+	bool Texture::CreateFromFile( Device& _device, const std::string& _path )
 	{
 		path = _path;
 
@@ -308,7 +301,7 @@ namespace fan
 		mipLevels = static_cast< uint32_t >( std::floor( std::log2( std::max( texWidth, texHeight ) ) ) ) + 1;
 		mipLevels = 1;
 
-		CreateFromData( pixels, { (uint32_t)texWidth, (uint32_t)texHeight }, mipLevels );
+		CreateFromData( _device, pixels, { (uint32_t)texWidth, (uint32_t)texHeight }, mipLevels );
 
 		stbi_image_free( pixels );
 
@@ -317,17 +310,15 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Texture::CreateFromData( const unsigned char* _data, const VkExtent2D _extent, const uint32_t _mipLevels )
+	void Texture::CreateFromData( Device& _device, const unsigned char* _data, const VkExtent2D _extent, const uint32_t _mipLevels )
 	{
+		assert( deviceMemory == VK_NULL_HANDLE );
+		assert( imageView == VK_NULL_HANDLE );
+		assert( image == VK_NULL_HANDLE );
+
 		mipLevels = _mipLevels;
 		extent = _extent;
-		GenerateGpuData( s_resourceManager.GetDevice(), _data );
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void Texture::GenerateGpuData( Device& _device, const void* _data )
-	{
+		
 		VkDeviceSize imageSize = extent.width * extent.height * 4 * sizeof( unsigned char );
 
 		// Create a buffer in host visible memory
@@ -345,7 +336,7 @@ namespace fan
 		TransitionImageLayout( cmd, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, subresourceRange );
 		CopyBufferToImage( cmd, stagingBuffer.buffer, extent );
 
-		if ( mipLevels > 1 )
+		if( mipLevels > 1 )
 		{
 			GenerateMipmaps( _device, cmd, VK_FORMAT_R8G8B8A8_UNORM, extent, mipLevels );
 		}

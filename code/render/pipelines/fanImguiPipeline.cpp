@@ -65,7 +65,7 @@ namespace fan
 		Debug::Log( "reloading icons" );
 
 		m_iconsTexture.Destroy( m_device );
-		m_iconsTexture.CreateFromFile( RenderGlobal::s_defaultIcons );
+		m_iconsTexture.CreateFromFile( m_device, RenderGlobal::s_defaultIcons );
 
 		VkDescriptorImageInfo iconsDescriptorImageInfo{};
 		iconsDescriptorImageInfo.sampler = m_iconsSampler.sampler;
@@ -269,8 +269,8 @@ namespace fan
 		int texWidth, texHeight;
 		ImGui::GetIO().Fonts->GetTexDataAsRGBA32( &fontData, &texWidth, &texHeight );
 
-		m_fontTexture.CreateFromData( fontData, { (uint32_t)texWidth, (uint32_t)texHeight }, 1 );
-		m_iconsTexture.CreateFromFile( RenderGlobal::s_defaultIcons );
+		m_fontTexture.CreateFromData( m_device, fontData, { (uint32_t)texWidth, (uint32_t)texHeight }, 1 );
+		m_iconsTexture.CreateFromFile( m_device, RenderGlobal::s_defaultIcons );
 		m_sampler.Create( m_device, 0, 1.f, VK_FILTER_LINEAR );
 		m_iconsSampler.Create( m_device, 0, 0.f, VK_FILTER_NEAREST );
 	}

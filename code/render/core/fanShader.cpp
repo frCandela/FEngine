@@ -13,6 +13,8 @@ namespace fan
 	//================================================================================================================================
 	bool Shader::Create( Device& _device, const std::string _path )
 	{
+		assert( shaderModule == VK_NULL_HANDLE );
+
 		std::vector<unsigned int> spirvCode = SpirvCompiler::Compile( _path );
 		if ( spirvCode.empty() )
 		{
