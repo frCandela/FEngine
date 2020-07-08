@@ -7,11 +7,11 @@ WARNINGS_GLM_PUSH()
 WARNINGS_POP()
 
 #include "render/core/fanSwapChain.hpp"
+#include "render/core/fanInstance.hpp"
 
 namespace fan
 {
 	class Device;
-	class Instance;
 
 	//================================================================================================================================
 	// Abstraction of the glfw window
@@ -25,7 +25,7 @@ namespace fan
 		GLFWwindow*			GetWindow()			  { return m_window; }
 		const GLFWwindow*	GetWindow()		const { return m_window; }
 		SwapChain&			GetSwapChain() { return m_swapchain; }
-		Instance*			GetInstance()	const { return m_instance; }
+		Instance*			GetInstance()  { return &m_instance; }
 		Device&				GetDevice()		const { return *m_device; }
 		VkSurfaceKHR		GetSurface()	const { return m_surface; }
 		VkExtent2D			GetExtent()		const;
@@ -35,7 +35,7 @@ namespace fan
 
 	private:
 		GLFWwindow*		m_window = nullptr;
-		Instance*		m_instance;
+		Instance		m_instance;
 		Device*			m_device = nullptr;
 		SwapChain		m_swapchain;
 		VkSurfaceKHR	m_surface;

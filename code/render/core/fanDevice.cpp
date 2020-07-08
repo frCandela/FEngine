@@ -187,8 +187,8 @@ namespace fan
 		deviceCreateInfo.flags = 0;
 		deviceCreateInfo.queueCreateInfoCount = static_cast< uint32_t >( queueCreateInfos.size() );
 		deviceCreateInfo.pQueueCreateInfos = queueCreateInfos.data();
-		deviceCreateInfo.enabledLayerCount = static_cast< uint32_t >( m_instance->GetValidationLayers().size() );
-		deviceCreateInfo.ppEnabledLayerNames = m_instance->GetValidationLayers().data();
+		deviceCreateInfo.enabledLayerCount = static_cast< uint32_t >( m_instance->enabledValidationLayers.size() );
+		deviceCreateInfo.ppEnabledLayerNames = m_instance->enabledValidationLayers.data();
 		deviceCreateInfo.enabledExtensionCount = static_cast< uint32_t >( existingExtensions.size() );
 		deviceCreateInfo.ppEnabledExtensionNames = existingExtensions.data();
 		deviceCreateInfo.pEnabledFeatures = &desiredFeatures;
@@ -213,9 +213,9 @@ namespace fan
 	bool Device::SelectPhysicalDevice()
 	{
 		uint32_t devicesCount;
-		if ( vkEnumeratePhysicalDevices( m_instance->vkInstance, &devicesCount, nullptr ) != VK_SUCCESS ) { return false; }
+		if ( vkEnumeratePhysicalDevices( m_instance->instance, &devicesCount, nullptr ) != VK_SUCCESS ) { return false; }
 		std::vector< VkPhysicalDevice> availableDevices( devicesCount );
-		if ( vkEnumeratePhysicalDevices( m_instance->vkInstance, &devicesCount, availableDevices.data() ) != VK_SUCCESS ) { return false; }
+		if ( vkEnumeratePhysicalDevices( m_instance->instance, &devicesCount, availableDevices.data() ) != VK_SUCCESS ) { return false; }
 
 		for ( int deviceIndex = 0; deviceIndex < availableDevices.size(); deviceIndex++ )
 		{

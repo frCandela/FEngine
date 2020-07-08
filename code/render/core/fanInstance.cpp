@@ -2,13 +2,16 @@
 
 #include <iostream>
 #include "core/fanDebug.hpp"
+#include "render/fanRenderGlobal.hpp"
 
 namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	Instance::Instance()
+	void Instance::Create()
 	{
+		assert( instance == VK_NULL_HANDLE );
+
 		// Get desired extensions
 		uint32_t glfwExtensionCount = 0;
 		const char** glfwExtensions;
@@ -16,31 +19,15 @@ namespace fan
 		int res = glfwVulkanSupported() == GLFW_TRUE;
 		( void ) res;
 		glfwExtensions = glfwGetRequiredInstanceExtensions( &glfwExtensionCount );
-		std::vector< const char* > desiredExtensions = {
-			VK_EXT_DEBUG_REPORT_EXTENSION_NAME
-			, VK_KHR_SURFACE_EXTENSION_NAME
-		};
+		std::vector< const char* > desiredExtensions = RenderGlobal::s_desiredInstanceExtensions;
 
 		for ( unsigned glfwExtensionIndex = 0; glfwExtensionIndex < glfwExtensionCount; glfwExtensionIndex++ )
 		{
 			desiredExtensions.push_back( glfwExtensions[ glfwExtensionIndex ] );
 		}
-		SetDesiredExtensions( desiredExtensions );
 
-
-	#ifndef NDEBUG
-		SetDesiredValidationLayers( {
-			 "VK_LAYER_LUNARG_standard_validation"
-			 ,"VK_LAYER_LUNARG_assistant_layer"
-			 ,"VK_LAYER_LUNARG_core_validation"
-			,"VK_LAYER_KHRONOS_validation"
-			,"VK_LAYER_LUNARG_monitor"
-			,"VK_LAYER_LUNARG_object_tracker"
-			,"VK_LAYER_LUNARG_screenshot"
-			,"VK_LAYER_LUNARG_standard_validation"
-			,"VK_LAYER_LUNARG_parameter_validation"
-			} );
-	#endif
+		FindDesiredExtensions( desiredExtensions );	
+		FindDesiredValidationLayers( RenderGlobal::s_desiredValidationLayers );
 
 		VkApplicationInfo appInfo;
 		appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
@@ -54,12 +41,12 @@ namespace fan
 		instanceCreateInfo.pNext = nullptr;
 		instanceCreateInfo.flags = 0;
 		instanceCreateInfo.pApplicationInfo = &appInfo;
-		instanceCreateInfo.enabledLayerCount = static_cast< uint32_t >( m_validationLayers.size() );
-		instanceCreateInfo.ppEnabledLayerNames = m_validationLayers.data();
-		instanceCreateInfo.enabledExtensionCount = static_cast< uint32_t >( m_extensions.size() );
-		instanceCreateInfo.ppEnabledExtensionNames = m_extensions.size() > 0 ? m_extensions.data() : nullptr;
+		instanceCreateInfo.enabledLayerCount = static_cast< uint32_t >( enabledValidationLayers.size() );
+		instanceCreateInfo.ppEnabledLayerNames = enabledValidationLayers.data();
+		instanceCreateInfo.enabledExtensionCount = static_cast< uint32_t >( enabledExtensions.size() );
+		instanceCreateInfo.ppEnabledExtensionNames = enabledExtensions.size() > 0 ? enabledExtensions.data() : nullptr;
 
-		if ( vkCreateInstance( &instanceCreateInfo, nullptr, &vkInstance ) != VK_SUCCESS || vkInstance == VK_NULL_HANDLE )
+		if ( vkCreateInstance( &instanceCreateInfo, nullptr, &instance ) != VK_SUCCESS || instance == VK_NULL_HANDLE )
 		{
 			Debug::Error( "ouch, this is going to be messy" );
 		}
@@ -68,20 +55,26 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	Instance::~Instance()
+	void Instance::Destroy()
 	{
-		DestroyDebugReportCallback( m_callback, nullptr );
-		vkDestroyInstance( vkInstance, nullptr );
-		vkInstance = VK_NULL_HANDLE;
+		// destroy debug report callback
+		PFN_vkDestroyDebugReportCallbackEXT func = (PFN_vkDestroyDebugReportCallbackEXT)vkGetInstanceProcAddr( instance, "vkDestroyDebugReportCallbackEXT" );
+		if( func != nullptr )
+		{
+			func( instance, debugReportCallback, nullptr );
+		}
+
+		vkDestroyInstance( instance, nullptr );
+		instance = VK_NULL_HANDLE;
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool Instance::IsExtensionAvailable( std::string _requiredExtension )
+	bool Instance::IsExtensionAvailable( const std::vector< VkExtensionProperties >& _availableExtensions, const std::string _requiredExtension )
 	{
-		for ( int availableExtensionIndex = 0; availableExtensionIndex < m_availableExtensions.size(); availableExtensionIndex++ )
+		for ( int availableExtensionIndex = 0; availableExtensionIndex < _availableExtensions.size(); availableExtensionIndex++ )
 		{
-			if ( _requiredExtension.compare( m_availableExtensions[ availableExtensionIndex ].extensionName ) == 0 )
+			if ( _requiredExtension.compare( _availableExtensions[ availableExtensionIndex ].extensionName ) == 0 )
 			{
 				return true;
 			}
@@ -91,11 +84,11 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool Instance::IsLayerAvailable( std::string _requiredLayer )
+	bool Instance::IsLayerAvailable( const std::vector<VkLayerProperties>& _availableLayers, const std::string _requiredLayer )
 	{
-		for ( int availableLayerIndex = 0; availableLayerIndex < m_availableLayers.size(); availableLayerIndex++ )
+		for ( int availableLayerIndex = 0; availableLayerIndex < _availableLayers.size(); availableLayerIndex++ )
 		{
-			if ( _requiredLayer.compare( m_availableLayers[ availableLayerIndex ].layerName ) == 0 )
+			if ( _requiredLayer.compare( _availableLayers[ availableLayerIndex ].layerName ) == 0 )
 			{
 				return true;
 			}
@@ -105,42 +98,44 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Instance::SetDesiredValidationLayers( const std::vector < const char*> _desiredLayers )
+	void Instance::FindDesiredValidationLayers( const std::vector < const char*> _desiredLayers )
 	{
+		if( _desiredLayers.empty() ) { return; }
+
 		// Get available layers
 		uint32_t layerCount;
 		vkEnumerateInstanceLayerProperties( &layerCount, nullptr );
-		m_availableLayers.resize( layerCount );
-		vkEnumerateInstanceLayerProperties( &layerCount, m_availableLayers.data() );
+		std::vector<VkLayerProperties> availableLayers( layerCount );
+		vkEnumerateInstanceLayerProperties( &layerCount, availableLayers.data() );
 
-		m_validationLayers.clear();
-		m_validationLayers.reserve( _desiredLayers.size() );
+		enabledValidationLayers.clear();
+		enabledValidationLayers.reserve( _desiredLayers.size() );
 		for ( int layerIndex = 0; layerIndex < _desiredLayers.size(); layerIndex++ )
 		{
-			if ( IsLayerAvailable( _desiredLayers[ layerIndex ] ) )
+			if ( IsLayerAvailable( availableLayers, _desiredLayers[ layerIndex ] ) )
 			{
-				m_validationLayers.push_back( _desiredLayers[ layerIndex ] );
+				enabledValidationLayers.push_back( _desiredLayers[ layerIndex ] );
 			}
 		}
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Instance::SetDesiredExtensions( const std::vector < const char*> _desiredExtensions )
+	void Instance::FindDesiredExtensions( const std::vector < const char*> _desiredExtensions )
 	{
 		// Get available extensions
 		uint32_t extensionsCount;
 		vkEnumerateInstanceExtensionProperties( nullptr, &extensionsCount, nullptr );
-		m_availableExtensions.resize( extensionsCount );
-		vkEnumerateInstanceExtensionProperties( nullptr, &extensionsCount, m_availableExtensions.data() );
+		std::vector< VkExtensionProperties > availableExtensions( extensionsCount );
+		vkEnumerateInstanceExtensionProperties( nullptr, &extensionsCount, availableExtensions.data() );
 
-		m_extensions.clear();
-		m_extensions.reserve( _desiredExtensions.size() );
+		enabledExtensions.clear();
+		enabledExtensions.reserve( _desiredExtensions.size() );
 		for ( int extensionIndex = 0; extensionIndex < _desiredExtensions.size(); extensionIndex++ )
 		{
-			if ( IsExtensionAvailable( _desiredExtensions[ extensionIndex ] ) )
+			if ( IsExtensionAvailable( availableExtensions, _desiredExtensions[ extensionIndex ] ) )
 			{
-				m_extensions.push_back( _desiredExtensions[ extensionIndex ] );
+				enabledExtensions.push_back( _desiredExtensions[ extensionIndex ] );
 			}
 		}
 	}
@@ -154,25 +149,14 @@ namespace fan
 		createInfo.flags = VK_DEBUG_REPORT_ERROR_BIT_EXT | VK_DEBUG_REPORT_WARNING_BIT_EXT;
 		createInfo.pfnCallback = DebugCallback;
 
-		auto func = ( PFN_vkCreateDebugReportCallbackEXT ) vkGetInstanceProcAddr( vkInstance, "vkCreateDebugReportCallbackEXT" );
-		if ( func != nullptr && func( vkInstance, &createInfo, nullptr, &m_callback ) == VK_SUCCESS )
+		auto func = ( PFN_vkCreateDebugReportCallbackEXT ) vkGetInstanceProcAddr( instance, "vkCreateDebugReportCallbackEXT" );
+		if ( func != nullptr && func( instance, &createInfo, nullptr, &debugReportCallback ) == VK_SUCCESS )
 		{
-			Debug::Get() << Debug::Severity::log << std::hex << "VkDebugCallback       " << m_callback << std::dec << Debug::Endl();
+			Debug::Get() << Debug::Severity::log << std::hex << "VkDebugCallback       " << debugReportCallback << std::dec << Debug::Endl();
 			return true;
 		}
 
 		return false;
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void Instance::DestroyDebugReportCallback( VkDebugReportCallbackEXT _callback, const VkAllocationCallbacks* _pAllocator )
-	{
-		PFN_vkDestroyDebugReportCallbackEXT func = ( PFN_vkDestroyDebugReportCallbackEXT ) vkGetInstanceProcAddr( vkInstance, "vkDestroyDebugReportCallbackEXT" );
-		if ( func != nullptr )
-		{
-			func( vkInstance, _callback, _pAllocator );
-		}
 	}
 
 	//================================================================================================================================

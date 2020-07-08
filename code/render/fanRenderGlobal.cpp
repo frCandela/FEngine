@@ -1,4 +1,5 @@
 #include "render/fanRenderGlobal.hpp"
+#include "glfw/glfw3.h"
 
 namespace fan
 {
@@ -28,6 +29,23 @@ namespace fan
 	const char* RenderGlobal::s_imguiVertexShader		= "code/shaders/imgui.vert";
 	const char* RenderGlobal::s_imguiFragmentShader		= "code/shaders/imgui.frag";
 
-	
-		
+	const std::vector < const char* > RenderGlobal::s_desiredValidationLayers = {
+#ifndef NDEBUG	
+		"VK_LAYER_LUNARG_standard_validation"
+		, "VK_LAYER_LUNARG_assistant_layer"
+		, "VK_LAYER_LUNARG_core_validation"
+		, "VK_LAYER_KHRONOS_validation"
+		, "VK_LAYER_LUNARG_monitor"
+		, "VK_LAYER_LUNARG_object_tracker"
+		, "VK_LAYER_LUNARG_screenshot"
+		, "VK_LAYER_LUNARG_standard_validation"
+		, "VK_LAYER_LUNARG_parameter_validation"
+#endif
+	};
+
+	const std::vector < const char* > RenderGlobal::s_desiredInstanceExtensions =
+	{
+		VK_EXT_DEBUG_REPORT_EXTENSION_NAME
+		, VK_KHR_SURFACE_EXTENSION_NAME
+	};		
 }

@@ -9,30 +9,24 @@ namespace fan
 	//================================================================================================================================
 	// The vulkan instance of the application
 	//================================================================================================================================
-	class Instance
+	struct Instance
 	{
-	public:
-		Instance();
-		~Instance();
+		void Create();
+		void Destroy();
 
-		const std::vector < const char*>& GetValidationLayers() const { return m_validationLayers; }
+		VkInstance instance = VK_NULL_HANDLE;
 
-		VkInstance vkInstance = VK_NULL_HANDLE;
+		std::vector < const char*> enabledValidationLayers;
+		std::vector < const char*> enabledExtensions;
+		VkDebugReportCallbackEXT   debugReportCallback;
 
 	private:
-		std::vector< VkExtensionProperties > m_availableExtensions;
-		std::vector<VkLayerProperties> m_availableLayers;
-		VkDebugReportCallbackEXT m_callback;
-
-		std::vector < const char*> m_validationLayers;
-		std::vector < const char*> m_extensions;
-
-		bool IsExtensionAvailable( std::string _requiredExtension );
-		bool IsLayerAvailable( std::string _requiredLayer );
-		void SetDesiredValidationLayers( const std::vector < const char*> _desiredLayers );
-		void SetDesiredExtensions( const std::vector < const char*> _desiredExtensions );
+		void FindDesiredValidationLayers( const std::vector < const char*> _desiredLayers );
+		void FindDesiredExtensions( const std::vector < const char*> _desiredExtensions );
 		bool SetupDebugCallback();
-		void DestroyDebugReportCallback( VkDebugReportCallbackEXT _callback, const VkAllocationCallbacks* _pAllocator );
+		
+		static bool IsExtensionAvailable( const std::vector< VkExtensionProperties >& _availableExtensions, const std::string _requiredExtension );
+		static bool IsLayerAvailable( const std::vector<VkLayerProperties>& _availableLayers, const std::string _requiredLayer );
 		static VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(
 			VkDebugReportFlagsEXT _flags,
 			VkDebugReportObjectTypeEXT _objType,

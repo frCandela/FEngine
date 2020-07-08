@@ -19,7 +19,6 @@ namespace fan
 	class Window;
 	class Mesh;
 	class UIMesh;
-	class Instance;
 	class Device;
 	class ImguiPipeline;
 	class FrameBuffer;

@@ -1,7 +1,6 @@
 #include "render/fanWindow.hpp"
 
 #include "core/fanDebug.hpp"
-#include "render/core/fanInstance.hpp"
 #include "render/core/fanDevice.hpp"
 #include "core/input/fanInput.hpp"
 
@@ -11,18 +10,17 @@ namespace fan
 	//================================================================================================================================
 	Window::Window( const char* _name, const glm::ivec2 _size, const glm::ivec2 _position )
 	{
-
-		m_instance = new Instance();
+		m_instance.Create();
 
 		glfwWindowHint( GLFW_CLIENT_API, GLFW_NO_API );
 		glfwWindowHint( GLFW_RESIZABLE, GLFW_TRUE );
 		m_window = glfwCreateWindow( _size.x, _size.y, _name, nullptr/* fullscreen monitor */, nullptr );
-		glfwCreateWindowSurface( m_instance->vkInstance, m_window, nullptr, &m_surface );
+		glfwCreateWindowSurface( m_instance.instance, m_window, nullptr, &m_surface );
 		Debug::Get() << Debug::Severity::log << std::hex << "VkSurfaceKHR          " << m_surface << std::dec << Debug::Endl();
 
 		glfwSetWindowPos( m_window, _position.x, _position.y );
 
-		m_device = new Device( m_instance, m_surface );
+		m_device = new Device( &m_instance, m_surface );
 		m_swapchain.Create( *m_device, m_surface, { (uint32_t)_size.x, (uint32_t)_size.y } );
 
 		Input::Get().Setup( m_window );
@@ -35,12 +33,12 @@ namespace fan
 		m_swapchain.Destroy( *m_device );
 		delete m_device;
 
-		vkDestroySurfaceKHR( m_instance->vkInstance, m_surface, nullptr );
+		vkDestroySurfaceKHR( m_instance.instance, m_surface, nullptr );
 		m_surface = VK_NULL_HANDLE;
 		glfwDestroyWindow( m_window );
 		glfwTerminate();
 
-		delete m_instance;
+		m_instance.Destroy();
 	}
 
 	//================================================================================================================================

@@ -3,6 +3,7 @@
 #include <set>
 #include <cstdint>
 #include <string>
+#include <vector>
 
 namespace fan
 {
@@ -41,5 +42,8 @@ namespace fan
 		// rendering
 		static const uint32_t s_maximumNumPointLights = 16;
 		static const uint32_t s_maximumNumDirectionalLight = 4;
+
+		static const std::vector < const char* > s_desiredValidationLayers;
+		static const std::vector < const char* > s_desiredInstanceExtensions;
 	};
 }
