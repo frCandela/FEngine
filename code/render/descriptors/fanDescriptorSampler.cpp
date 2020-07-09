@@ -24,7 +24,7 @@ namespace fan
 			descriptorPoolInfo.poolSizeCount = static_cast< uint32_t >( poolSizes.size() );
 			descriptorPoolInfo.pPoolSizes = poolSizes.data();
 			descriptorPoolInfo.maxSets = 1;
-			vkCreateDescriptorPool( m_device.vkDevice, &descriptorPoolInfo, nullptr, &m_descriptorPool );
+			vkCreateDescriptorPool( m_device.device, &descriptorPoolInfo, nullptr, &m_descriptorPool );
 		}
 
 		// Descriptor set layout
@@ -43,7 +43,7 @@ namespace fan
 			descriptorSetLayoutCreateInfo.pBindings = setLayoutBindings.data();
 			descriptorSetLayoutCreateInfo.bindingCount = static_cast< uint32_t >( setLayoutBindings.size() );
 
-			vkCreateDescriptorSetLayout( m_device.vkDevice, &descriptorSetLayoutCreateInfo, nullptr, &m_descriptorSetLayout );
+			vkCreateDescriptorSetLayout( m_device.device, &descriptorSetLayoutCreateInfo, nullptr, &m_descriptorSetLayout );
 
 			// Descriptor set
 			std::vector<VkDescriptorSetLayout>  layouts = { m_descriptorSetLayout };
@@ -54,7 +54,7 @@ namespace fan
 			descriptorSetAllocateInfo.pSetLayouts = layouts.data();
 			descriptorSetAllocateInfo.descriptorSetCount = 1;
 
-			vkAllocateDescriptorSets( m_device.vkDevice, &descriptorSetAllocateInfo, &m_descriptorSet );
+			vkAllocateDescriptorSets( m_device.device, &descriptorSetAllocateInfo, &m_descriptorSet );
 		}
 	}
 
@@ -64,13 +64,13 @@ namespace fan
 	{
 		if ( m_descriptorPool != VK_NULL_HANDLE )
 		{
-			vkDestroyDescriptorPool( m_device.vkDevice, m_descriptorPool, nullptr );
+			vkDestroyDescriptorPool( m_device.device, m_descriptorPool, nullptr );
 			m_descriptorPool = VK_NULL_HANDLE;
 		}
 
 		if ( m_descriptorSetLayout != VK_NULL_HANDLE )
 		{
-			vkDestroyDescriptorSetLayout( m_device.vkDevice, m_descriptorSetLayout, nullptr );
+			vkDestroyDescriptorSetLayout( m_device.device, m_descriptorSetLayout, nullptr );
 			m_descriptorSetLayout = VK_NULL_HANDLE;
 		}
 	}
@@ -93,6 +93,6 @@ namespace fan
 		writeDescriptorSet.pImageInfo = nullptr;
 		writeDescriptorSet.descriptorCount = 1;
 
-		vkUpdateDescriptorSets( m_device.vkDevice, 1, &writeDescriptorSet, 0, nullptr );
+		vkUpdateDescriptorSets( m_device.device, 1, &writeDescriptorSet, 0, nullptr );
 	}
 }

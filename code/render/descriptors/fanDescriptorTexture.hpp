@@ -5,7 +5,7 @@
 
 namespace fan
 {
-	class Device;
+	struct Device;
 
 	//================================================================================================================================
 	// utility for making texture descriptors

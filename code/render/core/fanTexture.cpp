@@ -21,19 +21,19 @@ namespace fan
 	{ 
 		if( deviceMemory != VK_NULL_HANDLE )
 		{
-			vkFreeMemory( _device.vkDevice, deviceMemory, nullptr );
+			vkFreeMemory( _device.device, deviceMemory, nullptr );
 			deviceMemory = VK_NULL_HANDLE;
 		}
 
 		if( imageView != VK_NULL_HANDLE )
 		{
-			vkDestroyImageView( _device.vkDevice, imageView, nullptr );
+			vkDestroyImageView( _device.device, imageView, nullptr );
 			imageView = VK_NULL_HANDLE;
 		}
 
 		if( image != VK_NULL_HANDLE )
 		{
-			vkDestroyImage( _device.vkDevice, image, nullptr );
+			vkDestroyImage( _device.device, image, nullptr );
 			image = VK_NULL_HANDLE;
 		}
 	}
@@ -78,7 +78,7 @@ namespace fan
 	{
 		// Check if image format supports linear bitting
 		VkFormatProperties formatProperties;
-		vkGetPhysicalDeviceFormatProperties( _device.vkPhysicalDevice, _imageFormat, &formatProperties );
+		vkGetPhysicalDeviceFormatProperties( _device.physicalDevice, _imageFormat, &formatProperties );
 		if ( !( formatProperties.optimalTilingFeatures & VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT ) )
 		{
 			throw std::runtime_error( "texture image format does not support linear blitting!" );
@@ -187,25 +187,25 @@ namespace fan
 		imageInfo.samples = VK_SAMPLE_COUNT_1_BIT;
 		imageInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
-		if ( vkCreateImage( _device.vkDevice, &imageInfo, nullptr, &image ) != VK_SUCCESS )
+		if ( vkCreateImage( _device.device, &imageInfo, nullptr, &image ) != VK_SUCCESS )
 			throw std::runtime_error( "failed to create image!" );
 
 		Debug::Get() << Debug::Severity::log << std::hex << "VkImage               " << image << std::dec << Debug::Endl();
 
 		// Allocate memory for the image
 		VkMemoryRequirements memRequirements;
-		vkGetImageMemoryRequirements( _device.vkDevice, image, &memRequirements );
+		vkGetImageMemoryRequirements( _device.device, image, &memRequirements );
 
 		VkMemoryAllocateInfo allocInfo = {};
 		allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
 		allocInfo.allocationSize = memRequirements.size;
 		allocInfo.memoryTypeIndex = _device.FindMemoryType( memRequirements.memoryTypeBits, _properties );
 
-		if ( vkAllocateMemory( _device.vkDevice, &allocInfo, nullptr, &deviceMemory ) != VK_SUCCESS )
+		if ( vkAllocateMemory( _device.device, &allocInfo, nullptr, &deviceMemory ) != VK_SUCCESS )
 			throw std::runtime_error( "failed to allocate image memory!" );
 		Debug::Get() << Debug::Severity::log << std::hex << "VkDeviceMemory        " << deviceMemory << std::dec << Debug::Endl();
 
-		vkBindImageMemory( _device.vkDevice, image, deviceMemory, 0 );
+		vkBindImageMemory( _device.device, image, deviceMemory, 0 );
 	}
 
 	//================================================================================================================================
@@ -219,7 +219,7 @@ namespace fan
 		viewInfo.format = _format;
 		viewInfo.subresourceRange = _subresourceRange;
 
-		if ( vkCreateImageView( _device.vkDevice, &viewInfo, nullptr, &imageView ) != VK_SUCCESS )
+		if ( vkCreateImageView( _device.device, &viewInfo, nullptr, &imageView ) != VK_SUCCESS )
 			throw std::runtime_error( "failed to create texture image view!" );
 
 		Debug::Get() << Debug::Severity::log << std::hex << "VkImageView           " << imageView << std::dec << Debug::Endl();

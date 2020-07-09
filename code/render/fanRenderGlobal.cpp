@@ -47,5 +47,9 @@ namespace fan
 	{
 		VK_EXT_DEBUG_REPORT_EXTENSION_NAME
 		, VK_KHR_SURFACE_EXTENSION_NAME
-	};		
+	};	
+
+	const std::vector < const char* > RenderGlobal::s_desiredDeviceExtensions = {
+		VK_KHR_SWAPCHAIN_EXTENSION_NAME
+	};
 }

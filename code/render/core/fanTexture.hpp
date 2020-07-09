@@ -10,7 +10,7 @@ WARNINGS_POP()
 
 namespace fan
 {
-	class Device;
+	struct Device;
 
 	//================================================================================================================================
 	// like an Image but generated from a png file

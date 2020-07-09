@@ -12,7 +12,7 @@ namespace fan
 {
 	class Mesh;
 	struct Vertex;
-	class Device;
+	struct Device;
 	class Descriptor;
 	class DescriptorTextures;
 	class DescriptorSampler;

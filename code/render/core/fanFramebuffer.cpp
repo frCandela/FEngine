@@ -35,7 +35,7 @@ namespace fan
 	{
 		for ( int framebufferIndex = 0; framebufferIndex < m_frameBuffers.size(); framebufferIndex++ )
 		{
-			vkDestroyFramebuffer( m_device.vkDevice, m_frameBuffers[ framebufferIndex ], nullptr );
+			vkDestroyFramebuffer( m_device.device, m_frameBuffers[ framebufferIndex ], nullptr );
 		} m_frameBuffers.clear();
 	}
 
@@ -71,7 +71,7 @@ namespace fan
 			framebufferCreateInfo.height = m_extent.height;
 			framebufferCreateInfo.layers = 1;
 
-			if ( vkCreateFramebuffer( m_device.vkDevice, &framebufferCreateInfo, nullptr, &m_frameBuffers[ frameIndex ] ) != VK_SUCCESS )
+			if ( vkCreateFramebuffer( m_device.device, &framebufferCreateInfo, nullptr, &m_frameBuffers[ frameIndex ] ) != VK_SUCCESS )
 			{
 				Debug::Error( "Could not create framebuffer" );
 				return false;

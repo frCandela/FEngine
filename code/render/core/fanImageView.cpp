@@ -11,7 +11,7 @@ namespace fan
 	{
 		if ( imageView != VK_NULL_HANDLE )
 		{
-			vkDestroyImageView( _device.vkDevice, imageView, nullptr );
+			vkDestroyImageView( _device.device, imageView, nullptr );
 			imageView = VK_NULL_HANDLE;
 		}
 	}
@@ -39,7 +39,7 @@ namespace fan
 		imageViewCreateInfo.subresourceRange.baseArrayLayer = 0;
 		imageViewCreateInfo.subresourceRange.layerCount		= VK_REMAINING_ARRAY_LAYERS;
 
-		VkResult result = vkCreateImageView( _device.vkDevice, &imageViewCreateInfo, nullptr, &imageView );
+		VkResult result = vkCreateImageView( _device.device, &imageViewCreateInfo, nullptr, &imageView );
 		Debug::Get() << Debug::Severity::log << std::hex << "VkImageView           " << imageView << std::dec << Debug::Endl();
 		return result == VK_SUCCESS;
 	}

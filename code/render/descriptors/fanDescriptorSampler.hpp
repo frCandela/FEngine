@@ -4,7 +4,7 @@
 
 namespace fan
 {
-	class Device;
+	struct Device;
 
 	//================================================================================================================================
 	// Utility for making sampler descriptors

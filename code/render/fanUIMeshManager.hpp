@@ -6,7 +6,7 @@
 namespace fan
 {
 	class UIMesh;
-	class Device;
+	struct Device;
 
 	//================================================================================================================================
 	// Owns all the ui meshes of the engine

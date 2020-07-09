@@ -5,7 +5,7 @@
 namespace fan
 {
 	struct Texture;
-	class Device;
+	struct Device;
 
 	//================================================================================================================================
 	// Owns all the textures of the engine

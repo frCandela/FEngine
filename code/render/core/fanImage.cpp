@@ -11,13 +11,13 @@ namespace fan
 	{
 		if ( image != VK_NULL_HANDLE )
 		{
-			vkDestroyImage( _device.vkDevice, image, VK_NULL_HANDLE );
+			vkDestroyImage( _device.device, image, VK_NULL_HANDLE );
 			image = VK_NULL_HANDLE;
 		}
 
 		if ( memory != VK_NULL_HANDLE )
 		{
-			vkFreeMemory( _device.vkDevice, memory, VK_NULL_HANDLE );
+			vkFreeMemory( _device.device, memory, VK_NULL_HANDLE );
 			memory = VK_NULL_HANDLE;
 		}
 	}
@@ -48,13 +48,13 @@ namespace fan
 		imageCreateInfo.pQueueFamilyIndices		= nullptr;
 		imageCreateInfo.initialLayout			= VK_IMAGE_LAYOUT_UNDEFINED;
 
-		if ( vkCreateImage( _device.vkDevice, &imageCreateInfo, VK_NULL_HANDLE, &image ) != VK_SUCCESS )
+		if ( vkCreateImage( _device.device, &imageCreateInfo, VK_NULL_HANDLE, &image ) != VK_SUCCESS )
 		{
 			Debug::Error( "Could not allocate image" );
 			return false;
 		}
 		VkMemoryRequirements memoryRequirements;
-		vkGetImageMemoryRequirements( _device.vkDevice, image, &memoryRequirements );
+		vkGetImageMemoryRequirements( _device.device, image, &memoryRequirements );
 
 		VkMemoryAllocateInfo bufferMemoryAllocateInfo;
 		bufferMemoryAllocateInfo.sType				= VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
@@ -62,13 +62,13 @@ namespace fan
 		bufferMemoryAllocateInfo.allocationSize		= memoryRequirements.size;
 		bufferMemoryAllocateInfo.memoryTypeIndex	= _device.FindMemoryType( memoryRequirements.memoryTypeBits, _memoryProperties );
 
-		if ( vkAllocateMemory( _device.vkDevice, &bufferMemoryAllocateInfo, nullptr, &memory ) != VK_SUCCESS )
+		if ( vkAllocateMemory( _device.device, &bufferMemoryAllocateInfo, nullptr, &memory ) != VK_SUCCESS )
 		{
 			Debug::Error( "Could not allocate buffer" );
 			return false;
 		}
 
-		if ( vkBindImageMemory( _device.vkDevice, image, memory, 0 ) != VK_SUCCESS )
+		if ( vkBindImageMemory( _device.device, image, memory, 0 ) != VK_SUCCESS )
 		{
 			Debug::Error( "Could not bind memory to image" );
 			return false;

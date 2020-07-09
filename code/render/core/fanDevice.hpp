@@ -9,58 +9,35 @@ namespace fan
 	struct Instance;
 
 	//================================================================================================================================
-	// Vulkan device (gpu)
+	// Vulkan device
 	//================================================================================================================================
-	class Device
+	struct Device
 	{
-	public:
-		Device( Instance* _instance, VkSurfaceKHR _surface );
-		~Device();
+		Device(){}
+		void Create( Instance& _instance, VkSurfaceKHR _surface );
+		void Destroy();
 
-		VkPhysicalDevice vkPhysicalDevice = VK_NULL_HANDLE;
-		VkDevice vkDevice = VK_NULL_HANDLE;
+		VkPhysicalDevice	physicalDevice	= VK_NULL_HANDLE;
+		VkDevice			device			= VK_NULL_HANDLE;
+		VkCommandPool		commandPool		= VK_NULL_HANDLE;
+		VkQueue				graphicsQueue	= VK_NULL_HANDLE;
 
-		VkCommandPool	GetCommandPool() const { return m_commandPool; }
-		VkQueue&		GetGraphicsQueue() { return m_graphicsQueue; }
-		uint32_t		GetGraphicsQueueFamilyIndex() { return m_graphicsQueueFamilyIndex; }
+		VkPhysicalDeviceProperties		 deviceProperties;
+		VkPhysicalDeviceMemoryProperties memoryProperties;
+
 		uint32_t		FindMemoryType( uint32_t _typeFilter, VkMemoryPropertyFlags _properties );
 		VkFormat		FindDepthFormat();
-
 		VkCommandBuffer BeginSingleTimeCommands();
 		void			EndSingleTimeCommands( VkCommandBuffer _commandBuffer );
-
-		const VkPhysicalDeviceProperties& GetDeviceProperties() const { return m_deviceProperties; }
-
+	
 	private:
 		Device( Device const& ) = delete;
-		Device& operator=( Device const& ) = delete;
-
-		Instance*		m_instance;
-		VkSurfaceKHR	m_surface;
-		VkCommandPool	m_commandPool;
-
-		VkPhysicalDeviceFeatures				m_availableFeatures;
-		VkPhysicalDeviceProperties				m_deviceProperties;
-		VkPhysicalDeviceMemoryProperties		m_memoryProperties;
-		std::vector<VkExtensionProperties>		m_availableExtensions;
-		std::vector<VkQueueFamilyProperties>	m_queueFamilyProperties;
-		uint32_t	m_graphicsQueueFamilyIndex;
-		uint32_t	m_computeQueueFamilyIndex;
-		uint32_t	m_presentQueueFamilyIndex;
-		VkQueue		m_graphicsQueue;
-		VkQueue		m_computeQueue;
-		VkQueue		m_presentQueue;
-
-		// Device
-		bool Create();
-		bool SelectPhysicalDevice();
-		std::vector < const char*> GetDesiredExtensions( const std::vector < const char*> _desiredExtensions );
-		bool IsExtensionAvailable( std::string _requiredExtension );
-		void GetQueueFamilies();
-
-		// Command pool
-		bool CreateCommandPool();
-		bool ResetCommandPool();
-
+		Device& operator=( Device const& ) = delete;	
+		
+		bool						SelectPhysicalDevice( Instance& _instance, VkPhysicalDeviceFeatures& _outAvailableFeatures, std::vector<VkExtensionProperties>& _outAvailableExtensions );
+		std::vector < const char*>	GetDesiredExtensions( const std::vector<VkExtensionProperties>& _availableExtensions, const std::vector < const char*> _desiredExtensions );
+		static bool					IsExtensionAvailable( const std::vector<VkExtensionProperties>& _availableExtensions, std::string _requiredExtension );
+		void						GetQueueFamiliesIndices( VkSurfaceKHR _surface, uint32_t& _outGraphics, uint32_t& _outCompute, uint32_t& _outPresent );
+		bool						ResetCommandPool();
 	};
 }

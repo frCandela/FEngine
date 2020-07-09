@@ -7,7 +7,7 @@
 namespace fan
 {
 	class Mesh;
-	class Device;
+	struct Device;
 
 	//================================================================================================================================
 	// Owns all the meshes of the engine

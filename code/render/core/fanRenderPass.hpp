@@ -5,17 +5,17 @@
 
 namespace fan
 {
-	class Device;
+	struct Device;
 
 	//================================================================================================================================
 	// abstraction of a vulkan render pass
 	//================================================================================================================================
 	struct RenderPass
 	{
-		bool Create( VkDevice _device, 	VkAttachmentDescription* _attachmentdescriptions,	uint32_t _countAttachments,  
+		bool Create( Device& _device, 	VkAttachmentDescription* _attachmentdescriptions,	uint32_t _countAttachments,  
 										VkSubpassDescription*	 _subpassDescriptions,		uint32_t _countSubpasses,
 										VkSubpassDependency*	 _dependencies,				uint32_t _countDependencies );
-		void Destroy( VkDevice _device );
+		void Destroy( Device& _device );
 
 		static VkAttachmentDescription	GetColorAttachment( const VkFormat _format, const VkImageLayout _finalLayout );
 		static VkAttachmentDescription	GetDepthAttachment( const VkFormat _format );

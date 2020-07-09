@@ -35,11 +35,11 @@ namespace fan
 		m_fragShader.Destroy( m_device );
 		m_vertShader.Destroy( m_device );
 
-		vkDestroyPipelineCache( m_device.vkDevice, m_pipelineCache, nullptr );
-		vkDestroyPipeline( m_device.vkDevice, m_pipeline, nullptr );
-		vkDestroyPipelineLayout( m_device.vkDevice, m_pipelineLayout, nullptr );
-		vkDestroyDescriptorPool( m_device.vkDevice, m_descriptorPool, nullptr );
-		vkDestroyDescriptorSetLayout( m_device.vkDevice, m_descriptorSetLayout, nullptr );
+		vkDestroyPipelineCache( m_device.device, m_pipelineCache, nullptr );
+		vkDestroyPipeline( m_device.device, m_pipeline, nullptr );
+		vkDestroyPipelineLayout( m_device.device, m_pipelineLayout, nullptr );
+		vkDestroyDescriptorPool( m_device.device, m_descriptorPool, nullptr );
+		vkDestroyDescriptorSetLayout( m_device.device, m_descriptorSetLayout, nullptr );
 
 		ImGui::DestroyContext();
 	}
@@ -80,7 +80,7 @@ namespace fan
 		writeDescriptorSetIcons.pImageInfo = &iconsDescriptorImageInfo;
 		writeDescriptorSetIcons.descriptorCount = 1;
 
-		vkUpdateDescriptorSets( m_device.vkDevice, 1, &writeDescriptorSetIcons, 0, nullptr );
+		vkUpdateDescriptorSets( m_device.device, 1, &writeDescriptorSetIcons, 0, nullptr );
 	}
 
 	//================================================================================================================================
@@ -294,7 +294,7 @@ namespace fan
 		descriptorPoolInfo.pPoolSizes = poolSizes.data();
 		descriptorPoolInfo.maxSets = 3;
 
-		vkCreateDescriptorPool( m_device.vkDevice, &descriptorPoolInfo, nullptr, &m_descriptorPool );
+		vkCreateDescriptorPool( m_device.device, &descriptorPoolInfo, nullptr, &m_descriptorPool );
 
 		// Descriptor set layout
 		VkDescriptorSetLayoutBinding setLayoutBinding{};
@@ -310,7 +310,7 @@ namespace fan
 		descriptorSetLayoutCreateInfo.pBindings = setLayoutBindings.data();
 		descriptorSetLayoutCreateInfo.bindingCount = static_cast< uint32_t >( setLayoutBindings.size() );
 
-		vkCreateDescriptorSetLayout( m_device.vkDevice, &descriptorSetLayoutCreateInfo, nullptr, &m_descriptorSetLayout );
+		vkCreateDescriptorSetLayout( m_device.device, &descriptorSetLayoutCreateInfo, nullptr, &m_descriptorSetLayout );
 
 		// Descriptor set
 		VkDescriptorSetLayout layouts[ 3 ] = { m_descriptorSetLayout ,m_descriptorSetLayout, m_descriptorSetLayout };
@@ -320,7 +320,7 @@ namespace fan
 		descriptorSetAllocateInfo.pSetLayouts = layouts;
 		descriptorSetAllocateInfo.descriptorSetCount = 3;
 
-		vkAllocateDescriptorSets( m_device.vkDevice, &descriptorSetAllocateInfo, m_descriptorSets );
+		vkAllocateDescriptorSets( m_device.device, &descriptorSetAllocateInfo, m_descriptorSets );
 
 		VkDescriptorImageInfo fontDescriptorImageInfo{};
 		fontDescriptorImageInfo.sampler = m_sampler.sampler;
@@ -363,7 +363,7 @@ namespace fan
 
 		std::vector<VkWriteDescriptorSet> writeDescriptorSets = { writeDescriptorSet, writeDescriptorSetIcons, writeDescriptorSet3DView };
 
-		vkUpdateDescriptorSets( m_device.vkDevice, static_cast< uint32_t >( writeDescriptorSets.size() ), writeDescriptorSets.data(), 0, nullptr );
+		vkUpdateDescriptorSets( m_device.device, static_cast< uint32_t >( writeDescriptorSets.size() ), writeDescriptorSets.data(), 0, nullptr );
 	}
 
 	//================================================================================================================================
@@ -385,7 +385,7 @@ namespace fan
 
 		std::vector<VkWriteDescriptorSet> writeDescriptorSets = { writeDescriptorSet3DView };
 
-		vkUpdateDescriptorSets( m_device.vkDevice, static_cast< uint32_t >( writeDescriptorSets.size() ), writeDescriptorSets.data(), 0, nullptr );
+		vkUpdateDescriptorSets( m_device.device, static_cast< uint32_t >( writeDescriptorSets.size() ), writeDescriptorSets.data(), 0, nullptr );
 	}
 
 	//================================================================================================================================
@@ -395,7 +395,7 @@ namespace fan
 		// Pipeline cache
 		VkPipelineCacheCreateInfo pipelineCacheCreateInfo = {};
 		pipelineCacheCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
-		vkCreatePipelineCache( m_device.vkDevice, &pipelineCacheCreateInfo, nullptr, &m_pipelineCache );
+		vkCreatePipelineCache( m_device.device, &pipelineCacheCreateInfo, nullptr, &m_pipelineCache );
 
 		// Push constants for UI rendering parameters
 		VkPushConstantRange pushConstantRange = {};
@@ -410,7 +410,7 @@ namespace fan
 		pipelineLayoutCreateInfo.pushConstantRangeCount = 1;
 		pipelineLayoutCreateInfo.pPushConstantRanges = &pushConstantRange;
 
-		vkCreatePipelineLayout( m_device.vkDevice, &pipelineLayoutCreateInfo, nullptr, &m_pipelineLayout );
+		vkCreatePipelineLayout( m_device.device, &pipelineLayoutCreateInfo, nullptr, &m_pipelineLayout );
 
 		// Setup graphics pipeline for UI rendering
 		VkPipelineInputAssemblyStateCreateInfo inputAssemblyState = {};
@@ -552,6 +552,6 @@ namespace fan
 		pipelineCreateInfo.pVertexInputState = &vertexInputState;
 		pipelineCreateInfo.subpass = 0;
 
-		vkCreateGraphicsPipelines( m_device.vkDevice, m_pipelineCache, 1, &pipelineCreateInfo, nullptr, &m_pipeline );
+		vkCreateGraphicsPipelines( m_device.device, m_pipelineCache, 1, &pipelineCreateInfo, nullptr, &m_pipeline );
 	}
 }

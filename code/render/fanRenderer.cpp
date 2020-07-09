@@ -100,7 +100,7 @@ namespace fan
 	{
 		Device& device = m_window.GetDevice();
 
-		vkDeviceWaitIdle( device.vkDevice );
+		vkDeviceWaitIdle( device.device );
 
 		delete m_imguiPipeline;
 		delete m_forwardPipeline;
@@ -140,9 +140,9 @@ namespace fan
 		delete m_gameFrameBuffers;
 		delete m_postProcessFramebuffers;
 
-		m_renderPassGame.Destroy( device.vkDevice );
-		m_renderPassPostprocess.Destroy( device.vkDevice );
-		m_renderPassImgui.Destroy( device.vkDevice );
+		m_renderPassGame.Destroy( device );
+		m_renderPassPostprocess.Destroy( device );
+		m_renderPassImgui.Destroy( device );
 
 		delete m_swapchainFramebuffers;
 
@@ -179,8 +179,8 @@ namespace fan
 		}
 		else
 		{
-			vkWaitForFences( m_window.GetDevice().vkDevice, 1, m_window.GetSwapChain().GetCurrentInFlightFence(), VK_TRUE, std::numeric_limits<uint64_t>::max() );
-			vkResetFences( m_window.GetDevice().vkDevice, 1, m_window.GetSwapChain().GetCurrentInFlightFence() );
+			vkWaitForFences( m_window.GetDevice().device, 1, m_window.GetSwapChain().GetCurrentInFlightFence(), VK_TRUE, std::numeric_limits<uint64_t>::max() );
+			vkResetFences( m_window.GetDevice().device, 1, m_window.GetSwapChain().GetCurrentInFlightFence() );
 		}
 
 		ImGui::GetIO().DisplaySize = ImVec2( static_cast< float >( m_window.GetSwapChain().extent.width ), static_cast< float >( m_window.GetSwapChain().extent.height ) );
@@ -265,7 +265,7 @@ namespace fan
 	//================================================================================================================================
 	void Renderer::WaitIdle()
 	{
-		vkDeviceWaitIdle( m_window.GetDevice().vkDevice );
+		vkDeviceWaitIdle( m_window.GetDevice().device );
 		Debug::Log( "Renderer idle" );
 	}
 
@@ -746,7 +746,7 @@ namespace fan
 		submitInfo.signalSemaphoreCount = 1;
 		submitInfo.pSignalSemaphores = m_window.GetSwapChain().GetCurrentRenderFinishedSemaphore();
 
-		VkResult result = vkQueueSubmit( m_window.GetDevice().GetGraphicsQueue(), 1, &submitInfo, *m_window.GetSwapChain().GetCurrentInFlightFence() );
+		VkResult result = vkQueueSubmit( m_window.GetDevice().graphicsQueue, 1, &submitInfo, *m_window.GetSwapChain().GetCurrentInFlightFence() );
 		if ( result != VK_SUCCESS )
 		{
 			Debug::Error( "Could not submit draw command buffer " );
@@ -762,7 +762,7 @@ namespace fan
 	{
 		Debug::Highlight( "Reloading shaders" );
 
-		vkDeviceWaitIdle( m_window.GetDevice().vkDevice );
+		vkDeviceWaitIdle( m_window.GetDevice().device );
 
 		CreateTextureDescriptor();
 		m_postprocessPipeline->ReloadShaders();
@@ -805,14 +805,14 @@ namespace fan
 	//================================================================================================================================
 	bool Renderer::CreateRenderPasses()
 	{
-		VkDevice device = m_window.GetDevice().vkDevice;
+		Device& device = m_window.GetDevice();
 		bool result = true;
 
 		// game
 		{
 			VkAttachmentDescription colorAtt = RenderPass::GetColorAttachment( m_window.GetSwapChain().surfaceFormat.format, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL );
 			VkAttachmentReference	colorAttRef = RenderPass::GetColorAttachmentReference( 0 );
-			VkAttachmentDescription depthAtt = RenderPass::GetDepthAttachment( m_window.GetDevice().FindDepthFormat() );
+			VkAttachmentDescription depthAtt = RenderPass::GetDepthAttachment( device.FindDepthFormat() );
 			VkAttachmentReference	depthAttRef = RenderPass::GetDepthAttachmentReference( 1 );
 			VkSubpassDescription	subpassDescription = RenderPass::GetSubpassDescription( &colorAttRef, 1, &depthAttRef );
 			VkSubpassDependency		subpassDependency = RenderPass::GetDependency();

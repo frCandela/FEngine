@@ -14,11 +14,11 @@ namespace fan
 		VkCommandBufferAllocateInfo commandBufferAllocateInfo;
 		commandBufferAllocateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
 		commandBufferAllocateInfo.pNext = nullptr;
-		commandBufferAllocateInfo.commandPool = _device.GetCommandPool();
+		commandBufferAllocateInfo.commandPool = _device.commandPool;
 		commandBufferAllocateInfo.level = _level;
 		commandBufferAllocateInfo.commandBufferCount = _size;
 
-		if( vkAllocateCommandBuffers( _device.vkDevice, &commandBufferAllocateInfo, buffers ) != VK_SUCCESS )
+		if( vkAllocateCommandBuffers( _device.device, &commandBufferAllocateInfo, buffers ) != VK_SUCCESS )
 		{
 			Debug::Error( "Could not allocate command buffers." );
 			return false;

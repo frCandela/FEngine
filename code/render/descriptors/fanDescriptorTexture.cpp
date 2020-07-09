@@ -31,7 +31,7 @@ namespace fan
 			descriptorPoolInfo.poolSizeCount = static_cast< uint32_t >( poolSizes.size() );
 			descriptorPoolInfo.pPoolSizes = poolSizes.data();
 			descriptorPoolInfo.maxSets = m_maxTextures;
-			vkCreateDescriptorPool( m_device.vkDevice, &descriptorPoolInfo, nullptr, &m_descriptorPool );
+			vkCreateDescriptorPool( m_device.device, &descriptorPoolInfo, nullptr, &m_descriptorPool );
 		}
 
 		// Descriptor set layout
@@ -49,7 +49,7 @@ namespace fan
 			descriptorSetLayoutCreateInfo.pBindings = setLayoutBindings.data();
 			descriptorSetLayoutCreateInfo.bindingCount = static_cast< uint32_t >( setLayoutBindings.size() );
 
-			vkCreateDescriptorSetLayout( m_device.vkDevice, &descriptorSetLayoutCreateInfo, nullptr, &m_descriptorSetLayout );
+			vkCreateDescriptorSetLayout( m_device.device, &descriptorSetLayoutCreateInfo, nullptr, &m_descriptorSetLayout );
 
 			Debug::Log() << "VkDescriptorSetAllocateInfo: " << m_maxTextures << Debug::Endl();
 			// Descriptor set
@@ -62,7 +62,7 @@ namespace fan
 			descriptorSetAllocateInfo.descriptorSetCount = m_maxTextures;
 
 			m_descriptorSets.resize( m_maxTextures );
-			vkAllocateDescriptorSets( m_device.vkDevice, &descriptorSetAllocateInfo, m_descriptorSets.data() );
+			vkAllocateDescriptorSets( m_device.device, &descriptorSetAllocateInfo, m_descriptorSets.data() );
 
 			Debug::Log() << " allocated " << m_maxTextures << Debug::Endl();
 		}
@@ -74,13 +74,13 @@ namespace fan
 	{
 		if ( m_descriptorPool != VK_NULL_HANDLE )
 		{
-			vkDestroyDescriptorPool( m_device.vkDevice, m_descriptorPool, nullptr );
+			vkDestroyDescriptorPool( m_device.device, m_descriptorPool, nullptr );
 			m_descriptorPool = VK_NULL_HANDLE;
 		}
 
 		if ( m_descriptorSetLayout != VK_NULL_HANDLE )
 		{
-			vkDestroyDescriptorSetLayout( m_device.vkDevice, m_descriptorSetLayout, nullptr );
+			vkDestroyDescriptorSetLayout( m_device.device, m_descriptorSetLayout, nullptr );
 			m_descriptorSetLayout = VK_NULL_HANDLE;
 		}
 	}
@@ -125,6 +125,6 @@ namespace fan
 			writeDescriptorSets[ viewIndex ].pImageInfo = &imageInfos[ viewIndex ];
 			writeDescriptorSets[ viewIndex ].descriptorCount = 1;
 		}
-		vkUpdateDescriptorSets( m_device.vkDevice, static_cast< uint32_t >( writeDescriptorSets.size() ), writeDescriptorSets.data(), 0, nullptr );
+		vkUpdateDescriptorSets( m_device.device, static_cast< uint32_t >( writeDescriptorSets.size() ), writeDescriptorSets.data(), 0, nullptr );
 	}
 }

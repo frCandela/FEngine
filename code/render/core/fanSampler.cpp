@@ -11,7 +11,7 @@ namespace fan
 	{
 		if( sampler != VK_NULL_HANDLE )
 		{
-			vkDestroySampler( _device.vkDevice, sampler, VK_NULL_HANDLE );
+			vkDestroySampler( _device.device, sampler, VK_NULL_HANDLE );
 			sampler = VK_NULL_HANDLE;
 		}
 	}
@@ -42,7 +42,7 @@ namespace fan
 		samplerInfo.maxLod = _maxLod;
 		samplerInfo.mipLodBias = 0;
 
-		if( vkCreateSampler( _device.vkDevice, &samplerInfo, VK_NULL_HANDLE, &sampler ) != VK_SUCCESS )
+		if( vkCreateSampler( _device.device, &samplerInfo, VK_NULL_HANDLE, &sampler ) != VK_SUCCESS )
 		{
 			Debug::Error() << "sampler creation failed" << Debug::Endl();
 		}

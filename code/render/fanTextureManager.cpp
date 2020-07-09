@@ -23,7 +23,7 @@ namespace fan
 	//================================================================================================================================
 	void TextureManager::Clear()
 	{
-		vkDeviceWaitIdle( m_device->vkDevice );
+		vkDeviceWaitIdle( m_device->device );
 		Debug::Highlight( "Renderer idle texture manager" );
 		while ( !m_textureList.empty() ) 
 		{ 

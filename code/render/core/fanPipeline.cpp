@@ -87,7 +87,7 @@ namespace fan
 		pipelineLayoutCreateInfo.pushConstantRangeCount = static_cast< uint32_t >( m_pushConstantRanges.size() );
 		pipelineLayoutCreateInfo.pPushConstantRanges = m_pushConstantRanges.data();
 
-		if ( vkCreatePipelineLayout( m_device.vkDevice, &pipelineLayoutCreateInfo, nullptr, &m_pipelineLayout ) != VK_SUCCESS )
+		if ( vkCreatePipelineLayout( m_device.device, &pipelineLayoutCreateInfo, nullptr, &m_pipelineLayout ) != VK_SUCCESS )
 		{
 			Debug::Error( "Could not allocate command pool." );
 			return false;
@@ -121,7 +121,7 @@ namespace fan
 		graphicsPipelineCreateInfo.basePipelineIndex = -1;
 
 		if ( vkCreateGraphicsPipelines(
-			m_device.vkDevice,
+			m_device.device,
 			VK_NULL_HANDLE,
 			1,
 			&graphicsPipelineCreateInfo,
@@ -297,13 +297,13 @@ namespace fan
 	{
 		if ( m_pipelineLayout != VK_NULL_HANDLE )
 		{
-			vkDestroyPipelineLayout( m_device.vkDevice, m_pipelineLayout, nullptr );
+			vkDestroyPipelineLayout( m_device.device, m_pipelineLayout, nullptr );
 			m_pipelineLayout = VK_NULL_HANDLE;
 		}
 
 		if ( m_pipeline != VK_NULL_HANDLE )
 		{
-			vkDestroyPipeline( m_device.vkDevice, m_pipeline, nullptr );
+			vkDestroyPipeline( m_device.device, m_pipeline, nullptr );
 			m_pipeline = VK_NULL_HANDLE;
 		}
 	}

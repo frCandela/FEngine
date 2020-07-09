@@ -45,5 +45,6 @@ namespace fan
 
 		static const std::vector < const char* > s_desiredValidationLayers;
 		static const std::vector < const char* > s_desiredInstanceExtensions;
+		static const std::vector < const char* > s_desiredDeviceExtensions;
 	};
 }

@@ -8,7 +8,7 @@
 
 namespace fan
 {
-	class Device;
+	struct Device;
 
 	//================================================================================================================================
 	// render target with attachments (color, depth, etc. )

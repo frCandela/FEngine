@@ -39,7 +39,7 @@ namespace fan
 		shaderModuleCreateInfo.codeSize = spirvCode.size() * sizeof( unsigned int );
 		shaderModuleCreateInfo.pCode = spirvCode.data();
 
-		if ( vkCreateShaderModule( _device.vkDevice, &shaderModuleCreateInfo, nullptr, &shaderModule ) != VK_SUCCESS )
+		if ( vkCreateShaderModule( _device.device, &shaderModuleCreateInfo, nullptr, &shaderModule ) != VK_SUCCESS )
 		{
 			Debug::Get() << Debug::Severity::error << "Could not create shader module: " << _path << Debug::Endl();
 			return false;
@@ -55,7 +55,7 @@ namespace fan
 	{
 		if( shaderModule != VK_NULL_HANDLE )
 		{
-			vkDestroyShaderModule( _device.vkDevice, shaderModule, nullptr );
+			vkDestroyShaderModule( _device.device, shaderModule, nullptr );
 			shaderModule = VK_NULL_HANDLE;
 		}
 	}

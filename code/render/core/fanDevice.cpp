@@ -3,27 +3,93 @@
 #include <vector>
 #include "render/core/fanInstance.hpp"
 #include "core/fanDebug.hpp"
+#include "render/fanRenderGlobal.hpp"
 
 namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	Device::Device( Instance* _instance, VkSurfaceKHR _surface ) :
-		m_instance( _instance ),
-		m_surface( _surface )
+	void Device::Create( Instance& _instance, VkSurfaceKHR _surface )
 	{
-		Create();
-		CreateCommandPool();
+		assert( device == VK_NULL_HANDLE );
+
+		VkPhysicalDeviceFeatures availableFeatures;
+		std::vector<VkExtensionProperties>	availableExtensions;
+		SelectPhysicalDevice( _instance, availableFeatures, availableExtensions );
+
+		std::vector< const char* > existingExtensions = GetDesiredExtensions( availableExtensions, RenderGlobal::s_desiredDeviceExtensions );
+
+		uint32_t graphicsQueueFamilyIndex = 0, computeQueueFamilyIndex = 0, presentQueueFamilyIndex = 0;
+		GetQueueFamiliesIndices( _surface, graphicsQueueFamilyIndex, computeQueueFamilyIndex, presentQueueFamilyIndex );
+
+		float queuePriority = 1.0f;
+		std::vector <VkDeviceQueueCreateInfo> queueCreateInfos;
+
+		VkDeviceQueueCreateInfo queueCreateInfo = {};
+		queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+		queueCreateInfo.pNext = nullptr;
+		queueCreateInfo.flags = 0;
+		queueCreateInfo.queueFamilyIndex = graphicsQueueFamilyIndex;
+		queueCreateInfo.queueCount = 1;
+		queueCreateInfo.pQueuePriorities = &queuePriority;
+		queueCreateInfos.push_back( queueCreateInfo );
+
+		VkPhysicalDeviceFeatures desiredFeatures = {};
+		desiredFeatures.samplerAnisotropy = availableFeatures.samplerAnisotropy == VK_TRUE;
+		desiredFeatures.shaderUniformBufferArrayDynamicIndexing = VK_TRUE;
+
+		VkPhysicalDeviceDescriptorIndexingFeaturesEXT indexingFeatures = {};
+		indexingFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES_EXT;
+		indexingFeatures.pNext = nullptr;
+		//indexingFeatures.runtimeDescriptorArray = VK_TRUE;
+
+		VkDeviceCreateInfo deviceCreateInfo = {};
+		deviceCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+		deviceCreateInfo.pNext = &indexingFeatures;
+		deviceCreateInfo.flags = 0;
+		deviceCreateInfo.queueCreateInfoCount = static_cast<uint32_t>( queueCreateInfos.size() );
+		deviceCreateInfo.pQueueCreateInfos = queueCreateInfos.data();
+		deviceCreateInfo.enabledLayerCount = static_cast<uint32_t>( _instance.enabledValidationLayers.size() );
+		deviceCreateInfo.ppEnabledLayerNames = _instance.enabledValidationLayers.data();
+		deviceCreateInfo.enabledExtensionCount = static_cast<uint32_t>( existingExtensions.size() );
+		deviceCreateInfo.ppEnabledExtensionNames = existingExtensions.data();
+		deviceCreateInfo.pEnabledFeatures = &desiredFeatures;
+
+		if( vkCreateDevice( physicalDevice, &deviceCreateInfo, nullptr, &device ) != VK_SUCCESS )
+		{
+			Debug::Error() << "vulkan device creation failed" << Debug::Endl();
+		}
+		Debug::Log() << std::hex << "vkDevice:             " << deviceProperties.deviceName << std::dec << Debug::Endl();
+
+		VkQueue		computeQueue = VK_NULL_HANDLE, presentQueue = VK_NULL_HANDLE;
+		vkGetDeviceQueue( device, graphicsQueueFamilyIndex, 0, &graphicsQueue );
+		vkGetDeviceQueue( device, computeQueueFamilyIndex, 0, &computeQueue );
+		vkGetDeviceQueue( device, presentQueueFamilyIndex, 0, &presentQueue );
+		vkGetPhysicalDeviceMemoryProperties( physicalDevice, &memoryProperties );
+
+		// Creates command pool 
+		assert( commandPool == VK_NULL_HANDLE );
+		VkCommandPoolCreateInfo commandPoolCreateInfo;
+		commandPoolCreateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+		commandPoolCreateInfo.pNext = nullptr;
+		commandPoolCreateInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
+		commandPoolCreateInfo.queueFamilyIndex = graphicsQueueFamilyIndex;
+
+		if( vkCreateCommandPool( device, &commandPoolCreateInfo, nullptr, &commandPool ) != VK_SUCCESS )
+		{
+			Debug::Error( "Could not allocate command pool." );
+		}
+		Debug::Log() << std::hex << "VkCommandPool         " << commandPool << std::dec << Debug::Endl();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	Device::~Device()
+	void Device::Destroy()
 	{
-		vkDestroyCommandPool( vkDevice, m_commandPool, nullptr );
+		vkDestroyCommandPool( device, commandPool, nullptr );
 
-		vkDestroyDevice( vkDevice, nullptr );
-		vkDevice = VK_NULL_HANDLE;
+		vkDestroyDevice( device, nullptr );
+		device = VK_NULL_HANDLE;
 	}
 
 	//================================================================================================================================
@@ -34,11 +100,11 @@ namespace fan
 		VkCommandBufferAllocateInfo allocInfo = {};
 		allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
 		allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-		allocInfo.commandPool = m_commandPool;
+		allocInfo.commandPool = commandPool;
 		allocInfo.commandBufferCount = 1;
 
 		VkCommandBuffer commandBuffer;
-		vkAllocateCommandBuffers( vkDevice, &allocInfo, &commandBuffer );
+		vkAllocateCommandBuffers( device, &allocInfo, &commandBuffer );
 
 		// Start recording the command buffer
 		VkCommandBufferBeginInfo beginInfo = {};
@@ -62,11 +128,11 @@ namespace fan
 		submitInfo.commandBufferCount = 1;
 		submitInfo.pCommandBuffers = &_commandBuffer;
 
-		vkQueueSubmit( GetGraphicsQueue(), 1, &submitInfo, VK_NULL_HANDLE );
-		vkQueueWaitIdle( GetGraphicsQueue() );
+		vkQueueSubmit( graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE );
+		vkQueueWaitIdle( graphicsQueue );
 
 		// Cleaning
-		vkFreeCommandBuffers( vkDevice, m_commandPool, 1, &_commandBuffer );
+		vkFreeCommandBuffers( device, commandPool, 1, &_commandBuffer );
 	}
 
 	//================================================================================================================================
@@ -75,7 +141,7 @@ namespace fan
 	{
 		VkCommandPoolResetFlags releaseResources = VK_COMMAND_POOL_RESET_RELEASE_RESOURCES_BIT;
 
-		if ( vkResetCommandPool( vkDevice, m_commandPool, releaseResources ) != VK_SUCCESS )
+		if ( vkResetCommandPool( device, commandPool, releaseResources ) != VK_SUCCESS )
 		{
 			Debug::Error( "Could not reset command pool." );
 			return false;
@@ -85,31 +151,12 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool Device::CreateCommandPool()
-	{
-		VkCommandPoolCreateInfo commandPoolCreateInfo;
-		commandPoolCreateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
-		commandPoolCreateInfo.pNext = nullptr;
-		commandPoolCreateInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
-		commandPoolCreateInfo.queueFamilyIndex = GetGraphicsQueueFamilyIndex();
-
-		if ( vkCreateCommandPool( vkDevice, &commandPoolCreateInfo, nullptr, &m_commandPool ) != VK_SUCCESS )
-		{
-			Debug::Error( "Could not allocate command pool." );
-			return false;
-		}
-		Debug::Get() << Debug::Severity::log << std::hex << "VkCommandPool         " << m_commandPool << std::dec << Debug::Endl();
-		return true;
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
 	uint32_t Device::FindMemoryType( uint32_t _typeFilter, VkMemoryPropertyFlags _properties )
 	{
 		//check for the support of the properties
-		for ( uint32_t propertyIndex = 0; propertyIndex < m_memoryProperties.memoryTypeCount; propertyIndex++ )
+		for ( uint32_t propertyIndex = 0; propertyIndex < memoryProperties.memoryTypeCount; propertyIndex++ )
 		{
-			if ( ( _typeFilter & ( 1 << propertyIndex ) ) && ( m_memoryProperties.memoryTypes[ propertyIndex ].propertyFlags & _properties ) == _properties )
+			if ( ( _typeFilter & ( 1 << propertyIndex ) ) && ( memoryProperties.memoryTypes[ propertyIndex ].propertyFlags & _properties ) == _properties )
 			{
 				return propertyIndex;
 			}
@@ -133,7 +180,7 @@ namespace fan
 		for ( int candidateIndex = 0; candidateIndex < candidates.size(); candidateIndex++ )
 		{
 			VkFormatProperties props;
-			vkGetPhysicalDeviceFormatProperties( vkPhysicalDevice, candidates[ candidateIndex ], &props );
+			vkGetPhysicalDeviceFormatProperties( physicalDevice, candidates[ candidateIndex ], &props );
 
 			if ( tiling == VK_IMAGE_TILING_LINEAR && ( props.linearTilingFeatures & features ) == features )
 			{
@@ -150,86 +197,26 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool Device::Create()
-	{
-		SelectPhysicalDevice();
-		GetQueueFamilies();
-		std::vector< const char* > existingExtensions = GetDesiredExtensions(
-			{ VK_KHR_SWAPCHAIN_EXTENSION_NAME
-
-			}
-		);
-
-		float queuePriority = 1.0f;
-		std::vector <VkDeviceQueueCreateInfo> queueCreateInfos;
-
-		VkDeviceQueueCreateInfo queueCreateInfo = {};
-		queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-		queueCreateInfo.pNext = nullptr;
-		queueCreateInfo.flags = 0;
-		queueCreateInfo.queueFamilyIndex = m_graphicsQueueFamilyIndex;
-		queueCreateInfo.queueCount = 1;
-		queueCreateInfo.pQueuePriorities = &queuePriority;
-		queueCreateInfos.push_back( queueCreateInfo );
-
-		VkPhysicalDeviceFeatures desiredFeatures = {};
-		desiredFeatures.samplerAnisotropy = m_availableFeatures.samplerAnisotropy == VK_TRUE;
-		desiredFeatures.shaderUniformBufferArrayDynamicIndexing = VK_TRUE;
-
-		VkPhysicalDeviceDescriptorIndexingFeaturesEXT indexingFeatures = {};
-		indexingFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES_EXT;
-		indexingFeatures.pNext = nullptr;
-		//indexingFeatures.runtimeDescriptorArray = VK_TRUE;
-
-		VkDeviceCreateInfo deviceCreateInfo = {};
-		deviceCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-		deviceCreateInfo.pNext = &indexingFeatures;
-		deviceCreateInfo.flags = 0;
-		deviceCreateInfo.queueCreateInfoCount = static_cast< uint32_t >( queueCreateInfos.size() );
-		deviceCreateInfo.pQueueCreateInfos = queueCreateInfos.data();
-		deviceCreateInfo.enabledLayerCount = static_cast< uint32_t >( m_instance->enabledValidationLayers.size() );
-		deviceCreateInfo.ppEnabledLayerNames = m_instance->enabledValidationLayers.data();
-		deviceCreateInfo.enabledExtensionCount = static_cast< uint32_t >( existingExtensions.size() );
-		deviceCreateInfo.ppEnabledExtensionNames = existingExtensions.data();
-		deviceCreateInfo.pEnabledFeatures = &desiredFeatures;
-
-		if ( vkCreateDevice( vkPhysicalDevice, &deviceCreateInfo, nullptr, &vkDevice ) != VK_SUCCESS )
-		{
-			return false;
-		}
-		Debug::Get() << Debug::Severity::log << std::hex << "vkDevice:             " << m_deviceProperties.deviceName << std::dec << Debug::Endl();
-
-		vkGetDeviceQueue( vkDevice, m_graphicsQueueFamilyIndex, 0, &m_graphicsQueue );
-		vkGetDeviceQueue( vkDevice, m_computeQueueFamilyIndex, 0, &m_computeQueue );
-		vkGetDeviceQueue( vkDevice, m_presentQueueFamilyIndex, 0, &m_presentQueue );
-
-		vkGetPhysicalDeviceMemoryProperties( vkPhysicalDevice, &m_memoryProperties );
-
-		return true;
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	bool Device::SelectPhysicalDevice()
+	bool Device::SelectPhysicalDevice( Instance& _instance, VkPhysicalDeviceFeatures& _outAvailableFeatures, std::vector<VkExtensionProperties>& _outAvailableExtensions )
 	{
 		uint32_t devicesCount;
-		if ( vkEnumeratePhysicalDevices( m_instance->instance, &devicesCount, nullptr ) != VK_SUCCESS ) { return false; }
+		if ( vkEnumeratePhysicalDevices( _instance.instance, &devicesCount, nullptr ) != VK_SUCCESS ) { return false; }
 		std::vector< VkPhysicalDevice> availableDevices( devicesCount );
-		if ( vkEnumeratePhysicalDevices( m_instance->instance, &devicesCount, availableDevices.data() ) != VK_SUCCESS ) { return false; }
+		if ( vkEnumeratePhysicalDevices( _instance.instance, &devicesCount, availableDevices.data() ) != VK_SUCCESS ) { return false; }
 
 		for ( int deviceIndex = 0; deviceIndex < availableDevices.size(); deviceIndex++ )
 		{
-			vkPhysicalDevice = availableDevices[ deviceIndex ];
+			physicalDevice = availableDevices[ deviceIndex ];
 
 			uint32_t extensionsCount;
-			if ( vkEnumerateDeviceExtensionProperties( vkPhysicalDevice, nullptr, &extensionsCount, nullptr ) != VK_SUCCESS ) { return false; }
-			m_availableExtensions.resize( extensionsCount );
-			if ( vkEnumerateDeviceExtensionProperties( vkPhysicalDevice, nullptr, &extensionsCount, m_availableExtensions.data() ) != VK_SUCCESS ) { return false; }
+			if ( vkEnumerateDeviceExtensionProperties( physicalDevice, nullptr, &extensionsCount, nullptr ) != VK_SUCCESS ) { return false; }
+			_outAvailableExtensions.resize( extensionsCount );
+			if ( vkEnumerateDeviceExtensionProperties( physicalDevice, nullptr, &extensionsCount, _outAvailableExtensions.data() ) != VK_SUCCESS ) { return false; }
 
-			vkGetPhysicalDeviceProperties( vkPhysicalDevice, &m_deviceProperties );
-			vkGetPhysicalDeviceFeatures( vkPhysicalDevice, &m_availableFeatures );
+			vkGetPhysicalDeviceProperties( physicalDevice, &deviceProperties );
+			vkGetPhysicalDeviceFeatures( physicalDevice, &_outAvailableFeatures );
 
-			if ( m_deviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU )
+			if ( deviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU )
 			{
 				break;
 			}
@@ -239,14 +226,14 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	std::vector < const char*> Device::GetDesiredExtensions( const std::vector < const char*> _desiredExtensions )
+	std::vector < const char*> Device::GetDesiredExtensions( const std::vector<VkExtensionProperties>& _availableExtensions, const std::vector < const char*> _desiredExtensions )
 	{
 		std::vector < const char*> existingExtensions;
 		existingExtensions.reserve( _desiredExtensions.size() );
 
 		for ( int extensionIndex = 0; extensionIndex < _desiredExtensions.size(); extensionIndex++ )
 		{
-			if ( IsExtensionAvailable( _desiredExtensions[ extensionIndex ] ) )
+			if ( IsExtensionAvailable( _availableExtensions, _desiredExtensions[ extensionIndex ] ) )
 			{
 				existingExtensions.push_back( _desiredExtensions[ extensionIndex ] );
 			}
@@ -256,11 +243,11 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool Device::IsExtensionAvailable( std::string _requiredExtension )
+	bool Device::IsExtensionAvailable( const std::vector<VkExtensionProperties>& _availableExtensions, std::string _requiredExtension )
 	{
-		for ( int availableExtensionIndex = 0; availableExtensionIndex < m_availableExtensions.size(); availableExtensionIndex++ )
+		for ( int availableExtensionIndex = 0; availableExtensionIndex < _availableExtensions.size(); availableExtensionIndex++ )
 		{
-			if ( _requiredExtension.compare( m_availableExtensions[ availableExtensionIndex ].extensionName ) == 0 )
+			if ( _requiredExtension.compare( _availableExtensions[ availableExtensionIndex ].extensionName ) == 0 )
 			{
 				return true;
 			}
@@ -268,46 +255,48 @@ namespace fan
 		return false;
 	}
 
+	
+
 	//================================================================================================================================
 	//================================================================================================================================
-	void Device::GetQueueFamilies()
+	void Device::GetQueueFamiliesIndices( VkSurfaceKHR _surface, uint32_t& _outGraphics, uint32_t& _outCompute, uint32_t& _outPresent )
 	{
 		uint32_t queueFamiliesCount;
-		vkGetPhysicalDeviceQueueFamilyProperties( vkPhysicalDevice, &queueFamiliesCount, nullptr );
-		m_queueFamilyProperties.resize( queueFamiliesCount );
-		vkGetPhysicalDeviceQueueFamilyProperties( vkPhysicalDevice, &queueFamiliesCount, m_queueFamilyProperties.data() );
+		vkGetPhysicalDeviceQueueFamilyProperties( physicalDevice, &queueFamiliesCount, nullptr );
+		std::vector<VkQueueFamilyProperties>	queueFamilyProperties( queueFamiliesCount );
+		vkGetPhysicalDeviceQueueFamilyProperties( physicalDevice, &queueFamiliesCount, queueFamilyProperties.data() );
 
 		VkQueueFlags desiredGraphicsCapabilities = VK_QUEUE_GRAPHICS_BIT;
 		VkQueueFlags desiredComputeCapabilities = VK_QUEUE_COMPUTE_BIT;
 
-		for ( int queueIndex = 0; queueIndex < m_queueFamilyProperties.size(); queueIndex++ )
+		for ( int queueIndex = 0; queueIndex < queueFamilyProperties.size(); queueIndex++ )
 		{
-			if ( ( m_queueFamilyProperties[ queueIndex ].queueCount > 0 ) &&
-				( m_queueFamilyProperties[ queueIndex ].queueFlags & desiredGraphicsCapabilities ) )
+			if ( ( queueFamilyProperties[ queueIndex ].queueCount > 0 ) &&
+				( queueFamilyProperties[ queueIndex ].queueFlags & desiredGraphicsCapabilities ) )
 			{
-				m_graphicsQueueFamilyIndex = queueIndex;
+				_outGraphics = queueIndex;
 				break;
 			}
 		}
-		for ( int queueIndex = 0; queueIndex < m_queueFamilyProperties.size(); queueIndex++ )
+		for ( int queueIndex = 0; queueIndex < queueFamilyProperties.size(); queueIndex++ )
 		{
-			if ( ( m_queueFamilyProperties[ queueIndex ].queueCount > 0 ) &&
-				( m_queueFamilyProperties[ queueIndex ].queueFlags & desiredComputeCapabilities ) )
+			if ( ( queueFamilyProperties[ queueIndex ].queueCount > 0 ) &&
+				( queueFamilyProperties[ queueIndex ].queueFlags & desiredComputeCapabilities ) )
 			{
-				m_computeQueueFamilyIndex = queueIndex;
+				_outCompute = queueIndex;
 				break;
 			}
 		}
 
-		for ( int queueIndex = 0; queueIndex < m_queueFamilyProperties.size(); queueIndex++ )
+		for ( int queueIndex = 0; queueIndex < queueFamilyProperties.size(); queueIndex++ )
 		{
-			if ( m_queueFamilyProperties[ queueIndex ].queueCount > 0 )
+			if ( queueFamilyProperties[ queueIndex ].queueCount > 0 )
 			{
 				VkBool32 presentationSupported;
-				if ( vkGetPhysicalDeviceSurfaceSupportKHR( vkPhysicalDevice, queueIndex, m_surface, &presentationSupported ) == VK_SUCCESS &&
+				if ( vkGetPhysicalDeviceSurfaceSupportKHR( physicalDevice, queueIndex, _surface, &presentationSupported ) == VK_SUCCESS &&
 					 presentationSupported == VK_TRUE )
 				{
-					m_presentQueueFamilyIndex = queueIndex;
+					_outPresent = queueIndex;
 					break;
 				}
 			}

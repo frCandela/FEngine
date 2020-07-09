@@ -44,15 +44,15 @@ namespace fan
 
 		for( int i = 0; i < s_maxFramesInFlight; i++ )
 		{
-			vkDestroySemaphore( _device.vkDevice, imagesAvailableSemaphores[i], nullptr );
-			vkDestroySemaphore( _device.vkDevice, renderFinishedSemaphores[i], nullptr );
-			vkDestroyFence( _device.vkDevice, inFlightFences[i], nullptr );
+			vkDestroySemaphore( _device.device, imagesAvailableSemaphores[i], nullptr );
+			vkDestroySemaphore( _device.device, renderFinishedSemaphores[i], nullptr );
+			vkDestroyFence( _device.device, inFlightFences[i], nullptr );
 			imagesAvailableSemaphores[i] = VK_NULL_HANDLE;
 			renderFinishedSemaphores[i] = VK_NULL_HANDLE;
 			inFlightFences[i]			= VK_NULL_HANDLE;
 		}
 
-		vkDestroySwapchainKHR( _device.vkDevice, swapchain, nullptr );
+		vkDestroySwapchainKHR( _device.device, swapchain, nullptr );
 		swapchain = VK_NULL_HANDLE;
 	}
 
@@ -60,7 +60,7 @@ namespace fan
 	//================================================================================================================================
 	VkResult SwapChain::AcquireNextImage( Device& _device )
 	{
-		return vkAcquireNextImageKHR( _device.vkDevice, swapchain, std::numeric_limits<uint64_t>::max(), imagesAvailableSemaphores[ currentFrame ], VK_NULL_HANDLE, &currentImageIndex );
+		return vkAcquireNextImageKHR( _device.device, swapchain, std::numeric_limits<uint64_t>::max(), imagesAvailableSemaphores[ currentFrame ], VK_NULL_HANDLE, &currentImageIndex );
 	}
 
 	//================================================================================================================================
@@ -77,7 +77,7 @@ namespace fan
 		presentInfo.pImageIndices = &currentImageIndex;
 		presentInfo.pResults = nullptr;
 
-		if ( vkQueuePresentKHR( _device.GetGraphicsQueue(), &presentInfo ) != VK_SUCCESS )
+		if ( vkQueuePresentKHR( _device.graphicsQueue, &presentInfo ) != VK_SUCCESS )
 		{
 			Debug::Warning( "Could not present image to graphics queue" );
 			return false;
@@ -92,10 +92,10 @@ namespace fan
 		std::vector<VkPresentModeKHR>	supportedPresentModes;
 
 		uint32_t presentModeCount;
-		vkGetPhysicalDeviceSurfacePresentModesKHR( _device.vkPhysicalDevice, surface, &presentModeCount, nullptr );
+		vkGetPhysicalDeviceSurfacePresentModesKHR( _device.physicalDevice, surface, &presentModeCount, nullptr );
 		supportedPresentModes.clear();
 		supportedPresentModes.resize( presentModeCount );
-		vkGetPhysicalDeviceSurfacePresentModesKHR( _device.vkPhysicalDevice, surface, &presentModeCount, supportedPresentModes.data() );
+		vkGetPhysicalDeviceSurfacePresentModesKHR( _device.physicalDevice, surface, &presentModeCount, supportedPresentModes.data() );
 
 		for ( int presentModeIndex = 0; presentModeIndex < supportedPresentModes.size(); presentModeIndex++ )
 		{
@@ -160,10 +160,10 @@ namespace fan
 	VkSurfaceFormatKHR SwapChain::FindDesiredSurfaceFormat( Device& _device, VkSurfaceFormatKHR _desiredSurfaceFormat ) const
 	{
 		uint32_t formatsCount;
-		vkGetPhysicalDeviceSurfaceFormatsKHR( _device.vkPhysicalDevice, surface, &formatsCount, nullptr );
+		vkGetPhysicalDeviceSurfaceFormatsKHR( _device.physicalDevice, surface, &formatsCount, nullptr );
 		std::vector<VkSurfaceFormatKHR> supportedSurfaceFormats;
 		supportedSurfaceFormats.resize( formatsCount );
-		vkGetPhysicalDeviceSurfaceFormatsKHR( _device.vkPhysicalDevice, surface, &formatsCount, supportedSurfaceFormats.data() );
+		vkGetPhysicalDeviceSurfaceFormatsKHR( _device.physicalDevice, surface, &formatsCount, supportedSurfaceFormats.data() );
 
 		if ( supportedSurfaceFormats.size() == 1 && supportedSurfaceFormats[ 0 ].format == VK_FORMAT_UNDEFINED )
 		{
@@ -195,7 +195,7 @@ namespace fan
 	void SwapChain::CreateSwapChain( Device& _device, VkExtent2D _desiredSize )
 	{
 		VkSurfaceCapabilitiesKHR surfaceCapabilities;
-		vkGetPhysicalDeviceSurfaceCapabilitiesKHR( _device.vkPhysicalDevice, surface, &surfaceCapabilities );
+		vkGetPhysicalDeviceSurfaceCapabilitiesKHR( _device.physicalDevice, surface, &surfaceCapabilities );
 
 		imagesCount						   = FindDesiredNumberOfImages( surfaceCapabilities, s_maxFramesInFlight );
 		extent							   = FindDesiredImagesSize( surfaceCapabilities, _desiredSize );
@@ -225,18 +225,18 @@ namespace fan
 		swapchainCreateInfo.clipped = VK_TRUE;
 		swapchainCreateInfo.oldSwapchain = oldSwapchain;
 
-		vkCreateSwapchainKHR( _device.vkDevice, &swapchainCreateInfo, nullptr, &swapchain );
+		vkCreateSwapchainKHR( _device.device, &swapchainCreateInfo, nullptr, &swapchain );
 		Debug::Get() << Debug::Severity::log << std::hex << "VkSwapchainKHR        " << swapchain << std::dec << Debug::Endl();
 
 		if ( oldSwapchain != VK_NULL_HANDLE )
 		{
-			vkDestroySwapchainKHR( _device.vkDevice, oldSwapchain, nullptr );
+			vkDestroySwapchainKHR( _device.device, oldSwapchain, nullptr );
 		}
 
 		uint32_t count;
-		vkGetSwapchainImagesKHR( _device.vkDevice, swapchain, &count, nullptr );
+		vkGetSwapchainImagesKHR( _device.device, swapchain, &count, nullptr );
 		assert( count == imagesCount );
-		if( vkGetSwapchainImagesKHR( _device.vkDevice, swapchain, &count, images ) == VK_INCOMPLETE )
+		if( vkGetSwapchainImagesKHR( _device.device, swapchain, &count, images ) == VK_INCOMPLETE )
 		{
 			Debug::Error() << "vkGetSwapchainImagesKHR failed." << Debug::Endl();
 		}
@@ -263,9 +263,9 @@ namespace fan
 
 		for ( int semaphoreIndex = 0; semaphoreIndex < s_maxFramesInFlight; semaphoreIndex++ )
 		{
-			vkCreateSemaphore( _device.vkDevice, &semaphoreCreateInfo, nullptr, &imagesAvailableSemaphores[ semaphoreIndex ] );
-			vkCreateSemaphore( _device.vkDevice, &semaphoreCreateInfo, nullptr, &renderFinishedSemaphores[ semaphoreIndex ] );
-			vkCreateFence( _device.vkDevice, &fenceCreateInfo, nullptr, &inFlightFences[ semaphoreIndex ] );
+			vkCreateSemaphore( _device.device, &semaphoreCreateInfo, nullptr, &imagesAvailableSemaphores[ semaphoreIndex ] );
+			vkCreateSemaphore( _device.device, &semaphoreCreateInfo, nullptr, &renderFinishedSemaphores[ semaphoreIndex ] );
+			vkCreateFence( _device.device, &fenceCreateInfo, nullptr, &inFlightFences[ semaphoreIndex ] );
 
 			Debug::Get() << Debug::Severity::log << std::hex << "VkSemaphore           " << imagesAvailableSemaphores[ semaphoreIndex ] << std::dec << Debug::Endl();
 			Debug::Get() << Debug::Severity::log << std::hex << "VkSemaphore           " << renderFinishedSemaphores[ semaphoreIndex ] << std::dec << Debug::Endl();

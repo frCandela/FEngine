@@ -17,7 +17,7 @@ namespace fan
 	{
 
 		// Calculate required alignment based on minimum device offset alignment
-		size_t minUboAlignment = (size_t)m_device.GetDeviceProperties().limits.minUniformBufferOffsetAlignment;
+		size_t minUboAlignment = (size_t)m_device.deviceProperties.limits.minUniformBufferOffsetAlignment;
 		size_t dynamicAlignmentVert = sizeof( DynamicUniformUIVert );
 		if ( minUboAlignment > 0 )
 		{

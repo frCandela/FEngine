@@ -8,7 +8,7 @@ namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	bool RenderPass::Create( VkDevice _device,	VkAttachmentDescription* _attachmentdescriptions,	uint32_t _countAttachments,
+	bool RenderPass::Create( Device& _device,	VkAttachmentDescription* _attachmentdescriptions,	uint32_t _countAttachments,
 												VkSubpassDescription* _subpassDescriptions,			uint32_t _countSubpasses,
 												VkSubpassDependency* _dependencies,					uint32_t _countDependencies ) 
 	{
@@ -25,7 +25,7 @@ namespace fan
 		renderPassCreateInfo.dependencyCount	= _countDependencies;
 		renderPassCreateInfo.pDependencies		= _dependencies;
 
-		if( vkCreateRenderPass( _device, &renderPassCreateInfo, nullptr, &renderPass ) != VK_SUCCESS )
+		if( vkCreateRenderPass( _device.device, &renderPassCreateInfo, nullptr, &renderPass ) != VK_SUCCESS )
 		{
 			Debug::Error( "Could not create render pass" );
 			return false;
@@ -37,11 +37,11 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void RenderPass::Destroy( VkDevice _device )
+	void RenderPass::Destroy( Device& _device )
 	{
 		if( renderPass != VK_NULL_HANDLE )
 		{
-			vkDestroyRenderPass( _device, renderPass, VK_NULL_HANDLE );
+			vkDestroyRenderPass( _device.device, renderPass, VK_NULL_HANDLE );
 		}
 	}
 
