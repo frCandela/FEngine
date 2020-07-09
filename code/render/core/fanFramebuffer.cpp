@@ -3,129 +3,119 @@
 #include <cassert>
 #include "core/fanDebug.hpp"
 #include "render/core/fanDevice.hpp"
+#include "render/core/fanRenderPass.hpp"
 
 namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	FrameBuffer::FrameBuffer( Device& _device, const VkExtent2D _extent )
-		: m_device( _device )
-		, m_extent( _extent )
-	{}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	FrameBuffer::~FrameBuffer()
+	void FrameBuffer::Create( Device& _device, const size_t _count, const VkExtent2D _extent, RenderPass& _renderPass, ImageView* _externalAttachments )
 	{
-		// color attachment
-		m_colorImageView.Destroy( m_device );
-		m_colorImage.Destroy( m_device );
-		m_colorSampler.Destroy( m_device );
-
-		// depth attachment
-		m_depthImageView.Destroy( m_device );
-		m_depthImage.Destroy( m_device );
-
-		DestroyFrameBuffers();
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void FrameBuffer::DestroyFrameBuffers()
-	{
-		for ( int framebufferIndex = 0; framebufferIndex < m_frameBuffers.size(); framebufferIndex++ )
-		{
-			vkDestroyFramebuffer( m_device.mDevice, m_frameBuffers[ framebufferIndex ], nullptr );
-		} m_frameBuffers.clear();
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	bool FrameBuffer::Create( const size_t _count, VkRenderPass _renderPass )
-	{
-		m_count = _count;
-		m_renderPass = _renderPass;
-
 		std::vector<VkImageView> commonAttachments;
 		if( m_colorImageView.mImageView != VK_NULL_HANDLE ) { commonAttachments.push_back( m_colorImageView.mImageView ); }
 		if( m_depthImageView.mImageView != VK_NULL_HANDLE ) { commonAttachments.push_back( m_depthImageView.mImageView ); }
 
-		assert( m_frameBuffers.empty() );
-		m_frameBuffers.resize( _count );
-		for ( int frameIndex = 0; frameIndex < _count; frameIndex++ )
+		for( int frameIndex = 0; frameIndex < _count; frameIndex++ )
 		{
+			assert( mFrameBuffers[frameIndex] == VK_NULL_HANDLE );
 			std::vector<VkImageView> attachments = commonAttachments;
-			if ( m_externalAttachments != nullptr )
+			if( _externalAttachments != nullptr )
 			{
-				attachments.push_back( m_externalAttachments[ frameIndex ].mImageView );
+				attachments.push_back( _externalAttachments[frameIndex].mImageView );
 			}
 
 			VkFramebufferCreateInfo framebufferCreateInfo;
 			framebufferCreateInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
 			framebufferCreateInfo.pNext = nullptr;
 			framebufferCreateInfo.flags = 0;
-			framebufferCreateInfo.renderPass = _renderPass;
-			framebufferCreateInfo.attachmentCount = static_cast< uint32_t >( attachments.size() );
+			framebufferCreateInfo.renderPass = _renderPass.mRenderPass;
+			framebufferCreateInfo.attachmentCount = static_cast<uint32_t>( attachments.size() );
 			framebufferCreateInfo.pAttachments = attachments.data();
-			framebufferCreateInfo.width = m_extent.width;
-			framebufferCreateInfo.height = m_extent.height;
+			framebufferCreateInfo.width = _extent.width;
+			framebufferCreateInfo.height = _extent.height;
 			framebufferCreateInfo.layers = 1;
 
-			if ( vkCreateFramebuffer( m_device.mDevice, &framebufferCreateInfo, nullptr, &m_frameBuffers[ frameIndex ] ) != VK_SUCCESS )
+			if( vkCreateFramebuffer( _device.mDevice, &framebufferCreateInfo, nullptr, &mFrameBuffers[frameIndex] ) != VK_SUCCESS )
 			{
 				Debug::Error( "Could not create framebuffer" );
-				return false;
-			} Debug::Get() << Debug::Severity::log << std::hex << "VkFramebuffer         " << m_frameBuffers[ frameIndex ] << std::dec << Debug::Endl();
+			} Debug::Get() << Debug::Severity::log << std::hex << "VkFramebuffer         " << mFrameBuffers[frameIndex] << std::dec << Debug::Endl();
 		}
-		return true;
+	}
+
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void FrameBuffer::Destroy( Device& _device )
+	{
+		// color attachment
+		m_colorImageView.Destroy( _device );
+		m_colorImage.Destroy( _device );
+		m_colorSampler.Destroy( _device );
+
+		// depth attachment
+		m_depthImageView.Destroy( _device );
+		m_depthImage.Destroy( _device );
+
+		DestroyFrameBuffers( _device );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void FrameBuffer::Resize( const VkExtent2D _extent )
+	void FrameBuffer::DestroyFrameBuffers( Device& _device )
 	{
-		m_extent = _extent;
+		for ( int framebufferIndex = 0; framebufferIndex < SwapChain::s_maxFramesInFlight; framebufferIndex++ )
+		{
+			if( mFrameBuffers[framebufferIndex] != VK_NULL_HANDLE )
+			{
+				vkDestroyFramebuffer( _device.mDevice, mFrameBuffers[framebufferIndex], nullptr );
+				mFrameBuffers[framebufferIndex] = VK_NULL_HANDLE;
+			}
+		}
+	}
 
+	//================================================================================================================================
+	//================================================================================================================================
+	void FrameBuffer::Resize( Device& _device, const size_t _count, const VkExtent2D _extent, RenderPass& _renderPass, ImageView* _externalAttachments )
+	{
 		// Rebuild color attachment
 		if ( m_colorImageView.mImageView != VK_NULL_HANDLE )
 		{
-			m_colorImage.Destroy( m_device );
-			m_colorImageView.Destroy( m_device );
-			CreateColorImageAndView( m_device, m_colorFormat, _extent );
+			m_colorImage.Destroy( _device );
+			m_colorImageView.Destroy( _device );
+			CreateColorImageAndView( _device, m_colorFormat, _extent );
 		}
 
 		// Rebuild depth attachment
 		if ( m_depthImageView.mImageView != VK_NULL_HANDLE )
 		{
-			CreateDepthResources( m_device );
+			CreateDepthResources( _device, _extent );
 		}
 
-		DestroyFrameBuffers();
-		Create( m_count, m_renderPass );
+		DestroyFrameBuffers( _device );
+		Create( _device, _count, _extent, _renderPass, _externalAttachments );
 	}
 
 	//================================================================================================================================
 	// Only one depth attachment needed for all swapchain images
 	//================================================================================================================================
-	void FrameBuffer::AddDepthAttachment()
+	void FrameBuffer::AddDepthAttachment( Device& _device, const VkExtent2D _extent )
 	{
-		assert( m_depthImageView.mImageView == VK_NULL_HANDLE );
-		depthFormat = m_device.FindDepthFormat();
-		CreateDepthResources( m_device );
+		assert( m_depthImageView.mImageView == VK_NULL_HANDLE );		
+		CreateDepthResources( _device, _extent );
 	}
 
 	//================================================================================================================================
 	// Only one color attachment needed for all swapchain images
 	//================================================================================================================================
-	void FrameBuffer::AddColorAttachment( const VkFormat _format, const VkExtent2D _extent )
+	void FrameBuffer::AddColorAttachment( Device& _device, const VkFormat _format, const VkExtent2D _extent )
 	{
 		assert( m_colorImageView.mImageView == VK_NULL_HANDLE );
 
 		m_colorFormat = _format;
 
-		m_colorSampler.Create( m_device, 0, 1.f, VK_FILTER_LINEAR );
+		m_colorSampler.Create( _device, 0, 1.f, VK_FILTER_LINEAR );
 
-		CreateColorImageAndView( m_device, _format, _extent );
+		CreateColorImageAndView( _device, _format, _extent );
 	}
 
 	//================================================================================================================================
@@ -144,23 +134,24 @@ namespace fan
 	void FrameBuffer::CreateDepthImageAndView( Device& _device, const VkFormat _format, const VkExtent2D _extent )
 	{
 		m_depthImage.Create( _device, _format, _extent, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT );
-		m_depthImageView.Create( _device, m_depthImage.mImage, depthFormat, VK_IMAGE_ASPECT_DEPTH_BIT, VK_IMAGE_VIEW_TYPE_2D );
+		m_depthImageView.Create( _device, m_depthImage.mImage, _format, VK_IMAGE_ASPECT_DEPTH_BIT, VK_IMAGE_VIEW_TYPE_2D );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool FrameBuffer::CreateDepthResources( Device& _device )
+	bool FrameBuffer::CreateDepthResources( Device& _device, const VkExtent2D _extent )
 	{
-		
+		VkFormat depthFormat = _device.FindDepthFormat();
+
 		if ( m_depthImage.mImage == VK_NULL_HANDLE )
 		{
-			CreateDepthImageAndView( _device, depthFormat, m_extent );			
+			CreateDepthImageAndView( _device, depthFormat, _extent );			
 		}
 		else
 		{
 			m_depthImage.Destroy( _device );
 			m_depthImageView.Destroy( _device );
-			CreateDepthImageAndView( _device, depthFormat, m_extent );
+			CreateDepthImageAndView( _device, depthFormat, _extent );
 		}
 
 		VkCommandBuffer cmd = _device.BeginSingleTimeCommands();

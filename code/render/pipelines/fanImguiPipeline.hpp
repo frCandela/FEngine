@@ -29,7 +29,7 @@ namespace fan
 		void UpdateBuffer( const size_t _index );
 		void DrawFrame( VkCommandBuffer commandBuffer, const size_t _index );
 		void ReloadIcons();
-		void SetGameView( ImageView* _imageView ) { m_gameImageView = _imageView; }
+		void SetGameView( ImageView& _imageView ) { m_gameImageView = &_imageView; }
 		void UpdateGameImageDescriptor();
 
 	private:

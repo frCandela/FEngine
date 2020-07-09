@@ -7,7 +7,6 @@
 namespace fan
 {
 	struct Device;
-	class FrameBuffer;
 
 	//================================================================================================================================
 	// Abstraction of the vulkan swapchain

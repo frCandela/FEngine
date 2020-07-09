@@ -5,55 +5,40 @@
 #include "render/core/fanImage.hpp"
 #include "render/core/fanImageView.hpp" 
 #include "render/core/fanSampler.hpp"
+#include "render/core/fanSwapChain.hpp"
 
 namespace fan
 {
 	struct Device;
+	struct RenderPass;
 
 	//================================================================================================================================
 	// render target with attachments (color, depth, etc. )
 	//================================================================================================================================
-	class FrameBuffer
+	struct FrameBuffer
 	{
-	public:
-		FrameBuffer( Device& _device, const VkExtent2D _extent );
-		~FrameBuffer();
+		void Create( Device& _device, const size_t _count, const VkExtent2D _extent, RenderPass& _renderPass, ImageView* _externalAttachments = nullptr );
+		void Resize( Device& _device, const size_t _count, const VkExtent2D _extent, RenderPass& _renderPass, ImageView* _externalAttachments = nullptr );
+		void Destroy( Device& _device );
 
-		void AddDepthAttachment();
-		void AddColorAttachment( const VkFormat _format, const VkExtent2D _extent );
-		void SetExternalAttachment( ImageView* _perFramebufferViews ) { m_externalAttachments = _perFramebufferViews; }
-		bool Create( const size_t _count, VkRenderPass _renderPass );
-		void Resize( const VkExtent2D _extent );
+		void AddDepthAttachment( Device& _device, const VkExtent2D _extent );
+		void AddColorAttachment( Device& _device, const VkFormat _format, const VkExtent2D _extent );
 
-		VkFramebuffer	Get( const size_t _index ) { return m_frameBuffers[ _index ]; }
-		Sampler*		GetColorAttachmentSampler() { return &m_colorSampler; }
-		ImageView*		GetColorAttachmentImageView() { return &m_colorImageView; }
-		VkExtent2D		GetExtent() const { return m_extent; }
-	private:
-		Device& m_device;
-
-		std::vector<VkFramebuffer> m_frameBuffers;
-		VkRenderPass m_renderPass;
-		size_t m_count;
-
-		// External attachment
-		ImageView* m_externalAttachments = nullptr;
+		VkFramebuffer mFrameBuffers[ SwapChain::s_maxFramesInFlight ] = { VK_NULL_HANDLE,VK_NULL_HANDLE,VK_NULL_HANDLE };
 
 		// Depth attachment
-		VkFormat depthFormat;
 		Image m_depthImage;
 		ImageView m_depthImageView;
 
 		// Color attachment
 		VkFormat	m_colorFormat;
-		VkExtent2D	m_extent;
 		Sampler		m_colorSampler;
 		Image		m_colorImage;
 		ImageView	m_colorImageView;
 
 		void CreateColorImageAndView( Device& _device, const VkFormat _format, const VkExtent2D _extent );
 		void CreateDepthImageAndView( Device& _device, const VkFormat _format, const VkExtent2D _extent );
-		bool CreateDepthResources( Device& _device );
-		void DestroyFrameBuffers();
+		bool CreateDepthResources( Device& _device, const VkExtent2D _extent );
+		void DestroyFrameBuffers( Device& _device );
 	};
 }

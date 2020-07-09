@@ -3,7 +3,6 @@
 #include "core/fanDebug.hpp"
 #include "render/core/fanDevice.hpp"
 #include "render/core/fanImage.hpp"
-#include "render/core/fanFrameBuffer.hpp"
 
 namespace fan
 {

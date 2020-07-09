@@ -13,6 +13,7 @@ WARNINGS_POP()
 #include "render/core/fanRenderPass.hpp"
 #include "render/core/fanSampler.hpp"
 #include "render/core/fanBuffer.hpp"
+#include "render/core/fanFrameBuffer.hpp"
 
 namespace fan
 {
@@ -20,7 +21,6 @@ namespace fan
 	class Mesh;
 	class UIMesh;
 	class ImguiPipeline;
-	class FrameBuffer;
 	class DescriptorTextures;
 	class DescriptorSampler;
 	class PostprocessPipeline;
@@ -101,9 +101,9 @@ namespace fan
 		PostprocessPipeline*	GetPostprocessPipeline() { return m_postprocessPipeline; }
 		ForwardPipeline*		GetForwardPipeline() { return m_forwardPipeline; }
 		glm::vec4				GetClearColor()					const { return m_clearColor; }
-		const FrameBuffer*		GetGameFrameBuffers()			const { return m_gameFrameBuffers; }
-		const FrameBuffer*		GetPostProcessFramebuffers()	const { return m_postProcessFramebuffers; }
-		const FrameBuffer*		GetSwapchainFramebuffers()		const { return m_swapchainFramebuffers; }
+		const FrameBuffer*		GetGameFrameBuffers()			const { return &m_gameFrameBuffers; }
+		const FrameBuffer*		GetPostProcessFramebuffers()	const { return &m_postProcessFramebuffers; }
+		const FrameBuffer*		GetSwapchainFramebuffers()		const { return &m_swapchainFramebuffers; }
 		float					GetWindowAspectRatio() const;
 
 		void SetClearColor( glm::vec4 _color ) { m_clearColor = _color; }
@@ -154,9 +154,9 @@ namespace fan
 		CommandBuffer m_debugCommandBuffers;
 
 		// frame buffers
-		FrameBuffer* m_gameFrameBuffers = VK_NULL_HANDLE;
-		FrameBuffer* m_postProcessFramebuffers = VK_NULL_HANDLE;
-		FrameBuffer* m_swapchainFramebuffers = VK_NULL_HANDLE;
+		FrameBuffer m_gameFrameBuffers;
+		FrameBuffer m_postProcessFramebuffers;
+		FrameBuffer m_swapchainFramebuffers;
 
 		// data
 		Buffer		m_quadVertexBuffer;
