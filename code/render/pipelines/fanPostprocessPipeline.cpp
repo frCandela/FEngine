@@ -34,7 +34,7 @@ namespace fan
 	void PostprocessPipeline::Resize( const VkExtent2D _extent )
 	{
 		Pipeline::Resize( _extent );
-		m_descriptorImageSampler->Set( 0, m_imageView->imageView );
+		m_descriptorImageSampler->Set( 0, m_imageView->mImageView );
 		m_descriptorImageSampler->UpdateRange( 0, 0 );
 	}
 
@@ -78,8 +78,8 @@ namespace fan
 		UpdateUniformBuffers();
 
 		delete m_descriptorImageSampler;
-		m_descriptorImageSampler = new DescriptorTextures( m_device, 1, m_sampler.sampler );
-		m_descriptorImageSampler->Append( m_imageView->imageView );
+		m_descriptorImageSampler = new DescriptorTextures( m_device, 1, m_sampler.mSampler );
+		m_descriptorImageSampler->Append( m_imageView->mImageView );
 		m_descriptorImageSampler->UpdateRange( 0, 0 );
 	}
 

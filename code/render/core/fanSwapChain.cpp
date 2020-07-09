@@ -11,10 +11,10 @@ namespace fan
 	//================================================================================================================================
 	void SwapChain::Create( Device& _device, VkSurfaceKHR _surface, VkExtent2D _desiredSize )
 	{
-		assert( surface == VK_NULL_HANDLE );
-		assert( swapchain == VK_NULL_HANDLE );
+		assert( mSurface == VK_NULL_HANDLE );
+		assert( mSwapchain == VK_NULL_HANDLE );
 
-		surface = _surface;
+		mSurface = _surface;
 		CreateSwapChain( _device, _desiredSize );
 		CreateSemaphores( _device );
 		CreateImageViews( _device );
@@ -24,11 +24,11 @@ namespace fan
 	//================================================================================================================================
 	void SwapChain::Resize( Device& _device, VkExtent2D _desiredSize )
 	{
-		currentFrame = 0;
+		mCurrentFrame = 0;
 		CreateSwapChain( _device, _desiredSize );
-		for( uint32_t imageIndex = 0; imageIndex < imagesCount; imageIndex++ )
+		for( uint32_t imageIndex = 0; imageIndex < mImagesCount; imageIndex++ )
 		{
-			imageViews[imageIndex].Destroy( _device );
+			mImageViews[imageIndex].Destroy( _device );
 		}
 		CreateImageViews( _device );
 	}
@@ -37,30 +37,30 @@ namespace fan
 	//================================================================================================================================
 	void SwapChain::Destroy( Device& _device )
 	{
-		for( uint32_t i = 0; i < imagesCount; i++ )
+		for( uint32_t i = 0; i < mImagesCount; i++ )
 		{
-			imageViews[i].Destroy( _device );
+			mImageViews[i].Destroy( _device );
 		}
 
 		for( int i = 0; i < s_maxFramesInFlight; i++ )
 		{
-			vkDestroySemaphore( _device.device, imagesAvailableSemaphores[i], nullptr );
-			vkDestroySemaphore( _device.device, renderFinishedSemaphores[i], nullptr );
-			vkDestroyFence( _device.device, inFlightFences[i], nullptr );
-			imagesAvailableSemaphores[i] = VK_NULL_HANDLE;
-			renderFinishedSemaphores[i] = VK_NULL_HANDLE;
-			inFlightFences[i]			= VK_NULL_HANDLE;
+			vkDestroySemaphore( _device.mDevice, mImagesAvailableSemaphores[i], nullptr );
+			vkDestroySemaphore( _device.mDevice, mRenderFinishedSemaphores[i], nullptr );
+			vkDestroyFence( _device.mDevice, mInFlightFences[i], nullptr );
+			mImagesAvailableSemaphores[i] = VK_NULL_HANDLE;
+			mRenderFinishedSemaphores[i] = VK_NULL_HANDLE;
+			mInFlightFences[i]			= VK_NULL_HANDLE;
 		}
 
-		vkDestroySwapchainKHR( _device.device, swapchain, nullptr );
-		swapchain = VK_NULL_HANDLE;
+		vkDestroySwapchainKHR( _device.mDevice, mSwapchain, nullptr );
+		mSwapchain = VK_NULL_HANDLE;
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	VkResult SwapChain::AcquireNextImage( Device& _device )
 	{
-		return vkAcquireNextImageKHR( _device.device, swapchain, std::numeric_limits<uint64_t>::max(), imagesAvailableSemaphores[ currentFrame ], VK_NULL_HANDLE, &currentImageIndex );
+		return vkAcquireNextImageKHR( _device.mDevice, mSwapchain, std::numeric_limits<uint64_t>::max(), mImagesAvailableSemaphores[ mCurrentFrame ], VK_NULL_HANDLE, &mCurrentImageIndex );
 	}
 
 	//================================================================================================================================
@@ -73,11 +73,11 @@ namespace fan
 		presentInfo.waitSemaphoreCount = 1;
 		presentInfo.pWaitSemaphores = GetCurrentRenderFinishedSemaphore();
 		presentInfo.swapchainCount = 1;
-		presentInfo.pSwapchains = &swapchain;
-		presentInfo.pImageIndices = &currentImageIndex;
+		presentInfo.pSwapchains = &mSwapchain;
+		presentInfo.pImageIndices = &mCurrentImageIndex;
 		presentInfo.pResults = nullptr;
 
-		if ( vkQueuePresentKHR( _device.graphicsQueue, &presentInfo ) != VK_SUCCESS )
+		if ( vkQueuePresentKHR( _device.mGraphicsQueue, &presentInfo ) != VK_SUCCESS )
 		{
 			Debug::Warning( "Could not present image to graphics queue" );
 			return false;
@@ -92,10 +92,10 @@ namespace fan
 		std::vector<VkPresentModeKHR>	supportedPresentModes;
 
 		uint32_t presentModeCount;
-		vkGetPhysicalDeviceSurfacePresentModesKHR( _device.physicalDevice, surface, &presentModeCount, nullptr );
+		vkGetPhysicalDeviceSurfacePresentModesKHR( _device.mPhysicalDevice, mSurface, &presentModeCount, nullptr );
 		supportedPresentModes.clear();
 		supportedPresentModes.resize( presentModeCount );
-		vkGetPhysicalDeviceSurfacePresentModesKHR( _device.physicalDevice, surface, &presentModeCount, supportedPresentModes.data() );
+		vkGetPhysicalDeviceSurfacePresentModesKHR( _device.mPhysicalDevice, mSurface, &presentModeCount, supportedPresentModes.data() );
 
 		for ( int presentModeIndex = 0; presentModeIndex < supportedPresentModes.size(); presentModeIndex++ )
 		{
@@ -160,10 +160,10 @@ namespace fan
 	VkSurfaceFormatKHR SwapChain::FindDesiredSurfaceFormat( Device& _device, VkSurfaceFormatKHR _desiredSurfaceFormat ) const
 	{
 		uint32_t formatsCount;
-		vkGetPhysicalDeviceSurfaceFormatsKHR( _device.physicalDevice, surface, &formatsCount, nullptr );
+		vkGetPhysicalDeviceSurfaceFormatsKHR( _device.mPhysicalDevice, mSurface, &formatsCount, nullptr );
 		std::vector<VkSurfaceFormatKHR> supportedSurfaceFormats;
 		supportedSurfaceFormats.resize( formatsCount );
-		vkGetPhysicalDeviceSurfaceFormatsKHR( _device.physicalDevice, surface, &formatsCount, supportedSurfaceFormats.data() );
+		vkGetPhysicalDeviceSurfaceFormatsKHR( _device.mPhysicalDevice, mSurface, &formatsCount, supportedSurfaceFormats.data() );
 
 		if ( supportedSurfaceFormats.size() == 1 && supportedSurfaceFormats[ 0 ].format == VK_FORMAT_UNDEFINED )
 		{
@@ -195,25 +195,25 @@ namespace fan
 	void SwapChain::CreateSwapChain( Device& _device, VkExtent2D _desiredSize )
 	{
 		VkSurfaceCapabilitiesKHR surfaceCapabilities;
-		vkGetPhysicalDeviceSurfaceCapabilitiesKHR( _device.physicalDevice, surface, &surfaceCapabilities );
+		vkGetPhysicalDeviceSurfaceCapabilitiesKHR( _device.mPhysicalDevice, mSurface, &surfaceCapabilities );
 
-		imagesCount						   = FindDesiredNumberOfImages( surfaceCapabilities, s_maxFramesInFlight );
-		extent							   = FindDesiredImagesSize( surfaceCapabilities, _desiredSize );
-		surfaceFormat					   = FindDesiredSurfaceFormat( _device, { VK_FORMAT_R8G8B8A8_UNORM , VK_COLOR_SPACE_SRGB_NONLINEAR_KHR } );
+		mImagesCount						   = FindDesiredNumberOfImages( surfaceCapabilities, s_maxFramesInFlight );
+		mExtent							   = FindDesiredImagesSize( surfaceCapabilities, _desiredSize );
+		mSurfaceFormat					   = FindDesiredSurfaceFormat( _device, { VK_FORMAT_R8G8B8A8_UNORM , VK_COLOR_SPACE_SRGB_NONLINEAR_KHR } );
 		const VkPresentModeKHR presentMode = FindDesiredPresentMode( _device, VK_PRESENT_MODE_MAILBOX_KHR );
 		const VkImageUsageFlags imageUsage = FindDesiredImageUsage( surfaceCapabilities, VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT );
 
-		VkSwapchainKHR oldSwapchain = swapchain;
+		VkSwapchainKHR oldSwapchain = mSwapchain;
 
 		VkSwapchainCreateInfoKHR swapchainCreateInfo = {};
 		swapchainCreateInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
 		swapchainCreateInfo.pNext = nullptr;
 		swapchainCreateInfo.flags = 0;
-		swapchainCreateInfo.surface = surface;
-		swapchainCreateInfo.minImageCount = imagesCount;
-		swapchainCreateInfo.imageFormat = surfaceFormat.format;
-		swapchainCreateInfo.imageColorSpace = surfaceFormat.colorSpace;
-		swapchainCreateInfo.imageExtent = extent;
+		swapchainCreateInfo.surface = mSurface;
+		swapchainCreateInfo.minImageCount = mImagesCount;
+		swapchainCreateInfo.imageFormat = mSurfaceFormat.format;
+		swapchainCreateInfo.imageColorSpace = mSurfaceFormat.colorSpace;
+		swapchainCreateInfo.imageExtent = mExtent;
 		swapchainCreateInfo.imageArrayLayers = 1;
 		swapchainCreateInfo.imageUsage = imageUsage;
 		swapchainCreateInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
@@ -225,25 +225,25 @@ namespace fan
 		swapchainCreateInfo.clipped = VK_TRUE;
 		swapchainCreateInfo.oldSwapchain = oldSwapchain;
 
-		vkCreateSwapchainKHR( _device.device, &swapchainCreateInfo, nullptr, &swapchain );
-		Debug::Get() << Debug::Severity::log << std::hex << "VkSwapchainKHR        " << swapchain << std::dec << Debug::Endl();
+		vkCreateSwapchainKHR( _device.mDevice, &swapchainCreateInfo, nullptr, &mSwapchain );
+		Debug::Get() << Debug::Severity::log << std::hex << "VkSwapchainKHR        " << mSwapchain << std::dec << Debug::Endl();
 
 		if ( oldSwapchain != VK_NULL_HANDLE )
 		{
-			vkDestroySwapchainKHR( _device.device, oldSwapchain, nullptr );
+			vkDestroySwapchainKHR( _device.mDevice, oldSwapchain, nullptr );
 		}
 
 		uint32_t count;
-		vkGetSwapchainImagesKHR( _device.device, swapchain, &count, nullptr );
-		assert( count == imagesCount );
-		if( vkGetSwapchainImagesKHR( _device.device, swapchain, &count, images ) == VK_INCOMPLETE )
+		vkGetSwapchainImagesKHR( _device.mDevice, mSwapchain, &count, nullptr );
+		assert( count == mImagesCount );
+		if( vkGetSwapchainImagesKHR( _device.mDevice, mSwapchain, &count, mImages ) == VK_INCOMPLETE )
 		{
 			Debug::Error() << "vkGetSwapchainImagesKHR failed." << Debug::Endl();
 		}
 
-		for ( uint32_t imageIndex = 0; imageIndex < imagesCount; imageIndex++ )
+		for ( uint32_t imageIndex = 0; imageIndex < mImagesCount; imageIndex++ )
 		{
-			Debug::Log() << std::hex << "VkImage swapchain     " << images[ imageIndex ] << std::dec << Debug::Endl();
+			Debug::Log() << std::hex << "VkImage swapchain     " << mImages[ imageIndex ] << std::dec << Debug::Endl();
 		}
 	}
 
@@ -263,13 +263,13 @@ namespace fan
 
 		for ( int semaphoreIndex = 0; semaphoreIndex < s_maxFramesInFlight; semaphoreIndex++ )
 		{
-			vkCreateSemaphore( _device.device, &semaphoreCreateInfo, nullptr, &imagesAvailableSemaphores[ semaphoreIndex ] );
-			vkCreateSemaphore( _device.device, &semaphoreCreateInfo, nullptr, &renderFinishedSemaphores[ semaphoreIndex ] );
-			vkCreateFence( _device.device, &fenceCreateInfo, nullptr, &inFlightFences[ semaphoreIndex ] );
+			vkCreateSemaphore( _device.mDevice, &semaphoreCreateInfo, nullptr, &mImagesAvailableSemaphores[ semaphoreIndex ] );
+			vkCreateSemaphore( _device.mDevice, &semaphoreCreateInfo, nullptr, &mRenderFinishedSemaphores[ semaphoreIndex ] );
+			vkCreateFence( _device.mDevice, &fenceCreateInfo, nullptr, &mInFlightFences[ semaphoreIndex ] );
 
-			Debug::Get() << Debug::Severity::log << std::hex << "VkSemaphore           " << imagesAvailableSemaphores[ semaphoreIndex ] << std::dec << Debug::Endl();
-			Debug::Get() << Debug::Severity::log << std::hex << "VkSemaphore           " << renderFinishedSemaphores[ semaphoreIndex ] << std::dec << Debug::Endl();
-			Debug::Get() << Debug::Severity::log << std::hex << "VkFence               " << inFlightFences[ semaphoreIndex ] << std::dec << Debug::Endl();
+			Debug::Get() << Debug::Severity::log << std::hex << "VkSemaphore           " << mImagesAvailableSemaphores[ semaphoreIndex ] << std::dec << Debug::Endl();
+			Debug::Get() << Debug::Severity::log << std::hex << "VkSemaphore           " << mRenderFinishedSemaphores[ semaphoreIndex ] << std::dec << Debug::Endl();
+			Debug::Get() << Debug::Severity::log << std::hex << "VkFence               " << mInFlightFences[ semaphoreIndex ] << std::dec << Debug::Endl();
 		}
 	}
 
@@ -277,10 +277,10 @@ namespace fan
 	//================================================================================================================================
 	void SwapChain::CreateImageViews( Device& _device )
 	{
-		for ( uint32_t imageIndex = 0; imageIndex < imagesCount; imageIndex++ )
+		for ( uint32_t imageIndex = 0; imageIndex < mImagesCount; imageIndex++ )
 		{
-			assert( imageViews[imageIndex].imageView == VK_NULL_HANDLE );
-			imageViews[ imageIndex ].Create( _device, images[ imageIndex ], surfaceFormat.format, VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_VIEW_TYPE_2D );
+			assert( mImageViews[imageIndex].mImageView == VK_NULL_HANDLE );
+			mImageViews[ imageIndex ].Create( _device, mImages[ imageIndex ], mSurfaceFormat.format, VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_VIEW_TYPE_2D );
 		}
 	}
 }

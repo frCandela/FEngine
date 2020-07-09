@@ -21,11 +21,11 @@ namespace fan
 		VkResult	Flush( Device& _device, VkDeviceSize _size = VK_WHOLE_SIZE, VkDeviceSize _offset = 0 );
 		void		CopyBufferTo( VkCommandBuffer _commandBuffer, VkBuffer _dstBuffer, VkDeviceSize _size );
 
-		VkBuffer		buffer = VK_NULL_HANDLE;
-		VkDeviceMemory	memory = VK_NULL_HANDLE;
-		VkDeviceSize	size = 0;
-		VkDeviceSize	alignment = 0;
+		VkBuffer		mBuffer = VK_NULL_HANDLE;
+		VkDeviceMemory	mMemory = VK_NULL_HANDLE;
+		VkDeviceSize	mSize = 0;
+		VkDeviceSize	mAlignment = 0;
 
-		void* mappedData;
+		void* mappedData = nullptr;
 	};
 }

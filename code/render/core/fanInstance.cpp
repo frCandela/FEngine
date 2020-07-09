@@ -10,7 +10,7 @@ namespace fan
 	//================================================================================================================================
 	void Instance::Create()
 	{
-		assert( instance == VK_NULL_HANDLE );
+		assert( mInstance == VK_NULL_HANDLE );
 
 		// Get desired extensions
 		uint32_t glfwExtensionCount = 0;
@@ -41,12 +41,12 @@ namespace fan
 		instanceCreateInfo.pNext = nullptr;
 		instanceCreateInfo.flags = 0;
 		instanceCreateInfo.pApplicationInfo = &appInfo;
-		instanceCreateInfo.enabledLayerCount = static_cast< uint32_t >( enabledValidationLayers.size() );
-		instanceCreateInfo.ppEnabledLayerNames = enabledValidationLayers.data();
-		instanceCreateInfo.enabledExtensionCount = static_cast< uint32_t >( enabledExtensions.size() );
-		instanceCreateInfo.ppEnabledExtensionNames = enabledExtensions.size() > 0 ? enabledExtensions.data() : nullptr;
+		instanceCreateInfo.enabledLayerCount = static_cast< uint32_t >( mEnabledValidationLayers.size() );
+		instanceCreateInfo.ppEnabledLayerNames = mEnabledValidationLayers.data();
+		instanceCreateInfo.enabledExtensionCount = static_cast< uint32_t >( mEnabledExtensions.size() );
+		instanceCreateInfo.ppEnabledExtensionNames = mEnabledExtensions.size() > 0 ? mEnabledExtensions.data() : nullptr;
 
-		if ( vkCreateInstance( &instanceCreateInfo, nullptr, &instance ) != VK_SUCCESS || instance == VK_NULL_HANDLE )
+		if ( vkCreateInstance( &instanceCreateInfo, nullptr, &mInstance ) != VK_SUCCESS || mInstance == VK_NULL_HANDLE )
 		{
 			Debug::Error( "ouch, this is going to be messy" );
 		}
@@ -58,14 +58,14 @@ namespace fan
 	void Instance::Destroy()
 	{
 		// destroy debug report callback
-		PFN_vkDestroyDebugReportCallbackEXT func = (PFN_vkDestroyDebugReportCallbackEXT)vkGetInstanceProcAddr( instance, "vkDestroyDebugReportCallbackEXT" );
+		PFN_vkDestroyDebugReportCallbackEXT func = (PFN_vkDestroyDebugReportCallbackEXT)vkGetInstanceProcAddr( mInstance, "vkDestroyDebugReportCallbackEXT" );
 		if( func != nullptr )
 		{
-			func( instance, debugReportCallback, nullptr );
+			func( mInstance, mDebugReportCallback, nullptr );
 		}
 
-		vkDestroyInstance( instance, nullptr );
-		instance = VK_NULL_HANDLE;
+		vkDestroyInstance( mInstance, nullptr );
+		mInstance = VK_NULL_HANDLE;
 	}
 
 	//================================================================================================================================
@@ -108,13 +108,13 @@ namespace fan
 		std::vector<VkLayerProperties> availableLayers( layerCount );
 		vkEnumerateInstanceLayerProperties( &layerCount, availableLayers.data() );
 
-		enabledValidationLayers.clear();
-		enabledValidationLayers.reserve( _desiredLayers.size() );
+		mEnabledValidationLayers.clear();
+		mEnabledValidationLayers.reserve( _desiredLayers.size() );
 		for ( int layerIndex = 0; layerIndex < _desiredLayers.size(); layerIndex++ )
 		{
 			if ( IsLayerAvailable( availableLayers, _desiredLayers[ layerIndex ] ) )
 			{
-				enabledValidationLayers.push_back( _desiredLayers[ layerIndex ] );
+				mEnabledValidationLayers.push_back( _desiredLayers[ layerIndex ] );
 			}
 		}
 	}
@@ -129,13 +129,13 @@ namespace fan
 		std::vector< VkExtensionProperties > availableExtensions( extensionsCount );
 		vkEnumerateInstanceExtensionProperties( nullptr, &extensionsCount, availableExtensions.data() );
 
-		enabledExtensions.clear();
-		enabledExtensions.reserve( _desiredExtensions.size() );
+		mEnabledExtensions.clear();
+		mEnabledExtensions.reserve( _desiredExtensions.size() );
 		for ( int extensionIndex = 0; extensionIndex < _desiredExtensions.size(); extensionIndex++ )
 		{
 			if ( IsExtensionAvailable( availableExtensions, _desiredExtensions[ extensionIndex ] ) )
 			{
-				enabledExtensions.push_back( _desiredExtensions[ extensionIndex ] );
+				mEnabledExtensions.push_back( _desiredExtensions[ extensionIndex ] );
 			}
 		}
 	}
@@ -149,10 +149,10 @@ namespace fan
 		createInfo.flags = VK_DEBUG_REPORT_ERROR_BIT_EXT | VK_DEBUG_REPORT_WARNING_BIT_EXT;
 		createInfo.pfnCallback = DebugCallback;
 
-		auto func = ( PFN_vkCreateDebugReportCallbackEXT ) vkGetInstanceProcAddr( instance, "vkCreateDebugReportCallbackEXT" );
-		if ( func != nullptr && func( instance, &createInfo, nullptr, &debugReportCallback ) == VK_SUCCESS )
+		auto func = ( PFN_vkCreateDebugReportCallbackEXT ) vkGetInstanceProcAddr( mInstance, "vkCreateDebugReportCallbackEXT" );
+		if ( func != nullptr && func( mInstance, &createInfo, nullptr, &mDebugReportCallback ) == VK_SUCCESS )
 		{
-			Debug::Get() << Debug::Severity::log << std::hex << "VkDebugCallback       " << debugReportCallback << std::dec << Debug::Endl();
+			Debug::Get() << Debug::Severity::log << std::hex << "VkDebugCallback       " << mDebugReportCallback << std::dec << Debug::Endl();
 			return true;
 		}
 

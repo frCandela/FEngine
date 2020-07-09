@@ -11,7 +11,7 @@ namespace fan
 	//================================================================================================================================
 	void Device::Create( Instance& _instance, VkSurfaceKHR _surface )
 	{
-		assert( device == VK_NULL_HANDLE );
+		assert( mDevice == VK_NULL_HANDLE );
 
 		VkPhysicalDeviceFeatures availableFeatures;
 		std::vector<VkExtensionProperties>	availableExtensions;
@@ -49,47 +49,47 @@ namespace fan
 		deviceCreateInfo.flags = 0;
 		deviceCreateInfo.queueCreateInfoCount = static_cast<uint32_t>( queueCreateInfos.size() );
 		deviceCreateInfo.pQueueCreateInfos = queueCreateInfos.data();
-		deviceCreateInfo.enabledLayerCount = static_cast<uint32_t>( _instance.enabledValidationLayers.size() );
-		deviceCreateInfo.ppEnabledLayerNames = _instance.enabledValidationLayers.data();
+		deviceCreateInfo.enabledLayerCount = static_cast<uint32_t>( _instance.mEnabledValidationLayers.size() );
+		deviceCreateInfo.ppEnabledLayerNames = _instance.mEnabledValidationLayers.data();
 		deviceCreateInfo.enabledExtensionCount = static_cast<uint32_t>( existingExtensions.size() );
 		deviceCreateInfo.ppEnabledExtensionNames = existingExtensions.data();
 		deviceCreateInfo.pEnabledFeatures = &desiredFeatures;
 
-		if( vkCreateDevice( physicalDevice, &deviceCreateInfo, nullptr, &device ) != VK_SUCCESS )
+		if( vkCreateDevice( mPhysicalDevice, &deviceCreateInfo, nullptr, &mDevice ) != VK_SUCCESS )
 		{
 			Debug::Error() << "vulkan device creation failed" << Debug::Endl();
 		}
-		Debug::Log() << std::hex << "vkDevice:             " << deviceProperties.deviceName << std::dec << Debug::Endl();
+		Debug::Log() << std::hex << "vkDevice:             " << mDeviceProperties.deviceName << std::dec << Debug::Endl();
 
 		VkQueue		computeQueue = VK_NULL_HANDLE, presentQueue = VK_NULL_HANDLE;
-		vkGetDeviceQueue( device, graphicsQueueFamilyIndex, 0, &graphicsQueue );
-		vkGetDeviceQueue( device, computeQueueFamilyIndex, 0, &computeQueue );
-		vkGetDeviceQueue( device, presentQueueFamilyIndex, 0, &presentQueue );
-		vkGetPhysicalDeviceMemoryProperties( physicalDevice, &memoryProperties );
+		vkGetDeviceQueue( mDevice, graphicsQueueFamilyIndex, 0, &mGraphicsQueue );
+		vkGetDeviceQueue( mDevice, computeQueueFamilyIndex, 0, &computeQueue );
+		vkGetDeviceQueue( mDevice, presentQueueFamilyIndex, 0, &presentQueue );
+		vkGetPhysicalDeviceMemoryProperties( mPhysicalDevice, &mMemoryProperties );
 
 		// Creates command pool 
-		assert( commandPool == VK_NULL_HANDLE );
+		assert( mCommandPool == VK_NULL_HANDLE );
 		VkCommandPoolCreateInfo commandPoolCreateInfo;
 		commandPoolCreateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
 		commandPoolCreateInfo.pNext = nullptr;
 		commandPoolCreateInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
 		commandPoolCreateInfo.queueFamilyIndex = graphicsQueueFamilyIndex;
 
-		if( vkCreateCommandPool( device, &commandPoolCreateInfo, nullptr, &commandPool ) != VK_SUCCESS )
+		if( vkCreateCommandPool( mDevice, &commandPoolCreateInfo, nullptr, &mCommandPool ) != VK_SUCCESS )
 		{
 			Debug::Error( "Could not allocate command pool." );
 		}
-		Debug::Log() << std::hex << "VkCommandPool         " << commandPool << std::dec << Debug::Endl();
+		Debug::Log() << std::hex << "VkCommandPool         " << mCommandPool << std::dec << Debug::Endl();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void Device::Destroy()
 	{
-		vkDestroyCommandPool( device, commandPool, nullptr );
+		vkDestroyCommandPool( mDevice, mCommandPool, nullptr );
 
-		vkDestroyDevice( device, nullptr );
-		device = VK_NULL_HANDLE;
+		vkDestroyDevice( mDevice, nullptr );
+		mDevice = VK_NULL_HANDLE;
 	}
 
 	//================================================================================================================================
@@ -100,11 +100,11 @@ namespace fan
 		VkCommandBufferAllocateInfo allocInfo = {};
 		allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
 		allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-		allocInfo.commandPool = commandPool;
+		allocInfo.commandPool = mCommandPool;
 		allocInfo.commandBufferCount = 1;
 
 		VkCommandBuffer commandBuffer;
-		vkAllocateCommandBuffers( device, &allocInfo, &commandBuffer );
+		vkAllocateCommandBuffers( mDevice, &allocInfo, &commandBuffer );
 
 		// Start recording the command buffer
 		VkCommandBufferBeginInfo beginInfo = {};
@@ -128,11 +128,11 @@ namespace fan
 		submitInfo.commandBufferCount = 1;
 		submitInfo.pCommandBuffers = &_commandBuffer;
 
-		vkQueueSubmit( graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE );
-		vkQueueWaitIdle( graphicsQueue );
+		vkQueueSubmit( mGraphicsQueue, 1, &submitInfo, VK_NULL_HANDLE );
+		vkQueueWaitIdle( mGraphicsQueue );
 
 		// Cleaning
-		vkFreeCommandBuffers( device, commandPool, 1, &_commandBuffer );
+		vkFreeCommandBuffers( mDevice, mCommandPool, 1, &_commandBuffer );
 	}
 
 	//================================================================================================================================
@@ -141,7 +141,7 @@ namespace fan
 	{
 		VkCommandPoolResetFlags releaseResources = VK_COMMAND_POOL_RESET_RELEASE_RESOURCES_BIT;
 
-		if ( vkResetCommandPool( device, commandPool, releaseResources ) != VK_SUCCESS )
+		if ( vkResetCommandPool( mDevice, mCommandPool, releaseResources ) != VK_SUCCESS )
 		{
 			Debug::Error( "Could not reset command pool." );
 			return false;
@@ -154,9 +154,9 @@ namespace fan
 	uint32_t Device::FindMemoryType( uint32_t _typeFilter, VkMemoryPropertyFlags _properties )
 	{
 		//check for the support of the properties
-		for ( uint32_t propertyIndex = 0; propertyIndex < memoryProperties.memoryTypeCount; propertyIndex++ )
+		for ( uint32_t propertyIndex = 0; propertyIndex < mMemoryProperties.memoryTypeCount; propertyIndex++ )
 		{
-			if ( ( _typeFilter & ( 1 << propertyIndex ) ) && ( memoryProperties.memoryTypes[ propertyIndex ].propertyFlags & _properties ) == _properties )
+			if ( ( _typeFilter & ( 1 << propertyIndex ) ) && ( mMemoryProperties.memoryTypes[ propertyIndex ].propertyFlags & _properties ) == _properties )
 			{
 				return propertyIndex;
 			}
@@ -180,7 +180,7 @@ namespace fan
 		for ( int candidateIndex = 0; candidateIndex < candidates.size(); candidateIndex++ )
 		{
 			VkFormatProperties props;
-			vkGetPhysicalDeviceFormatProperties( physicalDevice, candidates[ candidateIndex ], &props );
+			vkGetPhysicalDeviceFormatProperties( mPhysicalDevice, candidates[ candidateIndex ], &props );
 
 			if ( tiling == VK_IMAGE_TILING_LINEAR && ( props.linearTilingFeatures & features ) == features )
 			{
@@ -200,23 +200,23 @@ namespace fan
 	bool Device::SelectPhysicalDevice( Instance& _instance, VkPhysicalDeviceFeatures& _outAvailableFeatures, std::vector<VkExtensionProperties>& _outAvailableExtensions )
 	{
 		uint32_t devicesCount;
-		if ( vkEnumeratePhysicalDevices( _instance.instance, &devicesCount, nullptr ) != VK_SUCCESS ) { return false; }
+		if ( vkEnumeratePhysicalDevices( _instance.mInstance, &devicesCount, nullptr ) != VK_SUCCESS ) { return false; }
 		std::vector< VkPhysicalDevice> availableDevices( devicesCount );
-		if ( vkEnumeratePhysicalDevices( _instance.instance, &devicesCount, availableDevices.data() ) != VK_SUCCESS ) { return false; }
+		if ( vkEnumeratePhysicalDevices( _instance.mInstance, &devicesCount, availableDevices.data() ) != VK_SUCCESS ) { return false; }
 
 		for ( int deviceIndex = 0; deviceIndex < availableDevices.size(); deviceIndex++ )
 		{
-			physicalDevice = availableDevices[ deviceIndex ];
+			mPhysicalDevice = availableDevices[ deviceIndex ];
 
 			uint32_t extensionsCount;
-			if ( vkEnumerateDeviceExtensionProperties( physicalDevice, nullptr, &extensionsCount, nullptr ) != VK_SUCCESS ) { return false; }
+			if ( vkEnumerateDeviceExtensionProperties( mPhysicalDevice, nullptr, &extensionsCount, nullptr ) != VK_SUCCESS ) { return false; }
 			_outAvailableExtensions.resize( extensionsCount );
-			if ( vkEnumerateDeviceExtensionProperties( physicalDevice, nullptr, &extensionsCount, _outAvailableExtensions.data() ) != VK_SUCCESS ) { return false; }
+			if ( vkEnumerateDeviceExtensionProperties( mPhysicalDevice, nullptr, &extensionsCount, _outAvailableExtensions.data() ) != VK_SUCCESS ) { return false; }
 
-			vkGetPhysicalDeviceProperties( physicalDevice, &deviceProperties );
-			vkGetPhysicalDeviceFeatures( physicalDevice, &_outAvailableFeatures );
+			vkGetPhysicalDeviceProperties( mPhysicalDevice, &mDeviceProperties );
+			vkGetPhysicalDeviceFeatures( mPhysicalDevice, &_outAvailableFeatures );
 
-			if ( deviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU )
+			if ( mDeviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU )
 			{
 				break;
 			}
@@ -262,9 +262,9 @@ namespace fan
 	void Device::GetQueueFamiliesIndices( VkSurfaceKHR _surface, uint32_t& _outGraphics, uint32_t& _outCompute, uint32_t& _outPresent )
 	{
 		uint32_t queueFamiliesCount;
-		vkGetPhysicalDeviceQueueFamilyProperties( physicalDevice, &queueFamiliesCount, nullptr );
+		vkGetPhysicalDeviceQueueFamilyProperties( mPhysicalDevice, &queueFamiliesCount, nullptr );
 		std::vector<VkQueueFamilyProperties>	queueFamilyProperties( queueFamiliesCount );
-		vkGetPhysicalDeviceQueueFamilyProperties( physicalDevice, &queueFamiliesCount, queueFamilyProperties.data() );
+		vkGetPhysicalDeviceQueueFamilyProperties( mPhysicalDevice, &queueFamiliesCount, queueFamilyProperties.data() );
 
 		VkQueueFlags desiredGraphicsCapabilities = VK_QUEUE_GRAPHICS_BIT;
 		VkQueueFlags desiredComputeCapabilities = VK_QUEUE_COMPUTE_BIT;
@@ -293,7 +293,7 @@ namespace fan
 			if ( queueFamilyProperties[ queueIndex ].queueCount > 0 )
 			{
 				VkBool32 presentationSupported;
-				if ( vkGetPhysicalDeviceSurfaceSupportKHR( physicalDevice, queueIndex, _surface, &presentationSupported ) == VK_SUCCESS &&
+				if ( vkGetPhysicalDeviceSurfaceSupportKHR( mPhysicalDevice, queueIndex, _surface, &presentationSupported ) == VK_SUCCESS &&
 					 presentationSupported == VK_TRUE )
 				{
 					_outPresent = queueIndex;

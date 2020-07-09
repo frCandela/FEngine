@@ -25,6 +25,6 @@ namespace fan
 		static VkSubpassDescription		GetSubpassDescription( VkAttachmentReference* _colorReferences, uint32_t _count, VkAttachmentReference* _depthReference );
 		static VkRenderPassBeginInfo	GetBeginInfo( VkRenderPass _renderPass, VkFramebuffer _frameBuffer, VkExtent2D _extent, const VkClearValue* _clearValue, uint32_t _clearCount );
 
-		VkRenderPass renderPass = VK_NULL_HANDLE;
+		VkRenderPass mRenderPass = VK_NULL_HANDLE;
 	};
 }

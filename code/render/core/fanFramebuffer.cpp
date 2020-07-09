@@ -35,7 +35,7 @@ namespace fan
 	{
 		for ( int framebufferIndex = 0; framebufferIndex < m_frameBuffers.size(); framebufferIndex++ )
 		{
-			vkDestroyFramebuffer( m_device.device, m_frameBuffers[ framebufferIndex ], nullptr );
+			vkDestroyFramebuffer( m_device.mDevice, m_frameBuffers[ framebufferIndex ], nullptr );
 		} m_frameBuffers.clear();
 	}
 
@@ -47,8 +47,8 @@ namespace fan
 		m_renderPass = _renderPass;
 
 		std::vector<VkImageView> commonAttachments;
-		if( m_colorImageView.imageView != VK_NULL_HANDLE ) { commonAttachments.push_back( m_colorImageView.imageView ); }
-		if( m_depthImageView.imageView != VK_NULL_HANDLE ) { commonAttachments.push_back( m_depthImageView.imageView ); }
+		if( m_colorImageView.mImageView != VK_NULL_HANDLE ) { commonAttachments.push_back( m_colorImageView.mImageView ); }
+		if( m_depthImageView.mImageView != VK_NULL_HANDLE ) { commonAttachments.push_back( m_depthImageView.mImageView ); }
 
 		assert( m_frameBuffers.empty() );
 		m_frameBuffers.resize( _count );
@@ -57,7 +57,7 @@ namespace fan
 			std::vector<VkImageView> attachments = commonAttachments;
 			if ( m_externalAttachments != nullptr )
 			{
-				attachments.push_back( m_externalAttachments[ frameIndex ].imageView );
+				attachments.push_back( m_externalAttachments[ frameIndex ].mImageView );
 			}
 
 			VkFramebufferCreateInfo framebufferCreateInfo;
@@ -71,7 +71,7 @@ namespace fan
 			framebufferCreateInfo.height = m_extent.height;
 			framebufferCreateInfo.layers = 1;
 
-			if ( vkCreateFramebuffer( m_device.device, &framebufferCreateInfo, nullptr, &m_frameBuffers[ frameIndex ] ) != VK_SUCCESS )
+			if ( vkCreateFramebuffer( m_device.mDevice, &framebufferCreateInfo, nullptr, &m_frameBuffers[ frameIndex ] ) != VK_SUCCESS )
 			{
 				Debug::Error( "Could not create framebuffer" );
 				return false;
@@ -87,7 +87,7 @@ namespace fan
 		m_extent = _extent;
 
 		// Rebuild color attachment
-		if ( m_colorImageView.imageView != VK_NULL_HANDLE )
+		if ( m_colorImageView.mImageView != VK_NULL_HANDLE )
 		{
 			m_colorImage.Destroy( m_device );
 			m_colorImageView.Destroy( m_device );
@@ -95,7 +95,7 @@ namespace fan
 		}
 
 		// Rebuild depth attachment
-		if ( m_depthImageView.imageView != VK_NULL_HANDLE )
+		if ( m_depthImageView.mImageView != VK_NULL_HANDLE )
 		{
 			CreateDepthResources( m_device );
 		}
@@ -109,7 +109,7 @@ namespace fan
 	//================================================================================================================================
 	void FrameBuffer::AddDepthAttachment()
 	{
-		assert( m_depthImageView.imageView == VK_NULL_HANDLE );
+		assert( m_depthImageView.mImageView == VK_NULL_HANDLE );
 		depthFormat = m_device.FindDepthFormat();
 		CreateDepthResources( m_device );
 	}
@@ -119,7 +119,7 @@ namespace fan
 	//================================================================================================================================
 	void FrameBuffer::AddColorAttachment( const VkFormat _format, const VkExtent2D _extent )
 	{
-		assert( m_colorImageView.imageView == VK_NULL_HANDLE );
+		assert( m_colorImageView.mImageView == VK_NULL_HANDLE );
 
 		m_colorFormat = _format;
 
@@ -136,7 +136,7 @@ namespace fan
 			VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_STORAGE_BIT | VK_IMAGE_USAGE_INPUT_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
 			VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT
 		);
-		m_colorImageView.Create( _device, m_colorImage.image, _format, VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_VIEW_TYPE_2D );
+		m_colorImageView.Create( _device, m_colorImage.mImage, _format, VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_VIEW_TYPE_2D );
 	}
 
 	//================================================================================================================================
@@ -144,7 +144,7 @@ namespace fan
 	void FrameBuffer::CreateDepthImageAndView( Device& _device, const VkFormat _format, const VkExtent2D _extent )
 	{
 		m_depthImage.Create( _device, _format, _extent, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT );
-		m_depthImageView.Create( _device, m_depthImage.image, depthFormat, VK_IMAGE_ASPECT_DEPTH_BIT, VK_IMAGE_VIEW_TYPE_2D );
+		m_depthImageView.Create( _device, m_depthImage.mImage, depthFormat, VK_IMAGE_ASPECT_DEPTH_BIT, VK_IMAGE_VIEW_TYPE_2D );
 	}
 
 	//================================================================================================================================
@@ -152,7 +152,7 @@ namespace fan
 	bool FrameBuffer::CreateDepthResources( Device& _device )
 	{
 		
-		if ( m_depthImage.image == VK_NULL_HANDLE )
+		if ( m_depthImage.mImage == VK_NULL_HANDLE )
 		{
 			CreateDepthImageAndView( _device, depthFormat, m_extent );			
 		}

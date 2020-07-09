@@ -12,7 +12,7 @@ namespace fan
 												VkSubpassDescription* _subpassDescriptions,			uint32_t _countSubpasses,
 												VkSubpassDependency* _dependencies,					uint32_t _countDependencies ) 
 	{
-		assert( renderPass == VK_NULL_HANDLE );
+		assert( mRenderPass == VK_NULL_HANDLE );
 
 		VkRenderPassCreateInfo renderPassCreateInfo;
 		renderPassCreateInfo.sType				= VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
@@ -25,12 +25,12 @@ namespace fan
 		renderPassCreateInfo.dependencyCount	= _countDependencies;
 		renderPassCreateInfo.pDependencies		= _dependencies;
 
-		if( vkCreateRenderPass( _device.device, &renderPassCreateInfo, nullptr, &renderPass ) != VK_SUCCESS )
+		if( vkCreateRenderPass( _device.mDevice, &renderPassCreateInfo, nullptr, &mRenderPass ) != VK_SUCCESS )
 		{
 			Debug::Error( "Could not create render pass" );
 			return false;
 		}
-		Debug::Get() << Debug::Severity::log << std::hex << "VkRenderPass          " << renderPass << std::dec << Debug::Endl();
+		Debug::Get() << Debug::Severity::log << std::hex << "VkRenderPass          " << mRenderPass << std::dec << Debug::Endl();
 
 		return true;
 	}
@@ -39,9 +39,9 @@ namespace fan
 	//================================================================================================================================
 	void RenderPass::Destroy( Device& _device )
 	{
-		if( renderPass != VK_NULL_HANDLE )
+		if( mRenderPass != VK_NULL_HANDLE )
 		{
-			vkDestroyRenderPass( _device.device, renderPass, VK_NULL_HANDLE );
+			vkDestroyRenderPass( _device.mDevice, mRenderPass, VK_NULL_HANDLE );
 		}
 	}
 

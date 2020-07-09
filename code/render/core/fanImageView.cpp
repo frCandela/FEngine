@@ -9,10 +9,10 @@ namespace fan
 	//================================================================================================================================
 	void ImageView::Destroy( Device& _device )
 	{
-		if ( imageView != VK_NULL_HANDLE )
+		if ( mImageView != VK_NULL_HANDLE )
 		{
-			vkDestroyImageView( _device.device, imageView, nullptr );
-			imageView = VK_NULL_HANDLE;
+			vkDestroyImageView( _device.mDevice, mImageView, nullptr );
+			mImageView = VK_NULL_HANDLE;
 		}
 	}
 
@@ -20,7 +20,7 @@ namespace fan
 	//================================================================================================================================
 	bool ImageView::Create( Device& _device, VkImage _image, const VkFormat _format, const VkImageAspectFlags _aspectFlags, const VkImageViewType _viewType )
 	{
-		assert( imageView == VK_NULL_HANDLE );
+		assert( mImageView == VK_NULL_HANDLE );
 
 		VkImageViewCreateInfo imageViewCreateInfo;
 		imageViewCreateInfo.sType							= VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
@@ -39,8 +39,8 @@ namespace fan
 		imageViewCreateInfo.subresourceRange.baseArrayLayer = 0;
 		imageViewCreateInfo.subresourceRange.layerCount		= VK_REMAINING_ARRAY_LAYERS;
 
-		VkResult result = vkCreateImageView( _device.device, &imageViewCreateInfo, nullptr, &imageView );
-		Debug::Get() << Debug::Severity::log << std::hex << "VkImageView           " << imageView << std::dec << Debug::Endl();
+		VkResult result = vkCreateImageView( _device.mDevice, &imageViewCreateInfo, nullptr, &mImageView );
+		Debug::Get() << Debug::Severity::log << std::hex << "VkImageView           " << mImageView << std::dec << Debug::Endl();
 		return result == VK_SUCCESS;
 	}
 }

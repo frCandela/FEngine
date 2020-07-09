@@ -13,7 +13,7 @@ namespace fan
 	//================================================================================================================================
 	bool Shader::Create( Device& _device, const std::string _path )
 	{
-		assert( shaderModule == VK_NULL_HANDLE );
+		assert( mShaderModule == VK_NULL_HANDLE );
 
 		std::vector<unsigned int> spirvCode = SpirvCompiler::Compile( _path );
 		if ( spirvCode.empty() )
@@ -39,12 +39,12 @@ namespace fan
 		shaderModuleCreateInfo.codeSize = spirvCode.size() * sizeof( unsigned int );
 		shaderModuleCreateInfo.pCode = spirvCode.data();
 
-		if ( vkCreateShaderModule( _device.device, &shaderModuleCreateInfo, nullptr, &shaderModule ) != VK_SUCCESS )
+		if ( vkCreateShaderModule( _device.mDevice, &shaderModuleCreateInfo, nullptr, &mShaderModule ) != VK_SUCCESS )
 		{
 			Debug::Get() << Debug::Severity::error << "Could not create shader module: " << _path << Debug::Endl();
 			return false;
 		}
-		Debug::Get() << Debug::Severity::log << std::hex << "VkShaderModule        " << shaderModule << std::dec << Debug::Endl();
+		Debug::Get() << Debug::Severity::log << std::hex << "VkShaderModule        " << mShaderModule << std::dec << Debug::Endl();
 
 		return true;
 	}
@@ -53,10 +53,10 @@ namespace fan
 	//================================================================================================================================
 	void Shader::Destroy( Device& _device )
 	{
-		if( shaderModule != VK_NULL_HANDLE )
+		if( mShaderModule != VK_NULL_HANDLE )
 		{
-			vkDestroyShaderModule( _device.device, shaderModule, nullptr );
-			shaderModule = VK_NULL_HANDLE;
+			vkDestroyShaderModule( _device.mDevice, mShaderModule, nullptr );
+			mShaderModule = VK_NULL_HANDLE;
 		}
 	}
 

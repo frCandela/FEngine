@@ -87,7 +87,7 @@ namespace fan
 		pipelineLayoutCreateInfo.pushConstantRangeCount = static_cast< uint32_t >( m_pushConstantRanges.size() );
 		pipelineLayoutCreateInfo.pPushConstantRanges = m_pushConstantRanges.data();
 
-		if ( vkCreatePipelineLayout( m_device.device, &pipelineLayoutCreateInfo, nullptr, &m_pipelineLayout ) != VK_SUCCESS )
+		if ( vkCreatePipelineLayout( m_device.mDevice, &pipelineLayoutCreateInfo, nullptr, &m_pipelineLayout ) != VK_SUCCESS )
 		{
 			Debug::Error( "Could not allocate command pool." );
 			return false;
@@ -95,8 +95,8 @@ namespace fan
 		Debug::Get() << Debug::Severity::log << std::hex << "VkPipelineLayout      " << m_pipelineLayout << std::dec << Debug::Endl();
 
 
-		m_fragShaderStageCreateInfos.module = m_fragmentShader.shaderModule;
-		m_vertshaderStageCreateInfos.module = m_vertexShader.shaderModule;
+		m_fragShaderStageCreateInfos.module = m_fragmentShader.mShaderModule;
+		m_vertshaderStageCreateInfos.module = m_vertexShader.mShaderModule;
 		std::vector<VkPipelineShaderStageCreateInfo> shaderStages = { m_vertshaderStageCreateInfos, m_fragShaderStageCreateInfos };
 
 		VkGraphicsPipelineCreateInfo graphicsPipelineCreateInfo = {};
@@ -121,7 +121,7 @@ namespace fan
 		graphicsPipelineCreateInfo.basePipelineIndex = -1;
 
 		if ( vkCreateGraphicsPipelines(
-			m_device.device,
+			m_device.mDevice,
 			VK_NULL_HANDLE,
 			1,
 			&graphicsPipelineCreateInfo,
@@ -145,7 +145,7 @@ namespace fan
 		m_vertshaderStageCreateInfos.pNext = nullptr;
 		m_vertshaderStageCreateInfos.flags = 0;
 		m_vertshaderStageCreateInfos.stage = VK_SHADER_STAGE_VERTEX_BIT;
-		m_vertshaderStageCreateInfos.module = m_vertexShader.shaderModule;
+		m_vertshaderStageCreateInfos.module = m_vertexShader.mShaderModule;
 		m_vertshaderStageCreateInfos.pName = "main";
 		m_vertshaderStageCreateInfos.pSpecializationInfo = nullptr;
 
@@ -153,7 +153,7 @@ namespace fan
 		m_fragShaderStageCreateInfos.pNext = nullptr;
 		m_fragShaderStageCreateInfos.flags = 0;
 		m_fragShaderStageCreateInfos.stage = VK_SHADER_STAGE_FRAGMENT_BIT;
-		m_fragShaderStageCreateInfos.module = m_fragmentShader.shaderModule;
+		m_fragShaderStageCreateInfos.module = m_fragmentShader.mShaderModule;
 		m_fragShaderStageCreateInfos.pName = "main";
 		m_fragShaderStageCreateInfos.pSpecializationInfo = nullptr;
 
@@ -297,13 +297,13 @@ namespace fan
 	{
 		if ( m_pipelineLayout != VK_NULL_HANDLE )
 		{
-			vkDestroyPipelineLayout( m_device.device, m_pipelineLayout, nullptr );
+			vkDestroyPipelineLayout( m_device.mDevice, m_pipelineLayout, nullptr );
 			m_pipelineLayout = VK_NULL_HANDLE;
 		}
 
 		if ( m_pipeline != VK_NULL_HANDLE )
 		{
-			vkDestroyPipeline( m_device.device, m_pipeline, nullptr );
+			vkDestroyPipeline( m_device.mDevice, m_pipeline, nullptr );
 			m_pipeline = VK_NULL_HANDLE;
 		}
 	}

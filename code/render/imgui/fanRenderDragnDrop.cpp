@@ -15,7 +15,7 @@ namespace ImGui
 			{
 				ImGui::SetDragDropPayload( "dragndrop_texture", &_texture, sizeof( fan::Texture** ) );
 				ImGui::Icon( ImGui::IconType::IMAGE16, { 16,16 } ); ImGui::SameLine();
-				ImGui::Text( _texture->path.c_str() );
+				ImGui::Text( _texture->mPath.c_str() );
 				ImGui::EndDragDropSource();
 			}
 		}

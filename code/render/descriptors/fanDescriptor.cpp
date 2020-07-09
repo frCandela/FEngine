@@ -21,13 +21,13 @@ namespace fan
 	{
 		if ( m_descriptorPool != VK_NULL_HANDLE )
 		{
-			vkDestroyDescriptorPool( m_device.device, m_descriptorPool, nullptr );
+			vkDestroyDescriptorPool( m_device.mDevice, m_descriptorPool, nullptr );
 			m_descriptorPool = VK_NULL_HANDLE;
 		}
 
 		if ( m_descriptorSetLayout != VK_NULL_HANDLE )
 		{
-			vkDestroyDescriptorSetLayout( m_device.device, m_descriptorSetLayout, nullptr );
+			vkDestroyDescriptorSetLayout( m_device.mDevice, m_descriptorSetLayout, nullptr );
 			m_descriptorSetLayout = VK_NULL_HANDLE;
 		}
 
@@ -119,7 +119,7 @@ namespace fan
 			descriptorSetLayoutCreateInfo.bindingCount = static_cast< uint32_t >( m_bindingData.size() );
 			descriptorSetLayoutCreateInfo.pBindings = bindingsArray.data();
 
-			if ( vkCreateDescriptorSetLayout( m_device.device, &descriptorSetLayoutCreateInfo, nullptr, &m_descriptorSetLayout ) != VK_SUCCESS )
+			if ( vkCreateDescriptorSetLayout( m_device.mDevice, &descriptorSetLayoutCreateInfo, nullptr, &m_descriptorSetLayout ) != VK_SUCCESS )
 			{
 				Debug::Error( "Could not allocate descriptor set layout." );
 				return false;
@@ -141,7 +141,7 @@ namespace fan
 			descriptorPoolCreateInfo.maxSets = static_cast< uint32_t >( m_numDescriptors );
 			descriptorPoolCreateInfo.poolSizeCount = static_cast< uint32_t >( poolSizes.size() );
 			descriptorPoolCreateInfo.pPoolSizes = poolSizes.data();
-			if ( vkCreateDescriptorPool( m_device.device, &descriptorPoolCreateInfo, nullptr, &m_descriptorPool ) != VK_SUCCESS )
+			if ( vkCreateDescriptorPool( m_device.mDevice, &descriptorPoolCreateInfo, nullptr, &m_descriptorPool ) != VK_SUCCESS )
 			{
 				Debug::Error( "Could not allocate descriptor pool." );
 				return false;
@@ -163,7 +163,7 @@ namespace fan
 			descriptorSetAllocateInfo.pSetLayouts = descriptorSetLayouts.data();
 
 			m_descriptorSets.resize( m_numDescriptors );
-			if ( vkAllocateDescriptorSets( m_device.device, &descriptorSetAllocateInfo, m_descriptorSets.data() ) != VK_SUCCESS )
+			if ( vkAllocateDescriptorSets( m_device.mDevice, &descriptorSetAllocateInfo, m_descriptorSets.data() ) != VK_SUCCESS )
 			{
 				Debug::Error( "Could not allocate descriptor set." );
 				return false;
@@ -197,7 +197,7 @@ namespace fan
 		}
 
 		vkUpdateDescriptorSets(
-			m_device.device,
+			m_device.mDevice,
 			static_cast< uint32_t >( writeDescriptors.size() ),
 			writeDescriptors.data(),
 			0,
@@ -224,9 +224,9 @@ namespace fan
 				VK_MEMORY_PROPERTY_HOST_COHERENT_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT,
 				_alignment
 			);
-			descriptorBufferInfos[ bufferIndex ].buffer = buffers[ bufferIndex ].buffer;
+			descriptorBufferInfos[ bufferIndex ].buffer = buffers[ bufferIndex ].mBuffer;
 			descriptorBufferInfos[ bufferIndex ].offset = 0;
-			descriptorBufferInfos[ bufferIndex ].range = buffers[ bufferIndex ].alignment > 1 ? buffers[ bufferIndex ].alignment : buffers[ bufferIndex ].size;
+			descriptorBufferInfos[ bufferIndex ].range = buffers[ bufferIndex ].mAlignment > 1 ? buffers[ bufferIndex ].mAlignment : buffers[ bufferIndex ].mSize;
 		}
 	}
 

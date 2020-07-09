@@ -15,7 +15,7 @@ namespace fan
 		void Destroy( Device& _device );
 		void TransitionImageLayout( VkCommandBuffer _commandBuffer, VkFormat _format, VkImageLayout _oldLayout, VkImageLayout _newLayout, uint32_t _mipLevels );
 
-		VkImage			image	= VK_NULL_HANDLE;
-		VkDeviceMemory	memory	= VK_NULL_HANDLE;
+		VkImage			mImage	= VK_NULL_HANDLE;
+		VkDeviceMemory	mMemory	= VK_NULL_HANDLE;
 	};
 }

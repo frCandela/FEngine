@@ -35,11 +35,11 @@ namespace fan
 		m_fragShader.Destroy( m_device );
 		m_vertShader.Destroy( m_device );
 
-		vkDestroyPipelineCache( m_device.device, m_pipelineCache, nullptr );
-		vkDestroyPipeline( m_device.device, m_pipeline, nullptr );
-		vkDestroyPipelineLayout( m_device.device, m_pipelineLayout, nullptr );
-		vkDestroyDescriptorPool( m_device.device, m_descriptorPool, nullptr );
-		vkDestroyDescriptorSetLayout( m_device.device, m_descriptorSetLayout, nullptr );
+		vkDestroyPipelineCache( m_device.mDevice, m_pipelineCache, nullptr );
+		vkDestroyPipeline( m_device.mDevice, m_pipeline, nullptr );
+		vkDestroyPipelineLayout( m_device.mDevice, m_pipelineLayout, nullptr );
+		vkDestroyDescriptorPool( m_device.mDevice, m_descriptorPool, nullptr );
+		vkDestroyDescriptorSetLayout( m_device.mDevice, m_descriptorSetLayout, nullptr );
 
 		ImGui::DestroyContext();
 	}
@@ -68,8 +68,8 @@ namespace fan
 		m_iconsTexture.CreateFromFile( m_device, RenderGlobal::s_defaultIcons );
 
 		VkDescriptorImageInfo iconsDescriptorImageInfo{};
-		iconsDescriptorImageInfo.sampler = m_iconsSampler.sampler;
-		iconsDescriptorImageInfo.imageView = m_iconsTexture.imageView;
+		iconsDescriptorImageInfo.sampler = m_iconsSampler.mSampler;
+		iconsDescriptorImageInfo.imageView = m_iconsTexture.mImageView;
 		iconsDescriptorImageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 
 		VkWriteDescriptorSet writeDescriptorSetIcons{};
@@ -80,7 +80,7 @@ namespace fan
 		writeDescriptorSetIcons.pImageInfo = &iconsDescriptorImageInfo;
 		writeDescriptorSetIcons.descriptorCount = 1;
 
-		vkUpdateDescriptorSets( m_device.device, 1, &writeDescriptorSetIcons, 0, nullptr );
+		vkUpdateDescriptorSets( m_device.mDevice, 1, &writeDescriptorSetIcons, 0, nullptr );
 	}
 
 	//================================================================================================================================
@@ -100,7 +100,7 @@ namespace fan
 
 			// Vertex buffer
 			Buffer& vertexBuffer = m_vertexBuffers[ _index ];
-			if ( ( vertexBuffer.buffer == VK_NULL_HANDLE ) || ( m_vertexCount[ _index ] != imDrawData->TotalVtxCount ) )
+			if ( ( vertexBuffer.mBuffer == VK_NULL_HANDLE ) || ( m_vertexCount[ _index ] != imDrawData->TotalVtxCount ) )
 			{
 				vertexBuffer.Unmap( m_device );
 				vertexBuffer.Destroy( m_device  );
@@ -111,7 +111,7 @@ namespace fan
 
 			// Index buffer
 			Buffer& indexBuffer = m_indexBuffers[ _index ];
-			if ( ( indexBuffer.buffer == VK_NULL_HANDLE ) || ( m_indexCount[ _index ] < imDrawData->TotalIdxCount ) )
+			if ( ( indexBuffer.mBuffer == VK_NULL_HANDLE ) || ( m_indexCount[ _index ] < imDrawData->TotalIdxCount ) )
 			{
 				indexBuffer.Unmap( m_device );
 				indexBuffer.Destroy( m_device );
@@ -152,10 +152,10 @@ namespace fan
 
 			// Bind vertex and index buffer
 			VkDeviceSize offsets[ 1 ] = { 0 };
-			std::vector<VkBuffer> buffers = { m_vertexBuffers[ _index ].buffer };
+			std::vector<VkBuffer> buffers = { m_vertexBuffers[ _index ].mBuffer };
 
 			vkCmdBindVertexBuffers( _commandBuffer, 0, static_cast< uint32_t >( buffers.size() ), buffers.data(), offsets );
-			vkCmdBindIndexBuffer( _commandBuffer, m_indexBuffers[ _index ].buffer, 0, VK_INDEX_TYPE_UINT16 );
+			vkCmdBindIndexBuffer( _commandBuffer, m_indexBuffers[ _index ].mBuffer, 0, VK_INDEX_TYPE_UINT16 );
 
 			// Viewport
 			VkViewport viewport{};
@@ -294,7 +294,7 @@ namespace fan
 		descriptorPoolInfo.pPoolSizes = poolSizes.data();
 		descriptorPoolInfo.maxSets = 3;
 
-		vkCreateDescriptorPool( m_device.device, &descriptorPoolInfo, nullptr, &m_descriptorPool );
+		vkCreateDescriptorPool( m_device.mDevice, &descriptorPoolInfo, nullptr, &m_descriptorPool );
 
 		// Descriptor set layout
 		VkDescriptorSetLayoutBinding setLayoutBinding{};
@@ -310,7 +310,7 @@ namespace fan
 		descriptorSetLayoutCreateInfo.pBindings = setLayoutBindings.data();
 		descriptorSetLayoutCreateInfo.bindingCount = static_cast< uint32_t >( setLayoutBindings.size() );
 
-		vkCreateDescriptorSetLayout( m_device.device, &descriptorSetLayoutCreateInfo, nullptr, &m_descriptorSetLayout );
+		vkCreateDescriptorSetLayout( m_device.mDevice, &descriptorSetLayoutCreateInfo, nullptr, &m_descriptorSetLayout );
 
 		// Descriptor set
 		VkDescriptorSetLayout layouts[ 3 ] = { m_descriptorSetLayout ,m_descriptorSetLayout, m_descriptorSetLayout };
@@ -320,21 +320,21 @@ namespace fan
 		descriptorSetAllocateInfo.pSetLayouts = layouts;
 		descriptorSetAllocateInfo.descriptorSetCount = 3;
 
-		vkAllocateDescriptorSets( m_device.device, &descriptorSetAllocateInfo, m_descriptorSets );
+		vkAllocateDescriptorSets( m_device.mDevice, &descriptorSetAllocateInfo, m_descriptorSets );
 
 		VkDescriptorImageInfo fontDescriptorImageInfo{};
-		fontDescriptorImageInfo.sampler = m_sampler.sampler;
-		fontDescriptorImageInfo.imageView = m_fontTexture.imageView;
+		fontDescriptorImageInfo.sampler = m_sampler.mSampler;
+		fontDescriptorImageInfo.imageView = m_fontTexture.mImageView;
 		fontDescriptorImageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 
 		VkDescriptorImageInfo iconsDescriptorImageInfo{};
-		iconsDescriptorImageInfo.sampler = m_iconsSampler.sampler;
-		iconsDescriptorImageInfo.imageView = m_iconsTexture.imageView;
+		iconsDescriptorImageInfo.sampler = m_iconsSampler.mSampler;
+		iconsDescriptorImageInfo.imageView = m_iconsTexture.mImageView;
 		iconsDescriptorImageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 
 		VkDescriptorImageInfo view3DDescriptorImageInfo{};
-		view3DDescriptorImageInfo.sampler = m_iconsSampler.sampler;
-		view3DDescriptorImageInfo.imageView = m_gameImageView->imageView;
+		view3DDescriptorImageInfo.sampler = m_iconsSampler.mSampler;
+		view3DDescriptorImageInfo.imageView = m_gameImageView->mImageView;
 		view3DDescriptorImageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 
 		VkWriteDescriptorSet writeDescriptorSet{};
@@ -363,7 +363,7 @@ namespace fan
 
 		std::vector<VkWriteDescriptorSet> writeDescriptorSets = { writeDescriptorSet, writeDescriptorSetIcons, writeDescriptorSet3DView };
 
-		vkUpdateDescriptorSets( m_device.device, static_cast< uint32_t >( writeDescriptorSets.size() ), writeDescriptorSets.data(), 0, nullptr );
+		vkUpdateDescriptorSets( m_device.mDevice, static_cast< uint32_t >( writeDescriptorSets.size() ), writeDescriptorSets.data(), 0, nullptr );
 	}
 
 	//================================================================================================================================
@@ -371,8 +371,8 @@ namespace fan
 	void ImguiPipeline::UpdateGameImageDescriptor()
 	{
 		VkDescriptorImageInfo viewGameDescriptorImageInfo{};
-		viewGameDescriptorImageInfo.sampler = m_iconsSampler.sampler;
-		viewGameDescriptorImageInfo.imageView = m_gameImageView->imageView;
+		viewGameDescriptorImageInfo.sampler = m_iconsSampler.mSampler;
+		viewGameDescriptorImageInfo.imageView = m_gameImageView->mImageView;
 		viewGameDescriptorImageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 
 		VkWriteDescriptorSet writeDescriptorSet3DView{};
@@ -385,7 +385,7 @@ namespace fan
 
 		std::vector<VkWriteDescriptorSet> writeDescriptorSets = { writeDescriptorSet3DView };
 
-		vkUpdateDescriptorSets( m_device.device, static_cast< uint32_t >( writeDescriptorSets.size() ), writeDescriptorSets.data(), 0, nullptr );
+		vkUpdateDescriptorSets( m_device.mDevice, static_cast< uint32_t >( writeDescriptorSets.size() ), writeDescriptorSets.data(), 0, nullptr );
 	}
 
 	//================================================================================================================================
@@ -395,7 +395,7 @@ namespace fan
 		// Pipeline cache
 		VkPipelineCacheCreateInfo pipelineCacheCreateInfo = {};
 		pipelineCacheCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
-		vkCreatePipelineCache( m_device.device, &pipelineCacheCreateInfo, nullptr, &m_pipelineCache );
+		vkCreatePipelineCache( m_device.mDevice, &pipelineCacheCreateInfo, nullptr, &m_pipelineCache );
 
 		// Push constants for UI rendering parameters
 		VkPushConstantRange pushConstantRange = {};
@@ -410,7 +410,7 @@ namespace fan
 		pipelineLayoutCreateInfo.pushConstantRangeCount = 1;
 		pipelineLayoutCreateInfo.pPushConstantRanges = &pushConstantRange;
 
-		vkCreatePipelineLayout( m_device.device, &pipelineLayoutCreateInfo, nullptr, &m_pipelineLayout );
+		vkCreatePipelineLayout( m_device.mDevice, &pipelineLayoutCreateInfo, nullptr, &m_pipelineLayout );
 
 		// Setup graphics pipeline for UI rendering
 		VkPipelineInputAssemblyStateCreateInfo inputAssemblyState = {};
@@ -479,14 +479,14 @@ namespace fan
 		VkPipelineShaderStageCreateInfo vertShaderStageInfo = {};
 		vertShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
 		vertShaderStageInfo.stage = VK_SHADER_STAGE_VERTEX_BIT;
-		vertShaderStageInfo.module = m_vertShader.shaderModule;
+		vertShaderStageInfo.module = m_vertShader.mShaderModule;
 		vertShaderStageInfo.pName = "main";
 
 		// Fragment shader
 		VkPipelineShaderStageCreateInfo fragShaderStageInfo = {};
 		fragShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
 		fragShaderStageInfo.stage = VK_SHADER_STAGE_FRAGMENT_BIT;
-		fragShaderStageInfo.module = m_fragShader.shaderModule;
+		fragShaderStageInfo.module = m_fragShader.mShaderModule;
 		fragShaderStageInfo.pName = "main";
 
 		std::array<VkPipelineShaderStageCreateInfo, 2> shaderStages = { vertShaderStageInfo, fragShaderStageInfo };
@@ -552,6 +552,6 @@ namespace fan
 		pipelineCreateInfo.pVertexInputState = &vertexInputState;
 		pipelineCreateInfo.subpass = 0;
 
-		vkCreateGraphicsPipelines( m_device.device, m_pipelineCache, 1, &pipelineCreateInfo, nullptr, &m_pipeline );
+		vkCreateGraphicsPipelines( m_device.mDevice, m_pipelineCache, 1, &pipelineCreateInfo, nullptr, &m_pipeline );
 	}
 }

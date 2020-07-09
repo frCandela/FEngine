@@ -7,18 +7,16 @@ namespace fan
 	//================================================================================================================================
 	bool CommandBuffer::Create( Device& _device, const int _size, const VkCommandBufferLevel _level )
 	{
-		assert( buffers[0] == VK_NULL_HANDLE && buffers[1] == VK_NULL_HANDLE&& buffers[2] == VK_NULL_HANDLE );
-
-		size = _size;
+		assert( mBuffers[0] == VK_NULL_HANDLE && mBuffers[1] == VK_NULL_HANDLE&& mBuffers[2] == VK_NULL_HANDLE );
 
 		VkCommandBufferAllocateInfo commandBufferAllocateInfo;
 		commandBufferAllocateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
 		commandBufferAllocateInfo.pNext = nullptr;
-		commandBufferAllocateInfo.commandPool = _device.commandPool;
+		commandBufferAllocateInfo.commandPool = _device.mCommandPool;
 		commandBufferAllocateInfo.level = _level;
 		commandBufferAllocateInfo.commandBufferCount = _size;
 
-		if( vkAllocateCommandBuffers( _device.device, &commandBufferAllocateInfo, buffers ) != VK_SUCCESS )
+		if( vkAllocateCommandBuffers( _device.mDevice, &commandBufferAllocateInfo, mBuffers ) != VK_SUCCESS )
 		{
 			Debug::Error( "Could not allocate command buffers." );
 			return false;

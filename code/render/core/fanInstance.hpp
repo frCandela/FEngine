@@ -14,11 +14,11 @@ namespace fan
 		void Create();
 		void Destroy();
 
-		VkInstance instance = VK_NULL_HANDLE;
+		VkInstance mInstance = VK_NULL_HANDLE;
 
-		std::vector < const char*> enabledValidationLayers;
-		std::vector < const char*> enabledExtensions;
-		VkDebugReportCallbackEXT   debugReportCallback;
+		std::vector < const char*> mEnabledValidationLayers;
+		std::vector < const char*> mEnabledExtensions;
+		VkDebugReportCallbackEXT   mDebugReportCallback;
 
 	private:
 		void FindDesiredValidationLayers( const std::vector < const char*> _desiredLayers );

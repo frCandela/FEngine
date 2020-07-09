@@ -15,7 +15,7 @@ namespace fan
 		glfwWindowHint( GLFW_CLIENT_API, GLFW_NO_API );
 		glfwWindowHint( GLFW_RESIZABLE, GLFW_TRUE );
 		m_window = glfwCreateWindow( _size.x, _size.y, _name, nullptr/* fullscreen monitor */, nullptr );
-		glfwCreateWindowSurface( m_instance.instance, m_window, nullptr, &m_surface );
+		glfwCreateWindowSurface( m_instance.mInstance, m_window, nullptr, &m_surface );
 		Debug::Log() << std::hex << "VkSurfaceKHR          " << m_surface << std::dec << Debug::Endl();
 
 		glfwSetWindowPos( m_window, _position.x, _position.y );
@@ -33,7 +33,7 @@ namespace fan
 		m_swapchain.Destroy( m_device );
 		m_device.Destroy();
 
-		vkDestroySurfaceKHR( m_instance.instance, m_surface, nullptr );
+		vkDestroySurfaceKHR( m_instance.mInstance, m_surface, nullptr );
 		m_surface = VK_NULL_HANDLE;
 		glfwDestroyWindow( m_window );
 		glfwTerminate();

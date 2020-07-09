@@ -25,7 +25,7 @@ namespace fan
 	{
 		UIRenderer& uiRenderer = static_cast<UIRenderer&>( _component );
 
-		if( uiRenderer.uiMesh.GetVertexBuffer().buffer == VK_NULL_HANDLE )
+		if( uiRenderer.uiMesh.GetVertexBuffer().mBuffer == VK_NULL_HANDLE )
 		{
 			std::vector<UIVertex> vertices = { // tmp make a 2D quad
 				UIVertex( glm::vec2( +2.f, +0.f ), glm::vec2( +1.f, +0.f ) )
@@ -84,6 +84,6 @@ namespace fan
 	//================================================================================================================================
 	glm::ivec2	UIRenderer::GetTextureSize() const 
 	{ 
-		return *texture != nullptr ? glm::ivec2( texture->extent.width, texture->extent.height ) : glm::ivec2( 0, 0 );
+		return *texture != nullptr ? glm::ivec2( texture->mExtent.width, texture->mExtent.height ) : glm::ivec2( 0, 0 );
 	}
 }

@@ -9,10 +9,10 @@ namespace fan
 	//================================================================================================================================
 	void Sampler::Destroy( Device& _device )
 	{
-		if( sampler != VK_NULL_HANDLE )
+		if( mSampler != VK_NULL_HANDLE )
 		{
-			vkDestroySampler( _device.device, sampler, VK_NULL_HANDLE );
-			sampler = VK_NULL_HANDLE;
+			vkDestroySampler( _device.mDevice, mSampler, VK_NULL_HANDLE );
+			mSampler = VK_NULL_HANDLE;
 		}
 	}
 
@@ -20,7 +20,7 @@ namespace fan
 	//================================================================================================================================
 	void Sampler::Create( Device& _device, const float _maxLod, const float _maxAnisotropy, const VkFilter _filter )
 	{
-		assert( sampler == VK_NULL_HANDLE );
+		assert( mSampler == VK_NULL_HANDLE );
 
 		VkSamplerCreateInfo samplerInfo = {};
 		samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
@@ -42,7 +42,7 @@ namespace fan
 		samplerInfo.maxLod = _maxLod;
 		samplerInfo.mipLodBias = 0;
 
-		if( vkCreateSampler( _device.device, &samplerInfo, VK_NULL_HANDLE, &sampler ) != VK_SUCCESS )
+		if( vkCreateSampler( _device.mDevice, &samplerInfo, VK_NULL_HANDLE, &mSampler ) != VK_SUCCESS )
 		{
 			Debug::Error() << "sampler creation failed" << Debug::Endl();
 		}

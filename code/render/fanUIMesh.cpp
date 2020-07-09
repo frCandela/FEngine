@@ -53,7 +53,7 @@ namespace fan
 
 		Buffer& vertexBuffer = m_vertexBuffer[ m_currentBuffer ];
 		const VkDeviceSize requiredVertexSize = sizeof( m_vertices[ 0 ] ) * m_vertices.size();
-		if ( vertexBuffer.buffer == VK_NULL_HANDLE || vertexBuffer.size < requiredVertexSize )
+		if ( vertexBuffer.mBuffer == VK_NULL_HANDLE || vertexBuffer.mSize < requiredVertexSize )
 		{
 			vertexBuffer.Destroy( _device );
 			m_vertexBuffer[ m_currentBuffer ].Create(
@@ -79,7 +79,7 @@ namespace fan
 			);
 			stagingBuffer2.SetData( _device, m_vertices.data(), requiredVertexSize );
 			VkCommandBuffer cmd2 = _device.BeginSingleTimeCommands();
-			stagingBuffer2.CopyBufferTo( cmd2, vertexBuffer.buffer, requiredVertexSize );
+			stagingBuffer2.CopyBufferTo( cmd2, vertexBuffer.mBuffer, requiredVertexSize );
 			_device.EndSingleTimeCommands( cmd2 );
 			stagingBuffer2.Destroy( _device );
 		}
@@ -89,7 +89,7 @@ namespace fan
 	//================================================================================================================================
 	void UIMesh::DeleteGpuData( Device& _device )
 	{
-		vkDeviceWaitIdle( _device.device );
+		vkDeviceWaitIdle( _device.mDevice );
 		Debug::Highlight( "Renderer idle4" );
 
 		for ( int bufferIndex = 0; bufferIndex < 3; bufferIndex++ )

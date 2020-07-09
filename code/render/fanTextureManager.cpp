@@ -23,7 +23,7 @@ namespace fan
 	//================================================================================================================================
 	void TextureManager::Clear()
 	{
-		vkDeviceWaitIdle( m_device->device );
+		vkDeviceWaitIdle( m_device->mDevice );
 		Debug::Highlight( "Renderer idle texture manager" );
 		while ( !m_textureList.empty() ) 
 		{ 
@@ -71,7 +71,7 @@ namespace fan
 			texture = new Texture();			
 			if ( texture->CreateFromFile( Texture::s_resourceManager.GetDevice(), cleanPath ) )
 			{	
-				texture->renderID =  static_cast< int >( m_textureList.size() );
+				texture->mRenderID =  static_cast< int >( m_textureList.size() );
 				m_textureList.push_back( texture );
 				m_modified = true;
 				return texture;
@@ -89,7 +89,7 @@ namespace fan
 		for (int textureIndex = 0; textureIndex < m_textureList.size() ; textureIndex++)
 		{
 			Texture& texture = *m_textureList[ textureIndex ];
-			if ( texture.path == cleanPath )
+			if ( texture.mPath == cleanPath )
 			{
 				return &texture;
 			}

@@ -17,7 +17,7 @@ namespace fan
 		bool Create( Device& _device, const std::string _path );
 		void Destroy( Device& _device );
 
-		VkShaderModule	shaderModule = VK_NULL_HANDLE;
+		VkShaderModule	mShaderModule = VK_NULL_HANDLE;
 
 	private:
 		std::vector<char> ReadFile( const std::string& _filename );

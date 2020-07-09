@@ -17,13 +17,13 @@ namespace fan
 		void Create( Instance& _instance, VkSurfaceKHR _surface );
 		void Destroy();
 
-		VkPhysicalDevice	physicalDevice	= VK_NULL_HANDLE;
-		VkDevice			device			= VK_NULL_HANDLE;
-		VkCommandPool		commandPool		= VK_NULL_HANDLE;
-		VkQueue				graphicsQueue	= VK_NULL_HANDLE;
+		VkPhysicalDevice	mPhysicalDevice	= VK_NULL_HANDLE;
+		VkDevice			mDevice			= VK_NULL_HANDLE;
+		VkCommandPool		mCommandPool		= VK_NULL_HANDLE;
+		VkQueue				mGraphicsQueue	= VK_NULL_HANDLE;
 
-		VkPhysicalDeviceProperties		 deviceProperties;
-		VkPhysicalDeviceMemoryProperties memoryProperties;
+		VkPhysicalDeviceProperties		 mDeviceProperties;
+		VkPhysicalDeviceMemoryProperties mMemoryProperties;
 
 		uint32_t		FindMemoryType( uint32_t _typeFilter, VkMemoryPropertyFlags _properties );
 		VkFormat		FindDepthFormat();

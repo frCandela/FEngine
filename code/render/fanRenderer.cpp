@@ -30,9 +30,9 @@ namespace fan
 	//================================================================================================================================
 	Renderer::Renderer( Window& _window ) : m_window( _window )
 	{
-		m_debugLinesvertexBuffers.resize( m_window.GetSwapChain().imagesCount );
-		m_debugLinesNoDepthTestVertexBuffers.resize( m_window.GetSwapChain().imagesCount );
-		m_debugTrianglesvertexBuffers.resize( m_window.GetSwapChain().imagesCount );
+		m_debugLinesvertexBuffers.resize( m_window.GetSwapChain().mImagesCount );
+		m_debugLinesNoDepthTestVertexBuffers.resize( m_window.GetSwapChain().mImagesCount );
+		m_debugTrianglesvertexBuffers.resize( m_window.GetSwapChain().mImagesCount );
 
 		m_clearColor = glm::vec4( 0.f, 0.f, 0.2f, 1.f );
 
@@ -45,45 +45,45 @@ namespace fan
 		CreateFramebuffers();
 
 		m_samplerTextures.Create( m_window.GetDevice(), 0, 8, VK_FILTER_LINEAR );
-		m_samplerDescriptorTextures = new DescriptorSampler( m_window.GetDevice(), m_samplerTextures.sampler );
+		m_samplerDescriptorTextures = new DescriptorSampler( m_window.GetDevice(), m_samplerTextures.mSampler );
 		CreateTextureDescriptor();
 
 		m_debugLinesPipeline = new DebugPipeline( m_window.GetDevice(), VK_PRIMITIVE_TOPOLOGY_LINE_LIST, true );
-		m_debugLinesPipeline->Init( m_renderPassGame.renderPass, m_window.GetSwapChain().extent, "code/shaders/debugLines.vert", "code/shaders/debugLines.frag" );
-		m_debugLinesPipeline->CreateDescriptors( m_window.GetSwapChain().imagesCount );
+		m_debugLinesPipeline->Init( m_renderPassGame.mRenderPass, m_window.GetSwapChain().mExtent, "code/shaders/debugLines.vert", "code/shaders/debugLines.frag" );
+		m_debugLinesPipeline->CreateDescriptors( m_window.GetSwapChain().mImagesCount );
 		m_debugLinesPipeline->Create();
 
 		m_debugLinesPipelineNoDepthTest = new DebugPipeline( m_window.GetDevice(), VK_PRIMITIVE_TOPOLOGY_LINE_LIST, false );
-		m_debugLinesPipelineNoDepthTest->Init( m_renderPassGame.renderPass, m_window.GetSwapChain().extent, "code/shaders/debugLines.vert", "code/shaders/debugLines.frag" );
-		m_debugLinesPipelineNoDepthTest->CreateDescriptors( m_window.GetSwapChain().imagesCount );
+		m_debugLinesPipelineNoDepthTest->Init( m_renderPassGame.mRenderPass, m_window.GetSwapChain().mExtent, "code/shaders/debugLines.vert", "code/shaders/debugLines.frag" );
+		m_debugLinesPipelineNoDepthTest->CreateDescriptors( m_window.GetSwapChain().mImagesCount );
 		m_debugLinesPipelineNoDepthTest->Create();
 
 		m_debugTrianglesPipeline = new DebugPipeline( m_window.GetDevice(), VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, false );
-		m_debugTrianglesPipeline->Init( m_renderPassGame.renderPass, m_window.GetSwapChain().extent, "code/shaders/debugTriangles.vert", "code/shaders/debugTriangles.frag" );
-		m_debugTrianglesPipeline->CreateDescriptors( m_window.GetSwapChain().imagesCount );
+		m_debugTrianglesPipeline->Init( m_renderPassGame.mRenderPass, m_window.GetSwapChain().mExtent, "code/shaders/debugTriangles.vert", "code/shaders/debugTriangles.frag" );
+		m_debugTrianglesPipeline->CreateDescriptors( m_window.GetSwapChain().mImagesCount );
 		m_debugTrianglesPipeline->Create();
 
 		m_forwardPipeline = new ForwardPipeline( m_window.GetDevice(), m_imagesDescriptor, m_samplerDescriptorTextures );
-		m_forwardPipeline->Init( m_renderPassGame.renderPass, m_window.GetSwapChain().extent, "code/shaders/forward.vert", "code/shaders/forward.frag" );
-		m_forwardPipeline->CreateDescriptors( m_window.GetSwapChain().imagesCount );
+		m_forwardPipeline->Init( m_renderPassGame.mRenderPass, m_window.GetSwapChain().mExtent, "code/shaders/forward.vert", "code/shaders/forward.frag" );
+		m_forwardPipeline->CreateDescriptors( m_window.GetSwapChain().mImagesCount );
 		m_forwardPipeline->Create();
 
 		m_samplerUI.Create( m_window.GetDevice(), 0, 1, VK_FILTER_NEAREST );
-		m_samplerDescriptorUI = new DescriptorSampler( m_window.GetDevice(), m_samplerUI.sampler );
+		m_samplerDescriptorUI = new DescriptorSampler( m_window.GetDevice(), m_samplerUI.mSampler );
 		m_uiPipeline = new UIPipeline( m_window.GetDevice(), m_imagesDescriptor, m_samplerDescriptorUI );
-		m_uiPipeline->Init( m_renderPassPostprocess.renderPass, m_window.GetSwapChain().extent, "code/shaders/ui.vert", "code/shaders/ui.frag" );
-		m_uiPipeline->CreateDescriptors( m_window.GetSwapChain().imagesCount );
+		m_uiPipeline->Init( m_renderPassPostprocess.mRenderPass, m_window.GetSwapChain().mExtent, "code/shaders/ui.vert", "code/shaders/ui.frag" );
+		m_uiPipeline->CreateDescriptors( m_window.GetSwapChain().mImagesCount );
 		m_uiPipeline->Create();
 
 		m_postprocessPipeline = new PostprocessPipeline( m_window.GetDevice() );
 		m_postprocessPipeline->SetGameImageView( m_gameFrameBuffers->GetColorAttachmentImageView() );
-		m_postprocessPipeline->CreateDescriptors( m_window.GetSwapChain().imagesCount );
-		m_postprocessPipeline->Init( m_renderPassPostprocess.renderPass, m_window.GetSwapChain().extent, "code/shaders/postprocess.vert", "code/shaders/postprocess.frag" );
+		m_postprocessPipeline->CreateDescriptors( m_window.GetSwapChain().mImagesCount );
+		m_postprocessPipeline->Init( m_renderPassPostprocess.mRenderPass, m_window.GetSwapChain().mExtent, "code/shaders/postprocess.vert", "code/shaders/postprocess.frag" );
 		m_postprocessPipeline->Create();
 
-		m_imguiPipeline = new ImguiPipeline( m_window.GetDevice(), m_window.GetSwapChain().imagesCount );
+		m_imguiPipeline = new ImguiPipeline( m_window.GetDevice(), m_window.GetSwapChain().mImagesCount );
 		m_imguiPipeline->SetGameView( m_postProcessFramebuffers->GetColorAttachmentImageView() );
-		m_imguiPipeline->Create( m_renderPassImgui.renderPass, m_window.GetWindow(), m_window.GetSwapChain().extent );
+		m_imguiPipeline->Create( m_renderPassImgui.mRenderPass, m_window.GetWindow(), m_window.GetSwapChain().mExtent );
 
 		CreateCommandBuffers();
 		RecordAllCommandBuffers();
@@ -100,7 +100,7 @@ namespace fan
 	{
 		Device& device = m_window.GetDevice();
 
-		vkDeviceWaitIdle( device.device );
+		vkDeviceWaitIdle( device.mDevice );
 
 		delete m_imguiPipeline;
 		delete m_forwardPipeline;
@@ -179,11 +179,11 @@ namespace fan
 		}
 		else
 		{
-			vkWaitForFences( m_window.GetDevice().device, 1, m_window.GetSwapChain().GetCurrentInFlightFence(), VK_TRUE, std::numeric_limits<uint64_t>::max() );
-			vkResetFences( m_window.GetDevice().device, 1, m_window.GetSwapChain().GetCurrentInFlightFence() );
+			vkWaitForFences( m_window.GetDevice().mDevice, 1, m_window.GetSwapChain().GetCurrentInFlightFence(), VK_TRUE, std::numeric_limits<uint64_t>::max() );
+			vkResetFences( m_window.GetDevice().mDevice, 1, m_window.GetSwapChain().GetCurrentInFlightFence() );
 		}
 
-		ImGui::GetIO().DisplaySize = ImVec2( static_cast< float >( m_window.GetSwapChain().extent.width ), static_cast< float >( m_window.GetSwapChain().extent.height ) );
+		ImGui::GetIO().DisplaySize = ImVec2( static_cast< float >( m_window.GetSwapChain().mExtent.width ), static_cast< float >( m_window.GetSwapChain().mExtent.height ) );
 
 		if ( Texture::s_resourceManager.IsModified() )
 		{
@@ -193,7 +193,7 @@ namespace fan
 			Texture::s_resourceManager.SetUnmodified();
 		}
 
-		const uint32_t currentFrame = m_window.GetSwapChain().currentFrame;
+		const uint32_t currentFrame = m_window.GetSwapChain().mCurrentFrame;
 		UpdateUniformBuffers( currentFrame );
 		{
 			SCOPED_PROFILE( record_cmd );
@@ -265,7 +265,7 @@ namespace fan
 	//================================================================================================================================
 	void Renderer::WaitIdle()
 	{
-		vkDeviceWaitIdle( m_window.GetDevice().device );
+		vkDeviceWaitIdle( m_window.GetDevice().mDevice );
 		Debug::Log( "Renderer idle" );
 	}
 
@@ -273,7 +273,7 @@ namespace fan
 	//================================================================================================================================
 	float  Renderer::GetWindowAspectRatio() const
 	{
-		return static_cast< float >( m_window.GetSwapChain().extent.width ) / m_window.GetSwapChain().extent.height;
+		return static_cast< float >( m_window.GetSwapChain().mExtent.width ) / m_window.GetSwapChain().mExtent.height;
 	}
 
 	//================================================================================================================================
@@ -393,7 +393,7 @@ namespace fan
 		m_numDebugLinesNoDepthTest = (int)_debugLinesNoDepthTest.size();
 		m_numDebugTriangle = (int)_debugTriangles.size();
 
-		const uint32_t currentFrame = m_window.GetSwapChain().currentFrame;
+		const uint32_t currentFrame = m_window.GetSwapChain().mCurrentFrame;
 
 		SCOPED_PROFILE( update_buffer );
 		if( _debugLines.size() > 0 )
@@ -419,7 +419,7 @@ namespace fan
 				);
 				stagingBuffer.SetData( device, _debugLines.data(), size );
 				VkCommandBuffer cmd = device.BeginSingleTimeCommands();
-				stagingBuffer.CopyBufferTo( cmd, m_debugLinesvertexBuffers[currentFrame].buffer, size );
+				stagingBuffer.CopyBufferTo( cmd, m_debugLinesvertexBuffers[currentFrame].mBuffer, size );
 				device.EndSingleTimeCommands( cmd );
 				stagingBuffer.Destroy( device );
 			}
@@ -448,7 +448,7 @@ namespace fan
 				);
 				stagingBuffer.SetData( device, _debugLinesNoDepthTest.data(), size );
 				VkCommandBuffer cmd = device.BeginSingleTimeCommands();
-				stagingBuffer.CopyBufferTo( cmd, m_debugLinesNoDepthTestVertexBuffers[currentFrame].buffer, size );
+				stagingBuffer.CopyBufferTo( cmd, m_debugLinesNoDepthTestVertexBuffers[currentFrame].mBuffer, size );
 				device.EndSingleTimeCommands( cmd );
 				stagingBuffer.Destroy( device );
 			}
@@ -477,7 +477,7 @@ namespace fan
 				);
 				stagingBuffer.SetData( device, _debugTriangles.data(), size );
 				VkCommandBuffer cmd = device.BeginSingleTimeCommands();
-				stagingBuffer.CopyBufferTo( cmd, m_debugTrianglesvertexBuffers[currentFrame].buffer, size );
+				stagingBuffer.CopyBufferTo( cmd, m_debugTrianglesvertexBuffers[currentFrame].mBuffer, size );
 				device.EndSingleTimeCommands( cmd );
 				stagingBuffer.Destroy( device );
 			}
@@ -488,7 +488,7 @@ namespace fan
 	//================================================================================================================================
 	void Renderer::RecordAllCommandBuffers()
 	{
-		for( size_t i = 0; i < m_window.GetSwapChain().imagesCount; i++ )
+		for( size_t i = 0; i < m_window.GetSwapChain().mImagesCount; i++ )
 		{
 			RecordCommandBufferImgui( i );
 			RecordCommandBufferGeometry( i );
@@ -504,7 +504,7 @@ namespace fan
 	void Renderer::RecordPrimaryCommandBuffer( const size_t _index )
 	{
 		SCOPED_PROFILE( primary );
-		VkCommandBuffer commandBuffer = m_primaryCommandBuffers.buffers[ _index ];
+		VkCommandBuffer commandBuffer = m_primaryCommandBuffers.mBuffers[ _index ];
 
 		VkCommandBufferBeginInfo commandBufferBeginInfo = CommandBuffer::GetBeginInfo( VK_NULL_HANDLE );
 
@@ -512,30 +512,30 @@ namespace fan
 		clearValues[ 0 ].color = { m_clearColor.r, m_clearColor.g, m_clearColor.b, m_clearColor.a };
 		clearValues[ 1 ].depthStencil = { 1.0f, 0 };
 
-		VkRenderPassBeginInfo renderPassInfo =			  RenderPass::GetBeginInfo(	m_renderPassGame.renderPass,		m_gameFrameBuffers->Get( _index ),		  m_gameExtent, clearValues.data(), (uint32_t)clearValues.size() );
-		VkRenderPassBeginInfo renderPassInfoPostprocess = RenderPass::GetBeginInfo( m_renderPassPostprocess.renderPass, m_postProcessFramebuffers->Get( _index ), m_gameExtent, clearValues.data(), (uint32_t)clearValues.size() );
-		VkRenderPassBeginInfo renderPassInfoImGui =		  RenderPass::GetBeginInfo( m_renderPassImgui.renderPass,		m_swapchainFramebuffers->Get( _index ),	  m_window.GetSwapChain().extent, clearValues.data(), (uint32_t)clearValues.size() );
+		VkRenderPassBeginInfo renderPassInfo =			  RenderPass::GetBeginInfo(	m_renderPassGame.mRenderPass,		m_gameFrameBuffers->Get( _index ),		  m_gameExtent, clearValues.data(), (uint32_t)clearValues.size() );
+		VkRenderPassBeginInfo renderPassInfoPostprocess = RenderPass::GetBeginInfo( m_renderPassPostprocess.mRenderPass, m_postProcessFramebuffers->Get( _index ), m_gameExtent, clearValues.data(), (uint32_t)clearValues.size() );
+		VkRenderPassBeginInfo renderPassInfoImGui =		  RenderPass::GetBeginInfo( m_renderPassImgui.mRenderPass,		m_swapchainFramebuffers->Get( _index ),	  m_window.GetSwapChain().mExtent, clearValues.data(), (uint32_t)clearValues.size() );
 
 		if ( vkBeginCommandBuffer( commandBuffer, &commandBufferBeginInfo ) == VK_SUCCESS )
 		{
 			vkCmdBeginRenderPass( commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_SECONDARY_COMMAND_BUFFERS );
 			{
-				vkCmdExecuteCommands( commandBuffer, 1, &m_geometryCommandBuffers.buffers[ _index ] );
+				vkCmdExecuteCommands( commandBuffer, 1, &m_geometryCommandBuffers.mBuffers[ _index ] );
 				if ( ! m_hasNoDebugToDraw )
 				{
-					vkCmdExecuteCommands( commandBuffer, 1, &m_debugCommandBuffers.buffers[ _index ] );
+					vkCmdExecuteCommands( commandBuffer, 1, &m_debugCommandBuffers.mBuffers[ _index ] );
 				}
 			} vkCmdEndRenderPass( commandBuffer );
 
 			vkCmdBeginRenderPass( commandBuffer, &renderPassInfoPostprocess, VK_SUBPASS_CONTENTS_SECONDARY_COMMAND_BUFFERS );
 			{
-				vkCmdExecuteCommands( commandBuffer, 1, &m_postprocessCommandBuffers.buffers[ _index ] );
-				vkCmdExecuteCommands( commandBuffer, 1, &m_uiCommandBuffers.buffers[ _index ] );
+				vkCmdExecuteCommands( commandBuffer, 1, &m_postprocessCommandBuffers.mBuffers[ _index ] );
+				vkCmdExecuteCommands( commandBuffer, 1, &m_uiCommandBuffers.mBuffers[ _index ] );
 			} vkCmdEndRenderPass( commandBuffer );
 
 			vkCmdBeginRenderPass( commandBuffer, &renderPassInfoImGui, VK_SUBPASS_CONTENTS_SECONDARY_COMMAND_BUFFERS );
 			{
-				vkCmdExecuteCommands( commandBuffer, 1, &m_imguiCommandBuffers.buffers[ _index ] );
+				vkCmdExecuteCommands( commandBuffer, 1, &m_imguiCommandBuffers.mBuffers[ _index ] );
 			} vkCmdEndRenderPass( commandBuffer );
 
 
@@ -556,14 +556,14 @@ namespace fan
 	void Renderer::RecordCommandBufferPostProcess( const size_t _index )
 	{
 
-		VkCommandBuffer commandBuffer = m_postprocessCommandBuffers.buffers[ _index ];
-		VkCommandBufferInheritanceInfo commandBufferInheritanceInfo = CommandBuffer::GetInheritanceInfo( m_renderPassPostprocess.renderPass, m_postProcessFramebuffers->Get( _index ) );
+		VkCommandBuffer commandBuffer = m_postprocessCommandBuffers.mBuffers[ _index ];
+		VkCommandBufferInheritanceInfo commandBufferInheritanceInfo = CommandBuffer::GetInheritanceInfo( m_renderPassPostprocess.mRenderPass, m_postProcessFramebuffers->Get( _index ) );
 		VkCommandBufferBeginInfo commandBufferBeginInfo = CommandBuffer::GetBeginInfo( &commandBufferInheritanceInfo );
 
 		if ( vkBeginCommandBuffer( commandBuffer, &commandBufferBeginInfo ) == VK_SUCCESS )
 		{
 			m_postprocessPipeline->Bind( commandBuffer, _index );
-			VkBuffer vertexBuffers[] = { m_quadVertexBuffer.buffer };
+			VkBuffer vertexBuffers[] = { m_quadVertexBuffer.mBuffer };
 			VkDeviceSize offsets[] = { 0 };
 			vkCmdBindVertexBuffers( commandBuffer, 0, 1, vertexBuffers, offsets );
 			vkCmdDraw( commandBuffer, static_cast< uint32_t >( 4 ), 1, 0, 0 );
@@ -582,8 +582,8 @@ namespace fan
 	//================================================================================================================================
 	void Renderer::RecordCommandBufferUI( const size_t _index )
 	{
-		VkCommandBuffer commandBuffer = m_uiCommandBuffers.buffers[ _index ];
-		VkCommandBufferInheritanceInfo commandBufferInheritanceInfo = CommandBuffer::GetInheritanceInfo( m_renderPassPostprocess.renderPass, m_postProcessFramebuffers->Get( _index ) );
+		VkCommandBuffer commandBuffer = m_uiCommandBuffers.mBuffers[ _index ];
+		VkCommandBufferInheritanceInfo commandBufferInheritanceInfo = CommandBuffer::GetInheritanceInfo( m_renderPassPostprocess.mRenderPass, m_postProcessFramebuffers->Get( _index ) );
 		VkCommandBufferBeginInfo commandBufferBeginInfo = CommandBuffer::GetBeginInfo( &commandBufferInheritanceInfo );
 
 		if ( vkBeginCommandBuffer( commandBuffer, &commandBufferBeginInfo ) == VK_SUCCESS )
@@ -597,7 +597,7 @@ namespace fan
 			{
 				UIDrawData drawData = m_uiMeshDrawArray[ meshIndex ];
 				UIMesh* mesh = drawData.mesh;
-				VkBuffer vertexBuffers[] = { mesh->GetVertexBuffer().buffer };
+				VkBuffer vertexBuffers[] = { mesh->GetVertexBuffer().mBuffer };
 				m_uiPipeline->BindDescriptors( commandBuffer, _index, meshIndex );
 				vkCmdBindVertexBuffers( commandBuffer, 0, 1, vertexBuffers, offsets );
 				BindTexture( commandBuffer, drawData.textureIndex, m_samplerDescriptorUI, m_uiPipeline->GetLayout() );
@@ -622,8 +622,8 @@ namespace fan
 		SCOPED_PROFILE( imgui );
 		m_imguiPipeline->UpdateBuffer( _index );
 
-		VkCommandBuffer commandBuffer = m_imguiCommandBuffers.buffers[ _index ];
-		VkCommandBufferInheritanceInfo commandBufferInheritanceInfo = CommandBuffer::GetInheritanceInfo( m_renderPassImgui.renderPass, m_swapchainFramebuffers->Get( _index ) );
+		VkCommandBuffer commandBuffer = m_imguiCommandBuffers.mBuffers[ _index ];
+		VkCommandBufferInheritanceInfo commandBufferInheritanceInfo = CommandBuffer::GetInheritanceInfo( m_renderPassImgui.mRenderPass, m_swapchainFramebuffers->Get( _index ) );
 		VkCommandBufferBeginInfo commandBufferBeginInfo = CommandBuffer::GetBeginInfo( &commandBufferInheritanceInfo );
 
 		if ( vkBeginCommandBuffer( commandBuffer, &commandBufferBeginInfo ) == VK_SUCCESS )
@@ -646,8 +646,8 @@ namespace fan
 	void Renderer::RecordCommandBufferGeometry( const size_t _index )
 	{
 		SCOPED_PROFILE( geometry );
-		VkCommandBuffer commandBuffer = m_geometryCommandBuffers.buffers[ _index ];
-		VkCommandBufferInheritanceInfo commandBufferInheritanceInfo = CommandBuffer::GetInheritanceInfo( m_renderPassGame.renderPass, m_gameFrameBuffers->Get( _index ) );
+		VkCommandBuffer commandBuffer = m_geometryCommandBuffers.mBuffers[ _index ];
+		VkCommandBufferInheritanceInfo commandBufferInheritanceInfo = CommandBuffer::GetInheritanceInfo( m_renderPassGame.mRenderPass, m_gameFrameBuffers->Get( _index ) );
 		VkCommandBufferBeginInfo commandBufferBeginInfo = CommandBuffer::GetBeginInfo( &commandBufferInheritanceInfo );
 
 		if ( vkBeginCommandBuffer( commandBuffer, &commandBufferBeginInfo ) == VK_SUCCESS )
@@ -660,9 +660,9 @@ namespace fan
 				BindTexture( commandBuffer, drawData.textureIndex, m_samplerDescriptorTextures, m_forwardPipeline->GetLayout() );
 				m_forwardPipeline->BindDescriptors( commandBuffer, _index, meshIndex );
 				VkDeviceSize offsets[] = { 0 };
-				VkBuffer vertexBuffers[] = { drawData.mesh->GetVertexBuffer().buffer };
+				VkBuffer vertexBuffers[] = { drawData.mesh->GetVertexBuffer().mBuffer };
 				vkCmdBindVertexBuffers( commandBuffer, 0, 1, vertexBuffers, offsets );
-				vkCmdBindIndexBuffer( commandBuffer, drawData.mesh->GetIndexBuffer().buffer, 0, VK_INDEX_TYPE_UINT32 );
+				vkCmdBindIndexBuffer( commandBuffer, drawData.mesh->GetIndexBuffer().mBuffer, 0, VK_INDEX_TYPE_UINT32 );
 				vkCmdDrawIndexed( commandBuffer, static_cast< uint32_t >( drawData.mesh->GetIndices().size() ), 1, 0, 0, 0 );
 			}
 
@@ -684,8 +684,8 @@ namespace fan
 		SCOPED_PROFILE( debug );
 		if( ! m_hasNoDebugToDraw )
 		{
-			VkCommandBuffer commandBuffer = m_debugCommandBuffers.buffers[_index];
-			VkCommandBufferInheritanceInfo commandBufferInheritanceInfo = CommandBuffer::GetInheritanceInfo( m_renderPassGame.renderPass, m_gameFrameBuffers->Get( _index ) );
+			VkCommandBuffer commandBuffer = m_debugCommandBuffers.mBuffers[_index];
+			VkCommandBufferInheritanceInfo commandBufferInheritanceInfo = CommandBuffer::GetInheritanceInfo( m_renderPassGame.mRenderPass, m_gameFrameBuffers->Get( _index ) );
 			VkCommandBufferBeginInfo commandBufferBeginInfo = CommandBuffer::GetBeginInfo( &commandBufferInheritanceInfo );
 
 			if( vkBeginCommandBuffer( commandBuffer, &commandBufferBeginInfo ) == VK_SUCCESS )
@@ -694,21 +694,21 @@ namespace fan
 				if( m_numDebugLines > 0 )
 				{
 					m_debugLinesPipeline->Bind( commandBuffer, _index );
-					VkBuffer vertexBuffers[] = { m_debugLinesvertexBuffers[_index].buffer };
+					VkBuffer vertexBuffers[] = { m_debugLinesvertexBuffers[_index].mBuffer };
 					vkCmdBindVertexBuffers( commandBuffer, 0, 1, vertexBuffers, offsets );
 					vkCmdDraw( commandBuffer, static_cast<uint32_t>( m_numDebugLines ), 1, 0, 0 );
 				}
 				if( m_numDebugLinesNoDepthTest > 0 )
 				{
 					m_debugLinesPipelineNoDepthTest->Bind( commandBuffer, _index );
-					VkBuffer vertexBuffers[] = { m_debugLinesNoDepthTestVertexBuffers[_index].buffer };
+					VkBuffer vertexBuffers[] = { m_debugLinesNoDepthTestVertexBuffers[_index].mBuffer };
 					vkCmdBindVertexBuffers( commandBuffer, 0, 1, vertexBuffers, offsets );
 					vkCmdDraw( commandBuffer, static_cast<uint32_t>( m_numDebugLinesNoDepthTest ), 1, 0, 0 );
 				}
 				if( m_numDebugTriangle > 0 )
 				{
 					m_debugTrianglesPipeline->Bind( commandBuffer, _index );
-					VkBuffer vertexBuffers[] = { m_debugTrianglesvertexBuffers[_index].buffer };
+					VkBuffer vertexBuffers[] = { m_debugTrianglesvertexBuffers[_index].mBuffer };
 					vkCmdBindVertexBuffers( commandBuffer, 0, 1, vertexBuffers, offsets );
 					vkCmdDraw( commandBuffer, static_cast<uint32_t>( m_numDebugTriangle ), 1, 0, 0 );
 				}
@@ -731,7 +731,7 @@ namespace fan
 		std::vector<VkPipelineStageFlags> waitSemaphoreStages = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
 
 		std::vector< VkCommandBuffer> commandBuffers = {
-			m_primaryCommandBuffers.buffers[ m_window.GetSwapChain().currentImageIndex ]
+			m_primaryCommandBuffers.mBuffers[ m_window.GetSwapChain().mCurrentImageIndex ]
 			//, m_imguiCommandBuffers[m_window.GetSwapChain().GetCurrentImageIndex()]
 		};
 
@@ -746,7 +746,7 @@ namespace fan
 		submitInfo.signalSemaphoreCount = 1;
 		submitInfo.pSignalSemaphores = m_window.GetSwapChain().GetCurrentRenderFinishedSemaphore();
 
-		VkResult result = vkQueueSubmit( m_window.GetDevice().graphicsQueue, 1, &submitInfo, *m_window.GetSwapChain().GetCurrentInFlightFence() );
+		VkResult result = vkQueueSubmit( m_window.GetDevice().mGraphicsQueue, 1, &submitInfo, *m_window.GetSwapChain().GetCurrentInFlightFence() );
 		if ( result != VK_SUCCESS )
 		{
 			Debug::Error( "Could not submit draw command buffer " );
@@ -762,7 +762,7 @@ namespace fan
 	{
 		Debug::Highlight( "Reloading shaders" );
 
-		vkDeviceWaitIdle( m_window.GetDevice().device );
+		vkDeviceWaitIdle( m_window.GetDevice().mDevice );
 
 		CreateTextureDescriptor();
 		m_postprocessPipeline->ReloadShaders();
@@ -787,7 +787,7 @@ namespace fan
 	//================================================================================================================================
 	bool Renderer::CreateCommandBuffers()
 	{
-		const uint32_t count = m_window.GetSwapChain().imagesCount;
+		const uint32_t count = m_window.GetSwapChain().mImagesCount;
 
 		bool result = true;
 
@@ -810,7 +810,7 @@ namespace fan
 
 		// game
 		{
-			VkAttachmentDescription colorAtt = RenderPass::GetColorAttachment( m_window.GetSwapChain().surfaceFormat.format, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL );
+			VkAttachmentDescription colorAtt = RenderPass::GetColorAttachment( m_window.GetSwapChain().mSurfaceFormat.format, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL );
 			VkAttachmentReference	colorAttRef = RenderPass::GetColorAttachmentReference( 0 );
 			VkAttachmentDescription depthAtt = RenderPass::GetDepthAttachment( device.FindDepthFormat() );
 			VkAttachmentReference	depthAttRef = RenderPass::GetDepthAttachmentReference( 1 );
@@ -823,7 +823,7 @@ namespace fan
 
 		// postprocess
 		{
-			VkAttachmentDescription colorAtt = RenderPass::GetColorAttachment( m_window.GetSwapChain().surfaceFormat.format, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL );
+			VkAttachmentDescription colorAtt = RenderPass::GetColorAttachment( m_window.GetSwapChain().mSurfaceFormat.format, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL );
 			VkAttachmentReference	colorAttRef = RenderPass::GetColorAttachmentReference( 0 );
 			VkSubpassDescription	subpassDescription = RenderPass::GetSubpassDescription( &colorAttRef, 1, VK_NULL_HANDLE );
 			VkSubpassDependency		subpassDependency = RenderPass::GetDependency();
@@ -832,7 +832,7 @@ namespace fan
 
 		// imgui
 		{
-			VkAttachmentDescription colorAtt = RenderPass::GetColorAttachment( m_window.GetSwapChain().surfaceFormat.format, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR );
+			VkAttachmentDescription colorAtt = RenderPass::GetColorAttachment( m_window.GetSwapChain().mSurfaceFormat.format, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR );
 			VkAttachmentReference	colorAttRef = RenderPass::GetColorAttachmentReference( 0 );
 			VkSubpassDescription	subpassDescription = RenderPass::GetSubpassDescription( &colorAttRef, 1, VK_NULL_HANDLE );
 			VkSubpassDependency		subpassDependency = RenderPass::GetDependency();
@@ -846,20 +846,20 @@ namespace fan
 	//================================================================================================================================
 	void Renderer::CreateFramebuffers()
 	{
-		const VkExtent2D extent = m_window.GetSwapChain().extent;
+		const VkExtent2D extent = m_window.GetSwapChain().mExtent;
 
 		m_gameFrameBuffers = new FrameBuffer( m_window.GetDevice(), extent );
-		m_gameFrameBuffers->AddColorAttachment( m_window.GetSwapChain().surfaceFormat.format, extent );
+		m_gameFrameBuffers->AddColorAttachment( m_window.GetSwapChain().mSurfaceFormat.format, extent );
 		m_gameFrameBuffers->AddDepthAttachment();
-		m_gameFrameBuffers->Create( m_window.GetSwapChain().imagesCount, m_renderPassGame.renderPass );
+		m_gameFrameBuffers->Create( m_window.GetSwapChain().mImagesCount, m_renderPassGame.mRenderPass );
 
 		m_postProcessFramebuffers = new FrameBuffer( m_window.GetDevice(), extent );
-		m_postProcessFramebuffers->AddColorAttachment( m_window.GetSwapChain().surfaceFormat.format, extent );
-		m_postProcessFramebuffers->Create( m_window.GetSwapChain().imagesCount, m_renderPassPostprocess.renderPass );
+		m_postProcessFramebuffers->AddColorAttachment( m_window.GetSwapChain().mSurfaceFormat.format, extent );
+		m_postProcessFramebuffers->Create( m_window.GetSwapChain().mImagesCount, m_renderPassPostprocess.mRenderPass );
 
 		m_swapchainFramebuffers = new FrameBuffer( m_window.GetDevice(), extent );
-		m_swapchainFramebuffers->SetExternalAttachment( m_window.GetSwapChain().imageViews );
-		m_swapchainFramebuffers->Create( m_window.GetSwapChain().imagesCount, m_renderPassImgui.renderPass );
+		m_swapchainFramebuffers->SetExternalAttachment( m_window.GetSwapChain().mImageViews );
+		m_swapchainFramebuffers->Create( m_window.GetSwapChain().mImagesCount, m_renderPassImgui.mRenderPass );
 	}
 
 	//================================================================================================================================
@@ -892,7 +892,7 @@ namespace fan
 		);
 		stagingBuffer.SetData( device, vertices.data(), size );
 		VkCommandBuffer cmd = device.BeginSingleTimeCommands();
-		stagingBuffer.CopyBufferTo( cmd, m_quadVertexBuffer.buffer, size );
+		stagingBuffer.CopyBufferTo( cmd, m_quadVertexBuffer.mBuffer, size );
 		device.EndSingleTimeCommands( cmd );
 		stagingBuffer.Destroy( device );
 	}
@@ -909,7 +909,7 @@ namespace fan
 		std::vector< VkImageView > imageViews( texture.size() );
 		for ( int textureIndex = 0; textureIndex < texture.size(); textureIndex++ )
 		{
-			m_imagesDescriptor->Append( texture[ textureIndex ]->imageView );
+			m_imagesDescriptor->Append( texture[ textureIndex ]->mImageView );
 		}
 
 		m_imagesDescriptor->UpdateRange( 0, m_imagesDescriptor->Count() - 1 );

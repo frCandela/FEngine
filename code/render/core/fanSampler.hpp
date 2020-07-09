@@ -14,6 +14,6 @@ namespace fan
 		void Destroy( Device& _device );
 		void Create( Device& _device, const float _maxLod, const float _maxAnisotropy, const VkFilter _filter );
 
-		VkSampler sampler = VK_NULL_HANDLE;
+		VkSampler mSampler = VK_NULL_HANDLE;
 	};
 }

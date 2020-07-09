@@ -19,16 +19,16 @@ namespace fan
 	{
 		static TextureManager s_resourceManager;		
 
-		VkImage			image = VK_NULL_HANDLE;
-		VkImageView		imageView = VK_NULL_HANDLE;
-		VkDeviceMemory	deviceMemory = VK_NULL_HANDLE;
+		VkImage			mImage		= VK_NULL_HANDLE;
+		VkImageView		mImageView	= VK_NULL_HANDLE;
+		VkDeviceMemory	mMemory		= VK_NULL_HANDLE;
 
-		uint32_t	mipLevels = 1;
-		VkExtent2D	extent;
-		uint32_t	layerCount = 1;
+		uint32_t	mMipLevels = 1;
+		VkExtent2D	mExtent;
+		uint32_t	mLayerCount = 1;
 
-		std::string	   path;
-		int renderID = -1;
+		std::string	mPath;
+		int			mRenderID = -1;
 
 		bool CreateFromFile( Device& _device, const std::string& _path );
 		void CreateFromData( Device& _device, const unsigned char* _data, const VkExtent2D _extent, const uint32_t _mipLevels );
