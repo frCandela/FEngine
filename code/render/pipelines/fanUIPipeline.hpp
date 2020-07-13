@@ -3,13 +3,12 @@
 #include "core/memory/fanAlignedMemory.hpp"
 #include "render/core/fanPipeline.hpp"
 #include "render/fanUIMesh.hpp"
-#include "render/descriptors/fanDescriptorUniforms.hpp"
+#include "render/core/descriptors/fanDescriptorUniforms.hpp"
+#include "render/core/descriptors/fanDescriptorImages.hpp"
+#include "render/core/descriptors/fanDescriptorSampler.hpp"
 
 namespace fan
 {
-	class DescriptorTextures;
-	class DescriptorSampler;
-
 	//================================================================
 	//================================================================
 	struct DynamicUniformUIVert
@@ -25,7 +24,7 @@ namespace fan
 	class UIPipeline : public Pipeline
 	{
 	public:
-		UIPipeline( Device& _device, DescriptorTextures*& _textures, DescriptorSampler*& _sampler );
+		UIPipeline( Device& _device, DescriptorImages* _textures, DescriptorSampler* _sampler );
 		~UIPipeline() override;
 
 		void SetUniformsData( const size_t _index = 0 ) override;
@@ -40,7 +39,7 @@ namespace fan
 
 	private:
 		DescriptorUniforms m_transformDescriptor;
-		DescriptorTextures*& m_textures;
-		DescriptorSampler*& m_sampler;
+		DescriptorImages* m_textures;
+		DescriptorSampler* m_sampler;
 	};
 }

@@ -2,15 +2,12 @@
 
 #include "core/fanDebug.hpp"
 #include "render/core/fanDevice.hpp"
-#include "render/descriptors/fanDescriptorUniforms.hpp"
-#include "render/descriptors/fanDescriptorTexture.hpp"
-#include "render/descriptors/fanDescriptorSampler.hpp"
 
 namespace fan
 {
 	//================================================================================================================
 	//================================================================================================================================
-	UIPipeline::UIPipeline( Device& _device, DescriptorTextures*& _textures, DescriptorSampler*& _sampler ) :
+	UIPipeline::UIPipeline( Device& _device, DescriptorImages* _textures, DescriptorSampler* _sampler ) :
 		Pipeline( _device )
 		, m_textures( _textures )
 		, m_sampler( _sampler )
@@ -67,8 +64,8 @@ namespace fan
 
 		m_descriptorSetLayouts = {
 			 m_transformDescriptor.mDescriptorSetLayout
-			,m_textures->GetLayout()
-			, m_sampler->GetLayout()
+			,m_textures->mDescriptorSetLayout
+			, m_sampler->mDescriptorSetLayout
 		};
 	}
 

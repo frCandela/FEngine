@@ -1,4 +1,4 @@
-#include "render/descriptors/fanDescriptorUniforms.hpp"
+#include "render/core/descriptors/fanDescriptorUniforms.hpp"
 
 #include "core/fanDebug.hpp"
 #include "render/core/fanDevice.hpp"

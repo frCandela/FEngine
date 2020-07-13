@@ -5,7 +5,7 @@ WARNINGS_GLM_PUSH()
 #include "glm/glm.hpp"
 WARNINGS_POP()
 #include "render/core/fanPipeline.hpp"
-#include "render/descriptors/fanDescriptorUniforms.hpp"
+#include "render/core/descriptors/fanDescriptorUniforms.hpp"
 
 namespace fan
 {

@@ -12,7 +12,6 @@
 #include "render/core/fanInstance.hpp"
 #include "render/core/fanTexture.hpp"
 #include "render/core/fanDevice.hpp"
-#include "render/core/fanBuffer.hpp"
 #include "render/pipelines/fanPostprocessPipeline.hpp"
 #include "render/pipelines/fanForwardPipeline.hpp"
 #include "render/pipelines/fanDebugPipeline.hpp"
@@ -20,8 +19,6 @@
 #include "render/pipelines/fanUIPipeline.hpp"
 #include "render/fanVertex.hpp"
 #include "render/fanWindow.hpp"
-#include "render/descriptors/fanDescriptorTexture.hpp"
-#include "render/descriptors/fanDescriptorSampler.hpp"
 
 namespace fan
 {
@@ -50,7 +47,7 @@ namespace fan
 		m_swapchainFramebuffers.CreateForSwapchain( m_window.GetDevice(), m_window.GetSwapChain().mImagesCount, m_window.GetSwapChain().mExtent, m_renderPassImgui, m_window.GetSwapChain().mImageViews );
 
 		m_samplerTextures.Create( device, 0, 8, VK_FILTER_LINEAR );
-		m_samplerDescriptorTextures = new DescriptorSampler( device, m_samplerTextures.mSampler );
+		m_samplerDescriptorTextures.Create( device, m_samplerTextures.mSampler );
 		CreateTextureDescriptor();
 
 		m_debugLinesPipeline = new DebugPipeline( device, VK_PRIMITIVE_TOPOLOGY_LINE_LIST, true );
@@ -68,14 +65,14 @@ namespace fan
 		m_debugTrianglesPipeline->CreateDescriptors( m_window.GetSwapChain().mImagesCount );
 		m_debugTrianglesPipeline->Create();
 
-		m_forwardPipeline = new ForwardPipeline( device, m_imagesDescriptor, m_samplerDescriptorTextures );
+		m_forwardPipeline = new ForwardPipeline( device, &m_imagesDescriptor, &m_samplerDescriptorTextures );
 		m_forwardPipeline->Init( m_renderPassGame.mRenderPass, m_window.GetSwapChain().mExtent, "code/shaders/forward.vert", "code/shaders/forward.frag" );
 		m_forwardPipeline->CreateDescriptors( m_window.GetSwapChain().mImagesCount );
 		m_forwardPipeline->Create();
 
 		m_samplerUI.Create( device, 0, 1, VK_FILTER_NEAREST );
-		m_samplerDescriptorUI = new DescriptorSampler( device, m_samplerUI.mSampler );
-		m_uiPipeline = new UIPipeline( device, m_imagesDescriptor, m_samplerDescriptorUI );
+		m_samplerDescriptorUI.Create( device, m_samplerUI.mSampler );
+		m_uiPipeline = new UIPipeline( device, &m_imagesDescriptor, &m_samplerDescriptorUI );
 		m_uiPipeline->Init( m_renderPassPostprocess.mRenderPass, m_window.GetSwapChain().mExtent, "code/shaders/ui.vert", "code/shaders/ui.frag" );
 		m_uiPipeline->CreateDescriptors( m_window.GetSwapChain().mImagesCount );
 		m_uiPipeline->Create();
@@ -115,9 +112,9 @@ namespace fan
 		Texture::s_resourceManager.Clear();
 		UIMesh::s_resourceManager.Clear();
 
-		delete m_samplerDescriptorTextures;
-		delete m_samplerDescriptorUI;
-		delete m_imagesDescriptor;
+		m_samplerDescriptorTextures.Destroy( device );
+		m_samplerDescriptorUI.Destroy( device );
+		m_imagesDescriptor.Destroy( device );
 
 		m_samplerTextures.Destroy( device );
 		m_samplerUI.Destroy( device );
@@ -630,7 +627,7 @@ namespace fan
 				VkBuffer vertexBuffers[] = { mesh->GetVertexBuffer().mBuffer };
 				m_uiPipeline->BindDescriptors( commandBuffer, _index, meshIndex );
 				vkCmdBindVertexBuffers( commandBuffer, 0, 1, vertexBuffers, offsets );
-				BindTexture( commandBuffer, drawData.textureIndex, m_samplerDescriptorUI, m_uiPipeline->GetLayout() );
+				BindTexture( commandBuffer, drawData.textureIndex, &m_samplerDescriptorUI, m_uiPipeline->GetLayout() );
 				vkCmdDraw( commandBuffer, static_cast< uint32_t >( mesh->GetVertices().size() ), 1, 0, 0 );
 			}
 
@@ -687,7 +684,7 @@ namespace fan
 			for ( uint32_t meshIndex = 0; meshIndex < m_meshDrawArray.size(); meshIndex++ )
 			{
 				DrawData& drawData = m_meshDrawArray[ meshIndex ];
-				BindTexture( commandBuffer, drawData.textureIndex, m_samplerDescriptorTextures, m_forwardPipeline->GetLayout() );
+				BindTexture( commandBuffer, drawData.textureIndex, &m_samplerDescriptorTextures, m_forwardPipeline->GetLayout() );
 				m_forwardPipeline->BindDescriptors( commandBuffer, _index, meshIndex );
 				VkDeviceSize offsets[] = { 0 };
 				VkBuffer vertexBuffers[] = { drawData.mesh->GetVertexBuffer().mBuffer };
@@ -946,18 +943,15 @@ namespace fan
 	//================================================================================================================================
 	bool Renderer::CreateTextureDescriptor()
 	{		
-		delete m_imagesDescriptor;
-
-		const std::vector< Texture* >& texture = Texture::s_resourceManager.GetList();
-		m_imagesDescriptor = new  DescriptorTextures( m_window.GetDevice(), static_cast< uint32_t >( texture.size() ) );
-
-		std::vector< VkImageView > imageViews( texture.size() );
-		for ( int textureIndex = 0; textureIndex < texture.size(); textureIndex++ )
+		const std::vector< Texture* >& textures = Texture::s_resourceManager.GetList();
+		std::vector< VkImageView > imageViews( textures.size() );
+		for ( int i = 0; i < textures.size(); i++ )
 		{
-			m_imagesDescriptor->Append( texture[ textureIndex ]->mImageView );
+			imageViews[i] = textures[ i ]->mImageView;
 		}
 
-		m_imagesDescriptor->UpdateRange( 0, m_imagesDescriptor->Count() - 1 );
+		m_imagesDescriptor.Destroy( m_window.GetDevice() );
+		m_imagesDescriptor.Create( m_window.GetDevice(), imageViews.data(), static_cast<uint32_t>( imageViews.size() ) );
 
 		return true;
 	}
@@ -966,11 +960,11 @@ namespace fan
 	//================================================================================================================================
 	void  Renderer::BindTexture( VkCommandBuffer _commandBuffer, const uint32_t _textureIndex, DescriptorSampler* _samplerDescriptor, VkPipelineLayout _pipelineLayout )
 	{
-		assert( _textureIndex < m_imagesDescriptor->Count() );
+		assert( _textureIndex < Texture::s_resourceManager.GetList().size() );
 
 		std::vector<VkDescriptorSet> descriptors = {
-			 m_imagesDescriptor->GetSet( _textureIndex )
-			 , _samplerDescriptor->GetSet()
+			 m_imagesDescriptor.mDescriptorSets[ _textureIndex ]
+			 , _samplerDescriptor->mDescriptorSet
 		};
 
 		vkCmdBindDescriptorSets(

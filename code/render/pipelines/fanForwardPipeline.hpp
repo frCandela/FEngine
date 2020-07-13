@@ -7,15 +7,15 @@ WARNINGS_POP()
 #include "core/memory/fanAlignedMemory.hpp"
 #include "render/core/fanPipeline.hpp"
 #include "render/fanRenderGlobal.hpp"
-#include "render/descriptors/fanDescriptorUniforms.hpp"
+#include "render/core/descriptors/fanDescriptorUniforms.hpp"
+#include "render/core/descriptors/fanDescriptorImages.hpp"
+#include "render/core/descriptors/fanDescriptorSampler.hpp"
 
 namespace fan
 {
 	class Mesh;
 	struct Vertex;
 	struct Device;
-	class DescriptorTextures;
-	class DescriptorSampler;
 	class ResourceManager;
 
 	//================================================================
@@ -97,7 +97,7 @@ namespace fan
 		VertUniforms	m_vertUniforms;
 		FragUniforms	m_fragUniforms;
 
-		ForwardPipeline( Device& _device, DescriptorTextures*& _textures, DescriptorSampler*& _sampler );
+		ForwardPipeline( Device& _device, DescriptorImages* _textures, DescriptorSampler* _sampler );
 		~ForwardPipeline() override;
 
 		void Resize( const VkExtent2D _extent ) override;
@@ -113,7 +113,7 @@ namespace fan
 	private:
 		DescriptorUniforms m_sceneDescriptor;
 
-		DescriptorTextures*& m_textures;
-		DescriptorSampler*& m_sampler;
+		DescriptorImages* m_textures;
+		DescriptorSampler* m_sampler;
 	};
 }

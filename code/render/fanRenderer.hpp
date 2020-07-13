@@ -16,6 +16,8 @@ WARNINGS_POP()
 #include "render/core/fanFrameBuffer.hpp"
 #include "render/core/fanImageView.hpp"
 #include "render/core/fanImage.hpp"
+#include "render/core/descriptors/fanDescriptorImages.hpp"
+#include "render/core/descriptors/fanDescriptorSampler.hpp"
 
 namespace fan
 {
@@ -23,8 +25,6 @@ namespace fan
 	class Mesh;
 	class UIMesh;
 	class ImguiPipeline;
-	class DescriptorTextures;
-	class DescriptorSampler;
 	class PostprocessPipeline;
 	class ForwardPipeline;
 	class UIPipeline;
@@ -136,10 +136,10 @@ namespace fan
 		DebugPipeline*			m_debugTrianglesPipeline;
 
 		// global descriptors
-		DescriptorTextures* m_imagesDescriptor = nullptr;
-		DescriptorSampler*	m_samplerDescriptorTextures = nullptr;
+		DescriptorImages	m_imagesDescriptor;
+		DescriptorSampler	m_samplerDescriptorTextures;
 		Sampler				m_samplerTextures;
-		DescriptorSampler*	m_samplerDescriptorUI = nullptr;
+		DescriptorSampler	m_samplerDescriptorUI;
 		Sampler				m_samplerUI;
 
 		// render passes

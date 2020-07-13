@@ -8,9 +8,6 @@
 #include "render/core/fanBuffer.hpp"
 #include "render/core/fanTexture.hpp"
 #include "render/core/fanSampler.hpp"
-#include "render/descriptors/fanDescriptorUniforms.hpp"
-#include "render/descriptors/fanDescriptorTexture.hpp"
-#include "render/descriptors/fanDescriptorSampler.hpp"
 #include "render/fanVertex.hpp"
 #include "render/fanMesh.hpp"
 
@@ -18,7 +15,7 @@ namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	ForwardPipeline::ForwardPipeline( Device& _device, DescriptorTextures*& _textures, DescriptorSampler*& _sampler ) :
+	ForwardPipeline::ForwardPipeline( Device& _device, DescriptorImages* _textures, DescriptorSampler* _sampler ) :
 		Pipeline( _device )
 		, m_textures( _textures )
 		, m_sampler( _sampler )
@@ -137,8 +134,8 @@ namespace fan
 		m_attributeDescriptions = Vertex::GetAttributeDescriptions();
 		m_descriptorSetLayouts = {
 			m_sceneDescriptor.mDescriptorSetLayout
-			, m_textures->GetLayout()
-			, m_sampler->GetLayout()
+			, m_textures->mDescriptorSetLayout
+			, m_sampler->mDescriptorSetLayout
 		};
 	}
 }

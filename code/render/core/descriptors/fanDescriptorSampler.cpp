@@ -1,4 +1,4 @@
-#include "render/descriptors/fanDescriptorSampler.hpp"
+#include "render/core/descriptors/fanDescriptorSampler.hpp"
 #include "render/core/fanDevice.hpp"
 #include "render/core/fanTexture.hpp"
 
@@ -6,8 +6,7 @@ namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	DescriptorSampler::DescriptorSampler( Device& _device, VkSampler _sampler ) :
-		m_device( _device )
+	void DescriptorSampler::Create( Device& _device, VkSampler _sampler ) 
 	{
 		assert( _sampler != VK_NULL_HANDLE );
 
@@ -24,7 +23,7 @@ namespace fan
 			descriptorPoolInfo.poolSizeCount = static_cast< uint32_t >( poolSizes.size() );
 			descriptorPoolInfo.pPoolSizes = poolSizes.data();
 			descriptorPoolInfo.maxSets = 1;
-			vkCreateDescriptorPool( m_device.mDevice, &descriptorPoolInfo, nullptr, &m_descriptorPool );
+			vkCreateDescriptorPool( _device.mDevice, &descriptorPoolInfo, nullptr, &mDescriptorPool );
 		}
 
 		// Descriptor set layout
@@ -43,56 +42,37 @@ namespace fan
 			descriptorSetLayoutCreateInfo.pBindings = setLayoutBindings.data();
 			descriptorSetLayoutCreateInfo.bindingCount = static_cast< uint32_t >( setLayoutBindings.size() );
 
-			vkCreateDescriptorSetLayout( m_device.mDevice, &descriptorSetLayoutCreateInfo, nullptr, &m_descriptorSetLayout );
+			vkCreateDescriptorSetLayout( _device.mDevice, &descriptorSetLayoutCreateInfo, nullptr, &mDescriptorSetLayout );
 
 			// Descriptor set
-			std::vector<VkDescriptorSetLayout>  layouts = { m_descriptorSetLayout };
+			std::vector<VkDescriptorSetLayout>  layouts = { mDescriptorSetLayout };
 
 			VkDescriptorSetAllocateInfo descriptorSetAllocateInfo{};
 			descriptorSetAllocateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-			descriptorSetAllocateInfo.descriptorPool = m_descriptorPool;
+			descriptorSetAllocateInfo.descriptorPool = mDescriptorPool;
 			descriptorSetAllocateInfo.pSetLayouts = layouts.data();
 			descriptorSetAllocateInfo.descriptorSetCount = 1;
 
-			vkAllocateDescriptorSets( m_device.mDevice, &descriptorSetAllocateInfo, &m_descriptorSet );
+			vkAllocateDescriptorSets( _device.mDevice, &descriptorSetAllocateInfo, &mDescriptorSet );
 		}
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	DescriptorSampler::~DescriptorSampler()
+	void DescriptorSampler::Destroy( Device& _device )
 	{
-		if ( m_descriptorPool != VK_NULL_HANDLE )
+		if ( mDescriptorPool != VK_NULL_HANDLE )
 		{
-			vkDestroyDescriptorPool( m_device.mDevice, m_descriptorPool, nullptr );
-			m_descriptorPool = VK_NULL_HANDLE;
+			vkDestroyDescriptorPool( _device.mDevice, mDescriptorPool, nullptr );
+			mDescriptorPool = VK_NULL_HANDLE;
 		}
 
-		if ( m_descriptorSetLayout != VK_NULL_HANDLE )
+		if ( mDescriptorSetLayout != VK_NULL_HANDLE )
 		{
-			vkDestroyDescriptorSetLayout( m_device.mDevice, m_descriptorSetLayout, nullptr );
-			m_descriptorSetLayout = VK_NULL_HANDLE;
+			vkDestroyDescriptorSetLayout( _device.mDevice, mDescriptorSetLayout, nullptr );
+			mDescriptorSetLayout = VK_NULL_HANDLE;
 		}
-	}
 
-	//================================================================================================================================
-	//================================================================================================================================
-	void DescriptorSampler::Update()
-	{
-
-		// 		VkDescriptorImageInfo imageInfo;
-		// 		imageInfo.sampler = _sampler;
-		// 		imageInfo.imageView = VK_NULL_HANDLE;
-		// 		imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-
-		VkWriteDescriptorSet writeDescriptorSet;
-		writeDescriptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-		writeDescriptorSet.dstSet = m_descriptorSet;
-		writeDescriptorSet.descriptorType = VK_DESCRIPTOR_TYPE_SAMPLER;
-		writeDescriptorSet.dstBinding = 0;
-		writeDescriptorSet.pImageInfo = nullptr;
-		writeDescriptorSet.descriptorCount = 1;
-
-		vkUpdateDescriptorSets( m_device.mDevice, 1, &writeDescriptorSet, 0, nullptr );
+		mDescriptorSet = VK_NULL_HANDLE;
 	}
 }

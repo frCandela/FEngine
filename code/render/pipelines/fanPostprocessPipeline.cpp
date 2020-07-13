@@ -4,8 +4,6 @@
 #include "render/core/fanDevice.hpp"
 #include "render/core/fanShader.hpp"
 #include "render/core/fanBuffer.hpp"
-#include "render/descriptors/fanDescriptorTexture.hpp"
-#include "render/descriptors/fanDescriptorUniforms.hpp"
 #include "render/core/fanImageView.hpp"
 
 namespace fan
@@ -24,7 +22,7 @@ namespace fan
 	//================================================================================================================================
 	PostprocessPipeline::~PostprocessPipeline()
 	{
-		delete m_descriptorImageSampler;
+		m_descriptorImageSampler.Destroy( m_device );;
 		m_descriptorUniforms.Destroy( m_device );
 		m_sampler.Destroy( m_device );
 	}
@@ -34,8 +32,8 @@ namespace fan
 	void PostprocessPipeline::Resize( const VkExtent2D _extent )
 	{
 		Pipeline::Resize( _extent );
-		m_descriptorImageSampler->Set( 0, m_imageView->mImageView );
-		m_descriptorImageSampler->UpdateRange( 0, 0 );
+		m_descriptorImageSampler.Destroy( m_device );
+		m_descriptorImageSampler.Create( m_device, &m_imageView->mImageView, 1, m_sampler.mSampler );
 	}
 
 	//================================================================================================================================
@@ -44,7 +42,7 @@ namespace fan
 	{
 		Pipeline::Bind( _commandBuffer, _index );
 		std::vector<VkDescriptorSet> descriptors = {
-			m_descriptorImageSampler->GetSet( 0 )
+			m_descriptorImageSampler.mDescriptorSets[ 0 ]
 			, m_descriptorUniforms.mDescriptorSets[ _index ]
 		};
 		vkCmdBindDescriptorSets(
@@ -76,10 +74,8 @@ namespace fan
 		m_descriptorUniforms.Create( m_device, _numSwapchainImages );
 		SetUniformsData();
 
-		delete m_descriptorImageSampler;
-		m_descriptorImageSampler = new DescriptorTextures( m_device, 1, m_sampler.mSampler );
-		m_descriptorImageSampler->Append( m_imageView->mImageView );
-		m_descriptorImageSampler->UpdateRange( 0, 0 );
+		m_descriptorImageSampler.Destroy( m_device );
+		m_descriptorImageSampler.Create( m_device, &m_imageView->mImageView, 1, m_sampler.mSampler );
 	}
 
 	//================================================================================================================================
@@ -100,6 +96,6 @@ namespace fan
 		m_rasterizationStateCreateInfo.cullMode = VK_CULL_MODE_NONE;
 		m_attachmentBlendStates[ 0 ].srcColorBlendFactor = VK_BLEND_FACTOR_ONE;
 		m_attachmentBlendStates[ 0 ].dstColorBlendFactor = VK_BLEND_FACTOR_ZERO;
-		m_descriptorSetLayouts = { m_descriptorImageSampler->GetLayout(), m_descriptorUniforms.mDescriptorSetLayout };
+		m_descriptorSetLayouts = { m_descriptorImageSampler.mDescriptorSetLayout, m_descriptorUniforms.mDescriptorSetLayout };
 	}
 }

@@ -6,12 +6,12 @@ WARNINGS_GLM_PUSH()
 WARNINGS_POP()
 #include "render/core/fanPipeline.hpp"
 #include "render/core/fanSampler.hpp"
-#include "render/descriptors/fanDescriptorUniforms.hpp"
+#include "render/core/descriptors/fanDescriptorUniforms.hpp"
+#include "render/core/descriptors/fanDescriptorImages.hpp"
 
 namespace fan
 {
 	struct ImageView;
-	class DescriptorTextures;
 
 	//================================================================================================================================
 	// postprocess pipeline
@@ -40,7 +40,7 @@ namespace fan
 
 	private:
 
-		DescriptorTextures* m_descriptorImageSampler = nullptr;
+		DescriptorImages m_descriptorImageSampler;
 		DescriptorUniforms m_descriptorUniforms;
 		ImageView* m_imageView;
 		Sampler m_sampler;
