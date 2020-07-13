@@ -29,59 +29,65 @@ namespace fan
 	//================================================================================================================================
 	Renderer::Renderer( Window& _window ) : m_window( _window )
 	{
+		Device& device = m_window.GetDevice();
+
 		m_debugLinesvertexBuffers.resize( m_window.GetSwapChain().mImagesCount );
 		m_debugLinesNoDepthTestVertexBuffers.resize( m_window.GetSwapChain().mImagesCount );
 		m_debugTrianglesvertexBuffers.resize( m_window.GetSwapChain().mImagesCount );
 
 		m_clearColor = glm::vec4( 0.f, 0.f, 0.2f, 1.f );
 
-		Mesh::s_resourceManager.Init( m_window.GetDevice() );
-		Texture::s_resourceManager.Init( m_window.GetDevice() );
-		UIMesh::s_resourceManager.Init( m_window.GetDevice() );
+		Mesh::s_resourceManager.Init(    device );
+		Texture::s_resourceManager.Init( device );
+		UIMesh::s_resourceManager.Init(  device );
 
 		CreateRenderPasses();
 		CreateQuadVertexBuffer();
-		CreateFramebuffers();
 
-		m_samplerTextures.Create( m_window.GetDevice(), 0, 8, VK_FILTER_LINEAR );
-		m_samplerDescriptorTextures = new DescriptorSampler( m_window.GetDevice(), m_samplerTextures.mSampler );
+		m_gameColorSampler.Create( device, 0, 1.f, VK_FILTER_LINEAR );
+		m_ppColorSampler.Create( device, 0, 1.f, VK_FILTER_LINEAR );
+		CreateFramebuffers( m_window.GetSwapChain().mExtent );
+		m_swapchainFramebuffers.CreateForSwapchain( m_window.GetDevice(), m_window.GetSwapChain().mImagesCount, m_window.GetSwapChain().mExtent, m_renderPassImgui, m_window.GetSwapChain().mImageViews );
+
+		m_samplerTextures.Create( device, 0, 8, VK_FILTER_LINEAR );
+		m_samplerDescriptorTextures = new DescriptorSampler( device, m_samplerTextures.mSampler );
 		CreateTextureDescriptor();
 
-		m_debugLinesPipeline = new DebugPipeline( m_window.GetDevice(), VK_PRIMITIVE_TOPOLOGY_LINE_LIST, true );
+		m_debugLinesPipeline = new DebugPipeline( device, VK_PRIMITIVE_TOPOLOGY_LINE_LIST, true );
 		m_debugLinesPipeline->Init( m_renderPassGame.mRenderPass, m_window.GetSwapChain().mExtent, "code/shaders/debugLines.vert", "code/shaders/debugLines.frag" );
 		m_debugLinesPipeline->CreateDescriptors( m_window.GetSwapChain().mImagesCount );
 		m_debugLinesPipeline->Create();
 
-		m_debugLinesPipelineNoDepthTest = new DebugPipeline( m_window.GetDevice(), VK_PRIMITIVE_TOPOLOGY_LINE_LIST, false );
+		m_debugLinesPipelineNoDepthTest = new DebugPipeline( device, VK_PRIMITIVE_TOPOLOGY_LINE_LIST, false );
 		m_debugLinesPipelineNoDepthTest->Init( m_renderPassGame.mRenderPass, m_window.GetSwapChain().mExtent, "code/shaders/debugLines.vert", "code/shaders/debugLines.frag" );
 		m_debugLinesPipelineNoDepthTest->CreateDescriptors( m_window.GetSwapChain().mImagesCount );
 		m_debugLinesPipelineNoDepthTest->Create();
 
-		m_debugTrianglesPipeline = new DebugPipeline( m_window.GetDevice(), VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, false );
+		m_debugTrianglesPipeline = new DebugPipeline( device, VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, false );
 		m_debugTrianglesPipeline->Init( m_renderPassGame.mRenderPass, m_window.GetSwapChain().mExtent, "code/shaders/debugTriangles.vert", "code/shaders/debugTriangles.frag" );
 		m_debugTrianglesPipeline->CreateDescriptors( m_window.GetSwapChain().mImagesCount );
 		m_debugTrianglesPipeline->Create();
 
-		m_forwardPipeline = new ForwardPipeline( m_window.GetDevice(), m_imagesDescriptor, m_samplerDescriptorTextures );
+		m_forwardPipeline = new ForwardPipeline( device, m_imagesDescriptor, m_samplerDescriptorTextures );
 		m_forwardPipeline->Init( m_renderPassGame.mRenderPass, m_window.GetSwapChain().mExtent, "code/shaders/forward.vert", "code/shaders/forward.frag" );
 		m_forwardPipeline->CreateDescriptors( m_window.GetSwapChain().mImagesCount );
 		m_forwardPipeline->Create();
 
-		m_samplerUI.Create( m_window.GetDevice(), 0, 1, VK_FILTER_NEAREST );
-		m_samplerDescriptorUI = new DescriptorSampler( m_window.GetDevice(), m_samplerUI.mSampler );
-		m_uiPipeline = new UIPipeline( m_window.GetDevice(), m_imagesDescriptor, m_samplerDescriptorUI );
+		m_samplerUI.Create( device, 0, 1, VK_FILTER_NEAREST );
+		m_samplerDescriptorUI = new DescriptorSampler( device, m_samplerUI.mSampler );
+		m_uiPipeline = new UIPipeline( device, m_imagesDescriptor, m_samplerDescriptorUI );
 		m_uiPipeline->Init( m_renderPassPostprocess.mRenderPass, m_window.GetSwapChain().mExtent, "code/shaders/ui.vert", "code/shaders/ui.frag" );
 		m_uiPipeline->CreateDescriptors( m_window.GetSwapChain().mImagesCount );
 		m_uiPipeline->Create();
 
-		m_postprocessPipeline = new PostprocessPipeline( m_window.GetDevice() );
-		m_postprocessPipeline->SetGameImageView( m_gameFrameBuffers.m_colorImageView );
+		m_postprocessPipeline = new PostprocessPipeline( device );
+		m_postprocessPipeline->SetGameImageView( m_gameColorImageView );
 		m_postprocessPipeline->CreateDescriptors( m_window.GetSwapChain().mImagesCount );
 		m_postprocessPipeline->Init( m_renderPassPostprocess.mRenderPass, m_window.GetSwapChain().mExtent, "code/shaders/postprocess.vert", "code/shaders/postprocess.frag" );
 		m_postprocessPipeline->Create();
 
-		m_imguiPipeline = new ImguiPipeline( m_window.GetDevice(), m_window.GetSwapChain().mImagesCount );
-		m_imguiPipeline->SetGameView( m_postProcessFramebuffers.m_colorImageView );
+		m_imguiPipeline = new ImguiPipeline( device, m_window.GetSwapChain().mImagesCount );
+		m_imguiPipeline->SetGameView( m_ppColorImageView );
 		m_imguiPipeline->Create( m_renderPassImgui.mRenderPass, m_window.GetWindow(), m_window.GetSwapChain().mExtent );
 
 		CreateCommandBuffers();
@@ -136,9 +142,22 @@ namespace fan
 			m_debugTrianglesvertexBuffers[bufferIndex].Destroy( device );;
 		} m_debugTrianglesvertexBuffers.clear();
 
-		m_gameFrameBuffers.Destroy( device );
-		m_postProcessFramebuffers.Destroy( device );
 
+		// game framebuffers & attachements
+		m_gameFrameBuffers.Destroy( device );
+		m_gameDepthImage.Destroy( device );
+		m_gameDepthImageView.Destroy( device );
+		m_gameColorSampler.Destroy( device );
+		m_gameColorImage.Destroy( device );
+		m_gameColorImageView.Destroy( device );
+
+		// pp frame buffers & attachements
+		m_ppFramebuffers.Destroy( device );
+		m_ppColorSampler.Destroy( device );
+		m_ppColorImage.Destroy( device );
+		m_ppColorImageView.Destroy( device );
+		
+		// render passes
 		m_renderPassGame.Destroy( device );
 		m_renderPassPostprocess.Destroy( device );
 		m_renderPassImgui.Destroy( device );
@@ -221,8 +240,17 @@ namespace fan
 		const VkExtent2D extent = { ( uint32_t ) _newSize[ 0 ], ( uint32_t ) _newSize[ 1 ] };
 		m_gameExtent = extent;
 
-		m_gameFrameBuffers.Resize( device, m_window.GetSwapChain().mImagesCount, extent, m_renderPassGame );
-		m_postProcessFramebuffers.Resize( device, m_window.GetSwapChain().mImagesCount, extent, m_renderPassPostprocess );
+		// game framebuffers & attachements
+		m_gameDepthImage.Destroy( device );
+		m_gameDepthImageView.Destroy( device );
+		m_gameColorImage.Destroy( device );
+		m_gameColorImageView.Destroy( device );
+		m_gameFrameBuffers.Destroy( device );
+		// postprocess framebuffers & attachements
+		m_ppColorImage.Destroy( device );
+		m_ppColorImageView.Destroy( device );
+		m_ppFramebuffers.Destroy( device );
+		CreateFramebuffers( extent );
 
 		m_postprocessPipeline->Resize( extent );
 		m_forwardPipeline->Resize( extent );
@@ -244,7 +272,10 @@ namespace fan
 		const VkExtent2D extent = m_window.GetExtent();
 		Debug::Get() << Debug::Severity::highlight << "Resize renderer: " << extent.width << "x" << extent.height << Debug::Endl();
 		m_window.GetSwapChain().Resize( m_window.GetDevice(), extent );
-		m_swapchainFramebuffers.Resize( m_window.GetDevice(), m_window.GetSwapChain().mImagesCount, extent, m_renderPassImgui, m_window.GetSwapChain().mImageViews );
+
+		m_swapchainFramebuffers.Destroy( m_window.GetDevice() );
+		m_swapchainFramebuffers.CreateForSwapchain( m_window.GetDevice(), m_window.GetSwapChain().mImagesCount, extent, m_renderPassImgui, m_window.GetSwapChain().mImageViews );
+
 		RecordAllCommandBuffers();
 	}
 
@@ -512,7 +543,7 @@ namespace fan
 		clearValues[ 1 ].depthStencil = { 1.0f, 0 };
 
 		VkRenderPassBeginInfo renderPassInfo =			  RenderPass::GetBeginInfo(	m_renderPassGame.mRenderPass,		m_gameFrameBuffers.mFrameBuffers[_index],		  m_gameExtent, clearValues.data(), (uint32_t)clearValues.size() );
-		VkRenderPassBeginInfo renderPassInfoPostprocess = RenderPass::GetBeginInfo( m_renderPassPostprocess.mRenderPass,m_postProcessFramebuffers.mFrameBuffers[_index],  m_gameExtent, clearValues.data(), (uint32_t)clearValues.size() );
+		VkRenderPassBeginInfo renderPassInfoPostprocess = RenderPass::GetBeginInfo( m_renderPassPostprocess.mRenderPass,m_ppFramebuffers.mFrameBuffers[_index],  m_gameExtent, clearValues.data(), (uint32_t)clearValues.size() );
 		VkRenderPassBeginInfo renderPassInfoImGui =		  RenderPass::GetBeginInfo( m_renderPassImgui.mRenderPass,		m_swapchainFramebuffers.mFrameBuffers[_index],	  m_window.GetSwapChain().mExtent, clearValues.data(), (uint32_t)clearValues.size() );
 
 		if ( vkBeginCommandBuffer( commandBuffer, &commandBufferBeginInfo ) == VK_SUCCESS )
@@ -556,7 +587,7 @@ namespace fan
 	{
 
 		VkCommandBuffer commandBuffer = m_postprocessCommandBuffers.mBuffers[ _index ];
-		VkCommandBufferInheritanceInfo commandBufferInheritanceInfo = CommandBuffer::GetInheritanceInfo( m_renderPassPostprocess.mRenderPass, m_postProcessFramebuffers.mFrameBuffers[_index] );
+		VkCommandBufferInheritanceInfo commandBufferInheritanceInfo = CommandBuffer::GetInheritanceInfo( m_renderPassPostprocess.mRenderPass, m_ppFramebuffers.mFrameBuffers[_index] );
 		VkCommandBufferBeginInfo commandBufferBeginInfo = CommandBuffer::GetBeginInfo( &commandBufferInheritanceInfo );
 
 		if ( vkBeginCommandBuffer( commandBuffer, &commandBufferBeginInfo ) == VK_SUCCESS )
@@ -582,7 +613,7 @@ namespace fan
 	void Renderer::RecordCommandBufferUI( const size_t _index )
 	{
 		VkCommandBuffer commandBuffer = m_uiCommandBuffers.mBuffers[ _index ];
-		VkCommandBufferInheritanceInfo commandBufferInheritanceInfo = CommandBuffer::GetInheritanceInfo( m_renderPassPostprocess.mRenderPass, m_postProcessFramebuffers.mFrameBuffers[_index] );
+		VkCommandBufferInheritanceInfo commandBufferInheritanceInfo = CommandBuffer::GetInheritanceInfo( m_renderPassPostprocess.mRenderPass, m_ppFramebuffers.mFrameBuffers[_index] );
 		VkCommandBufferBeginInfo commandBufferBeginInfo = CommandBuffer::GetBeginInfo( &commandBufferInheritanceInfo );
 
 		if ( vkBeginCommandBuffer( commandBuffer, &commandBufferBeginInfo ) == VK_SUCCESS )
@@ -843,18 +874,37 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Renderer::CreateFramebuffers()
+	void Renderer::CreateFramebuffers( const VkExtent2D _extent )
 	{
-		const VkExtent2D extent = m_window.GetSwapChain().mExtent;
+		Device& device = m_window.GetDevice();		
+		const VkFormat depthFormat = device.FindDepthFormat();
+		const VkFormat colorFormat = m_window.GetSwapChain().mSurfaceFormat.format;
+		const uint32_t imagesCount = m_window.GetSwapChain().mImagesCount;
 
-		m_gameFrameBuffers.AddColorAttachment( m_window.GetDevice(), m_window.GetSwapChain().mSurfaceFormat.format, extent );
-		m_gameFrameBuffers.AddDepthAttachment( m_window.GetDevice(), extent );
-		m_gameFrameBuffers.Create( m_window.GetDevice(), m_window.GetSwapChain().mImagesCount, extent, m_renderPassGame );
+		// game color
+		m_gameColorImage.Create( device, colorFormat, _extent,
+			VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_STORAGE_BIT | VK_IMAGE_USAGE_INPUT_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
+			VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT
+		);
+		m_gameColorImageView.Create( device, m_gameColorImage.mImage, colorFormat, VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_VIEW_TYPE_2D );
+		// game depth
+		m_gameDepthImage.Create( device, depthFormat, _extent, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT );
+		m_gameDepthImageView.Create( device, m_gameDepthImage.mImage, depthFormat, VK_IMAGE_ASPECT_DEPTH_BIT, VK_IMAGE_VIEW_TYPE_2D );
+		{
+			VkCommandBuffer cmd = device.BeginSingleTimeCommands();
+			m_gameDepthImage.TransitionImageLayout( cmd, depthFormat, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL, 1 );
+			device.EndSingleTimeCommands( cmd );
+		}
+		VkImageView gameViews[2] = { m_gameColorImageView.mImageView, m_gameDepthImageView.mImageView };
+		m_gameFrameBuffers.Create( device, imagesCount, _extent, m_renderPassGame, gameViews, 2 );
 
-		m_postProcessFramebuffers.AddColorAttachment( m_window.GetDevice(), m_window.GetSwapChain().mSurfaceFormat.format, extent );
-		m_postProcessFramebuffers.Create( m_window.GetDevice(), m_window.GetSwapChain().mImagesCount, extent, m_renderPassPostprocess );
-
-		m_swapchainFramebuffers.Create( m_window.GetDevice(), m_window.GetSwapChain().mImagesCount, extent, m_renderPassImgui, m_window.GetSwapChain().mImageViews );
+		// pp color		
+		m_ppColorImage.Create( device, colorFormat, _extent,
+			VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_STORAGE_BIT | VK_IMAGE_USAGE_INPUT_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
+			VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT
+		);
+		m_ppColorImageView.Create( device, m_ppColorImage.mImage, colorFormat, VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_VIEW_TYPE_2D );
+		m_ppFramebuffers.Create( device, imagesCount, _extent, m_renderPassPostprocess, &m_ppColorImageView.mImageView, 1 );
 	}
 
 	//================================================================================================================================

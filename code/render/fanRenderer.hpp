@@ -14,6 +14,8 @@ WARNINGS_POP()
 #include "render/core/fanSampler.hpp"
 #include "render/core/fanBuffer.hpp"
 #include "render/core/fanFrameBuffer.hpp"
+#include "render/core/fanImageView.hpp"
+#include "render/core/fanImage.hpp"
 
 namespace fan
 {
@@ -102,7 +104,7 @@ namespace fan
 		ForwardPipeline*		GetForwardPipeline() { return m_forwardPipeline; }
 		glm::vec4				GetClearColor()					const { return m_clearColor; }
 		const FrameBuffer*		GetGameFrameBuffers()			const { return &m_gameFrameBuffers; }
-		const FrameBuffer*		GetPostProcessFramebuffers()	const { return &m_postProcessFramebuffers; }
+		const FrameBuffer*		GetPostProcessFramebuffers()	const { return &m_ppFramebuffers; }
 		const FrameBuffer*		GetSwapchainFramebuffers()		const { return &m_swapchainFramebuffers; }
 		float					GetWindowAspectRatio() const;
 
@@ -153,9 +155,21 @@ namespace fan
 		CommandBuffer m_postprocessCommandBuffers;
 		CommandBuffer m_debugCommandBuffers;
 
-		// frame buffers
+		// game frame buffers
 		FrameBuffer m_gameFrameBuffers;
-		FrameBuffer m_postProcessFramebuffers;
+		Image		m_gameDepthImage;
+		ImageView	m_gameDepthImageView;
+		Sampler		m_gameColorSampler;
+		Image		m_gameColorImage;
+		ImageView	m_gameColorImageView;
+
+		// postprocess frame buffers
+		FrameBuffer m_ppFramebuffers;
+		Sampler		m_ppColorSampler;
+		Image		m_ppColorImage;
+		ImageView	m_ppColorImageView;
+
+		// swapchain frame buffers
 		FrameBuffer m_swapchainFramebuffers;
 
 		// data
@@ -181,7 +195,7 @@ namespace fan
 
 		void CreateQuadVertexBuffer();
 		bool CreateCommandBuffers();
-		void CreateFramebuffers();
+		void CreateFramebuffers( const VkExtent2D _extent );
 		bool CreateRenderPasses();
 		bool CreateTextureDescriptor();
 		
