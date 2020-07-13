@@ -5,7 +5,7 @@
 #include "render/core/fanShader.hpp"
 #include "render/core/fanBuffer.hpp"
 #include "render/descriptors/fanDescriptorTexture.hpp"
-#include "render/descriptors/fanDescriptor.hpp"
+#include "render/descriptors/fanDescriptorUniforms.hpp"
 #include "render/core/fanImageView.hpp"
 
 namespace fan
@@ -25,7 +25,7 @@ namespace fan
 	PostprocessPipeline::~PostprocessPipeline()
 	{
 		delete m_descriptorImageSampler;
-		delete m_descriptorUniforms;
+		m_descriptorUniforms.Destroy( m_device );
 		m_sampler.Destroy( m_device );
 	}
 
@@ -45,7 +45,7 @@ namespace fan
 		Pipeline::Bind( _commandBuffer, _index );
 		std::vector<VkDescriptorSet> descriptors = {
 			m_descriptorImageSampler->GetSet( 0 )
-			, m_descriptorUniforms->GetSet( _index )
+			, m_descriptorUniforms.mDescriptorSets[ _index ]
 		};
 		vkCmdBindDescriptorSets(
 			_commandBuffer,
@@ -61,21 +61,20 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void PostprocessPipeline::UpdateUniformBuffers( const size_t _index )
+	void PostprocessPipeline::SetUniformsData( const size_t _index )
 	{
-		m_descriptorUniforms->SetBinding( 0, _index, &uniforms, sizeof( Uniforms ), 0 );
+		m_descriptorUniforms.SetData( m_device, 0, _index, &uniforms, sizeof( Uniforms ), 0 );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void PostprocessPipeline::CreateDescriptors( const size_t _numSwapchainImages )
+	void PostprocessPipeline::CreateDescriptors( const uint32_t _numSwapchainImages )
 	{
 		Debug::Log() << "Postprocess pipeline : create descriptors" << Debug::Endl();
-		delete m_descriptorUniforms;
-		m_descriptorUniforms = new Descriptor( m_device, _numSwapchainImages );
-		m_descriptorUniforms->SetUniformBinding( VK_SHADER_STAGE_FRAGMENT_BIT, sizeof( Uniforms ) );
-		m_descriptorUniforms->Create();
-		UpdateUniformBuffers();
+		m_descriptorUniforms.Destroy( m_device );
+		m_descriptorUniforms.AddUniformBinding( m_device, _numSwapchainImages, VK_SHADER_STAGE_FRAGMENT_BIT, sizeof( Uniforms ) );
+		m_descriptorUniforms.Create( m_device, _numSwapchainImages );
+		SetUniformsData();
 
 		delete m_descriptorImageSampler;
 		m_descriptorImageSampler = new DescriptorTextures( m_device, 1, m_sampler.mSampler );
@@ -101,6 +100,6 @@ namespace fan
 		m_rasterizationStateCreateInfo.cullMode = VK_CULL_MODE_NONE;
 		m_attachmentBlendStates[ 0 ].srcColorBlendFactor = VK_BLEND_FACTOR_ONE;
 		m_attachmentBlendStates[ 0 ].dstColorBlendFactor = VK_BLEND_FACTOR_ZERO;
-		m_descriptorSetLayouts = { m_descriptorImageSampler->GetLayout(), m_descriptorUniforms->GetLayout() };
+		m_descriptorSetLayouts = { m_descriptorImageSampler->GetLayout(), m_descriptorUniforms.mDescriptorSetLayout };
 	}
 }

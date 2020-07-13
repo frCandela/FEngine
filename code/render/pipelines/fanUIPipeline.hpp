@@ -1,14 +1,14 @@
 #pragma once
 
-#include "render/core/fanPipeline.hpp"
 #include "core/memory/fanAlignedMemory.hpp"
+#include "render/core/fanPipeline.hpp"
 #include "render/fanUIMesh.hpp"
+#include "render/descriptors/fanDescriptorUniforms.hpp"
 
 namespace fan
 {
 	class DescriptorTextures;
 	class DescriptorSampler;
-	class Descriptor;
 
 	//================================================================
 	//================================================================
@@ -28,10 +28,10 @@ namespace fan
 		UIPipeline( Device& _device, DescriptorTextures*& _textures, DescriptorSampler*& _sampler );
 		~UIPipeline() override;
 
-		void UpdateUniformBuffers( const size_t _index = 0 ) override;
-		void CreateDescriptors( const size_t _numSwapchainImages );
+		void SetUniformsData( const size_t _index = 0 ) override;
+		void CreateDescriptors( const uint32_t _numSwapchainImages );
 		void BindDescriptors( VkCommandBuffer _commandBuffer, const size_t _indexFrame, const uint32_t _indexOffset );
-		void ResizeDynamicDescriptors( const size_t _newSize );
+		void ResizeDynamicDescriptors( const uint32_t _count, const size_t _newSize );
 
 		AlignedMemory<DynamicUniformUIVert>		m_dynamicUniformsVert;
 
@@ -39,7 +39,7 @@ namespace fan
 		void ConfigurePipeline() override;
 
 	private:
-		Descriptor* m_transformDescriptor = nullptr;
+		DescriptorUniforms m_transformDescriptor;
 		DescriptorTextures*& m_textures;
 		DescriptorSampler*& m_sampler;
 	};

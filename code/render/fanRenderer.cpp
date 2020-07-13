@@ -283,12 +283,12 @@ namespace fan
 	//================================================================================================================================
 	void Renderer::UpdateUniformBuffers( const size_t _index )
 	{
-		m_postprocessPipeline->UpdateUniformBuffers( _index );
-		m_forwardPipeline->UpdateUniformBuffers( _index );
-		m_debugLinesPipeline->UpdateUniformBuffers( _index );
-		m_debugLinesPipelineNoDepthTest->UpdateUniformBuffers( _index );
-		m_debugTrianglesPipeline->UpdateUniformBuffers( _index );
-		m_uiPipeline->UpdateUniformBuffers( _index );
+		m_postprocessPipeline->SetUniformsData( _index );
+		m_forwardPipeline->SetUniformsData( _index );
+		m_debugLinesPipeline->SetUniformsData( _index );
+		m_debugLinesPipelineNoDepthTest->SetUniformsData( _index );
+		m_debugTrianglesPipeline->SetUniformsData( _index );
+		m_uiPipeline->SetUniformsData( _index );
 	}
 
 	//================================================================================================================================
@@ -371,7 +371,7 @@ namespace fan
 			WaitIdle();
 			const size_t newSize = 2 * _drawData.size();
 			m_meshDrawArray.reserve( newSize );
-			m_forwardPipeline->ResizeDynamicDescriptors( newSize );
+			m_forwardPipeline->ResizeDynamicDescriptors( m_window.GetSwapChain().mImagesCount, newSize );
 		}
 
 		m_meshDrawArray.clear();

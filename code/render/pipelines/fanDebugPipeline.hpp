@@ -1,14 +1,14 @@
 #pragma once
 
-#include "render/core/fanPipeline.hpp"
 #include "fanDisableWarnings.hpp"
 WARNINGS_GLM_PUSH()
 #include "glm/glm.hpp"
 WARNINGS_POP()
+#include "render/core/fanPipeline.hpp"
+#include "render/descriptors/fanDescriptorUniforms.hpp"
 
 namespace fan
 {
-	class Descriptor;
 	struct DebugUniforms;
 
 	//================================================================================================================================
@@ -31,14 +31,14 @@ namespace fan
 		virtual ~DebugPipeline() override;
 
 		void Bind( VkCommandBuffer _commandBuffer, const size_t _index ) override;
-		void UpdateUniformBuffers( const size_t _index ) override;
-		void CreateDescriptors( const size_t _numSwapchainImages );
+		void SetUniformsData( const size_t _index ) override;
+		void CreateDescriptors( const uint32_t _numSwapchainImages );
 
 	protected:
 		void ConfigurePipeline() override;
 
 	private:
-		Descriptor*			m_descriptor;
+		DescriptorUniforms			m_descriptor;
 		VkPrimitiveTopology m_primitiveTopology;
 		bool				m_depthTestEnable;
 	};

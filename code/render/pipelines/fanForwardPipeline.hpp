@@ -7,13 +7,13 @@ WARNINGS_POP()
 #include "core/memory/fanAlignedMemory.hpp"
 #include "render/core/fanPipeline.hpp"
 #include "render/fanRenderGlobal.hpp"
+#include "render/descriptors/fanDescriptorUniforms.hpp"
 
 namespace fan
 {
 	class Mesh;
 	struct Vertex;
 	struct Device;
-	class Descriptor;
 	class DescriptorTextures;
 	class DescriptorSampler;
 	class ResourceManager;
@@ -102,16 +102,16 @@ namespace fan
 
 		void Resize( const VkExtent2D _extent ) override;
 		void BindDescriptors( VkCommandBuffer _commandBuffer, const size_t _indexFrame, const uint32_t _indexOffset );
-		void UpdateUniformBuffers( const size_t _index = 0 ) override;
-		void CreateDescriptors( const size_t _numSwapchainImages );
-		void ResizeDynamicDescriptors( const size_t _newSize );
+		void SetUniformsData( const size_t _index = 0 ) override;
+		void CreateDescriptors( const uint32_t _numSwapchainImages );
+		void ResizeDynamicDescriptors( const uint32_t _count, const size_t _newSize );
 		void ReloadShaders() override;
 
 	protected:
 		void ConfigurePipeline() override;
 
 	private:
-		Descriptor* m_sceneDescriptor;
+		DescriptorUniforms m_sceneDescriptor;
 
 		DescriptorTextures*& m_textures;
 		DescriptorSampler*& m_sampler;
