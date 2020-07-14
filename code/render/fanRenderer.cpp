@@ -52,36 +52,36 @@ namespace fan
 
 		m_debugLinesPipeline = new DebugPipeline( device, VK_PRIMITIVE_TOPOLOGY_LINE_LIST, true );
 		m_debugLinesPipeline->Init( m_renderPassGame.mRenderPass, m_window.GetSwapChain().mExtent, "code/shaders/debugLines.vert", "code/shaders/debugLines.frag" );
-		m_debugLinesPipeline->CreateDescriptors( m_window.GetSwapChain().mImagesCount );
-		m_debugLinesPipeline->Create();
+		m_debugLinesPipeline->CreateDescriptors( device, m_window.GetSwapChain().mImagesCount );
+		m_debugLinesPipeline->Create( device, m_gameExtent );
 
 		m_debugLinesPipelineNoDepthTest = new DebugPipeline( device, VK_PRIMITIVE_TOPOLOGY_LINE_LIST, false );
 		m_debugLinesPipelineNoDepthTest->Init( m_renderPassGame.mRenderPass, m_window.GetSwapChain().mExtent, "code/shaders/debugLines.vert", "code/shaders/debugLines.frag" );
-		m_debugLinesPipelineNoDepthTest->CreateDescriptors( m_window.GetSwapChain().mImagesCount );
-		m_debugLinesPipelineNoDepthTest->Create();
+		m_debugLinesPipelineNoDepthTest->CreateDescriptors( device, m_window.GetSwapChain().mImagesCount );
+		m_debugLinesPipelineNoDepthTest->Create( device, m_gameExtent );
 
 		m_debugTrianglesPipeline = new DebugPipeline( device, VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, false );
 		m_debugTrianglesPipeline->Init( m_renderPassGame.mRenderPass, m_window.GetSwapChain().mExtent, "code/shaders/debugTriangles.vert", "code/shaders/debugTriangles.frag" );
-		m_debugTrianglesPipeline->CreateDescriptors( m_window.GetSwapChain().mImagesCount );
-		m_debugTrianglesPipeline->Create();
+		m_debugTrianglesPipeline->CreateDescriptors( device, m_window.GetSwapChain().mImagesCount );
+		m_debugTrianglesPipeline->Create( device, m_gameExtent );
 
 		m_forwardPipeline = new ForwardPipeline( device, &m_imagesDescriptor, &m_samplerDescriptorTextures );
 		m_forwardPipeline->Init( m_renderPassGame.mRenderPass, m_window.GetSwapChain().mExtent, "code/shaders/forward.vert", "code/shaders/forward.frag" );
-		m_forwardPipeline->CreateDescriptors( m_window.GetSwapChain().mImagesCount );
-		m_forwardPipeline->Create();
+		m_forwardPipeline->CreateDescriptors( device, m_window.GetSwapChain().mImagesCount );
+		m_forwardPipeline->Create( device, m_gameExtent );
 
 		m_samplerUI.Create( device, 0, 1, VK_FILTER_NEAREST );
 		m_samplerDescriptorUI.Create( device, m_samplerUI.mSampler );
 		m_uiPipeline = new UIPipeline( device, &m_imagesDescriptor, &m_samplerDescriptorUI );
 		m_uiPipeline->Init( m_renderPassPostprocess.mRenderPass, m_window.GetSwapChain().mExtent, "code/shaders/ui.vert", "code/shaders/ui.frag" );
-		m_uiPipeline->CreateDescriptors( m_window.GetSwapChain().mImagesCount );
-		m_uiPipeline->Create();
+		m_uiPipeline->CreateDescriptors( device, m_window.GetSwapChain().mImagesCount );
+		m_uiPipeline->Create( device, m_gameExtent );
 
 		m_postprocessPipeline = new PostprocessPipeline( device );
 		m_postprocessPipeline->SetGameImageView( m_gameColorImageView );
-		m_postprocessPipeline->CreateDescriptors( m_window.GetSwapChain().mImagesCount );
+		m_postprocessPipeline->CreateDescriptors( device, m_window.GetSwapChain().mImagesCount );
 		m_postprocessPipeline->Init( m_renderPassPostprocess.mRenderPass, m_window.GetSwapChain().mExtent, "code/shaders/postprocess.vert", "code/shaders/postprocess.frag" );
-		m_postprocessPipeline->Create();
+		m_postprocessPipeline->Create( device, m_gameExtent );
 
 		m_imguiPipeline = new ImguiPipeline( device, m_window.GetSwapChain().mImagesCount );
 		m_imguiPipeline->SetGameView( m_ppColorImageView );
@@ -209,7 +209,7 @@ namespace fan
 		}
 
 		const uint32_t currentFrame = m_window.GetSwapChain().mCurrentFrame;
-		UpdateUniformBuffers( currentFrame );
+		UpdateUniformBuffers( m_window.GetDevice(), currentFrame );
 		{
 			SCOPED_PROFILE( record_cmd );
 			RecordCommandBufferGeometry( currentFrame );
@@ -249,12 +249,8 @@ namespace fan
 		m_ppFramebuffers.Destroy( device );
 		CreateFramebuffers( extent );
 
-		m_postprocessPipeline->Resize( extent );
-		m_forwardPipeline->Resize( extent );
-		m_debugLinesPipeline->Resize( extent );
-		m_debugLinesPipelineNoDepthTest->Resize( extent );
-		m_debugTrianglesPipeline->Resize( extent );
-		m_uiPipeline->Resize( extent );
+		m_postprocessPipeline->m_descriptorImageSampler.Destroy( device );
+		m_postprocessPipeline->m_descriptorImageSampler.Create( device, &m_postprocessPipeline->m_imageView->mImageView, 1, m_postprocessPipeline->m_sampler.mSampler );
 
 		m_imguiPipeline->UpdateGameImageDescriptor();
 
@@ -278,14 +274,14 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Renderer::UpdateUniformBuffers( const size_t _index )
+	void Renderer::UpdateUniformBuffers( Device& _device, const size_t _index )
 	{
-		m_postprocessPipeline->SetUniformsData( _index );
-		m_forwardPipeline->SetUniformsData( _index );
-		m_debugLinesPipeline->SetUniformsData( _index );
-		m_debugLinesPipelineNoDepthTest->SetUniformsData( _index );
-		m_debugTrianglesPipeline->SetUniformsData( _index );
-		m_uiPipeline->SetUniformsData( _index );
+		m_postprocessPipeline->SetUniformsData( _device, _index );
+		m_forwardPipeline->SetUniformsData( _device, _index );
+		m_debugLinesPipeline->SetUniformsData( _device, _index );
+		m_debugLinesPipelineNoDepthTest->SetUniformsData( _device, _index );
+		m_debugTrianglesPipeline->SetUniformsData( _device, _index );
+		m_uiPipeline->SetUniformsData( _device, _index );
 	}
 
 	//================================================================================================================================
@@ -368,7 +364,7 @@ namespace fan
 			WaitIdle();
 			const size_t newSize = 2 * _drawData.size();
 			m_meshDrawArray.reserve( newSize );
-			m_forwardPipeline->ResizeDynamicDescriptors( m_window.GetSwapChain().mImagesCount, newSize );
+			m_forwardPipeline->ResizeDynamicDescriptors( m_window.GetDevice(), m_window.GetSwapChain().mImagesCount, newSize );
 		}
 
 		m_meshDrawArray.clear();
@@ -589,7 +585,7 @@ namespace fan
 
 		if ( vkBeginCommandBuffer( commandBuffer, &commandBufferBeginInfo ) == VK_SUCCESS )
 		{
-			m_postprocessPipeline->Bind( commandBuffer, _index );
+			m_postprocessPipeline->Bind( commandBuffer, m_gameExtent, _index );
 			VkBuffer vertexBuffers[] = { m_quadVertexBuffer.mBuffer };
 			VkDeviceSize offsets[] = { 0 };
 			vkCmdBindVertexBuffers( commandBuffer, 0, 1, vertexBuffers, offsets );
@@ -615,7 +611,7 @@ namespace fan
 
 		if ( vkBeginCommandBuffer( commandBuffer, &commandBufferBeginInfo ) == VK_SUCCESS )
 		{
-			m_uiPipeline->Bind( commandBuffer, _index );
+			m_uiPipeline->Bind( commandBuffer, m_gameExtent, _index );
 			m_uiPipeline->BindDescriptors( commandBuffer, _index, 0 );
 
 			VkDeviceSize offsets[] = { 0 };
@@ -627,7 +623,7 @@ namespace fan
 				VkBuffer vertexBuffers[] = { mesh->GetVertexBuffer().mBuffer };
 				m_uiPipeline->BindDescriptors( commandBuffer, _index, meshIndex );
 				vkCmdBindVertexBuffers( commandBuffer, 0, 1, vertexBuffers, offsets );
-				BindTexture( commandBuffer, drawData.textureIndex, &m_samplerDescriptorUI, m_uiPipeline->GetLayout() );
+				BindTexture( commandBuffer, drawData.textureIndex, &m_samplerDescriptorUI, m_uiPipeline->m_pipelineLayout );
 				vkCmdDraw( commandBuffer, static_cast< uint32_t >( mesh->GetVertices().size() ), 1, 0, 0 );
 			}
 
@@ -679,12 +675,12 @@ namespace fan
 
 		if ( vkBeginCommandBuffer( commandBuffer, &commandBufferBeginInfo ) == VK_SUCCESS )
 		{
-			m_forwardPipeline->Bind( commandBuffer, _index );
+			m_forwardPipeline->Bind( commandBuffer, m_gameExtent, _index );
 
 			for ( uint32_t meshIndex = 0; meshIndex < m_meshDrawArray.size(); meshIndex++ )
 			{
 				DrawData& drawData = m_meshDrawArray[ meshIndex ];
-				BindTexture( commandBuffer, drawData.textureIndex, &m_samplerDescriptorTextures, m_forwardPipeline->GetLayout() );
+				BindTexture( commandBuffer, drawData.textureIndex, &m_samplerDescriptorTextures, m_forwardPipeline->m_pipelineLayout );
 				m_forwardPipeline->BindDescriptors( commandBuffer, _index, meshIndex );
 				VkDeviceSize offsets[] = { 0 };
 				VkBuffer vertexBuffers[] = { drawData.mesh->GetVertexBuffer().mBuffer };
@@ -720,21 +716,21 @@ namespace fan
 				VkDeviceSize offsets[] = { 0 };
 				if( m_numDebugLines > 0 )
 				{
-					m_debugLinesPipeline->Bind( commandBuffer, _index );
+					m_debugLinesPipeline->Bind( commandBuffer, m_gameExtent, _index );
 					VkBuffer vertexBuffers[] = { m_debugLinesvertexBuffers[_index].mBuffer };
 					vkCmdBindVertexBuffers( commandBuffer, 0, 1, vertexBuffers, offsets );
 					vkCmdDraw( commandBuffer, static_cast<uint32_t>( m_numDebugLines ), 1, 0, 0 );
 				}
 				if( m_numDebugLinesNoDepthTest > 0 )
 				{
-					m_debugLinesPipelineNoDepthTest->Bind( commandBuffer, _index );
+					m_debugLinesPipelineNoDepthTest->Bind( commandBuffer, m_gameExtent, _index );
 					VkBuffer vertexBuffers[] = { m_debugLinesNoDepthTestVertexBuffers[_index].mBuffer };
 					vkCmdBindVertexBuffers( commandBuffer, 0, 1, vertexBuffers, offsets );
 					vkCmdDraw( commandBuffer, static_cast<uint32_t>( m_numDebugLinesNoDepthTest ), 1, 0, 0 );
 				}
 				if( m_numDebugTriangle > 0 )
 				{
-					m_debugTrianglesPipeline->Bind( commandBuffer, _index );
+					m_debugTrianglesPipeline->Bind( commandBuffer, m_gameExtent, _index );
 					VkBuffer vertexBuffers[] = { m_debugTrianglesvertexBuffers[_index].mBuffer };
 					vkCmdBindVertexBuffers( commandBuffer, 0, 1, vertexBuffers, offsets );
 					vkCmdDraw( commandBuffer, static_cast<uint32_t>( m_numDebugTriangle ), 1, 0, 0 );
@@ -788,16 +784,18 @@ namespace fan
 	void Renderer::ReloadShaders()
 	{
 		Debug::Highlight( "Reloading shaders" );
+		Device& device = m_window.GetDevice();
 
-		vkDeviceWaitIdle( m_window.GetDevice().mDevice );
+
+		vkDeviceWaitIdle( device.mDevice );
 
 		CreateTextureDescriptor();
-		m_postprocessPipeline->ReloadShaders();
-		m_forwardPipeline->ReloadShaders();
-		m_debugLinesPipeline->ReloadShaders();
-		m_debugLinesPipelineNoDepthTest->ReloadShaders();
-		m_debugTrianglesPipeline->ReloadShaders();
-		m_uiPipeline->ReloadShaders();
+		m_postprocessPipeline->ReloadShaders( device, m_gameExtent );
+		m_forwardPipeline->ReloadShaders( device, m_gameExtent );
+		m_debugLinesPipeline->ReloadShaders( device, m_gameExtent );
+		m_debugLinesPipelineNoDepthTest->ReloadShaders( device, m_gameExtent );
+		m_debugTrianglesPipeline->ReloadShaders( device, m_gameExtent );
+		m_uiPipeline->ReloadShaders( device, m_gameExtent );
 
 		RecordAllCommandBuffers();
 	}

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "core/memory/fanAlignedMemory.hpp"
-#include "render/core/fanPipeline.hpp"
+#include "render/pipelines/fanPipeline.hpp"
 #include "render/fanUIMesh.hpp"
 #include "render/core/descriptors/fanDescriptorUniforms.hpp"
 #include "render/core/descriptors/fanDescriptorImages.hpp"
@@ -25,17 +25,16 @@ namespace fan
 	{
 	public:
 		UIPipeline( Device& _device, DescriptorImages* _textures, DescriptorSampler* _sampler );
-		~UIPipeline() override;
+		void Destroy( Device& _device ) override;
 
-		void SetUniformsData( const size_t _index = 0 ) override;
-		void CreateDescriptors( const uint32_t _numSwapchainImages );
+		void SetUniformsData( Device& _device, const size_t _index = 0 ) override;
+		void CreateDescriptors( Device& _device, const uint32_t _numSwapchainImages );
 		void BindDescriptors( VkCommandBuffer _commandBuffer, const size_t _indexFrame, const uint32_t _indexOffset );
-		void ResizeDynamicDescriptors( const uint32_t _count, const size_t _newSize );
+		void ResizeDynamicDescriptors( Device& _device, const uint32_t _count, const size_t _newSize );
 
 		AlignedMemory<DynamicUniformUIVert>		m_dynamicUniformsVert;
 
-	protected:
-		void ConfigurePipeline() override;
+		PipelineConfig GetConfig() override;
 
 	private:
 		DescriptorUniforms m_transformDescriptor;

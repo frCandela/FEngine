@@ -5,7 +5,7 @@ WARNINGS_GLM_PUSH()
 #include "glm/glm.hpp"
 WARNINGS_POP()
 #include "core/memory/fanAlignedMemory.hpp"
-#include "render/core/fanPipeline.hpp"
+#include "render/pipelines/fanPipeline.hpp"
 #include "render/fanRenderGlobal.hpp"
 #include "render/core/descriptors/fanDescriptorUniforms.hpp"
 #include "render/core/descriptors/fanDescriptorImages.hpp"
@@ -98,17 +98,14 @@ namespace fan
 		FragUniforms	m_fragUniforms;
 
 		ForwardPipeline( Device& _device, DescriptorImages* _textures, DescriptorSampler* _sampler );
-		~ForwardPipeline() override;
+		void Destroy( Device& _device );
 
-		void Resize( const VkExtent2D _extent ) override;
 		void BindDescriptors( VkCommandBuffer _commandBuffer, const size_t _indexFrame, const uint32_t _indexOffset );
-		void SetUniformsData( const size_t _index = 0 ) override;
-		void CreateDescriptors( const uint32_t _numSwapchainImages );
-		void ResizeDynamicDescriptors( const uint32_t _count, const size_t _newSize );
-		void ReloadShaders() override;
+		void SetUniformsData( Device& _device, const size_t _index = 0 ) override;
+		void CreateDescriptors( Device& _device, const uint32_t _numSwapchainImages );
+		void ResizeDynamicDescriptors( Device& _device, const uint32_t _count, const size_t _newSize );
 
-	protected:
-		void ConfigurePipeline() override;
+		PipelineConfig GetConfig() override;
 
 	private:
 		DescriptorUniforms m_sceneDescriptor;

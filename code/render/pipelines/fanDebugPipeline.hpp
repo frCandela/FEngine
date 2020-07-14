@@ -4,7 +4,7 @@
 WARNINGS_GLM_PUSH()
 #include "glm/glm.hpp"
 WARNINGS_POP()
-#include "render/core/fanPipeline.hpp"
+#include "render/pipelines/fanPipeline.hpp"
 #include "render/core/descriptors/fanDescriptorUniforms.hpp"
 
 namespace fan
@@ -28,14 +28,12 @@ namespace fan
 		} m_debugUniforms;
 
 		DebugPipeline( Device& _device, const VkPrimitiveTopology _primitiveTopology, const bool _depthTestEnable );
-		virtual ~DebugPipeline() override;
+		void Destroy( Device& _device ) override;
 
-		void Bind( VkCommandBuffer _commandBuffer, const size_t _index ) override;
-		void SetUniformsData( const size_t _index ) override;
-		void CreateDescriptors( const uint32_t _numSwapchainImages );
-
-	protected:
-		void ConfigurePipeline() override;
+		void Bind( VkCommandBuffer _commandBuffer, VkExtent2D _extent, const size_t _index ) override;
+		void SetUniformsData( Device& _device, const size_t _index ) override;
+		void CreateDescriptors( Device& _device, const uint32_t _numSwapchainImages );
+		PipelineConfig GetConfig() override;
 
 	private:
 		DescriptorUniforms			m_descriptor;

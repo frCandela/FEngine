@@ -10,8 +10,7 @@ namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	PostprocessPipeline::PostprocessPipeline( Device& _device ) :
-		Pipeline( _device )
+	PostprocessPipeline::PostprocessPipeline( Device& _device )
 	{
 		uniforms.color = glm::vec4( 1, 1, 1, 1 );
 
@@ -20,27 +19,19 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	PostprocessPipeline::~PostprocessPipeline()
+	void PostprocessPipeline::Destroy( Device& _device )
 	{
-		m_descriptorImageSampler.Destroy( m_device );;
-		m_descriptorUniforms.Destroy( m_device );
-		m_sampler.Destroy( m_device );
+		Pipeline::Destroy( _device );
+		m_descriptorImageSampler.Destroy( _device );
+		m_descriptorUniforms.Destroy( _device );
+		m_sampler.Destroy( _device );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void PostprocessPipeline::Resize( const VkExtent2D _extent )
+	void PostprocessPipeline::Bind( VkCommandBuffer _commandBuffer, VkExtent2D _extent, const size_t _index )
 	{
-		Pipeline::Resize( _extent );
-		m_descriptorImageSampler.Destroy( m_device );
-		m_descriptorImageSampler.Create( m_device, &m_imageView->mImageView, 1, m_sampler.mSampler );
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void PostprocessPipeline::Bind( VkCommandBuffer _commandBuffer, const size_t _index )
-	{
-		Pipeline::Bind( _commandBuffer, _index );
+		Pipeline::Bind( _commandBuffer, _extent, _index );
 		std::vector<VkDescriptorSet> descriptors = {
 			m_descriptorImageSampler.mDescriptorSets[ 0 ]
 			, m_descriptorUniforms.mDescriptorSets[ _index ]
@@ -59,43 +50,47 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void PostprocessPipeline::SetUniformsData( const size_t _index )
+	void PostprocessPipeline::SetUniformsData( Device& _device, const size_t _index )
 	{
-		m_descriptorUniforms.SetData( m_device, 0, _index, &uniforms, sizeof( Uniforms ), 0 );
+		m_descriptorUniforms.SetData( _device, 0, _index, &uniforms, sizeof( Uniforms ), 0 );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void PostprocessPipeline::CreateDescriptors( const uint32_t _numSwapchainImages )
+	void PostprocessPipeline::CreateDescriptors( Device& _device, const uint32_t _numSwapchainImages )
 	{
 		Debug::Log() << "Postprocess pipeline : create descriptors" << Debug::Endl();
-		m_descriptorUniforms.Destroy( m_device );
-		m_descriptorUniforms.AddUniformBinding( m_device, _numSwapchainImages, VK_SHADER_STAGE_FRAGMENT_BIT, sizeof( Uniforms ) );
-		m_descriptorUniforms.Create( m_device, _numSwapchainImages );
-		SetUniformsData();
+		m_descriptorUniforms.Destroy( _device );
+		m_descriptorUniforms.AddUniformBinding( _device, _numSwapchainImages, VK_SHADER_STAGE_FRAGMENT_BIT, sizeof( Uniforms ) );
+		m_descriptorUniforms.Create( _device, _numSwapchainImages );
+		SetUniformsData( _device );
 
-		m_descriptorImageSampler.Destroy( m_device );
-		m_descriptorImageSampler.Create( m_device, &m_imageView->mImageView, 1, m_sampler.mSampler );
+		m_descriptorImageSampler.Destroy( _device );
+		m_descriptorImageSampler.Create( _device, &m_imageView->mImageView, 1, m_sampler.mSampler );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void PostprocessPipeline::ConfigurePipeline()
+	PipelineConfig PostprocessPipeline::GetConfig()
 	{
-		m_bindingDescription.resize( 1 );
-		m_bindingDescription[ 0 ].binding = 0;
-		m_bindingDescription[ 0 ].stride = sizeof( glm::vec3 );
-		m_bindingDescription[ 0 ].inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
+		PipelineConfig config( m_vertexShader, m_fragmentShader );
 
-		m_attributeDescriptions.resize( 1 );
-		m_attributeDescriptions[ 0 ].binding = 0;
-		m_attributeDescriptions[ 0 ].location = 0;
-		m_attributeDescriptions[ 0 ].format = VK_FORMAT_R32G32B32_SFLOAT;
-		m_attributeDescriptions[ 0 ].offset = 0;
-		m_inputAssemblyStateCreateInfo.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP;
-		m_rasterizationStateCreateInfo.cullMode = VK_CULL_MODE_NONE;
-		m_attachmentBlendStates[ 0 ].srcColorBlendFactor = VK_BLEND_FACTOR_ONE;
-		m_attachmentBlendStates[ 0 ].dstColorBlendFactor = VK_BLEND_FACTOR_ZERO;
-		m_descriptorSetLayouts = { m_descriptorImageSampler.mDescriptorSetLayout, m_descriptorUniforms.mDescriptorSetLayout };
+		config.bindingDescription.resize( 1 );
+		config.bindingDescription[ 0 ].binding = 0;
+		config.bindingDescription[ 0 ].stride = sizeof( glm::vec3 );
+		config.bindingDescription[ 0 ].inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
+
+		config.attributeDescriptions.resize( 1 );
+		config.attributeDescriptions[0].binding = 0;
+		config.attributeDescriptions[0].location = 0;
+		config.attributeDescriptions[0].format = VK_FORMAT_R32G32B32_SFLOAT;
+		config.attributeDescriptions[0].offset = 0;
+		config.inputAssemblyStateCreateInfo.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP;
+		config.rasterizationStateCreateInfo.cullMode = VK_CULL_MODE_NONE;
+		config.attachmentBlendStates[0].srcColorBlendFactor = VK_BLEND_FACTOR_ONE;
+		config.attachmentBlendStates[0].dstColorBlendFactor = VK_BLEND_FACTOR_ZERO;
+		config.descriptorSetLayouts = { m_descriptorImageSampler.mDescriptorSetLayout, m_descriptorUniforms.mDescriptorSetLayout };
+	
+		return config;
 	}
 }

@@ -4,7 +4,7 @@
 WARNINGS_GLM_PUSH()
 #include "glm/glm.hpp"
 WARNINGS_POP()
-#include "render/core/fanPipeline.hpp"
+#include "render/pipelines/fanPipeline.hpp"
 #include "render/core/fanSampler.hpp"
 #include "render/core/descriptors/fanDescriptorUniforms.hpp"
 #include "render/core/descriptors/fanDescriptorImages.hpp"
@@ -27,18 +27,16 @@ namespace fan
 		} uniforms;
 
 		PostprocessPipeline( Device& _device );
-		~PostprocessPipeline() override;
+		void Destroy( Device& _device );
 
 		void SetGameImageView( ImageView& _imageView ) { m_imageView = &_imageView; }
-		void CreateDescriptors( const uint32_t _numSwapchainImages );
-		void Resize( const VkExtent2D _extent ) override;
-		void Bind( VkCommandBuffer _commandBuffer, const size_t _index ) override;
-		void SetUniformsData( const size_t _index = 0 ) override;
+		void CreateDescriptors( Device& _device, const uint32_t _numSwapchainImages );
+		void Bind( VkCommandBuffer _commandBuffer, VkExtent2D _extent, const size_t _index ) override;
+		void SetUniformsData( Device& _device, const size_t _index = 0 ) override;
 
-	protected:
-		void ConfigurePipeline() override;
+		PipelineConfig GetConfig() override;
 
-	private:
+
 
 		DescriptorImages m_descriptorImageSampler;
 		DescriptorUniforms m_descriptorUniforms;

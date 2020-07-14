@@ -12,52 +12,56 @@ namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	DebugPipeline::DebugPipeline( Device& _device, const VkPrimitiveTopology _primitiveTopology, const bool _depthTestEnable ) :
-		Pipeline( _device )
-		, m_primitiveTopology( _primitiveTopology )
+	DebugPipeline::DebugPipeline( Device& /*_device*/, const VkPrimitiveTopology _primitiveTopology, const bool _depthTestEnable ) 
+		: m_primitiveTopology( _primitiveTopology )
 		, m_depthTestEnable( _depthTestEnable )
 	{}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	DebugPipeline::~DebugPipeline()
+	void DebugPipeline::Destroy( Device& _device )
 	{
-		m_descriptor.Destroy( m_device );
+		Pipeline::Destroy( _device );
+		m_descriptor.Destroy( _device );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void DebugPipeline::CreateDescriptors( const uint32_t _numSwapchainImages )
+	void DebugPipeline::CreateDescriptors( Device& _device, const uint32_t _numSwapchainImages )
 	{
 		Debug::Log( "Debug pipeline : create descriptors" );
-		m_descriptor.AddUniformBinding( m_device, _numSwapchainImages, VK_SHADER_STAGE_VERTEX_BIT, sizeof( DebugUniforms ) );
-		m_descriptor.Create( m_device, _numSwapchainImages );
+		m_descriptor.AddUniformBinding( _device, _numSwapchainImages, VK_SHADER_STAGE_VERTEX_BIT, sizeof( DebugUniforms ) );
+		m_descriptor.Create( _device, _numSwapchainImages );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void DebugPipeline::SetUniformsData( const size_t _index )
+	void DebugPipeline::SetUniformsData( Device& _device, const size_t _index )
 	{
-		m_descriptor.SetData( m_device, 0, _index, &m_debugUniforms, sizeof( DebugUniforms ), 0 );
+		m_descriptor.SetData( _device, 0, _index, &m_debugUniforms, sizeof( DebugUniforms ), 0 );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void DebugPipeline::Bind( VkCommandBuffer _commandBuffer, const size_t _index )
+	void DebugPipeline::Bind( VkCommandBuffer _commandBuffer, VkExtent2D _extent, const size_t _index )
 	{
-		Pipeline::Bind( _commandBuffer, _index );
+		Pipeline::Bind( _commandBuffer, _extent,  _index );
 		m_descriptor.Bind( _commandBuffer, m_pipelineLayout, _index );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void DebugPipeline::ConfigurePipeline()
+	PipelineConfig DebugPipeline::GetConfig()
 	{
-		m_bindingDescription = DebugVertex::GetBindingDescription();
-		m_attributeDescriptions = DebugVertex::GetAttributeDescriptions();
-		m_inputAssemblyStateCreateInfo.topology = m_primitiveTopology;
-		m_depthStencilStateCreateInfo.depthTestEnable = m_depthTestEnable ? VK_TRUE : VK_FALSE;
-		m_descriptorSetLayouts = { m_descriptor.mDescriptorSetLayout };
-		m_rasterizationStateCreateInfo.cullMode = VK_CULL_MODE_NONE;
+		PipelineConfig config( m_vertexShader, m_fragmentShader );
+
+		config.bindingDescription = DebugVertex::GetBindingDescription();
+		config.attributeDescriptions = DebugVertex::GetAttributeDescriptions();
+		config.inputAssemblyStateCreateInfo.topology = m_primitiveTopology;
+		config.depthStencilStateCreateInfo.depthTestEnable = m_depthTestEnable ? VK_TRUE : VK_FALSE;
+		config.descriptorSetLayouts = { m_descriptor.mDescriptorSetLayout };
+		config.rasterizationStateCreateInfo.cullMode = VK_CULL_MODE_NONE;
+
+		return config;
 	}
 }

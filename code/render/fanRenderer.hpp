@@ -199,7 +199,7 @@ namespace fan
 		bool CreateRenderPasses();
 		bool CreateTextureDescriptor();
 		
-		void UpdateUniformBuffers( const size_t _index );
+		void UpdateUniformBuffers( Device& _device, const size_t _index );
 		bool SubmitCommandBuffers();
 		void BindTexture( VkCommandBuffer _commandBuffer, const uint32_t _textureIndex, DescriptorSampler* _samplerDescriptor, VkPipelineLayout _pipelineLayout );
 	};

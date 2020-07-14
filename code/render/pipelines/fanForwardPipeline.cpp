@@ -15,13 +15,12 @@ namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	ForwardPipeline::ForwardPipeline( Device& _device, DescriptorImages* _textures, DescriptorSampler* _sampler ) :
-		Pipeline( _device )
-		, m_textures( _textures )
+	ForwardPipeline::ForwardPipeline( Device& _device, DescriptorImages* _textures, DescriptorSampler* _sampler ) 
+		: m_textures( _textures )
 		, m_sampler( _sampler )
 	{
 		// Calculate required alignment based on minimum device offset alignment
-		size_t minUboAlignment = (size_t)m_device.mDeviceProperties.limits.minUniformBufferOffsetAlignment;
+		size_t minUboAlignment = (size_t)_device.mDeviceProperties.limits.minUniformBufferOffsetAlignment;
 		size_t dynamicAlignmentVert = sizeof( DynamicUniformsVert );
 		size_t dynamicAlignmentFrag = sizeof( DynamicUniformsMaterial );
 		if ( minUboAlignment > 0 )
@@ -45,61 +44,45 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	ForwardPipeline::~ForwardPipeline()
+	void ForwardPipeline::Destroy( Device& _device )
 	{
-		m_sceneDescriptor.Destroy( m_device );
+		Pipeline::Destroy( _device );
+		m_sceneDescriptor.Destroy( _device );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ForwardPipeline::Resize( const VkExtent2D _extent )
-	{
-		Pipeline::Resize( _extent );
-		DeletePipeline();
-		CreatePipeline();
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void ForwardPipeline::CreateDescriptors( const uint32_t _numSwapchainImages )
+	void ForwardPipeline::CreateDescriptors( Device& _device, const uint32_t _numSwapchainImages )
 	{
 		Debug::Log() << "Forward pipeline : create descriptors" << Debug::Endl();
-		m_sceneDescriptor.AddUniformBinding( m_device, _numSwapchainImages, VK_SHADER_STAGE_VERTEX_BIT, sizeof( VertUniforms ) );
-		m_sceneDescriptor.AddDynamicUniformBinding( m_device, _numSwapchainImages, VK_SHADER_STAGE_VERTEX_BIT, m_dynamicUniformsVert.Size(), m_dynamicUniformsVert.Alignment() );
-		m_sceneDescriptor.AddUniformBinding( m_device, _numSwapchainImages, VK_SHADER_STAGE_FRAGMENT_BIT, sizeof( FragUniforms ) );
-		m_sceneDescriptor.AddDynamicUniformBinding( m_device, _numSwapchainImages, VK_SHADER_STAGE_FRAGMENT_BIT, m_dynamicUniformsMaterial.Size(), m_dynamicUniformsMaterial.Alignment() );
-		m_sceneDescriptor.AddUniformBinding( m_device, _numSwapchainImages, VK_SHADER_STAGE_FRAGMENT_BIT, sizeof( LightsUniforms ) );
-		m_sceneDescriptor.Create( m_device, _numSwapchainImages );
+		m_sceneDescriptor.AddUniformBinding( _device, _numSwapchainImages, VK_SHADER_STAGE_VERTEX_BIT, sizeof( VertUniforms ) );
+		m_sceneDescriptor.AddDynamicUniformBinding( _device, _numSwapchainImages, VK_SHADER_STAGE_VERTEX_BIT, m_dynamicUniformsVert.Size(), m_dynamicUniformsVert.Alignment() );
+		m_sceneDescriptor.AddUniformBinding( _device, _numSwapchainImages, VK_SHADER_STAGE_FRAGMENT_BIT, sizeof( FragUniforms ) );
+		m_sceneDescriptor.AddDynamicUniformBinding( _device, _numSwapchainImages, VK_SHADER_STAGE_FRAGMENT_BIT, m_dynamicUniformsMaterial.Size(), m_dynamicUniformsMaterial.Alignment() );
+		m_sceneDescriptor.AddUniformBinding( _device, _numSwapchainImages, VK_SHADER_STAGE_FRAGMENT_BIT, sizeof( LightsUniforms ) );
+		m_sceneDescriptor.Create( _device, _numSwapchainImages );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ForwardPipeline::ResizeDynamicDescriptors( const uint32_t _count, const size_t _newSize )
+	void ForwardPipeline::ResizeDynamicDescriptors( Device& _device, const uint32_t _count, const size_t _newSize )
 	{
 		m_dynamicUniformsVert.Resize( _newSize );
 		m_dynamicUniformsMaterial.Resize( _newSize );
-		m_sceneDescriptor.ResizeDynamicUniformBinding( m_device, _count, m_dynamicUniformsVert.Size(), m_dynamicUniformsVert.Alignment(), 1 );
-		m_sceneDescriptor.ResizeDynamicUniformBinding( m_device, _count, m_dynamicUniformsMaterial.Size(), m_dynamicUniformsMaterial.Alignment(), 3 );
-		m_sceneDescriptor.UpdateDescriptorSets( m_device, _count );
+		m_sceneDescriptor.ResizeDynamicUniformBinding( _device, _count, m_dynamicUniformsVert.Size(), m_dynamicUniformsVert.Alignment(), 1 );
+		m_sceneDescriptor.ResizeDynamicUniformBinding( _device, _count, m_dynamicUniformsMaterial.Size(), m_dynamicUniformsMaterial.Alignment(), 3 );
+		m_sceneDescriptor.UpdateDescriptorSets( _device, _count );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ForwardPipeline::ReloadShaders()
+	void ForwardPipeline::SetUniformsData( Device& _device, const size_t _index )
 	{
-		Pipeline::ReloadShaders();
-
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void ForwardPipeline::SetUniformsData( const size_t _index )
-	{
-		m_sceneDescriptor.SetData( m_device, 0, _index, &m_vertUniforms, sizeof( VertUniforms ), 0 );
-		m_sceneDescriptor.SetData( m_device, 1, _index, &m_dynamicUniformsVert[0], m_dynamicUniformsVert.Alignment() * m_dynamicUniformsVert.Size(), 0 );
-		m_sceneDescriptor.SetData( m_device, 2, _index, &m_fragUniforms, sizeof( FragUniforms ), 0 );
-		m_sceneDescriptor.SetData( m_device, 3, _index, &m_dynamicUniformsMaterial[0], m_dynamicUniformsMaterial.Alignment() * m_dynamicUniformsMaterial.Size(), 0 );
-		m_sceneDescriptor.SetData( m_device, 4, _index, &m_lightUniforms, sizeof( LightsUniforms ), 0 );
+		m_sceneDescriptor.SetData( _device, 0, _index, &m_vertUniforms, sizeof( VertUniforms ), 0 );
+		m_sceneDescriptor.SetData( _device, 1, _index, &m_dynamicUniformsVert[0], m_dynamicUniformsVert.Alignment() * m_dynamicUniformsVert.Size(), 0 );
+		m_sceneDescriptor.SetData( _device, 2, _index, &m_fragUniforms, sizeof( FragUniforms ), 0 );
+		m_sceneDescriptor.SetData( _device, 3, _index, &m_dynamicUniformsMaterial[0], m_dynamicUniformsMaterial.Alignment() * m_dynamicUniformsMaterial.Size(), 0 );
+		m_sceneDescriptor.SetData( _device, 4, _index, &m_lightUniforms, sizeof( LightsUniforms ), 0 );
 	}
 
 	//================================================================================================================================
@@ -128,14 +111,18 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ForwardPipeline::ConfigurePipeline()
+	PipelineConfig ForwardPipeline::GetConfig()
 	{
-		m_bindingDescription = Vertex::GetBindingDescription();
-		m_attributeDescriptions = Vertex::GetAttributeDescriptions();
-		m_descriptorSetLayouts = {
+		PipelineConfig config( m_vertexShader, m_fragmentShader );
+
+		config.bindingDescription = Vertex::GetBindingDescription();
+		config.attributeDescriptions = Vertex::GetAttributeDescriptions();
+		config.descriptorSetLayouts = {
 			m_sceneDescriptor.mDescriptorSetLayout
 			, m_textures->mDescriptorSetLayout
 			, m_sampler->mDescriptorSetLayout
 		};
+
+		return config;
 	}
 }
