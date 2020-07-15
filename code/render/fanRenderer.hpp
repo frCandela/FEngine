@@ -20,19 +20,15 @@ WARNINGS_POP()
 #include "render/core/descriptors/fanDescriptorImages.hpp"
 #include "render/core/descriptors/fanDescriptorSampler.hpp"
 #include "render/core/descriptors/fanDescriptorUniforms.hpp"
-#include "render/pipelines/fanForwardPipeline.hpp"
-#include "render/pipelines/fanPipeline.hpp"
+#include "render/imgui/fanImguiPipeline.hpp"
+#include "render/fanUniforms.hpp"
+#include "render/core/fanPipeline.hpp"
 
 namespace fan
 {
 	class Window;
 	class Mesh;
 	class UIMesh;
-	class ImguiPipeline;
-	class PostprocessPipeline;
-	class ForwardPipeline;
-	class UIPipeline;
-	class DebugPipeline;	
 
 	// Used to set uniforms
 	struct DrawDirectionalLight
@@ -104,12 +100,7 @@ namespace fan
 		void ResizeGame( btVector2 _newSize );
 		void ResizeSwapchain();
 
-		PostprocessPipeline*	GetPostprocessPipeline() { return m_postprocessPipeline; }
-		glm::vec4				GetClearColor()					const { return m_clearColor; }
-		const FrameBuffer*		GetGameFrameBuffers()			const { return &m_gameFrameBuffers; }
-		const FrameBuffer*		GetPostProcessFramebuffers()	const { return &m_ppFramebuffers; }
-		const FrameBuffer*		GetSwapchainFramebuffers()		const { return &m_swapchainFramebuffers; }
-		float					GetWindowAspectRatio() const;
+		glm::vec4 GetClearColor() const { return m_clearColor; }
 
 		void SetClearColor( glm::vec4 _color ) { m_clearColor = _color; }
 		void SetMainCamera( const glm::mat4 _projection, const glm::mat4 _view, const glm::vec3 _position );
@@ -121,23 +112,24 @@ namespace fan
 
 		const std::vector< DrawData >& GetDrawData() const { return m_meshDrawArray; }
 
-
 		VkExtent2D m_gameExtent = { 1,1 };
 
 		std::vector< DrawData >		m_meshDrawArray;
 		std::vector< UIDrawData >	m_uiMeshDrawArray;
 
 		Window& m_window;
+		Device& m_device;
 
 		// pipelines
-		ImguiPipeline*			m_imguiPipeline;
-		PostprocessPipeline*	m_postprocessPipeline;
-		Pipeline				m_forwardPipeline;
-		UIPipeline*				m_uiPipeline;
-		DebugPipeline*			m_debugLinesPipeline;
-		DebugPipeline*			m_debugLinesPipelineNoDepthTest;
-		DebugPipeline*			m_debugTrianglesPipeline;
+		ImguiPipeline m_imguiPipeline;
+		Pipeline	m_postprocessPipeline;
+		Pipeline	m_forwardPipeline;
+		Pipeline	m_uiPipeline;
+		Pipeline	m_debugLinesPipeline;
+		Pipeline	m_debugLinesPipelineNoDepthTest;
+		Pipeline	m_debugTrianglesPipeline;
 
+		// shaders
 		Shader				m_ppFragShader;
 		Shader				m_ppVertShader;
 		Shader				m_forwardFragShader;
@@ -159,8 +151,26 @@ namespace fan
 		Sampler				m_samplerUI;
 
 		// forward descriptors
-		ForwardUniforms		mForwardUniforms;
-		DescriptorUniforms	mForwardDescriptor;
+		ForwardUniforms		m_forwardUniforms;
+		DescriptorUniforms	m_forwardDescriptor;
+
+		// ui descriptors
+		DescriptorUniforms	m_uiTransformDescriptor;
+		UiUniforms			m_uiUniforms;
+		
+		// debug descriptors
+		DebugUniforms m_debugLinesUniforms;
+		DebugUniforms m_debugLinesNoDepthTestUniforms;
+		DebugUniforms m_debugTrianglesUniforms;
+		DescriptorUniforms	m_debugLinesDescriptor;
+		DescriptorUniforms	m_debugLinesNoDepthTestDescriptor;
+		DescriptorUniforms	m_debugTrianglesDescriptor;
+		
+		// pp descriptors
+		DescriptorImages m_ppDescriptorImage;
+		DescriptorUniforms m_ppUniformDescriptor;
+		Sampler m_ppSampler;
+		PostprocessUniforms m_ppUniforms;
 
 		// render passes
 		RenderPass m_renderPassGame;
@@ -203,7 +213,7 @@ namespace fan
 		std::vector<Buffer>		m_debugTrianglesvertexBuffers;
 		int m_numDebugLines = 0;
 		int m_numDebugLinesNoDepthTest = 0;
-		int m_numDebugTriangle = 0;	
+		int m_numDebugTriangle = 0;
 
 		void RecordCommandBufferPostProcess( const size_t _index );
 		void RecordCommandBufferImgui( const size_t _index );
@@ -227,6 +237,12 @@ namespace fan
 		bool SubmitCommandBuffers();
 		void BindTexture( VkCommandBuffer _commandBuffer, const uint32_t _textureIndex, DescriptorSampler* _samplerDescriptor, VkPipelineLayout _pipelineLayout );
 		void BindForwardDescriptors( VkCommandBuffer _commandBuffer, const size_t _indexFrame, const uint32_t _indexOffset );
-		PipelineConfig GetForwardPipelineConfig( Shader& _vert, Shader& _frag );
+		void BindUIDescriptors( VkCommandBuffer _commandBuffer, const size_t _indexFrame, const uint32_t _indexOffset );
+		void BindPostprocessDescriptors( VkCommandBuffer _commandBuffer, const size_t _index );
+
+		PipelineConfig			GetForwardPipelineConfig( Shader& _vert, Shader& _frag );
+		PipelineConfig			GetUiPipelineConfig( Shader& _vert, Shader& _frag );
+		static PipelineConfig	GetDebugPipelineConfig( Shader& _vert, Shader& _frag, const VkPrimitiveTopology _primitiveTopology, const bool _depthTestEnable, DescriptorUniforms& _descriptor );
+		PipelineConfig			GetPostprocessPipelineConfig( Shader& _vert, Shader& _frag );
 	};
 }

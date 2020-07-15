@@ -1,6 +1,5 @@
 #include "editor/windows/fanPreferencesWindow.hpp"
 
-#include "render/pipelines/fanPostprocessPipeline.hpp"
 #include "render/fanRenderer.hpp"
 #include "core/fanColor.hpp"
 #include "core/input/fanInputManager.hpp"
@@ -88,7 +87,7 @@ namespace fan
 		{
 			ImGui::Indent();
 			// Filter color
-			glm::vec4& color = m_renderer.GetPostprocessPipeline()->uniforms.color;
+			glm::vec4& color = m_renderer.m_ppUniforms.color;
 			ImGui::ColorEdit3( "Filter##1", &color[ 0 ], ImGui::fanColorEditFlags );
 
 			// Clear color

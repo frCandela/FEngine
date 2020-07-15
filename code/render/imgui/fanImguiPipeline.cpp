@@ -1,4 +1,4 @@
-#include "render/pipelines/fanImguiPipeline.hpp"
+#include "render/imgui/fanImguiPipeline.hpp"
 
 #include <array>
 #include "imgui/imgui.h"
@@ -15,57 +15,51 @@ namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	ImguiPipeline::ImguiPipeline( Device& _device, const int _swapchainImagesCount ) :
-		m_device( _device )
+	void ImguiPipeline::Create( Device& _device, const int _swapchainImagesCount, VkRenderPass _renderPass, GLFWwindow* _window, VkExtent2D _extent, ImageView& _gameImageView )
 	{
 		m_vertexBuffers.resize( _swapchainImagesCount );
 		m_indexBuffers.resize( _swapchainImagesCount );
 		m_vertexCount.resize( _swapchainImagesCount, 0 );
 		m_indexCount.resize( _swapchainImagesCount, 0 );
+
+		ImGui::CreateContext();
+
+		ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+
+		InitImgui( _device, _window, _extent );
+		CreateFontAndSampler( _device );
+		CreateDescriptors( _device, _gameImageView );
+		CreateGraphicsPipeline( _device, _renderPass );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	ImguiPipeline::~ImguiPipeline()
+	void ImguiPipeline::Destroy( Device& _device )
 	{
-		m_fontTexture.Destroy(m_device);
-		m_iconsTexture.Destroy( m_device );
-		m_sampler.Destroy( m_device );
-		m_iconsSampler.Destroy( m_device );
-		m_fragShader.Destroy( m_device );
-		m_vertShader.Destroy( m_device );
+		m_fontTexture.Destroy( _device );
+		m_iconsTexture.Destroy( _device );
+		m_sampler.Destroy( _device );
+		m_iconsSampler.Destroy( _device );
+		m_fragShader.Destroy( _device );
+		m_vertShader.Destroy( _device );
 
-		vkDestroyPipelineCache( m_device.mDevice, m_pipelineCache, nullptr );
-		vkDestroyPipeline( m_device.mDevice, m_pipeline, nullptr );
-		vkDestroyPipelineLayout( m_device.mDevice, m_pipelineLayout, nullptr );
-		vkDestroyDescriptorPool( m_device.mDevice, m_descriptorPool, nullptr );
-		vkDestroyDescriptorSetLayout( m_device.mDevice, m_descriptorSetLayout, nullptr );
+		vkDestroyPipelineCache( _device.mDevice, m_pipelineCache, nullptr );
+		vkDestroyPipeline( _device.mDevice, m_pipeline, nullptr );
+		vkDestroyPipelineLayout( _device.mDevice, m_pipelineLayout, nullptr );
+		vkDestroyDescriptorPool( _device.mDevice, m_descriptorPool, nullptr );
+		vkDestroyDescriptorSetLayout( _device.mDevice, m_descriptorSetLayout, nullptr );
 
 		ImGui::DestroyContext();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ImguiPipeline::Create( VkRenderPass _renderPass, GLFWwindow* _window, VkExtent2D _extent )
-	{
-		ImGui::CreateContext();
-
-		ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-
-		InitImgui( _window, _extent );
-		CreateFontAndSampler();
-		CreateDescriptors();
-		CreateGraphicsPipeline( _renderPass );
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void ImguiPipeline::ReloadIcons()
+	void ImguiPipeline::ReloadIcons( Device& _device )
 	{
 		Debug::Log( "reloading icons" );
 
-		m_iconsTexture.Destroy( m_device );
-		m_iconsTexture.CreateFromFile( m_device, RenderGlobal::s_defaultIcons );
+		m_iconsTexture.Destroy( _device );
+		m_iconsTexture.CreateFromFile( _device, RenderGlobal::s_defaultIcons );
 
 		VkDescriptorImageInfo iconsDescriptorImageInfo{};
 		iconsDescriptorImageInfo.sampler = m_iconsSampler.mSampler;
@@ -80,12 +74,12 @@ namespace fan
 		writeDescriptorSetIcons.pImageInfo = &iconsDescriptorImageInfo;
 		writeDescriptorSetIcons.descriptorCount = 1;
 
-		vkUpdateDescriptorSets( m_device.mDevice, 1, &writeDescriptorSetIcons, 0, nullptr );
+		vkUpdateDescriptorSets( _device.mDevice, 1, &writeDescriptorSetIcons, 0, nullptr );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ImguiPipeline::UpdateBuffer( const size_t _index )
+	void ImguiPipeline::UpdateBuffer( Device& _device, const size_t _index )
 	{
 		ImDrawData* imDrawData = ImGui::GetDrawData();
 
@@ -102,22 +96,22 @@ namespace fan
 			Buffer& vertexBuffer = m_vertexBuffers[ _index ];
 			if ( ( vertexBuffer.mBuffer == VK_NULL_HANDLE ) || ( m_vertexCount[ _index ] != imDrawData->TotalVtxCount ) )
 			{
-				vertexBuffer.Unmap( m_device );
-				vertexBuffer.Destroy( m_device  );
-				vertexBuffer.Create( m_device, vertexBufferSize, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT );
+				vertexBuffer.Unmap( _device );
+				vertexBuffer.Destroy( _device  );
+				vertexBuffer.Create( _device, vertexBufferSize, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT );
 				m_vertexCount[ _index ] = imDrawData->TotalVtxCount;
-				vertexBuffer.Map( m_device );
+				vertexBuffer.Map( _device );
 			}
 
 			// Index buffer
 			Buffer& indexBuffer = m_indexBuffers[ _index ];
 			if ( ( indexBuffer.mBuffer == VK_NULL_HANDLE ) || ( m_indexCount[ _index ] < imDrawData->TotalIdxCount ) )
 			{
-				indexBuffer.Unmap( m_device );
-				indexBuffer.Destroy( m_device );
-				indexBuffer.Create( m_device, indexBufferSize, VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT );
+				indexBuffer.Unmap( _device );
+				indexBuffer.Destroy( _device );
+				indexBuffer.Create( _device, indexBufferSize, VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT );
 				m_indexCount[ _index ] = imDrawData->TotalIdxCount;
-				indexBuffer.Map( m_device );
+				indexBuffer.Map( _device );
 			}
 
 			// Upload data
@@ -134,8 +128,8 @@ namespace fan
 			}
 
 			// Flush to make writes visible to GPU
-			vertexBuffer.Flush( m_device );
-			indexBuffer.Flush( m_device );
+			vertexBuffer.Flush( _device );
+			indexBuffer.Flush( _device );
 		}
 	}
 
@@ -214,7 +208,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ImguiPipeline::InitImgui( GLFWwindow* _window, VkExtent2D _extent )
+	void ImguiPipeline::InitImgui( Device& _device, GLFWwindow* _window, VkExtent2D _extent )
 	{
 		// Color scheme
 		ImGuiStyle& style = ImGui::GetStyle();
@@ -224,8 +218,8 @@ namespace fan
 		ImGuiIO& io = ImGui::GetIO();
 		io.DisplaySize = ImVec2( static_cast< float >( _extent.width ), static_cast< float >( _extent.height ) );
 		io.DisplayFramebufferScale = ImVec2( 1.0f, 1.0f );
-		m_vertShader.Create( m_device, RenderGlobal::s_imguiVertexShader );
-		m_fragShader.Create( m_device, RenderGlobal::s_imguiFragmentShader );
+		m_vertShader.Create( _device, RenderGlobal::s_imguiVertexShader );
+		m_fragShader.Create( _device, RenderGlobal::s_imguiFragmentShader );
 
 		// Setup back-end capabilities flags
 		io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;         // We can honor GetMouseCursor() values (optional)
@@ -260,7 +254,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ImguiPipeline::CreateFontAndSampler()
+	void ImguiPipeline::CreateFontAndSampler( Device& _device )
 	{
 		ImGui::GetIO().Fonts->AddFontFromFileTTF( RenderGlobal::s_defaultImguiFont, 15 );
 
@@ -269,15 +263,15 @@ namespace fan
 		int texWidth, texHeight;
 		ImGui::GetIO().Fonts->GetTexDataAsRGBA32( &fontData, &texWidth, &texHeight );
 
-		m_fontTexture.CreateFromData( m_device, fontData, { (uint32_t)texWidth, (uint32_t)texHeight }, 1 );
-		m_iconsTexture.CreateFromFile( m_device, RenderGlobal::s_defaultIcons );
-		m_sampler.Create( m_device, 0, 1.f, VK_FILTER_LINEAR );
-		m_iconsSampler.Create( m_device, 0, 0.f, VK_FILTER_NEAREST );
+		m_fontTexture.CreateFromData( _device, fontData, { (uint32_t)texWidth, (uint32_t)texHeight }, 1 );
+		m_iconsTexture.CreateFromFile( _device, RenderGlobal::s_defaultIcons );
+		m_sampler.Create( _device, 0, 1.f, VK_FILTER_LINEAR );
+		m_iconsSampler.Create( _device, 0, 0.f, VK_FILTER_NEAREST );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ImguiPipeline::CreateDescriptors()
+	void ImguiPipeline::CreateDescriptors( Device& _device, ImageView& _gameImageView )
 	{
 		Debug::Log() << "ImGui pipeline : create descriptors" << Debug::Endl();
 		// Descriptor pool
@@ -294,7 +288,7 @@ namespace fan
 		descriptorPoolInfo.pPoolSizes = poolSizes.data();
 		descriptorPoolInfo.maxSets = 3;
 
-		vkCreateDescriptorPool( m_device.mDevice, &descriptorPoolInfo, nullptr, &m_descriptorPool );
+		vkCreateDescriptorPool( _device.mDevice, &descriptorPoolInfo, nullptr, &m_descriptorPool );
 
 		// Descriptor set layout
 		VkDescriptorSetLayoutBinding setLayoutBinding{};
@@ -310,7 +304,7 @@ namespace fan
 		descriptorSetLayoutCreateInfo.pBindings = setLayoutBindings.data();
 		descriptorSetLayoutCreateInfo.bindingCount = static_cast< uint32_t >( setLayoutBindings.size() );
 
-		vkCreateDescriptorSetLayout( m_device.mDevice, &descriptorSetLayoutCreateInfo, nullptr, &m_descriptorSetLayout );
+		vkCreateDescriptorSetLayout( _device.mDevice, &descriptorSetLayoutCreateInfo, nullptr, &m_descriptorSetLayout );
 
 		// Descriptor set
 		VkDescriptorSetLayout layouts[ 3 ] = { m_descriptorSetLayout ,m_descriptorSetLayout, m_descriptorSetLayout };
@@ -320,7 +314,7 @@ namespace fan
 		descriptorSetAllocateInfo.pSetLayouts = layouts;
 		descriptorSetAllocateInfo.descriptorSetCount = 3;
 
-		vkAllocateDescriptorSets( m_device.mDevice, &descriptorSetAllocateInfo, m_descriptorSets );
+		vkAllocateDescriptorSets( _device.mDevice, &descriptorSetAllocateInfo, m_descriptorSets );
 
 		VkDescriptorImageInfo fontDescriptorImageInfo{};
 		fontDescriptorImageInfo.sampler = m_sampler.mSampler;
@@ -334,7 +328,7 @@ namespace fan
 
 		VkDescriptorImageInfo view3DDescriptorImageInfo{};
 		view3DDescriptorImageInfo.sampler = m_iconsSampler.mSampler;
-		view3DDescriptorImageInfo.imageView = m_gameImageView->mImageView;
+		view3DDescriptorImageInfo.imageView = _gameImageView.mImageView;
 		view3DDescriptorImageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 
 		VkWriteDescriptorSet writeDescriptorSet{};
@@ -363,16 +357,16 @@ namespace fan
 
 		std::vector<VkWriteDescriptorSet> writeDescriptorSets = { writeDescriptorSet, writeDescriptorSetIcons, writeDescriptorSet3DView };
 
-		vkUpdateDescriptorSets( m_device.mDevice, static_cast< uint32_t >( writeDescriptorSets.size() ), writeDescriptorSets.data(), 0, nullptr );
+		vkUpdateDescriptorSets( _device.mDevice, static_cast< uint32_t >( writeDescriptorSets.size() ), writeDescriptorSets.data(), 0, nullptr );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ImguiPipeline::UpdateGameImageDescriptor()
+	void ImguiPipeline::UpdateGameImageDescriptor( Device& _device, ImageView& _gameImageView )
 	{
 		VkDescriptorImageInfo viewGameDescriptorImageInfo{};
 		viewGameDescriptorImageInfo.sampler = m_iconsSampler.mSampler;
-		viewGameDescriptorImageInfo.imageView = m_gameImageView->mImageView;
+		viewGameDescriptorImageInfo.imageView = _gameImageView.mImageView;
 		viewGameDescriptorImageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 
 		VkWriteDescriptorSet writeDescriptorSet3DView{};
@@ -385,17 +379,17 @@ namespace fan
 
 		std::vector<VkWriteDescriptorSet> writeDescriptorSets = { writeDescriptorSet3DView };
 
-		vkUpdateDescriptorSets( m_device.mDevice, static_cast< uint32_t >( writeDescriptorSets.size() ), writeDescriptorSets.data(), 0, nullptr );
+		vkUpdateDescriptorSets( _device.mDevice, static_cast< uint32_t >( writeDescriptorSets.size() ), writeDescriptorSets.data(), 0, nullptr );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ImguiPipeline::CreateGraphicsPipeline( VkRenderPass _renderPass )
+	void ImguiPipeline::CreateGraphicsPipeline( Device& _device, VkRenderPass _renderPass )
 	{
 		// Pipeline cache
 		VkPipelineCacheCreateInfo pipelineCacheCreateInfo = {};
 		pipelineCacheCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
-		vkCreatePipelineCache( m_device.mDevice, &pipelineCacheCreateInfo, nullptr, &m_pipelineCache );
+		vkCreatePipelineCache( _device.mDevice, &pipelineCacheCreateInfo, nullptr, &m_pipelineCache );
 
 		// Push constants for UI rendering parameters
 		VkPushConstantRange pushConstantRange = {};
@@ -410,7 +404,7 @@ namespace fan
 		pipelineLayoutCreateInfo.pushConstantRangeCount = 1;
 		pipelineLayoutCreateInfo.pPushConstantRanges = &pushConstantRange;
 
-		vkCreatePipelineLayout( m_device.mDevice, &pipelineLayoutCreateInfo, nullptr, &m_pipelineLayout );
+		vkCreatePipelineLayout( _device.mDevice, &pipelineLayoutCreateInfo, nullptr, &m_pipelineLayout );
 
 		// Setup graphics pipeline for UI rendering
 		VkPipelineInputAssemblyStateCreateInfo inputAssemblyState = {};
@@ -552,6 +546,6 @@ namespace fan
 		pipelineCreateInfo.pVertexInputState = &vertexInputState;
 		pipelineCreateInfo.subpass = 0;
 
-		vkCreateGraphicsPipelines( m_device.mDevice, m_pipelineCache, 1, &pipelineCreateInfo, nullptr, &m_pipeline );
+		vkCreateGraphicsPipelines( _device.mDevice, m_pipelineCache, 1, &pipelineCreateInfo, nullptr, &m_pipeline );
 	}
 }

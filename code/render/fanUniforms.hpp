@@ -4,17 +4,12 @@
 WARNINGS_GLM_PUSH()
 #include "glm/glm.hpp"
 WARNINGS_POP()
+#include "glfw/glfw3.h"
 #include "core/memory/fanAlignedMemory.hpp"
 #include "render/fanRenderGlobal.hpp"
-#include "render/core/fanDevice.hpp"
 
 namespace fan
 {
-	class Mesh;
-	struct Vertex;
-	struct Device;
-	class ResourceManager;
-
 	//================================================================
 	//================================================================
 	struct DirectionalLightUniform
@@ -80,37 +75,51 @@ namespace fan
 		glm::vec3	cameraPosition = glm::vec3( 0, 0, 0 );
 	};
 
+	//================================================================
+	//================================================================
+	struct DynamicUniformUIVert
+	{
+		glm::vec2 position;
+		glm::vec2 scale;
+		glm::vec4 color;
+	};
+
+	//================================================================
+	//================================================================
 	struct ForwardUniforms
 	{
-		void Create( Device& _device )
-		{
-			// Calculate required alignment based on minimum device offset alignment
-			size_t minUboAlignment = (size_t)_device.mDeviceProperties.limits.minUniformBufferOffsetAlignment;
-			size_t dynamicAlignmentVert = sizeof( DynamicUniformsVert );
-			size_t dynamicAlignmentFrag = sizeof( DynamicUniformsMaterial );
-			if( minUboAlignment > 0 )
-			{
-				dynamicAlignmentVert = ( ( sizeof( DynamicUniformsVert ) + minUboAlignment - 1 ) & ~( minUboAlignment - 1 ) );
-				dynamicAlignmentFrag = ( ( sizeof( DynamicUniformsMaterial ) + minUboAlignment - 1 ) & ~( minUboAlignment - 1 ) );
-			}
-
-			m_dynamicUniformsVert.SetAlignement( dynamicAlignmentVert );
-			m_dynamicUniformsMaterial.SetAlignement( dynamicAlignmentFrag );
-
-			m_dynamicUniformsVert.Resize( 256 );
-			m_dynamicUniformsMaterial.Resize( 256 );
-
-			for( int uniformIndex = 0; uniformIndex < m_dynamicUniformsMaterial.Size(); uniformIndex++ )
-			{
-				m_dynamicUniformsMaterial[uniformIndex].color = glm::vec4( 1 );
-				m_dynamicUniformsMaterial[uniformIndex].shininess = 1;
-			}
-		}
+		void Create( const VkDeviceSize _minUniformBufferOffsetAlignment );
 
 		AlignedMemory<DynamicUniformsMaterial>	m_dynamicUniformsMaterial;
 		AlignedMemory<DynamicUniformsVert>		m_dynamicUniformsVert;
 		LightsUniforms	m_lightUniforms;
 		VertUniforms	m_vertUniforms;
 		FragUniforms	m_fragUniforms;
+	};
+
+	//================================================================
+	//================================================================
+	struct UiUniforms
+	{
+		void Create( const VkDeviceSize _minUniformBufferOffsetAlignment );
+
+		AlignedMemory<DynamicUniformUIVert>	mUidynamicUniformsVert;
+	};
+
+	//================================================================
+	//================================================================
+	struct DebugUniforms
+	{
+		glm::mat4 model;
+		glm::mat4 view;
+		glm::mat4 proj;
+		glm::vec4 color;
+	};
+
+	//================================================================
+	//================================================================
+	struct PostprocessUniforms
+	{
+		glm::vec4 color = glm::vec4( 1, 1, 1, 1 );
 	};
 }

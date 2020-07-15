@@ -35,12 +35,10 @@ namespace fan
 	//================================================================================================================================
 	struct Pipeline
 	{
-		virtual void Bind( VkCommandBuffer _commandBuffer, VkExtent2D _extent, const size_t _index );
-		virtual void SetUniformsData( Device& /*_device*/, const size_t /*_index*/ ) {};
+		void Bind( VkCommandBuffer _commandBuffer, VkExtent2D _extent, const size_t _index );
 
-		bool CreatePipeline( Device& _device, PipelineConfig _pipelineConfig, VkExtent2D _extent, VkRenderPass _renderPass );
-		void DeletePipeline( Device& _device );
-		void PreConfigurePipeline();
+		bool Create( Device& _device, PipelineConfig _pipelineConfig, VkExtent2D _extent, VkRenderPass _renderPass );
+		void Destroy( Device& _device );
 
 		VkPipelineLayout	m_pipelineLayout = VK_NULL_HANDLE;
 		VkPipeline			m_pipeline = VK_NULL_HANDLE;

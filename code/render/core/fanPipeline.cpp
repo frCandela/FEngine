@@ -1,4 +1,4 @@
-#include "render/pipelines/fanPipeline.hpp"
+#include "render/core/fanPipeline.hpp"
 
 #include "core/fanDebug.hpp"
 #include "render/core/fanDevice.hpp"
@@ -98,8 +98,11 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool Pipeline::CreatePipeline( Device& _device, PipelineConfig _pipelineConfig, VkExtent2D _extent, VkRenderPass _renderPass )
+	bool Pipeline::Create( Device& _device, PipelineConfig _pipelineConfig, VkExtent2D _extent, VkRenderPass _renderPass )
 	{
+		assert( m_pipelineLayout == VK_NULL_HANDLE );
+		assert( m_pipeline == VK_NULL_HANDLE );
+
 		VkViewport viewport;
 		viewport.x = 0.f;
 		viewport.y = 0.f;
@@ -222,7 +225,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Pipeline::DeletePipeline( Device& _device )
+	void Pipeline::Destroy( Device& _device )
 	{
 		if ( m_pipelineLayout != VK_NULL_HANDLE )
 		{

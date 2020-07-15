@@ -4,9 +4,6 @@
 #include "core/time/fanProfiler.hpp"
 #include "network/singletons/fanTime.hpp"
 #include "scene/fanPrefab.hpp"
-#include "render/pipelines/fanPostprocessPipeline.hpp"
-#include "render/pipelines/fanForwardPipeline.hpp"
-#include "render/pipelines/fanForwardPipeline.hpp"
 #include "render/core/fanFrameBuffer.hpp"
 #include "render/core/fanTexture.hpp"
 #include "render/fanRenderer.hpp"
@@ -76,7 +73,7 @@ namespace fan
 			}
 		}
 
-		LightsUniforms& lights = m_renderer.mForwardUniforms.m_lightUniforms;
+		LightsUniforms& lights = m_renderer.m_forwardUniforms.m_lightUniforms;
 		if ( ImGui::CollapsingHeader( "Directional lights : " ) )
 		{
 			ImGui::PushItemWidth( 150 );
