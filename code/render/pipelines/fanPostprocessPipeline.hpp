@@ -27,14 +27,14 @@ namespace fan
 		} uniforms;
 
 		PostprocessPipeline( Device& _device );
-		void Destroy( Device& _device );
+		void Plop( Device& _device );
 
 		void SetGameImageView( ImageView& _imageView ) { m_imageView = &_imageView; }
 		void CreateDescriptors( Device& _device, const uint32_t _numSwapchainImages );
 		void Bind( VkCommandBuffer _commandBuffer, VkExtent2D _extent, const size_t _index ) override;
 		void SetUniformsData( Device& _device, const size_t _index = 0 ) override;
 
-		PipelineConfig GetConfig() override;
+		PipelineConfig GetConfig( Shader& _vert, Shader& _frag );
 
 
 

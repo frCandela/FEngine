@@ -25,9 +25,8 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void UIPipeline::Destroy( Device& _device )
+	void UIPipeline::Plop( Device& _device )
 	{
-		Pipeline::Destroy( _device );
 		m_transformDescriptor.Destroy( _device );
 	}
 
@@ -57,9 +56,9 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	PipelineConfig UIPipeline::GetConfig()
+	PipelineConfig UIPipeline::GetConfig( Shader& _vert, Shader& _frag )
 	{
-		PipelineConfig config( m_vertexShader, m_fragmentShader );
+		PipelineConfig config( _vert, _frag );
 
 		config.bindingDescription = UIVertex::GetBindingDescription();
 		config.attributeDescriptions = UIVertex::GetAttributeDescriptions();

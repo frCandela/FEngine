@@ -25,7 +25,7 @@ namespace fan
 	{
 	public:
 		UIPipeline( Device& _device, DescriptorImages* _textures, DescriptorSampler* _sampler );
-		void Destroy( Device& _device ) override;
+		void Plop( Device& _device );
 
 		void SetUniformsData( Device& _device, const size_t _index = 0 ) override;
 		void CreateDescriptors( Device& _device, const uint32_t _numSwapchainImages );
@@ -34,7 +34,7 @@ namespace fan
 
 		AlignedMemory<DynamicUniformUIVert>		m_dynamicUniformsVert;
 
-		PipelineConfig GetConfig() override;
+		PipelineConfig GetConfig( Shader& _vert, Shader& _frag );
 
 	private:
 		DescriptorUniforms m_transformDescriptor;

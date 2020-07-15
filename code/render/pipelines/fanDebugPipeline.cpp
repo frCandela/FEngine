@@ -19,9 +19,8 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void DebugPipeline::Destroy( Device& _device )
+	void DebugPipeline::Plop( Device& _device )
 	{
-		Pipeline::Destroy( _device );
 		m_descriptor.Destroy( _device );
 	}
 
@@ -51,9 +50,9 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	PipelineConfig DebugPipeline::GetConfig()
+	PipelineConfig DebugPipeline::GetConfig( Shader& _vert, Shader& _frag )
 	{
-		PipelineConfig config( m_vertexShader, m_fragmentShader );
+		PipelineConfig config( _vert, _frag );
 
 		config.bindingDescription = DebugVertex::GetBindingDescription();
 		config.attributeDescriptions = DebugVertex::GetAttributeDescriptions();

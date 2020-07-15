@@ -19,9 +19,8 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void PostprocessPipeline::Destroy( Device& _device )
+	void PostprocessPipeline::Plop( Device& _device )
 	{
-		Pipeline::Destroy( _device );
 		m_descriptorImageSampler.Destroy( _device );
 		m_descriptorUniforms.Destroy( _device );
 		m_sampler.Destroy( _device );
@@ -71,9 +70,9 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	PipelineConfig PostprocessPipeline::GetConfig()
+	PipelineConfig PostprocessPipeline::GetConfig( Shader& _vert, Shader& _frag )
 	{
-		PipelineConfig config( m_vertexShader, m_fragmentShader );
+		PipelineConfig config( _vert, _frag );
 
 		config.bindingDescription.resize( 1 );
 		config.bindingDescription[ 0 ].binding = 0;

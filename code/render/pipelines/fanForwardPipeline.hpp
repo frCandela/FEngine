@@ -5,11 +5,8 @@ WARNINGS_GLM_PUSH()
 #include "glm/glm.hpp"
 WARNINGS_POP()
 #include "core/memory/fanAlignedMemory.hpp"
-#include "render/pipelines/fanPipeline.hpp"
 #include "render/fanRenderGlobal.hpp"
-#include "render/core/descriptors/fanDescriptorUniforms.hpp"
-#include "render/core/descriptors/fanDescriptorImages.hpp"
-#include "render/core/descriptors/fanDescriptorSampler.hpp"
+#include "render/core/fanDevice.hpp"
 
 namespace fan
 {
@@ -83,34 +80,37 @@ namespace fan
 		glm::vec3	cameraPosition = glm::vec3( 0, 0, 0 );
 	};
 
-	//================================================================================================================================
-	// 3D mesh rendering  
-	//================================================================================================================================
-	class ForwardPipeline : public Pipeline
+	struct ForwardUniforms
 	{
-	public:
-		// Uniforms
+		void Create( Device& _device )
+		{
+			// Calculate required alignment based on minimum device offset alignment
+			size_t minUboAlignment = (size_t)_device.mDeviceProperties.limits.minUniformBufferOffsetAlignment;
+			size_t dynamicAlignmentVert = sizeof( DynamicUniformsVert );
+			size_t dynamicAlignmentFrag = sizeof( DynamicUniformsMaterial );
+			if( minUboAlignment > 0 )
+			{
+				dynamicAlignmentVert = ( ( sizeof( DynamicUniformsVert ) + minUboAlignment - 1 ) & ~( minUboAlignment - 1 ) );
+				dynamicAlignmentFrag = ( ( sizeof( DynamicUniformsMaterial ) + minUboAlignment - 1 ) & ~( minUboAlignment - 1 ) );
+			}
+
+			m_dynamicUniformsVert.SetAlignement( dynamicAlignmentVert );
+			m_dynamicUniformsMaterial.SetAlignement( dynamicAlignmentFrag );
+
+			m_dynamicUniformsVert.Resize( 256 );
+			m_dynamicUniformsMaterial.Resize( 256 );
+
+			for( int uniformIndex = 0; uniformIndex < m_dynamicUniformsMaterial.Size(); uniformIndex++ )
+			{
+				m_dynamicUniformsMaterial[uniformIndex].color = glm::vec4( 1 );
+				m_dynamicUniformsMaterial[uniformIndex].shininess = 1;
+			}
+		}
+
 		AlignedMemory<DynamicUniformsMaterial>	m_dynamicUniformsMaterial;
 		AlignedMemory<DynamicUniformsVert>		m_dynamicUniformsVert;
-
 		LightsUniforms	m_lightUniforms;
 		VertUniforms	m_vertUniforms;
 		FragUniforms	m_fragUniforms;
-
-		ForwardPipeline( Device& _device, DescriptorImages* _textures, DescriptorSampler* _sampler );
-		void Destroy( Device& _device );
-
-		void BindDescriptors( VkCommandBuffer _commandBuffer, const size_t _indexFrame, const uint32_t _indexOffset );
-		void SetUniformsData( Device& _device, const size_t _index = 0 ) override;
-		void CreateDescriptors( Device& _device, const uint32_t _numSwapchainImages );
-		void ResizeDynamicDescriptors( Device& _device, const uint32_t _count, const size_t _newSize );
-
-		PipelineConfig GetConfig() override;
-
-	private:
-		DescriptorUniforms m_sceneDescriptor;
-
-		DescriptorImages* m_textures;
-		DescriptorSampler* m_sampler;
 	};
 }

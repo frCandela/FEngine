@@ -28,12 +28,12 @@ namespace fan
 		} m_debugUniforms;
 
 		DebugPipeline( Device& _device, const VkPrimitiveTopology _primitiveTopology, const bool _depthTestEnable );
-		void Destroy( Device& _device ) override;
+		void Plop( Device& _device );
 
 		void Bind( VkCommandBuffer _commandBuffer, VkExtent2D _extent, const size_t _index ) override;
 		void SetUniformsData( Device& _device, const size_t _index ) override;
 		void CreateDescriptors( Device& _device, const uint32_t _numSwapchainImages );
-		PipelineConfig GetConfig() override;
+		PipelineConfig GetConfig( Shader& _vert, Shader& _frag );
 
 	private:
 		DescriptorUniforms			m_descriptor;

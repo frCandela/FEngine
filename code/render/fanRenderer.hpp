@@ -16,8 +16,12 @@ WARNINGS_POP()
 #include "render/core/fanFrameBuffer.hpp"
 #include "render/core/fanImageView.hpp"
 #include "render/core/fanImage.hpp"
+#include "render/core/fanShader.hpp"
 #include "render/core/descriptors/fanDescriptorImages.hpp"
 #include "render/core/descriptors/fanDescriptorSampler.hpp"
+#include "render/core/descriptors/fanDescriptorUniforms.hpp"
+#include "render/pipelines/fanForwardPipeline.hpp"
+#include "render/pipelines/fanPipeline.hpp"
 
 namespace fan
 {
@@ -101,7 +105,6 @@ namespace fan
 		void ResizeSwapchain();
 
 		PostprocessPipeline*	GetPostprocessPipeline() { return m_postprocessPipeline; }
-		ForwardPipeline*		GetForwardPipeline() { return m_forwardPipeline; }
 		glm::vec4				GetClearColor()					const { return m_clearColor; }
 		const FrameBuffer*		GetGameFrameBuffers()			const { return &m_gameFrameBuffers; }
 		const FrameBuffer*		GetPostProcessFramebuffers()	const { return &m_ppFramebuffers; }
@@ -117,7 +120,7 @@ namespace fan
 		void SetDebugDrawData( const std::vector<DebugVertex>& _debugLines, const std::vector<DebugVertex>& _debugLinesNoDepthTest, const std::vector<DebugVertex>& _debugTriangles );
 
 		const std::vector< DrawData >& GetDrawData() const { return m_meshDrawArray; }
-	private:
+
 
 		VkExtent2D m_gameExtent = { 1,1 };
 
@@ -129,11 +132,24 @@ namespace fan
 		// pipelines
 		ImguiPipeline*			m_imguiPipeline;
 		PostprocessPipeline*	m_postprocessPipeline;
-		ForwardPipeline*		m_forwardPipeline;
+		Pipeline				m_forwardPipeline;
 		UIPipeline*				m_uiPipeline;
 		DebugPipeline*			m_debugLinesPipeline;
 		DebugPipeline*			m_debugLinesPipelineNoDepthTest;
 		DebugPipeline*			m_debugTrianglesPipeline;
+
+		Shader				m_ppFragShader;
+		Shader				m_ppVertShader;
+		Shader				m_forwardFragShader;
+		Shader				m_forwardVertShader;
+		Shader				m_uiFragShader;
+		Shader				m_uiVertShader;
+		Shader				m_debugLinesFragShader;
+		Shader				m_debugLinesVertShader;
+		Shader				m_debugLinesNoDepthTestFragShader;
+		Shader				m_debugLinesNoDepthTestVertShader;
+		Shader				m_debugTrianglesFragShader;
+		Shader				m_debugTrianglesVertShader;
 
 		// global descriptors
 		DescriptorImages	m_imagesDescriptor;
@@ -141,6 +157,10 @@ namespace fan
 		Sampler				m_samplerTextures;
 		DescriptorSampler	m_samplerDescriptorUI;
 		Sampler				m_samplerUI;
+
+		// forward descriptors
+		ForwardUniforms		mForwardUniforms;
+		DescriptorUniforms	mForwardDescriptor;
 
 		// render passes
 		RenderPass m_renderPassGame;
@@ -198,9 +218,15 @@ namespace fan
 		void CreateFramebuffers( const VkExtent2D _extent );
 		bool CreateRenderPasses();
 		bool CreateTextureDescriptor();
-		
+		void CreateShaders();
+		void DestroyShaders();
+		void CreatePipelines();
+		void DestroyPipelines();
+
 		void UpdateUniformBuffers( Device& _device, const size_t _index );
 		bool SubmitCommandBuffers();
 		void BindTexture( VkCommandBuffer _commandBuffer, const uint32_t _textureIndex, DescriptorSampler* _samplerDescriptor, VkPipelineLayout _pipelineLayout );
+		void BindForwardDescriptors( VkCommandBuffer _commandBuffer, const size_t _indexFrame, const uint32_t _indexOffset );
+		PipelineConfig GetForwardPipelineConfig( Shader& _vert, Shader& _frag );
 	};
 }

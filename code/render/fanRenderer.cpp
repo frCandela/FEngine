@@ -27,10 +27,11 @@ namespace fan
 	Renderer::Renderer( Window& _window ) : m_window( _window )
 	{
 		Device& device = m_window.GetDevice();
+		const uint32_t imagesCount = m_window.GetSwapChain().mImagesCount;
 
-		m_debugLinesvertexBuffers.resize( m_window.GetSwapChain().mImagesCount );
-		m_debugLinesNoDepthTestVertexBuffers.resize( m_window.GetSwapChain().mImagesCount );
-		m_debugTrianglesvertexBuffers.resize( m_window.GetSwapChain().mImagesCount );
+		m_debugLinesvertexBuffers.resize( imagesCount );
+		m_debugLinesNoDepthTestVertexBuffers.resize( imagesCount );
+		m_debugTrianglesvertexBuffers.resize( imagesCount );
 
 		m_clearColor = glm::vec4( 0.f, 0.f, 0.2f, 1.f );
 
@@ -44,46 +45,45 @@ namespace fan
 		m_gameColorSampler.Create( device, 0, 1.f, VK_FILTER_LINEAR );
 		m_ppColorSampler.Create( device, 0, 1.f, VK_FILTER_LINEAR );
 		CreateFramebuffers( m_window.GetSwapChain().mExtent );
-		m_swapchainFramebuffers.CreateForSwapchain( m_window.GetDevice(), m_window.GetSwapChain().mImagesCount, m_window.GetSwapChain().mExtent, m_renderPassImgui, m_window.GetSwapChain().mImageViews );
+		m_swapchainFramebuffers.CreateForSwapchain( m_window.GetDevice(), imagesCount, m_window.GetSwapChain().mExtent, m_renderPassImgui, m_window.GetSwapChain().mImageViews );
 
 		m_samplerTextures.Create( device, 0, 8, VK_FILTER_LINEAR );
 		m_samplerDescriptorTextures.Create( device, m_samplerTextures.mSampler );
 		CreateTextureDescriptor();
 
+		CreateShaders();
+
 		m_debugLinesPipeline = new DebugPipeline( device, VK_PRIMITIVE_TOPOLOGY_LINE_LIST, true );
-		m_debugLinesPipeline->Init( m_renderPassGame.mRenderPass, m_window.GetSwapChain().mExtent, "code/shaders/debugLines.vert", "code/shaders/debugLines.frag" );
-		m_debugLinesPipeline->CreateDescriptors( device, m_window.GetSwapChain().mImagesCount );
-		m_debugLinesPipeline->Create( device, m_gameExtent );
+		m_debugLinesPipeline->CreateDescriptors( device, imagesCount );
+		
 
 		m_debugLinesPipelineNoDepthTest = new DebugPipeline( device, VK_PRIMITIVE_TOPOLOGY_LINE_LIST, false );
-		m_debugLinesPipelineNoDepthTest->Init( m_renderPassGame.mRenderPass, m_window.GetSwapChain().mExtent, "code/shaders/debugLines.vert", "code/shaders/debugLines.frag" );
-		m_debugLinesPipelineNoDepthTest->CreateDescriptors( device, m_window.GetSwapChain().mImagesCount );
-		m_debugLinesPipelineNoDepthTest->Create( device, m_gameExtent );
+		m_debugLinesPipelineNoDepthTest->CreateDescriptors( device, imagesCount );
+
 
 		m_debugTrianglesPipeline = new DebugPipeline( device, VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, false );
-		m_debugTrianglesPipeline->Init( m_renderPassGame.mRenderPass, m_window.GetSwapChain().mExtent, "code/shaders/debugTriangles.vert", "code/shaders/debugTriangles.frag" );
-		m_debugTrianglesPipeline->CreateDescriptors( device, m_window.GetSwapChain().mImagesCount );
-		m_debugTrianglesPipeline->Create( device, m_gameExtent );
+		m_debugTrianglesPipeline->CreateDescriptors( device, imagesCount );
 
-		m_forwardPipeline = new ForwardPipeline( device, &m_imagesDescriptor, &m_samplerDescriptorTextures );
-		m_forwardPipeline->Init( m_renderPassGame.mRenderPass, m_window.GetSwapChain().mExtent, "code/shaders/forward.vert", "code/shaders/forward.frag" );
-		m_forwardPipeline->CreateDescriptors( device, m_window.GetSwapChain().mImagesCount );
-		m_forwardPipeline->Create( device, m_gameExtent );
+		mForwardUniforms.Create( device );
+		mForwardDescriptor.AddUniformBinding( device, imagesCount, VK_SHADER_STAGE_VERTEX_BIT, sizeof( VertUniforms ) );
+		mForwardDescriptor.AddDynamicUniformBinding( device, imagesCount, VK_SHADER_STAGE_VERTEX_BIT, mForwardUniforms.m_dynamicUniformsVert.Size(), mForwardUniforms.m_dynamicUniformsVert.Alignment() );
+		mForwardDescriptor.AddUniformBinding( device, imagesCount, VK_SHADER_STAGE_FRAGMENT_BIT, sizeof( FragUniforms ) );
+		mForwardDescriptor.AddDynamicUniformBinding( device, imagesCount, VK_SHADER_STAGE_FRAGMENT_BIT, mForwardUniforms.m_dynamicUniformsMaterial.Size(), mForwardUniforms.m_dynamicUniformsMaterial.Alignment() );
+		mForwardDescriptor.AddUniformBinding( device, imagesCount, VK_SHADER_STAGE_FRAGMENT_BIT, sizeof( LightsUniforms ) );
+		mForwardDescriptor.Create( device, imagesCount );		
 
 		m_samplerUI.Create( device, 0, 1, VK_FILTER_NEAREST );
 		m_samplerDescriptorUI.Create( device, m_samplerUI.mSampler );
 		m_uiPipeline = new UIPipeline( device, &m_imagesDescriptor, &m_samplerDescriptorUI );
-		m_uiPipeline->Init( m_renderPassPostprocess.mRenderPass, m_window.GetSwapChain().mExtent, "code/shaders/ui.vert", "code/shaders/ui.frag" );
-		m_uiPipeline->CreateDescriptors( device, m_window.GetSwapChain().mImagesCount );
-		m_uiPipeline->Create( device, m_gameExtent );
+		m_uiPipeline->CreateDescriptors( device, imagesCount );
 
 		m_postprocessPipeline = new PostprocessPipeline( device );
 		m_postprocessPipeline->SetGameImageView( m_gameColorImageView );
-		m_postprocessPipeline->CreateDescriptors( device, m_window.GetSwapChain().mImagesCount );
-		m_postprocessPipeline->Init( m_renderPassPostprocess.mRenderPass, m_window.GetSwapChain().mExtent, "code/shaders/postprocess.vert", "code/shaders/postprocess.frag" );
-		m_postprocessPipeline->Create( device, m_gameExtent );
+		m_postprocessPipeline->CreateDescriptors( device, imagesCount );
 
-		m_imguiPipeline = new ImguiPipeline( device, m_window.GetSwapChain().mImagesCount );
+		CreatePipelines();
+
+		m_imguiPipeline = new ImguiPipeline( device, imagesCount );
 		m_imguiPipeline->SetGameView( m_ppColorImageView );
 		m_imguiPipeline->Create( m_renderPassImgui.mRenderPass, m_window.GetWindow(), m_window.GetSwapChain().mExtent );
 
@@ -92,8 +92,8 @@ namespace fan
 
 		const size_t initialSize = 256;
 		m_meshDrawArray.reserve( initialSize );
-		m_forwardPipeline->m_dynamicUniformsVert.Resize( initialSize );
-		m_forwardPipeline->m_dynamicUniformsMaterial.Resize( initialSize );
+		mForwardUniforms.m_dynamicUniformsVert.Resize( initialSize );
+		mForwardUniforms.m_dynamicUniformsMaterial.Resize( initialSize );
 	}
 
 	//================================================================================================================================
@@ -105,7 +105,8 @@ namespace fan
 		vkDeviceWaitIdle( device.mDevice );
 
 		delete m_imguiPipeline;
-		delete m_forwardPipeline;
+		m_forwardPipeline.DeletePipeline( device );
+		mForwardDescriptor.Destroy( device );
 		delete m_uiPipeline;
 
 		Mesh::s_resourceManager.Clear();
@@ -164,7 +165,72 @@ namespace fan
 		delete m_postprocessPipeline;
 	}
 
+	//================================================================================================================================
+	//================================================================================================================================	
+	void Renderer::CreateShaders()
+	{
+		Device& device = m_window.GetDevice();
 
+		m_debugLinesVertShader.Create( device, "code/shaders/debugLines.vert" );
+		m_debugLinesFragShader.Create( device, "code/shaders/debugLines.frag" );
+		m_debugLinesNoDepthTestVertShader.Create( device, "code/shaders/debugLines.vert" );
+		m_debugLinesNoDepthTestFragShader.Create( device, "code/shaders/debugLines.frag" );
+		m_debugTrianglesVertShader.Create( device, "code/shaders/debugTriangles.vert" );
+		m_debugTrianglesFragShader.Create( device, "code/shaders/debugTriangles.frag" );
+		m_forwardVertShader.Create( device, "code/shaders/forward.vert" );
+		m_forwardFragShader.Create( device, "code/shaders/forward.frag" );
+		m_uiVertShader.Create( device, "code/shaders/ui.vert" );
+		m_uiFragShader.Create( device, "code/shaders/ui.frag" );
+		m_ppVertShader.Create( device, "code/shaders/postprocess.vert" );
+		m_ppFragShader.Create( device, "code/shaders/postprocess.frag" );
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================	
+	void Renderer::DestroyShaders()
+	{
+		Device& device = m_window.GetDevice();
+
+		m_debugLinesVertShader				.Destroy( device );
+		m_debugLinesFragShader				.Destroy( device );
+		m_debugLinesNoDepthTestVertShader	.Destroy( device );
+		m_debugLinesNoDepthTestFragShader	.Destroy( device );
+		m_debugTrianglesVertShader			.Destroy( device );
+		m_debugTrianglesFragShader			.Destroy( device );
+		m_forwardVertShader					.Destroy( device );
+		m_forwardFragShader					.Destroy( device );
+		m_uiVertShader						.Destroy( device );
+		m_uiFragShader						.Destroy( device );
+		m_ppVertShader						.Destroy( device );
+		m_ppFragShader						.Destroy( device );
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================	
+	void Renderer::CreatePipelines()
+	{
+		Device& device = m_window.GetDevice();
+
+		m_debugLinesPipeline->CreatePipeline( device, m_debugLinesPipeline->GetConfig( m_debugLinesVertShader, m_debugLinesFragShader ), m_gameExtent, m_renderPassGame.mRenderPass );
+		m_debugLinesPipelineNoDepthTest->CreatePipeline( device, m_debugLinesPipelineNoDepthTest->GetConfig( m_debugLinesNoDepthTestVertShader, m_debugLinesNoDepthTestFragShader ), m_gameExtent, m_renderPassGame.mRenderPass );
+		m_debugTrianglesPipeline->CreatePipeline( device, m_debugTrianglesPipeline->GetConfig( m_debugTrianglesVertShader, m_debugTrianglesFragShader ), m_gameExtent, m_renderPassGame.mRenderPass );
+		m_forwardPipeline.CreatePipeline( device, GetForwardPipelineConfig( m_forwardVertShader, m_forwardFragShader ), m_gameExtent, m_renderPassGame.mRenderPass );
+		m_uiPipeline->CreatePipeline( device, m_uiPipeline->GetConfig( m_uiVertShader, m_uiFragShader ), m_gameExtent, m_renderPassPostprocess.mRenderPass );
+		m_postprocessPipeline->CreatePipeline( device, m_postprocessPipeline->GetConfig( m_ppVertShader, m_ppFragShader ), m_gameExtent, m_renderPassPostprocess.mRenderPass );
+	}
+	//================================================================================================================================
+	//================================================================================================================================	
+	void Renderer::DestroyPipelines()
+	{
+		Device& device = m_window.GetDevice();
+
+		m_postprocessPipeline->DeletePipeline( device );
+		m_forwardPipeline.DeletePipeline( device );
+		m_uiPipeline->DeletePipeline( device );
+		m_debugLinesPipeline->DeletePipeline( device );
+		m_debugLinesPipelineNoDepthTest->DeletePipeline( device );
+		m_debugTrianglesPipeline->DeletePipeline( device );
+	}
 
 	//================================================================================================================================
 	//================================================================================================================================	
@@ -277,7 +343,15 @@ namespace fan
 	void Renderer::UpdateUniformBuffers( Device& _device, const size_t _index )
 	{
 		m_postprocessPipeline->SetUniformsData( _device, _index );
-		m_forwardPipeline->SetUniformsData( _device, _index );
+
+		// forward uniforms
+		{
+			mForwardDescriptor.SetData( _device, 0, _index, &mForwardUniforms.m_vertUniforms, sizeof( VertUniforms ), 0 );
+			mForwardDescriptor.SetData( _device, 1, _index, &mForwardUniforms.m_dynamicUniformsVert[0], mForwardUniforms.m_dynamicUniformsVert.Alignment() * mForwardUniforms.m_dynamicUniformsVert.Size(), 0 );
+			mForwardDescriptor.SetData( _device, 2, _index, &mForwardUniforms.m_fragUniforms, sizeof( FragUniforms ), 0 );
+			mForwardDescriptor.SetData( _device, 3, _index, &mForwardUniforms.m_dynamicUniformsMaterial[0], mForwardUniforms.m_dynamicUniformsMaterial.Alignment() * mForwardUniforms.m_dynamicUniformsMaterial.Size(), 0 );
+			mForwardDescriptor.SetData( _device, 4, _index, &mForwardUniforms.m_lightUniforms, sizeof( LightsUniforms ), 0 );
+		}
 		m_debugLinesPipeline->SetUniformsData( _device, _index );
 		m_debugLinesPipelineNoDepthTest->SetUniformsData( _device, _index );
 		m_debugTrianglesPipeline->SetUniformsData( _device, _index );
@@ -303,18 +377,18 @@ namespace fan
 	//================================================================================================================================
 	void Renderer::SetMainCamera( const glm::mat4 _projection, const glm::mat4 _view, const glm::vec3 _position )
 	{
-		m_forwardPipeline->m_vertUniforms.view = _view;
-		m_forwardPipeline->m_vertUniforms.proj = _projection;
-		m_forwardPipeline->m_vertUniforms.proj[ 1 ][ 1 ] *= -1;
+		mForwardUniforms.m_vertUniforms.view = _view;
+		mForwardUniforms.m_vertUniforms.proj = _projection;
+		mForwardUniforms.m_vertUniforms.proj[1][1] *= -1;
 
-		m_forwardPipeline->m_fragUniforms.cameraPosition = _position;
+		mForwardUniforms.m_fragUniforms.cameraPosition = _position;
 
 		std::array< DebugPipeline*, 3 > debugLinesPipelines = { m_debugLinesPipeline, m_debugLinesPipelineNoDepthTest, m_debugTrianglesPipeline };
 		for( int pipelingIndex = 0; pipelingIndex < debugLinesPipelines.size(); pipelingIndex++ )
 		{
 			debugLinesPipelines[pipelingIndex]->m_debugUniforms.model = glm::mat4( 1.0 );
 			debugLinesPipelines[pipelingIndex]->m_debugUniforms.view = _view;
-			debugLinesPipelines[pipelingIndex]->m_debugUniforms.proj = m_forwardPipeline->m_vertUniforms.proj;
+			debugLinesPipelines[pipelingIndex]->m_debugUniforms.proj = mForwardUniforms.m_vertUniforms.proj;
 			debugLinesPipelines[pipelingIndex]->m_debugUniforms.color = glm::vec4( 1, 1, 1, 1 );
 		}
 	}
@@ -324,14 +398,14 @@ namespace fan
 	void  Renderer::SetDirectionalLights( const std::vector<DrawDirectionalLight>& _lightData )
 	{
 		assert( _lightData.size() < RenderGlobal::s_maximumNumDirectionalLight );
-		m_forwardPipeline->m_lightUniforms.dirLightsNum = (uint32_t)_lightData.size();
+		mForwardUniforms.m_lightUniforms.dirLightsNum = (uint32_t)_lightData.size();
 		for( int i = 0; i < _lightData.size(); ++i )
 		{
 			const DrawDirectionalLight& light = _lightData[i];
-			m_forwardPipeline->m_lightUniforms.dirLights[i].direction = light.direction;
-			m_forwardPipeline->m_lightUniforms.dirLights[i].ambiant = light.ambiant;
-			m_forwardPipeline->m_lightUniforms.dirLights[i].diffuse = light.diffuse;
-			m_forwardPipeline->m_lightUniforms.dirLights[i].specular = light.specular;
+			mForwardUniforms.m_lightUniforms.dirLights[i].direction = light.direction;
+			mForwardUniforms.m_lightUniforms.dirLights[i].ambiant = light.ambiant;
+			mForwardUniforms.m_lightUniforms.dirLights[i].diffuse = light.diffuse;
+			mForwardUniforms.m_lightUniforms.dirLights[i].specular = light.specular;
 		}
 	}
 
@@ -340,17 +414,17 @@ namespace fan
 	void Renderer::SetPointLights( const std::vector<DrawPointLight>& _lightData )
 	{
 		assert( _lightData.size() < RenderGlobal::s_maximumNumPointLights );
-		m_forwardPipeline->m_lightUniforms.pointLightNum = (uint32_t)_lightData.size();
+		mForwardUniforms.m_lightUniforms.pointLightNum = (uint32_t)_lightData.size();
 		for ( int i = 0; i < _lightData.size(); ++i )
 		{
 			const DrawPointLight& light = _lightData[i];
-			m_forwardPipeline->m_lightUniforms.pointlights[i].position	= light.position;
-			m_forwardPipeline->m_lightUniforms.pointlights[i].diffuse	= light.diffuse;
-			m_forwardPipeline->m_lightUniforms.pointlights[i].specular	= light.specular;
-			m_forwardPipeline->m_lightUniforms.pointlights[i].ambiant	= light.ambiant;
-			m_forwardPipeline->m_lightUniforms.pointlights[i].constant	= light.constant;
-			m_forwardPipeline->m_lightUniforms.pointlights[i].linear	= light.linear;
-			m_forwardPipeline->m_lightUniforms.pointlights[i].quadratic = light.quadratic;
+			mForwardUniforms.m_lightUniforms.pointlights[i].position	= light.position;
+			mForwardUniforms.m_lightUniforms.pointlights[i].diffuse	= light.diffuse;
+			mForwardUniforms.m_lightUniforms.pointlights[i].specular	= light.specular;
+			mForwardUniforms.m_lightUniforms.pointlights[i].ambiant	= light.ambiant;
+			mForwardUniforms.m_lightUniforms.pointlights[i].constant	= light.constant;
+			mForwardUniforms.m_lightUniforms.pointlights[i].linear	= light.linear;
+			mForwardUniforms.m_lightUniforms.pointlights[i].quadratic = light.quadratic;
 		}
 	}
 
@@ -358,13 +432,20 @@ namespace fan
 	//================================================================================================================================
 	void Renderer::SetDrawData( const std::vector<DrawMesh>& _drawData )
 	{
+		Device& device = m_window.GetDevice();
+
 		if ( _drawData.size() > m_meshDrawArray.capacity() )
 		{
 			Debug::Warning( "Resizing draw data arrays" );
 			WaitIdle();
 			const size_t newSize = 2 * _drawData.size();
+			const uint32_t imagesCount = m_window.GetSwapChain().mImagesCount;
 			m_meshDrawArray.reserve( newSize );
-			m_forwardPipeline->ResizeDynamicDescriptors( m_window.GetDevice(), m_window.GetSwapChain().mImagesCount, newSize );
+			mForwardUniforms.m_dynamicUniformsVert.Resize( newSize );
+			mForwardUniforms.m_dynamicUniformsMaterial.Resize( newSize );
+			mForwardDescriptor.ResizeDynamicUniformBinding( device, imagesCount, mForwardUniforms.m_dynamicUniformsVert.Size(), mForwardUniforms.m_dynamicUniformsVert.Alignment(), 1 );
+			mForwardDescriptor.ResizeDynamicUniformBinding( device, imagesCount, mForwardUniforms.m_dynamicUniformsMaterial.Size(), mForwardUniforms.m_dynamicUniformsMaterial.Alignment(), 3 );
+			mForwardDescriptor.UpdateDescriptorSets( device, imagesCount );
 		}
 
 		m_meshDrawArray.clear();
@@ -375,12 +456,12 @@ namespace fan
 			if ( data.mesh != nullptr && !data.mesh->GetIndices().empty() )
 			{
 				// Transform
-				m_forwardPipeline->m_dynamicUniformsVert[ dataIndex ].modelMat = data.modelMatrix;
-				m_forwardPipeline->m_dynamicUniformsVert[ dataIndex ].normalMat = data.normalMatrix;
+				mForwardUniforms.m_dynamicUniformsVert[dataIndex].modelMat = data.modelMatrix;
+				mForwardUniforms.m_dynamicUniformsVert[dataIndex].normalMat = data.normalMatrix;
 
 				// material
-				m_forwardPipeline->m_dynamicUniformsMaterial[ dataIndex ].color = data.color;
-				m_forwardPipeline->m_dynamicUniformsMaterial[ dataIndex ].shininess = data.shininess;
+				mForwardUniforms.m_dynamicUniformsMaterial[ dataIndex ].color = data.color;
+				mForwardUniforms.m_dynamicUniformsMaterial[ dataIndex ].shininess = data.shininess;
 
 				// Mesh
 				m_meshDrawArray.push_back( { data.mesh, data.textureIndex } );
@@ -675,13 +756,13 @@ namespace fan
 
 		if ( vkBeginCommandBuffer( commandBuffer, &commandBufferBeginInfo ) == VK_SUCCESS )
 		{
-			m_forwardPipeline->Bind( commandBuffer, m_gameExtent, _index );
+			m_forwardPipeline.Bind( commandBuffer, m_gameExtent, _index );
 
 			for ( uint32_t meshIndex = 0; meshIndex < m_meshDrawArray.size(); meshIndex++ )
 			{
 				DrawData& drawData = m_meshDrawArray[ meshIndex ];
-				BindTexture( commandBuffer, drawData.textureIndex, &m_samplerDescriptorTextures, m_forwardPipeline->m_pipelineLayout );
-				m_forwardPipeline->BindDescriptors( commandBuffer, _index, meshIndex );
+				BindTexture( commandBuffer, drawData.textureIndex, &m_samplerDescriptorTextures, m_forwardPipeline.m_pipelineLayout );
+				BindForwardDescriptors( commandBuffer, _index, meshIndex );
 				VkDeviceSize offsets[] = { 0 };
 				VkBuffer vertexBuffers[] = { drawData.mesh->GetVertexBuffer().mBuffer };
 				vkCmdBindVertexBuffers( commandBuffer, 0, 1, vertexBuffers, offsets );
@@ -786,17 +867,12 @@ namespace fan
 		Debug::Highlight( "Reloading shaders" );
 		Device& device = m_window.GetDevice();
 
-
 		vkDeviceWaitIdle( device.mDevice );
-
 		CreateTextureDescriptor();
-		m_postprocessPipeline->ReloadShaders( device, m_gameExtent );
-		m_forwardPipeline->ReloadShaders( device, m_gameExtent );
-		m_debugLinesPipeline->ReloadShaders( device, m_gameExtent );
-		m_debugLinesPipelineNoDepthTest->ReloadShaders( device, m_gameExtent );
-		m_debugTrianglesPipeline->ReloadShaders( device, m_gameExtent );
-		m_uiPipeline->ReloadShaders( device, m_gameExtent );
-
+		DestroyPipelines();
+		DestroyShaders();
+		CreateShaders();
+		CreatePipelines();
 		RecordAllCommandBuffers();
 	}
 
@@ -975,5 +1051,45 @@ namespace fan
 			0,
 			nullptr
 		);
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void Renderer::BindForwardDescriptors( VkCommandBuffer _commandBuffer, const size_t _indexFrame, const uint32_t _indexOffset )
+	{
+		std::vector<VkDescriptorSet> descriptors = {
+			mForwardDescriptor.mDescriptorSets[_indexFrame]
+		};
+		std::vector<uint32_t> dynamicOffsets = {
+			 _indexOffset * static_cast<uint32_t>( mForwardUniforms.m_dynamicUniformsVert.Alignment() )
+			,_indexOffset* static_cast<uint32_t>( mForwardUniforms.m_dynamicUniformsMaterial.Alignment() )
+		};
+		vkCmdBindDescriptorSets(
+			_commandBuffer,
+			VK_PIPELINE_BIND_POINT_GRAPHICS,
+			m_forwardPipeline.m_pipelineLayout,
+			0,
+			static_cast<uint32_t>( descriptors.size() ),
+			descriptors.data(),
+			static_cast<uint32_t>( dynamicOffsets.size() ),
+			dynamicOffsets.data()
+		);
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	PipelineConfig Renderer::GetForwardPipelineConfig( Shader& _vert, Shader& _frag )
+	{
+		PipelineConfig config( _vert, _frag );
+
+		config.bindingDescription = Vertex::GetBindingDescription();
+		config.attributeDescriptions = Vertex::GetAttributeDescriptions();
+		config.descriptorSetLayouts = {
+			mForwardDescriptor.mDescriptorSetLayout
+			, m_imagesDescriptor.mDescriptorSetLayout
+			, m_samplerDescriptorTextures.mDescriptorSetLayout
+		};
+
+		return config;
 	}
 }

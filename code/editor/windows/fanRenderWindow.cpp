@@ -76,7 +76,7 @@ namespace fan
 			}
 		}
 
-		LightsUniforms& lights = m_renderer.GetForwardPipeline()->m_lightUniforms;
+		LightsUniforms& lights = m_renderer.mForwardUniforms.m_lightUniforms;
 		if ( ImGui::CollapsingHeader( "Directional lights : " ) )
 		{
 			ImGui::PushItemWidth( 150 );

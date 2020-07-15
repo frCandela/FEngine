@@ -5,7 +5,7 @@
 
 namespace fan
 {
-	PipelineConfig::PipelineConfig( Shader& _frag, Shader& _vert )
+	PipelineConfig::PipelineConfig( Shader& _vert, Shader& _frag )
 	{
 		vertshaderStageCreateInfos.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
 		vertshaderStageCreateInfos.pNext = nullptr;
@@ -98,33 +98,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Pipeline::Destroy( Device& _device )
-	{
-		m_fragmentShader.Destroy( _device );
-		m_vertexShader.Destroy( _device );
-		DeletePipeline( _device );
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void Pipeline::Init( VkRenderPass _renderPass, const VkExtent2D /*_extent*/, const std::string _vertShaderPath, const std::string _fragShaderPath )
-	{
-		m_renderPass = _renderPass;
-		m_fragShaderPath = _fragShaderPath;
-		m_vertShaderPath = _vertShaderPath;
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void Pipeline::Create( Device& _device, VkExtent2D _extent )
-	{
-		CreateShaders( _device );
-		CreatePipeline( _device, GetConfig(), _extent );
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	bool Pipeline::CreatePipeline( Device& _device, PipelineConfig _pipelineConfig, VkExtent2D _extent )
+	bool Pipeline::CreatePipeline( Device& _device, PipelineConfig _pipelineConfig, VkExtent2D _extent, VkRenderPass _renderPass )
 	{
 		VkViewport viewport;
 		viewport.x = 0.f;
@@ -185,9 +159,6 @@ namespace fan
 		}
 		Debug::Get() << Debug::Severity::log << std::hex << "VkPipelineLayout      " << m_pipelineLayout << std::dec << Debug::Endl();
 
-
-		_pipelineConfig.fragShaderStageCreateInfos.module = m_fragmentShader.mShaderModule;
-		_pipelineConfig.vertshaderStageCreateInfos.module = m_vertexShader.mShaderModule;
 		std::vector<VkPipelineShaderStageCreateInfo> shaderStages = { _pipelineConfig.vertshaderStageCreateInfos, _pipelineConfig.fragShaderStageCreateInfos };
 
 		VkGraphicsPipelineCreateInfo graphicsPipelineCreateInfo = {};
@@ -206,7 +177,7 @@ namespace fan
 		graphicsPipelineCreateInfo.pColorBlendState = &_pipelineConfig.colorBlendStateCreateInfo;
 		graphicsPipelineCreateInfo.pDynamicState = &dynamicStateCreateInfo;
 		graphicsPipelineCreateInfo.layout = m_pipelineLayout;
-		graphicsPipelineCreateInfo.renderPass = m_renderPass;
+		graphicsPipelineCreateInfo.renderPass = _renderPass;
 		graphicsPipelineCreateInfo.subpass = 0;
 		graphicsPipelineCreateInfo.basePipelineHandle = VK_NULL_HANDLE;
 		graphicsPipelineCreateInfo.basePipelineIndex = -1;
@@ -227,19 +198,7 @@ namespace fan
 		Debug::Get() << Debug::Severity::log << std::hex << "VkPipeline            " << m_pipeline << std::dec << Debug::Endl();
 		return true;
 	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void Pipeline::ReloadShaders( Device& _device, VkExtent2D _extent )
-	{
-		DeletePipeline( _device );
-		m_vertexShader.Destroy( _device );
-		m_fragmentShader.Destroy( _device );
-		m_vertexShader.Create( _device, m_vertShaderPath);
-		m_fragmentShader.Create( _device, m_fragShaderPath );
-		CreatePipeline( _device, GetConfig(), _extent );
-	}
-
+	   
 	//================================================================================================================================
 	//================================================================================================================================
 	void Pipeline::Bind( VkCommandBuffer _commandBuffer, VkExtent2D _extent, const size_t /*_index*/ )
@@ -259,17 +218,6 @@ namespace fan
 		vkCmdBindPipeline( _commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline );
 		vkCmdSetScissor( _commandBuffer, 0, 1, &scissor );
 		vkCmdSetViewport( _commandBuffer, 0, 1, &viewport );
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void Pipeline::CreateShaders( Device& _device )
-	{
-		assert( m_fragShaderPath != "" );
-		assert( m_vertShaderPath != "" );
-
-		m_fragmentShader.Create( _device, m_fragShaderPath );
-		m_vertexShader.Create( _device, m_vertShaderPath );
 	}
 
 	//================================================================================================================================
