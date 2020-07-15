@@ -19,25 +19,17 @@ namespace fan
 	class Window
 	{
 	public:
-		Window( const char* _name, const glm::ivec2 _size, const glm::ivec2 _position );
-		~Window();
+		void Create( const char* _name, const glm::ivec2 _size, const glm::ivec2 _position );
+		void Destroy();
 
-		GLFWwindow*			GetWindow()			  { return m_window; }
-		const GLFWwindow*	GetWindow()		const { return m_window; }
-		SwapChain&			GetSwapChain() { return m_swapchain; }
-		Instance*			GetInstance()  { return &m_instance; }
-		Device&				GetDevice()	   { return m_device; }
-		VkSurfaceKHR		GetSurface()	const { return m_surface; }
-		VkExtent2D			GetExtent()		const;
-		glm::ivec2			GetPosition()	const;
+		VkExtent2D	GetExtent()	 const;
+		glm::ivec2	GetPosition() const;
+		bool		IsOpen() const;
 
-		bool IsOpen() const;
-
-	private:
-		GLFWwindow*		m_window = nullptr;
-		Instance		m_instance;
-		Device			m_device;
-		SwapChain		m_swapchain;
-		VkSurfaceKHR	m_surface;
+		GLFWwindow*		mWindow = nullptr;
+		Instance		mInstance;
+		Device			mDevice;
+		SwapChain		mSwapchain;
+		VkSurfaceKHR	mSurface;
 	};
 }

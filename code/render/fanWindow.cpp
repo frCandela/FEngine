@@ -8,44 +8,44 @@ namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	Window::Window( const char* _name, const glm::ivec2 _size, const glm::ivec2 _position )
+	void Window::Create( const char* _name, const glm::ivec2 _size, const glm::ivec2 _position )
 	{
-		m_instance.Create();
+		mInstance.Create();
 
 		glfwWindowHint( GLFW_CLIENT_API, GLFW_NO_API );
 		glfwWindowHint( GLFW_RESIZABLE, GLFW_TRUE );
-		m_window = glfwCreateWindow( _size.x, _size.y, _name, nullptr/* fullscreen monitor */, nullptr );
-		glfwCreateWindowSurface( m_instance.mInstance, m_window, nullptr, &m_surface );
-		Debug::Log() << std::hex << "VkSurfaceKHR          " << m_surface << std::dec << Debug::Endl();
+		mWindow = glfwCreateWindow( _size.x, _size.y, _name, nullptr/* fullscreen monitor */, nullptr );
+		glfwCreateWindowSurface( mInstance.mInstance, mWindow, nullptr, &mSurface );
+		Debug::Log() << std::hex << "VkSurfaceKHR          " << mSurface << std::dec << Debug::Endl();
 
-		glfwSetWindowPos( m_window, _position.x, _position.y );
+		glfwSetWindowPos( mWindow, _position.x, _position.y );
 
-		m_device.Create( m_instance, m_surface );
-		m_swapchain.Create( m_device, m_surface, { (uint32_t)_size.x, (uint32_t)_size.y } );
+		mDevice.Create( mInstance, mSurface );
+		mSwapchain.Create( mDevice, mSurface, { (uint32_t)_size.x, (uint32_t)_size.y } );
 
-		Input::Get().Setup( m_window );
+		Input::Get().Setup( mWindow );
 	}
 
 	//======================================================c==========================================================================
 	//================================================================================================================================
-	Window::~Window()
+	void Window::Destroy()
 	{
-		m_swapchain.Destroy( m_device );
-		m_device.Destroy();
+		mSwapchain.Destroy( mDevice );
+		mDevice.Destroy();
 
-		vkDestroySurfaceKHR( m_instance.mInstance, m_surface, nullptr );
-		m_surface = VK_NULL_HANDLE;
-		glfwDestroyWindow( m_window );
+		vkDestroySurfaceKHR( mInstance.mInstance, mSurface, nullptr );
+		mSurface = VK_NULL_HANDLE;
+		glfwDestroyWindow( mWindow );
 		glfwTerminate();
 
-		m_instance.Destroy();
+		mInstance.Destroy();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================	
 	bool Window::IsOpen() const
 	{
-		return !glfwWindowShouldClose( m_window );
+		return !glfwWindowShouldClose( mWindow );
 	}
 
 	//================================================================================================================================
@@ -53,7 +53,7 @@ namespace fan
 	VkExtent2D Window::GetExtent() const
 	{
 		int width; int height;
-		glfwGetFramebufferSize( m_window, &width, &height );
+		glfwGetFramebufferSize( mWindow, &width, &height );
 		return { static_cast< uint32_t >( width ) ,static_cast< uint32_t >( height ) };
 	}
 
@@ -62,7 +62,7 @@ namespace fan
 	glm::ivec2	Window::GetPosition() const
 	{
 		glm::ivec2 position;
-		glfwGetWindowPos( m_window, &position.x, &position.y );
+		glfwGetWindowPos( mWindow, &position.x, &position.y );
 		return position;
 	}
 }

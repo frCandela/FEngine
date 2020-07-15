@@ -100,8 +100,8 @@ namespace fan
 	//================================================================================================================================
 	bool Pipeline::Create( Device& _device, PipelineConfig _pipelineConfig, VkExtent2D _extent, VkRenderPass _renderPass )
 	{
-		assert( m_pipelineLayout == VK_NULL_HANDLE );
-		assert( m_pipeline == VK_NULL_HANDLE );
+		assert( mPipelineLayout == VK_NULL_HANDLE );
+		assert( mPipeline == VK_NULL_HANDLE );
 
 		VkViewport viewport;
 		viewport.x = 0.f;
@@ -155,12 +155,12 @@ namespace fan
 		pipelineLayoutCreateInfo.pushConstantRangeCount = static_cast< uint32_t >( _pipelineConfig.pushConstantRanges.size() );
 		pipelineLayoutCreateInfo.pPushConstantRanges = _pipelineConfig.pushConstantRanges.data();
 
-		if ( vkCreatePipelineLayout( _device.mDevice, &pipelineLayoutCreateInfo, nullptr, &m_pipelineLayout ) != VK_SUCCESS )
+		if ( vkCreatePipelineLayout( _device.mDevice, &pipelineLayoutCreateInfo, nullptr, &mPipelineLayout ) != VK_SUCCESS )
 		{
 			Debug::Error( "Could not allocate command pool." );
 			return false;
 		}
-		Debug::Get() << Debug::Severity::log << std::hex << "VkPipelineLayout      " << m_pipelineLayout << std::dec << Debug::Endl();
+		Debug::Get() << Debug::Severity::log << std::hex << "VkPipelineLayout      " << mPipelineLayout << std::dec << Debug::Endl();
 
 		std::vector<VkPipelineShaderStageCreateInfo> shaderStages = { _pipelineConfig.vertshaderStageCreateInfos, _pipelineConfig.fragShaderStageCreateInfos };
 
@@ -179,7 +179,7 @@ namespace fan
 		graphicsPipelineCreateInfo.pDepthStencilState = &_pipelineConfig.depthStencilStateCreateInfo;
 		graphicsPipelineCreateInfo.pColorBlendState = &_pipelineConfig.colorBlendStateCreateInfo;
 		graphicsPipelineCreateInfo.pDynamicState = &dynamicStateCreateInfo;
-		graphicsPipelineCreateInfo.layout = m_pipelineLayout;
+		graphicsPipelineCreateInfo.layout = mPipelineLayout;
 		graphicsPipelineCreateInfo.renderPass = _renderPass;
 		graphicsPipelineCreateInfo.subpass = 0;
 		graphicsPipelineCreateInfo.basePipelineHandle = VK_NULL_HANDLE;
@@ -191,14 +191,14 @@ namespace fan
 			1,
 			&graphicsPipelineCreateInfo,
 			nullptr,
-			&m_pipeline
+			&mPipeline
 			) != VK_SUCCESS )
 		{
 			Debug::Error( "Could not allocate graphicsPipelines." );
 			return false;
 		}
 
-		Debug::Get() << Debug::Severity::log << std::hex << "VkPipeline            " << m_pipeline << std::dec << Debug::Endl();
+		Debug::Get() << Debug::Severity::log << std::hex << "VkPipeline            " << mPipeline << std::dec << Debug::Endl();
 		return true;
 	}
 	   
@@ -218,7 +218,7 @@ namespace fan
 		scissor.offset = { 0, 0 };
 		scissor.extent = _extent;
 
-		vkCmdBindPipeline( _commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline );
+		vkCmdBindPipeline( _commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mPipeline );
 		vkCmdSetScissor( _commandBuffer, 0, 1, &scissor );
 		vkCmdSetViewport( _commandBuffer, 0, 1, &viewport );
 	}
@@ -227,16 +227,16 @@ namespace fan
 	//================================================================================================================================
 	void Pipeline::Destroy( Device& _device )
 	{
-		if ( m_pipelineLayout != VK_NULL_HANDLE )
+		if ( mPipelineLayout != VK_NULL_HANDLE )
 		{
-			vkDestroyPipelineLayout( _device.mDevice, m_pipelineLayout, nullptr );
-			m_pipelineLayout = VK_NULL_HANDLE;
+			vkDestroyPipelineLayout( _device.mDevice, mPipelineLayout, nullptr );
+			mPipelineLayout = VK_NULL_HANDLE;
 		}
 
-		if ( m_pipeline != VK_NULL_HANDLE )
+		if ( mPipeline != VK_NULL_HANDLE )
 		{
-			vkDestroyPipeline( _device.mDevice, m_pipeline, nullptr );
-			m_pipeline = VK_NULL_HANDLE;
+			vkDestroyPipeline( _device.mDevice, mPipeline, nullptr );
+			mPipeline = VK_NULL_HANDLE;
 		}
 	}
 }

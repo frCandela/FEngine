@@ -6,7 +6,6 @@
 #include "core/input/fanMouse.hpp"
 #include "core/input/fanInput.hpp"
 #include "network/singletons/fanTime.hpp"
-#include "render/fanWindow.hpp"
 #include "render/fanRenderer.hpp"
 #include "scene/singletons/fanRenderWorld.hpp"
 #include "scene/components/fanCamera.hpp"
@@ -34,10 +33,10 @@ namespace fan
 		glm::ivec2 windowPosition;
 		glm::ivec2 windowSize;
 		SerializedValues::LoadWindowSizeAndPosition( _settings, windowPosition, windowSize );		
-		m_window = new Window( _settings.windowName.c_str(), windowSize, windowPosition );
+		m_window.Create( _settings.windowName.c_str(), windowSize, windowPosition );
 
 		// creates renderer
-		m_renderer = new Renderer( *m_window );
+		m_renderer = new Renderer( m_window );
 
 		Prefab::s_resourceManager.Init();
 
@@ -60,8 +59,8 @@ namespace fan
 		// Serialize editor positions if it was not modified by a launch command
 		if( m_launchSettings.window_size == glm::ivec2( -1, -1 ) )
 		{
-			const VkExtent2D rendererSize = m_window->GetExtent();
-			const glm::ivec2 windowPosition = m_window->GetPosition();
+			const VkExtent2D rendererSize = m_window.GetExtent();
+			const glm::ivec2 windowPosition = m_window.GetPosition();
 			SerializedValues::SaveWindowSizeAndPosition( windowPosition, { rendererSize.width, rendererSize.height } );
 		}
 
@@ -69,7 +68,7 @@ namespace fan
 
 		Prefab::s_resourceManager.Clear();
 		delete m_renderer;
-		delete m_window;
+		m_window.Destroy();
 	}
 
 	//================================================================================================================================
@@ -91,7 +90,7 @@ namespace fan
 		Profiler::Get().Begin();
 
 		// main loop
-		while( m_applicationShouldExit == false && m_window->IsOpen() == true )
+		while( m_applicationShouldExit == false && m_window.IsOpen() == true )
 		{
 			Step();
 		}
@@ -121,8 +120,8 @@ namespace fan
 			ImGui::GetIO().DeltaTime = time.logicDelta;
 			Input::Get().NewFrame();
 
-			const glm::ivec2 position = m_window->GetPosition();
-			const VkExtent2D extent = m_window->GetExtent();
+			const glm::ivec2 position = m_window.GetPosition();
+			const VkExtent2D extent = m_window.GetExtent();
 
 
 			Mouse::Get().Update( btVector2( (float)position.x, (float)position.y ), btVector2( (float)extent.width, (float)extent.height ), true );
@@ -180,7 +179,7 @@ namespace fan
 
 			Time::RegisterFrameDrawn();	// used for stats
 			
-			UpdateRenderWorld( *m_renderer, m_world, { m_window->GetExtent().width, m_window->GetExtent().height } );
+			UpdateRenderWorld( *m_renderer, m_world, { m_window.GetExtent().width, m_window.GetExtent().height } );
 			m_renderer->DrawFrame();
 			Profiler::Get().End();
 			Profiler::Get().Begin();

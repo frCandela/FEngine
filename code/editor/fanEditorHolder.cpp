@@ -4,7 +4,6 @@
 #include "core/input/fanMouse.hpp"
 #include "core/input/fanInput.hpp"
 #include "network/singletons/fanTime.hpp"
-#include "render/fanWindow.hpp"
 #include "render/fanRenderer.hpp"
 #include "network/singletons/fanTime.hpp"
 #include "editor/windows/fanPreferencesWindow.hpp"	
@@ -73,10 +72,10 @@ namespace fan
 		glm::ivec2 windowPosition;
 		glm::ivec2 windowSize;
 		SerializedValues::LoadWindowSizeAndPosition( _settings, windowPosition, windowSize );
-		m_window = new Window( _settings.windowName.c_str(), windowSize, windowPosition );
+		m_window.Create( _settings.windowName.c_str(), windowSize, windowPosition );
 
 		// creates renderer
-		m_renderer = new Renderer( *m_window );
+		m_renderer = new Renderer( m_window );
 
 		Prefab::s_resourceManager.Init();
 
@@ -182,8 +181,8 @@ namespace fan
 		// Serialize editor positions if it was not modified by a launch command
 		if( m_launchSettings.window_size == glm::ivec2( -1, -1 ) )
 		{
-			const VkExtent2D rendererSize = m_window->GetExtent();
-			const glm::ivec2 windowPosition = m_window->GetPosition();
+			const VkExtent2D rendererSize = m_window.GetExtent();
+			const glm::ivec2 windowPosition = m_window.GetPosition();
 			SerializedValues::Get().SetUInt( "renderer_extent_width", rendererSize.width );
 			SerializedValues::Get().SetUInt( "renderer_extent_height", rendererSize.height );
 			SerializedValues::Get().SetInt( "renderer_position_x", windowPosition.x );
@@ -194,7 +193,7 @@ namespace fan
 
 		Prefab::s_resourceManager.Clear();
 		delete m_renderer;
-		delete m_window;
+		m_window.Destroy();
 	}
 
 	//================================================================================================================================
@@ -218,7 +217,7 @@ namespace fan
 		Profiler::Get().Begin();
 
 		// main loop
-		while( m_applicationShouldExit == false && m_window->IsOpen() == true )
+		while( m_applicationShouldExit == false && m_window.IsOpen() == true )
 		{
 			Step();
 		}

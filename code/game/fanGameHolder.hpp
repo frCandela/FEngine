@@ -9,6 +9,7 @@ WARNINGS_POP()
 #include "game/fanGameClient.hpp"
 #include "game/fanGameServer.hpp"
 #include "game/fanLaunchSettings.hpp"
+#include "render/fanWindow.hpp"
 
 namespace fan
 {
@@ -37,7 +38,7 @@ namespace fan
 			   
 	private:		
 		Renderer* m_renderer;
-		Window*   m_window;
+		Window m_window;
 		EcsWorld& m_world;
 		double m_lastRenderTime = 0.;
 		const LaunchSettings m_launchSettings;

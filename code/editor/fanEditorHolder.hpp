@@ -6,6 +6,7 @@ WARNINGS_GLM_PUSH()
 WARNINGS_POP()
 #include "core/fanSerializedValues.hpp"
 #include "ecs/fanEcsWorld.hpp"
+#include "render/fanWindow.hpp"
 #include "game/fanGameClient.hpp"
 #include "game/fanGameServer.hpp"
 #include "game/fanLaunchSettings.hpp"
@@ -49,7 +50,7 @@ namespace fan
 			   
 	private:		
 		Renderer* m_renderer;
-		Window*   m_window;
+		Window   m_window;
 		std::vector<EcsWorld*> m_worlds; 
 		int m_currentWorld = 0;
 		double m_lastRenderTime = 0.;

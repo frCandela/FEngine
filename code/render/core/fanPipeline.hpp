@@ -40,7 +40,7 @@ namespace fan
 		bool Create( Device& _device, PipelineConfig _pipelineConfig, VkExtent2D _extent, VkRenderPass _renderPass );
 		void Destroy( Device& _device );
 
-		VkPipelineLayout	m_pipelineLayout = VK_NULL_HANDLE;
-		VkPipeline			m_pipeline = VK_NULL_HANDLE;
+		VkPipelineLayout	mPipelineLayout = VK_NULL_HANDLE;
+		VkPipeline			mPipeline = VK_NULL_HANDLE;
 	};
 }
