@@ -13,7 +13,7 @@ namespace fan
 	//================================================================================================================================
 	struct PipelineConfig
 	{
-		PipelineConfig( Shader& _vert, Shader& _frag );
+		PipelineConfig( const Shader& _vert, const Shader& _frag );
 
 		VkPipelineRasterizationStateCreateInfo			rasterizationStateCreateInfo = {};
 		VkPipelineInputAssemblyStateCreateInfo			inputAssemblyStateCreateInfo = {};

@@ -24,7 +24,7 @@ namespace fan
 		Color clearColor;
 		if( SerializedValues::Get().GetColor( "clear_color", clearColor ) )
 		{
-			m_renderer.SetClearColor( clearColor.ToGLM() );
+			m_renderer.mClearColor = clearColor.ToGLM();
 		}
 
 		// loads imgui colors
@@ -55,7 +55,7 @@ namespace fan
 	//================================================================================================================================
 	PreferencesWindow::~PreferencesWindow()
 	{
-		SerializedValues::Get().SetColor( "clear_color", m_renderer.GetClearColor() );
+		SerializedValues::Get().SetColor( "clear_color", m_renderer.mClearColor );
 
 		// saves imgui colors
 		ImGuiStyle& style = ImGui::GetStyle();
@@ -87,14 +87,14 @@ namespace fan
 		{
 			ImGui::Indent();
 			// Filter color
-			glm::vec4& color = m_renderer.m_ppUniforms.color;
+			glm::vec4& color = m_renderer.mDrawPostprocess.mUniforms.color;
 			ImGui::ColorEdit3( "Filter##1", &color[ 0 ], ImGui::fanColorEditFlags );
 
 			// Clear color
-			glm::vec4 clearColor = m_renderer.GetClearColor();
+			glm::vec4 clearColor = m_renderer.mClearColor;
 			if ( ImGui::ColorEdit3( "Clear color", &clearColor.r, ImGui::fanColorEditFlags ) )
 			{
-				m_renderer.SetClearColor( clearColor );
+				m_renderer.mClearColor = clearColor;
 			}
 			ImGui::Unindent();
 		}

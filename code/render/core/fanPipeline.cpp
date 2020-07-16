@@ -5,7 +5,9 @@
 
 namespace fan
 {
-	PipelineConfig::PipelineConfig( Shader& _vert, Shader& _frag )
+	//================================================================================================================================
+	//================================================================================================================================
+	PipelineConfig::PipelineConfig( const Shader& _vert, const Shader& _frag )
 	{
 		vertshaderStageCreateInfos.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
 		vertshaderStageCreateInfos.pNext = nullptr;

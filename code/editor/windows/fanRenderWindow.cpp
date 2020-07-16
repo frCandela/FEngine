@@ -58,7 +58,7 @@ namespace fan
 
 		if ( ImGui::CollapsingHeader( "Rendered Mesh : " ) )
 		{
-			const std::vector<DrawData>& meshArray = m_renderer.GetDrawData();
+			const std::vector<DrawData>& meshArray = m_renderer.mDrawModels.mDrawData;
 			for ( uint32_t meshIndex = 0; meshIndex < meshArray.size(); meshIndex++ )
 			{
 				const DrawData& drawData = meshArray[ meshIndex ];
@@ -73,7 +73,7 @@ namespace fan
 			}
 		}
 
-		LightsUniforms& lights = m_renderer.m_forwardUniforms.m_lightUniforms;
+		LightsUniforms& lights = m_renderer.mDrawModels.mUniforms.m_lightUniforms;
 		if ( ImGui::CollapsingHeader( "Directional lights : " ) )
 		{
 			ImGui::PushItemWidth( 150 );
