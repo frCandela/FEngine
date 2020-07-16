@@ -33,7 +33,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	PipelineConfig DrawModels::GetPipelineConfig( DescriptorImages& _imagesDescriptor, DescriptorSampler& _samplerDescriptor )
+	PipelineConfig DrawModels::GetPipelineConfig( DescriptorImages& _imagesDescriptor, DescriptorSampler& _samplerDescriptor ) const
 	{
 		PipelineConfig config( mVertexShader, mFragmentShader );
 

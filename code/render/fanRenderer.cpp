@@ -51,7 +51,7 @@ namespace fan
 
 		CreatePipelines();
 
-		m_imguiPipeline.Create( m_device, imagesCount, m_renderPassImgui.mRenderPass, m_window.mWindow, m_window.mSwapchain.mExtent, m_ppColorImageView );
+		mDrawImgui.Create( m_device, imagesCount, m_renderPassImgui.mRenderPass, m_window.mWindow, m_window.mSwapchain.mExtent, m_ppColorImageView );
 
 		CreateCommandBuffers();
 		RecordAllCommandBuffers();	}
@@ -62,7 +62,7 @@ namespace fan
 	{
 		vkDeviceWaitIdle( m_device.mDevice );
 
-		m_imguiPipeline.Destroy( m_device );
+		mDrawImgui.Destroy( m_device );
 		mDrawModels.Destroy( m_device );
 		mDrawUI.mPipeline.Destroy( m_device );
 		
@@ -260,7 +260,7 @@ namespace fan
 		mDrawPostprocess.mDescriptorImage.Destroy( m_device );
 		mDrawPostprocess.mDescriptorImage.Create( m_device, &m_gameColorImageView.mImageView, 1, mDrawPostprocess.mSampler.mSampler );
 
-		m_imguiPipeline.UpdateGameImageDescriptor( m_device, m_ppColorImageView );
+		mDrawImgui.UpdateGameImageDescriptor( m_device, m_ppColorImageView );
 
 		RecordAllCommandBuffers();
 	}
@@ -559,7 +559,7 @@ namespace fan
 
 			vkCmdBeginRenderPass( commandBuffer, &renderPassInfoImGui, VK_SUBPASS_CONTENTS_SECONDARY_COMMAND_BUFFERS );
 			{
-				vkCmdExecuteCommands( commandBuffer, 1, &m_imguiCommandBuffers.mBuffers[ _index ] );
+				vkCmdExecuteCommands( commandBuffer, 1, &mDrawImgui.mCommandBuffers.mBuffers[ _index ] );
 			} vkCmdEndRenderPass( commandBuffer );
 
 
@@ -586,7 +586,7 @@ namespace fan
 
 		if ( vkBeginCommandBuffer( commandBuffer, &commandBufferBeginInfo ) == VK_SUCCESS )
 		{			
-			mDrawPostprocess.mPipeline.Bind( commandBuffer, m_gameExtent, _index );
+			mDrawPostprocess.mPipeline.Bind( commandBuffer, m_gameExtent );
 			mDrawPostprocess.BindDescriptors( commandBuffer, _index );
 			VkBuffer vertexBuffers[] = { mDrawPostprocess.mVertexBufferQuad.mBuffer };
 			VkDeviceSize offsets[] = { 0 };
@@ -613,7 +613,7 @@ namespace fan
 
 		if ( vkBeginCommandBuffer( commandBuffer, &commandBufferBeginInfo ) == VK_SUCCESS )
 		{
-			mDrawUI.mPipeline.Bind( commandBuffer, m_gameExtent, _index );
+			mDrawUI.mPipeline.Bind( commandBuffer, m_gameExtent );
 			//m_uiPipeline.BindDescriptors( commandBuffer, _index, 0 );
 
 			VkDeviceSize offsets[] = { 0 };
@@ -645,15 +645,15 @@ namespace fan
 	void Renderer::RecordCommandBufferImgui( const size_t _index )
 	{
 		SCOPED_PROFILE( imgui );
-		m_imguiPipeline.UpdateBuffer( m_device, _index );
+		mDrawImgui.UpdateBuffer( m_device, _index );
 
-		VkCommandBuffer commandBuffer = m_imguiCommandBuffers.mBuffers[ _index ];
+		VkCommandBuffer commandBuffer = mDrawImgui.mCommandBuffers.mBuffers[ _index ];
 		VkCommandBufferInheritanceInfo commandBufferInheritanceInfo = CommandBuffer::GetInheritanceInfo( m_renderPassImgui.mRenderPass, m_swapchainFramebuffers.mFrameBuffers[_index] );
 		VkCommandBufferBeginInfo commandBufferBeginInfo = CommandBuffer::GetBeginInfo( &commandBufferInheritanceInfo );
 
 		if ( vkBeginCommandBuffer( commandBuffer, &commandBufferBeginInfo ) == VK_SUCCESS )
 		{
-			m_imguiPipeline.DrawFrame( commandBuffer, _index );
+			mDrawImgui.DrawFrame( commandBuffer, _index );
 
 			if ( vkEndCommandBuffer( commandBuffer ) != VK_SUCCESS )
 			{
@@ -677,7 +677,7 @@ namespace fan
 
 		if( vkBeginCommandBuffer( commandBuffer, &commandBufferBeginInfo ) == VK_SUCCESS )
 		{
-			mDrawModels.mPipeline.Bind( commandBuffer, m_gameExtent, _index );
+			mDrawModels.mPipeline.Bind( commandBuffer, m_gameExtent );
 
 			for( uint32_t meshIndex = 0; meshIndex < mDrawModels.mDrawData.size(); meshIndex++ )
 			{
@@ -718,7 +718,7 @@ namespace fan
 				VkDeviceSize offsets[] = { 0 };
 				if( mDrawDebug.mNumLines > 0 )
 				{
-					mDrawDebug.mPipelineLines.Bind( commandBuffer, m_gameExtent, _index );
+					mDrawDebug.mPipelineLines.Bind( commandBuffer, m_gameExtent );
 					mDrawDebug.BindDescriptorsLines( commandBuffer, _index );					
 					VkBuffer vertexBuffers[] = { mDrawDebug.mVertexBuffersLines[_index].mBuffer };
 					vkCmdBindVertexBuffers( commandBuffer, 0, 1, vertexBuffers, offsets );
@@ -726,7 +726,7 @@ namespace fan
 				}
 				if( mDrawDebug.mNumLinesNDT > 0 )
 				{
-					mDrawDebug.mPipelineLinesNDT.Bind( commandBuffer, m_gameExtent, _index );
+					mDrawDebug.mPipelineLinesNDT.Bind( commandBuffer, m_gameExtent );
 					mDrawDebug.BindDescriptorsLinesNDT( commandBuffer, _index );					
 					VkBuffer vertexBuffers[] = { mDrawDebug.mVertexBuffersLinesNDT[_index].mBuffer };
 					vkCmdBindVertexBuffers( commandBuffer, 0, 1, vertexBuffers, offsets );
@@ -734,7 +734,7 @@ namespace fan
 				}
 				if( mDrawDebug.mNumTriangles > 0 )
 				{
-					mDrawDebug.mPipelineTriangles.Bind( commandBuffer, m_gameExtent, _index );
+					mDrawDebug.mPipelineTriangles.Bind( commandBuffer, m_gameExtent );
 					mDrawDebug.BindDescriptorsTriangles( commandBuffer, _index );
 					VkBuffer vertexBuffers[] = { mDrawDebug.mVertexBuffersTriangles[_index].mBuffer };
 					vkCmdBindVertexBuffers( commandBuffer, 0, 1, vertexBuffers, offsets );
@@ -827,7 +827,7 @@ namespace fan
 	void Renderer::ReloadIcons()
 	{
 		WaitIdle();
-		m_imguiPipeline.ReloadIcons( m_device );
+		mDrawImgui.ReloadIcons( m_device );
 	}
 
 	//================================================================================================================================
@@ -836,8 +836,9 @@ namespace fan
 	{
 		const uint32_t count = m_window.mSwapchain.mImagesCount;
 		m_primaryCommandBuffers.Create( m_device, count, VK_COMMAND_BUFFER_LEVEL_PRIMARY );
+
 		mDrawModels.mCommandBuffers.Create( m_device, count, VK_COMMAND_BUFFER_LEVEL_SECONDARY );
-		m_imguiCommandBuffers.Create( m_device, count, VK_COMMAND_BUFFER_LEVEL_SECONDARY );
+		mDrawImgui.mCommandBuffers.Create( m_device, count, VK_COMMAND_BUFFER_LEVEL_SECONDARY );
 		mDrawUI.mCommandBuffers.Create( m_device, count, VK_COMMAND_BUFFER_LEVEL_SECONDARY );
 		mDrawPostprocess.mCommandBuffers.Create( m_device, count, VK_COMMAND_BUFFER_LEVEL_SECONDARY );
 		mDrawDebug.mCommandBuffers.Create( m_device, count, VK_COMMAND_BUFFER_LEVEL_SECONDARY );

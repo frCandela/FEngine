@@ -100,10 +100,18 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool Pipeline::Create( Device& _device, PipelineConfig _pipelineConfig, VkExtent2D _extent, VkRenderPass _renderPass )
+	bool Pipeline::Create( Device& _device, PipelineConfig _pipelineConfig, VkExtent2D _extent, VkRenderPass _renderPass, const bool _createCache )
 	{
 		assert( mPipelineLayout == VK_NULL_HANDLE );
 		assert( mPipeline == VK_NULL_HANDLE );
+
+		if( _createCache )
+		{
+			assert( mPipelineCache == VK_NULL_HANDLE );
+			VkPipelineCacheCreateInfo pipelineCacheCreateInfo = {};
+			pipelineCacheCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
+			vkCreatePipelineCache( _device.mDevice, &pipelineCacheCreateInfo, nullptr, &mPipelineCache );
+		}
 
 		VkViewport viewport;
 		viewport.x = 0.f;
@@ -189,7 +197,7 @@ namespace fan
 
 		if ( vkCreateGraphicsPipelines(
 			_device.mDevice,
-			VK_NULL_HANDLE,
+			mPipelineCache,
 			1,
 			&graphicsPipelineCreateInfo,
 			nullptr,
@@ -206,7 +214,7 @@ namespace fan
 	   
 	//================================================================================================================================
 	//================================================================================================================================
-	void Pipeline::Bind( VkCommandBuffer _commandBuffer, VkExtent2D _extent, const size_t /*_index*/ )
+	void Pipeline::Bind( VkCommandBuffer _commandBuffer, VkExtent2D _extent )
 	{
 		VkViewport viewport;
 		viewport.x = 0.f;
@@ -220,15 +228,23 @@ namespace fan
 		scissor.offset = { 0, 0 };
 		scissor.extent = _extent;
 
-		vkCmdBindPipeline( _commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mPipeline );
 		vkCmdSetScissor( _commandBuffer, 0, 1, &scissor );
 		vkCmdSetViewport( _commandBuffer, 0, 1, &viewport );
+
+		vkCmdBindPipeline( _commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mPipeline );
+
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void Pipeline::Destroy( Device& _device )
 	{
+		if( mPipelineCache != VK_NULL_HANDLE )
+		{
+			vkDestroyPipelineCache( _device.mDevice, mPipelineCache, nullptr );
+			mPipelineCache = VK_NULL_HANDLE;
+		}
+
 		if ( mPipelineLayout != VK_NULL_HANDLE )
 		{
 			vkDestroyPipelineLayout( _device.mDevice, mPipelineLayout, nullptr );

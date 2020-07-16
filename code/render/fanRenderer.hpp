@@ -21,9 +21,9 @@ WARNINGS_POP()
 #include "render/core/descriptors/fanDescriptorImages.hpp"
 #include "render/core/descriptors/fanDescriptorSampler.hpp"
 #include "render/core/descriptors/fanDescriptorUniforms.hpp"
-#include "render/imgui/fanImguiPipeline.hpp"
 #include "render/fanUniforms.hpp"
 
+#include "render/draw/fanDrawImgui.hpp"
 #include "render/draw/fanDrawModels.hpp"
 #include "render/draw/fanDrawDebug.hpp"
 #include "render/draw/fanDrawUI.hpp"
@@ -111,16 +111,13 @@ namespace fan
 		Device& m_device;
 
 		// data
-		DrawModels			mDrawModels;
-		DrawDebug			mDrawDebug;
-		DrawUI				mDrawUI;
-		DrawPostprocess		mDrawPostprocess;
+		DrawModels		mDrawModels;
+		DrawDebug		mDrawDebug;
+		DrawUI			mDrawUI;
+		DrawPostprocess	mDrawPostprocess;
+		DrawImgui		mDrawImgui;
 
 		glm::vec4	mClearColor;
-
-		// pipelines
-		ImguiPipeline	m_imguiPipeline;
-		CommandBuffer	m_imguiCommandBuffers;
 
 		// global descriptors
 		DescriptorImages	m_imagesDescriptor;

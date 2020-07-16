@@ -36,6 +36,6 @@ namespace fan
 		void			Destroy( Device& _device );
 		void			BindDescriptors( VkCommandBuffer _commandBuffer, const size_t _indexFrame, const uint32_t _indexOffset );
 		void			UpdateUniformBuffers( Device& _device, const size_t _index );
-		PipelineConfig	GetPipelineConfig( DescriptorImages& _imagesDescriptor, DescriptorSampler& _samplerDescriptor );
+		PipelineConfig	GetPipelineConfig( DescriptorImages& _imagesDescriptor, DescriptorSampler& _samplerDescriptor ) const;
 	};
 }
