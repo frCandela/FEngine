@@ -38,7 +38,10 @@ namespace fan
 		mSampler.Create( _device, 0, 1.f, VK_FILTER_LINEAR );
 		mSamplerIcons.Create( _device, 0, 0.f, VK_FILTER_NEAREST );
 
-		CreateDescriptors( _device, _gameImageView );
+		// create descriptors
+		VkImageView views[3] = { mTextureFont.mImageView, mTextureIcons.mImageView,  _gameImageView.mImageView };
+		VkSampler	samplers[3] = { mSampler.mSampler, mSamplerIcons.mSampler, mSamplerIcons.mSampler };
+		mDescriptorImages.Create( _device, views, 3, samplers );
 
 		const VkExtent2D extent = { (uint32_t)ImGui::GetIO().DisplaySize.x, (uint32_t)ImGui::GetIO().DisplaySize.y };
 		mPipeline.Create( _device, GetPipelineConfig(), extent, _renderPass, true );
@@ -56,8 +59,7 @@ namespace fan
 		mVertexShader.Destroy( _device );
 		
 		mPipeline.Destroy( _device );
-		vkDestroyDescriptorPool( _device.mDevice, mDescriptorPool, nullptr );
-		vkDestroyDescriptorSetLayout( _device.mDevice, mDescriptorSetLayout, nullptr );
+		mDescriptorImages.Destroy( _device );
 
 		ImGui::DestroyContext();
 	}
@@ -70,21 +72,7 @@ namespace fan
 
 		mTextureIcons.Destroy( _device );
 		mTextureIcons.CreateFromFile( _device, RenderGlobal::s_defaultIcons );
-
-		VkDescriptorImageInfo iconsDescriptorImageInfo{};
-		iconsDescriptorImageInfo.sampler = mSamplerIcons.mSampler;
-		iconsDescriptorImageInfo.imageView = mTextureIcons.mImageView;
-		iconsDescriptorImageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-
-		VkWriteDescriptorSet writeDescriptorSetIcons{};
-		writeDescriptorSetIcons.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-		writeDescriptorSetIcons.dstSet = mDescriptorSets[ 1 ];
-		writeDescriptorSetIcons.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-		writeDescriptorSetIcons.dstBinding = 0;
-		writeDescriptorSetIcons.pImageInfo = &iconsDescriptorImageInfo;
-		writeDescriptorSetIcons.descriptorCount = 1;
-
-		vkUpdateDescriptorSets( _device.mDevice, 1, &writeDescriptorSetIcons, 0, nullptr );
+		mDescriptorImages.UpdateDescriptorSet( _device, 1, mTextureIcons.mImageView, mSamplerIcons.mSampler );
 	}
 
 	//================================================================================================================================
@@ -179,17 +167,17 @@ namespace fan
 
 					const size_t textureID = ( size_t ) ( pcmd->TextureId );
 
-					// Bind imgui pipeline and Descriptors sets
+					// Bind imgui pipeline and Descriptors sets @hack, replace the numbers with something more explicit...
 					switch ( textureID )
 					{
 					case 42:
-						vkCmdBindDescriptorSets( _commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mPipeline.mPipelineLayout, 0, 1, &mDescriptorSets[ 1 ], 0, nullptr ); // Icons drawing
+						vkCmdBindDescriptorSets( _commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mPipeline.mPipelineLayout, 0, 1, &mDescriptorImages.mDescriptorSets[1], 0, nullptr ); // Icons drawing
 						break;
 					case 12:
-						vkCmdBindDescriptorSets( _commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mPipeline.mPipelineLayout, 0, 1, &mDescriptorSets[ 2 ], 0, nullptr ); // game drawing
+						vkCmdBindDescriptorSets( _commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mPipeline.mPipelineLayout, 0, 1, &mDescriptorImages.mDescriptorSets[2], 0, nullptr ); // game drawing
 						break;
 					default:
-						vkCmdBindDescriptorSets( _commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mPipeline.mPipelineLayout, 0, 1, &mDescriptorSets[ 0 ], 0, nullptr ); // regular drawing			
+						vkCmdBindDescriptorSets( _commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mPipeline.mPipelineLayout, 0, 1, &mDescriptorImages.mDescriptorSets[0], 0, nullptr ); // regular drawing			
 						break;
 					}
 
@@ -257,115 +245,9 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void DrawImgui::CreateDescriptors( Device& _device, ImageView& _gameImageView )
-	{
-		Debug::Log() << "ImGui pipeline : create descriptors" << Debug::Endl();
-		// Descriptor pool
-		VkDescriptorPoolSize descriptorPoolSize = {};
-		descriptorPoolSize.type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-		descriptorPoolSize.descriptorCount = 3;
-
-		std::vector<VkDescriptorPoolSize> poolSizes = { descriptorPoolSize };
-
-		VkDescriptorPoolCreateInfo descriptorPoolInfo = {};
-
-		descriptorPoolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-		descriptorPoolInfo.poolSizeCount = static_cast< uint32_t >( poolSizes.size() );
-		descriptorPoolInfo.pPoolSizes = poolSizes.data();
-		descriptorPoolInfo.maxSets = 3;
-
-		vkCreateDescriptorPool( _device.mDevice, &descriptorPoolInfo, nullptr, &mDescriptorPool );
-
-		// Descriptor set layout
-		VkDescriptorSetLayoutBinding setLayoutBinding{};
-		setLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-		setLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
-		setLayoutBinding.binding = 0;
-		setLayoutBinding.descriptorCount = 1;
-
-		std::vector<VkDescriptorSetLayoutBinding> setLayoutBindings = { setLayoutBinding };
-
-		VkDescriptorSetLayoutCreateInfo descriptorSetLayoutCreateInfo = {};
-		descriptorSetLayoutCreateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-		descriptorSetLayoutCreateInfo.pBindings = setLayoutBindings.data();
-		descriptorSetLayoutCreateInfo.bindingCount = static_cast< uint32_t >( setLayoutBindings.size() );
-
-		vkCreateDescriptorSetLayout( _device.mDevice, &descriptorSetLayoutCreateInfo, nullptr, &mDescriptorSetLayout );
-
-		// Descriptor set
-		VkDescriptorSetLayout layouts[ 3 ] = { mDescriptorSetLayout ,mDescriptorSetLayout, mDescriptorSetLayout };
-		VkDescriptorSetAllocateInfo descriptorSetAllocateInfo{};
-		descriptorSetAllocateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-		descriptorSetAllocateInfo.descriptorPool = mDescriptorPool;
-		descriptorSetAllocateInfo.pSetLayouts = layouts;
-		descriptorSetAllocateInfo.descriptorSetCount = 3;
-
-		vkAllocateDescriptorSets( _device.mDevice, &descriptorSetAllocateInfo, mDescriptorSets );
-
-		VkDescriptorImageInfo fontDescriptorImageInfo{};
-		fontDescriptorImageInfo.sampler = mSampler.mSampler;
-		fontDescriptorImageInfo.imageView = mTextureFont.mImageView;
-		fontDescriptorImageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-
-		VkDescriptorImageInfo iconsDescriptorImageInfo{};
-		iconsDescriptorImageInfo.sampler = mSamplerIcons.mSampler;
-		iconsDescriptorImageInfo.imageView = mTextureIcons.mImageView;
-		iconsDescriptorImageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-
-		VkDescriptorImageInfo view3DDescriptorImageInfo{};
-		view3DDescriptorImageInfo.sampler = mSamplerIcons.mSampler;
-		view3DDescriptorImageInfo.imageView = _gameImageView.mImageView;
-		view3DDescriptorImageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-
-		VkWriteDescriptorSet writeDescriptorSet{};
-		writeDescriptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-		writeDescriptorSet.dstSet = mDescriptorSets[ 0 ];
-		writeDescriptorSet.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-		writeDescriptorSet.dstBinding = 0;
-		writeDescriptorSet.pImageInfo = &fontDescriptorImageInfo;
-		writeDescriptorSet.descriptorCount = 1;
-
-		VkWriteDescriptorSet writeDescriptorSetIcons{};
-		writeDescriptorSetIcons.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-		writeDescriptorSetIcons.dstSet = mDescriptorSets[ 1 ];
-		writeDescriptorSetIcons.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-		writeDescriptorSetIcons.dstBinding = 0;
-		writeDescriptorSetIcons.pImageInfo = &iconsDescriptorImageInfo;
-		writeDescriptorSetIcons.descriptorCount = 1;
-
-		VkWriteDescriptorSet writeDescriptorSet3DView{};
-		writeDescriptorSet3DView.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-		writeDescriptorSet3DView.dstSet = mDescriptorSets[ 2 ];
-		writeDescriptorSet3DView.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-		writeDescriptorSet3DView.dstBinding = 0;
-		writeDescriptorSet3DView.pImageInfo = &view3DDescriptorImageInfo;
-		writeDescriptorSet3DView.descriptorCount = 1;
-
-		std::vector<VkWriteDescriptorSet> writeDescriptorSets = { writeDescriptorSet, writeDescriptorSetIcons, writeDescriptorSet3DView };
-
-		vkUpdateDescriptorSets( _device.mDevice, static_cast< uint32_t >( writeDescriptorSets.size() ), writeDescriptorSets.data(), 0, nullptr );
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
 	void DrawImgui::UpdateGameImageDescriptor( Device& _device, ImageView& _gameImageView )
 	{
-		VkDescriptorImageInfo viewGameDescriptorImageInfo{};
-		viewGameDescriptorImageInfo.sampler = mSamplerIcons.mSampler;
-		viewGameDescriptorImageInfo.imageView = _gameImageView.mImageView;
-		viewGameDescriptorImageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-
-		VkWriteDescriptorSet writeDescriptorSet3DView{};
-		writeDescriptorSet3DView.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-		writeDescriptorSet3DView.dstSet = mDescriptorSets[ 2 ];
-		writeDescriptorSet3DView.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-		writeDescriptorSet3DView.dstBinding = 0;
-		writeDescriptorSet3DView.pImageInfo = &viewGameDescriptorImageInfo;
-		writeDescriptorSet3DView.descriptorCount = 1;
-
-		std::vector<VkWriteDescriptorSet> writeDescriptorSets = { writeDescriptorSet3DView };
-
-		vkUpdateDescriptorSets( _device.mDevice, static_cast< uint32_t >( writeDescriptorSets.size() ), writeDescriptorSets.data(), 0, nullptr );
+		mDescriptorImages.UpdateDescriptorSet( _device, 2, _gameImageView.mImageView, mSamplerIcons.mSampler );
 	}
 
 	//================================================================================================================================
@@ -375,7 +257,7 @@ namespace fan
 		PipelineConfig config( mVertexShader, mFragmentShader );
 
 		config.pushConstantRanges = { {VK_SHADER_STAGE_VERTEX_BIT , 0, sizeof( PushConstBlock )} };
-		config.descriptorSetLayouts = { mDescriptorSetLayout };
+		config.descriptorSetLayouts = { mDescriptorImages.mDescriptorSetLayout };
 		config.rasterizationStateCreateInfo.cullMode = VK_CULL_MODE_NONE;
 		config.attachmentBlendStates[0].srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
 		config.depthStencilStateCreateInfo.depthTestEnable = VK_FALSE;

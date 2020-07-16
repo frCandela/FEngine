@@ -12,12 +12,15 @@ WARNINGS_POP()
 #include "render/core/fanBuffer.hpp"
 #include "render/core/fanCommandBuffer.hpp"
 #include "render/core/fanPipeline.hpp"
+#include "render/core/descriptors/fanDescriptorImages.hpp"
 
 namespace fan
 {
 	struct Device;
 	struct ImageView;
 
+	//================================================================
+	//================================================================
 	struct PushConstBlock
 	{
 		glm::vec2 scale;
@@ -29,25 +32,21 @@ namespace fan
 	//================================================================================================================================
 	struct DrawImgui
 	{
-		Pipeline mPipeline;
-		Sampler mSampler;
-		Sampler mSamplerIcons;
-		Texture mTextureFont;
-		Texture mTextureIcons;
-		Shader mFragmentShader;
-		Shader mVertexShader;
-		CommandBuffer	mCommandBuffers;
+		Pipeline			mPipeline;
+		Sampler				mSampler;
+		Sampler				mSamplerIcons;
+		Texture				mTextureFont;
+		Texture				mTextureIcons;
+		Shader				mFragmentShader;
+		Shader				mVertexShader;
+		DescriptorImages	mDescriptorImages;
+		CommandBuffer		mCommandBuffers;
+		PushConstBlock		mPushConstBlock;
 
 		std::vector<Buffer>		mVertexBuffers;
 		std::vector<Buffer>		mIndexBuffers;
 		std::vector < int32_t>	mVertexCount;
-		std::vector < int32_t>	mIndexCount; 		
-
-		VkDescriptorPool		mDescriptorPool;
-		VkDescriptorSetLayout	mDescriptorSetLayout;
-		VkDescriptorSet			mDescriptorSets[3];
-
-		PushConstBlock mPushConstBlock;
+		std::vector < int32_t>	mIndexCount;
 
 		void Create( Device& _device, const int _swapchainImagesCount, VkRenderPass _renderPass, GLFWwindow* _window, VkExtent2D _extent, ImageView& _gameImageView );
 		void Destroy( Device& _device );
@@ -62,7 +61,6 @@ namespace fan
 		
 	private:
 		void InitImgui( Device& _device, GLFWwindow* _window, VkExtent2D _extent );
-		void CreateDescriptors( Device& _device, ImageView& _gameImageView );
 		PipelineConfig	GetPipelineConfig() const;
 	};
 }

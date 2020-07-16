@@ -258,7 +258,7 @@ namespace fan
 		CreateFramebuffers( extent );
 
 		mDrawPostprocess.mDescriptorImage.Destroy( m_device );
-		mDrawPostprocess.mDescriptorImage.Create( m_device, &m_gameColorImageView.mImageView, 1, mDrawPostprocess.mSampler.mSampler );
+		mDrawPostprocess.mDescriptorImage.Create( m_device, &m_gameColorImageView.mImageView, 1, &mDrawPostprocess.mSampler.mSampler );
 
 		mDrawImgui.UpdateGameImageDescriptor( m_device, m_ppColorImageView );
 

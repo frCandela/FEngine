@@ -190,24 +190,24 @@ namespace fan
 			descriptorBufferInfo.resize( _count );
 			writeDescriptorSet.resize( _count );
 			
-			for( uint32_t bufferIndex = 0; bufferIndex < _count; bufferIndex++ )
+			for( uint32_t i = 0; i < _count; i++ )
 			{
-				descriptorBufferInfo[bufferIndex].buffer = bindingData.buffers[bufferIndex].mBuffer;
-				descriptorBufferInfo[bufferIndex].offset = 0;
-				descriptorBufferInfo[bufferIndex].range = bindingData.buffers[bufferIndex].mAlignment > 1 ? bindingData.buffers[bufferIndex].mAlignment : bindingData.buffers[bufferIndex].mSize;
+				descriptorBufferInfo[i].buffer = bindingData.buffers[i].mBuffer;
+				descriptorBufferInfo[i].offset = 0;
+				descriptorBufferInfo[i].range = bindingData.buffers[i].mAlignment > 1 ? bindingData.buffers[i].mAlignment : bindingData.buffers[i].mSize;
 			
-				writeDescriptorSet[bufferIndex].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-				writeDescriptorSet[bufferIndex].pNext = nullptr;
-				writeDescriptorSet[bufferIndex].dstSet = mDescriptorSets[bufferIndex];
-				writeDescriptorSet[bufferIndex].dstBinding = static_cast<uint32_t>( bindingIndex );
-				writeDescriptorSet[bufferIndex].dstArrayElement = 0;
-				writeDescriptorSet[bufferIndex].descriptorCount = bindingData.layoutBinding.descriptorCount;
-				writeDescriptorSet[bufferIndex].descriptorType = bindingData.layoutBinding.descriptorType;
-				writeDescriptorSet[bufferIndex].pImageInfo = nullptr;
-				writeDescriptorSet[bufferIndex].pBufferInfo = &descriptorBufferInfo[bufferIndex];
+				writeDescriptorSet[i].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+				writeDescriptorSet[i].pNext = nullptr;
+				writeDescriptorSet[i].dstSet = mDescriptorSets[i];
+				writeDescriptorSet[i].dstBinding = static_cast<uint32_t>( bindingIndex );
+				writeDescriptorSet[i].dstArrayElement = 0;
+				writeDescriptorSet[i].descriptorCount = bindingData.layoutBinding.descriptorCount;
+				writeDescriptorSet[i].descriptorType = bindingData.layoutBinding.descriptorType;
+				writeDescriptorSet[i].pImageInfo = nullptr;
+				writeDescriptorSet[i].pBufferInfo = &descriptorBufferInfo[i];
 				//uboWriteDescriptorSet.pTexelBufferView = nullptr;		
 
-				writeDescriptors.push_back( writeDescriptorSet[ bufferIndex ] );
+				writeDescriptors.push_back( writeDescriptorSet[ i ] );
 			}
 		}
 

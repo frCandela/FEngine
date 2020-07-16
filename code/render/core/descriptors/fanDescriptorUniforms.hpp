@@ -12,11 +12,13 @@ namespace fan
 
 	//================================================================================================================================
 	// Create a uniform buffer descriptor or a dynamic  uniform buffer descriptor
+	// @todo the descriptor class shouldn't create buffers for the user, they should be passed as arguments
 	//================================================================================================================================
 	struct DescriptorUniforms
 	{
 		//================================================================
 		// Contain the information for a descriptor binding
+		// used when creating & updating the descriptor sets
 		//================================================================
 		struct BindingData
 		{

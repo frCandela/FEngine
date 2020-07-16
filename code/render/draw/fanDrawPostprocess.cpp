@@ -18,7 +18,7 @@ namespace fan
 		mDescriptorUniform.Create( _device, _imagesCount );
 		mDescriptorUniform.SetData( _device, 0, 0, &mUniforms, sizeof( PostprocessUniforms ), 0 );
 		
-		mDescriptorImage.Create( _device, &_inputImageView.mImageView, 1, mSampler.mSampler );
+		mDescriptorImage.Create( _device, &_inputImageView.mImageView, 1, &mSampler.mSampler );
 	}
 
 	//================================================================================================================================
