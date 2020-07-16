@@ -21,8 +21,6 @@ WARNINGS_POP()
 #include "render/core/descriptors/fanDescriptorImages.hpp"
 #include "render/core/descriptors/fanDescriptorSampler.hpp"
 #include "render/core/descriptors/fanDescriptorUniforms.hpp"
-#include "render/fanUniforms.hpp"
-
 #include "render/draw/fanDrawImgui.hpp"
 #include "render/draw/fanDrawModels.hpp"
 #include "render/draw/fanDrawDebug.hpp"
@@ -32,10 +30,8 @@ WARNINGS_POP()
 namespace fan
 {
 	class Window;
-	class UIMesh;
 
-	// Used to set uniforms
-	struct DrawDirectionalLight
+	struct RenderDataDirectionalLight
 	{
 		glm::vec4 direction;
 		glm::vec4 ambiant;
@@ -43,7 +39,7 @@ namespace fan
 		glm::vec4 specular;
 	};
 
-	struct DrawPointLight
+	struct RenderDataPointLight
 	{
 		glm::vec4	 position;
 		glm::vec4	 diffuse;
@@ -54,7 +50,7 @@ namespace fan
 		glm::float32 quadratic;
 	};
 
-	struct DrawMesh
+	struct RenderDataModel
 	{
 		Mesh* mesh;
 		glm::mat4 modelMatrix;
@@ -64,21 +60,14 @@ namespace fan
 		uint32_t textureIndex;
 	};
 
-	struct DrawUIMesh
+	struct RenderDataUIMesh
 	{
 		UIMesh* mesh;
 		glm::vec2 position;
 		glm::vec2 scale;
 		glm::vec4 color;
 		uint32_t textureIndex;
-	};
-
-	// Used to batch rendering
-	struct UIDrawData
-	{
-		UIMesh* mesh;
-		uint32_t textureIndex;
-	};
+	};	   
 
 	//================================================================================================================================
 	// Contains all the rendering data
@@ -98,66 +87,58 @@ namespace fan
 		void ResizeSwapchain();
 
 		void SetMainCamera( const glm::mat4 _projection, const glm::mat4 _view, const glm::vec3 _position );
-		void SetDirectionalLights( const std::vector<DrawDirectionalLight>& _lightData );
-		void SetPointLights( const std::vector<DrawPointLight>& _lightData );
-		void SetDrawData( const std::vector<DrawMesh>& _drawData );
-		void SetUIDrawData( const std::vector<DrawUIMesh>& _drawData );
+		void SetDirectionalLights( const std::vector<RenderDataDirectionalLight>& _lightData );
+		void SetPointLights( const std::vector<RenderDataPointLight>& _lightData );
+		void SetDrawData( const std::vector<RenderDataModel>& _drawData );
+		void SetUIDrawData( const std::vector<RenderDataUIMesh>& _drawData );
 		void SetDebugDrawData( const std::vector<DebugVertex>& _debugLines, const std::vector<DebugVertex>& _debugLinesNoDepthTest, const std::vector<DebugVertex>& _debugTriangles );
 
-		VkExtent2D m_gameExtent = { 1,1 };		
-		std::vector< UIDrawData >	m_uiMeshDrawArray;
+		Window& mWindow;
+		Device& mDevice;
 
-		Window& m_window;
-		Device& m_device;
+		VkExtent2D		mGameExtent = { 1,1 };
+		glm::vec4		mClearColor = glm::vec4( 0.f, 0.f, 0.2f, 1.f );;
+		CommandBuffer	mPrimaryCommandBuffers;
 
 		// data
 		DrawModels		mDrawModels;
 		DrawDebug		mDrawDebug;
 		DrawUI			mDrawUI;
 		DrawPostprocess	mDrawPostprocess;
-		DrawImgui		mDrawImgui;
-
-		glm::vec4	mClearColor;
+		DrawImgui		mDrawImgui;	
 
 		// global descriptors
-		DescriptorImages	m_imagesDescriptor;
-		DescriptorSampler	m_samplerDescriptorTextures;
-		Sampler				m_samplerTextures;
+		DescriptorImages	mDescriptorTextures;
 
 		// render passes
-		RenderPass m_renderPassGame;
-		RenderPass m_renderPassPostprocess;
-		RenderPass m_renderPassImgui;
-
-		CommandBuffer m_primaryCommandBuffers;		
+		RenderPass mRenderPassGame;
+		RenderPass mRenderPassPostprocess;
+		RenderPass mRenderPassImgui;
 
 		// frame buffers game 
-		FrameBuffer m_gameFrameBuffers;
-		Image		m_gameDepthImage;
-		ImageView	m_gameDepthImageView;
-		Sampler		m_gameColorSampler;
-		Image		m_gameColorImage;
-		ImageView	m_gameColorImageView;
+		FrameBuffer mFrameBuffersGame;
+		Image		mImageGameDepth;
+		ImageView	mImageViewGameDepth;
+		Sampler		mSamplerGameColor;
+		Image		mImageGameColor;
+		ImageView	mImageViewGameColor;
 
 		// frame buffers postprocess 
-		FrameBuffer m_ppFramebuffers;
-		Sampler		m_ppColorSampler;
-		Image		m_ppColorImage;
-		ImageView	m_ppColorImageView;
+		FrameBuffer mFramebuffersPostprocess;
+		Sampler		mSamplerPostprocessColor;
+		Image		mImagePostprocessColor;
+		ImageView	mImageViewPostprocessColor;
 
 		// frame buffers swapchain 
-		FrameBuffer m_swapchainFramebuffers;
-
-
+		FrameBuffer mFramebuffersSwapchain;
 
 		void BindTexture( VkCommandBuffer _commandBuffer, const uint32_t _textureIndex, DescriptorSampler* _samplerDescriptor, VkPipelineLayout _pipelineLayout );
-
-		void RecordCommandBufferForward( const size_t _index );
-		void RecordCommandBufferPostProcess( const size_t _index );
+		void RecordCommandBufferModels( const size_t _index );
+		void RecordCommandBufferPostprocess( const size_t _index );
 		void RecordCommandBufferImgui( const size_t _index );
 		void RecordCommandBufferUI( const size_t _index );
-		void RecordPrimaryCommandBuffer( const size_t _index );
 		void RecordCommandBufferDebug( const size_t _index );
+		void RecordPrimaryCommandBuffer( const size_t _index );
 		void RecordAllCommandBuffers();
 
 		void CreateCommandBuffers();
@@ -165,8 +146,8 @@ namespace fan
 		bool CreateRenderPasses();
 		bool CreateTextureDescriptor();
 		void CreateShaders();
-		void DestroyShaders();
 		void CreatePipelines();
+		void DestroyShaders();
 		void DestroyPipelines();
 
 		void UpdateUniformBuffers( Device& _device, const size_t _index );

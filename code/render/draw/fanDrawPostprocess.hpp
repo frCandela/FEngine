@@ -1,8 +1,11 @@
 #pragma once
 
+#include "fanDisableWarnings.hpp"
+WARNINGS_GLM_PUSH()
+#include "glm/glm.hpp"
+WARNINGS_POP()
 #include "render/core/fanPipeline.hpp"
 #include "render/core/fanShader.hpp"
-#include "render/fanUniforms.hpp"
 #include "render/core/descriptors/fanDescriptorUniforms.hpp"
 #include "render/core/descriptors/fanDescriptorImages.hpp"
 #include "render/core/descriptors/fanDescriptorSampler.hpp"
@@ -11,6 +14,13 @@
 
 namespace fan
 {
+	//================================================================
+	//================================================================
+	struct UniformsPostprocess
+	{
+		glm::vec4 color = glm::vec4( 1, 1, 1, 1 );
+	};
+
 	//================================================================================================================================
 	//================================================================================================================================
 	struct DrawPostprocess
@@ -21,7 +31,7 @@ namespace fan
 		DescriptorImages	mDescriptorImage;
 		DescriptorUniforms	mDescriptorUniform;
 		Sampler				mSampler;
-		PostprocessUniforms	mUniforms;
+		UniformsPostprocess	mUniforms;
 		CommandBuffer		mCommandBuffers;
 		Buffer				mVertexBufferQuad;
  		

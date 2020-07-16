@@ -13,7 +13,7 @@ namespace fan
 		mSampler.Create( _device, 0, 1, VK_FILTER_NEAREST );
 		mDescriptorSampler.Create( _device, mSampler.mSampler );
 
-		mDescriptorTransform.AddDynamicUniformBinding( _device, _imagesCount, VK_SHADER_STAGE_VERTEX_BIT, mUniforms.mUidynamicUniformsVert.Size(), mUniforms.mUidynamicUniformsVert.Alignment() );
+		mDescriptorTransform.AddDynamicUniformBinding( _device, _imagesCount, VK_SHADER_STAGE_VERTEX_BIT, mUniforms.mDynamicUniforms.Size(), mUniforms.mDynamicUniforms.Alignment() );
 		mDescriptorTransform.Create( _device, _imagesCount );
 	}
 
@@ -34,7 +34,7 @@ namespace fan
 			mDescriptorTransform.mDescriptorSets[_indexFrame]
 		};
 		std::vector<uint32_t> dynamicOffsets = {
-			 _indexOffset * static_cast<uint32_t>( mUniforms.mUidynamicUniformsVert.Alignment() )
+			 _indexOffset * static_cast<uint32_t>( mUniforms.mDynamicUniforms.Alignment() )
 		};
 
 		vkCmdBindDescriptorSets(
@@ -65,11 +65,26 @@ namespace fan
 		return config;
 	}
 
-
 	//================================================================================================================================
 	//================================================================================================================================
 	void DrawUI::UpdateUniformBuffers( Device& _device, const size_t _index )
 	{
-		mDescriptorTransform.SetData( _device, 0, _index, &mUniforms.mUidynamicUniformsVert[0], mUniforms.mUidynamicUniformsVert.Alignment() * mUniforms.mUidynamicUniformsVert.Size(), 0 );
+		mDescriptorTransform.SetData( _device, 0, _index, &mUniforms.mDynamicUniforms[0], mUniforms.mDynamicUniforms.Alignment() * mUniforms.mDynamicUniforms.Size(), 0 );
+	}
+
+	//================================================================================================================================
+	// UiUniforms
+	//================================================================================================================================
+	void UniformsUI::Create( const VkDeviceSize _minUniformBufferOffsetAlignment )
+	{
+		// Calculate required alignment based on minimum device offset alignment
+		size_t minUboAlignment = (size_t)_minUniformBufferOffsetAlignment;
+		size_t dynamicAlignmentVert = sizeof( DynamicUniformUIVert );
+		if( minUboAlignment > 0 )
+		{
+			dynamicAlignmentVert = ( ( sizeof( DynamicUniformUIVert ) + minUboAlignment - 1 ) & ~( minUboAlignment - 1 ) );
+		}
+		mDynamicUniforms.SetAlignement( dynamicAlignmentVert );
+		mDynamicUniforms.Resize( 256 );
 	}
 }

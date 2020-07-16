@@ -43,7 +43,7 @@ namespace fan
 				if( meshRenderer.mesh.IsValid() )
 				{
 					// drawMesh data;
-					DrawMesh data;
+					RenderDataModel data;
 					data.mesh = *meshRenderer.mesh;
 					data.modelMatrix = transform.GetModelMatrix();
 					data.normalMatrix = transform.GetNormalMatrix();
@@ -87,7 +87,7 @@ namespace fan
 				const glm::vec2 imageRatio = textureSize / renderWorld.targetSize;
 				const glm::vec2 positionRatio = 2.f * transform.position / renderWorld.targetSize;
 
-				DrawUIMesh data;
+				RenderDataUIMesh data;
 				data.mesh = &renderer.uiMesh;
 				data.scale = transform.scale * imageRatio;
 				data.position = positionRatio - glm::vec2( 1, 1 );
@@ -122,7 +122,7 @@ namespace fan
 				const Transform& transform = *transformIt;
 				PointLight& light = *lightIt;
 
-				DrawPointLight pointLight;
+				RenderDataPointLight pointLight;
 				pointLight.position = glm::vec4( ToGLM( transform.GetPosition() ), 1.f );
 				pointLight.diffuse = light.diffuse.ToGLM();
 				pointLight.specular = light.specular.ToGLM();
@@ -159,7 +159,7 @@ namespace fan
 				const Transform& transform = *transformIt;
 				DirectionalLight& directionalLight = *lightIt;
 
-				DrawDirectionalLight light;
+				RenderDataDirectionalLight light;
 				light.direction = glm::vec4( ToGLM( transform.Forward() ), 1 );
 				light.ambiant = directionalLight.ambiant.ToGLM();
 				light.diffuse = directionalLight.diffuse.ToGLM();

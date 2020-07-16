@@ -13,13 +13,13 @@ namespace fan
 		mVertexBuffersLinesNDT.resize( _imagesCount );
 		mVertexBuffersTriangles.resize( _imagesCount );
 
-		mDescriptorLines.AddUniformBinding( _device, _imagesCount, VK_SHADER_STAGE_VERTEX_BIT, sizeof( DebugUniforms ) );
+		mDescriptorLines.AddUniformBinding( _device, _imagesCount, VK_SHADER_STAGE_VERTEX_BIT, sizeof( UniformsDebug ) );
 		mDescriptorLines.Create( _device, _imagesCount );
 
-		mDescriptorLinesNDT.AddUniformBinding( _device, _imagesCount, VK_SHADER_STAGE_VERTEX_BIT, sizeof( DebugUniforms ) );
+		mDescriptorLinesNDT.AddUniformBinding( _device, _imagesCount, VK_SHADER_STAGE_VERTEX_BIT, sizeof( UniformsDebug ) );
 		mDescriptorLinesNDT.Create( _device, _imagesCount );
 
-		mDescriptorTriangles.AddUniformBinding( _device, _imagesCount, VK_SHADER_STAGE_VERTEX_BIT, sizeof( DebugUniforms ) );
+		mDescriptorTriangles.AddUniformBinding( _device, _imagesCount, VK_SHADER_STAGE_VERTEX_BIT, sizeof( UniformsDebug ) );
 		mDescriptorTriangles.Create( _device, _imagesCount );
 	}
 
@@ -47,9 +47,9 @@ namespace fan
 	//================================================================================================================================
 	void DrawDebug::UpdateUniformBuffers( Device& _device, const size_t _index )
 	{
-		mDescriptorLines.SetData( _device, 0, _index, &mUniformsLines, sizeof( DebugUniforms ), 0 );
-		mDescriptorLinesNDT.SetData( _device, 0, _index, &mUniformsLinesNDT, sizeof( DebugUniforms ), 0 );
-		mDescriptorTriangles.SetData( _device, 0, _index, &mUniformsTriangles, sizeof( DebugUniforms ), 0 );
+		mDescriptorLines.SetData( _device, 0, _index, &mUniformsLines, sizeof( UniformsDebug ), 0 );
+		mDescriptorLinesNDT.SetData( _device, 0, _index, &mUniformsLinesNDT, sizeof( UniformsDebug ), 0 );
+		mDescriptorTriangles.SetData( _device, 0, _index, &mUniformsTriangles, sizeof( UniformsDebug ), 0 );
 	}
 
 	//================================================================================================================================

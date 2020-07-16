@@ -1,8 +1,13 @@
 #pragma once
 
+#include "fanDisableWarnings.hpp"
+WARNINGS_GLM_PUSH()
+#include "glm/glm.hpp"
+WARNINGS_POP()
+#include "render/fanRenderGlobal.hpp"
 #include "render/core/fanPipeline.hpp"
 #include "render/core/fanShader.hpp"
-#include "render/fanUniforms.hpp"
+#include "render/core/fanSampler.hpp"
 #include "render/core/descriptors/fanDescriptorUniforms.hpp"
 #include "render/core/descriptors/fanDescriptorImages.hpp"
 #include "render/core/descriptors/fanDescriptorSampler.hpp"
@@ -12,23 +17,107 @@ namespace fan
 {
 	class Mesh;
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//================================================================
+	//================================================================
+	struct UniformDirectionalLight
+	{
+		alignas( 16 ) glm::vec4 direction;
+		alignas( 16 ) glm::vec4 ambiant;
+		alignas( 16 ) glm::vec4 diffuse;
+		alignas( 16 ) glm::vec4 specular;
+	};
+
+	//================================================================
+	//================================================================
+	struct UniformPointLight
+	{
+		alignas( 16 ) glm::vec4		position;
+		alignas( 16 ) glm::vec4		diffuse;
+		alignas( 16 ) glm::vec4		specular;
+		alignas( 16 ) glm::vec4		ambiant;
+		alignas( 4 ) glm::float32	constant;
+		alignas( 4 ) glm::float32	linear;
+		alignas( 4 ) glm::float32	quadratic;
+		alignas( 4 ) glm::float32	_0;
+	};
+
+	//================================================================
+	//================================================================
+	struct UniformLights
+	{
+		UniformDirectionalLight dirLights[RenderGlobal::s_maximumNumDirectionalLight];
+		UniformPointLight		pointlights[RenderGlobal::s_maximumNumPointLights];
+		uint32_t				dirLightsNum;
+		uint32_t				pointLightNum;
+	};
+
+	//================================================================
+	//================================================================
+	struct DynamicUniformMatrices
+	{
+		glm::mat4 modelMat;
+		glm::mat4 normalMat;
+	};
+
+	//================================================================
+	//================================================================
+	struct UniformCameraPosition
+	{
+		glm::vec3 cameraPosition = glm::vec3( 0, 0, 0 );
+	};
+
+	//================================================================
+	//================================================================
+	struct UniformViewProj
+	{
+		glm::mat4 view;
+		glm::mat4 proj;
+	};
+
+	//================================================================
+	// material data for drawing a mesh
+	//================================================================
+	struct DynamicUniformsMaterial
+	{
+		glm::vec4  color = glm::vec4( 1 );
+		glm::int32 shininess;
+	};
+
+	//================================================================
+	// All uniforms data for the models drawing
+	//================================================================
+	struct UniformsModelDraw
+	{
+		void Create( const VkDeviceSize _minUniformBufferOffsetAlignment );
+
+		AlignedMemory<DynamicUniformsMaterial>	mDynamicUniformsMaterial;
+		AlignedMemory<DynamicUniformMatrices>	mDynamicUniformsMatrices;
+		UniformLights							mUniformsLights;
+		UniformViewProj							mUniformsProjView;
+		UniformCameraPosition					mUniformsCameraPosition;
+	};
+
+	//================================================================
+	// references a mesh that must be drawn on the screen
+	//================================================================
 	struct DrawData
 	{
-		Mesh* mesh;
-		uint32_t textureIndex;
+		Mesh*		mesh;
+		uint32_t	textureIndex;
 	};
 
 	//================================================================================================================================
+	// Models drawing data for the rendering engine
 	//================================================================================================================================
 	struct DrawModels
 	{
 		Pipeline				mPipeline;
 		Shader					mFragmentShader;
 		Shader					mVertexShader;
-		ForwardUniforms			mUniforms;
+		UniformsModelDraw		mUniforms;
 		DescriptorUniforms		mDescriptorUniforms;
+		DescriptorSampler		mDescriptorSampler;
+		Sampler					mSamplerTextures;
 		CommandBuffer			mCommandBuffers;
 		std::vector< DrawData >	mDrawData;
 		
@@ -36,6 +125,6 @@ namespace fan
 		void			Destroy( Device& _device );
 		void			BindDescriptors( VkCommandBuffer _commandBuffer, const size_t _indexFrame, const uint32_t _indexOffset );
 		void			UpdateUniformBuffers( Device& _device, const size_t _index );
-		PipelineConfig	GetPipelineConfig( DescriptorImages& _imagesDescriptor, DescriptorSampler& _samplerDescriptor ) const;
+		PipelineConfig	GetPipelineConfig( DescriptorImages& _imagesDescriptor ) const;
 	};
 }

@@ -73,13 +73,13 @@ namespace fan
 			}
 		}
 
-		LightsUniforms& lights = m_renderer.mDrawModels.mUniforms.m_lightUniforms;
+		UniformLights& lights = m_renderer.mDrawModels.mUniforms.mUniformsLights;
 		if ( ImGui::CollapsingHeader( "Directional lights : " ) )
 		{
 			ImGui::PushItemWidth( 150 );
 			for ( size_t lightIndex = 0; lightIndex < lights.dirLightsNum; lightIndex++ )
 			{
-				DirectionalLightUniform light = lights.dirLights[ lightIndex ];
+				UniformDirectionalLight light = lights.dirLights[ lightIndex ];
 				ImGui::DragFloat3( "dir ", &light.direction[ 0 ] );
 				ImGui::SameLine();
 				ImGui::ColorEdit3( "diffuse", &light.diffuse[ 0 ], ImGui::fanColorEditFlags );
@@ -91,7 +91,7 @@ namespace fan
 			ImGui::PushItemWidth( 150 );
 			for ( size_t lightIndex = 0; lightIndex < lights.pointLightNum; lightIndex++ )
 			{
-				PointLightUniform& light = lights.pointlights[ lightIndex ];
+				UniformPointLight& light = lights.pointlights[ lightIndex ];
 				ImGui::DragFloat3( "pos ##pos", &light.position[ 0 ] );
 				ImGui::SameLine();
 				ImGui::ColorEdit3( "diffuse", &light.diffuse[ 0 ], ImGui::fanColorEditFlags );

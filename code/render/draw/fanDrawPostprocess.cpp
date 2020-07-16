@@ -14,9 +14,9 @@ namespace fan
 		mSampler.Create( _device, 0, 0.f, VK_FILTER_NEAREST );
 		
 		mDescriptorUniform.Destroy( _device );
-		mDescriptorUniform.AddUniformBinding( _device, _imagesCount, VK_SHADER_STAGE_FRAGMENT_BIT, sizeof( PostprocessUniforms ) );
+		mDescriptorUniform.AddUniformBinding( _device, _imagesCount, VK_SHADER_STAGE_FRAGMENT_BIT, sizeof( UniformsPostprocess ) );
 		mDescriptorUniform.Create( _device, _imagesCount );
-		mDescriptorUniform.SetData( _device, 0, 0, &mUniforms, sizeof( PostprocessUniforms ), 0 );
+		mDescriptorUniform.SetData( _device, 0, 0, &mUniforms, sizeof( UniformsPostprocess ), 0 );
 		
 		mDescriptorImage.Create( _device, &_inputImageView.mImageView, 1, &mSampler.mSampler );
 	}
@@ -79,7 +79,7 @@ namespace fan
 	//================================================================================================================================
 	void DrawPostprocess::UpdateUniformBuffers( Device& _device, const size_t _index )
 	{
-		mDescriptorUniform.SetData( _device, 0, _index, &mUniforms, sizeof( PostprocessUniforms ), 0 );
+		mDescriptorUniform.SetData( _device, 0, _index, &mUniforms, sizeof( UniformsPostprocess ), 0 );
 	}
 
 	//================================================================================================================================

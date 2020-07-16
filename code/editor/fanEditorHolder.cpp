@@ -490,7 +490,7 @@ namespace fan
 		_world.Run<S_UpdateRenderWorldDirectionalLights>();
 
 		// particles mesh
-		DrawMesh particlesDrawData;
+		RenderDataModel particlesDrawData;
 		particlesDrawData.mesh = &renderWorld.particlesMesh;
 		particlesDrawData.modelMatrix = glm::mat4( 1.f );
 		particlesDrawData.normalMatrix = glm::mat4( 1.f );

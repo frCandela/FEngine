@@ -1,10 +1,13 @@
 #pragma once
 
 #include <vector>
+#include "fanDisableWarnings.hpp"
+WARNINGS_GLM_PUSH()
+#include "glm/glm.hpp"
+WARNINGS_POP()
 #include "render/core/fanPipeline.hpp"
 #include "render/core/fanShader.hpp"
 #include "render/core/fanBuffer.hpp"
-#include "render/fanUniforms.hpp"
 #include "render/core/descriptors/fanDescriptorUniforms.hpp"
 #include "render/core/descriptors/fanDescriptorImages.hpp"
 #include "render/core/descriptors/fanDescriptorSampler.hpp"
@@ -12,6 +15,16 @@
 
 namespace fan
 {
+	//================================================================
+	//================================================================
+	struct UniformsDebug
+	{
+		glm::mat4 model;
+		glm::mat4 view;
+		glm::mat4 proj;
+		glm::vec4 color;
+	};
+
 	//================================================================================================================================
 	// NDT = no depth test
 	//================================================================================================================================
@@ -26,9 +39,9 @@ namespace fan
 		Shader				mVertexShaderLinesNDT;
 		Shader				mFragmentShaderTriangles;
 		Shader				mVertexShaderTriangles;
-		DebugUniforms		mUniformsLines;
-		DebugUniforms		mUniformsLinesNDT;
-		DebugUniforms		mUniformsTriangles;
+		UniformsDebug		mUniformsLines;
+		UniformsDebug		mUniformsLinesNDT;
+		UniformsDebug		mUniformsTriangles;
 		DescriptorUniforms	mDescriptorLines;
 		DescriptorUniforms	mDescriptorLinesNDT;
 		DescriptorUniforms	mDescriptorTriangles;

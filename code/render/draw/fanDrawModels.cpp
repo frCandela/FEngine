@@ -9,17 +9,20 @@ namespace fan
 	//================================================================================================================================
 	void DrawModels::Create( Device& _device, uint32_t _imagesCount )
 	{
+		mSamplerTextures.Create( _device, 0, 8, VK_FILTER_LINEAR );
+		mDescriptorSampler.Create( _device, mSamplerTextures.mSampler );
+
 		const size_t initialDrawDataSize = 256;
 		mDrawData.reserve( initialDrawDataSize );
 		mUniforms.Create( _device.mDeviceProperties.limits.minUniformBufferOffsetAlignment );
-		mUniforms.m_dynamicUniformsVert.Resize( initialDrawDataSize );
-		mUniforms.m_dynamicUniformsMaterial.Resize( initialDrawDataSize );
+		mUniforms.mDynamicUniformsMatrices.Resize( initialDrawDataSize );
+		mUniforms.mDynamicUniformsMaterial.Resize( initialDrawDataSize );
 
-		mDescriptorUniforms.AddUniformBinding( _device, _imagesCount, VK_SHADER_STAGE_VERTEX_BIT, sizeof( VertUniforms ) );
-		mDescriptorUniforms.AddDynamicUniformBinding( _device, _imagesCount, VK_SHADER_STAGE_VERTEX_BIT, mUniforms.m_dynamicUniformsVert.Size(), mUniforms.m_dynamicUniformsVert.Alignment() );
-		mDescriptorUniforms.AddUniformBinding( _device, _imagesCount, VK_SHADER_STAGE_FRAGMENT_BIT, sizeof( FragUniforms ) );
-		mDescriptorUniforms.AddDynamicUniformBinding( _device, _imagesCount, VK_SHADER_STAGE_FRAGMENT_BIT, mUniforms.m_dynamicUniformsMaterial.Size(), mUniforms.m_dynamicUniformsMaterial.Alignment() );
-		mDescriptorUniforms.AddUniformBinding( _device, _imagesCount, VK_SHADER_STAGE_FRAGMENT_BIT, sizeof( LightsUniforms ) );
+		mDescriptorUniforms.AddUniformBinding( _device, _imagesCount, VK_SHADER_STAGE_VERTEX_BIT, sizeof( UniformViewProj ) );
+		mDescriptorUniforms.AddDynamicUniformBinding( _device, _imagesCount, VK_SHADER_STAGE_VERTEX_BIT, mUniforms.mDynamicUniformsMatrices.Size(), mUniforms.mDynamicUniformsMatrices.Alignment() );
+		mDescriptorUniforms.AddUniformBinding( _device, _imagesCount, VK_SHADER_STAGE_FRAGMENT_BIT, sizeof( UniformCameraPosition ) );
+		mDescriptorUniforms.AddDynamicUniformBinding( _device, _imagesCount, VK_SHADER_STAGE_FRAGMENT_BIT, mUniforms.mDynamicUniformsMaterial.Size(), mUniforms.mDynamicUniformsMaterial.Alignment() );
+		mDescriptorUniforms.AddUniformBinding( _device, _imagesCount, VK_SHADER_STAGE_FRAGMENT_BIT, sizeof( UniformLights ) );
 		mDescriptorUniforms.Create( _device, _imagesCount );
 	}
 
@@ -29,11 +32,13 @@ namespace fan
 	{
 		mPipeline.Destroy( _device );
 		mDescriptorUniforms.Destroy( _device );
+		mDescriptorSampler.Destroy( _device );
+		mSamplerTextures.Destroy( _device );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	PipelineConfig DrawModels::GetPipelineConfig( DescriptorImages& _imagesDescriptor, DescriptorSampler& _samplerDescriptor ) const
+	PipelineConfig DrawModels::GetPipelineConfig( DescriptorImages& _imagesDescriptor ) const
 	{
 		PipelineConfig config( mVertexShader, mFragmentShader );
 
@@ -42,7 +47,7 @@ namespace fan
 		config.descriptorSetLayouts = {
 			mDescriptorUniforms.mDescriptorSetLayout
 			, _imagesDescriptor.mDescriptorSetLayout
-			, _samplerDescriptor.mDescriptorSetLayout
+			, mDescriptorSampler.mDescriptorSetLayout
 		};
 
 		return config;
@@ -56,8 +61,8 @@ namespace fan
 			mDescriptorUniforms.mDescriptorSets[_indexFrame]
 		};
 		std::vector<uint32_t> dynamicOffsets = {
-			 _indexOffset * static_cast<uint32_t>( mUniforms.m_dynamicUniformsVert.Alignment() )
-			,_indexOffset* static_cast<uint32_t>( mUniforms.m_dynamicUniformsMaterial.Alignment() )
+			 _indexOffset * static_cast<uint32_t>( mUniforms.mDynamicUniformsMatrices.Alignment() )
+			,_indexOffset* static_cast<uint32_t>( mUniforms.mDynamicUniformsMaterial.Alignment() )
 		};
 		vkCmdBindDescriptorSets(
 			_commandBuffer,
@@ -75,10 +80,37 @@ namespace fan
 	//================================================================================================================================
 	void DrawModels::UpdateUniformBuffers( Device& _device, const size_t _index )
 	{
-		mDescriptorUniforms.SetData( _device, 0, _index, &mUniforms.m_vertUniforms, sizeof( VertUniforms ), 0 );
-		mDescriptorUniforms.SetData( _device, 1, _index, &mUniforms.m_dynamicUniformsVert[0], mUniforms.m_dynamicUniformsVert.Alignment() * mUniforms.m_dynamicUniformsVert.Size(), 0 );
-		mDescriptorUniforms.SetData( _device, 2, _index, &mUniforms.m_fragUniforms, sizeof( FragUniforms ), 0 );
-		mDescriptorUniforms.SetData( _device, 3, _index, &mUniforms.m_dynamicUniformsMaterial[0], mUniforms.m_dynamicUniformsMaterial.Alignment() * mUniforms.m_dynamicUniformsMaterial.Size(), 0 );
-		mDescriptorUniforms.SetData( _device, 4, _index, &mUniforms.m_lightUniforms, sizeof( LightsUniforms ), 0 );		
+		mDescriptorUniforms.SetData( _device, 0, _index, &mUniforms.mUniformsProjView, sizeof( UniformViewProj ), 0 );
+		mDescriptorUniforms.SetData( _device, 1, _index, &mUniforms.mDynamicUniformsMatrices[0], mUniforms.mDynamicUniformsMatrices.Alignment() * mUniforms.mDynamicUniformsMatrices.Size(), 0 );
+		mDescriptorUniforms.SetData( _device, 2, _index, &mUniforms.mUniformsCameraPosition, sizeof( UniformCameraPosition ), 0 );
+		mDescriptorUniforms.SetData( _device, 3, _index, &mUniforms.mDynamicUniformsMaterial[0], mUniforms.mDynamicUniformsMaterial.Alignment() * mUniforms.mDynamicUniformsMaterial.Size(), 0 );
+		mDescriptorUniforms.SetData( _device, 4, _index, &mUniforms.mUniformsLights, sizeof( UniformLights ), 0 );		
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void UniformsModelDraw::Create( const VkDeviceSize _minUniformBufferOffsetAlignment )
+	{
+		// Calculate required alignment based on minimum device offset alignment
+		size_t minUboAlignment = (size_t)_minUniformBufferOffsetAlignment;
+		size_t dynamicAlignmentVert = sizeof( DynamicUniformMatrices );
+		size_t dynamicAlignmentFrag = sizeof( DynamicUniformsMaterial );
+		if( minUboAlignment > 0 )
+		{
+			dynamicAlignmentVert = ( ( sizeof( DynamicUniformMatrices ) + minUboAlignment - 1 ) & ~( minUboAlignment - 1 ) );
+			dynamicAlignmentFrag = ( ( sizeof( DynamicUniformsMaterial ) + minUboAlignment - 1 ) & ~( minUboAlignment - 1 ) );
+		}
+
+		mDynamicUniformsMatrices.SetAlignement( dynamicAlignmentVert );
+		mDynamicUniformsMaterial.SetAlignement( dynamicAlignmentFrag );
+
+		mDynamicUniformsMatrices.Resize( 256 );
+		mDynamicUniformsMaterial.Resize( 256 );
+
+		for( int uniformIndex = 0; uniformIndex < mDynamicUniformsMaterial.Size(); uniformIndex++ )
+		{
+			mDynamicUniformsMaterial[uniformIndex].color = glm::vec4( 1 );
+			mDynamicUniformsMaterial[uniformIndex].shininess = 1;
+		}
 	}
 }
