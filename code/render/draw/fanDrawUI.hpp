@@ -14,6 +14,19 @@ WARNINGS_POP()
 
 namespace fan
 {
+	class UIMesh;
+
+	//================================================================
+	//================================================================
+	struct RenderDataUIMesh
+	{
+		UIMesh* mesh;
+		glm::vec2 position;
+		glm::vec2 scale;
+		glm::vec4 color;
+		uint32_t textureIndex;
+	};
+
 	//================================================================
 	//================================================================
 	struct DynamicUniformUIVert
@@ -34,7 +47,6 @@ namespace fan
 
 	//================================================================
 	//================================================================
-	class UIMesh;
 	struct UIDrawData
 	{
 		UIMesh* mesh;
@@ -64,6 +76,7 @@ namespace fan
 		void UpdateUniformBuffers( Device& _device, const size_t _index );
 		void RecordCommandBuffer( const size_t _index, RenderPass& _renderPass, FrameBuffer& _framebuffer, VkExtent2D _extent, DescriptorImages& _descriptorTextures );
 		void BindTexture( VkCommandBuffer _commandBuffer, const uint32_t _textureIndex, DescriptorSampler& _descriptorSampler, DescriptorImages& _descriptorTextures, VkPipelineLayout _pipelineLayout );
+		void SetUIDrawData( const std::vector<RenderDataUIMesh>& _drawData );
 		PipelineConfig	GetPipelineConfig( DescriptorImages& _descriptorImages ) const;
 	};
 }

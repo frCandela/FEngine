@@ -156,6 +156,79 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
+	void DrawModels::SetDrawData( Device& _device, const uint32_t _imagesCount, const std::vector<RenderDataModel>& _drawData )
+	{
+		if( _drawData.size() > mDrawData.capacity() )
+		{
+			Debug::Warning( "Resizing draw data arrays" );
+			vkDeviceWaitIdle( _device.mDevice );
+			const size_t newSize = 2 * _drawData.size();
+			mDrawData.reserve( newSize );
+			mUniforms.mDynamicUniformsMatrices.Resize( newSize );
+			mUniforms.mDynamicUniformsMaterial.Resize( newSize );
+			mDescriptorUniforms.ResizeDynamicUniformBinding( _device, _imagesCount, mUniforms.mDynamicUniformsMatrices.Size(), mUniforms.mDynamicUniformsMatrices.Alignment(), 1 );
+			mDescriptorUniforms.ResizeDynamicUniformBinding( _device, _imagesCount, mUniforms.mDynamicUniformsMaterial.Size(), mUniforms.mDynamicUniformsMaterial.Alignment(), 3 );
+			mDescriptorUniforms.UpdateDescriptorSets( _device, _imagesCount );
+		}
+
+		mDrawData.clear();
+		for( int dataIndex = 0; dataIndex < _drawData.size(); dataIndex++ )
+		{
+			const RenderDataModel& data = _drawData[dataIndex];
+
+			if( data.mesh != nullptr && !data.mesh->GetIndices().empty() )
+			{
+				// Transform
+				mUniforms.mDynamicUniformsMatrices[dataIndex].modelMat = data.modelMatrix;
+				mUniforms.mDynamicUniformsMatrices[dataIndex].normalMat = data.normalMatrix;
+
+				// material
+				mUniforms.mDynamicUniformsMaterial[dataIndex].color = data.color;
+				mUniforms.mDynamicUniformsMaterial[dataIndex].shininess = data.shininess;
+
+				// Mesh
+				mDrawData.push_back( { data.mesh, data.textureIndex } );
+			}
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void DrawModels::SetPointLights( const std::vector<RenderDataPointLight>& _lightData )
+	{
+		assert( _lightData.size() < RenderGlobal::s_maximumNumPointLights );
+		mUniforms.mUniformsLights.pointLightNum = (uint32_t)_lightData.size();
+		for( int i = 0; i < _lightData.size(); ++i )
+		{
+			const RenderDataPointLight& light = _lightData[i];
+			mUniforms.mUniformsLights.pointlights[i].position = light.position;
+			mUniforms.mUniformsLights.pointlights[i].diffuse = light.diffuse;
+			mUniforms.mUniformsLights.pointlights[i].specular = light.specular;
+			mUniforms.mUniformsLights.pointlights[i].ambiant = light.ambiant;
+			mUniforms.mUniformsLights.pointlights[i].constant = light.constant;
+			mUniforms.mUniformsLights.pointlights[i].linear = light.linear;
+			mUniforms.mUniformsLights.pointlights[i].quadratic = light.quadratic;
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void  DrawModels::SetDirectionalLights( const std::vector<RenderDataDirectionalLight>& _lightData )
+	{
+		assert( _lightData.size() < RenderGlobal::s_maximumNumDirectionalLight );
+		mUniforms.mUniformsLights.dirLightsNum = (uint32_t)_lightData.size();
+		for( int i = 0; i < _lightData.size(); ++i )
+		{
+			const RenderDataDirectionalLight& light = _lightData[i];
+			mUniforms.mUniformsLights.dirLights[i].direction = light.direction;
+			mUniforms.mUniformsLights.dirLights[i].ambiant = light.ambiant;
+			mUniforms.mUniformsLights.dirLights[i].diffuse = light.diffuse;
+			mUniforms.mUniformsLights.dirLights[i].specular = light.specular;
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
 	void  DrawModels::BindTexture( VkCommandBuffer _commandBuffer, const uint32_t _textureIndex, DescriptorSampler& _descriptorSampler, DescriptorImages& _descriptorTextures, VkPipelineLayout _pipelineLayout )
 	{
 		assert( _textureIndex < Texture::s_resourceManager.GetList().size() );

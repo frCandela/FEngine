@@ -31,44 +31,6 @@ namespace fan
 {
 	class Window;
 
-	struct RenderDataDirectionalLight
-	{
-		glm::vec4 direction;
-		glm::vec4 ambiant;
-		glm::vec4 diffuse;
-		glm::vec4 specular;
-	};
-
-	struct RenderDataPointLight
-	{
-		glm::vec4	 position;
-		glm::vec4	 diffuse;
-		glm::vec4	 specular;
-		glm::vec4	 ambiant;
-		glm::float32 constant;
-		glm::float32 linear;
-		glm::float32 quadratic;
-	};
-
-	struct RenderDataModel
-	{
-		Mesh* mesh;
-		glm::mat4 modelMatrix;
-		glm::mat4 normalMatrix;
-		glm::vec4 color;
-		uint32_t shininess;
-		uint32_t textureIndex;
-	};
-
-	struct RenderDataUIMesh
-	{
-		UIMesh* mesh;
-		glm::vec2 position;
-		glm::vec2 scale;
-		glm::vec4 color;
-		uint32_t textureIndex;
-	};	   
-
 	//================================================================================================================================
 	// Contains all the rendering data
 	//================================================================================================================================
@@ -92,6 +54,7 @@ namespace fan
 		void SetDrawData( const std::vector<RenderDataModel>& _drawData );
 		void SetUIDrawData( const std::vector<RenderDataUIMesh>& _drawData );
 		void SetDebugDrawData( const std::vector<DebugVertex>& _debugLines, const std::vector<DebugVertex>& _debugLinesNoDepthTest, const std::vector<DebugVertex>& _debugTriangles );
+
 
 		Window& mWindow;
 		Device& mDevice;

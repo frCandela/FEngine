@@ -308,190 +308,35 @@ namespace fan
 	//================================================================================================================================
 	void  Renderer::SetDirectionalLights( const std::vector<RenderDataDirectionalLight>& _lightData )
 	{
-		assert( _lightData.size() < RenderGlobal::s_maximumNumDirectionalLight );
-		mDrawModels.mUniforms.mUniformsLights.dirLightsNum = (uint32_t)_lightData.size();
-		for( int i = 0; i < _lightData.size(); ++i )
-		{
-			const RenderDataDirectionalLight& light = _lightData[i];
-			mDrawModels.mUniforms.mUniformsLights.dirLights[i].direction = light.direction;
-			mDrawModels.mUniforms.mUniformsLights.dirLights[i].ambiant = light.ambiant;
-			mDrawModels.mUniforms.mUniformsLights.dirLights[i].diffuse = light.diffuse;
-			mDrawModels.mUniforms.mUniformsLights.dirLights[i].specular = light.specular;
-		}
+		mDrawModels.SetDirectionalLights( _lightData );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void Renderer::SetPointLights( const std::vector<RenderDataPointLight>& _lightData )
 	{
-		assert( _lightData.size() < RenderGlobal::s_maximumNumPointLights );
-		mDrawModels.mUniforms.mUniformsLights.pointLightNum = (uint32_t)_lightData.size();
-		for ( int i = 0; i < _lightData.size(); ++i )
-		{
-			const RenderDataPointLight& light = _lightData[i];
-			mDrawModels.mUniforms.mUniformsLights.pointlights[i].position	= light.position;
-			mDrawModels.mUniforms.mUniformsLights.pointlights[i].diffuse	= light.diffuse;
-			mDrawModels.mUniforms.mUniformsLights.pointlights[i].specular	= light.specular;
-			mDrawModels.mUniforms.mUniformsLights.pointlights[i].ambiant	= light.ambiant;
-			mDrawModels.mUniforms.mUniformsLights.pointlights[i].constant	= light.constant;
-			mDrawModels.mUniforms.mUniformsLights.pointlights[i].linear	= light.linear;
-			mDrawModels.mUniforms.mUniformsLights.pointlights[i].quadratic = light.quadratic;
-		}
+		mDrawModels.SetPointLights( _lightData );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void Renderer::SetDrawData( const std::vector<RenderDataModel>& _drawData )
 	{
-		if ( _drawData.size() > mDrawModels.mDrawData.capacity() )
-		{
-			Debug::Warning( "Resizing draw data arrays" );
-			WaitIdle();
-			const size_t newSize = 2 * _drawData.size();
-			const uint32_t imagesCount = mWindow.mSwapchain.mImagesCount;
-			mDrawModels.mDrawData.reserve( newSize );
-			mDrawModels.mUniforms.mDynamicUniformsMatrices.Resize( newSize );
-			mDrawModels.mUniforms.mDynamicUniformsMaterial.Resize( newSize );
-			mDrawModels.mDescriptorUniforms.ResizeDynamicUniformBinding( mDevice, imagesCount, mDrawModels.mUniforms.mDynamicUniformsMatrices.Size(), mDrawModels.mUniforms.mDynamicUniformsMatrices.Alignment(), 1 );
-			mDrawModels.mDescriptorUniforms.ResizeDynamicUniformBinding( mDevice, imagesCount, mDrawModels.mUniforms.mDynamicUniformsMaterial.Size(), mDrawModels.mUniforms.mDynamicUniformsMaterial.Alignment(), 3 );
-			mDrawModels.mDescriptorUniforms.UpdateDescriptorSets( mDevice, imagesCount );
-		}
-
-		mDrawModels.mDrawData.clear();
-		for ( int dataIndex = 0; dataIndex < _drawData.size(); dataIndex++ )
-		{
-			const RenderDataModel& data = _drawData[ dataIndex ];
-
-			if ( data.mesh != nullptr && !data.mesh->GetIndices().empty() )
-			{
-				// Transform
-				mDrawModels.mUniforms.mDynamicUniformsMatrices[dataIndex].modelMat = data.modelMatrix;
-				mDrawModels.mUniforms.mDynamicUniformsMatrices[dataIndex].normalMat = data.normalMatrix;
-
-				// material
-				mDrawModels.mUniforms.mDynamicUniformsMaterial[ dataIndex ].color = data.color;
-				mDrawModels.mUniforms.mDynamicUniformsMaterial[ dataIndex ].shininess = data.shininess;
-
-				// Mesh
-				mDrawModels.mDrawData.push_back( { data.mesh, data.textureIndex } );
-			}
-		}
+		mDrawModels.SetDrawData( mDevice, mWindow.mSwapchain.mImagesCount,_drawData );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void Renderer::SetUIDrawData( const std::vector<RenderDataUIMesh>& _drawData )
 	{
-		mDrawUI.mDrawData.resize( _drawData.size() );
-		for ( int meshIndex = 0; meshIndex < _drawData.size(); meshIndex++ )
-		{
-			const RenderDataUIMesh& uiData = _drawData[ meshIndex ];
-
-			mDrawUI.mDrawData[ meshIndex ].mesh = uiData.mesh;
-			mDrawUI.mDrawData[ meshIndex ].textureIndex = uiData.textureIndex;
-			mDrawUI.mUniforms.mDynamicUniforms[meshIndex].position = uiData.position;
-			mDrawUI.mUniforms.mDynamicUniforms[meshIndex].scale = uiData.scale;
-			mDrawUI.mUniforms.mDynamicUniforms[meshIndex].color = uiData.color;
-		}
+		mDrawUI.SetUIDrawData( _drawData );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void Renderer::SetDebugDrawData( const std::vector<DebugVertex>& _debugLines, const std::vector<DebugVertex>& _debugLinesNoDepthTest, const std::vector<DebugVertex>& _debugTriangles )
 	{
-		mDrawDebug.mNumLines = (int)_debugLines.size();
-		mDrawDebug.mNumLinesNDT = (int)_debugLinesNoDepthTest.size();
-		mDrawDebug.mNumTriangles = (int)_debugTriangles.size();
-
-		const uint32_t currentFrame = mWindow.mSwapchain.mCurrentFrame;
-
-		SCOPED_PROFILE( update_buffer );
-		if( _debugLines.size() > 0 )
-		{
-			SCOPED_PROFILE( lines );
-			mDrawDebug.mVertexBuffersLines[currentFrame].Destroy( mDevice );	// TODO update instead of delete
-			const VkDeviceSize size = sizeof( DebugVertex ) * _debugLines.size();
-			mDrawDebug.mVertexBuffersLines[currentFrame].Create(
-				mDevice,
-				size,
-				VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
-				VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT
-			);
-
-			if( size > 0 )
-			{
-				Buffer stagingBuffer;
-				stagingBuffer.Create(
-					mDevice,
-					size,
-					VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-					VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
-				);
-				stagingBuffer.SetData( mDevice, _debugLines.data(), size );
-				VkCommandBuffer cmd = mDevice.BeginSingleTimeCommands();
-				stagingBuffer.CopyBufferTo( cmd, mDrawDebug.mVertexBuffersLines[currentFrame].mBuffer, size );
-				mDevice.EndSingleTimeCommands( cmd );
-				stagingBuffer.Destroy( mDevice );
-			}
-		}
-
-		if( _debugLinesNoDepthTest.size() > 0 )
-		{
-			SCOPED_PROFILE( lines_no_depth );
-			mDrawDebug.mVertexBuffersLinesNDT[currentFrame].Destroy( mDevice );
-			const VkDeviceSize size = sizeof( DebugVertex ) * _debugLinesNoDepthTest.size();
-			mDrawDebug.mVertexBuffersLinesNDT[currentFrame].Create(
-				mDevice,
-				size,
-				VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
-				VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT
-			);
-
-			if( size > 0 )
-			{
-				Buffer stagingBuffer;
-				stagingBuffer.Create(
-					mDevice,
-					size,
-					VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-					VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
-				);
-				stagingBuffer.SetData( mDevice, _debugLinesNoDepthTest.data(), size );
-				VkCommandBuffer cmd = mDevice.BeginSingleTimeCommands();
-				stagingBuffer.CopyBufferTo( cmd, mDrawDebug.mVertexBuffersLinesNDT[currentFrame].mBuffer, size );
-				mDevice.EndSingleTimeCommands( cmd );
-				stagingBuffer.Destroy( mDevice );
-			}
-		}
-
-		if( _debugTriangles.size() > 0 )
-		{
-			SCOPED_PROFILE( triangles );
-			mDrawDebug.mVertexBuffersTriangles[currentFrame].Destroy( mDevice );
-			const VkDeviceSize size = sizeof( DebugVertex ) * _debugTriangles.size();
-			mDrawDebug.mVertexBuffersTriangles[currentFrame].Create(
-				mDevice,
-				size,
-				VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
-				VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT
-			);
-
-			if( size > 0 )
-			{
-				Buffer stagingBuffer;
-				stagingBuffer.Create(
-					mDevice,
-					size,
-					VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-					VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
-				);
-				stagingBuffer.SetData( mDevice, _debugTriangles.data(), size );
-				VkCommandBuffer cmd = mDevice.BeginSingleTimeCommands();
-				stagingBuffer.CopyBufferTo( cmd, mDrawDebug.mVertexBuffersTriangles[currentFrame].mBuffer, size );
-				mDevice.EndSingleTimeCommands( cmd );
-				stagingBuffer.Destroy( mDevice );
-			}
-		}
+		mDrawDebug.SetDebugDrawData( mWindow.mSwapchain.mCurrentFrame, mDevice, _debugLines, _debugLinesNoDepthTest, _debugTriangles );
 	}
 
 	//================================================================================================================================

@@ -136,6 +136,23 @@ namespace fan
 	}
 
 	//================================================================================================================================
+	//================================================================================================================================
+	void DrawUI::SetUIDrawData( const std::vector<RenderDataUIMesh>& _drawData )
+	{
+		mDrawData.resize( _drawData.size() );
+		for( int meshIndex = 0; meshIndex < _drawData.size(); meshIndex++ )
+		{
+			const RenderDataUIMesh& uiData = _drawData[meshIndex];
+
+			mDrawData[meshIndex].mesh = uiData.mesh;
+			mDrawData[meshIndex].textureIndex = uiData.textureIndex;
+			mUniforms.mDynamicUniforms[meshIndex].position = uiData.position;
+			mUniforms.mDynamicUniforms[meshIndex].scale = uiData.scale;
+			mUniforms.mDynamicUniforms[meshIndex].color = uiData.color;
+		}
+	}
+
+	//================================================================================================================================
 	// UiUniforms
 	//================================================================================================================================
 	void UniformsUI::Create( const VkDeviceSize _minUniformBufferOffsetAlignment )

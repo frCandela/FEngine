@@ -171,4 +171,97 @@ namespace fan
 			}
 		}
 	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void DrawDebug::SetDebugDrawData( const uint32_t _index, Device& _device, const std::vector<DebugVertex>& _debugLines, const std::vector<DebugVertex>& _debugLinesNoDepthTest, const std::vector<DebugVertex>& _debugTriangles )
+	{
+		mNumLines = (int)_debugLines.size();
+		mNumLinesNDT = (int)_debugLinesNoDepthTest.size();
+		mNumTriangles = (int)_debugTriangles.size();		
+
+		if( _debugLines.size() > 0 )
+		{
+			mVertexBuffersLines[_index].Destroy( _device );	// TODO update instead of delete
+			const VkDeviceSize size = sizeof( DebugVertex ) * _debugLines.size();
+			mVertexBuffersLines[_index].Create(
+				_device,
+				size,
+				VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+				VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT
+			);
+
+			if( size > 0 )
+			{
+				Buffer stagingBuffer;
+				stagingBuffer.Create(
+					_device,
+					size,
+					VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+					VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
+				);
+				stagingBuffer.SetData( _device, _debugLines.data(), size );
+				VkCommandBuffer cmd = _device.BeginSingleTimeCommands();
+				stagingBuffer.CopyBufferTo( cmd, mVertexBuffersLines[_index].mBuffer, size );
+				_device.EndSingleTimeCommands( cmd );
+				stagingBuffer.Destroy( _device );
+			}
+		}
+
+		if( _debugLinesNoDepthTest.size() > 0 )
+		{
+			mVertexBuffersLinesNDT[_index].Destroy( _device );
+			const VkDeviceSize size = sizeof( DebugVertex ) * _debugLinesNoDepthTest.size();
+			mVertexBuffersLinesNDT[_index].Create(
+				_device,
+				size,
+				VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+				VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT
+			);
+
+			if( size > 0 )
+			{
+				Buffer stagingBuffer;
+				stagingBuffer.Create(
+					_device,
+					size,
+					VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+					VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
+				);
+				stagingBuffer.SetData( _device, _debugLinesNoDepthTest.data(), size );
+				VkCommandBuffer cmd = _device.BeginSingleTimeCommands();
+				stagingBuffer.CopyBufferTo( cmd, mVertexBuffersLinesNDT[_index].mBuffer, size );
+				_device.EndSingleTimeCommands( cmd );
+				stagingBuffer.Destroy( _device );
+			}
+		}
+
+		if( _debugTriangles.size() > 0 )
+		{
+			mVertexBuffersTriangles[_index].Destroy( _device );
+			const VkDeviceSize size = sizeof( DebugVertex ) * _debugTriangles.size();
+			mVertexBuffersTriangles[_index].Create(
+				_device,
+				size,
+				VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+				VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT
+			);
+
+			if( size > 0 )
+			{
+				Buffer stagingBuffer;
+				stagingBuffer.Create(
+					_device,
+					size,
+					VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+					VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
+				);
+				stagingBuffer.SetData( _device, _debugTriangles.data(), size );
+				VkCommandBuffer cmd = _device.BeginSingleTimeCommands();
+				stagingBuffer.CopyBufferTo( cmd, mVertexBuffersTriangles[_index].mBuffer, size );
+				_device.EndSingleTimeCommands( cmd );
+				stagingBuffer.Destroy( _device );
+			}
+		}
+	}
 }

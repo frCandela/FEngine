@@ -19,6 +19,41 @@ namespace fan
 
 	//================================================================
 	//================================================================
+	struct RenderDataModel
+	{
+		Mesh* mesh;
+		glm::mat4 modelMatrix;
+		glm::mat4 normalMatrix;
+		glm::vec4 color;
+		uint32_t shininess;
+		uint32_t textureIndex;
+	};
+
+	//================================================================
+	//================================================================
+	struct RenderDataDirectionalLight
+	{
+		glm::vec4 direction;
+		glm::vec4 ambiant;
+		glm::vec4 diffuse;
+		glm::vec4 specular;
+	};
+
+	//================================================================
+	//================================================================
+	struct RenderDataPointLight
+	{
+		glm::vec4	 position;
+		glm::vec4	 diffuse;
+		glm::vec4	 specular;
+		glm::vec4	 ambiant;
+		glm::float32 constant;
+		glm::float32 linear;
+		glm::float32 quadratic;
+	};
+
+	//================================================================
+	//================================================================
 	struct UniformDirectionalLight
 	{
 		alignas( 16 ) glm::vec4 direction;
@@ -131,6 +166,9 @@ namespace fan
 		void UpdateUniformBuffers( Device& _device, const size_t _index );
 		void RecordCommandBuffer( const size_t _index, RenderPass& _renderPass, FrameBuffer& _framebuffer, VkExtent2D _extent, DescriptorImages& _descriptorTextures );
 		void BindTexture( VkCommandBuffer _commandBuffer, const uint32_t _textureIndex, DescriptorSampler& _descriptorSampler, DescriptorImages& _descriptorTextures, VkPipelineLayout _pipelineLayout );
+		void SetDrawData( Device& _device, const uint32_t _imagesCount, const std::vector<RenderDataModel>& _drawData );
+		void SetPointLights( const std::vector<RenderDataPointLight>& _lightData );
+		void SetDirectionalLights( const std::vector<RenderDataDirectionalLight>& _lightData );
 		PipelineConfig	GetPipelineConfig( DescriptorImages& _imagesDescriptor ) const;
 	};
 }

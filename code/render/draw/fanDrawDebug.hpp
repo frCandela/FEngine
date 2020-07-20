@@ -12,6 +12,7 @@ WARNINGS_POP()
 #include "render/core/descriptors/fanDescriptorImages.hpp"
 #include "render/core/descriptors/fanDescriptorSampler.hpp"
 #include "render/core/fanCommandBuffer.hpp"
+#include "render/fanVertex.hpp"
 
 namespace fan
 {
@@ -65,6 +66,8 @@ namespace fan
 		void BindDescriptorsTriangles( VkCommandBuffer _commandBuffer, const size_t _index );
 		bool HasNothingToDraw() const { return mNumLines == 0 && mNumLinesNDT == 0 && mNumTriangles == 0; }
 		void RecordCommandBuffer( const size_t _index, RenderPass& _renderPass, FrameBuffer& _framebuffer, VkExtent2D _extent );
+		void SetDebugDrawData( const uint32_t _index, Device& _device, const std::vector<DebugVertex>& _debugLines, const std::vector<DebugVertex>& _debugLinesNoDepthTest, const std::vector<DebugVertex>& _debugTriangles );
+
 		PipelineConfig		GetPipelineConfigLines() const;
 		PipelineConfig		GetPipelineConfigLinesNDT() const;
 		PipelineConfig		GetPipelineConfigTriangles() const;
