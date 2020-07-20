@@ -27,6 +27,9 @@ namespace fan
 		glm::vec2 translate;
 	};
 
+	struct RenderPass;
+	struct FrameBuffer;
+
 	//================================================================================================================================
 	// imgui backend
 	//================================================================================================================================
@@ -55,6 +58,7 @@ namespace fan
 		void DrawFrame( VkCommandBuffer commandBuffer, const size_t _index );
 		void ReloadIcons( Device& _device );
 		void UpdateGameImageDescriptor( Device& _device, ImageView& _gameImageView );
+		void RecordCommandBuffer( const size_t _index, Device& _device, RenderPass& _renderPass, FrameBuffer& _framebuffer );
 
 		static void			SetClipboardText( void* _userData, const char* _text ) { glfwSetClipboardString( (GLFWwindow*)_userData, _text ); }
 		static const char*	GetClipboardText( void* _userData ) { return glfwGetClipboardString( (GLFWwindow*)_userData ); }

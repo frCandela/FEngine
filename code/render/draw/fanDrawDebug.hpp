@@ -25,6 +25,9 @@ namespace fan
 		glm::vec4 color;
 	};
 
+	struct FrameBuffer;
+	struct RenderPass;
+
 	//================================================================================================================================
 	// NDT = no depth test
 	//================================================================================================================================
@@ -54,13 +57,14 @@ namespace fan
 		int mNumLinesNDT = 0;
 		int mNumTriangles = 0;
 
-		void				Create( Device& _device, uint32_t _imagesCount );
-		void				Destroy( Device& _device );
-		void				UpdateUniformBuffers( Device& _device, const size_t _index );
-		void				BindDescriptorsLines( VkCommandBuffer _commandBuffer, const size_t _index );
-		void				BindDescriptorsLinesNDT( VkCommandBuffer _commandBuffer, const size_t _index );
-		void				BindDescriptorsTriangles( VkCommandBuffer _commandBuffer, const size_t _index );
-		bool				HasNothingToDraw() const { return mNumLines == 0 && mNumLinesNDT == 0 && mNumTriangles == 0; }
+		void Create( Device& _device, uint32_t _imagesCount );
+		void Destroy( Device& _device );
+		void UpdateUniformBuffers( Device& _device, const size_t _index );
+		void BindDescriptorsLines( VkCommandBuffer _commandBuffer, const size_t _index );
+		void BindDescriptorsLinesNDT( VkCommandBuffer _commandBuffer, const size_t _index );
+		void BindDescriptorsTriangles( VkCommandBuffer _commandBuffer, const size_t _index );
+		bool HasNothingToDraw() const { return mNumLines == 0 && mNumLinesNDT == 0 && mNumTriangles == 0; }
+		void RecordCommandBuffer( const size_t _index, RenderPass& _renderPass, FrameBuffer& _framebuffer, VkExtent2D _extent );
 		PipelineConfig		GetPipelineConfigLines() const;
 		PipelineConfig		GetPipelineConfigLinesNDT() const;
 		PipelineConfig		GetPipelineConfigTriangles() const;

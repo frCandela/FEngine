@@ -106,6 +106,10 @@ namespace fan
 		uint32_t	textureIndex;
 	};
 
+	struct RenderPass;
+	struct FrameBuffer;
+	struct DescriptorImages;
+
 	//================================================================================================================================
 	// Models drawing data for the rendering engine
 	//================================================================================================================================
@@ -121,10 +125,12 @@ namespace fan
 		CommandBuffer			mCommandBuffers;
 		std::vector< DrawData >	mDrawData;
 		
-		void			Create( Device& _device, uint32_t _imagesCount );
-		void			Destroy( Device& _device );
-		void			BindDescriptors( VkCommandBuffer _commandBuffer, const size_t _indexFrame, const uint32_t _indexOffset );
-		void			UpdateUniformBuffers( Device& _device, const size_t _index );
+		void Create( Device& _device, uint32_t _imagesCount );
+		void Destroy( Device& _device );
+		void BindDescriptors( VkCommandBuffer _commandBuffer, const size_t _indexFrame, const uint32_t _indexOffset );
+		void UpdateUniformBuffers( Device& _device, const size_t _index );
+		void RecordCommandBuffer( const size_t _index, RenderPass& _renderPass, FrameBuffer& _framebuffer, VkExtent2D _extent, DescriptorImages& _descriptorTextures );
+		void BindTexture( VkCommandBuffer _commandBuffer, const uint32_t _textureIndex, DescriptorSampler& _descriptorSampler, DescriptorImages& _descriptorTextures, VkPipelineLayout _pipelineLayout );
 		PipelineConfig	GetPipelineConfig( DescriptorImages& _imagesDescriptor ) const;
 	};
 }

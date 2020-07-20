@@ -2,6 +2,8 @@
 
 #include "core/fanDebug.hpp"
 #include "render/fanVertex.hpp"
+#include "render/core/fanRenderPass.hpp"
+#include "render/core/fanFrameBuffer.hpp"
 
 namespace fan
 {
@@ -113,5 +115,32 @@ namespace fan
 		stagingBuffer.CopyBufferTo( cmd, mVertexBufferQuad.mBuffer, size );
 		_device.EndSingleTimeCommands( cmd );
 		stagingBuffer.Destroy( _device );
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void DrawPostprocess::RecordCommandBuffer( const size_t _index, RenderPass& _renderPass, FrameBuffer& _framebuffer, VkExtent2D _extent )
+	{
+		VkCommandBuffer commandBuffer = mCommandBuffers.mBuffers[_index];
+		VkCommandBufferInheritanceInfo commandBufferInheritanceInfo = CommandBuffer::GetInheritanceInfo( _renderPass.mRenderPass, _framebuffer.mFrameBuffers[_index] );
+		VkCommandBufferBeginInfo commandBufferBeginInfo = CommandBuffer::GetBeginInfo( &commandBufferInheritanceInfo );
+
+		if( vkBeginCommandBuffer( commandBuffer, &commandBufferBeginInfo ) == VK_SUCCESS )
+		{
+			mPipeline.Bind( commandBuffer, _extent );
+			BindDescriptors( commandBuffer, _index );
+			VkBuffer vertexBuffers[] = { mVertexBufferQuad.mBuffer };
+			VkDeviceSize offsets[] = { 0 };
+			vkCmdBindVertexBuffers( commandBuffer, 0, 1, vertexBuffers, offsets );
+			vkCmdDraw( commandBuffer, static_cast<uint32_t>( 4 ), 1, 0, 0 );
+			if( vkEndCommandBuffer( commandBuffer ) != VK_SUCCESS )
+			{
+				Debug::Get() << Debug::Severity::error << "Could not record command buffer " << commandBuffer << "." << Debug::Endl();
+			}
+		}
+		else
+		{
+			Debug::Get() << Debug::Severity::error << "Could not record command buffer " << commandBuffer << "." << Debug::Endl();
+		}
 	}
 }

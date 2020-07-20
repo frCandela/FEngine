@@ -132,25 +132,19 @@ namespace fan
 		// frame buffers swapchain 
 		FrameBuffer mFramebuffersSwapchain;
 
-		void BindTexture( VkCommandBuffer _commandBuffer, const uint32_t _textureIndex, DescriptorSampler* _samplerDescriptor, VkPipelineLayout _pipelineLayout );
-		void RecordCommandBufferModels( const size_t _index );
-		void RecordCommandBufferPostprocess( const size_t _index );
-		void RecordCommandBufferImgui( const size_t _index );
-		void RecordCommandBufferUI( const size_t _index );
-		void RecordCommandBufferDebug( const size_t _index );
 		void RecordPrimaryCommandBuffer( const size_t _index );
 		void RecordAllCommandBuffers();
 
 		void CreateCommandBuffers();
 		void CreateFramebuffers( const VkExtent2D _extent );
-		bool CreateRenderPasses();
-		bool CreateTextureDescriptor();
+		void CreateRenderPasses();
+		void CreateTextureDescriptor();
 		void CreateShaders();
 		void CreatePipelines();
 		void DestroyShaders();
 		void DestroyPipelines();
 
 		void UpdateUniformBuffers( Device& _device, const size_t _index );
-		bool SubmitCommandBuffers();
+		void SubmitCommandBuffers();
 	};
 }

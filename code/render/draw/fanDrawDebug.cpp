@@ -2,6 +2,8 @@
 
 #include "core/fanDebug.hpp"
 #include "render/fanVertex.hpp"
+#include "render/core/fanRenderPass.hpp"
+#include "render/core/fanFrameBuffer.hpp"
 
 namespace fan
 {
@@ -119,5 +121,54 @@ namespace fan
 		config.rasterizationStateCreateInfo.cullMode = VK_CULL_MODE_NONE;
 
 		return config;
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void DrawDebug::RecordCommandBuffer( const size_t _index, RenderPass& _renderPass, FrameBuffer& _framebuffer, VkExtent2D _extent )
+	{		
+		if( !HasNothingToDraw() )
+		{
+			VkCommandBuffer commandBuffer = mCommandBuffers.mBuffers[_index];
+			VkCommandBufferInheritanceInfo commandBufferInheritanceInfo = CommandBuffer::GetInheritanceInfo( _renderPass.mRenderPass, _framebuffer.mFrameBuffers[_index] );
+			VkCommandBufferBeginInfo commandBufferBeginInfo = CommandBuffer::GetBeginInfo( &commandBufferInheritanceInfo );
+
+			if( vkBeginCommandBuffer( commandBuffer, &commandBufferBeginInfo ) == VK_SUCCESS )
+			{
+				VkDeviceSize offsets[] = { 0 };
+				if( mNumLines > 0 )
+				{
+					mPipelineLines.Bind( commandBuffer, _extent );
+					BindDescriptorsLines( commandBuffer, _index );
+					VkBuffer vertexBuffers[] = { mVertexBuffersLines[_index].mBuffer };
+					vkCmdBindVertexBuffers( commandBuffer, 0, 1, vertexBuffers, offsets );
+					vkCmdDraw( commandBuffer, static_cast<uint32_t>( mNumLines ), 1, 0, 0 );
+				}
+				if( mNumLinesNDT > 0 )
+				{
+					mPipelineLinesNDT.Bind( commandBuffer, _extent );
+					BindDescriptorsLinesNDT( commandBuffer, _index );
+					VkBuffer vertexBuffers[] = { mVertexBuffersLinesNDT[_index].mBuffer };
+					vkCmdBindVertexBuffers( commandBuffer, 0, 1, vertexBuffers, offsets );
+					vkCmdDraw( commandBuffer, static_cast<uint32_t>( mNumLinesNDT ), 1, 0, 0 );
+				}
+				if( mNumTriangles > 0 )
+				{
+					mPipelineTriangles.Bind( commandBuffer, _extent );
+					BindDescriptorsTriangles( commandBuffer, _index );
+					VkBuffer vertexBuffers[] = { mVertexBuffersTriangles[_index].mBuffer };
+					vkCmdBindVertexBuffers( commandBuffer, 0, 1, vertexBuffers, offsets );
+					vkCmdDraw( commandBuffer, static_cast<uint32_t>( mNumTriangles ), 1, 0, 0 );
+				}
+				if( vkEndCommandBuffer( commandBuffer ) != VK_SUCCESS )
+				{
+					Debug::Get() << Debug::Severity::error << "Could not record command buffer " << _index << "." << Debug::Endl();
+				}
+			}
+			else
+			{
+				Debug::Get() << Debug::Severity::error << "Could not record command buffer " << _index << "." << Debug::Endl();
+			}
+		}
 	}
 }

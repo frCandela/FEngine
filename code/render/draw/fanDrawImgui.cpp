@@ -10,6 +10,8 @@
 #include "render/core/fanBuffer.hpp"
 #include "render/core/fanTexture.hpp"
 #include "render/core/fanImageView.hpp"
+#include "render/core/fanFrameBuffer.hpp"
+#include "render/core/fanRenderPass.hpp"
 
 namespace fan
 {
@@ -241,6 +243,31 @@ namespace fan
 		io.SetClipboardTextFn = SetClipboardText;
 		io.GetClipboardTextFn = GetClipboardText;
 		io.ClipboardUserData = _window;
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void DrawImgui::RecordCommandBuffer( const size_t _index, Device& _device, RenderPass& _renderPass, FrameBuffer& _framebuffer )
+	{		
+		UpdateBuffer( _device, _index );
+
+		VkCommandBuffer commandBuffer = mCommandBuffers.mBuffers[_index];
+		VkCommandBufferInheritanceInfo commandBufferInheritanceInfo = CommandBuffer::GetInheritanceInfo( _renderPass.mRenderPass, _framebuffer.mFrameBuffers[_index] );
+		VkCommandBufferBeginInfo commandBufferBeginInfo = CommandBuffer::GetBeginInfo( &commandBufferInheritanceInfo );
+
+		if( vkBeginCommandBuffer( commandBuffer, &commandBufferBeginInfo ) == VK_SUCCESS )
+		{
+			DrawFrame( commandBuffer, _index );
+
+			if( vkEndCommandBuffer( commandBuffer ) != VK_SUCCESS )
+			{
+				Debug::Get() << Debug::Severity::error << "Could not record command buffer " << _index << "." << Debug::Endl();
+			}
+		}
+		else
+		{
+			Debug::Get() << Debug::Severity::error << "Could not record command buffer " << _index << "." << Debug::Endl();
+		}
 	}
 
 	//================================================================================================================================

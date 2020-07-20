@@ -2,6 +2,11 @@
 
 #include "core/fanDebug.hpp"
 #include "render/fanVertex.hpp"
+#include "render/fanMesh.hpp"
+#include "render/core/fanRenderPass.hpp"
+#include "render/core/fanFrameBuffer.hpp"
+#include "render/core/fanTexture.hpp"
+#include "render/core/descriptors/fanDescriptorImages.hpp"
 
 namespace fan
 {
@@ -112,5 +117,63 @@ namespace fan
 			mDynamicUniformsMaterial[uniformIndex].color = glm::vec4( 1 );
 			mDynamicUniformsMaterial[uniformIndex].shininess = 1;
 		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void DrawModels::RecordCommandBuffer( const size_t _index, RenderPass& _renderPass, FrameBuffer& _framebuffer, VkExtent2D _extent, DescriptorImages& _descriptorTextures )
+	{		
+		VkCommandBuffer commandBuffer = mCommandBuffers.mBuffers[_index];
+		VkCommandBufferInheritanceInfo commandBufferInheritanceInfo = CommandBuffer::GetInheritanceInfo( _renderPass.mRenderPass, _framebuffer.mFrameBuffers[_index] );
+		VkCommandBufferBeginInfo commandBufferBeginInfo = CommandBuffer::GetBeginInfo( &commandBufferInheritanceInfo );
+
+		if( vkBeginCommandBuffer( commandBuffer, &commandBufferBeginInfo ) == VK_SUCCESS )
+		{
+			mPipeline.Bind( commandBuffer, _extent );
+
+			for( uint32_t meshIndex = 0; meshIndex < mDrawData.size(); meshIndex++ )
+			{
+				DrawData& drawData = mDrawData[meshIndex];
+				BindTexture( commandBuffer, drawData.textureIndex, mDescriptorSampler, _descriptorTextures, mPipeline.mPipelineLayout );
+				BindDescriptors( commandBuffer, _index, meshIndex );
+				VkDeviceSize offsets[] = { 0 };
+				VkBuffer vertexBuffers[] = { drawData.mesh->GetVertexBuffer().mBuffer };
+				vkCmdBindVertexBuffers( commandBuffer, 0, 1, vertexBuffers, offsets );
+				vkCmdBindIndexBuffer( commandBuffer, drawData.mesh->GetIndexBuffer().mBuffer, 0, VK_INDEX_TYPE_UINT32 );
+				vkCmdDrawIndexed( commandBuffer, static_cast<uint32_t>( drawData.mesh->GetIndices().size() ), 1, 0, 0, 0 );
+			}
+
+			if( vkEndCommandBuffer( commandBuffer ) != VK_SUCCESS )
+			{
+				Debug::Get() << Debug::Severity::error << "Could not record command buffer " << _index << "." << Debug::Endl();
+			}
+		}
+		else
+		{
+			Debug::Get() << Debug::Severity::error << "Could not record command buffer " << _index << "." << Debug::Endl();
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void  DrawModels::BindTexture( VkCommandBuffer _commandBuffer, const uint32_t _textureIndex, DescriptorSampler& _descriptorSampler, DescriptorImages& _descriptorTextures, VkPipelineLayout _pipelineLayout )
+	{
+		assert( _textureIndex < Texture::s_resourceManager.GetList().size() );
+
+		std::vector<VkDescriptorSet> descriptors = {
+			 _descriptorTextures.mDescriptorSets[_textureIndex]
+			 , _descriptorSampler.mDescriptorSet
+		};
+
+		vkCmdBindDescriptorSets(
+			_commandBuffer,
+			VK_PIPELINE_BIND_POINT_GRAPHICS,
+			_pipelineLayout,
+			1,
+			static_cast<uint32_t>( descriptors.size() ),
+			descriptors.data(),
+			0,
+			nullptr
+		);
 	}
 }

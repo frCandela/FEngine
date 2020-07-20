@@ -117,18 +117,18 @@ namespace fan
 	//================================================================================================================================	
 	void Renderer::DestroyShaders()
 	{
-		mDrawDebug.mVertexShaderLines				.Destroy( mDevice );
-		mDrawDebug.mFragmentShaderLines				.Destroy( mDevice );
+		mDrawDebug.mVertexShaderLines		.Destroy( mDevice );
+		mDrawDebug.mFragmentShaderLines		.Destroy( mDevice );
 		mDrawDebug.mVertexShaderLinesNDT	.Destroy( mDevice );
 		mDrawDebug.mFragmentShaderLinesNDT	.Destroy( mDevice );
-		mDrawDebug.mVertexShaderTriangles			.Destroy( mDevice );
-		mDrawDebug.mFragmentShaderTriangles			.Destroy( mDevice );
-		mDrawModels.mVertexShader	.Destroy( mDevice );
-		mDrawModels.mFragmentShader	.Destroy( mDevice );
-		mDrawUI.mVertexShader						.Destroy( mDevice );
-		mDrawUI.mFragmentShader						.Destroy( mDevice );
-		mDrawPostprocess.mVertexShader						.Destroy( mDevice );
-		mDrawPostprocess.mFragmentShader						.Destroy( mDevice );
+		mDrawDebug.mVertexShaderTriangles	.Destroy( mDevice );
+		mDrawDebug.mFragmentShaderTriangles	.Destroy( mDevice );
+		mDrawModels.mVertexShader			.Destroy( mDevice );
+		mDrawModels.mFragmentShader			.Destroy( mDevice );
+		mDrawUI.mVertexShader				.Destroy( mDevice );
+		mDrawUI.mFragmentShader				.Destroy( mDevice );
+		mDrawPostprocess.mVertexShader		.Destroy( mDevice );
+		mDrawPostprocess.mFragmentShader	.Destroy( mDevice );
 	}
 
 	//================================================================================================================================
@@ -142,12 +142,12 @@ namespace fan
 		const PipelineConfig modelsPipelineConfig = mDrawModels.GetPipelineConfig( mDescriptorTextures );
 		const PipelineConfig uiPipelineConfig = mDrawUI.GetPipelineConfig( mDescriptorTextures );
 
-		mDrawDebug.mPipelineLines.Create( mDevice, debugLinesPipelineConfig, mGameExtent, mRenderPassGame.mRenderPass );
-		mDrawDebug.mPipelineLinesNDT.Create( mDevice, debugLinesNoDepthTestPipelineConfig, mGameExtent, mRenderPassGame.mRenderPass );
-		mDrawDebug.mPipelineTriangles.Create( mDevice, debugTrianglesPipelineConfig, mGameExtent, mRenderPassGame.mRenderPass );
-		mDrawModels.mPipeline.Create( mDevice, modelsPipelineConfig, mGameExtent, mRenderPassGame.mRenderPass );
-		mDrawUI.mPipeline.Create( mDevice, uiPipelineConfig, mGameExtent, mRenderPassPostprocess.mRenderPass );
-		mDrawPostprocess.mPipeline.Create( mDevice, ppPipelineConfig, mGameExtent, mRenderPassPostprocess.mRenderPass );
+		mDrawDebug.mPipelineLines.Create(		mDevice, debugLinesPipelineConfig,				mGameExtent, mRenderPassGame.mRenderPass );
+		mDrawDebug.mPipelineLinesNDT.Create(	mDevice, debugLinesNoDepthTestPipelineConfig,	mGameExtent, mRenderPassGame.mRenderPass );
+		mDrawDebug.mPipelineTriangles.Create(	mDevice, debugTrianglesPipelineConfig,			mGameExtent, mRenderPassGame.mRenderPass );
+		mDrawModels.mPipeline.Create(			mDevice, modelsPipelineConfig, mGameExtent, mRenderPassGame.mRenderPass );
+		mDrawUI.mPipeline.Create(				mDevice, uiPipelineConfig, mGameExtent,		mRenderPassPostprocess.mRenderPass );
+		mDrawPostprocess.mPipeline.Create(		mDevice, ppPipelineConfig, mGameExtent,		mRenderPassPostprocess.mRenderPass );
 	}
 
 	//================================================================================================================================
@@ -171,7 +171,6 @@ namespace fan
 		const VkResult result = mWindow.mSwapchain.AcquireNextImage( mDevice );
 		if ( result == VK_ERROR_OUT_OF_DATE_KHR )
 		{
-
 			// window minimized
 			if ( mWindow.GetExtent().width == 0 && mWindow.GetExtent().height == 0 )
 			{
@@ -207,11 +206,12 @@ namespace fan
 		const uint32_t currentFrame = mWindow.mSwapchain.mCurrentFrame;
 		UpdateUniformBuffers( mDevice, currentFrame );
 		{
+		
 			SCOPED_PROFILE( record_cmd );
-			RecordCommandBufferModels( currentFrame );
-			RecordCommandBufferDebug( currentFrame );
-			RecordCommandBufferUI( currentFrame );
-			RecordCommandBufferImgui( currentFrame );
+			mDrawModels.RecordCommandBuffer( currentFrame, mRenderPassGame, mFrameBuffersGame, mGameExtent, mDescriptorTextures );
+			mDrawDebug.RecordCommandBuffer( currentFrame, mRenderPassGame, mFrameBuffersGame, mGameExtent );
+			mDrawUI.RecordCommandBuffer( currentFrame, mRenderPassPostprocess, mFramebuffersPostprocess, mGameExtent, mDescriptorTextures );
+			mDrawImgui.RecordCommandBuffer( currentFrame, mDevice, mRenderPassImgui, mFramebuffersSwapchain );
 			RecordPrimaryCommandBuffer( currentFrame );
 		}
 
@@ -500,11 +500,11 @@ namespace fan
 	{
 		for( size_t i = 0; i < mWindow.mSwapchain.mImagesCount; i++ )
 		{
-			RecordCommandBufferImgui( i );
-			RecordCommandBufferModels( i );
-			RecordCommandBufferDebug( i );
-			RecordCommandBufferPostprocess( i );
-			RecordCommandBufferUI( i );
+			mDrawImgui.RecordCommandBuffer( i, mDevice, mRenderPassImgui, mFramebuffersSwapchain );
+			mDrawModels.RecordCommandBuffer( i, mRenderPassGame, mFrameBuffersGame, mGameExtent, mDescriptorTextures );
+			mDrawDebug.RecordCommandBuffer( i, mRenderPassGame, mFrameBuffersGame, mGameExtent );
+			mDrawPostprocess.RecordCommandBuffer( i, mRenderPassPostprocess, mFramebuffersPostprocess, mGameExtent );
+			mDrawUI.RecordCommandBuffer( i, mRenderPassPostprocess, mFramebuffersPostprocess, mGameExtent, mDescriptorTextures );
 			RecordPrimaryCommandBuffer( i );
 		}
 	}
@@ -563,191 +563,9 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Renderer::RecordCommandBufferPostprocess( const size_t _index )
-	{
-
-		VkCommandBuffer commandBuffer = mDrawPostprocess.mCommandBuffers.mBuffers[ _index ];
-		VkCommandBufferInheritanceInfo commandBufferInheritanceInfo = CommandBuffer::GetInheritanceInfo( mRenderPassPostprocess.mRenderPass, mFramebuffersPostprocess.mFrameBuffers[_index] );
-		VkCommandBufferBeginInfo commandBufferBeginInfo = CommandBuffer::GetBeginInfo( &commandBufferInheritanceInfo );
-
-		if ( vkBeginCommandBuffer( commandBuffer, &commandBufferBeginInfo ) == VK_SUCCESS )
-		{			
-			mDrawPostprocess.mPipeline.Bind( commandBuffer, mGameExtent );
-			mDrawPostprocess.BindDescriptors( commandBuffer, _index );
-			VkBuffer vertexBuffers[] = { mDrawPostprocess.mVertexBufferQuad.mBuffer };
-			VkDeviceSize offsets[] = { 0 };
-			vkCmdBindVertexBuffers( commandBuffer, 0, 1, vertexBuffers, offsets );
-			vkCmdDraw( commandBuffer, static_cast< uint32_t >( 4 ), 1, 0, 0 );
-			if ( vkEndCommandBuffer( commandBuffer ) != VK_SUCCESS )
-			{
-				Debug::Get() << Debug::Severity::error << "Could not record command buffer " << commandBuffer << "." << Debug::Endl();
-			}
-		}
-		else
-		{
-			Debug::Get() << Debug::Severity::error << "Could not record command buffer " << commandBuffer << "." << Debug::Endl();
-		}
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void Renderer::RecordCommandBufferUI( const size_t _index )
-	{
-		VkCommandBuffer commandBuffer = mDrawUI.mCommandBuffers.mBuffers[ _index ];
-		VkCommandBufferInheritanceInfo commandBufferInheritanceInfo = CommandBuffer::GetInheritanceInfo( mRenderPassPostprocess.mRenderPass, mFramebuffersPostprocess.mFrameBuffers[_index] );
-		VkCommandBufferBeginInfo commandBufferBeginInfo = CommandBuffer::GetBeginInfo( &commandBufferInheritanceInfo );
-
-		if ( vkBeginCommandBuffer( commandBuffer, &commandBufferBeginInfo ) == VK_SUCCESS )
-		{
-			mDrawUI.mPipeline.Bind( commandBuffer, mGameExtent );
-			//m_uiPipeline.BindDescriptors( commandBuffer, _index, 0 );
-
-			VkDeviceSize offsets[] = { 0 };
-
-			for ( uint32_t meshIndex = 0; meshIndex < mDrawUI.mDrawData.size(); meshIndex++ )
-			{
-				UIDrawData drawData = mDrawUI.mDrawData[ meshIndex ];
-				UIMesh* mesh = drawData.mesh;
-				VkBuffer vertexBuffers[] = { mesh->GetVertexBuffer().mBuffer };
-				mDrawUI.BindDescriptors( commandBuffer, _index, meshIndex );
-				vkCmdBindVertexBuffers( commandBuffer, 0, 1, vertexBuffers, offsets );
-				BindTexture( commandBuffer, drawData.textureIndex, &mDrawUI.mDescriptorSampler, mDrawUI.mPipeline.mPipelineLayout );
-				vkCmdDraw( commandBuffer, static_cast< uint32_t >( mesh->GetVertices().size() ), 1, 0, 0 );
-			}
-
-			if ( vkEndCommandBuffer( commandBuffer ) != VK_SUCCESS )
-			{
-				Debug::Get() << Debug::Severity::error << "Could not record command buffer " << _index << "." << Debug::Endl();
-			}
-		}
-		else
-		{
-			Debug::Get() << Debug::Severity::error << "Could not record command buffer " << _index << "." << Debug::Endl();
-		}
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void Renderer::RecordCommandBufferImgui( const size_t _index )
-	{
-		SCOPED_PROFILE( imgui );
-		mDrawImgui.UpdateBuffer( mDevice, _index );
-
-		VkCommandBuffer commandBuffer = mDrawImgui.mCommandBuffers.mBuffers[ _index ];
-		VkCommandBufferInheritanceInfo commandBufferInheritanceInfo = CommandBuffer::GetInheritanceInfo( mRenderPassImgui.mRenderPass, mFramebuffersSwapchain.mFrameBuffers[_index] );
-		VkCommandBufferBeginInfo commandBufferBeginInfo = CommandBuffer::GetBeginInfo( &commandBufferInheritanceInfo );
-
-		if ( vkBeginCommandBuffer( commandBuffer, &commandBufferBeginInfo ) == VK_SUCCESS )
-		{
-			mDrawImgui.DrawFrame( commandBuffer, _index );
-
-			if ( vkEndCommandBuffer( commandBuffer ) != VK_SUCCESS )
-			{
-				Debug::Get() << Debug::Severity::error << "Could not record command buffer " << _index << "." << Debug::Endl();
-			}
-		}
-		else
-		{
-			Debug::Get() << Debug::Severity::error << "Could not record command buffer " << _index << "." << Debug::Endl();
-		}
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void Renderer::RecordCommandBufferModels( const size_t _index )
-	{
-		SCOPED_PROFILE( geometry );
-		VkCommandBuffer commandBuffer = mDrawModels.mCommandBuffers.mBuffers[_index];
-		VkCommandBufferInheritanceInfo commandBufferInheritanceInfo = CommandBuffer::GetInheritanceInfo( mRenderPassGame.mRenderPass, mFrameBuffersGame.mFrameBuffers[_index] );
-		VkCommandBufferBeginInfo commandBufferBeginInfo = CommandBuffer::GetBeginInfo( &commandBufferInheritanceInfo );
-
-		if( vkBeginCommandBuffer( commandBuffer, &commandBufferBeginInfo ) == VK_SUCCESS )
-		{
-			mDrawModels.mPipeline.Bind( commandBuffer, mGameExtent );
-
-			for( uint32_t meshIndex = 0; meshIndex < mDrawModels.mDrawData.size(); meshIndex++ )
-			{
-				DrawData& drawData = mDrawModels.mDrawData[meshIndex];
-				BindTexture( commandBuffer, drawData.textureIndex, &mDrawModels.mDescriptorSampler, mDrawModels.mPipeline.mPipelineLayout );
-				mDrawModels.BindDescriptors( commandBuffer, _index, meshIndex );
-				VkDeviceSize offsets[] = { 0 };
-				VkBuffer vertexBuffers[] = { drawData.mesh->GetVertexBuffer().mBuffer };
-				vkCmdBindVertexBuffers( commandBuffer, 0, 1, vertexBuffers, offsets );
-				vkCmdBindIndexBuffer( commandBuffer, drawData.mesh->GetIndexBuffer().mBuffer, 0, VK_INDEX_TYPE_UINT32 );
-				vkCmdDrawIndexed( commandBuffer, static_cast<uint32_t>( drawData.mesh->GetIndices().size() ), 1, 0, 0, 0 );
-			}
-
-			if( vkEndCommandBuffer( commandBuffer ) != VK_SUCCESS )
-			{
-				Debug::Get() << Debug::Severity::error << "Could not record command buffer " << _index << "." << Debug::Endl();
-			}
-		}
-		else
-		{
-			Debug::Get() << Debug::Severity::error << "Could not record command buffer " << _index << "." << Debug::Endl();
-		}
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void Renderer::RecordCommandBufferDebug( const size_t _index )
-	{
-		SCOPED_PROFILE( debug );
-		if( !mDrawDebug.HasNothingToDraw() )
-		{
-			VkCommandBuffer commandBuffer = mDrawDebug.mCommandBuffers.mBuffers[_index];
-			VkCommandBufferInheritanceInfo commandBufferInheritanceInfo = CommandBuffer::GetInheritanceInfo( mRenderPassGame.mRenderPass, mFrameBuffersGame.mFrameBuffers[_index] );
-			VkCommandBufferBeginInfo commandBufferBeginInfo = CommandBuffer::GetBeginInfo( &commandBufferInheritanceInfo );
-
-			if( vkBeginCommandBuffer( commandBuffer, &commandBufferBeginInfo ) == VK_SUCCESS )
-			{
-				VkDeviceSize offsets[] = { 0 };
-				if( mDrawDebug.mNumLines > 0 )
-				{
-					mDrawDebug.mPipelineLines.Bind( commandBuffer, mGameExtent );
-					mDrawDebug.BindDescriptorsLines( commandBuffer, _index );					
-					VkBuffer vertexBuffers[] = { mDrawDebug.mVertexBuffersLines[_index].mBuffer };
-					vkCmdBindVertexBuffers( commandBuffer, 0, 1, vertexBuffers, offsets );
-					vkCmdDraw( commandBuffer, static_cast<uint32_t>( mDrawDebug.mNumLines ), 1, 0, 0 );
-				}
-				if( mDrawDebug.mNumLinesNDT > 0 )
-				{
-					mDrawDebug.mPipelineLinesNDT.Bind( commandBuffer, mGameExtent );
-					mDrawDebug.BindDescriptorsLinesNDT( commandBuffer, _index );					
-					VkBuffer vertexBuffers[] = { mDrawDebug.mVertexBuffersLinesNDT[_index].mBuffer };
-					vkCmdBindVertexBuffers( commandBuffer, 0, 1, vertexBuffers, offsets );
-					vkCmdDraw( commandBuffer, static_cast<uint32_t>( mDrawDebug.mNumLinesNDT ), 1, 0, 0 );
-				}
-				if( mDrawDebug.mNumTriangles > 0 )
-				{
-					mDrawDebug.mPipelineTriangles.Bind( commandBuffer, mGameExtent );
-					mDrawDebug.BindDescriptorsTriangles( commandBuffer, _index );
-					VkBuffer vertexBuffers[] = { mDrawDebug.mVertexBuffersTriangles[_index].mBuffer };
-					vkCmdBindVertexBuffers( commandBuffer, 0, 1, vertexBuffers, offsets );
-					vkCmdDraw( commandBuffer, static_cast<uint32_t>( mDrawDebug.mNumTriangles ), 1, 0, 0 );
-				}
-				if( vkEndCommandBuffer( commandBuffer ) != VK_SUCCESS )
-				{
-					Debug::Get() << Debug::Severity::error << "Could not record command buffer " << _index << "." << Debug::Endl();
-				}
-			}
-			else
-			{
-				Debug::Get() << Debug::Severity::error << "Could not record command buffer " << _index << "." << Debug::Endl();
-			}
-		}
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	bool Renderer::SubmitCommandBuffers()
+	void Renderer::SubmitCommandBuffers()
 	{
 		std::vector<VkPipelineStageFlags> waitSemaphoreStages = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
-
-		std::vector< VkCommandBuffer> commandBuffers = {
-			mPrimaryCommandBuffers.mBuffers[ mWindow.mSwapchain.mCurrentImageIndex ]
-			//, m_imguiCommandBuffers[m_window.mSwapchain.GetCurrentImageIndex()]
-		};
 
 		VkSubmitInfo submitInfo;
 		submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
@@ -755,8 +573,8 @@ namespace fan
 		submitInfo.waitSemaphoreCount = 1;
 		submitInfo.pWaitSemaphores = mWindow.mSwapchain.GetCurrentImageAvailableSemaphore();
 		submitInfo.pWaitDstStageMask = waitSemaphoreStages.data();
-		submitInfo.commandBufferCount = static_cast< uint32_t >( commandBuffers.size() );
-		submitInfo.pCommandBuffers = commandBuffers.data();
+		submitInfo.commandBufferCount = 1;
+		submitInfo.pCommandBuffers = &mPrimaryCommandBuffers.mBuffers[mWindow.mSwapchain.mCurrentImageIndex];
 		submitInfo.signalSemaphoreCount = 1;
 		submitInfo.pSignalSemaphores = mWindow.mSwapchain.GetCurrentRenderFinishedSemaphore();
 
@@ -764,33 +582,7 @@ namespace fan
 		if ( result != VK_SUCCESS )
 		{
 			Debug::Error( "Could not submit draw command buffer " );
-			return false;
 		}
-
-		return true;
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void  Renderer::BindTexture( VkCommandBuffer _commandBuffer, const uint32_t _textureIndex, DescriptorSampler* _samplerDescriptor, VkPipelineLayout _pipelineLayout )
-	{
-		assert( _textureIndex < Texture::s_resourceManager.GetList().size() );
-
-		std::vector<VkDescriptorSet> descriptors = {
-			 mDescriptorTextures.mDescriptorSets[_textureIndex]
-			 , _samplerDescriptor->mDescriptorSet
-		};
-
-		vkCmdBindDescriptorSets(
-			_commandBuffer,
-			VK_PIPELINE_BIND_POINT_GRAPHICS,
-			_pipelineLayout,
-			1,
-			static_cast<uint32_t>( descriptors.size() ),
-			descriptors.data(),
-			0,
-			nullptr
-		);
 	}
 
 	//================================================================================================================================
@@ -832,10 +624,8 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool Renderer::CreateRenderPasses()
+	void Renderer::CreateRenderPasses()
 	{
-		bool result = true;
-
 		// game
 		{
 			VkAttachmentDescription colorAtt = RenderPass::GetColorAttachment( mWindow.mSwapchain.mSurfaceFormat.format, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL );
@@ -846,7 +636,7 @@ namespace fan
 			VkSubpassDependency		subpassDependency = RenderPass::GetDependency();
 			
 			VkAttachmentDescription attachmentDescriptions[2] = { colorAtt, depthAtt };
-			result &= mRenderPassGame.Create( mDevice, attachmentDescriptions, 2, &subpassDescription, 1, &subpassDependency, 1 );
+			mRenderPassGame.Create( mDevice, attachmentDescriptions, 2, &subpassDescription, 1, &subpassDependency, 1 );
 		}
 
 		// postprocess
@@ -855,7 +645,7 @@ namespace fan
 			VkAttachmentReference	colorAttRef = RenderPass::GetColorAttachmentReference( 0 );
 			VkSubpassDescription	subpassDescription = RenderPass::GetSubpassDescription( &colorAttRef, 1, VK_NULL_HANDLE );
 			VkSubpassDependency		subpassDependency = RenderPass::GetDependency();
-			result &= mRenderPassPostprocess.Create( mDevice, &colorAtt, 1, &subpassDescription, 1, &subpassDependency, 1 );
+			mRenderPassPostprocess.Create( mDevice, &colorAtt, 1, &subpassDescription, 1, &subpassDependency, 1 );
 		}
 
 		// imgui
@@ -864,10 +654,8 @@ namespace fan
 			VkAttachmentReference	colorAttRef = RenderPass::GetColorAttachmentReference( 0 );
 			VkSubpassDescription	subpassDescription = RenderPass::GetSubpassDescription( &colorAttRef, 1, VK_NULL_HANDLE );
 			VkSubpassDependency		subpassDependency = RenderPass::GetDependency();
-			result &= mRenderPassImgui.Create( mDevice, &colorAtt, 1, &subpassDescription, 1, &subpassDependency, 1);
+			mRenderPassImgui.Create( mDevice, &colorAtt, 1, &subpassDescription, 1, &subpassDependency, 1);
 		}
-
-		return result;
 	}
 
 	//================================================================================================================================
@@ -906,7 +694,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool Renderer::CreateTextureDescriptor()
+	void Renderer::CreateTextureDescriptor()
 	{		
 		const std::vector< Texture* >& textures = Texture::s_resourceManager.GetList();
 		std::vector< VkImageView > imageViews( textures.size() );
@@ -914,10 +702,7 @@ namespace fan
 		{
 			imageViews[i] = textures[ i ]->mImageView;
 		}
-
 		mDescriptorTextures.Destroy( mDevice );
 		mDescriptorTextures.Create( mDevice, imageViews.data(), static_cast<uint32_t>( imageViews.size() ) );
-
-		return true;
 	}
 }
