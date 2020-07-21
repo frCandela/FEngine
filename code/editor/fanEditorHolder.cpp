@@ -75,7 +75,7 @@ namespace fan
 		m_window.Create( _settings.windowName.c_str(), windowSize, windowPosition );
 
 		// creates renderer
-		m_renderer = new Renderer( m_window );
+		m_renderer = new Renderer( m_window, Renderer::ViewType::Editor );
 
 		Prefab::s_resourceManager.Init();
 

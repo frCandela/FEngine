@@ -38,7 +38,7 @@ namespace fan
 		if ( m_size != size )
 		{
 			m_size = size;
-			onSizeChanged.Emmit( size );
+			onSizeChanged.Emmit( { (uint32_t)size[0], (uint32_t)size[1] } );
 		}
 
 		// draw menu bar

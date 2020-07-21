@@ -37,7 +37,9 @@ namespace fan
 	class Renderer
 	{
 	public:
-		Renderer( Window& _window );
+		enum class ViewType{ Editor, Game };
+
+		Renderer( Window& _window, const ViewType _viewType );
 		~Renderer();
 
 		void DrawFrame();
@@ -45,7 +47,7 @@ namespace fan
 
 		void ReloadIcons();
 		void ReloadShaders();
-		void ResizeGame( btVector2 _newSize );
+		void ResizeGame( VkExtent2D _extent );
 		void ResizeSwapchain();
 
 		void SetMainCamera( const glm::mat4 _projection, const glm::mat4 _view, const glm::vec3 _position );
@@ -55,10 +57,10 @@ namespace fan
 		void SetUIDrawData( const std::vector<RenderDataUIMesh>& _drawData );
 		void SetDebugDrawData( const std::vector<DebugVertex>& _debugLines, const std::vector<DebugVertex>& _debugLinesNoDepthTest, const std::vector<DebugVertex>& _debugTriangles );
 
-
 		Window& mWindow;
 		Device& mDevice;
 
+		const ViewType  mViewType;
 		VkExtent2D		mGameExtent = { 1,1 };
 		glm::vec4		mClearColor = glm::vec4( 0.f, 0.f, 0.2f, 1.f );;
 		CommandBuffer	mPrimaryCommandBuffers;
@@ -95,7 +97,8 @@ namespace fan
 		// frame buffers swapchain 
 		FrameBuffer mFramebuffersSwapchain;
 
-		void RecordPrimaryCommandBuffer( const size_t _index );
+		void RecordPrimaryCommandBuffer( const uint32_t _index );
+		void RecordSecondaryCommandBuffers( const uint32_t _index );
 		void RecordAllCommandBuffers();
 
 		void CreateCommandBuffers();

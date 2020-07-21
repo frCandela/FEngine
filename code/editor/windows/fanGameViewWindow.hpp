@@ -4,6 +4,7 @@
 #include "ecs/fanSignal.hpp"
 #include "editor/windows/fanEditorWindow.hpp"
 #include "game/fanLaunchSettings.hpp"
+#include "glfw/glfw3.h"
 
 namespace fan
 {
@@ -15,7 +16,7 @@ namespace fan
 	class GameViewWindow : public EditorWindow
 	{
 	public:
-		Signal< btVector2 > onSizeChanged;
+		Signal< VkExtent2D > onSizeChanged;
 		Signal<>	onPlay;
 		Signal<>	onPause;
 		Signal<>	onResume;

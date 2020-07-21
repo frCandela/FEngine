@@ -145,9 +145,9 @@ int main( int _argc, char* _argv[] )
 	for( int i = 1; i < _argc; i++ ){	args.push_back( _argv[i] );	}
 
 	// Parse the arguments & run the engine
-	fan::LaunchArguments commandLine;
-	fan::LaunchSettings settings = commandLine.Parse( args );
-	fan::LPPMain main( settings );
+	fan::LaunchArguments launchArguments;
+	fan::LaunchSettings settings = launchArguments.Parse( args );
+	fan::LPPMain main( settings ); 
 
 	return 0;
 }

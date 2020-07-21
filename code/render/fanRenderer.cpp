@@ -19,9 +19,11 @@ namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	Renderer::Renderer( Window& _window ) : mWindow( _window ), mDevice( _window.mDevice )
+	Renderer::Renderer( Window& _window, const ViewType _viewType ) : mWindow( _window ), mDevice( _window.mDevice ), mViewType( _viewType )
 	{
 		const uint32_t imagesCount = mWindow.mSwapchain.mImagesCount;
+		mGameExtent = mWindow.mSwapchain.mExtent;
+		RenderPass& finalRenderPass = mViewType == ViewType::Editor ? mRenderPassImgui : mRenderPassPostprocess;
 
 		Mesh::s_resourceManager.Init( mDevice );
 		Texture::s_resourceManager.Init( mDevice );
@@ -32,7 +34,7 @@ namespace fan
 		mSamplerGameColor.Create( mDevice, 0, 1.f, VK_FILTER_LINEAR );
 		mSamplerPostprocessColor.Create( mDevice, 0, 1.f, VK_FILTER_LINEAR );
 		CreateFramebuffers( mWindow.mSwapchain.mExtent );
-		mFramebuffersSwapchain.CreateForSwapchain( mDevice, imagesCount, mWindow.mSwapchain.mExtent, mRenderPassImgui, mWindow.mSwapchain.mImageViews );
+		mFramebuffersSwapchain.CreateForSwapchain( mDevice, imagesCount, mWindow.mSwapchain.mExtent, finalRenderPass, mWindow.mSwapchain.mImageViews );
 
 		CreateTextureDescriptor();
 		CreateShaders();
@@ -41,11 +43,12 @@ namespace fan
 		mDrawUI.Create( mDevice, imagesCount );
 		mDrawModels.Create( mDevice, imagesCount );	
 		mDrawPostprocess.Create( mDevice, imagesCount, mImageViewGameColor );
-		mDrawImgui.Create( mDevice, imagesCount, mRenderPassImgui.mRenderPass, mWindow.mWindow, mWindow.mSwapchain.mExtent, mImageViewPostprocessColor );
+		mDrawImgui.Create( mDevice, imagesCount, finalRenderPass.mRenderPass, mWindow.mWindow, mWindow.mSwapchain.mExtent, mImageViewPostprocessColor );
 
 		CreatePipelines();
 		CreateCommandBuffers();
-		RecordAllCommandBuffers();	}
+		RecordAllCommandBuffers();
+}
 
 	//================================================================================================================================
 	//================================================================================================================================	
@@ -205,13 +208,9 @@ namespace fan
 
 		const uint32_t currentFrame = mWindow.mSwapchain.mCurrentFrame;
 		UpdateUniformBuffers( mDevice, currentFrame );
-		{
-		
+		{		
 			SCOPED_PROFILE( record_cmd );
-			mDrawModels.RecordCommandBuffer( currentFrame, mRenderPassGame, mFrameBuffersGame, mGameExtent, mDescriptorTextures );
-			mDrawDebug.RecordCommandBuffer( currentFrame, mRenderPassGame, mFrameBuffersGame, mGameExtent );
-			mDrawUI.RecordCommandBuffer( currentFrame, mRenderPassPostprocess, mFramebuffersPostprocess, mGameExtent, mDescriptorTextures );
-			mDrawImgui.RecordCommandBuffer( currentFrame, mDevice, mRenderPassImgui, mFramebuffersSwapchain );
+			RecordSecondaryCommandBuffers( currentFrame );
 			RecordPrimaryCommandBuffer( currentFrame );
 		}
 
@@ -225,11 +224,11 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Renderer::ResizeGame( btVector2 _newSize )
+	void Renderer::ResizeGame( VkExtent2D _extent )
 	{
 		WaitIdle();
-		const VkExtent2D extent = { ( uint32_t ) _newSize[ 0 ], ( uint32_t ) _newSize[ 1 ] };
-		mGameExtent = extent;
+		
+		mGameExtent = _extent;
 
 		// game framebuffers & attachements
 		mImageGameDepth.Destroy( mDevice );
@@ -241,7 +240,7 @@ namespace fan
 		mImagePostprocessColor.Destroy( mDevice );
 		mImageViewPostprocessColor.Destroy( mDevice );
 		mFramebuffersPostprocess.Destroy( mDevice );
-		CreateFramebuffers( extent );
+		CreateFramebuffers( _extent );
 
 		mDrawPostprocess.mDescriptorImage.Destroy( mDevice );
 		mDrawPostprocess.mDescriptorImage.Create( mDevice, &mImageViewGameColor.mImageView, 1, &mDrawPostprocess.mSampler.mSampler );
@@ -257,13 +256,27 @@ namespace fan
 	{
 		WaitIdle();
 		const VkExtent2D extent = mWindow.GetExtent();
+
+		if( mViewType == ViewType::Game )
+		{
+			mGameExtent = extent;
+		}
+
 		Debug::Get() << Debug::Severity::highlight << "Resize renderer: " << extent.width << "x" << extent.height << Debug::Endl();
 		mWindow.mSwapchain.Resize( mDevice , extent );
 
 		mFramebuffersSwapchain.Destroy( mDevice );
-		mFramebuffersSwapchain.CreateForSwapchain( mDevice, mWindow.mSwapchain.mImagesCount, extent, mRenderPassImgui, mWindow.mSwapchain.mImageViews );
+		RenderPass& finalRenderPass = ( mViewType ==  ViewType::Editor ? mRenderPassImgui : mRenderPassPostprocess );
+		mFramebuffersSwapchain.CreateForSwapchain( mDevice, mWindow.mSwapchain.mImagesCount, extent, finalRenderPass, mWindow.mSwapchain.mImageViews );
 
-		RecordAllCommandBuffers();
+		if( mViewType == ViewType::Editor )
+		{
+			RecordAllCommandBuffers();
+		}
+		else
+		{
+			ResizeGame( mGameExtent );
+		}
 	}
 
 	//================================================================================================================================
@@ -341,22 +354,33 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
+	void Renderer::RecordSecondaryCommandBuffers( const uint32_t _index )
+	{
+		RenderPass& finalRenderPass = mViewType == ViewType::Editor ? mRenderPassImgui : mRenderPassPostprocess;
+		FrameBuffer& finalFramebuffer = mViewType == ViewType::Editor ? mFramebuffersPostprocess : mFramebuffersSwapchain;
+
+		mDrawModels.RecordCommandBuffer( _index, mRenderPassGame, mFrameBuffersGame, mGameExtent, mDescriptorTextures );
+		mDrawDebug.RecordCommandBuffer( _index, mRenderPassGame, mFrameBuffersGame, mGameExtent );		
+		mDrawUI.RecordCommandBuffer( _index, mRenderPassPostprocess, finalFramebuffer, mGameExtent, mDescriptorTextures );
+		mDrawImgui.RecordCommandBuffer( _index, mDevice, finalRenderPass, mFramebuffersSwapchain );
+	}
+	
+	//================================================================================================================================
+	//================================================================================================================================
 	void Renderer::RecordAllCommandBuffers()
 	{
-		for( size_t i = 0; i < mWindow.mSwapchain.mImagesCount; i++ )
+		for( uint32_t i = 0; i < mWindow.mSwapchain.mImagesCount; i++ )
 		{
-			mDrawImgui.RecordCommandBuffer( i, mDevice, mRenderPassImgui, mFramebuffersSwapchain );
-			mDrawModels.RecordCommandBuffer( i, mRenderPassGame, mFrameBuffersGame, mGameExtent, mDescriptorTextures );
-			mDrawDebug.RecordCommandBuffer( i, mRenderPassGame, mFrameBuffersGame, mGameExtent );
-			mDrawPostprocess.RecordCommandBuffer( i, mRenderPassPostprocess, mFramebuffersPostprocess, mGameExtent );
-			mDrawUI.RecordCommandBuffer( i, mRenderPassPostprocess, mFramebuffersPostprocess, mGameExtent, mDescriptorTextures );
+			FrameBuffer& finalFramebuffer = mViewType == ViewType::Editor ? mFramebuffersPostprocess : mFramebuffersSwapchain;
+			mDrawPostprocess.RecordCommandBuffer( i, mRenderPassPostprocess, finalFramebuffer, mGameExtent );
+			RecordSecondaryCommandBuffers( i );
 			RecordPrimaryCommandBuffer( i );
 		}
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Renderer::RecordPrimaryCommandBuffer( const size_t _index )
+	void Renderer::RecordPrimaryCommandBuffer( const uint32_t _index )
 	{
 		SCOPED_PROFILE( primary );
 		VkCommandBuffer commandBuffer = mPrimaryCommandBuffers.mBuffers[ _index ];
@@ -367,11 +391,13 @@ namespace fan
 		clearValues[ 0 ].color = { mClearColor.r, mClearColor.g, mClearColor.b, mClearColor.a };
 		clearValues[ 1 ].depthStencil = { 1.0f, 0 };
 
-		VkRenderPassBeginInfo renderPassInfo =			  RenderPass::GetBeginInfo(	mRenderPassGame.mRenderPass,		mFrameBuffersGame.mFrameBuffers[_index],		  mGameExtent, clearValues.data(), (uint32_t)clearValues.size() );
-		VkRenderPassBeginInfo renderPassInfoPostprocess = RenderPass::GetBeginInfo( mRenderPassPostprocess.mRenderPass,mFramebuffersPostprocess.mFrameBuffers[_index],  mGameExtent, clearValues.data(), (uint32_t)clearValues.size() );
-		VkRenderPassBeginInfo renderPassInfoImGui =		  RenderPass::GetBeginInfo( mRenderPassImgui.mRenderPass,		mFramebuffersSwapchain.mFrameBuffers[_index],	  mWindow.mSwapchain.mExtent, clearValues.data(), (uint32_t)clearValues.size() );
+		FrameBuffer& finalFramebuffer = mViewType == ViewType::Editor ? mFramebuffersPostprocess : mFramebuffersSwapchain;
 
-		if ( vkBeginCommandBuffer( commandBuffer, &commandBufferBeginInfo ) == VK_SUCCESS )
+		VkRenderPassBeginInfo renderPassInfo =			  RenderPass::GetBeginInfo(	mRenderPassGame.mRenderPass,		mFrameBuffersGame.mFrameBuffers[_index], mGameExtent, clearValues.data(), (uint32_t)clearValues.size() );
+		VkRenderPassBeginInfo renderPassInfoPostprocess = RenderPass::GetBeginInfo( mRenderPassPostprocess.mRenderPass, finalFramebuffer.mFrameBuffers[_index], mGameExtent, clearValues.data(), (uint32_t)clearValues.size() );
+		VkRenderPassBeginInfo renderPassInfoImGui =		  RenderPass::GetBeginInfo( mRenderPassImgui.mRenderPass,		mFramebuffersSwapchain.mFrameBuffers[_index],	mWindow.mSwapchain.mExtent, clearValues.data(), (uint32_t)clearValues.size() );
+
+		if( vkBeginCommandBuffer( commandBuffer, &commandBufferBeginInfo ) == VK_SUCCESS )
 		{
 			vkCmdBeginRenderPass( commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_SECONDARY_COMMAND_BUFFERS );
 			{
@@ -384,15 +410,21 @@ namespace fan
 
 			vkCmdBeginRenderPass( commandBuffer, &renderPassInfoPostprocess, VK_SUBPASS_CONTENTS_SECONDARY_COMMAND_BUFFERS );
 			{
-				vkCmdExecuteCommands( commandBuffer, 1, &mDrawPostprocess.mCommandBuffers.mBuffers[ _index ] );
-				vkCmdExecuteCommands( commandBuffer, 1, &mDrawUI.mCommandBuffers.mBuffers[ _index ] );
+				vkCmdExecuteCommands( commandBuffer, 1, &mDrawPostprocess.mCommandBuffers.mBuffers[_index] );
+				vkCmdExecuteCommands( commandBuffer, 1, &mDrawUI.mCommandBuffers.mBuffers[_index] );
+
+				if( mViewType == ViewType::Game )
+				{
+					vkCmdExecuteCommands( commandBuffer, 1, &mDrawImgui.mCommandBuffers.mBuffers[_index] );
+				}
 			} vkCmdEndRenderPass( commandBuffer );
 
-			vkCmdBeginRenderPass( commandBuffer, &renderPassInfoImGui, VK_SUBPASS_CONTENTS_SECONDARY_COMMAND_BUFFERS );
+			if( mViewType == ViewType::Editor )
 			{
-				vkCmdExecuteCommands( commandBuffer, 1, &mDrawImgui.mCommandBuffers.mBuffers[ _index ] );
-			} vkCmdEndRenderPass( commandBuffer );
-
+				vkCmdBeginRenderPass( commandBuffer, &renderPassInfoImGui, VK_SUBPASS_CONTENTS_SECONDARY_COMMAND_BUFFERS );
+				vkCmdExecuteCommands( commandBuffer, 1, &mDrawImgui.mCommandBuffers.mBuffers[_index] );
+				vkCmdEndRenderPass( commandBuffer );
+			}
 
 			if ( vkEndCommandBuffer( commandBuffer ) != VK_SUCCESS )
 			{
@@ -479,14 +511,15 @@ namespace fan
 			VkAttachmentReference	depthAttRef = RenderPass::GetDepthAttachmentReference( 1 );
 			VkSubpassDescription	subpassDescription = RenderPass::GetSubpassDescription( &colorAttRef, 1, &depthAttRef );
 			VkSubpassDependency		subpassDependency = RenderPass::GetDependency();
-			
+
 			VkAttachmentDescription attachmentDescriptions[2] = { colorAtt, depthAtt };
 			mRenderPassGame.Create( mDevice, attachmentDescriptions, 2, &subpassDescription, 1, &subpassDependency, 1 );
 		}
 
 		// postprocess
 		{
-			VkAttachmentDescription colorAtt = RenderPass::GetColorAttachment( mWindow.mSwapchain.mSurfaceFormat.format, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL );
+			const VkImageLayout ppLayout = ( mViewType == ViewType::Editor ? VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL : VK_IMAGE_LAYOUT_PRESENT_SRC_KHR );
+			VkAttachmentDescription colorAtt = RenderPass::GetColorAttachment( mWindow.mSwapchain.mSurfaceFormat.format, ppLayout );
 			VkAttachmentReference	colorAttRef = RenderPass::GetColorAttachmentReference( 0 );
 			VkSubpassDescription	subpassDescription = RenderPass::GetSubpassDescription( &colorAttRef, 1, VK_NULL_HANDLE );
 			VkSubpassDependency		subpassDependency = RenderPass::GetDependency();
@@ -494,6 +527,7 @@ namespace fan
 		}
 
 		// imgui
+		if( mViewType == ViewType::Editor )
 		{
 			VkAttachmentDescription colorAtt = RenderPass::GetColorAttachment( mWindow.mSwapchain.mSurfaceFormat.format, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR );
 			VkAttachmentReference	colorAttRef = RenderPass::GetColorAttachmentReference( 0 );
