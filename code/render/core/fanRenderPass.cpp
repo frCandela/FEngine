@@ -32,6 +32,8 @@ namespace fan
 		}
 		Debug::Get() << Debug::Severity::log << std::hex << "VkRenderPass          " << mRenderPass << std::dec << Debug::Endl();
 
+		_device.AddDebugName( (uint64_t)mRenderPass, "RenderPass" );
+
 		return true;
 	}
 
@@ -42,6 +44,8 @@ namespace fan
 		if( mRenderPass != VK_NULL_HANDLE )
 		{
 			vkDestroyRenderPass( _device.mDevice, mRenderPass, VK_NULL_HANDLE );
+			_device.RemoveDebugName( (uint64_t)mRenderPass );
+			mRenderPass = VK_NULL_HANDLE;
 		}
 	}
 

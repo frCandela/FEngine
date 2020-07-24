@@ -13,12 +13,14 @@ namespace fan
 		if ( mMemory != VK_NULL_HANDLE )
 		{
 			vkFreeMemory( _device.mDevice, mMemory, nullptr );
+			_device.RemoveDebugName( (uint64_t)mMemory );
 			mMemory = VK_NULL_HANDLE;
 		}
 
 		if ( mBuffer != VK_NULL_HANDLE )
 		{
 			vkDestroyBuffer( _device.mDevice, mBuffer, nullptr );
+			_device.RemoveDebugName( (uint64_t)mBuffer );
 			mBuffer = VK_NULL_HANDLE;
 		}
 	}
@@ -48,7 +50,7 @@ namespace fan
 			Debug::Error( "Could not create buffer" );
 			return false;
 		}
-		//Debug::Get() << Debug::Severity::log << std::hex << "VkBuffer        " << m_buffer << std::dec << Debug::Endl();
+		Debug::Get() << Debug::Severity::log << std::hex << "VkBuffer              " << mBuffer << std::dec << Debug::Endl();
 
 		VkMemoryRequirements memoryRequirements;
 		vkGetBufferMemoryRequirements( _device.mDevice, mBuffer, &memoryRequirements );
@@ -64,9 +66,12 @@ namespace fan
 			Debug::Error( "Could not allocate buffer" );
 			return false;
 		}
-		//Debug::Get() << Debug::Severity::log << std::hex << "VkDeviceMemory        " << m_memory << std::dec << Debug::Endl();
+		Debug::Get() << Debug::Severity::log << std::hex << "VkDeviceMemory        " << mMemory << std::dec << Debug::Endl();
 
 		Bind( _device );
+
+		_device.AddDebugName( (uint64_t)mMemory, "fan Buffer" );
+		_device.AddDebugName( (uint64_t)mBuffer, "fan Buffer" );
 
 		return true;
 	}

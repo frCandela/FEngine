@@ -73,6 +73,8 @@ namespace fan
 		mDrawDebug.mPipelineLinesNDT.Destroy( mDevice );
 		mDrawDebug.mPipelineTriangles.Destroy( mDevice );
 
+		DestroyShaders();
+
 		// game framebuffers & attachements
 		mFrameBuffersGame.Destroy( mDevice );
 		mImageGameDepth.Destroy( mDevice );

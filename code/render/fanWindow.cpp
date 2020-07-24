@@ -10,7 +10,7 @@ namespace fan
 	//================================================================================================================================
 	void Window::Create( const char* _name, const glm::ivec2 _size, const glm::ivec2 _position )
 	{
-		mInstance.Create();
+		mInstance.Create( &mDevice.mDebugNames );
 
 		glfwWindowHint( GLFW_CLIENT_API, GLFW_NO_API );
 		glfwWindowHint( GLFW_RESIZABLE, GLFW_TRUE );

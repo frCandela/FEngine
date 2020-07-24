@@ -22,18 +22,21 @@ namespace fan
 		if( mMemory != VK_NULL_HANDLE )
 		{
 			vkFreeMemory( _device.mDevice, mMemory, nullptr );
+			_device.RemoveDebugName( (uint64_t)mMemory );
 			mMemory = VK_NULL_HANDLE;
 		}
 
 		if( mImageView != VK_NULL_HANDLE )
 		{
 			vkDestroyImageView( _device.mDevice, mImageView, nullptr );
+			_device.RemoveDebugName( (uint64_t)mImageView );
 			mImageView = VK_NULL_HANDLE;
 		}
 
 		if( mImage != VK_NULL_HANDLE )
 		{
 			vkDestroyImage( _device.mDevice, mImage, nullptr );
+			_device.RemoveDebugName( (uint64_t)mImage );
 			mImage = VK_NULL_HANDLE;
 		}
 	}
@@ -223,7 +226,6 @@ namespace fan
 			throw std::runtime_error( "failed to create texture image view!" );
 
 		Debug::Get() << Debug::Severity::log << std::hex << "VkImageView           " << mImageView << std::dec << Debug::Endl();
-
 	}
 
 	//================================================================================================================================
@@ -350,5 +352,9 @@ namespace fan
 
 		_device.EndSingleTimeCommands( cmd );
 		stagingBuffer.Destroy( _device );
+
+		_device.AddDebugName( (uint64_t)mImage, "texture" );
+		_device.AddDebugName( (uint64_t)mImageView, "texture" );
+		_device.AddDebugName( (uint64_t)mMemory, "texture" );
 	}
 }

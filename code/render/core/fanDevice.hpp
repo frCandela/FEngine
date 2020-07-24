@@ -3,6 +3,7 @@
 #include "glfw/glfw3.h"
 #include <vector>
 #include <string>
+#include <map>
 
 namespace fan
 {
@@ -22,14 +23,18 @@ namespace fan
 		VkCommandPool		mCommandPool		= VK_NULL_HANDLE;
 		VkQueue				mGraphicsQueue	= VK_NULL_HANDLE;
 
-		VkPhysicalDeviceProperties		 mDeviceProperties;
-		VkPhysicalDeviceMemoryProperties mMemoryProperties;
+		VkPhysicalDeviceProperties			mDeviceProperties;
+		VkPhysicalDeviceMemoryProperties	mMemoryProperties;
+		std::map< uint64_t, std::string >	mDebugNames;
+		
 
 		uint32_t		FindMemoryType( uint32_t _typeFilter, VkMemoryPropertyFlags _properties );
 		VkFormat		FindDepthFormat();
 		VkCommandBuffer BeginSingleTimeCommands();
 		void			EndSingleTimeCommands( VkCommandBuffer _commandBuffer );
-	
+		void				AddDebugName( const uint64_t _object, const std::string& _name );
+		void				RemoveDebugName( const uint64_t _object );
+		const std::string	GetDebugName( const uint64_t _object ) const;
 	private:
 		Device( Device const& ) = delete;
 		Device& operator=( Device const& ) = delete;	

@@ -12,12 +12,14 @@ namespace fan
 		if ( mImage != VK_NULL_HANDLE )
 		{
 			vkDestroyImage( _device.mDevice, mImage, VK_NULL_HANDLE );
+			_device.RemoveDebugName( (uint64_t)mImage );
 			mImage = VK_NULL_HANDLE;
 		}
 
 		if ( mMemory != VK_NULL_HANDLE )
 		{
 			vkFreeMemory( _device.mDevice, mMemory, VK_NULL_HANDLE );
+			_device.RemoveDebugName( (uint64_t)mMemory );
 			mMemory = VK_NULL_HANDLE;
 		}
 	}
@@ -75,6 +77,9 @@ namespace fan
 		}
 		Debug::Get() << Debug::Severity::log << std::hex << "VkImage               " << mImage << std::dec << Debug::Endl();
 		Debug::Get() << Debug::Severity::log << "VkDeviceMemory        " << mMemory << std::dec << Debug::Endl();
+
+		_device.AddDebugName( (uint64_t)mImage, "Image" );
+		_device.AddDebugName( (uint64_t)mMemory, "Image" );
 
 		return true;
 	}

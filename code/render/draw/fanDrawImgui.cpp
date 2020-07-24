@@ -101,6 +101,8 @@ namespace fan
 				vertexBuffer.Create( _device, vertexBufferSize, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT );
 				mVertexCount[ _index ] = imDrawData->TotalVtxCount;
 				vertexBuffer.Map( _device );
+				_device.AddDebugName( (uint64_t)vertexBuffer.mBuffer, "imgui vertex buffer" );
+				_device.AddDebugName( (uint64_t)vertexBuffer.mMemory, "imgui vertex buffer" );
 			}
 
 			// Index buffer
@@ -112,6 +114,8 @@ namespace fan
 				indexBuffer.Create( _device, indexBufferSize, VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT );
 				mIndexCount[ _index ] = imDrawData->TotalIdxCount;
 				indexBuffer.Map( _device );
+				_device.AddDebugName( (uint64_t)indexBuffer.mBuffer, "imgui index buffer" );
+				_device.AddDebugName( (uint64_t)indexBuffer.mMemory, "imgui index buffer" );
 			}
 
 			// Upload data

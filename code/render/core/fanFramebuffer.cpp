@@ -32,6 +32,8 @@ namespace fan
 				Debug::Error( "Could not create swapchain framebuffer" );
 			} 
 			Debug::Get() << Debug::Severity::log << std::hex << "VkFramebuffer         " << mFrameBuffers[i]  << " swapchain" << std::dec << Debug::Endl();
+		
+			_device.AddDebugName( (uint64_t)mFrameBuffers[i], "Framebuffer" );
 		}
 	}
 	
@@ -71,6 +73,7 @@ namespace fan
 			if( mFrameBuffers[framebufferIndex] != VK_NULL_HANDLE )
 			{
 				vkDestroyFramebuffer( _device.mDevice, mFrameBuffers[framebufferIndex], nullptr );
+				_device.RemoveDebugName( (uint64_t)mFrameBuffers[framebufferIndex] );
 				mFrameBuffers[framebufferIndex] = VK_NULL_HANDLE;
 			}
 		}

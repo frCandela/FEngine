@@ -147,6 +147,8 @@ namespace fan
 				VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
 				memPropertyFlags
 			);
+			_device.AddDebugName( (uint64_t)vertexBuffer.mBuffer, "mesh vertex buffer" );
+			_device.AddDebugName( (uint64_t)vertexBuffer.mMemory, "mesh vertex buffer" );
 		}
 
 		Buffer& indexBuffer = m_indexBuffer[ m_currentBuffer ];
@@ -159,6 +161,8 @@ namespace fan
 				VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
 				memPropertyFlags
 			);
+			_device.AddDebugName( (uint64_t)indexBuffer.mBuffer, "mesh index buffer" );
+			_device.AddDebugName( (uint64_t)indexBuffer.mMemory, "mesh index buffer" );
 		}
 
 		if ( m_hostVisible )

@@ -20,7 +20,8 @@ namespace fan
 		{
 			Debug::Error( "Could not allocate command buffers." );
 			return false;
-		}
+		}		
+
 		return true;
 	}
 

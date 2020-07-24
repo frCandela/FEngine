@@ -45,6 +45,8 @@ namespace fan
 			return false;
 		}
 		Debug::Get() << Debug::Severity::log << std::hex << "VkShaderModule        " << mShaderModule << std::dec << Debug::Endl();
+		
+		_device.AddDebugName( (uint64_t)mShaderModule, _path );
 
 		return true;
 	}
@@ -56,6 +58,7 @@ namespace fan
 		if( mShaderModule != VK_NULL_HANDLE )
 		{
 			vkDestroyShaderModule( _device.mDevice, mShaderModule, nullptr );
+			_device.RemoveDebugName( (uint64_t)mShaderModule );
 			mShaderModule = VK_NULL_HANDLE;
 		}
 	}

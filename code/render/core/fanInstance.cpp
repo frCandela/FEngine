@@ -8,7 +8,7 @@ namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	void Instance::Create()
+	void Instance::Create( void* _debugCallbackUserData )
 	{
 		assert( mInstance == VK_NULL_HANDLE );
 
@@ -50,7 +50,7 @@ namespace fan
 		{
 			Debug::Error( "ouch, this is going to be messy" );
 		}
-		SetupDebugCallback();
+		SetupDebugCallback( _debugCallbackUserData );
 	}
 
 	//================================================================================================================================
@@ -142,12 +142,13 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool Instance::SetupDebugCallback()
+	bool Instance::SetupDebugCallback( void * _userData )
 	{
 		VkDebugReportCallbackCreateInfoEXT createInfo = {};
 		createInfo.sType = VK_STRUCTURE_TYPE_DEBUG_REPORT_CALLBACK_CREATE_INFO_EXT;
 		createInfo.flags = VK_DEBUG_REPORT_ERROR_BIT_EXT | VK_DEBUG_REPORT_WARNING_BIT_EXT;
 		createInfo.pfnCallback = DebugCallback;
+		createInfo.pUserData = _userData;
 
 		auto func = ( PFN_vkCreateDebugReportCallbackEXT ) vkGetInstanceProcAddr( mInstance, "vkCreateDebugReportCallbackEXT" );
 		if ( func != nullptr && func( mInstance, &createInfo, nullptr, &mDebugReportCallback ) == VK_SUCCESS )
@@ -161,10 +162,22 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	VKAPI_ATTR VkBool32 VKAPI_CALL Instance::DebugCallback( VkDebugReportFlagsEXT /*_flags*/, VkDebugReportObjectTypeEXT /*_objType*/, uint64_t /*_obj*/, size_t /*_location*/, int32_t /*_code*/, const char* /*_layerPrefix*/, const char* _msg, void* /*_userData*/ )
+	VKAPI_ATTR VkBool32 VKAPI_CALL Instance::DebugCallback( VkDebugReportFlagsEXT /*_flags*/, VkDebugReportObjectTypeEXT /*_objType*/, uint64_t _obj, size_t /*_location*/, int32_t /*_code*/, const char* /*_layerPrefix*/, const char* _msg, void* _userData )
 	{
 		//Debug::Get() << Debug::Severity::error << "Vulkan  Error:  " << _msg << Debug::Endl();
-		std::cout << "Vulkan  Error:  " << _msg << std::endl;
+		std::stringstream ss;
+		ss << "######## VkError";
+
+		std::map< uint64_t, std::string >& debugNames = *static_cast<std::map< uint64_t, std::string >*>( _userData );
+		auto it = debugNames.find( _obj );
+		if( it != debugNames.end() )
+		{
+			ss << "[ " << it->second << " ] ";
+		}
+
+		ss << _msg;
+
+		std::cout << ss.str() << std::endl;
 		return VK_FALSE;
 	}
 }

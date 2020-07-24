@@ -190,6 +190,8 @@ namespace fan
 				VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
 				VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT
 			);
+			_device.AddDebugName( (uint64_t)mVertexBuffersLines[_index].mBuffer, "vertex buffers debug lines" );
+			_device.AddDebugName( (uint64_t)mVertexBuffersLines[_index].mMemory, "vertex buffers debug lines" );
 
 			if( size > 0 )
 			{
@@ -218,6 +220,9 @@ namespace fan
 				VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
 				VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT
 			);
+			_device.AddDebugName( (uint64_t)mVertexBuffersLinesNDT[_index].mBuffer, "vertex buffers debug lines NDT" );
+			_device.AddDebugName( (uint64_t)mVertexBuffersLinesNDT[_index].mMemory, "vertex buffers debug lines NDT" );
+
 
 			if( size > 0 )
 			{
@@ -246,6 +251,8 @@ namespace fan
 				VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
 				VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT
 			);
+			_device.AddDebugName( (uint64_t)mVertexBuffersTriangles[_index].mBuffer, "vertex buffers debug triangles" );
+			_device.AddDebugName( (uint64_t)mVertexBuffersTriangles[_index].mMemory, "vertex buffers debug triangles" );
 
 			if( size > 0 )
 			{

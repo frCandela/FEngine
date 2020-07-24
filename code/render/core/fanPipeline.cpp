@@ -208,6 +208,9 @@ namespace fan
 			return false;
 		}
 
+		_device.AddDebugName( (uint64_t)mPipelineLayout, "Pipeline" );
+		_device.AddDebugName( (uint64_t)mPipeline, "Pipeline" );
+
 		Debug::Get() << Debug::Severity::log << std::hex << "VkPipeline            " << mPipeline << std::dec << Debug::Endl();
 		return true;
 	}
@@ -242,18 +245,21 @@ namespace fan
 		if( mPipelineCache != VK_NULL_HANDLE )
 		{
 			vkDestroyPipelineCache( _device.mDevice, mPipelineCache, nullptr );
+			_device.RemoveDebugName( (uint64_t)mPipelineCache );
 			mPipelineCache = VK_NULL_HANDLE;
 		}
 
 		if ( mPipelineLayout != VK_NULL_HANDLE )
 		{
 			vkDestroyPipelineLayout( _device.mDevice, mPipelineLayout, nullptr );
+			_device.RemoveDebugName( (uint64_t)mPipelineLayout );
 			mPipelineLayout = VK_NULL_HANDLE;
 		}
 
 		if ( mPipeline != VK_NULL_HANDLE )
 		{
 			vkDestroyPipeline( _device.mDevice, mPipeline, nullptr );
+			_device.RemoveDebugName( (uint64_t)mPipeline );
 			mPipeline = VK_NULL_HANDLE;
 		}
 	}

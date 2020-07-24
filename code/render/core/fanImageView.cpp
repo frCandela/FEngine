@@ -12,6 +12,7 @@ namespace fan
 		if ( mImageView != VK_NULL_HANDLE )
 		{
 			vkDestroyImageView( _device.mDevice, mImageView, nullptr );
+			_device.RemoveDebugName( (uint64_t)mImageView );
 			mImageView = VK_NULL_HANDLE;
 		}
 	}
@@ -41,6 +42,9 @@ namespace fan
 
 		VkResult result = vkCreateImageView( _device.mDevice, &imageViewCreateInfo, nullptr, &mImageView );
 		Debug::Get() << Debug::Severity::log << std::hex << "VkImageView           " << mImageView << std::dec << Debug::Endl();
+		
+		_device.AddDebugName( (uint64_t)mImageView, "ImageView" );
+		
 		return result == VK_SUCCESS;
 	}
 }

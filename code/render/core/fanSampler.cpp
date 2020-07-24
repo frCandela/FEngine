@@ -12,6 +12,7 @@ namespace fan
 		if( mSampler != VK_NULL_HANDLE )
 		{
 			vkDestroySampler( _device.mDevice, mSampler, VK_NULL_HANDLE );
+			_device.RemoveDebugName( (uint64_t)mSampler );
 			mSampler = VK_NULL_HANDLE;
 		}
 	}
@@ -45,6 +46,10 @@ namespace fan
 		if( vkCreateSampler( _device.mDevice, &samplerInfo, VK_NULL_HANDLE, &mSampler ) != VK_SUCCESS )
 		{
 			Debug::Error() << "sampler creation failed" << Debug::Endl();
+		}
+		else
+		{
+			_device.AddDebugName( (uint64_t)mSampler, "Sampler" );
 		}
 	}
 }
