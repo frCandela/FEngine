@@ -172,7 +172,7 @@ namespace fan
 		auto it = debugNames.find( _obj );
 		if( it != debugNames.end() )
 		{
-			ss << "[ " << it->second << " ] ";
+			ss << " [  " << it->second << "  ] ";
 		}
 
 		ss << _msg;

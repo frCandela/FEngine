@@ -220,7 +220,7 @@ namespace fan
 			world.Run<S_MoveFollowTransformsUI>();			
 
 			world.Run<S_FireWeapons>(			_delta );
-			world.Run<S_GenerateLightMesh>(		_delta );
+			//world.Run<S_GenerateLightMesh>(		_delta );
 			world.Run<S_UpdateSolarPannels>(	_delta );
 			world.Run<S_RechargeBatteries>(		_delta );
 			world.Run<S_UpdateExpirationTimes>(	_delta );
@@ -238,7 +238,7 @@ namespace fan
 				world.Run<S_ParticlesOcclusion>(		_delta );
 				world.Run<S_UpdateParticles>(			_delta );
 				world.Run<S_EmitParticles>(				_delta );
-				world.Run<S_GenerateParticles>(			_delta );
+				//world.Run<S_GenerateParticles>(			_delta );
 				world.Run<S_UpdateBoundsFromRigidbody>( _delta );
 				world.Run<S_UpdateBoundsFromModel>();
 				world.Run<S_UpdateBoundsFromTransform>();

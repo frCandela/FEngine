@@ -63,6 +63,18 @@ namespace fan
 		mPipeline.Destroy( _device );
 		mDescriptorImages.Destroy( _device );
 
+		for ( Buffer & buffer : mVertexBuffers )
+		{
+			buffer.Destroy( _device );
+		}
+		mVertexBuffers.clear();
+
+		for( Buffer& buffer : mIndexBuffers )
+		{
+			buffer.Destroy( _device );
+		}
+		mIndexBuffers.clear();
+
 		ImGui::DestroyContext();
 	}
 
