@@ -69,7 +69,7 @@ namespace fan
  		_packet << sf::Uint8( packetData.getDataSize() );
  		
 		sf::Packet packetCpy = packetData;
-		for( int i = 0; i < packetData.getDataSize(); i++ )
+		for( int i = 0; i < (int)packetData.getDataSize(); i++ )
 		{
 			sf::Uint8 data;
 			packetCpy >> data;

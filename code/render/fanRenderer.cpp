@@ -579,7 +579,7 @@ namespace fan
 	{		
 		const std::vector< Texture* >& textures = Texture::s_resourceManager.GetList();
 		std::vector< VkImageView > imageViews( textures.size() );
-		for ( int i = 0; i < textures.size(); i++ )
+		for ( int i = 0; i < (int)textures.size(); i++ )
 		{
 			imageViews[i] = textures[ i ]->mImageView;
 		}

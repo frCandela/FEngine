@@ -63,7 +63,7 @@ namespace fan
 	//==============================================================================================================================================================
 	const LaunchArguments::LaunchCommand* LaunchArguments::FindCommand( const std::string& _arg )
 	{
-		for( int cmdIndex = 0; cmdIndex < commands.size(); cmdIndex++ )
+		for( int cmdIndex = 0; cmdIndex < (int)commands.size(); cmdIndex++ )
 		{
 			const LaunchCommand& cmd = commands[cmdIndex];
 			if( _arg == cmd.name )
@@ -90,7 +90,7 @@ namespace fan
 
 		// parse commands & arguments
 		int argIndex = 1;
-		while( argIndex < _args.size() )
+		while( argIndex < (int)_args.size() )
 		{
 			const LaunchCommand* command = FindCommand( _args[argIndex] );
 			if( command != nullptr )
@@ -98,7 +98,7 @@ namespace fan
 
 				// find the arguments of this command
 				std::vector < std::string > commandArguments;
-				while( ++argIndex < _args.size() && !IsCommand( _args[argIndex] ) )
+				while( ++argIndex < (int)_args.size() && !IsCommand( _args[argIndex] ) )
 				{
 					commandArguments.push_back( _args[argIndex] );
 				}

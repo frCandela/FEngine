@@ -72,7 +72,7 @@ namespace fan
 	//================================================================================================================================
 	bool Instance::IsExtensionAvailable( const std::vector< VkExtensionProperties >& _availableExtensions, const std::string _requiredExtension )
 	{
-		for ( int availableExtensionIndex = 0; availableExtensionIndex < _availableExtensions.size(); availableExtensionIndex++ )
+		for ( int availableExtensionIndex = 0; availableExtensionIndex < (int)_availableExtensions.size(); availableExtensionIndex++ )
 		{
 			if ( _requiredExtension.compare( _availableExtensions[ availableExtensionIndex ].extensionName ) == 0 )
 			{
@@ -86,7 +86,7 @@ namespace fan
 	//================================================================================================================================
 	bool Instance::IsLayerAvailable( const std::vector<VkLayerProperties>& _availableLayers, const std::string _requiredLayer )
 	{
-		for ( int availableLayerIndex = 0; availableLayerIndex < _availableLayers.size(); availableLayerIndex++ )
+		for ( int availableLayerIndex = 0; availableLayerIndex < (int)_availableLayers.size(); availableLayerIndex++ )
 		{
 			if ( _requiredLayer.compare( _availableLayers[ availableLayerIndex ].layerName ) == 0 )
 			{
@@ -110,7 +110,7 @@ namespace fan
 
 		mEnabledValidationLayers.clear();
 		mEnabledValidationLayers.reserve( _desiredLayers.size() );
-		for ( int layerIndex = 0; layerIndex < _desiredLayers.size(); layerIndex++ )
+		for ( int layerIndex = 0; layerIndex < (int)_desiredLayers.size(); layerIndex++ )
 		{
 			if ( IsLayerAvailable( availableLayers, _desiredLayers[ layerIndex ] ) )
 			{
@@ -131,7 +131,7 @@ namespace fan
 
 		mEnabledExtensions.clear();
 		mEnabledExtensions.reserve( _desiredExtensions.size() );
-		for ( int extensionIndex = 0; extensionIndex < _desiredExtensions.size(); extensionIndex++ )
+		for ( int extensionIndex = 0; extensionIndex < (int)_desiredExtensions.size(); extensionIndex++ )
 		{
 			if ( IsExtensionAvailable( availableExtensions, _desiredExtensions[ extensionIndex ] ) )
 			{

@@ -63,7 +63,7 @@ namespace fan
 		// Generate fake indices
 		m_indices.clear();
 		m_indices.reserve( _vertices.size() );
-		for ( int vertIndex = 0; vertIndex < _vertices.size(); vertIndex++ )
+		for ( int vertIndex = 0; vertIndex < (int)_vertices.size(); vertIndex++ )
 		{
 			m_indices.push_back( vertIndex );
 		}
@@ -89,7 +89,7 @@ namespace fan
 		std::vector<Vertex> uniqueVertices;
 		std::vector<uint32_t>	uniqueIndices;
 
-		for ( int indexIndex = 0; indexIndex < m_indices.size(); indexIndex++ )
+		for ( int indexIndex = 0; indexIndex < (int)m_indices.size(); indexIndex++ )
 		{
 			Vertex vertex = m_vertices[ m_indices[ indexIndex ] ];
 			auto it = verticesMap.find( vertex );
@@ -118,7 +118,7 @@ namespace fan
 		// Generate points clouds from vertex list
 		std::vector < btVector3> pointCloud;
 		pointCloud.reserve( m_vertices.size() );
-		for ( int point = 0; point < m_vertices.size(); point++ )
+		for ( int point = 0; point < (int)m_vertices.size(); point++ )
 		{
 			Vertex& vertex = m_vertices[ point ];
 			pointCloud.push_back( btVector3( vertex.pos.x, vertex.pos.y, vertex.pos.z ) );
@@ -224,7 +224,7 @@ namespace fan
 	{
 		btVector3 intersection;
 		float closestDistance = std::numeric_limits<float>::max();
-		for ( int triIndex = 0; triIndex < m_indices.size() / 3; triIndex++ )
+		for ( int triIndex = 0; triIndex < (int)m_indices.size() / 3; triIndex++ )
 		{
 			const btVector3 v0 = ToBullet( m_vertices[ m_indices[ 3 * triIndex + 0 ] ].pos );
 			const btVector3 v1 = ToBullet( m_vertices[ m_indices[ 3 * triIndex + 1 ] ].pos );

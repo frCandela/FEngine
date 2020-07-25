@@ -306,7 +306,7 @@ namespace fan
 
 		if( isOpen )
 		{
-			for( int childIndex = 0; childIndex < _node.childs.size(); childIndex++ )
+			for( int childIndex = 0; childIndex < (int)_node.childs.size(); childIndex++ )
 			{
 				SceneNode& child = world.GetComponent<SceneNode>( world.GetEntity( _node.childs[childIndex] ) );
 				R_DrawSceneTree( child, _nodeRightClicked );

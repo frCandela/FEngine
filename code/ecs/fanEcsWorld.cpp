@@ -34,13 +34,13 @@ namespace fan
 			destroyedComponent.destroy( *this, destroyedComponent.entity, destroyedComponent.component );
 		}
 
-		assert( m_transitionArchetype.Size() == m_transitions.size() );
+		assert( m_transitionArchetype.Size() == (int)m_transitions.size() );
 		if( m_transitions.size() == 0 ) { return; }
 
 		// Sort transitions by ascending entity index
 		std::vector<SortedTransition> sortedTransitions;
 		sortedTransitions.reserve( m_transitions.size() );
-		for (int transitionIndex = 0; transitionIndex < m_transitions.size(); transitionIndex++)
+		for (int transitionIndex = 0; transitionIndex < (int)m_transitions.size(); transitionIndex++)
 		{
 			const EcsTransition& transition = m_transitions[transitionIndex];
 			sortedTransitions.push_back( { transitionIndex, transition.entity.index } );
@@ -170,7 +170,7 @@ namespace fan
 			}
 		}
 		assert( m_transitions.size() == sortedTransitions.size() );			// we must keep the transitions intact during the apply
-		assert( m_transitionArchetype.Size() == sortedTransitions.size() );	// we must keep the transition archetype intact during the apply 
+		assert( m_transitionArchetype.Size() == (int)sortedTransitions.size() );	// we must keep the transition archetype intact during the apply
 
 		m_transitions.clear();
 		m_transitionArchetype.Clear();

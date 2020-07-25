@@ -56,7 +56,7 @@ namespace fan
 					const std::vector<uint32_t>& indices = meshRenderer.mesh->GetIndices();
 					const std::vector<Vertex>& vertices = meshRenderer.mesh->GetVertices();
 
-					for( int index = 0; index < indices.size(); index++ )
+					for( int index = 0; index < (int)indices.size(); index++ )
 					{
 						const Vertex& vertex = vertices[indices[index]];
 						const btVector3 position = ToBullet( modelMat * glm::vec4( vertex.pos, 1.f ) );
@@ -92,7 +92,7 @@ namespace fan
 					const std::vector<uint32_t>& indices = meshRenderer.mesh->GetIndices();
 					const std::vector<Vertex>& vertices = meshRenderer.mesh->GetVertices();
 
-					for( int index = 0; index < indices.size() / 3; index++ )
+					for( int index = 0; index < (int)indices.size() / 3; index++ )
 					{
 						const btVector3 v0 = ToBullet( modelMat * glm::vec4( vertices[indices[3 * index + 0]].pos, 1.f ) );
 						const btVector3 v1 = ToBullet( modelMat * glm::vec4( vertices[indices[3 * index + 1]].pos, 1.f ) );

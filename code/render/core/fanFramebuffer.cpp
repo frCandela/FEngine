@@ -12,7 +12,7 @@ namespace fan
 	//================================================================================================================================
 	void FrameBuffer::CreateForSwapchain( Device& _device, const size_t _framesCount, const VkExtent2D _extent, RenderPass& _renderPass, ImageView* _swapchainImageViews )
 	{		
-		for( int i = 0; i < _framesCount; i++ )
+		for( int i = 0; i < (int)_framesCount; i++ )
 		{
 			assert( mFrameBuffers[i] == VK_NULL_HANDLE );
 		
@@ -42,7 +42,7 @@ namespace fan
 	//================================================================================================================================
 	void FrameBuffer::Create( Device& _device, const size_t _framesCount, const VkExtent2D _extent, RenderPass& _renderPass, const VkImageView* _attachments, uint32_t _attCount )
 	{
-		for( int i = 0; i < _framesCount; i++ )
+		for( int i = 0; i < (int)_framesCount; i++ )
 		{
 			assert( mFrameBuffers[i] == VK_NULL_HANDLE );
 

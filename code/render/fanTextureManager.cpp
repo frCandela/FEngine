@@ -86,7 +86,7 @@ namespace fan
 	Texture* TextureManager::FindTexture( const std::string& _path )
 	{
 		const std::string cleanPath = std::filesystem::path( _path ).make_preferred().string();
-		for (int textureIndex = 0; textureIndex < m_textureList.size() ; textureIndex++)
+		for (int textureIndex = 0; textureIndex < (int)m_textureList.size() ; textureIndex++)
 		{
 			Texture& texture = *m_textureList[ textureIndex ];
 			if ( texture.mPath == cleanPath )

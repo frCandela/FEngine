@@ -12,7 +12,7 @@ namespace fan
 	{
 		assert( m_keysPressed.size() == m_keysReleased.size() );
 		const uint64_t max = std::numeric_limits<uint64_t>::max();
-		for ( int buttonIndex = 0; buttonIndex < m_keysPressed.size(); buttonIndex++ )
+		for ( int buttonIndex = 0; buttonIndex < (int) m_keysPressed.size(); buttonIndex++ )
 		{
 			m_keysPressed[ buttonIndex ] = max;
 			m_keysReleased[ buttonIndex ] = max;
@@ -75,7 +75,7 @@ namespace fan
 		{
 			std::string name( glfwName );
 
-			for ( int charIndex = 0; charIndex < name.size(); charIndex++ )
+			for ( int charIndex = 0; charIndex < (int) name.size(); charIndex++ )
 			{
 				name[ charIndex ] = ( char ) std::toupper( name[ charIndex ] );
 			}

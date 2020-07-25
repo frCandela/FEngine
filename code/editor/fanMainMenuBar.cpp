@@ -47,7 +47,7 @@ namespace fan
 // 		SerializedValues::Get().SetColor( "editor_grid_color", m_editorGrid->color );
 // 		SerializedValues::Get().SetVec3( "editor_grid_offset", m_editorGrid->offset );
 
-		for ( int windowIndex = 0; windowIndex < m_editorWindows.size(); windowIndex++ )
+		for ( int windowIndex = 0; windowIndex < (int)m_editorWindows.size(); windowIndex++ )
 		{
 			delete m_editorWindows[ windowIndex ];
 		}
@@ -95,7 +95,7 @@ namespace fan
 		ImGui::End();
 
 		// Draw editor windows
-		for ( int windowIndex = 0; windowIndex < m_editorWindows.size(); windowIndex++ )
+		for ( int windowIndex = 0; windowIndex < (int)m_editorWindows.size(); windowIndex++ )
 		{
 			m_editorWindows[ windowIndex ]->Draw( _world );
 		}

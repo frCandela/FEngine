@@ -112,7 +112,7 @@ namespace fan
 		int Size() const
 		{
 			int size = 0;
-			for( int i = 0; i < m_archetypes.size(); i++ )
+			for( int i = 0; i < (int)m_archetypes.size(); i++ )
 			{
 				size += m_archetypes[i]->Size();
 			}

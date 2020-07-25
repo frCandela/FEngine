@@ -71,7 +71,7 @@ namespace fan
 		assert( _colors.size() == _triangles.size() / 3 );
 
 		debugTriangles.resize( debugTriangles.size() + _triangles.size() );
-		for( int triangleIndex = 0; triangleIndex < _triangles.size() / 3; triangleIndex++ )
+		for( int triangleIndex = 0; triangleIndex < (int)_triangles.size() / 3; triangleIndex++ )
 		{
 			const btVector3 v0 = _triangles[3 * triangleIndex + 0];
 			const btVector3 v1 = _triangles[3 * triangleIndex + 1];
@@ -123,7 +123,7 @@ namespace fan
 	{
 		std::vector< btVector3 > cube = GetCube( _halfExtent );
 
-		for( int vertIndex = 0; vertIndex < cube.size(); vertIndex++ )
+		for( int vertIndex = 0; vertIndex < (int)cube.size(); vertIndex++ )
 		{
 			cube[vertIndex] = _transform * cube[vertIndex];
 		}
@@ -172,12 +172,12 @@ namespace fan
 
 		std::vector<btVector3> sphere = GetSphere( _radius, _numSubdivisions );
 
-		for( int vertIndex = 0; vertIndex < sphere.size(); vertIndex++ )
+		for( int vertIndex = 0; vertIndex < (int)sphere.size(); vertIndex++ )
 		{
 			sphere[vertIndex] = _transform * sphere[vertIndex];
 		}
 
-		for( int triangleIndex = 0; triangleIndex < sphere.size() / 3; triangleIndex++ )
+		for( int triangleIndex = 0; triangleIndex < (int)sphere.size() / 3; triangleIndex++ )
 		{
 			const btVector3 v0 = sphere[3 * triangleIndex + 0];
 			const btVector3 v1 = sphere[3 * triangleIndex + 1];
@@ -203,12 +203,12 @@ namespace fan
 	{
 		std::vector<btVector3> cone = GetCone( _radius, _height, _numSubdivisions );
 
-		for( int vertIndex = 0; vertIndex < cone.size(); vertIndex++ )
+		for( int vertIndex = 0; vertIndex < (int)cone.size(); vertIndex++ )
 		{
 			cone[vertIndex] = _transform * cone[vertIndex];
 		}
 
-		for( int triangleIndex = 0; triangleIndex < cone.size() / 3; triangleIndex++ )
+		for( int triangleIndex = 0; triangleIndex < (int)cone.size() / 3; triangleIndex++ )
 		{
 			DebugTriangle( cone[3 * triangleIndex + 0], cone[3 * triangleIndex + 1], cone[3 * triangleIndex + 2], _color );
 		}

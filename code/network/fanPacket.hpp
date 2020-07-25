@@ -222,7 +222,7 @@ namespace fan
 			_packet << PacketTypeInt( PacketType::PlayerInput );
 			_packet << sf::Uint8(inputs.size());
 
-			for( int i = 0; i < inputs.size(); i++ )
+			for( int i = 0; i < (int)inputs.size(); i++ )
 			{
 				const InputData& inputData = inputs[i];
 				const sf::Uint8 keyBits =

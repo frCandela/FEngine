@@ -88,7 +88,7 @@ namespace fan
 						std::stringstream ss;
 						ImGui::Icon( info.icon, { 16,16 }, GroupsColors::GetColor( info.group ) ); ImGui::SameLine();
 						ss << info.name.c_str();
-						for( int i = 0; i < 19 - info.name.size(); i++ )
+						for( int i = 0; i < 19 - (int)info.name.size(); i++ )
 						{
 							ss << " ";
 						}

@@ -123,14 +123,14 @@ namespace fan
  			// Get components paths
 			std::vector<Path> componentsPath;
 			componentsPath.reserve( components.size() );
-			for( int componentIndex = 0; componentIndex < components.size(); componentIndex++ )
+			for( int componentIndex = 0; componentIndex < (int)components.size(); componentIndex++ )
 			{
 				componentsPath.push_back(  components[componentIndex].editorPath );
 			}
 
 			// Sort components paths
 			std::set< Path > componentsPathSet;
-			for( int componentIndex = 0; componentIndex < components.size(); componentIndex++ )
+			for( int componentIndex = 0; componentIndex < (int)components.size(); componentIndex++ )
 			{
 				componentsPathSet.insert( componentsPath[componentIndex] );
 			} componentsPathSet.erase( "" );
@@ -144,7 +144,7 @@ namespace fan
 			}
 
 			// Draw menu items for components at path "/"
-			for( int componentIndex = 0; componentIndex < components.size(); componentIndex++ )
+			for( int componentIndex = 0; componentIndex < (int)components.size(); componentIndex++ )
 			{
 				if( componentsPath[componentIndex] == "/" ) 
 				{ 
@@ -167,7 +167,7 @@ namespace fan
 		std::string name = rootPath.string();
 
 		// Replace back slashes with forward slashes
-		for( int charIndex = 0; charIndex < name.size(); charIndex++ )
+		for( int charIndex = 0; charIndex < (int)name.size(); charIndex++ )
 		{
 			if( name[charIndex] == '\\' ) { name[charIndex] = '/'; }
 		}
@@ -195,7 +195,7 @@ namespace fan
 			}
 
 			// draw menu items (components)
-			for( int componentIndex = 0; componentIndex < _components.size(); componentIndex++ )
+			for( int componentIndex = 0; componentIndex < (int)_components.size(); componentIndex++ )
 			{
 				if( _componentsPath[componentIndex] == rootPath.string() )
 				{

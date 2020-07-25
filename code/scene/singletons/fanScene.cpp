@@ -123,7 +123,7 @@ namespace fan
 
 		EcsHandle handle = _node.handle;
 		const std::vector<EcsHandle>& childs = _node.childs;
-		for ( int childIndex = 0; childIndex < childs.size(); childIndex++ )
+		for ( int childIndex = 0; childIndex < (int)childs.size(); childIndex++ )
 		{
 			EcsHandle childHandle = R_FindMaximumHandle( world.GetComponent<SceneNode>( world.GetEntity( childs[childIndex] ) ) );
 			if ( childHandle > handle )
@@ -242,7 +242,7 @@ namespace fan
 		// save childs
 		Json& jchilds = _json["childs"];
 		unsigned childIndex = 0;
-		for( int sceneNodeIndex = 0; sceneNodeIndex < _node.childs.size(); sceneNodeIndex++ )
+		for( int sceneNodeIndex = 0; sceneNodeIndex < (int)_node.childs.size(); sceneNodeIndex++ )
 		{
 			const EcsHandle childHandle = _node.childs[sceneNodeIndex];
 			SceneNode& childNode = world.GetComponent<SceneNode>( world.GetEntity(childHandle ));
@@ -281,7 +281,7 @@ namespace fan
 				// push all childs
 				const Json& jchilds = jNode["childs"];
 				{
-					for( int childIndex = 0; childIndex < jchilds.size(); childIndex++ )
+					for( int childIndex = 0; childIndex < (int)jchilds.size(); childIndex++ )
 					{
 						const Json& jChild = jchilds[childIndex];
 						stack.push( &jChild );
@@ -351,7 +351,7 @@ namespace fan
 			if( jScene.find( "singletons" ) != jScene.end() )
 			{
 				const Json& jSingletons = jScene["singletons"];
-				for( int childIndex = 0; childIndex < jSingletons.size(); childIndex++ )
+				for( int childIndex = 0; childIndex < (int)jSingletons.size(); childIndex++ )
 				{
 					const Json& jSingleton_i = jSingletons[childIndex];
 					unsigned staticIndex = 0;
@@ -415,7 +415,7 @@ namespace fan
 		const Json& jComponents = _json["components"];
 		{
 			const EcsEntity	entity = world.GetEntity( node.handle );
-			for( int childIndex = 0; childIndex < jComponents.size(); childIndex++ )
+			for( int childIndex = 0; childIndex < (int)jComponents.size(); childIndex++ )
 			{
 				const Json& jComponent_i = jComponents[childIndex];				
 				unsigned staticIndex = 0;
@@ -429,7 +429,7 @@ namespace fan
 		// Load childs
 		const Json& jchilds = _json["childs"];
 		{
-			for( int childIndex = 0; childIndex < jchilds.size(); childIndex++ )
+			for( int childIndex = 0; childIndex < (int)jchilds.size(); childIndex++ )
 			{
 				const Json& jchild_i = jchilds[childIndex];
 				{					

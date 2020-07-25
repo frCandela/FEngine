@@ -44,7 +44,7 @@ namespace fan
 	{
 		m_scrollDown = true;
 
-		if ( m_logBuffer.size() < m_maxSizeLogBuffers )
+		if ( (int)m_logBuffer.size() < m_maxSizeLogBuffers )
 		{
 			m_logBuffer.push_back( LogItem( _item ) );
 		}
@@ -66,7 +66,7 @@ namespace fan
 		if ( height > 60 )
 		{
 			ImGui::BeginChild( "scrolling", ImVec2( 0, height - 65 ), true, ImGuiWindowFlags_AlwaysVerticalScrollbar );
-			for ( int logIndex = m_firstLogIndex; logIndex < m_firstLogIndex + m_logBuffer.size(); logIndex++ )
+			for ( int logIndex = m_firstLogIndex; logIndex < m_firstLogIndex + (int)m_logBuffer.size(); logIndex++ )
 			{
 				const LogItem& item = m_logBuffer[ logIndex % m_maxSizeLogBuffers ];
 				ImGui::TextColored( item.color, item.logMessage.c_str() );	// Time			

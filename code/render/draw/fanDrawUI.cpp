@@ -140,7 +140,7 @@ namespace fan
 	void DrawUI::SetUIDrawData( const std::vector<RenderDataUIMesh>& _drawData )
 	{
 		mDrawData.resize( _drawData.size() );
-		for( int meshIndex = 0; meshIndex < _drawData.size(); meshIndex++ )
+		for( int meshIndex = 0; meshIndex < (int)_drawData.size(); meshIndex++ )
 		{
 			const RenderDataUIMesh& uiData = _drawData[meshIndex];
 

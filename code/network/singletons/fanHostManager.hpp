@@ -31,7 +31,7 @@ namespace fan
 			}
 			size_t operator()( const IPPort& _ipPort ) const 
 			{ 
-				return size_t(_ipPort.adress.toInteger()) | ( size_t(_ipPort.port) << 32 );
+				return size_t(_ipPort.adress.toInteger()) | ( size_t(_ipPort.port) >> 31 );
 			}
 		};
 

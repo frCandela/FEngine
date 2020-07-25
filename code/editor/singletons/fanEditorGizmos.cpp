@@ -65,7 +65,7 @@ namespace fan
 			// Generates a cone shape
 			std::vector<btVector3> coneTris = GetCone( 0.1f * size, 0.5f * size, 10 );
 			btTransform transform = _transform * coneRotation[ axisIndex ];
-			for ( int vertIndex = 0; vertIndex < coneTris.size(); vertIndex++ )
+			for ( int vertIndex = 0; vertIndex < (int)coneTris.size(); vertIndex++ )
 			{
 				coneTris[ vertIndex ] = transform * coneTris[ vertIndex ];
 			}
@@ -79,7 +79,7 @@ namespace fan
 			// Raycast on the gizmo shape to determine if the mouse is hovering it
 			Color clickedColor = opaqueColor;
 			const Ray ray = camera.ScreenPosToRay( cameraTransform, Mouse::Get().GetScreenSpacePosition() );
-			for ( int triIndex = 0; triIndex < coneTris.size() / 3; triIndex++ )
+			for ( int triIndex = 0; triIndex < (int)coneTris.size() / 3; triIndex++ )
 			{
 				Triangle triangle( coneTris[ 3 * triIndex + 0 ], coneTris[ 3 * triIndex + 1 ], coneTris[ 3 * triIndex + 2 ] );
 				btVector3 intersection;
@@ -97,7 +97,7 @@ namespace fan
 
 			// Draw the gizmo cone & lines
 			world.GetSingleton<RenderDebug>().DebugLine( origin, origin + size * ( _transform * axisDirection[ axisIndex ] - origin ), opaqueColor, false );
-			for ( int triangleIndex = 0; triangleIndex < coneTris.size() / 3; triangleIndex++ )
+			for ( int triangleIndex = 0; triangleIndex < (int)coneTris.size() / 3; triangleIndex++ )
 			{
 				world.GetSingleton<RenderDebug>().DebugTriangle( coneTris[ 3 * triangleIndex + 0 ], coneTris[ 3 * triangleIndex + 1 ], coneTris[ 3 * triangleIndex + 2 ], clickedColor );
 			}

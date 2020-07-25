@@ -40,7 +40,7 @@ namespace fan
 		const std::vector< Texture* >& textures = Texture::s_resourceManager.GetList();
 		if ( ImGui::CollapsingHeader( "Loaded textures : " ) )
 		{
-			for ( int textureIndex = 0; textureIndex < textures.size(); textureIndex++ )
+			for ( int textureIndex = 0; textureIndex < (int)textures.size(); textureIndex++ )
 			{
 				const Texture* tex = textures[ textureIndex ];
 				ImGui::Text( "ref: %d size: %u x %u name: %s", tex->GetRefCount(), tex->mExtent.width, tex->mExtent.height, tex->mPath.c_str() );

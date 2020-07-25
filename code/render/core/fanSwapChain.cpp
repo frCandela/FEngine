@@ -96,7 +96,7 @@ namespace fan
 		supportedPresentModes.resize( presentModeCount );
 		vkGetPhysicalDeviceSurfacePresentModesKHR( _device.mPhysicalDevice, mSurface, &presentModeCount, supportedPresentModes.data() );
 
-		for ( int presentModeIndex = 0; presentModeIndex < supportedPresentModes.size(); presentModeIndex++ )
+		for ( int presentModeIndex = 0; presentModeIndex < (int)supportedPresentModes.size(); presentModeIndex++ )
 		{
 			if ( supportedPresentModes[ presentModeIndex ] == _desiredPresentMode )
 			{
@@ -169,7 +169,7 @@ namespace fan
 			return _desiredSurfaceFormat;
 		}
 
-		for ( int formatIndex = 0; formatIndex < supportedSurfaceFormats.size(); formatIndex++ )
+		for ( int formatIndex = 0; formatIndex < (int)supportedSurfaceFormats.size(); formatIndex++ )
 		{
 			if ( supportedSurfaceFormats[ formatIndex ].colorSpace == _desiredSurfaceFormat.colorSpace &&
 				 supportedSurfaceFormats[ formatIndex ].format == _desiredSurfaceFormat.format )
@@ -178,7 +178,7 @@ namespace fan
 			}
 		}
 
-		for ( int formatIndex = 0; formatIndex < supportedSurfaceFormats.size(); formatIndex++ )
+		for ( int formatIndex = 0; formatIndex < (int)supportedSurfaceFormats.size(); formatIndex++ )
 		{
 			if ( supportedSurfaceFormats[ formatIndex ].format == _desiredSurfaceFormat.format )
 			{

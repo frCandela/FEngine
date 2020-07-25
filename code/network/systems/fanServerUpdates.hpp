@@ -120,7 +120,7 @@ namespace fan
 				{
 					int max = hostConnection.framesDelta[0];
 					int min = hostConnection.framesDelta[0];
-					for( int i = 1; i < hostConnection.framesDelta.size(); i++ )
+					for( int i = 1; i < (int)hostConnection.framesDelta.size(); i++ )
 					{
 						max = std::max( max, hostConnection.framesDelta[i] );
 						min = std::min( min, hostConnection.framesDelta[i] );

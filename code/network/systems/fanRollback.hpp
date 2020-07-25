@@ -146,7 +146,7 @@ namespace fan
 				std::fill( firstStateFound.begin(), firstStateFound.end(), false );
 
 				// iterate over all components and only keep the first rollback state when RollbackNoOverwrite is not set				
-				for (int i = 0; i < clientRollback.rollbackDatas.size();)
+				for (int i = 0; i < (int)clientRollback.rollbackDatas.size();)
 				{
 					const ClientRollback::RollbackData& rollbackData = clientRollback.rollbackDatas[i];
 					const EcsComponentInfo& componentInfo = _world.IndexedGetComponentInfo( rollbackData.componentIndex );

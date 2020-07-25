@@ -82,7 +82,7 @@ namespace fan
 	void ReliabilityLayer::ProcessPacket( const PacketAck& _packetAck )
 	{
 		int ackIndex = 0;
-		while( ackIndex < _packetAck.tags.size() && !inFlightPackets.empty() )
+		while( ackIndex < (int)_packetAck.tags.size() && !inFlightPackets.empty() )
 		{
 			const PacketTag ackPacketTag = _packetAck.tags[ackIndex];
 			/*const*/ InFlightPacket& inFlightPacket = inFlightPackets.front();

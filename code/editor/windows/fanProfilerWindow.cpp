@@ -98,7 +98,7 @@ namespace fan
 			lastColorStateAtDepth.fill( false );
 
 			int endIndex = 0;
-			for ( int index = 0; index < m_intervalsCopy.size() / 2; ++index )
+			for ( int index = 0; index < (int)m_intervalsCopy.size() / 2; ++index )
 			{
 
 				// Find next closed interval

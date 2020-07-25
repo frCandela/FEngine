@@ -231,7 +231,7 @@ namespace fan
 
 						// axes
 						const std::vector< Joystick::Axis >& axes = Joystick::Get().GetGamepadAxisList();
-						for ( int axisIndex = 0; axisIndex < axes.size(); axisIndex++ )
+						for ( int axisIndex = 0; axisIndex < (int)axes.size(); axisIndex++ )
 						{
 							float axisValue = Joystick::Get().GetAxis( joystickIndex, axes[ axisIndex ] );
 							ImGui::SliderFloat( Joystick::Get().s_axisNames[ axisIndex ], &axisValue, -1.f, 1.f );
@@ -239,7 +239,7 @@ namespace fan
 
 						// buttons
 						const std::vector< Joystick::Button >& buttons = Joystick::Get().GetGamepadButtonsList();
-						for ( int buttonindex = 0; buttonindex < buttons.size(); buttonindex++ )
+						for ( int buttonindex = 0; buttonindex < (int)buttons.size(); buttonindex++ )
 						{
 							bool buttonValue = Joystick::Get().GetButton( joystickIndex, buttons[ buttonindex ] );
 							ImGui::Checkbox( Joystick::Get().s_buttonsNames[ buttonindex ], &buttonValue );

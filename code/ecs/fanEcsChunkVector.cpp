@@ -26,7 +26,7 @@ namespace fan
 		EcsChunk& chunk = m_chunks[chunkIndex];
 
 		// Last chunk ? just remove the element & back swap locally in the chunk
-		if( chunkIndex == m_chunks.size() - 1 )
+		if( chunkIndex == (int)m_chunks.size() - 1 )
 		{
 			chunk.Remove( elementIndex );
 		}

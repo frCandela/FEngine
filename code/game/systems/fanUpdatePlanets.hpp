@@ -111,7 +111,7 @@ namespace fan
 				// Finds the index of a RIGHT axis that has a minimal number of nested levels of planets	(depth)	
 				int startIndexDepth = 10000;
 				int depth = 0;	//			
-				for( int axisIndex = 0; axisIndex < segments.size(); axisIndex++ )
+				for( int axisIndex = 0; axisIndex < (int)segments.size(); axisIndex++ )
 				{
 					OrientedSegment& axis = segments[axisIndex];
 					depth += axis.openSide == OrientedSegment::RIGHT ? 1 : -1;
@@ -128,7 +128,7 @@ namespace fan
 			vertices.reserve( 3 * _view.Size() );
 			const float minGapRadians = btRadians( sunLight.subAngle );
 			std::set<float> norms;	// Stores the nested opening segments norms
-			for( int axisIndex = 0; axisIndex < segments.size(); axisIndex++ )
+			for( int axisIndex = 0; axisIndex < (int)segments.size(); axisIndex++ )
 			{
 				const int index = ( axisIndex + startIndex ) % segments.size();
 				const int indexNext = ( index + 1 ) % segments.size();

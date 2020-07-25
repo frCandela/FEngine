@@ -131,7 +131,7 @@ namespace fan
 		m_gameViewWindow->onSelectGame.Connect( &EditorHolder::OnCurrentGameSelect, this );
 
 		// Loop over all worlds to initialize them
-		for (int worldIndex = 0; worldIndex < m_worlds.size() ; worldIndex++)
+		for (int worldIndex = 0; worldIndex < (int)m_worlds.size() ; worldIndex++)
 		{
 			assert( m_worlds[worldIndex] != nullptr );
 			EcsWorld& world = *m_worlds[worldIndex];
@@ -236,7 +236,7 @@ namespace fan
 		const bool logicIsThisFrame = currentTime > currentWorldTime.lastLogicTime + currentWorldTime.logicDelta;
 
 		// Update all worlds
-		for( int worldIndex = 0; worldIndex < m_worlds.size(); worldIndex++ )
+		for( int worldIndex = 0; worldIndex < (int)m_worlds.size(); worldIndex++ )
 		{
 			EcsWorld& world = *m_worlds[worldIndex];
 			const bool isCurrentWorld = ( &world == &GetCurrentWorld() );			
@@ -572,12 +572,12 @@ namespace fan
 	//================================================================================================================================
 	void EditorHolder::OnCurrentGameSelect( const int _index )
 	{
-		assert( _index < m_worlds.size() );
+		assert( _index < (int)m_worlds.size() );
 
 		m_currentWorld = _index;
 
 		// Set all to headless except the current
-		for( int worldIndex = 0; worldIndex < m_worlds.size(); worldIndex++ )
+		for( int worldIndex = 0; worldIndex < (int)m_worlds.size(); worldIndex++ )
 		{
 			EcsWorld& world = *m_worlds[worldIndex];
 			RenderWorld& renderWorld = world.GetSingleton<RenderWorld>();

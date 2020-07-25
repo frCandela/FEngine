@@ -34,7 +34,7 @@ namespace fan
 		mDescriptorTriangles.Destroy( _device );
 
 		assert( (mVertexBuffersLines.size() == mVertexBuffersLinesNDT.size()) && (mVertexBuffersLines.size() == mVertexBuffersTriangles.size()) );
-		for( int i = 0; i < mVertexBuffersLines.size(); i++ )
+		for( int i = 0; i < (int)mVertexBuffersLines.size(); i++ )
 		{
 			mVertexBuffersLines[i].Destroy( _device );
 			mVertexBuffersLinesNDT[i].Destroy( _device );

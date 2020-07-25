@@ -291,7 +291,7 @@ namespace ImGui
 						if ( Joystick::Get().IsConnected( joystickIndex ) && Joystick::Get().IsGamepad( joystickIndex ) )
 						{
 							const std::vector< Joystick::Axis >& axes = Joystick::Get().GetGamepadAxisList();
-							for ( int axisIndex = 0; axisIndex < axes.size(); axisIndex++ )
+							for ( int axisIndex = 0; axisIndex < (int) axes.size(); axisIndex++ )
 							{
 								float axisValue = Joystick::Get().GetAxis( joystickIndex, axes[ axisIndex ] );
 								if ( axisValue == 1.f )
@@ -318,7 +318,7 @@ namespace ImGui
 					ImGui::Text( "PRESS ANY KEY" );
 					Keyboard& toto = Keyboard::Get();
 					const std::vector<Keyboard::Key>& keysList = toto.GetKeysList();
-					for ( int keyIndex = 0; keyIndex < keysList.size(); keyIndex++ )
+					for ( int keyIndex = 0; keyIndex < (int)keysList.size(); keyIndex++ )
 					{
 						if ( Keyboard::IsKeyDown( keysList[ keyIndex ] ) )
 						{
@@ -349,7 +349,7 @@ namespace ImGui
 						if ( Joystick::Get().IsConnected( joystickIndex ) && Joystick::Get().IsGamepad( joystickIndex ) )
 						{
 							const std::vector< Joystick::Button >& buttons = Joystick::Get().GetGamepadButtonsList();
-							for ( int buttonIndex = 0; buttonIndex < buttons.size(); buttonIndex++ )
+							for ( int buttonIndex = 0; buttonIndex < (int)buttons.size(); buttonIndex++ )
 							{
 								if ( Joystick::Get().GetButton( joystickIndex, buttons[ buttonIndex ] ) )
 								{

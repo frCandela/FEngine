@@ -22,7 +22,7 @@ namespace fan
 			mDescriptorSetLayout = VK_NULL_HANDLE;
 		}
 
-		for ( int bindingIndex = 0; bindingIndex < mBindingData.size(); bindingIndex++ )
+		for ( int bindingIndex = 0; bindingIndex < (int)mBindingData.size(); bindingIndex++ )
 		{
 			for ( int bufferIndex = 0; bufferIndex < SwapChain::s_maxFramesInFlight; bufferIndex++ )
 			{
@@ -69,8 +69,8 @@ namespace fan
 	//================================================================================================================================
 	void DescriptorUniforms::ResizeDynamicUniformBinding( Device& _device, const size_t _count, VkDeviceSize _bufferSize, VkDeviceSize _alignment, const int _index )
 	{
-		assert( _index < mBindingData.size() );
-		for ( int bufferIndex = 0; bufferIndex < _count; bufferIndex++ )
+		assert( _index < (int)mBindingData.size() );
+		for ( int bufferIndex = 0; bufferIndex < (int)_count; bufferIndex++ )
 		{
 			mBindingData[ _index ].buffers[ bufferIndex ].Destroy( _device );
 		}
@@ -101,7 +101,7 @@ namespace fan
 		{
 			std::vector < VkDescriptorSetLayoutBinding > bindingsArray;
 			bindingsArray.reserve( mBindingData.size() );
-			for( int bindingIndex = 0; bindingIndex < mBindingData.size(); bindingIndex++ )
+			for( int bindingIndex = 0; bindingIndex < (int)mBindingData.size(); bindingIndex++ )
 			{
 				bindingsArray.push_back( mBindingData[bindingIndex].layoutBinding );
 			}
@@ -123,7 +123,7 @@ namespace fan
 		// Create DescriptorPool
 		{
 			std::vector< VkDescriptorPoolSize > poolSizes( mBindingData.size() );
-			for ( int layoutIndex = 0; layoutIndex < mBindingData.size(); layoutIndex++ )
+			for ( int layoutIndex = 0; layoutIndex < (int)mBindingData.size(); layoutIndex++ )
 			{
 				poolSizes[ layoutIndex ].type = mBindingData[ layoutIndex ].layoutBinding.descriptorType;
 				poolSizes[ layoutIndex ].descriptorCount = mBindingData[ layoutIndex ].layoutBinding.descriptorCount;
@@ -181,7 +181,7 @@ namespace fan
 		std::vector < std::vector<VkDescriptorBufferInfo> > descriptorBufferInfos( mBindingData.size() );
 		std::vector < std::vector < VkWriteDescriptorSet> >	writeDescriptorSets( mBindingData.size() );
 
-		for ( int bindingIndex = 0; bindingIndex < mBindingData.size(); bindingIndex++ )
+		for ( int bindingIndex = 0; bindingIndex < (int)mBindingData.size(); bindingIndex++ )
 		{
 			BindingData& bindingData = mBindingData[ bindingIndex ];
 
@@ -225,7 +225,7 @@ namespace fan
 	void DescriptorUniforms::BindingData::CreateBuffers( Device& _device, const size_t _count, VkDeviceSize _sizeBuffer, VkDeviceSize _alignment )
 	{		
 		assert( _count <= SwapChain::s_maxFramesInFlight );
-		for ( int bufferIndex = 0; bufferIndex < _count; bufferIndex++ )
+		for ( int bufferIndex = 0; bufferIndex < (int)_count; bufferIndex++ )
 		{
 			buffers[ bufferIndex ].Create(_device,_sizeBuffer,VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,VK_MEMORY_PROPERTY_HOST_COHERENT_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, _alignment );
 		}		

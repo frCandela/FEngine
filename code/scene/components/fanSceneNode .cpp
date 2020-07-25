@@ -65,7 +65,7 @@ namespace fan
 				SceneNode& childNode = _world.GetComponent<SceneNode>( childEntity );
 				nodesstack.pop();
 				
-				for( int childIndex = 0; childIndex < childNode.childs.size(); childIndex++ )
+				for( int childIndex = 0; childIndex < (int)childNode.childs.size(); childIndex++ )
 				{
 					nodesstack.push( childNode.childs[childIndex] );
 				}
@@ -128,7 +128,7 @@ namespace fan
 	//================================================================================================================================
 	void SceneNode::RemoveChild( const SceneNode& _child )
 	{
-		for( int childIndex = 0; childIndex < childs.size(); childIndex++ )
+		for( int childIndex = 0; childIndex < (int)childs.size(); childIndex++ )
 		{
 			EcsHandle childHandle = childs[childIndex];
 			if( childHandle == _child.handle )
@@ -144,7 +144,7 @@ namespace fan
 	//================================================================================================================================
 	bool SceneNode::HasChild( const SceneNode& _child )
 	{
-		for( int childIndex = 0; childIndex < childs.size(); childIndex++ )
+		for( int childIndex = 0; childIndex < (int)childs.size(); childIndex++ )
 		{
 			if( childs[childIndex] == _child.handle )
 			{
@@ -219,7 +219,7 @@ namespace fan
 		GetParent().RemoveChild( *this );
 
 		SceneNode& brotherParent = _brother.GetParent();
-		for( int childIndex = 0; childIndex < brotherParent.childs.size(); childIndex++ )
+		for( int childIndex = 0; childIndex < (int)brotherParent.childs.size(); childIndex++ )
 		{
 			if( brotherParent.childs[childIndex] == _brother.handle )
 			{
@@ -243,7 +243,7 @@ namespace fan
 			SceneNode& node =  world.GetComponent<SceneNode>( world.GetEntity( stack.top() ) );
 			stack.pop();
 			_outList.push_back( &node );
-			for( int i = 0; i < node.childs.size(); i++ )
+			for( int i = 0; i < (int)node.childs.size(); i++ )
 			{
 				stack.push( node.childs[i] );
 			}

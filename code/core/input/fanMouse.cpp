@@ -11,7 +11,7 @@ namespace fan
 	{
 		assert( m_buttonsPressed.size() == m_buttonsReleased.size() );
 		constexpr uint64_t max = std::numeric_limits<uint64_t>::max();
-		for ( int buttonIndex = 0; buttonIndex < m_buttonsPressed.size(); buttonIndex++ )
+		for ( int buttonIndex = 0; buttonIndex < (int)m_buttonsPressed.size(); buttonIndex++ )
 		{
 			m_buttonsPressed[ buttonIndex ] = max;
 			m_buttonsReleased[ buttonIndex ] = max;

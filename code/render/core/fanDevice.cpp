@@ -177,7 +177,7 @@ namespace fan
 		VkImageTiling tiling = VK_IMAGE_TILING_OPTIMAL;
 		VkFormatFeatureFlags features = VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT;
 
-		for ( int candidateIndex = 0; candidateIndex < candidates.size(); candidateIndex++ )
+		for ( int candidateIndex = 0; candidateIndex < (int)candidates.size(); candidateIndex++ )
 		{
 			VkFormatProperties props;
 			vkGetPhysicalDeviceFormatProperties( mPhysicalDevice, candidates[ candidateIndex ], &props );
@@ -204,7 +204,7 @@ namespace fan
 		std::vector< VkPhysicalDevice> availableDevices( devicesCount );
 		if ( vkEnumeratePhysicalDevices( _instance.mInstance, &devicesCount, availableDevices.data() ) != VK_SUCCESS ) { return false; }
 
-		for ( int deviceIndex = 0; deviceIndex < availableDevices.size(); deviceIndex++ )
+		for ( int deviceIndex = 0; deviceIndex < (int)availableDevices.size(); deviceIndex++ )
 		{
 			mPhysicalDevice = availableDevices[ deviceIndex ];
 
@@ -231,7 +231,7 @@ namespace fan
 		std::vector < const char*> existingExtensions;
 		existingExtensions.reserve( _desiredExtensions.size() );
 
-		for ( int extensionIndex = 0; extensionIndex < _desiredExtensions.size(); extensionIndex++ )
+		for ( int extensionIndex = 0; extensionIndex < (int)_desiredExtensions.size(); extensionIndex++ )
 		{
 			if ( IsExtensionAvailable( _availableExtensions, _desiredExtensions[ extensionIndex ] ) )
 			{
@@ -245,7 +245,7 @@ namespace fan
 	//================================================================================================================================
 	bool Device::IsExtensionAvailable( const std::vector<VkExtensionProperties>& _availableExtensions, std::string _requiredExtension )
 	{
-		for ( int availableExtensionIndex = 0; availableExtensionIndex < _availableExtensions.size(); availableExtensionIndex++ )
+		for ( int availableExtensionIndex = 0; availableExtensionIndex < (int)_availableExtensions.size(); availableExtensionIndex++ )
 		{
 			if ( _requiredExtension.compare( _availableExtensions[ availableExtensionIndex ].extensionName ) == 0 )
 			{
@@ -267,7 +267,7 @@ namespace fan
 		VkQueueFlags desiredGraphicsCapabilities = VK_QUEUE_GRAPHICS_BIT;
 		VkQueueFlags desiredComputeCapabilities = VK_QUEUE_COMPUTE_BIT;
 
-		for ( int queueIndex = 0; queueIndex < queueFamilyProperties.size(); queueIndex++ )
+		for ( int queueIndex = 0; queueIndex < (int)queueFamilyProperties.size(); queueIndex++ )
 		{
 			if ( ( queueFamilyProperties[ queueIndex ].queueCount > 0 ) &&
 				( queueFamilyProperties[ queueIndex ].queueFlags & desiredGraphicsCapabilities ) )
@@ -276,7 +276,7 @@ namespace fan
 				break;
 			}
 		}
-		for ( int queueIndex = 0; queueIndex < queueFamilyProperties.size(); queueIndex++ )
+		for ( int queueIndex = 0; queueIndex < (int)queueFamilyProperties.size(); queueIndex++ )
 		{
 			if ( ( queueFamilyProperties[ queueIndex ].queueCount > 0 ) &&
 				( queueFamilyProperties[ queueIndex ].queueFlags & desiredComputeCapabilities ) )
@@ -286,7 +286,7 @@ namespace fan
 			}
 		}
 
-		for ( int queueIndex = 0; queueIndex < queueFamilyProperties.size(); queueIndex++ )
+		for ( int queueIndex = 0; queueIndex < (int)queueFamilyProperties.size(); queueIndex++ )
 		{
 			if ( queueFamilyProperties[ queueIndex ].queueCount > 0 )
 			{

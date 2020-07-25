@@ -239,7 +239,7 @@ namespace ImGui
 			{
 				ImGui::Text( "PRESS ANY KEY" );
 				const std::vector<Keyboard::Key>& keysList = Keyboard::Get().GetKeysList();
-				for ( int keyIndex = 0; keyIndex < keysList.size(); keyIndex++ )
+				for ( int keyIndex = 0; keyIndex < (int) keysList.size(); keyIndex++ )
 				{
 					if ( Keyboard::IsKeyDown( keysList[ keyIndex ] ) )
 					{

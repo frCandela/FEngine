@@ -112,7 +112,7 @@ namespace fan
 		mDynamicUniformsMatrices.Resize( 256 );
 		mDynamicUniformsMaterial.Resize( 256 );
 
-		for( int uniformIndex = 0; uniformIndex < mDynamicUniformsMaterial.Size(); uniformIndex++ )
+		for( int uniformIndex = 0; uniformIndex < (int)mDynamicUniformsMaterial.Size(); uniformIndex++ )
 		{
 			mDynamicUniformsMaterial[uniformIndex].color = glm::vec4( 1 );
 			mDynamicUniformsMaterial[uniformIndex].shininess = 1;
@@ -137,8 +137,10 @@ namespace fan
 				BindTexture( commandBuffer, drawData.textureIndex, mDescriptorSampler, _descriptorTextures, mPipeline.mPipelineLayout );
 				BindDescriptors( commandBuffer, _index, meshIndex );
 				VkDeviceSize offsets[] = { 0 };
-				VkBuffer vertexBuffers[] = { drawData.mesh->GetVertexBuffer().mBuffer };
-				vkCmdBindVertexBuffers( commandBuffer, 0, 1, vertexBuffers, offsets );
+
+
+
+				vkCmdBindVertexBuffers( commandBuffer, 0, 1, &drawData.mesh->GetVertexBuffer().mBuffer, offsets );
 				vkCmdBindIndexBuffer( commandBuffer, drawData.mesh->GetIndexBuffer().mBuffer, 0, VK_INDEX_TYPE_UINT32 );
 				vkCmdDrawIndexed( commandBuffer, static_cast<uint32_t>( drawData.mesh->GetIndices().size() ), 1, 0, 0, 0 );
 			}
@@ -172,7 +174,7 @@ namespace fan
 		}
 
 		mDrawData.clear();
-		for( int dataIndex = 0; dataIndex < _drawData.size(); dataIndex++ )
+		for( int dataIndex = 0; dataIndex < (int)_drawData.size(); dataIndex++ )
 		{
 			const RenderDataModel& data = _drawData[dataIndex];
 
@@ -198,7 +200,7 @@ namespace fan
 	{
 		assert( _lightData.size() < RenderGlobal::s_maximumNumPointLights );
 		mUniforms.mUniformsLights.pointLightNum = (uint32_t)_lightData.size();
-		for( int i = 0; i < _lightData.size(); ++i )
+		for( int i = 0; i < (int)_lightData.size(); ++i )
 		{
 			const RenderDataPointLight& light = _lightData[i];
 			mUniforms.mUniformsLights.pointlights[i].position = light.position;
@@ -217,7 +219,7 @@ namespace fan
 	{
 		assert( _lightData.size() < RenderGlobal::s_maximumNumDirectionalLight );
 		mUniforms.mUniformsLights.dirLightsNum = (uint32_t)_lightData.size();
-		for( int i = 0; i < _lightData.size(); ++i )
+		for( int i = 0; i < (int)_lightData.size(); ++i )
 		{
 			const RenderDataDirectionalLight& light = _lightData[i];
 			mUniforms.mUniformsLights.dirLights[i].direction = light.direction;
