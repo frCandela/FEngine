@@ -303,6 +303,7 @@ namespace fan
 	//================================================================================================================================
 	void Renderer::SetMainCamera( const glm::mat4 _projection, const glm::mat4 _view, const glm::vec3 _position )
 	{
+        SCOPED_PROFILE( set_main_camera );
 		mDrawModels.mUniforms.mUniformsProjView.view = _view;
 		mDrawModels.mUniforms.mUniformsProjView.proj = _projection;
 		mDrawModels.mUniforms.mUniformsProjView.proj[1][1] *= -1;
@@ -323,6 +324,7 @@ namespace fan
 	//================================================================================================================================
 	void  Renderer::SetDirectionalLights( const std::vector<RenderDataDirectionalLight>& _lightData )
 	{
+        SCOPED_PROFILE( set_dir_lights );
 		mDrawModels.SetDirectionalLights( _lightData );
 	}
 
@@ -330,6 +332,7 @@ namespace fan
 	//================================================================================================================================
 	void Renderer::SetPointLights( const std::vector<RenderDataPointLight>& _lightData )
 	{
+        SCOPED_PROFILE( set_point_lights );
 		mDrawModels.SetPointLights( _lightData );
 	}
 
@@ -337,6 +340,7 @@ namespace fan
 	//================================================================================================================================
 	void Renderer::SetDrawData( const std::vector<RenderDataModel>& _drawData )
 	{
+        SCOPED_PROFILE(set_draw_data);
 		mDrawModels.SetDrawData( mDevice, mWindow.mSwapchain.mImagesCount,_drawData );
 	}
 
@@ -344,6 +348,7 @@ namespace fan
 	//================================================================================================================================
 	void Renderer::SetUIDrawData( const std::vector<RenderDataUIMesh>& _drawData )
 	{
+        SCOPED_PROFILE( set_ui_draw_data );
 		mDrawUI.SetUIDrawData( _drawData );
 	}
 
@@ -351,6 +356,7 @@ namespace fan
 	//================================================================================================================================
 	void Renderer::SetDebugDrawData( const std::vector<DebugVertex>& _debugLines, const std::vector<DebugVertex>& _debugLinesNoDepthTest, const std::vector<DebugVertex>& _debugTriangles )
 	{
+        SCOPED_PROFILE( set_debug_draw_data );
 		mDrawDebug.SetDebugDrawData( mWindow.mSwapchain.mCurrentFrame, mDevice, _debugLines, _debugLinesNoDepthTest, _debugTriangles );
 	}
 

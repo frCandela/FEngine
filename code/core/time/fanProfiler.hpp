@@ -14,7 +14,7 @@ namespace fan
 	{
 	public:
 
-		static const size_t s_nameSize = 16;
+		static const size_t s_nameSize = 32;
 		Signal<> onProfilingEnd;
 
 		//================================================================
@@ -50,7 +50,7 @@ namespace fan
 	class ScopedProfile
 	{
 	public:
-		ScopedProfile( const char  _name[ 24 ] );
+		ScopedProfile( const char  _name[ Profiler::s_nameSize ] );
 		~ScopedProfile();
 	private:
 		size_t m_index;

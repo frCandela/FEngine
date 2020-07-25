@@ -302,6 +302,7 @@ namespace fan
 
 					if( renderIsThisFrame )
 					{
+                        SCOPED_PROFILE( debug_draw );
 						// Debug Draw
 						if( m_mainMenuBar->ShowWireframe() ) { world.Run<S_DrawDebugWireframe>(); }
 						if( m_mainMenuBar->ShowNormals() ) { world.Run<S_DrawDebugNormals>(); }
@@ -315,16 +316,22 @@ namespace fan
 						EditorGrid::Draw( GetCurrentWorld() );
 
 						// ImGui render
-						ImGui::NewFrame();
-						m_mainMenuBar->Draw( world );
-						ImGui::Render();
+                        {
+                            SCOPED_PROFILE( ImGui_render );
+						    ImGui::NewFrame();
+						    m_mainMenuBar->Draw( world );
+						    ImGui::Render();
+                        }
 					}
 				}
-				world.ApplyTransitions();
+                {
+                    SCOPED_PROFILE( apply_transitions );
+				    world.ApplyTransitions();
+                }
 			}
 		}
 
-		onLPPSynch.Emmit();	
+        onLPPSynch.Emmit();
 
 		// Render world		
 		if( renderIsThisFrame && logicIsThisFrame )
@@ -451,6 +458,7 @@ namespace fan
 	//================================================================================================================================
 	void  EditorHolder::GameStep( EcsWorld& _world, float _delta )
 	{
+        SCOPED_PROFILE(game_step );
  		Game& game = _world.GetSingleton<Game>();
  		if( game.state == Game::PLAYING )
  		{
@@ -479,15 +487,19 @@ namespace fan
 	//================================================================================================================================
 	void EditorHolder::UpdateRenderWorld( Renderer& _renderer, EcsWorld& _world, const glm::vec2 _size )
 	{
+        SCOPED_PROFILE( update_RW );
 		RenderWorld& renderWorld = _world.GetSingleton<RenderWorld>();
 		const RenderDebug& renderDebug = _world.GetSingleton<RenderDebug>();
 		renderWorld.targetSize = _size;
 
 		// update render data
-		_world.Run<S_UpdateRenderWorldModels>();
-		_world.Run<S_UpdateRenderWorldUI>();
-		_world.Run<S_UpdateRenderWorldPointLights>();
-		_world.Run<S_UpdateRenderWorldDirectionalLights>();
+        {
+            SCOPED_PROFILE( update_render_data );
+            _world.Run<S_UpdateRenderWorldModels>();
+            _world.Run<S_UpdateRenderWorldUI>();
+            _world.Run<S_UpdateRenderWorldPointLights>();
+            _world.Run<S_UpdateRenderWorldDirectionalLights>();
+        }
 
 		// particles mesh
 		RenderDataModel particlesDrawData;
@@ -499,23 +511,29 @@ namespace fan
 		particlesDrawData.textureIndex = 1;
 		renderWorld.drawData.push_back( particlesDrawData );
 
-		_renderer.SetDrawData( renderWorld.drawData );
-		_renderer.SetUIDrawData( renderWorld.uiDrawData );
-		_renderer.SetPointLights( renderWorld.pointLights );
-		_renderer.SetDirectionalLights( renderWorld.directionalLights );
-		_renderer.SetDebugDrawData( renderDebug.debugLines, renderDebug.debugLinesNoDepthTest, renderDebug.debugTriangles );
-		
+        {
+            SCOPED_PROFILE(set_render_data);
+            _renderer.SetDrawData(renderWorld.drawData);
+            _renderer.SetUIDrawData(renderWorld.uiDrawData);
+            _renderer.SetPointLights(renderWorld.pointLights);
+            _renderer.SetDirectionalLights(renderWorld.directionalLights);
+            _renderer.SetDebugDrawData(renderDebug.debugLines, renderDebug.debugLinesNoDepthTest, renderDebug.debugTriangles);
+        }
+
 		// Camera
-		Scene& scene = _world.GetSingleton<Scene>();
-		EcsEntity cameraID = _world.GetEntity( scene.mainCameraHandle );
-		Camera& camera = _world.GetComponent<Camera>( cameraID );
-		camera.aspectRatio = _size[0] / _size[1];
-		Transform& cameraTransform = _world.GetComponent<Transform>( cameraID );
-		_renderer.SetMainCamera(
-			camera.GetProjection(),
-			camera.GetView( cameraTransform ),
-			ToGLM( cameraTransform.GetPosition() )
-		);
+        {
+            SCOPED_PROFILE( update_camera );
+            Scene& scene = _world.GetSingleton<Scene>();
+            EcsEntity cameraID = _world.GetEntity( scene.mainCameraHandle );
+            Camera& camera = _world.GetComponent<Camera>( cameraID );
+            camera.aspectRatio = _size[0] / _size[1];
+            Transform& cameraTransform = _world.GetComponent<Transform>( cameraID );
+            _renderer.SetMainCamera(
+                    camera.GetProjection(),
+                    camera.GetView( cameraTransform ),
+                    ToGLM( cameraTransform.GetPosition() )
+            );
+        }
 	}
 
 	//================================================================================================================================

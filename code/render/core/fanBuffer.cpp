@@ -50,7 +50,7 @@ namespace fan
 			Debug::Error( "Could not create buffer" );
 			return false;
 		}
-		Debug::Get() << Debug::Severity::log << std::hex << "VkBuffer              " << mBuffer << std::dec << Debug::Endl();
+		//Debug::Get() << Debug::Severity::log << std::hex << "VkBuffer              " << mBuffer << std::dec << Debug::Endl();
 
 		VkMemoryRequirements memoryRequirements;
 		vkGetBufferMemoryRequirements( _device.mDevice, mBuffer, &memoryRequirements );
@@ -66,7 +66,7 @@ namespace fan
 			Debug::Error( "Could not allocate buffer" );
 			return false;
 		}
-		Debug::Get() << Debug::Severity::log << std::hex << "VkDeviceMemory        " << mMemory << std::dec << Debug::Endl();
+		//Debug::Get() << Debug::Severity::log << std::hex << "VkDeviceMemory        " << mMemory << std::dec << Debug::Endl();
 
 		Bind( _device );
 
