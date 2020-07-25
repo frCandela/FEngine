@@ -4,15 +4,17 @@ FEngine is a 3D game engine. It uses Vulkan for Rendering, Dear ImGui for user i
 ## Some features: 
 * Global
 	 * Game Editor
-	 * Entity/Component system
-	 * Scene tree & serialization
-	 * Profiling tools
+	 * Entity Component System architecture
+	 * Scene tree
+	 * Profiling
 	 * keyboard & gamepad input
-	 * client/server network
+	 * client/server network tools
+	 * Reflection / Serialization
+	 * Rich UI & tools
 * Rendering
 	 * 3D Models
 	 * ui
-	 * directionnal & point lights
+	 * directional & point lights
 	 * Phong illumination
 	 * Postprocessing
 	 * Debug lines/shapes
@@ -34,4 +36,4 @@ FEngine is a 3D game engine. It uses Vulkan for Rendering, Dear ImGui for user i
 * network : [SFML 2.5.1](https://www.sfml-dev.org/index.php)
 	
 ## Screenshots
-![Editor preview](/docs/screenshot2.png)
+![Editor preview](/docs/screenshot3.png)
