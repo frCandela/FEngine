@@ -244,7 +244,7 @@ namespace fan
 						}
 						else
 						{
-							Debug::Warning() << "no available input from player " << Debug::Endl();
+							//Debug::Warning() << "no available input from player " << Debug::Endl();
 						}
 					}
 				}

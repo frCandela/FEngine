@@ -131,7 +131,7 @@ namespace fan
 			const double loopDelayMilliseconds = 1000. * ( currentTime - ( time.lastLogicTime + time.logicDelta ) );
 			if( loopDelayMilliseconds > 30 )
 			{
-				Debug::Warning() << "logic is late of " << loopDelayMilliseconds << "ms" << Debug::Endl();
+				//Debug::Warning() << "logic is late of " << loopDelayMilliseconds << "ms" << Debug::Endl();
 				// if we are really really late, resets the timer
 				if( loopDelayMilliseconds > 100 )
 				{

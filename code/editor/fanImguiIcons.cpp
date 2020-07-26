@@ -30,7 +30,7 @@ namespace ImGui
 		,DECL_ICON( 16.f, 8, 4 )  // PREFERENCES16,
 		,DECL_ICON( 16.f, 9, 4 )  // SINGLETON16,
 
-		// scene special
+		// special
 		,DECL_ICON( 16.f, 0, 6 )  // GAMEOBJECT16,
 		,DECL_ICON( 16.f, 1, 6 )  // PREFAB16,
 		,DECL_ICON( 16.f, 2, 6 )  // MESH16,
@@ -42,6 +42,9 @@ namespace ImGui
 		,DECL_ICON( 16.f, 2, 0 )  // PAUSE16
 		,DECL_ICON( 16.f, 3, 0 )  // STEP16
 		,DECL_ICON( 16.f, 4, 0 )  // STOP16
+        ,DECL_ICON( 16.f, 5, 0 )  // CHECK_NEUTRAL16,
+        ,DECL_ICON( 16.f, 6, 0 )  // CHECK_FAILED16,
+        ,DECL_ICON( 16.f, 7, 0 )  // CHECK_SUCCESS16,
 
 		// scene components
 		,DECL_ICON( 16.f, 0, 8 )  // IMAGE16,

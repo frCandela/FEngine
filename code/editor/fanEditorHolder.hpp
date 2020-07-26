@@ -1,5 +1,6 @@
 #pragma once
 
+#include <editor/windows/fanUnitsTestsWindow.hpp>
 #include "fanDisableWarnings.hpp"
 WARNINGS_GLM_PUSH()
 #include "glm/glm.hpp"
@@ -23,6 +24,7 @@ namespace fan
 	class RenderWindow;
 	class EditorWindow;
 	class SceneWindow;
+	class UnitTestsWindow;
 	class EcsWindow;
 	class MainMenuBar;
 	class EcsWorld;
@@ -57,17 +59,18 @@ namespace fan
 		const LaunchSettings m_launchSettings;
 
 		// UI elements
-		MainMenuBar* m_mainMenuBar;
-		PreferencesWindow* m_preferencesWindow;
-		SingletonsWindow* m_singletonsWindow;
-		InspectorWindow* m_inspectorWindow;
-		ProfilerWindow* m_profilerWindow;
-		NetworkWindow* m_networkWindow;
-		ConsoleWindow* m_consoleWindow;
-		RenderWindow* m_renderWindow;
-		SceneWindow* m_sceneWindow;
-		GameViewWindow* m_gameViewWindow;
-		EcsWindow* m_ecsWindow;
+        MainMenuBar      *mMainMenuBar;
+        PreferencesWindow*mPreferencesWindow;
+        SingletonsWindow *mSingletonsWindow;
+        InspectorWindow  *mInspectorWindow;
+        ProfilerWindow   *mProfilerWindow;
+        NetworkWindow    *mNetworkWindow;
+        ConsoleWindow    *mConsoleWindow;
+        RenderWindow     *mRenderWindow;
+        SceneWindow      *mSceneWindow;
+        GameViewWindow   *mGameViewWindow;
+        EcsWindow        *mEcsWindow;
+        UnitTestsWindow  *mUnitTestsWindow;
 
 		bool m_applicationShouldExit;
 		bool m_showUI = true;

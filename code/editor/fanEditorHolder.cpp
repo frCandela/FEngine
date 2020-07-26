@@ -16,6 +16,7 @@
 #include "editor/windows/fanSceneWindow.hpp"	
 #include "editor/windows/fanGameViewWindow.hpp"
 #include "editor/windows/fanEcsWindow.hpp"
+#include "editor/windows/fanUnitsTestsWindow.hpp"
 #include "editor/singletons/fanEditorSelection.hpp"
 #include "editor/singletons/fanEditorCopyPaste.hpp"
 #include "editor/singletons/fanEditorGizmos.hpp"
@@ -80,34 +81,36 @@ namespace fan
 		Prefab::s_resourceManager.Init();
 
 		// Initialize editor components		
-		m_gameViewWindow	= new GameViewWindow( _settings.launchMode );
-		m_renderWindow		= new RenderWindow( *m_renderer );
-		m_sceneWindow		= new SceneWindow();
-		m_inspectorWindow	= new InspectorWindow();
-		m_consoleWindow		= new ConsoleWindow();
-		m_ecsWindow			= new EcsWindow();
-		m_profilerWindow	= new ProfilerWindow();
-		m_preferencesWindow = new PreferencesWindow( *m_renderer );
-		m_networkWindow		= new NetworkWindow();
-		m_singletonsWindow	= new SingletonsWindow();
-		m_mainMenuBar		= new MainMenuBar();
-		m_mainMenuBar->SetWindows( {
-			  m_renderWindow
-			, m_sceneWindow
-			, m_inspectorWindow
-			, m_consoleWindow
-			, m_ecsWindow
-			, m_singletonsWindow
-			, m_profilerWindow
-			, m_gameViewWindow
-			, m_networkWindow
-			, m_preferencesWindow
-			} );
+		mGameViewWindow    = new GameViewWindow( _settings.launchMode );
+        mRenderWindow      = new RenderWindow( *m_renderer );
+        mSceneWindow       = new SceneWindow();
+        mInspectorWindow   = new InspectorWindow();
+        mConsoleWindow     = new ConsoleWindow();
+        mEcsWindow         = new EcsWindow();
+        mProfilerWindow    = new ProfilerWindow();
+        mPreferencesWindow = new PreferencesWindow( *m_renderer );
+        mNetworkWindow     = new NetworkWindow();
+        mSingletonsWindow  = new SingletonsWindow();
+        mUnitTestsWindow   = new UnitTestsWindow();
+        mMainMenuBar       = new MainMenuBar();
+        mMainMenuBar->SetWindows( {
+                mRenderWindow,
+                mSceneWindow,
+                mInspectorWindow,
+                mConsoleWindow,
+                mEcsWindow,
+                mSingletonsWindow,
+                mProfilerWindow,
+                mGameViewWindow,
+                mNetworkWindow,
+                mPreferencesWindow,
+                mUnitTestsWindow
+        } );
 
 		// Instance messages				
-		m_mainMenuBar->onReloadShaders.Connect( &Renderer::ReloadShaders, m_renderer );
-		m_mainMenuBar->onReloadIcons.Connect( &Renderer::ReloadIcons, m_renderer );
-		m_mainMenuBar->onExit.Connect( &EditorHolder::Exit, this );
+		mMainMenuBar->onReloadShaders.Connect( &Renderer::ReloadShaders, m_renderer );
+		mMainMenuBar->onReloadIcons.Connect( &Renderer::ReloadIcons, m_renderer );
+		mMainMenuBar->onExit.Connect( &EditorHolder::Exit, this );
 
 		// Events linking
 		Input::Get().Manager().FindEvent( "reload_shaders" )->Connect( &Renderer::ReloadShaders, m_renderer );
@@ -122,13 +125,13 @@ namespace fan
 		Input::Get().Manager().FindEvent( "toogle_world" )->Connect( &EditorHolder::OnCycleCurrentGame, this );
 		Input::Get().Manager().FindEvent( "reload_icons" )->Connect( &Renderer::ReloadIcons, m_renderer );		
 
-		m_gameViewWindow->onSizeChanged.Connect( &Renderer::ResizeGame, m_renderer );
-		m_gameViewWindow->onPlay.Connect( &EditorHolder::OnCurrentGameStart, this );
-		m_gameViewWindow->onPause.Connect( &EditorHolder::OnCurrentGamePause, this );
-		m_gameViewWindow->onResume.Connect( &EditorHolder::OnCurrentGameResume, this );
-		m_gameViewWindow->onStop.Connect( &EditorHolder::OnCurrentGameStop, this );
-		m_gameViewWindow->onStep.Connect( &EditorHolder::OnCurrentGameStep, this );
-		m_gameViewWindow->onSelectGame.Connect( &EditorHolder::OnCurrentGameSelect, this );
+		mGameViewWindow->onSizeChanged.Connect( &Renderer::ResizeGame, m_renderer );
+		mGameViewWindow->onPlay.Connect( &EditorHolder::OnCurrentGameStart, this );
+		mGameViewWindow->onPause.Connect( &EditorHolder::OnCurrentGamePause, this );
+		mGameViewWindow->onResume.Connect( &EditorHolder::OnCurrentGameResume, this );
+		mGameViewWindow->onStop.Connect( &EditorHolder::OnCurrentGameStop, this );
+		mGameViewWindow->onStep.Connect( &EditorHolder::OnCurrentGameStep, this );
+		mGameViewWindow->onSelectGame.Connect( &EditorHolder::OnCurrentGameSelect, this );
 
 		// Loop over all worlds to initialize them
 		for (int worldIndex = 0; worldIndex < (int)m_worlds.size() ; worldIndex++)
@@ -147,9 +150,9 @@ namespace fan
 			EditorSelection& selection = world.GetSingleton<EditorSelection>();
 
 			selection.ConnectCallbacks( scene );
-			m_sceneWindow->onSelectSceneNode.Connect( &EditorSelection::SetSelectedSceneNode, &selection );
+			mSceneWindow->onSelectSceneNode.Connect( &EditorSelection::SetSelectedSceneNode, &selection );
 
-			scene.onLoad.Connect( &SceneWindow::OnExpandHierarchy, m_sceneWindow );
+			scene.onLoad.Connect( &SceneWindow::OnExpandHierarchy, mSceneWindow );
 			scene.onLoad.Connect( &EditorHolder::OnSceneLoad, this );
 
 			// load scene
@@ -176,7 +179,7 @@ namespace fan
 	EditorHolder::~EditorHolder()
 	{
 		// Deletes ui
-		delete m_mainMenuBar;
+		delete mMainMenuBar;
 
 		// Serialize editor positions if it was not modified by a launch command
 		if( m_launchSettings.window_size == glm::ivec2( -1, -1 ) )
@@ -252,7 +255,7 @@ namespace fan
 					// Update input
 					ImGui::GetIO().DeltaTime = time.logicDelta;
 					Input::Get().NewFrame();
-					Mouse::Get().Update( m_gameViewWindow->GetPosition(), m_gameViewWindow->GetSize(), m_gameViewWindow->IsHovered() );
+					Mouse::Get().Update( mGameViewWindow->GetPosition(), mGameViewWindow->GetSize(), mGameViewWindow->IsHovered() );
 					Input::Get().Manager().PullEvents();
 				}
 
@@ -260,7 +263,7 @@ namespace fan
 				const double loopDelayMilliseconds = 1000. * ( currentTime - ( time.lastLogicTime + time.logicDelta ) );
 				if( loopDelayMilliseconds > 30 )
 				{
-					Debug::Warning() << "logic is late of " << loopDelayMilliseconds << "ms" << Debug::Endl();
+					//Debug::Warning() << "logic is late of " << loopDelayMilliseconds << "ms" << Debug::Endl();
 					// if we are really really late, resets the timer
 					if( loopDelayMilliseconds > 100 )
 					{
@@ -298,17 +301,17 @@ namespace fan
 					{
 						EditorCamera::Update( world, time.logicDelta );
 					}
-					world.GetSingleton<EditorSelection>().Update( m_gameViewWindow->IsHovered() );
+					world.GetSingleton<EditorSelection>().Update( mGameViewWindow->IsHovered() );
 
 					if( renderIsThisFrame )
 					{
                         SCOPED_PROFILE( debug_draw );
 						// Debug Draw
-						if( m_mainMenuBar->ShowWireframe() ) { world.Run<S_DrawDebugWireframe>(); }
-						if( m_mainMenuBar->ShowNormals() ) { world.Run<S_DrawDebugNormals>(); }
-						if( m_mainMenuBar->ShowAABB() ) { world.Run<S_DrawDebugBounds>(); }
-						if( m_mainMenuBar->ShowHull() ) { world.Run<S_DrawDebugHull>(); }
-						if( m_mainMenuBar->ShowLights() )
+						if( mMainMenuBar->ShowWireframe() ) { world.Run<S_DrawDebugWireframe>(); }
+						if( mMainMenuBar->ShowNormals() ) { world.Run<S_DrawDebugNormals>(); }
+						if( mMainMenuBar->ShowAABB() ) { world.Run<S_DrawDebugBounds>(); }
+						if( mMainMenuBar->ShowHull() ) { world.Run<S_DrawDebugHull>(); }
+						if( mMainMenuBar->ShowLights() )
 						{
 							world.Run<S_DrawDebugPointLights>();
 							world.Run<S_DrawDebugDirectionalLights>();
@@ -319,7 +322,7 @@ namespace fan
                         {
                             SCOPED_PROFILE( ImGui_render );
 						    ImGui::NewFrame();
-						    m_mainMenuBar->Draw( world );
+						    mMainMenuBar->Draw( world );
 						    ImGui::Render();
                         }
 					}
@@ -340,7 +343,7 @@ namespace fan
 
 			Time::RegisterFrameDrawn();	// used for stats
 			
-			UpdateRenderWorld( *m_renderer, GetCurrentWorld(), ToGLM( m_gameViewWindow->GetSize() ) );
+			UpdateRenderWorld( *m_renderer, GetCurrentWorld(), ToGLM( mGameViewWindow->GetSize() ) );
 
 			m_renderer->DrawFrame();
 			Profiler::Get().End();
@@ -579,9 +582,9 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void EditorHolder::OnCurrentGameOpen() { m_mainMenuBar->Open( GetCurrentWorld() ); }
-	void EditorHolder::OnCurrentGameReload() { m_mainMenuBar->Reload( GetCurrentWorld() ); }
-	void EditorHolder::OnCurrentGameSave() { m_mainMenuBar->Save( GetCurrentWorld() ); }
+	void EditorHolder::OnCurrentGameOpen() { mMainMenuBar->Open( GetCurrentWorld() ); }
+	void EditorHolder::OnCurrentGameReload() { mMainMenuBar->Reload( GetCurrentWorld() ); }
+	void EditorHolder::OnCurrentGameSave() { mMainMenuBar->Save( GetCurrentWorld() ); }
 	void EditorHolder::OnCurrentGameCopy() { GetCurrentWorld().GetSingleton<EditorCopyPaste>().OnCopy(); }
 	void EditorHolder::OnCurrentGamePaste() { GetCurrentWorld().GetSingleton<EditorCopyPaste>().OnPaste(); }
 
@@ -602,7 +605,7 @@ namespace fan
 			renderWorld.isHeadless = ( worldIndex != m_currentWorld );
 		}
 
-		m_gameViewWindow->SetCurrentGameSelected( m_currentWorld );
+		mGameViewWindow->SetCurrentGameSelected( m_currentWorld );
 	}
 
 	//================================================================================================================================

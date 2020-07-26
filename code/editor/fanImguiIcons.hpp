@@ -30,11 +30,14 @@ namespace ImGui
 		LOCK_CLOSED16,
 		NETWORK16,
 
-		// scene special
+		// special
 		PLAY16,
 		PAUSE16,
 		STEP16,
 		STOP16,
+        CHECK_NEUTRAL16,
+        CHECK_FAILED16,
+        CHECK_SUCCESS16,
 
 		// scene components
 		IMAGE16,
