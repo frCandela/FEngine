@@ -1,55 +1,31 @@
 #pragma once
 
-#include <vector>
-#include <string>
-#include <exception>
+#include "core/fanUnitTest.hpp"
 #include "fanCurrency.hpp"
-#include "core/fanDebug.hpp"
 
 namespace fan
 {
-#define TEST_ASSERT( _condition )               \
-        if( ! (_condition) ) {                  \
-            __debugbreak();                     \
-            throw std::exception("test failed");                \
-        }
-
     //========================================================================================================
     //========================================================================================================
-    struct UnitTestDisplayResult
-    {
-        std::string     mName;
-        ImGui::IconType mIcon;
-        ImVec4          mColor;
-    };
-
-    //========================================================================================================
-    //========================================================================================================
-    class UnitTestsCurrency
+    class UnitTestCurrency : public UnitTest< UnitTestCurrency >
     {
     public:
-        struct UnitTest
+        static std::vector<TestMethod> GetTests()
         {
-            using TestMethod = void ( UnitTestsCurrency::* )();
-            TestMethod  mMethod;
-            std::string mName;
-        };
-
-        static std::vector<UnitTestDisplayResult> TestAll();
-
-        static std::vector<UnitTest> GetTests()
-        {
-            return {
-                    { &UnitTestsCurrency::TestEquality,                 "equality"        },
-                    { &UnitTestsCurrency::TestCurrency,                 "currency"        },
-                    { &UnitTestsCurrency::TestMultiplication,           "multiplication"  },
-                    { &UnitTestsCurrency::TestAddition,                 "addition"        },
-                    { &UnitTestsCurrency::TestReduceSum,                "reduce sum"      },
-                    { &UnitTestsCurrency::TestReduceMoney,              "reduce money"    },
-                    { &UnitTestsCurrency::TestReduceDifferentCurrency,  "reduce money different currency" },
-                    { &UnitTestsCurrency::TestMixedAddition,            "mixed addition" },
+            return  {
+                    { &UnitTestCurrency::TestEquality,                "equality"        },
+                    { &UnitTestCurrency::TestCurrencyName,            "currency"        },
+                    { &UnitTestCurrency::TestMultiplication,          "multiplication"  },
+                    { &UnitTestCurrency::TestAddition,                "addition"        },
+                    { &UnitTestCurrency::TestReduceSum,               "reduce sum"      },
+                    { &UnitTestCurrency::TestReduceMoney,             "reduce money"    },
+                    { &UnitTestCurrency::TestReduceDifferentCurrency, "reduce money different currency" },
+                    { &UnitTestCurrency::TestMixedAddition,           "mixed addition" },
             };
         }
+
+        void Create() override {}
+        void Destroy() override {}
 
         void TestMultiplication()
         {
@@ -57,6 +33,7 @@ namespace fan
             TEST_ASSERT( Money::Dollar( 5 ) * 3 == Money::Dollar( 15 ) );
             TEST_ASSERT( Money::Franc( 5 ) * 2 == Money::Franc( 10 ) );
             TEST_ASSERT( Money::Franc( 5 ) * 3 == Money::Franc( 15 ) );
+            TEST_ASSERT( false );
         }
 
         void TestAddition()
@@ -88,7 +65,7 @@ namespace fan
             TEST_ASSERT( !( Money::Franc( 5 ) == Money::Dollar( 5 ) ) );
         }
 
-        void TestCurrency()
+        void TestCurrencyName()
         {
             TEST_ASSERT( Money::Dollar(1).Currency() == "USD" );
             TEST_ASSERT( Money::Franc(1).Currency() == "CHF" );

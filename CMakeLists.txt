@@ -40,6 +40,10 @@ set( COMPILATION_FLAGS /W4 /WX  )
 set( MIDDLEWARE_COMPILATION_FLAGS /W0 )
 add_compile_options( /FUNCTIONPADMIN )
 
+if( WIN32 )
+    add_compile_definitions( FAN_WIN32 )
+endif()
+
 add_compile_definitions(SFML_STATIC)
 add_compile_definitions(GLFW_INCLUDE_VULKAN)
 add_compile_definitions(GLM_FORCE_RADIANS)

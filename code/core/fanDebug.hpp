@@ -1,10 +1,8 @@
 #pragma once
 
-
+#include <sstream>
 #include "core/fanSingleton.hpp"
 #include "ecs/fanSignal.hpp"
-
-#include <sstream>
 
 namespace fan
 {
@@ -42,7 +40,6 @@ namespace fan
 		static Debug& Highlight();
 
 		static void Clear();
-		static void Break() { __debugbreak(); }
 		const std::vector< LogItem >& GetLogBuffer() { return m_logBuffer; }
 	protected:
 		Debug();
