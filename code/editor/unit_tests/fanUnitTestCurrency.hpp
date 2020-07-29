@@ -33,7 +33,6 @@ namespace fan
             TEST_ASSERT( Money::Dollar( 5 ) * 3 == Money::Dollar( 15 ) );
             TEST_ASSERT( Money::Franc( 5 ) * 2 == Money::Franc( 10 ) );
             TEST_ASSERT( Money::Franc( 5 ) * 3 == Money::Franc( 15 ) );
-            TEST_ASSERT( false );
         }
 
         void TestAddition()

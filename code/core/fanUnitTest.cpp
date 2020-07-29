@@ -3,4 +3,5 @@
 namespace fan
 {
     bool UnitTestsUtils::sBreakWhenUnitTestFails = true;
+
 }

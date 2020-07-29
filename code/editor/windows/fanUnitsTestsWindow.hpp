@@ -17,20 +17,21 @@ namespace fan
     protected:
         struct TestArgument
         {
-            using RunMethod = UnitTestDisplay ( * )();
+            using RunMethod = UnitTestResult ( * )();
             const char*      mName;
             RunMethod        mRunMethod;
-            UnitTestDisplay& mTestDisplay;
+            UnitTestResult& mTestDisplay;
         };
 
         void OnGui( EcsWorld& _world ) override;
         std::vector<TestArgument> GetTests();
-        static void DrawTest( const UnitTestDisplay::TestDisplay& displayResult );
+        static void DrawTest( const UnitTestResult::TestResult& _testResult );
         static void DrawUnitTest( const TestArgument& _testArgument );
-        static void DrawStatusIcon( const UnitTestDisplay::Status _status );
+        static void DrawStatusIcon( const UnitTestResult::Status _status );
         static void RunTest( const TestArgument& _testArgument );
         static void ClearTest( const TestArgument& _testArgument );
 
-        UnitTestDisplay mCurrencyDisplay;
+        UnitTestResult mCurrencyResult;
+        UnitTestResult mMeshManagerResult;
     };
 }

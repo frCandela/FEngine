@@ -26,15 +26,15 @@ namespace fan
 
     //========================================================================================================
     //========================================================================================================
-    struct UnitTestDisplay
+    struct UnitTestResult
     {
         enum class Status { Success, Failed, Unknown };
-        struct TestDisplay
+        struct TestResult
         {
             std::string mName = "";
             Status      mStatus = Status::Unknown;
         };
-        std::vector<TestDisplay> mTestDisplays;
+        std::vector<TestResult>  mTestDisplays;
         Status                   mTotalStatus  = Status::Unknown;
     };
 
@@ -72,11 +72,11 @@ namespace fan
             std::string mName;
         };
 
-        static UnitTestDisplay RunTests()
+        static UnitTestResult RunTests()
         {
-            std::vector<TestMethod>      tests = UnitTestType::GetTests();
-            UnitTestDisplay results;
-            results.mTotalStatus = UnitTestDisplay::Status::Success;
+            std::vector<TestMethod> tests = UnitTestType::GetTests();
+            UnitTestResult          results;
+            results.mTotalStatus = UnitTestResult::Status::Success;
             results.mTestDisplays.reserve( tests.size() );
 
             for( const TestMethod& test : tests )
@@ -96,12 +96,12 @@ namespace fan
 
                 if( success )
                 {
-                    results.mTestDisplays.push_back( { test.mName, UnitTestDisplay::Status::Success } );
+                    results.mTestDisplays.push_back( { test.mName, UnitTestResult::Status::Success } );
                 }
                 else
                 {
-                    results.mTestDisplays.push_back( { test.mName, UnitTestDisplay::Status::Failed } );
-                    results.mTotalStatus = UnitTestDisplay::Status::Failed;
+                    results.mTestDisplays.push_back( { test.mName, UnitTestResult::Status::Failed } );
+                    results.mTotalStatus = UnitTestResult::Status::Failed;
                 }
             }
             return results;
