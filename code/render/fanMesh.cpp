@@ -32,22 +32,22 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool Mesh::LoadFromFile( const std::string& _path )
+	bool Mesh::LoadFromFile( const std::string& _path, bool _genBuffers )
 	{
 		GLTFImporter importer;
 		if ( importer.Load( _path ) )
 		{
 			if ( !importer.GetMesh( *this ) )
 			{
-				Debug::Get() << "Failed to load mesh : " << m_path << Debug::Endl();
+				Debug::Get() << "Failed to load mesh : " << mPath << Debug::Endl();
 				return false;
 			}
 
 			OptimizeVertices();
 			GenerateConvexHull();
-			GenerateGpuBuffers( s_resourceManager.GetDevice() );
+			if( _genBuffers )GenerateGpuBuffers( s_resourceManager.GetDevice() );
 
-			m_path = _path;
+            mPath = _path;
 			return true;
 		}
 
