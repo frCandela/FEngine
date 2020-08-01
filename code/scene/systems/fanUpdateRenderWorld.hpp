@@ -88,7 +88,7 @@ namespace fan
 				const glm::vec2 positionRatio = 2.f * transform.position / renderWorld.targetSize;
 
 				RenderDataUIMesh data;
-				data.mesh = &renderer.uiMesh;
+				data.mesh = renderer.mUiMesh;
 				data.scale = transform.scale * imageRatio;
 				data.position = positionRatio - glm::vec2( 1, 1 );
 				data.color = renderer.color.ToGLM();

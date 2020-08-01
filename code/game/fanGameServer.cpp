@@ -170,8 +170,8 @@ namespace fan
         MeshManager& meshManager = *world.GetSingleton<RenderResources>().mMeshManager;
         SunLight& sunLight = world.GetSingleton<SunLight>();
         RenderWorld& renderWorld = world.GetSingleton<RenderWorld>();
-        meshManager.AddMesh( &sunLight.mesh, "sunlight_mesh_" + game.name );
-        meshManager.AddMesh( &renderWorld.particlesMesh, "particles_mesh_" + game.name );
+        meshManager.Add( &sunLight.mesh, "sunlight_mesh_" + game.name );
+        meshManager.Add( &renderWorld.particlesMesh, "particles_mesh_" + game.name );
 	}
 
 	//================================================================================================================================

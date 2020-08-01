@@ -6,7 +6,7 @@
 #include "network/singletons/fanTime.hpp"
 #include "render/fanRenderGlobal.hpp"
 #include "render/fanMeshManager.hpp"
-#include "render/fanUIMesh.hpp"
+#include "render/fanMesh2D.hpp"
 #include "render/fanMesh.hpp"
 #include "render/core/fanSwapChain.hpp"
 #include "render/core/fanInstance.hpp"
@@ -26,7 +26,6 @@ namespace fan
 		RenderPass& finalRenderPass = mViewType == ViewType::Editor ? mRenderPassImgui : mRenderPassPostprocess;
 
 		Texture::s_resourceManager.Init( mDevice );
-		UIMesh::s_resourceManager.Init( mDevice );
 
 		CreateRenderPasses();		
 
@@ -59,9 +58,11 @@ namespace fan
 		mDrawModels.Destroy( mDevice );
 		mDrawUI.mPipeline.Destroy( mDevice );
 		mDrawDebug.Destroy( mDevice );
+
 		mMeshManager.Clear( mDevice );
+        mMesh2DManager.Clear( mDevice );
+
 		Texture::s_resourceManager.Clear();
-		UIMesh::s_resourceManager.Clear();
 
 		mDrawUI.Destroy( mDevice );
 
@@ -194,6 +195,8 @@ namespace fan
 		{
 			vkWaitForFences( mDevice.mDevice, 1, mWindow.mSwapchain.GetCurrentInFlightFence(), VK_TRUE, std::numeric_limits<uint64_t>::max() );
 			vkResetFences( mDevice.mDevice, 1, mWindow.mSwapchain.GetCurrentInFlightFence() );
+            mMeshManager.CreateBuffers( mDevice );
+            mMesh2DManager.CreateBuffers( mDevice );
 		}
 
 		ImGui::GetIO().DisplaySize = ImVec2( static_cast< float >( mWindow.mSwapchain.mExtent.width ), static_cast< float >( mWindow.mSwapchain.mExtent.height ) );

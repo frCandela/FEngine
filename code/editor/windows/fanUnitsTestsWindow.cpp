@@ -4,6 +4,7 @@
 #include "core/time/fanProfiler.hpp"
 #include "editor/unit_tests/fanUnitTestCurrency.hpp"
 #include "render/unit_tests/fanUnitTestMeshManager.hpp"
+#include "render/unit_tests/fanUnitTestMesh2DManager.hpp"
 
 namespace fan
 {
@@ -17,6 +18,7 @@ namespace fan
         return {
                 { "Currency", &UnitTestCurrency::RunTests,        mCurrencyResult },
                 { "Mesh manager", &UnitTestMeshManager::RunTests, mMeshManagerResult },
+                { "Mesh2D manager", &UnitTestMesh2DManager::RunTests, mMesh2DManagerResult },
         };
     }
 

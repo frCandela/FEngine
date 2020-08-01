@@ -47,8 +47,6 @@ namespace fan
 
 		static void GameStart( EcsWorld& _world );
 		static void GameStop( EcsWorld& _world );
-		static void GamePause( EcsWorld& _world );
-		static void GameResume( EcsWorld& _world );
 		static void GameStep( EcsWorld& _world, const float _delta );		
 		static void UpdateRenderWorld( Renderer& _renderer, EcsWorld& _world, const glm::vec2 _size );
 	};

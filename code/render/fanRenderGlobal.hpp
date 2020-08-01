@@ -31,6 +31,8 @@ namespace fan
 		static const char* s_meshSphere;
 		static const char* s_meshAxisCheck;
 
+        static const char* sMesh2DQuad;
+
 		static const char* s_textureUVCheck;
 		static const char* s_textureWhite;
 

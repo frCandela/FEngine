@@ -2,7 +2,7 @@
 
 #include "ecs/fanEcsComponent.hpp"
 #include "render/fanRenderResourcePtr.hpp"
-#include "render/fanUIMesh.hpp"
+#include "render/fanMesh2D.hpp"
 
 namespace fan
 {
@@ -18,9 +18,9 @@ namespace fan
 		static void Save( const EcsComponent& _component, Json& _json );
 		static void Load( EcsComponent& _component, const Json& _json );
 
-		UIMesh		uiMesh;
-		Color		color;
-		TexturePtr	texture;
+		Mesh2D*    mUiMesh;
+		Color      color;
+		TexturePtr texture;
 
 		glm::ivec2	GetTextureSize() const;
 		Texture*	GetTexture() const { return *texture; }

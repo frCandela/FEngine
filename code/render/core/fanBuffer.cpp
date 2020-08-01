@@ -70,8 +70,8 @@ namespace fan
 
 		Bind( _device );
 
-		_device.AddDebugName( (uint64_t)mMemory, "fan Buffer" );
-		_device.AddDebugName( (uint64_t)mBuffer, "fan Buffer" );
+		_device.AddDebugName( (uint64_t)mMemory, "fan Buffer_" );
+		_device.AddDebugName( (uint64_t)mBuffer, "fan Buffer_" );
 
 		return true;
 	}

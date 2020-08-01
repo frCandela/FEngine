@@ -13,6 +13,7 @@
 #include "scene/systems/fanUpdateRenderWorld.hpp"
 #include "scene/singletons/fanScene.hpp"
 #include "scene/singletons/fanRenderDebug.hpp"
+#include "scene/singletons/fanRenderResources.hpp"
 #include "scene/fanPrefab.hpp"
 #include "game/singletons/fanGameCamera.hpp"
 #include "game/singletons/fanGame.hpp"
@@ -37,6 +38,10 @@ namespace fan
 
 		// creates renderer
 		m_renderer = new Renderer( m_window, Renderer::ViewType::Game );
+        RenderResources::SetupResources( m_renderer->mMeshManager, m_renderer->mMesh2DManager );
+
+        RenderResources& renderResources = m_world.GetSingleton<RenderResources>();
+        renderResources.SetPointers(&m_renderer->mMeshManager,  &m_renderer->mMesh2DManager );
 
 		Prefab::s_resourceManager.Init();
 
@@ -232,31 +237,6 @@ namespace fan
 			game.state = Game::STOPPED;
 			if( game.gameServer != nullptr ) game.gameServer->Stop();
 			else							 game.gameClient->Stop();
-		}
-	}
-
-	
-	//================================================================================================================================
-	//================================================================================================================================
-	void  GameHolder::GamePause( EcsWorld& _world )
-	{
-		Game& game = _world.GetSingleton<Game>();
-		if( game.state == Game::PLAYING )
-		{
-			Debug::Highlight() << game.name << ": paused" << Debug::Endl();
-			game.state = Game::PAUSED;
-		}
-	}	
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void  GameHolder::GameResume( EcsWorld& _world )
-	{
-		Game& game = _world.GetSingleton<Game>();
-		if( game.state == Game::PAUSED )
-		{
-			Debug::Highlight() << game.name << ": resumed" << Debug::Endl();
-			game.state = Game::PLAYING;
 		}
 	}
 

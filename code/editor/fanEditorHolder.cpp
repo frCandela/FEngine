@@ -78,8 +78,10 @@ namespace fan
 
 		// creates renderer
 		m_renderer = new Renderer( m_window, Renderer::ViewType::Editor );
+		RenderResources::SetupResources( m_renderer->mMeshManager, m_renderer->mMesh2DManager );
 
-		Prefab::s_resourceManager.Init();
+        Prefab::s_resourceManager.Init();;
+
 
 		// Initialize editor components		
 		mGameViewWindow    = new GameViewWindow( _settings.launchMode );
@@ -134,9 +136,6 @@ namespace fan
 		mGameViewWindow->onStep.Connect( &EditorHolder::OnCurrentGameStep, this );
 		mGameViewWindow->onSelectGame.Connect( &EditorHolder::OnCurrentGameSelect, this );
 
-        ResourcePtr< Mesh >::s_onResolve.Connect( &MeshManager::ResolvePtr, &m_renderer->mMeshManager );
-        m_renderer->mMeshManager.LoadMesh( RenderGlobal::s_defaultMesh );
-
         // Loop over all worlds to initialize them
 		for (int worldIndex = 0; worldIndex < (int)m_worlds.size() ; worldIndex++)
 		{
@@ -154,7 +153,7 @@ namespace fan
             renderWorld.isHeadless = ( &world != &GetCurrentWorld() );
 
             RenderResources& renderResources = world.GetSingleton<RenderResources>();
-            renderResources.mMeshManager = &m_renderer->mMeshManager;
+            renderResources.SetPointers(&m_renderer->mMeshManager,  &m_renderer->mMesh2DManager );
 
 			Scene& scene = world.GetSingleton<Scene>();
 			EditorSelection& selection = world.GetSingleton<EditorSelection>();
@@ -352,7 +351,6 @@ namespace fan
 			Time::RegisterFrameDrawn();	// used for stats
 
 			UpdateRenderWorld( *m_renderer, currentWorld, ToGLM( mGameViewWindow->GetSize() ) );
-			m_renderer->mMeshManager.GenerateBuffers( m_renderer->mDevice );
 
 			m_renderer->DrawFrame();
 			Profiler::Get().End();

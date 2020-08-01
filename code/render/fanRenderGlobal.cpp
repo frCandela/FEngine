@@ -17,6 +17,8 @@ namespace fan
 	const char* RenderGlobal::s_meshSphere		= "content/_default/mesh/sphere.gltf";
 	const char* RenderGlobal::s_meshAxisCheck	= "content/_default/mesh/axis_check_yup.gltf";
 
+	const char* RenderGlobal::sMesh2DQuad	= "2Dquad";
+
 	const char* RenderGlobal::s_textureUVCheck	= "content/_default/texture/uv_checker.png";
 	const char* RenderGlobal::s_textureWhite	= "content/_default/texture/white.png";
 

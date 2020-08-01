@@ -14,13 +14,13 @@ WARNINGS_POP()
 
 namespace fan
 {
-	class UIMesh;
+	class Mesh2D;
 
 	//================================================================
 	//================================================================
 	struct RenderDataUIMesh
 	{
-		UIMesh* mesh;
+		Mesh2D* mesh;
 		glm::vec2 position;
 		glm::vec2 scale;
 		glm::vec4 color;
@@ -49,7 +49,7 @@ namespace fan
 	//================================================================
 	struct UIDrawData
 	{
-		UIMesh* mesh;
+		Mesh2D* mesh;
 		uint32_t textureIndex;
 	};
 

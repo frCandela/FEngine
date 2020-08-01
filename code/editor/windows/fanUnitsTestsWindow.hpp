@@ -33,5 +33,6 @@ namespace fan
 
         UnitTestResult mCurrencyResult;
         UnitTestResult mMeshManagerResult;
+        UnitTestResult mMesh2DManagerResult;
     };
 }

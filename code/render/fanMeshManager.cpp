@@ -21,7 +21,7 @@ namespace fan
 
     //========================================================================================================
     //========================================================================================================
-    Mesh* MeshManager::GetMesh( const std::string& _path ) const
+    Mesh* MeshManager::Get( const std::string& _path ) const
     {
         const std::string cleanPath = std::filesystem::path( _path ).make_preferred().string();
         for( Mesh* mesh : mMeshes )
@@ -38,19 +38,19 @@ namespace fan
     //========================================================================================================
     Mesh* MeshManager::GetOrLoad( const std::string& _path )
     {
-        Mesh * mesh = GetMesh( _path );
+        Mesh * mesh = Get( _path );
         if( mesh == nullptr )
         {
-            mesh = LoadMesh( _path );
+            mesh = Load( _path );
         }
         return mesh;
     }
 
     //========================================================================================================
     //========================================================================================================
-    Mesh* MeshManager::LoadMesh( const std::string& _path )
+    Mesh* MeshManager::Load( const std::string& _path )
     {
-        Mesh* mesh = GetMesh( _path );
+        Mesh* mesh = Get( _path );
         if( mesh != nullptr ) { return mesh; }
 
         // Load
@@ -68,13 +68,13 @@ namespace fan
 
     //========================================================================================================
     //========================================================================================================
-    void MeshManager::AddMesh( Mesh * mesh, const std::string& _name )
+    void MeshManager::Add( Mesh * _mesh, const std::string& _name )
     {
-        assert( mesh != nullptr );
-        mesh->mIndex = (int)mMeshes.size();
-        mesh->mPath = _name;
-        mesh->mExternallyOwned = true;
-        mMeshes.push_back( { mesh } );
+        assert( _mesh != nullptr );
+        _mesh->mIndex = (int)mMeshes.size();
+        _mesh->mPath = _name;
+        _mesh->mExternallyOwned = true;
+        mMeshes.push_back( { _mesh } );
     }
 
     //========================================================================================================
@@ -111,11 +111,7 @@ namespace fan
     {
         for ( Mesh* mesh : mMeshes )
         {
-            for( int i = 0 ; i < SwapChain::s_maxFramesInFlight; i++)
-            {
-                mesh->mIndexBuffer[i].Destroy( _device );
-                mesh->mVertexBuffer[i].Destroy( _device );
-            }
+            mesh->DestroyBuffers( _device );
             if( ! mesh->mExternallyOwned )
             {
                 delete mesh;
@@ -127,13 +123,13 @@ namespace fan
 
     //========================================================================================================
     //========================================================================================================
-    void MeshManager::GenerateBuffers( Device& _device )
+    void MeshManager::CreateBuffers( Device& _device )
     {
         for( Mesh * mesh : mMeshes )
         {
             if( mesh->mBuffersOutdated )
             {
-                mesh->GenerateBuffers( _device );
+                mesh->CreateBuffers( _device );
             }
         }
     }

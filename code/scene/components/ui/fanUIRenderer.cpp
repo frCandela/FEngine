@@ -1,7 +1,9 @@
 #include "scene/components/ui/fanUIRenderer.hpp"
 
 #include "render/fanRenderSerializable.hpp"
+#include "render/fanRenderGlobal.hpp"
 #include "core/input/fanInput.hpp"
+#include "scene/singletons/fanRenderResources.hpp"
 #include "editor/fanModals.hpp"
 
 namespace fan
@@ -21,22 +23,13 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void UIRenderer::Init( EcsWorld& /*_world*/, EcsEntity /*_entity*/, EcsComponent& _component )
+	void UIRenderer::Init( EcsWorld& _world, EcsEntity /*_entity*/, EcsComponent& _component )
 	{
 		UIRenderer& uiRenderer = static_cast<UIRenderer&>( _component );
+        RenderResources& renderResources = _world.GetSingleton<RenderResources>();
 
-		if( uiRenderer.uiMesh.GetVertexBuffer().mBuffer == VK_NULL_HANDLE )
-		{
-			std::vector<UIVertex> vertices = { // tmp make a 2D quad
-				UIVertex( glm::vec2( +2.f, +0.f ), glm::vec2( +1.f, +0.f ) )
-				,UIVertex( glm::vec2( +0.f, +0.f ), glm::vec2( +0.f, +0.f ) )
-				,UIVertex( glm::vec2( +2.f, +2.f ), glm::vec2( +1.f, +1.f ) )
-				,UIVertex( glm::vec2( +0.f, +0.f ), glm::vec2( +0.f, +0.f ) )
-				,UIVertex( glm::vec2( +0.f, +2.f ), glm::vec2( +0.f, +1.f ) )
-				,UIVertex( glm::vec2( +2.f, +2.f ), glm::vec2( +1.f, +1.f ) )
-			};
-			uiRenderer.uiMesh.LoadFromVertices( vertices );
-		}
+       uiRenderer.mUiMesh = renderResources.mMesh2DManager->Get( RenderGlobal::sMesh2DQuad );
+       assert( uiRenderer.mUiMesh );
 	}
 
 	//================================================================================================================================

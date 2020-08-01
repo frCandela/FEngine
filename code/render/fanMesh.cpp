@@ -135,13 +135,24 @@ namespace fan
 
     //========================================================================================================
     //========================================================================================================
-    void Mesh::GenerateBuffers( Device& _device )
+    void Mesh::DestroyBuffers( Device & _device )
+    {
+        for( int i = 0 ; i < SwapChain::s_maxFramesInFlight; i++)
+        {
+            mIndexBuffer[i].Destroy( _device );
+            mVertexBuffer[i].Destroy( _device );
+        }
+    }
+
+    //========================================================================================================
+    //========================================================================================================
+    void Mesh::CreateBuffers( Device& _device )
     {
 	    mBuffersOutdated = false;
 
         if ( mIndices.empty() ) { return; }
 
-        mCurrentBuffer = ( mCurrentBuffer + 1 ) % 3;
+        mCurrentBuffer = ( mCurrentBuffer + 1 ) % SwapChain::s_maxFramesInFlight;
 
         const VkMemoryPropertyFlags memPropertyFlags = ( mHostVisible ?
                 VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT :

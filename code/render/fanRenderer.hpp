@@ -9,6 +9,8 @@ WARNINGS_POP()
 #include "glfw/glfw3.h"
 #include "core/math/fanVector2.hpp"
 #include "render/fanVertex.hpp"
+#include "render/fanMeshManager.hpp"
+#include "render/fanMesh2DManager.hpp"
 #include "render/core/fanCommandBuffer.hpp"
 #include "render/core/fanRenderPass.hpp"
 #include "render/core/fanSampler.hpp"
@@ -26,7 +28,6 @@ WARNINGS_POP()
 #include "render/draw/fanDrawDebug.hpp"
 #include "render/draw/fanDrawUI.hpp"
 #include "render/draw/fanDrawPostprocess.hpp"
-#include "fanMeshManager.hpp"
 
 namespace fan
 {
@@ -58,7 +59,8 @@ namespace fan
 		void SetUIDrawData( const std::vector<RenderDataUIMesh>& _drawData );
 		void SetDebugDrawData( const std::vector<DebugVertex>& _debugLines, const std::vector<DebugVertex>& _debugLinesNoDepthTest, const std::vector<DebugVertex>& _debugTriangles );
 
-		MeshManager mMeshManager;
+		MeshManager     mMeshManager;
+        Mesh2DManager   mMesh2DManager;
 		Window& mWindow;
 		Device& mDevice;
 

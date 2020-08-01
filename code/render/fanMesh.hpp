@@ -24,20 +24,21 @@ namespace fan
         bool LoadFromVertices( const std::vector<Vertex>& _vertices );
         void OptimizeVertices();
         void GenerateConvexHull();
-        void GenerateBuffers( Device& _device );
+        void CreateBuffers( Device& _device );
+        void DestroyBuffers( Device & _device );
 
-        int                     mIndex = -1;
         std::string             mPath;
         std::vector<Vertex>     mVertices;
         std::vector<uint32_t>   mIndices;
-        bool                    mHostVisible      = false;
-        bool                    mOptimizeVertices = true;
-        bool                    mAutoUpdateHull   = true;
-        bool                    mBuffersOutdated = false;
-        bool                    mExternallyOwned = false;
         ConvexHull              mConvexHull;
         Buffer                  mIndexBuffer [ SwapChain::s_maxFramesInFlight ];
         Buffer                  mVertexBuffer[ SwapChain::s_maxFramesInFlight ];
         uint32_t                mCurrentBuffer = 0;
+        int                     mIndex = -1;
+        bool                    mHostVisible      = false;
+        bool                    mOptimizeVertices = true;
+        bool                    mAutoUpdateHull   = true;
+        bool                    mBuffersOutdated  = false;
+        bool                    mExternallyOwned  = false;
     };
 }

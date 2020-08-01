@@ -1,12 +1,14 @@
 #pragma once
 
+#include <render/fanRenderGlobal.hpp>
 #include "ecs/fanEcsSingleton.hpp"
-#include "render/fanMeshManager.hpp"
-
+#include "render/fanMesh2D.hpp"
 
 namespace fan
 {
     struct Device;
+    class MeshManager;
+    class Mesh2DManager;
 
     //========================================================================================================
     //========================================================================================================
@@ -18,7 +20,12 @@ namespace fan
         static void Init( EcsWorld& _world, EcsSingleton& _singleton );
         static void OnGui( EcsWorld& _world, EcsSingleton& _singleton );
 
-        MeshManager  * mMeshManager = nullptr;
+        static void SetupResources( MeshManager& _meshManager, Mesh2DManager& _mesh2DManager );
+        static Mesh2D * CreateMesh2DQuad();
+        void SetPointers( MeshManager * _meshManager, Mesh2DManager* _mesh2DManager );
+
+        MeshManager  *   mMeshManager = nullptr;
+        Mesh2DManager  * mMesh2DManager = nullptr;
     };
 }
 

@@ -4,7 +4,7 @@
 #include "render/fanVertex.hpp"
 #include "render/core/fanRenderPass.hpp"
 #include "render/core/fanFrameBuffer.hpp"
-#include "render/fanUIMesh.hpp"
+#include "render/fanMesh2D.hpp"
 #include "render/core/fanTexture.hpp"
 
 namespace fan
@@ -93,12 +93,12 @@ namespace fan
 			for( uint32_t meshIndex = 0; meshIndex < mDrawData.size(); meshIndex++ )
 			{
 				UIDrawData drawData = mDrawData[meshIndex];
-				UIMesh* mesh = drawData.mesh;
-				VkBuffer vertexBuffers[] = { mesh->GetVertexBuffer().mBuffer };
+				Mesh2D* mesh = drawData.mesh;
+				VkBuffer vertexBuffers[] = { mesh->mVertexBuffer[ mesh->mCurrentBuffer ].mBuffer };
 				BindDescriptors( commandBuffer, _index, meshIndex );
 				vkCmdBindVertexBuffers( commandBuffer, 0, 1, vertexBuffers, offsets );
 				BindTexture( commandBuffer, drawData.textureIndex, mDescriptorSampler, _descriptorTextures, mPipeline.mPipelineLayout );
-				vkCmdDraw( commandBuffer, static_cast<uint32_t>( mesh->GetVertices().size() ), 1, 0, 0 );
+				vkCmdDraw( commandBuffer, static_cast<uint32_t>( mesh->mVertices.size() ), 1, 0, 0 );
 			}
 
 			if( vkEndCommandBuffer( commandBuffer ) != VK_SUCCESS )
