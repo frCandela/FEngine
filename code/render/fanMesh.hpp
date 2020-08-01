@@ -6,14 +6,12 @@
 #include "render/fanVertex.hpp"
 #include "render/fanMeshManager.hpp"
 #include "render/core/fanBuffer.hpp"
+#include "core/resources/fanResourcePtr.hpp"
+
+struct Device;
 
 namespace fan
 {
-
-    struct Device;
-
-    class MeshManager;
-
     //================================================================================================================================
     // 3D mesh composed of triangles
     // can have a convex hull computed for it
@@ -21,51 +19,25 @@ namespace fan
     class Mesh : public Resource
     {
     public:
-        static MeshManager s_resourceManager;
-
-        Mesh();
-        ~Mesh();
-
-        bool
-        RayCast( const btVector3 _origin, const btVector3 _direction, btVector3& _outIntersection ) const;
-
-        std::vector<Vertex>& GetVertices() { return m_vertices; }
-        const std::vector<Vertex>& GetVertices() const { return m_vertices; }
-        std::vector<uint32_t>& GetIndices() { return m_indices; }
-        const std::vector<uint32_t>& GetIndices() const { return m_indices; }
-        Buffer& GetIndexBuffer() { return m_indexBuffer[m_currentBuffer]; }
-        Buffer& GetVertexBuffer() { return m_vertexBuffer[m_currentBuffer]; }
-        const ConvexHull& GetHull() { return m_convexHull; }
-        std::string GetPath() const { return mPath; }
-
-        // Useful when the mesh changes very often
-        void SetHostVisible( const bool _hostVisible ) { m_hostVisible = _hostVisible; }
-        void SetOptimizeVertices( const bool _optimizeVertices ) { m_optimizeVertices = _optimizeVertices; }
-        void SetAutoUpdateHull( const bool _autoUpdateHull ) { m_autoUpdateHull = _autoUpdateHull; }
-
-        void GenerateGpuBuffers( Device& _device );
-        void DeleteGpuBuffers( Device& _device );
-
-        bool LoadFromFile( const std::string& _path, bool _genBuffers = true );
+        bool RayCast( const btVector3 _origin, const btVector3 _dir, btVector3& _outIntersection ) const;
+        bool LoadFromFile( const std::string& _path );
         bool LoadFromVertices( const std::vector<Vertex>& _vertices );
-
-        int         mIndex = -1;
-        std::string mPath;
-        std::vector<Vertex>   m_vertices;
-        std::vector<uint32_t> m_indices;
-
-
-        bool m_hostVisible      = false;
-        bool m_optimizeVertices = true;
-        bool m_autoUpdateHull   = true;
-    private:
-
-        uint32_t   m_currentBuffer = 0;
-        Buffer     m_indexBuffer[3];
-        Buffer     m_vertexBuffer[3];
-        ConvexHull m_convexHull;
-
         void OptimizeVertices();
         void GenerateConvexHull();
+        void GenerateBuffers( Device& _device );
+
+        int                     mIndex = -1;
+        std::string             mPath;
+        std::vector<Vertex>     mVertices;
+        std::vector<uint32_t>   mIndices;
+        bool                    mHostVisible      = false;
+        bool                    mOptimizeVertices = true;
+        bool                    mAutoUpdateHull   = true;
+        bool                    mBuffersOutdated = false;
+        bool                    mExternallyOwned = false;
+        ConvexHull              mConvexHull;
+        Buffer                  mIndexBuffer [ SwapChain::s_maxFramesInFlight ];
+        Buffer                  mVertexBuffer[ SwapChain::s_maxFramesInFlight ];
+        uint32_t                mCurrentBuffer = 0;
     };
 }

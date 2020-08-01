@@ -43,7 +43,6 @@ namespace fan
 	{
 	public:
 		// Global
-		void Create();
 		void ApplyTransitions();
 		void Clear();
 		int  NumComponents() const	{ return int( m_componentsInfo.size() ); }
@@ -60,13 +59,13 @@ namespace fan
 		bool		HandleExists( const EcsHandle _handle ) { return m_handles.find( _handle ) != m_handles.end();  }
 
 		// Singletons
-		template <typename _SingletonType >	void			AddSingletonType();
+		template <typename _SingletonType >	void		AddSingletonType();
 		template< typename _SingletonType > _SingletonType& GetSingleton();
-		EcsSingleton&										GetSingleton		( const uint32_t _type )		{ return  *m_singletons[_type];			}
-		const EcsSingleton&									GetSingleton		( const uint32_t _type ) const	{ return  *m_singletons.at(_type);		}
-		const EcsSingletonInfo&								GetSingletonInfo	( const uint32_t _type ) const	{ return  m_singletonInfos.at( _type ); }
-		const EcsSingletonInfo*								SafeGetSingletonInfo( const uint32_t _type ) const;
-		std::vector< EcsSingletonInfo >						GetVectorSingletonInfo() const;
+		EcsSingleton&					GetSingleton		( const uint32_t _type )		{ return  *m_singletons[_type];			}
+		const EcsSingleton&				GetSingleton		( const uint32_t _type ) const	{ return  *m_singletons.at(_type);		}
+		const EcsSingletonInfo&			GetSingletonInfo	( const uint32_t _type ) const	{ return  m_singletonInfos.at( _type ); }
+		const EcsSingletonInfo*			SafeGetSingletonInfo( const uint32_t _type ) const;
+		std::vector< EcsSingletonInfo >	GetVectorSingletonInfo() const;
 
 		// Tags
 		template <typename _TagType > void AddTagType();
@@ -79,17 +78,17 @@ namespace fan
 
 		// Components
 		template <typename _ComponentType >	void			AddComponentType	();
-		template <typename _ComponentType > _ComponentType& AddComponent		( const EcsEntity _entity );
-		template <typename _ComponentType > void			RemoveComponent		( const EcsEntity _entity );
-		template <typename _ComponentType > bool			HasComponent		( const EcsEntity _entity );
+		template <typename _ComponentType > _ComponentType&    AddComponent		( const EcsEntity _entity );
+		template <typename _ComponentType > void			    RemoveComponent		( const EcsEntity _entity );
+		template <typename _ComponentType > bool			    HasComponent		( const EcsEntity _entity );
 		template< typename _ComponentType >	_ComponentType& GetComponent		( const EcsEntity _entity );
-		EcsComponent&										AddComponent		( const EcsEntity _entity, const uint32_t _type );
-		void												RemoveComponent		( const EcsEntity _entity, const uint32_t _type );
-		bool												HasComponent		( const EcsEntity _entity, const uint32_t _type );
-		EcsComponent&										GetComponent		( const EcsEntity _entity, const uint32_t _type );
-		EcsComponent&										IndexedGetComponent ( const EcsEntity _entity, const int _componentIndex );
-		const EcsComponentInfo&								IndexedGetComponentInfo( const int _componentIndex ) const;
-		const EcsComponentInfo&					GetComponentInfo( const uint32_t _type ) const	{ return  m_componentsInfo.at( GetIndex(_type) ); }
+		EcsComponent&						AddComponent		( const EcsEntity _entity, const uint32_t _type );
+		void								RemoveComponent		( const EcsEntity _entity, const uint32_t _type );
+		bool								HasComponent		( const EcsEntity _entity, const uint32_t _type );
+		EcsComponent&						GetComponent		( const EcsEntity _entity, const uint32_t _type );
+		EcsComponent&						IndexedGetComponent ( const EcsEntity _entity, const int _componentIndex );
+		const EcsComponentInfo&				IndexedGetComponentInfo( const int _componentIndex ) const;
+		const EcsComponentInfo&				GetComponentInfo( const uint32_t _type ) const	{ return  m_componentsInfo.at( GetIndex(_type) ); }
 		const std::vector< EcsComponentInfo >&	GetComponentInfos() const	{ return m_componentsInfo; }
 
 		// Entities
@@ -98,7 +97,7 @@ namespace fan
 		bool		IsAlive	( const EcsEntity _entity ) const;
 
 		template< typename _tagOrComponentType >			EcsSignature	GetSignature() const;
-		template< typename _SystemType, typename... _Args > void			Run( _Args&&... _args );
+		template< typename _SystemType, typename... _Args > void			            Run( _Args&&... _args );
 		template< typename _SystemType > EcsView							Match() const;
 
 		// Const accessors

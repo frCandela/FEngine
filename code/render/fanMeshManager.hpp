@@ -1,36 +1,39 @@
 #pragma once
 
-#include <map>
 #include <string>
+#include <vector>
 #include "core/resources/fanResourcePtr.hpp"
+#include "render/core/fanBuffer.hpp"
+#include "render/fanRenderGlobal.hpp"
+#include "render/core/fanSwapChain.hpp"
 
 namespace fan
 {
-	class Mesh;
-	struct Device;
+    class Mesh;
 
-	//================================================================================================================================
-	// Owns all the meshes of the engine
-	// load, find, resolve pointers, delete
-	//================================================================================================================================
-	class MeshManager
-	{
-	public:
-		void Init( Device& _device );
-		void Clear();
+    //================================================================================================================================
+    //================================================================================================================================
+    class MeshManager
+    {
+    public:
+        ~MeshManager();
 
-		bool IsCleared() { return m_device == nullptr; } //@hack ressources gpu buffers deletion problem
+        Mesh* GetMesh( const std::string& _path ) const;
+        Mesh*  LoadMesh( const std::string& _path );
+        Mesh*  GetOrLoad( const std::string& _path );
+        void   AddMesh( Mesh* mesh, const std::string& _name );
+        void   Remove( const std::string& _path );
+        void   Clear( Device& _device);
+        bool   Empty() const { return mMeshes.empty(); }
+        void   ResolvePtr( ResourcePtr<Mesh>& _resourcePtr );
 
-		void	ResolvePtr( ResourcePtr< Mesh >& _resourcePtr );
-		Device& GetDevice() const { assert( m_device != nullptr ); return *m_device;  }
-		Mesh*	GetMesh( const std::string& _path );
+        void GenerateBuffers( Device& _device );
+        void DestroyBuffers( Device& _device );
 
-		const std::map< std::string, Mesh* >& GetList() const { return m_meshList; }
-
-	private:
-		Device* m_device = nullptr;
-		std::map< std::string, Mesh* > m_meshList;
-
-		Mesh* FindMesh( const std::string& _path );
-	};
+        int GetCountBuffersPendingDestruction() const  { return (int)mDestroyList.size(); }
+        const std::vector< Mesh * >& GetMeshes() const { return mMeshes; }
+    private:
+        std::vector< Mesh * > mMeshes;
+        std::vector< Buffer > mDestroyList;
+    };
 }

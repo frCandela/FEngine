@@ -1,6 +1,7 @@
 #include "game/singletons/fanSunLight.hpp"
 
 #include "scene/fanSceneSerializable.hpp"
+#include "scene/singletons/fanRenderResources.hpp"
 
 namespace fan
 {
@@ -25,13 +26,13 @@ namespace fan
 		sunLight.subAngle = 45.f;
 		sunLight.radius = 100.f;
 
-		if( !sunLight.mesh.GetVertices().empty() )
+		if( !sunLight.mesh.mVertices.empty() )
 		{
 			sunLight.mesh = Mesh();
 		}
-		sunLight.mesh.SetHostVisible( true );
-		sunLight.mesh.SetOptimizeVertices( false );
-		sunLight.mesh.SetAutoUpdateHull( false );
+		sunLight.mesh.mHostVisible = true;
+		sunLight.mesh.mOptimizeVertices = false;
+		sunLight.mesh.mAutoUpdateHull = false;
 	}
 
 	//================================================================================================================================

@@ -113,8 +113,8 @@ namespace fan
 	bool GLTFImporter::GetMesh( Mesh& _mesh )
 	{
 		// Get mesh data references
-		std::vector<uint32_t>& meshIndices = _mesh.GetIndices();
-		std::vector<Vertex>& meshVertices = _mesh.GetVertices();
+		std::vector<uint32_t>& meshIndices = _mesh.mIndices;
+		std::vector<Vertex>& meshVertices = _mesh.mVertices;
 
 		// Get main json lists		
 		const Json& jmeshes = m_json[ "meshes" ];

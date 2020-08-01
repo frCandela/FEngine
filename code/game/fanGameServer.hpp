@@ -20,7 +20,5 @@ namespace fan
 		void Step( const float _delta );
 
 		EcsWorld			  world;
-		ServerNetworkManager* netManager;
-		Game*				  game;
 	};					  
 }

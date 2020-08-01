@@ -48,7 +48,7 @@ namespace ImGui
 			{
 				ImGui::SetDragDropPayload( "dragndrop_mesh", &_mesh, sizeof( fan::Mesh** ) );
 				ImGui::Icon( ImGui::IconType::MESH16, { 16,16 } ); ImGui::SameLine();
-				ImGui::Text( ( _mesh->GetPath() ).c_str() );
+				ImGui::Text( _mesh->mPath.c_str() );
 				ImGui::EndDragDropSource();
 			}
 		}

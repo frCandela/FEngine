@@ -20,29 +20,32 @@ namespace fan
 		static constexpr const char* s_name		{ #_SingletonType		  };	\
 		static constexpr uint32_t	 s_type		{ SSID( #_SingletonType ) };	
 
-	struct EcsSingleton {
+    //==============================================================================================================================================================
+    //==============================================================================================================================================================
+    struct EcsSingleton {
 		EcsSingleton(){}
 		EcsSingleton( EcsSingleton const& ) = delete;
 		EcsSingleton& operator=( EcsSingleton const& ) = delete;
 	};
-	class EcsWorld;
 
+	class EcsWorld;
 	//==============================================================================================================================================================
 	// EcsSingletonInfo is runtime type information for singleton components
 	// Function pointers :
 	// init			: clears the component value and registers it when necessary (mandatory)
-	// onGui		: draws ui associated with the component (optional)
-	// save			: serializes the component to json (optional)
-	// load			: deserializes the component from json (optional)
-	// netSave		: serializes the component into a packet for replication (optional)
-	// netLoad		: deserializes the component from a packet for replication (optional)
+    // start		: called once at the start of the game
+	// onGui		: draws ui associated with the component
+	// save			: serializes the component to json
+	// load			: deserializes the component from json
+	// netSave		: serializes the component into a packet for replication
+	// netLoad		: deserializes the component from a packet for replication
 	//==============================================================================================================================================================
 	struct EcsSingletonInfo
 	{
 		std::string		name;
 		uint32_t		type;
 		ImGui::IconType icon = ImGui::IconType::NONE;
-		EngineGroups		group = EngineGroups::None;
+		EngineGroups	group = EngineGroups::None;
 
 		void ( *init ) ( EcsWorld&, EcsSingleton& ) = nullptr;
 		void ( *onGui ) ( EcsWorld&, EcsSingleton& ) = nullptr;

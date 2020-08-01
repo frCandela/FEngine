@@ -53,15 +53,16 @@ namespace fan
 				{
 					const glm::mat4  modelMat = transform.GetModelMatrix();
 					const glm::mat4  normalMat = transform.GetNormalMatrix();
-					const std::vector<uint32_t>& indices = meshRenderer.mesh->GetIndices();
-					const std::vector<Vertex>& vertices = meshRenderer.mesh->GetVertices();
+					const std::vector<uint32_t>& indices = meshRenderer.mesh->mIndices;
+					const std::vector<Vertex>& vertices = meshRenderer.mesh->mVertices;
 
 					for( int index = 0; index < (int)indices.size(); index++ )
 					{
 						const Vertex& vertex = vertices[indices[index]];
 						const btVector3 position = ToBullet( modelMat * glm::vec4( vertex.pos, 1.f ) );
 						const btVector3 normal = ToBullet( normalMat * glm::vec4( vertex.normal, 1.f ) );
-						_world.GetSingleton<RenderDebug>().DebugLine( position, position + 0.1f * normal, Color::Green );
+                        RenderDebug & renderDebug = _world.GetSingleton<RenderDebug>();
+                        renderDebug.DebugLine( position, position + 0.1f * normal, Color::Green );
 					}
 				}
 			}
@@ -89,8 +90,8 @@ namespace fan
 				if( *meshRenderer.mesh != nullptr )
 				{
 					const glm::mat4  modelMat = transform.GetModelMatrix();
-					const std::vector<uint32_t>& indices = meshRenderer.mesh->GetIndices();
-					const std::vector<Vertex>& vertices = meshRenderer.mesh->GetVertices();
+					const std::vector<uint32_t>& indices = meshRenderer.mesh->mIndices;
+					const std::vector<Vertex>& vertices = meshRenderer.mesh->mVertices;
 
 					for( int index = 0; index < (int)indices.size() / 3; index++ )
 					{
@@ -126,7 +127,7 @@ namespace fan
 
 				if( *meshRenderer.mesh != nullptr )
 				{
-					const ConvexHull& hull = meshRenderer.mesh->GetHull();
+					const ConvexHull& hull = meshRenderer.mesh->mConvexHull;
 					const std::vector<btVector3>& vertices = hull.GetVertices();
 					const std::vector<uint32_t>& indices = hull.GetIndices();
 					if( !vertices.empty() )

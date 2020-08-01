@@ -29,6 +29,7 @@
 #include "scene/components/ui/fanFollowTransformUI.hpp"
 #include "scene/singletons/fanScene.hpp"
 #include "scene/singletons/fanRenderWorld.hpp"
+#include "scene/singletons/fanRenderResources.hpp"
 #include "scene/singletons/fanScenePointers.hpp"
 #include "scene/singletons/fanPhysicsWorld.hpp"
 #include "scene/singletons/fanRenderDebug.hpp"
@@ -127,6 +128,7 @@ namespace fan
 
 		// base singleton components
 		world.AddSingletonType<Scene>();
+        world.AddSingletonType<RenderResources>();
 		world.AddSingletonType<RenderWorld>();
 		world.AddSingletonType<PhysicsWorld>();
 		world.AddSingletonType<ScenePointers>();
@@ -162,6 +164,13 @@ namespace fan
 		world.Run<S_RegisterAllRigidbodies>();
 		GameCamera::CreateGameCamera( world );
 		SolarEruption::Start( world );
+
+        Game& game = world.GetSingleton<Game>();
+        MeshManager& meshManager = *world.GetSingleton<RenderResources>().mMeshManager;
+        SunLight& sunLight = world.GetSingleton<SunLight>();
+        RenderWorld& renderWorld = world.GetSingleton<RenderWorld>();
+        meshManager.AddMesh( &sunLight.mesh, "sunlight_mesh_" + game.name );
+        meshManager.AddMesh( &renderWorld.particlesMesh, "particles_mesh_" + game.name );
 	}
 
 	//================================================================================================================================
@@ -173,7 +182,11 @@ namespace fan
 
 		// clears the particles mesh
 		RenderWorld& renderWorld = world.GetSingleton<RenderWorld>();
-		renderWorld.particlesMesh.LoadFromVertices( {} );
+        SunLight& sunLight = world.GetSingleton<SunLight>();
+        renderWorld.particlesMesh.LoadFromVertices( {} );
+        MeshManager& meshManager = *world.GetSingleton<RenderResources>().mMeshManager;
+        meshManager.Remove( sunLight.mesh.mPath );
+        meshManager.Remove( renderWorld.particlesMesh.mPath );
 
 		GameCamera::DeleteGameCamera( world );
 

@@ -1,3 +1,4 @@
+#include <scene/singletons/fanRenderResources.hpp>
 #include "editor/fanEditorHolder.hpp"
 
 #include "core/input/fanInputManager.hpp"
@@ -133,7 +134,10 @@ namespace fan
 		mGameViewWindow->onStep.Connect( &EditorHolder::OnCurrentGameStep, this );
 		mGameViewWindow->onSelectGame.Connect( &EditorHolder::OnCurrentGameSelect, this );
 
-		// Loop over all worlds to initialize them
+        ResourcePtr< Mesh >::s_onResolve.Connect( &MeshManager::ResolvePtr, &m_renderer->mMeshManager );
+        m_renderer->mMeshManager.LoadMesh( RenderGlobal::s_defaultMesh );
+
+        // Loop over all worlds to initialize them
 		for (int worldIndex = 0; worldIndex < (int)m_worlds.size() ; worldIndex++)
 		{
 			assert( m_worlds[worldIndex] != nullptr );
@@ -145,6 +149,12 @@ namespace fan
 			world.AddSingletonType<EditorCopyPaste>();
 			world.AddSingletonType<EditorGizmos>();
 			world.AddTagType<tag_editorOnly>();
+
+            RenderWorld& renderWorld = world.GetSingleton<RenderWorld>();
+            renderWorld.isHeadless = ( &world != &GetCurrentWorld() );
+
+            RenderResources& renderResources = world.GetSingleton<RenderResources>();
+            renderResources.mMeshManager = &m_renderer->mMeshManager;
 
 			Scene& scene = world.GetSingleton<Scene>();
 			EditorSelection& selection = world.GetSingleton<EditorSelection>();
@@ -167,10 +177,6 @@ namespace fan
 					GameStart( world );
 				}
 			}
-
-			// Set all to headless except the first
-			RenderWorld& renderWorld = world.GetSingleton<RenderWorld>();
-			renderWorld.isHeadless = ( worldIndex != 0 );
 		}
 	}
 
@@ -195,6 +201,7 @@ namespace fan
 		SerializedValues::Get().SaveValuesToDisk();
 
 		Prefab::s_resourceManager.Clear();
+
 		delete m_renderer;
 		m_window.Destroy();
 	}
@@ -339,11 +346,13 @@ namespace fan
 		// Render world		
 		if( renderIsThisFrame && logicIsThisFrame )
 		{
+		    EcsWorld& currentWorld = GetCurrentWorld();
 			m_lastRenderTime = currentTime;
 
 			Time::RegisterFrameDrawn();	// used for stats
-			
-			UpdateRenderWorld( *m_renderer, GetCurrentWorld(), ToGLM( mGameViewWindow->GetSize() ) );
+
+			UpdateRenderWorld( *m_renderer, currentWorld, ToGLM( mGameViewWindow->GetSize() ) );
+			m_renderer->mMeshManager.GenerateBuffers( m_renderer->mDevice );
 
 			m_renderer->DrawFrame();
 			Profiler::Get().End();

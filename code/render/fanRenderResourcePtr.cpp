@@ -100,7 +100,9 @@ namespace ImGui
 		bool returnValue = false;
 
 		fan::Mesh* mesh = *_ptr;
-		const std::string name = mesh == nullptr ? "null" : std::filesystem::path( mesh->GetPath() ).filename().string();
+        const std::string name = ( mesh == nullptr ) ?
+                "null" :
+                std::filesystem::path( mesh->mPath ).filename().string();
 
 		// Set button icon & modal
 		const std::string modalName = std::string( "Find mesh (" ) + _label + ")";
@@ -112,7 +114,8 @@ namespace ImGui
 			{
 				openModal = true;
 			}
-		} ImGui::PopID();
+		}
+		ImGui::PopID();
 		if ( openModal )
 		{
 			ImGui::OpenPopup( modalName.c_str() );
@@ -128,7 +131,7 @@ namespace ImGui
 		// tooltip
 		if ( mesh != nullptr )
 		{
-			ImGui::FanToolTip( mesh->GetPath().c_str() );
+			ImGui::FanToolTip( mesh->mPath.c_str() );
 		}
 
 		// dragndrop		

@@ -28,6 +28,7 @@
 #include "scene/components/ui/fanFollowTransformUI.hpp"
 #include "scene/singletons/fanScene.hpp"
 #include "scene/singletons/fanRenderWorld.hpp"
+#include "scene/singletons/fanRenderResources.hpp"
 #include "scene/singletons/fanScenePointers.hpp"
 #include "scene/singletons/fanPhysicsWorld.hpp"
 #include "scene/singletons/fanRenderDebug.hpp"
@@ -124,6 +125,7 @@ namespace fan
 
 		// base singleton components
 		world.AddSingletonType<Scene>();
+        world.AddSingletonType<RenderResources>();
 		world.AddSingletonType<RenderWorld>();
 		world.AddSingletonType<PhysicsWorld>();
 		world.AddSingletonType<ScenePointers>();
@@ -154,16 +156,22 @@ namespace fan
 	//================================================================================================================================
 	void GameServer::Start()
 	{
-		game = &world.GetSingleton<Game>();
-		netManager = &world.GetSingleton<ServerNetworkManager>();
+        ServerNetworkManager & netManager = world.GetSingleton<ServerNetworkManager>();
+		netManager.Start( world );
 
-		netManager->Start( world );
 		world.Run<S_RegisterAllRigidbodies>();
 		GameCamera::CreateGameCamera( world );
-		SolarEruption::Start( world );	
+		SolarEruption::Start( world );
 
 		SolarEruption& eruption = world.GetSingleton<SolarEruption>();
 		eruption.ScheduleNextEruption( world );
+
+		Game & game = world.GetSingleton<Game>();
+        MeshManager& meshManager = *world.GetSingleton<RenderResources>().mMeshManager;
+        SunLight& sunLight = world.GetSingleton<SunLight>();
+        RenderWorld& renderWorld = world.GetSingleton<RenderWorld>();
+        meshManager.AddMesh( &sunLight.mesh, "sunlight_mesh_" + game.name );
+        meshManager.AddMesh( &renderWorld.particlesMesh, "particles_mesh_" + game.name );
 	}
 
 	//================================================================================================================================
@@ -173,16 +181,17 @@ namespace fan
 		// clears the physics world
 		world.Run<S_UnregisterAllRigidbodies>();
 
-		// clears the particles mesh
+		// clears the registered mesh
 		RenderWorld& renderWorld = world.GetSingleton<RenderWorld>();
+        SunLight& sunLight = world.GetSingleton<SunLight>();
 		renderWorld.particlesMesh.LoadFromVertices( {} );
+        MeshManager& meshManager = *world.GetSingleton<RenderResources>().mMeshManager;
+        meshManager.Remove( sunLight.mesh.mPath );
+        meshManager.Remove( renderWorld.particlesMesh.mPath );
 
 		GameCamera::DeleteGameCamera( world );
-
-		netManager->Stop( world );
-
-		game = nullptr;
-		netManager = nullptr;
+        ServerNetworkManager & netManager = world.GetSingleton<ServerNetworkManager>();
+		netManager.Stop( world );
 	}
 
 	//================================================================================================================================

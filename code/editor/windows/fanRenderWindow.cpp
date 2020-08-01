@@ -30,10 +30,11 @@ namespace fan
 		// Display mesh list
 		if ( ImGui::CollapsingHeader( "Loaded meshes : " ) )
 		{
-			for ( const auto pair : Mesh::s_resourceManager.GetList() )
+		    // @todo repair this using the new non static mesh manager
+			/*for ( const auto pair : Mesh::s_resourceManager.GetList() )
 			{
 				ImGui::Text("ref: %d name: %s", pair.second->GetRefCount(), pair.second->GetPath().c_str() );
-			}
+			}*/
 		}
 
 		// display textures list
@@ -64,7 +65,7 @@ namespace fan
 				const DrawData& drawData = meshArray[ meshIndex ];
 				if ( drawData.mesh != nullptr )
 				{
-					ImGui::Text( drawData.mesh->GetPath().c_str() );
+					ImGui::Text( drawData.mesh->mPath.c_str() );
 				}
 				else
 				{

@@ -87,16 +87,17 @@ namespace fan
 
 				if( *renderer.mesh != nullptr )
 				{
-					const ConvexHull& hull = renderer.mesh->GetHull();
-
 					// Calculates model matrix
 					const glm::vec3 position = ToGLM( transform.GetPosition() );
 					const glm::vec3 scale = ToGLM( transform.scale );
 					const glm::quat rotation = ToGLM( transform.GetRotationQuat() );
-					glm::mat4 modelMatrix = glm::translate( glm::mat4( 1.f ), position ) * glm::mat4_cast( rotation ) * glm::scale( glm::mat4( 1.f ), scale );
+					glm::mat4 modelMatrix =
+					        glm::translate( glm::mat4( 1.f ), position ) *
+					        glm::mat4_cast( rotation ) *
+					        glm::scale( glm::mat4( 1.f ), scale );
 
 					// Set the bounds
-					bounds.aabb = AABB( hull.GetVertices(), modelMatrix );
+					bounds.aabb = AABB( renderer.mesh->mConvexHull.GetVertices(), modelMatrix );
 
 					sceneNode.RemoveFlag( SceneNode::BoundsOutdated );
 				}

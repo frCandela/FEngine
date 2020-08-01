@@ -19,13 +19,13 @@ namespace fan
 		static void Init( EcsWorld& _world, EcsSingleton& _component );
 		static void OnGui( EcsWorld&, EcsSingleton& _component );
 
-		std::vector<RenderDataModel>				drawData;
-		std::vector<RenderDataUIMesh>				uiDrawData;
-		std::vector<RenderDataPointLight>			pointLights;
+		std::vector<RenderDataModel>			drawData;
+		std::vector<RenderDataUIMesh>			uiDrawData;
+		std::vector<RenderDataPointLight>		pointLights;
 		std::vector<RenderDataDirectionalLight>	directionalLights;
 
-		Mesh particlesMesh;
-		glm::vec2 targetSize; // render target size in pixels
-		bool isHeadless;
+		Mesh        particlesMesh;
+		glm::vec2   targetSize; // render target size in pixels
+		bool        isHeadless;
 	};
 }

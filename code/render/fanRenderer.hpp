@@ -26,6 +26,7 @@ WARNINGS_POP()
 #include "render/draw/fanDrawDebug.hpp"
 #include "render/draw/fanDrawUI.hpp"
 #include "render/draw/fanDrawPostprocess.hpp"
+#include "fanMeshManager.hpp"
 
 namespace fan
 {
@@ -57,6 +58,7 @@ namespace fan
 		void SetUIDrawData( const std::vector<RenderDataUIMesh>& _drawData );
 		void SetDebugDrawData( const std::vector<DebugVertex>& _debugLines, const std::vector<DebugVertex>& _debugLinesNoDepthTest, const std::vector<DebugVertex>& _debugTriangles );
 
+		MeshManager mMeshManager;
 		Window& mWindow;
 		Device& mDevice;
 

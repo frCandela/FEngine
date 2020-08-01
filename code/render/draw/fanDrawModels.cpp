@@ -119,8 +119,8 @@ namespace fan
 		}
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void DrawModels::RecordCommandBuffer( const size_t _index, RenderPass& _renderPass, FrameBuffer& _framebuffer, VkExtent2D _extent, DescriptorImages& _descriptorTextures )
 	{		
 		VkCommandBuffer commandBuffer = mCommandBuffers.mBuffers[_index];
@@ -134,15 +134,27 @@ namespace fan
 			for( uint32_t meshIndex = 0; meshIndex < mDrawData.size(); meshIndex++ )
 			{
 				DrawData& drawData = mDrawData[meshIndex];
+				Mesh& mesh = *drawData.mesh;
+
 				BindTexture( commandBuffer, drawData.textureIndex, mDescriptorSampler, _descriptorTextures, mPipeline.mPipelineLayout );
 				BindDescriptors( commandBuffer, _index, meshIndex );
 				VkDeviceSize offsets[] = { 0 };
 
-
-
-				vkCmdBindVertexBuffers( commandBuffer, 0, 1, &drawData.mesh->GetVertexBuffer().mBuffer, offsets );
-				vkCmdBindIndexBuffer( commandBuffer, drawData.mesh->GetIndexBuffer().mBuffer, 0, VK_INDEX_TYPE_UINT32 );
-				vkCmdDrawIndexed( commandBuffer, static_cast<uint32_t>( drawData.mesh->GetIndices().size() ), 1, 0, 0, 0 );
+                vkCmdBindVertexBuffers(
+                        commandBuffer,
+                        0,
+                        1,
+                        &mesh.mVertexBuffer[ mesh.mCurrentBuffer ].mBuffer,
+                        offsets );
+				vkCmdBindIndexBuffer(
+				        commandBuffer,
+				        mesh.mIndexBuffer[ mesh.mCurrentBuffer ].mBuffer,
+				        0,
+				        VK_INDEX_TYPE_UINT32 );
+				vkCmdDrawIndexed(
+				        commandBuffer,
+				        static_cast<uint32_t>( mesh.mIndices.size() ),
+				        1, 0, 0, 0 );
 			}
 
 			if( vkEndCommandBuffer( commandBuffer ) != VK_SUCCESS )
@@ -178,7 +190,7 @@ namespace fan
 		{
 			const RenderDataModel& data = _drawData[dataIndex];
 
-			if( data.mesh != nullptr && !data.mesh->GetIndices().empty() )
+			if( data.mesh != nullptr && !data.mesh->mIndices.empty() )
 			{
 				// Transform
 				mUniforms.mDynamicUniformsMatrices[dataIndex].modelMat = data.modelMatrix;

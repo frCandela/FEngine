@@ -38,7 +38,7 @@ namespace fan
 		// num triangles
 		std::stringstream ss;
 		ss << "triangles: ";
-		ss << ( *meshRenderer.mesh != nullptr ? meshRenderer.mesh->GetIndices().size() / 3 : 0 );
+		ss << ( *meshRenderer.mesh != nullptr ? meshRenderer.mesh->mIndices.size() / 3 : 0 );
 		ImGui::Text( ss.str().c_str() );
 
 	}

@@ -92,7 +92,15 @@ namespace fan
                 {
                     success = false;
                 }
-                unitTest.Destroy();
+
+                try
+                {
+                    unitTest.Destroy();
+                }
+                catch( ... )
+                {
+                    success = false;
+                }
 
                 if( success )
                 {

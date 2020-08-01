@@ -25,7 +25,6 @@ namespace fan
 		mGameExtent = mWindow.mSwapchain.mExtent;
 		RenderPass& finalRenderPass = mViewType == ViewType::Editor ? mRenderPassImgui : mRenderPassPostprocess;
 
-		Mesh::s_resourceManager.Init( mDevice );
 		Texture::s_resourceManager.Init( mDevice );
 		UIMesh::s_resourceManager.Init( mDevice );
 
@@ -60,8 +59,7 @@ namespace fan
 		mDrawModels.Destroy( mDevice );
 		mDrawUI.mPipeline.Destroy( mDevice );
 		mDrawDebug.Destroy( mDevice );
-
-		Mesh::s_resourceManager.Clear();
+		mMeshManager.Clear( mDevice );
 		Texture::s_resourceManager.Clear();
 		UIMesh::s_resourceManager.Clear();
 

@@ -105,7 +105,5 @@ namespace fan
 
 		void OnSceneLoad( Scene& _scene );
 		void OnToogleShowUI() { m_showUI = !m_showUI; }
-		
-		
 	};
 }

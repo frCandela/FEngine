@@ -1,9 +1,9 @@
 #pragma once
 
 #include "core/fanUnitTest.hpp"
-#include "render/fanMeshManager2.hpp"
+#include "render/fanMeshManager.hpp"
 #include "render/fanRenderGlobal.hpp"
-#include "render/fanMesh2.hpp"
+#include "render/fanMesh.hpp"
 #include "render/fanRenderResourcePtr.hpp"
 
 namespace fan
@@ -31,34 +31,36 @@ namespace fan
             meshManager.Clear( *device );
         }
 
-        MeshManager2 meshManager;
+        MeshManager meshManager;
 
         void TestLoadMesh()
         {
             TEST_ASSERT( meshManager.LoadMesh( "toto" ) == nullptr );
 
-            Mesh2* meshCube = meshManager.LoadMesh( RenderGlobal::s_meshCube );
+            Mesh* meshCube = meshManager.GetOrLoad( RenderGlobal::s_meshCube );
             TEST_ASSERT( meshCube != nullptr );
-            Mesh2* meshPlane = meshManager.LoadMesh( RenderGlobal::s_meshPlane );
+            Mesh* meshPlane = meshManager.LoadMesh( RenderGlobal::s_meshPlane );
             TEST_ASSERT( meshPlane != nullptr );
 
             TEST_ASSERT( meshManager.GetMesh( RenderGlobal::s_meshCube ) == meshCube );
             TEST_ASSERT( meshManager.GetMesh( RenderGlobal::s_meshPlane ) == meshPlane );
 
-            Mesh2 * testMesh = new Mesh2();
+            Mesh* testMesh = new Mesh();
+            TEST_ASSERT( testMesh->mExternallyOwned == false );
             const std::string testMeshName = "test_mesh";
             meshManager.AddMesh( testMesh, testMeshName );
             TEST_ASSERT( meshManager.GetMesh( testMeshName ) == testMesh );
+            TEST_ASSERT( testMesh->mExternallyOwned == true );
         }
 
         void TestMeshIndexing()
         {
-            Mesh2 * generatedMesh = new Mesh2();
+            Mesh* generatedMesh = new Mesh();
             const std::string generatedMeshName = "generated_mesh";
 
-            Mesh2* meshCube  = meshManager.LoadMesh( RenderGlobal::s_meshCube );
+            Mesh* meshCube = meshManager.LoadMesh( RenderGlobal::s_meshCube );
             meshManager.AddMesh( generatedMesh, generatedMeshName );
-            Mesh2* meshPlane = meshManager.LoadMesh( RenderGlobal::s_meshPlane );
+            Mesh* meshPlane = meshManager.LoadMesh( RenderGlobal::s_meshPlane );
 
             TEST_ASSERT( meshCube->mIndex == 0 );
             TEST_ASSERT( generatedMesh->mIndex == 1 );
@@ -85,8 +87,8 @@ namespace fan
 
         void TestResolveRscPtr()
         {
-            Mesh2 * meshCube = meshManager.LoadMesh( RenderGlobal::s_meshCube );
-            Mesh2Ptr rscPtr;
+            Mesh* meshCube = meshManager.LoadMesh( RenderGlobal::s_meshCube );
+            MeshPtr rscPtr;
             TEST_ASSERT( ! rscPtr.IsValid() );
             rscPtr.Init( RenderGlobal::s_meshCube);
             meshManager.ResolvePtr( rscPtr );
@@ -98,10 +100,10 @@ namespace fan
         {
             meshManager.LoadMesh( RenderGlobal::s_meshCube );
             meshManager.Remove( RenderGlobal::s_meshCube );
-            TEST_ASSERT( meshManager.CountBuffersPendingDestruction() == 6 );
+            TEST_ASSERT( meshManager.GetCountBuffersPendingDestruction() == 6 );
             Device * device = nullptr;
             meshManager.Clear( * device );
-            TEST_ASSERT( meshManager.CountBuffersPendingDestruction() == 0 );
+            TEST_ASSERT( meshManager.GetCountBuffersPendingDestruction() == 0 );
         }
     };
 }

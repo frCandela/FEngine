@@ -69,9 +69,11 @@ namespace fan
         if( ImGui::CollapsingHeader( _testArgument.mName ) )
         {
             ImGui::Indent();
-            if( ImGui::Button( "Test" ) ){ RunTest( _testArgument ); }
+            std::string testButtonName = "Test##" + std::string(_testArgument.mName);
+            if( ImGui::Button( testButtonName.c_str() ) ){ RunTest( _testArgument ); }
             ImGui::SameLine();
-            if( ImGui::Button( "Clear" ) ){ ClearTest( _testArgument ); }
+            std::string clearButtonName = "Clear##" + std::string(_testArgument.mName);
+            if( ImGui::Button( clearButtonName.c_str() ) ){ ClearTest( _testArgument ); }
 
             ImGui::Columns( 2 );
             for( const UnitTestResult::TestResult& testResult : _testArgument.mTestDisplay.mTestDisplays )
