@@ -191,7 +191,7 @@ namespace fan
 			}
 
 			// Load mesh
-			sunLight.mesh.LoadFromVertices( vertices );
+			sunLight.mesh->LoadFromVertices( vertices );
 		}
 	};
 }

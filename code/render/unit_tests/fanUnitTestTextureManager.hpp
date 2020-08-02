@@ -47,13 +47,10 @@ namespace fan
             TEST_ASSERT( mTextureManager.Get( RenderGlobal::sDefaultTexture ) == defaultTexture );
             TEST_ASSERT( mTextureManager.Get( RenderGlobal::sTextureWhite ) == whiteTexture );
 
-            TEST_ASSERT( whiteTexture->mExternallyOwned == false );
-
             Texture* testTexture = new Texture();
             const std::string testTextureName = "test_texture";
             mTextureManager.Add( testTexture, testTextureName );
             TEST_ASSERT( mTextureManager.Get( testTextureName ) == testTexture );
-            TEST_ASSERT( testTexture->mExternallyOwned == true );
         }
 
         void TestMeshRemove()

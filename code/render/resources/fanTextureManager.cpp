@@ -60,13 +60,13 @@ namespace fan
     }
 
     //========================================================================================================
+    // Every texture added using this method will be deleted by the TextureManager
     //========================================================================================================
     void TextureManager::Add( Texture* _texture, const std::string& _name )
     {
         assert( _texture != nullptr );
         _texture->mIndex = (int)mTextures.size();
         _texture->mPath = _name;
-        _texture->mExternallyOwned = true;
         mTextures.push_back( _texture );
     }
 
@@ -87,17 +87,14 @@ namespace fan
         }
     }
 
-    //================================================================================================================================
-    //================================================================================================================================
+    //========================================================================================================
+    //========================================================================================================
     void TextureManager::Clear( Device& _device )
     {
         for ( Texture* texture : mTextures )
         {
             texture->Destroy( _device );
-            if( ! texture->mExternallyOwned )
-            {
-                delete texture;
-            }
+            delete texture;
         }
         mTextures.clear();
         Destroy( _device );
@@ -140,10 +137,7 @@ namespace fan
         for( Texture* texture : mDestroyList )
         {
             texture->Destroy( _device );
-            if( !texture->mExternallyOwned )
-            {
-                delete texture;
-            }
+            delete texture;
         }
         mDestroyList.clear();
     }

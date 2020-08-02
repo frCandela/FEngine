@@ -18,7 +18,7 @@ namespace fan
 	public:
 		void Clear( Device& _device );
         Mesh2D* Get( const std::string& _path ) const;
-        void Add( Mesh2D* _mesh, const std::string& _name, const bool _externalOwner = false );
+        void Add( Mesh2D* _mesh, const std::string& _name );
         void Remove( const std::string& _path );
         bool Empty() const { return mMeshes.empty(); }
 		int  MeshCount() const { return (int)mMeshes.size(); }

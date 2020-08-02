@@ -57,13 +57,13 @@ namespace fan
     }
 
     //========================================================================================================
+    // Every mesh added using this method will be deleted by the MeshManager
     //========================================================================================================
     void MeshManager::Add( Mesh * _mesh, const std::string& _name )
     {
         assert( _mesh != nullptr );
         _mesh->mIndex = (int)mMeshes.size();
         _mesh->mPath = _name;
-        _mesh->mExternallyOwned = true;
         mMeshes.push_back( _mesh );
     }
 
@@ -92,10 +92,7 @@ namespace fan
         for ( Mesh* mesh : mMeshes )
         {
             mesh->Destroy( _device );
-            if( ! mesh->mExternallyOwned )
-            {
-                delete mesh;
-            }
+            delete mesh;
         }
         mMeshes.clear();
         Destroy( _device );
@@ -121,11 +118,7 @@ namespace fan
         for( Mesh* mesh : mDestroyList )
         {
             mesh->Destroy( _device );
-            if( ! mesh->mExternallyOwned )
-            {
-                Debug::Log( mesh->mPath );
-                delete mesh;
-            }
+            delete mesh;
         }
         mDestroyList.clear();
     }

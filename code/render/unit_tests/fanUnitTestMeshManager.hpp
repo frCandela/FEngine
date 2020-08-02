@@ -47,12 +47,10 @@ namespace fan
             TEST_ASSERT( mMeshManager.Get( RenderGlobal::s_meshPlane ) == meshPlane );
 
             Mesh* testMesh = new Mesh();
-            TEST_ASSERT( testMesh->mExternallyOwned == false );
             const std::string testMeshName = "test_mesh";
             mMeshManager.Add( testMesh, testMeshName );
             TEST_ASSERT( testMesh->mPath == testMeshName );
             TEST_ASSERT( mMeshManager.Get( testMeshName ) == testMesh );
-            TEST_ASSERT( testMesh->mExternallyOwned == true );
         }
 
         void TestMeshIndexing()

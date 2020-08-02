@@ -39,6 +39,5 @@ namespace fan
         bool                    mOptimizeVertices = true;
         bool                    mAutoUpdateHull   = true;
         bool                    mBuffersOutdated  = false;
-        bool                    mExternallyOwned  = false;
     };
 }

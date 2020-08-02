@@ -7,13 +7,12 @@ namespace fan
     //================================================================================================================================
     // _externalOwner set to true means the Mesh2DManager will destroy the mesh
     //================================================================================================================================
-    void Mesh2DManager::Add( Mesh2D* _mesh, const std::string& _name, const bool _externalOwner )
+    void Mesh2DManager::Add( Mesh2D* _mesh, const std::string& _name )
     {
         assert( _mesh != nullptr );
         _mesh->mIndex = (int)mMeshes.size();
         _mesh->mPath = _name;
-        _mesh->mExternallyOwned = _externalOwner;
-        mMeshes.push_back( { _mesh } );
+        mMeshes.push_back( _mesh );
     }
 
     //========================================================================================================
@@ -54,10 +53,7 @@ namespace fan
         for ( Mesh2D* mesh : mMeshes )
         {
             mesh->Destroy( _device );
-            if( ! mesh->mExternallyOwned )
-            {
-                delete mesh;
-            }
+            delete mesh;
         }
         mMeshes.clear();
         Destroy( _device );
@@ -83,10 +79,7 @@ namespace fan
         for( Mesh2D* mesh : mDestroyList )
         {
             mesh->Destroy( _device );
-            if( !mesh->mExternallyOwned )
-            {
-                delete mesh;
-            }
+            delete mesh;
         }
         mDestroyList.clear();
     }

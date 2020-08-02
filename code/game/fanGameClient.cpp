@@ -169,8 +169,8 @@ namespace fan
         MeshManager& meshManager = *world.GetSingleton<RenderResources>().mMeshManager;
         SunLight& sunLight = world.GetSingleton<SunLight>();
         RenderWorld& renderWorld = world.GetSingleton<RenderWorld>();
-        meshManager.Add( &sunLight.mesh, "sunlight_mesh_" + game.name );
-        meshManager.Add( &renderWorld.particlesMesh, "particles_mesh_" + game.name );
+        meshManager.Add( sunLight.mesh, "sunlight_mesh_" + game.name );
+        meshManager.Add( renderWorld.particlesMesh, "particles_mesh_" + game.name );
 	}
 
 	//================================================================================================================================
@@ -183,10 +183,9 @@ namespace fan
 		// clears the particles mesh
 		RenderWorld& renderWorld = world.GetSingleton<RenderWorld>();
         SunLight& sunLight = world.GetSingleton<SunLight>();
-        renderWorld.particlesMesh.LoadFromVertices( {} );
         MeshManager& meshManager = *world.GetSingleton<RenderResources>().mMeshManager;
-        meshManager.Remove( sunLight.mesh.mPath );
-        meshManager.Remove( renderWorld.particlesMesh.mPath );
+        meshManager.Remove( sunLight.mesh->mPath );
+        meshManager.Remove( renderWorld.particlesMesh->mPath );
 
 		GameCamera::DeleteGameCamera( world );
 

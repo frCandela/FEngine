@@ -27,6 +27,5 @@ namespace fan
         int                   mIndex = -1;
 		bool                  mHostVisible = false;
         bool                  mBuffersOutdated  = false;
-        bool                  mExternallyOwned = false; //if false, the manager is responsible for destruction
 	};
 }

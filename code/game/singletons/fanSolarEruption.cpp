@@ -80,7 +80,7 @@ namespace fan
 		if( eruption.sunlightRenderer != nullptr )
 		{
 			SunLight& sunlight = _world.GetSingleton<SunLight>();
-			eruption.sunlightRenderer->mesh = &sunlight.mesh;
+			eruption.sunlightRenderer->mesh = sunlight.mesh;
 		}
 
 		// initialize the sun point light

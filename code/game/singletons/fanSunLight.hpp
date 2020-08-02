@@ -19,7 +19,7 @@ namespace fan
 		static void Save( const EcsSingleton& _component, Json& _json );
 		static void Load( EcsSingleton& _component, const Json& _json );
 
-		Mesh  mesh;
+		Mesh * mesh = nullptr;
 		float subAngle;
 		float radius;
 

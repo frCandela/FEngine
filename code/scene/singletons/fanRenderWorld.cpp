@@ -25,10 +25,10 @@ namespace fan
 		renderWorld.pointLights.clear();
 		renderWorld.directionalLights.clear();
 		renderWorld.targetSize = {1920,1080};
-		renderWorld.particlesMesh = Mesh();
-		renderWorld.particlesMesh.mHostVisible = true;
-		renderWorld.particlesMesh.mOptimizeVertices = false;
-		renderWorld.particlesMesh.mAutoUpdateHull = false;
+		renderWorld.particlesMesh = new Mesh();
+		renderWorld.particlesMesh->mHostVisible = true;
+		renderWorld.particlesMesh->mOptimizeVertices = false;
+		renderWorld.particlesMesh->mAutoUpdateHull = false;
 		renderWorld.isHeadless = false;
 	}
 
@@ -44,7 +44,7 @@ namespace fan
 			ImGui::Text( "ui mesh:            %d", renderWorld.uiDrawData.size() );
 			ImGui::Text( "pointLights:        %d", renderWorld.pointLights.size() );
 			ImGui::Text( "directionalLights:  %d", renderWorld.directionalLights.size() );
-			ImGui::Text( "particles vertices: %d", renderWorld.particlesMesh.mVertices.size() );
+			ImGui::Text( "particles vertices: %d", renderWorld.particlesMesh->mVertices.size() );
 			ImGui::Text( "target size:        %d x %d", (int)renderWorld.targetSize.x, (int)renderWorld.targetSize.y );
 
 

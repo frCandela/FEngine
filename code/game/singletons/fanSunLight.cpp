@@ -22,17 +22,12 @@ namespace fan
 	void SunLight::Init( EcsWorld& /*_world*/, EcsSingleton& _component )
 	{
 		SunLight& sunLight = static_cast<SunLight&>( _component );
-
 		sunLight.subAngle = 45.f;
 		sunLight.radius = 100.f;
-
-		if( !sunLight.mesh.mVertices.empty() )
-		{
-			sunLight.mesh = Mesh();
-		}
-		sunLight.mesh.mHostVisible = true;
-		sunLight.mesh.mOptimizeVertices = false;
-		sunLight.mesh.mAutoUpdateHull = false;
+		sunLight.mesh = new Mesh();
+		sunLight.mesh->mHostVisible = true;
+		sunLight.mesh->mOptimizeVertices = false;
+		sunLight.mesh->mAutoUpdateHull = false;
 	}
 
 	//================================================================================================================================
