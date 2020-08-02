@@ -5,6 +5,7 @@
 #include "editor/unit_tests/fanUnitTestCurrency.hpp"
 #include "render/unit_tests/fanUnitTestMeshManager.hpp"
 #include "render/unit_tests/fanUnitTestMesh2DManager.hpp"
+#include "render/unit_tests/fanUnitTestTextureManager.hpp"
 
 namespace fan
 {
@@ -16,9 +17,10 @@ namespace fan
     //========================================================================================================
     std::vector<UnitTestsWindow::TestArgument> UnitTestsWindow::GetTests() {
         return {
-                { "Currency", &UnitTestCurrency::RunTests,        mCurrencyResult },
-                { "Mesh manager", &UnitTestMeshManager::RunTests, mMeshManagerResult },
-                { "Mesh2D manager", &UnitTestMesh2DManager::RunTests, mMesh2DManagerResult },
+                { "Currency",           &UnitTestCurrency::RunTests,        mCurrencyResult },
+                { "Mesh manager",       &UnitTestMeshManager::RunTests,     mMeshManagerResult },
+                { "Mesh2D manager",     &UnitTestMesh2DManager::RunTests,   mMesh2DManagerResult },
+                { "Texture manager",    &UnitTestTextureManager::RunTests,  mTextureManagerResult },
         };
     }
 

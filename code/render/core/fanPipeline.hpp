@@ -15,19 +15,19 @@ namespace fan
 	{
 		PipelineConfig( const Shader& _vert, const Shader& _frag );
 
-		VkPipelineRasterizationStateCreateInfo			rasterizationStateCreateInfo = {};
-		VkPipelineInputAssemblyStateCreateInfo			inputAssemblyStateCreateInfo = {};
-		VkPipelineDepthStencilStateCreateInfo			depthStencilStateCreateInfo = {};
-		VkPipelineMultisampleStateCreateInfo			multisampleStateCreateInfo = {};
-		VkPipelineShaderStageCreateInfo					vertshaderStageCreateInfos = {};
-		VkPipelineShaderStageCreateInfo					fragShaderStageCreateInfos = {};
-		VkPipelineColorBlendStateCreateInfo				colorBlendStateCreateInfo = {};
-		std::vector<VkVertexInputBindingDescription >	bindingDescription;
-		std::vector<VkVertexInputAttributeDescription > attributeDescriptions;
-		std::vector<VkPipelineColorBlendAttachmentState>attachmentBlendStates;
-		std::vector<VkDescriptorSetLayout>				descriptorSetLayouts;
-		std::vector<VkPushConstantRange>				pushConstantRanges = {};
-		std::vector<VkDynamicState>						dynamicStates;
+		VkPipelineRasterizationStateCreateInfo           rasterizationStateInfo = {};
+		VkPipelineInputAssemblyStateCreateInfo           inputAssemblyStateInfo = {};
+		VkPipelineDepthStencilStateCreateInfo            depthStencilStateInfo  = {};
+		VkPipelineMultisampleStateCreateInfo             multisampleStateInfo   = {};
+		VkPipelineShaderStageCreateInfo                  vertshaderStageInfos   = {};
+		VkPipelineShaderStageCreateInfo                  fragShaderStageInfos   = {};
+		VkPipelineColorBlendStateCreateInfo              colorBlendStateInfo    = {};
+		std::vector<VkVertexInputBindingDescription >    bindingDescription;
+		std::vector<VkVertexInputAttributeDescription >  attributeDescriptions;
+		std::vector<VkPipelineColorBlendAttachmentState> attachmentBlendStates;
+		std::vector<VkDescriptorSetLayout>               descriptorSetLayouts   = {};
+		std::vector<VkPushConstantRange>                 pushConstantRanges     = {};
+		std::vector<VkDynamicState>                      dynamicStates;
 	};
 
 	//================================================================================================================================

@@ -16,24 +16,22 @@ namespace fan
     class MeshManager
     {
     public:
-        ~MeshManager();
-
         Mesh*  Get( const std::string& _path ) const;
         Mesh*  Load( const std::string& _path );
+        Mesh*  GetOrLoad( const std::string& _path );
         void   Add( Mesh* _mesh, const std::string& _name );
         void   Remove( const std::string& _path );
-        Mesh*  GetOrLoad( const std::string& _path );
         void   Clear( Device& _device);
         bool   Empty() const { return mMeshes.empty(); }
         void   ResolvePtr( ResourcePtr<Mesh>& _resourcePtr );
 
-        void CreateBuffers( Device& _device );
-        void DestroyBuffers( Device& _device );
+        void Create( Device& _device );
+        void Destroy( Device& _device );
 
         int DestroyListSize() const  { return (int)mDestroyList.size(); }
         const std::vector< Mesh * >& GetMeshes() const { return mMeshes; }
     private:
         std::vector< Mesh * > mMeshes;
-        std::vector< Buffer > mDestroyList;
+        std::vector< Mesh * > mDestroyList;
     };
 }

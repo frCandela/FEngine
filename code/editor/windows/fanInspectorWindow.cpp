@@ -14,7 +14,7 @@
 #include "ecs/fanSignal.hpp"
 #include "render/core/fanTexture.hpp"
 #include "render/core/fanTexture.hpp"
-#include "render/fanMesh.hpp"
+#include "render/resources/fanMesh.hpp"
 #include "editor/singletons/fanEditorSelection.hpp"
 #include "editor/fanGroupsColors.hpp"
 

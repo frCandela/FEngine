@@ -107,16 +107,17 @@ namespace fan
 				{
 					SceneNode& node = scene.CreateSceneNode( "model", m_lastSceneNodeRightClicked );
 					const EcsEntity entity = world.GetEntity( node.handle );
-					
+                    RenderResources& renderResources = _world.GetSingleton<RenderResources>();
+
 					Transform& transform = world.AddComponent<Transform>( entity );
 					transform.SetPosition( origin );
-					
+
 					MeshRenderer& meshRenderer = world.AddComponent<MeshRenderer>( entity );
-                    RenderResources& renderResources = _world.GetSingleton<RenderResources>();
 					meshRenderer.mesh = renderResources.mMeshManager->GetOrLoad( RenderGlobal::s_meshSphere );
 					
 					Material& material = world.AddComponent<Material>( entity );
-					material.texture = Texture::s_resourceManager.GetTexture( RenderGlobal::s_textureWhite );
+
+					material.texture = renderResources.mTextureManager->Get( RenderGlobal::sTextureWhite );
 					onSelectSceneNode.Emmit( &node );
 				}
 
@@ -126,15 +127,15 @@ namespace fan
 				{
 					SceneNode& node = scene.CreateSceneNode( "physics_model", m_lastSceneNodeRightClicked );
 					const EcsEntity entity = world.GetEntity( node.handle );
-					
+                    RenderResources& renderResources = _world.GetSingleton<RenderResources>();
+
 					Transform& transform = world.AddComponent<Transform>( entity );
 					transform.SetPosition( origin );
-					
+
 					MeshRenderer& meshRenderer = world.AddComponent<MeshRenderer>( entity );
-                    RenderResources& renderResources = _world.GetSingleton<RenderResources>();
 					meshRenderer.mesh = renderResources.mMeshManager->GetOrLoad( RenderGlobal::s_meshCube );
 					Material& material = world.AddComponent<Material>( entity );
-					material.texture = Texture::s_resourceManager.GetTexture( RenderGlobal::s_textureWhite );
+					material.texture = renderResources.mTextureManager->Get( RenderGlobal::sTextureWhite );
 					onSelectSceneNode.Emmit( &node );
 					
 					Rigidbody& rigidbody = world.AddComponent<Rigidbody>( entity );

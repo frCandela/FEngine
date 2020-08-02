@@ -81,12 +81,12 @@ namespace fan
 	{
 		PipelineConfig config( mVertexShaderLines, mFragmentShaderLines );
 		
-		config.bindingDescription = DebugVertex::GetBindingDescription();
-		config.attributeDescriptions = DebugVertex::GetAttributeDescriptions();
-		config.inputAssemblyStateCreateInfo.topology = VK_PRIMITIVE_TOPOLOGY_LINE_LIST;
-		config.depthStencilStateCreateInfo.depthTestEnable =  VK_TRUE;
-		config.descriptorSetLayouts = { mDescriptorLines.mDescriptorSetLayout };
-		config.rasterizationStateCreateInfo.cullMode = VK_CULL_MODE_NONE;
+		config.bindingDescription                    = DebugVertex::GetBindingDescription();
+		config.attributeDescriptions                 = DebugVertex::GetAttributeDescriptions();
+		config.inputAssemblyStateInfo.topology       = VK_PRIMITIVE_TOPOLOGY_LINE_LIST;
+		config.depthStencilStateInfo.depthTestEnable =  VK_TRUE;
+		config.descriptorSetLayouts                  = { mDescriptorLines.mDescriptorSetLayout };
+		config.rasterizationStateInfo.cullMode       = VK_CULL_MODE_NONE;
 		
 		return config;
 	}
@@ -97,12 +97,12 @@ namespace fan
 	{
 		PipelineConfig config( mVertexShaderLinesNDT, mFragmentShaderLinesNDT );
 
-		config.bindingDescription = DebugVertex::GetBindingDescription();
-		config.attributeDescriptions = DebugVertex::GetAttributeDescriptions();
-		config.inputAssemblyStateCreateInfo.topology = VK_PRIMITIVE_TOPOLOGY_LINE_LIST;
-		config.depthStencilStateCreateInfo.depthTestEnable = VK_TRUE;
-		config.descriptorSetLayouts = { mDescriptorLinesNDT.mDescriptorSetLayout };
-		config.rasterizationStateCreateInfo.cullMode = VK_CULL_MODE_NONE;
+		config.bindingDescription                    = DebugVertex::GetBindingDescription();
+		config.attributeDescriptions                 = DebugVertex::GetAttributeDescriptions();
+		config.inputAssemblyStateInfo.topology       = VK_PRIMITIVE_TOPOLOGY_LINE_LIST;
+		config.depthStencilStateInfo.depthTestEnable = VK_TRUE;
+		config.descriptorSetLayouts                  = { mDescriptorLinesNDT.mDescriptorSetLayout };
+		config.rasterizationStateInfo.cullMode       = VK_CULL_MODE_NONE;
 
 		return config;
 	}
@@ -113,12 +113,12 @@ namespace fan
 	{
 		PipelineConfig config( mVertexShaderTriangles, mFragmentShaderTriangles );
 
-		config.bindingDescription = DebugVertex::GetBindingDescription();
-		config.attributeDescriptions = DebugVertex::GetAttributeDescriptions();
-		config.inputAssemblyStateCreateInfo.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
-		config.depthStencilStateCreateInfo.depthTestEnable = VK_FALSE;
-		config.descriptorSetLayouts = { mDescriptorTriangles.mDescriptorSetLayout };
-		config.rasterizationStateCreateInfo.cullMode = VK_CULL_MODE_NONE;
+		config.bindingDescription                    = DebugVertex::GetBindingDescription();
+		config.attributeDescriptions                 = DebugVertex::GetAttributeDescriptions();
+		config.inputAssemblyStateInfo.topology       = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
+		config.depthStencilStateInfo.depthTestEnable = VK_FALSE;
+		config.descriptorSetLayouts                  = { mDescriptorTriangles.mDescriptorSetLayout };
+		config.rasterizationStateInfo.cullMode       = VK_CULL_MODE_NONE;
 
 		return config;
 	}

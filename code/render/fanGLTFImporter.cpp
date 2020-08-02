@@ -1,5 +1,5 @@
 #include "render/fanGLTFImporter.hpp"
-#include "render/fanMesh.hpp"
+#include "render/resources/fanMesh.hpp"
 
 #include <filesystem>
 #include <fstream>

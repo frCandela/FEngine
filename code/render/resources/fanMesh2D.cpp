@@ -1,4 +1,4 @@
-#include "render/fanMesh2D.hpp"
+#include "fanMesh2D.hpp"
 
 #include "core/fanDebug.hpp"
 #include "render/core/fanDevice.hpp"
@@ -17,7 +17,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Mesh2D::CreateBuffers( Device& _device )
+	void Mesh2D::Create( Device& _device )
 	{
         mBuffersOutdated = false;
 
@@ -67,7 +67,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Mesh2D::DestroyBuffers( Device& _device )
+	void Mesh2D::Destroy( Device& _device )
 	{
 		for ( int bufferIndex = 0; bufferIndex <  SwapChain::s_maxFramesInFlight ; bufferIndex++ )
 		{

@@ -4,7 +4,7 @@
 #include "core/resources/fanResource.hpp"
 #include "core/resources/fanResource.hpp"
 #include "render/fanVertex.hpp"
-#include "render/fanMeshManager.hpp"
+#include "fanMeshManager.hpp"
 #include "render/core/fanBuffer.hpp"
 #include "core/resources/fanResourcePtr.hpp"
 
@@ -24,8 +24,8 @@ namespace fan
         bool LoadFromVertices( const std::vector<Vertex>& _vertices );
         void OptimizeVertices();
         void GenerateConvexHull();
-        void CreateBuffers( Device& _device );
-        void DestroyBuffers( Device & _device );
+        void Create( Device& _device );
+        void Destroy( Device & _device );
 
         std::string             mPath;
         std::vector<Vertex>     mVertices;

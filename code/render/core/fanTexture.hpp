@@ -6,7 +6,7 @@ WARNINGS_GLM_PUSH()
 WARNINGS_POP()
 #include "glfw/glfw3.h"
 #include "core/resources/fanResource.hpp"
-#include "render/fanTextureManager.hpp"
+#include "render/resources/fanTextureManager.hpp"
 
 namespace fan
 {
@@ -23,16 +23,20 @@ namespace fan
 		VkImageView		mImageView	= VK_NULL_HANDLE;
 		VkDeviceMemory	mMemory		= VK_NULL_HANDLE;
 
-		uint32_t	mMipLevels = 1;
-		VkExtent2D	mExtent;
-		uint32_t	mLayerCount = 1;
+		uint32_t	    mMipLevels = 1;
+		VkExtent2D	    mExtent;
+		uint32_t	    mLayerCount = 1;
+		std::string	    mPath;
+        uint8_t *       mPixels = nullptr;
+		int             mIndex = -1;
+		bool            mExternallyOwned = false;
+        bool            mBuffersOutdated = false;
 
-		std::string	mPath;
-		int			mRenderID = -1;
-
-		bool CreateFromFile( Device& _device, const std::string& _path );
-		void CreateFromData( Device& _device, const unsigned char* _data, const VkExtent2D _extent, const uint32_t _mipLevels );
+        void LoadFromPixels( const uint8_t* _pixelsRGBA32, const VkExtent2D _extent, const uint32_t _mipLevels );
+		bool LoadFromFile( const std::string& _path );
+		void Create( Device& _device );
 		void Destroy( Device& _device );
+		void FreePixels();
 
 	private:
 		void CreateImage( Device& _device, VkExtent2D _extent, uint32_t _mipLevels, VkFormat _format, VkImageTiling _tiling, VkImageUsageFlags _usage, VkMemoryPropertyFlags _properties );

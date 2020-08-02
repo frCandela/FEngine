@@ -65,15 +65,15 @@ namespace fan
 		config.bindingDescription[0].inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
 
 		config.attributeDescriptions.resize( 1 );
-		config.attributeDescriptions[0].binding = 0;
-		config.attributeDescriptions[0].location = 0;
-		config.attributeDescriptions[0].format = VK_FORMAT_R32G32B32_SFLOAT;
-		config.attributeDescriptions[0].offset = 0;
-		config.inputAssemblyStateCreateInfo.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP;
-		config.rasterizationStateCreateInfo.cullMode = VK_CULL_MODE_NONE;
+		config.attributeDescriptions[0].binding             = 0;
+		config.attributeDescriptions[0].location            = 0;
+		config.attributeDescriptions[0].format              = VK_FORMAT_R32G32B32_SFLOAT;
+		config.attributeDescriptions[0].offset              = 0;
+		config.inputAssemblyStateInfo.topology              = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP;
+		config.rasterizationStateInfo.cullMode              = VK_CULL_MODE_NONE;
 		config.attachmentBlendStates[0].srcColorBlendFactor = VK_BLEND_FACTOR_ONE;
 		config.attachmentBlendStates[0].dstColorBlendFactor = VK_BLEND_FACTOR_ZERO;
-		config.descriptorSetLayouts = { mDescriptorImage.mDescriptorSetLayout, mDescriptorUniform.mDescriptorSetLayout };
+		config.descriptorSetLayouts                         = { mDescriptorImage.mDescriptorSetLayout, mDescriptorUniform.mDescriptorSetLayout };
 
 		return config;
 	}

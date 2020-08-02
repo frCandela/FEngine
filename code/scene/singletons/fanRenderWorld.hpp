@@ -4,7 +4,7 @@
 #include "core/shapes/fanAABB.hpp"
 #include "ecs/fanEcsSingleton.hpp"
 #include "render/fanRenderer.hpp"
-#include "render/fanMesh.hpp"
+#include "render/resources/fanMesh.hpp"
 
 namespace fan
 {

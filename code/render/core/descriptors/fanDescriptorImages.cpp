@@ -10,10 +10,10 @@ namespace fan
 	//================================================================================================================================
 	void DescriptorImages::Create( Device& _device, VkImageView* _pViews, const uint32_t _count, VkSampler* _pSamplers )
 	{
+	    if(  _count == 0) { return; }
+
 		assert( mDescriptorPool == VK_NULL_HANDLE );
 		assert( mDescriptorSetLayout == VK_NULL_HANDLE );
-
-		Debug::Log() << "reserve: " << _count << Debug::Endl();
 
 		VkDescriptorType descriptorType = ( _pSamplers == nullptr ? VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE : VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER );
 

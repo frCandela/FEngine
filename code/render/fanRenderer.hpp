@@ -9,8 +9,9 @@ WARNINGS_POP()
 #include "glfw/glfw3.h"
 #include "core/math/fanVector2.hpp"
 #include "render/fanVertex.hpp"
-#include "render/fanMeshManager.hpp"
-#include "render/fanMesh2DManager.hpp"
+#include "render/resources/fanMeshManager.hpp"
+#include "render/resources/fanMesh2DManager.hpp"
+#include "render/resources/fanTextureManager.hpp"
 #include "render/core/fanCommandBuffer.hpp"
 #include "render/core/fanRenderPass.hpp"
 #include "render/core/fanSampler.hpp"
@@ -61,6 +62,7 @@ namespace fan
 
 		MeshManager     mMeshManager;
         Mesh2DManager   mMesh2DManager;
+        TextureManager  mTextureManager;
 		Window& mWindow;
 		Device& mDevice;
 

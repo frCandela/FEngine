@@ -31,12 +31,14 @@ namespace fan
 		InitImgui( _device, _window, _extent );
 
 		// create font and sampler
-		ImGui::GetIO().Fonts->AddFontFromFileTTF( RenderGlobal::s_defaultImguiFont, 15 );
+		ImGui::GetIO().Fonts->AddFontFromFileTTF( RenderGlobal::sDefaultImguiFont, 15 );
 		unsigned char* fontData;
 		int texWidth, texHeight;
 		ImGui::GetIO().Fonts->GetTexDataAsRGBA32( &fontData, &texWidth, &texHeight );
-		mTextureFont.CreateFromData( _device, fontData, { (uint32_t)texWidth, (uint32_t)texHeight }, 1 );
-		mTextureIcons.CreateFromFile( _device, RenderGlobal::s_defaultIcons );
+        mTextureFont.LoadFromPixels( fontData, { (uint32_t)texWidth, (uint32_t)texHeight }, 1 );
+        mTextureFont.Create( _device );
+		mTextureIcons.LoadFromFile( RenderGlobal::sDefaultIcons );
+        mTextureIcons.Create( _device );
 		mSampler.Create( _device, 0, 1.f, VK_FILTER_LINEAR );
 		mSamplerIcons.Create( _device, 0, 0.f, VK_FILTER_NEAREST );
 
@@ -53,8 +55,8 @@ namespace fan
 	//================================================================================================================================
 	void DrawImgui::Destroy( Device& _device )
 	{
-		mTextureFont.Destroy( _device );
-		mTextureIcons.Destroy( _device );
+        mTextureFont.Destroy( _device );
+        mTextureIcons.Destroy( _device );
 		mSampler.Destroy( _device );
 		mSamplerIcons.Destroy( _device );
 		mFragmentShader.Destroy( _device );
@@ -84,8 +86,9 @@ namespace fan
 	{
 		Debug::Log( "reloading icons" );
 
-		mTextureIcons.Destroy( _device );
-		mTextureIcons.CreateFromFile( _device, RenderGlobal::s_defaultIcons );
+        mTextureIcons.Destroy( _device );
+		mTextureIcons.LoadFromFile( RenderGlobal::sDefaultIcons );
+        mTextureIcons.Create( _device );
 		mDescriptorImages.UpdateDescriptorSet( _device, 1, mTextureIcons.mImageView, mSamplerIcons.mSampler );
 	}
 
@@ -299,15 +302,15 @@ namespace fan
 	{
 		PipelineConfig config( mVertexShader, mFragmentShader );
 
-		config.pushConstantRanges = { {VK_SHADER_STAGE_VERTEX_BIT , 0, sizeof( PushConstBlock )} };
-		config.descriptorSetLayouts = { mDescriptorImages.mDescriptorSetLayout };
-		config.rasterizationStateCreateInfo.cullMode = VK_CULL_MODE_NONE;
+		config.pushConstantRanges                           = { {VK_SHADER_STAGE_VERTEX_BIT , 0, sizeof( PushConstBlock )} };
+		config.descriptorSetLayouts                         = { mDescriptorImages.mDescriptorSetLayout };
+		config.rasterizationStateInfo.cullMode              = VK_CULL_MODE_NONE;
 		config.attachmentBlendStates[0].srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
-		config.depthStencilStateCreateInfo.depthTestEnable = VK_FALSE;
-		config.depthStencilStateCreateInfo.depthWriteEnable = VK_FALSE;
-		config.depthStencilStateCreateInfo.depthCompareOp = VK_COMPARE_OP_LESS_OR_EQUAL;
-		config.depthStencilStateCreateInfo.front = config.depthStencilStateCreateInfo.back;
-		config.depthStencilStateCreateInfo.back.compareOp = VK_COMPARE_OP_ALWAYS;
+		config.depthStencilStateInfo.depthTestEnable        = VK_FALSE;
+		config.depthStencilStateInfo.depthWriteEnable       = VK_FALSE;
+		config.depthStencilStateInfo.depthCompareOp         = VK_COMPARE_OP_LESS_OR_EQUAL;
+		config.depthStencilStateInfo.front                  = config.depthStencilStateInfo.back;
+		config.depthStencilStateInfo.back.compareOp         = VK_COMPARE_OP_ALWAYS;
 
 		// Vertex bindings an attributes based on ImGui vertex definition
 		VkVertexInputBindingDescription vInputBindDescription{};

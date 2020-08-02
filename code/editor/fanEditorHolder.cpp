@@ -78,7 +78,9 @@ namespace fan
 
 		// creates renderer
 		m_renderer = new Renderer( m_window, Renderer::ViewType::Editor );
-		RenderResources::SetupResources( m_renderer->mMeshManager, m_renderer->mMesh2DManager );
+        RenderResources::SetupResources( m_renderer->mMeshManager,
+                                         m_renderer->mMesh2DManager,
+                                         m_renderer->mTextureManager );
 
         Prefab::s_resourceManager.Init();;
 
@@ -153,7 +155,9 @@ namespace fan
             renderWorld.isHeadless = ( &world != &GetCurrentWorld() );
 
             RenderResources& renderResources = world.GetSingleton<RenderResources>();
-            renderResources.SetPointers(&m_renderer->mMeshManager,  &m_renderer->mMesh2DManager );
+            renderResources.SetPointers( &m_renderer->mMeshManager,
+                                         &m_renderer->mMesh2DManager,
+                                         &m_renderer->mTextureManager );
 
 			Scene& scene = world.GetSingleton<Scene>();
 			EditorSelection& selection = world.GetSingleton<EditorSelection>();

@@ -19,11 +19,11 @@ namespace fan
 		static const std::set<std::string>	s_sceneExtensions;
 		static const std::set<std::string>	s_prefabExtensions;
 
-		static const char* s_defaultMesh;
-		static const char* s_defaultTexture;
-		static const char* s_whiteTexture;
-		static const char* s_defaultIcons;
-		static const char* s_defaultImguiFont;
+		static const char* sDefaultMesh;
+		static const char* sDefaultTexture;
+		static const char* sWhiteTexture;
+		static const char* sDefaultIcons;
+		static const char* sDefaultImguiFont;
 
 		static const char* s_meshCone;
 		static const char* s_meshCube;
@@ -33,8 +33,8 @@ namespace fan
 
         static const char* sMesh2DQuad;
 
-		static const char* s_textureUVCheck;
-		static const char* s_textureWhite;
+		static const char* sTextureUVCheck;
+		static const char* sTextureWhite;
 
 		static const char* s_defaultVertexShader;
 		static const char* s_defaultFragmentShader;

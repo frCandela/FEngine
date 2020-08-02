@@ -1,6 +1,6 @@
-#include "render/fanMesh2DManager.hpp"
+#include "fanMesh2DManager.hpp"
 
-#include "render/fanMesh2D.hpp"
+#include "fanMesh2D.hpp"
 
 namespace fan
 {
@@ -25,16 +25,7 @@ namespace fan
             if( mMeshes[meshIndex]->mPath == _path )
             {
                 (*mMeshes.rbegin())->mIndex = meshIndex;
-
-                for( int i = 0; i < SwapChain::s_maxFramesInFlight; i++ )
-                {
-                    mDestroyList.push_back( mMeshes[meshIndex]->mVertexBuffer[i] );
-                }
-                if( ! mMeshes[meshIndex]->mExternallyOwned )
-                {
-                    delete mMeshes[meshIndex];
-                }
-
+                mDestroyList.push_back( mMeshes[meshIndex] );
                 mMeshes[meshIndex] = mMeshes[mMeshes.size() - 1];
                 mMeshes.pop_back();
                 return;
@@ -62,36 +53,40 @@ namespace fan
     {
         for ( Mesh2D* mesh : mMeshes )
         {
-            mesh->DestroyBuffers( _device );
+            mesh->Destroy( _device );
             if( ! mesh->mExternallyOwned )
             {
                 delete mesh;
             }
         }
         mMeshes.clear();
-        DestroyBuffers( _device );
+        Destroy( _device );
     }
 
     //========================================================================================================
     //========================================================================================================
-    void Mesh2DManager::CreateBuffers( Device& _device )
+    void Mesh2DManager::Create( Device& _device )
     {
         for( Mesh2D * mesh : mMeshes )
         {
             if( mesh->mBuffersOutdated )
             {
-                mesh->CreateBuffers( _device );
+                mesh->Create( _device );
             }
         }
     }
 
     //========================================================================================================
     //========================================================================================================
-    void Mesh2DManager::DestroyBuffers( Device& _device )
+    void Mesh2DManager::Destroy( Device& _device )
     {
-        for( Buffer& buffer : mDestroyList )
+        for( Mesh2D* mesh : mDestroyList )
         {
-            buffer.Destroy( _device );
+            mesh->Destroy( _device );
+            if( !mesh->mExternallyOwned )
+            {
+                delete mesh;
+            }
         }
         mDestroyList.clear();
     }

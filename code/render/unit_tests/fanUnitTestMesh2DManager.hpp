@@ -1,9 +1,9 @@
 #pragma once
 
 #include "core/fanUnitTest.hpp"
-#include "render/fanMesh2DManager.hpp"
+#include "render/resources/fanMesh2DManager.hpp"
 #include "render/fanRenderGlobal.hpp"
-#include "render/fanMesh2D.hpp"
+#include "render/resources/fanMesh2D.hpp"
 
 namespace fan
 {
@@ -15,30 +15,33 @@ namespace fan
         static std::vector<TestMethod> GetTests()
         {
             return {
-                    { &UnitTestMesh2DManager::TestAddMesh,            "Add" },
-                    { &UnitTestMesh2DManager::TestMeshRemove,         "Remove" },
-                    { &UnitTestMesh2DManager::TestMeshIndexing,       "Indexing" },
-                    { &UnitTestMesh2DManager::TestClear,              "Clear" },
-                    { &UnitTestMesh2DManager::TestBuffersCreation,    "Buffers creation" },
-                    { &UnitTestMesh2DManager::TestBuffersDestruction, "Buffers destruction" },
+                    { &UnitTestMesh2DManager::TestAddMesh,      "Add" },
+                    { &UnitTestMesh2DManager::TestMeshRemove,   "Remove" },
+                    { &UnitTestMesh2DManager::TestMeshIndexing, "Indexing" },
+                    { &UnitTestMesh2DManager::TestClear,        "Clear" },
+                    { &UnitTestMesh2DManager::TestCreate,       "Create" },
+                    { &UnitTestMesh2DManager::TestDestroy,      "Destroy" },
             };
         }
         void Create() override {}
         void Destroy() override
         {
             Device * device = nullptr;  // when testing we dont generate gpu buffers
-            meshManager.Clear( *device );
+            mMeshManager.Clear( *device );
         }
 
-        Mesh2DManager meshManager;
+        Mesh2DManager mMeshManager;
 
         void TestAddMesh()
+
         {
-            TEST_ASSERT( meshManager.Empty() );
+            TEST_ASSERT( mMeshManager.Empty() );
             Mesh2D* mesh2D = new Mesh2D;
-            meshManager.Add( mesh2D, "toto" );
-            TEST_ASSERT( ! meshManager.Empty() );
-            TEST_ASSERT( meshManager.MeshCount() == 1 );
+            const std::string meshName = "toto";
+            mMeshManager.Add( mesh2D, meshName );
+            TEST_ASSERT( mesh2D->mPath == meshName);
+            TEST_ASSERT( ! mMeshManager.Empty() );
+            TEST_ASSERT( mMeshManager.MeshCount() == 1 );
         }
 
         void TestMeshIndexing()
@@ -47,15 +50,15 @@ namespace fan
             Mesh2D* mesh2 = new Mesh2D;
             Mesh2D* mesh3 = new Mesh2D;
 
-            meshManager.Add( mesh1, "mesh1" );
-            meshManager.Add( mesh2, "mesh2" );
-            meshManager.Add( mesh3, "mesh3" );
+            mMeshManager.Add( mesh1, "mesh1" );
+            mMeshManager.Add( mesh2, "mesh2" );
+            mMeshManager.Add( mesh3, "mesh3" );
 
             TEST_ASSERT( mesh1->mIndex == 0 );
             TEST_ASSERT( mesh2->mIndex == 1 );
             TEST_ASSERT( mesh3->mIndex == 2 );
 
-            meshManager.Remove( mesh2->mPath );
+            mMeshManager.Remove( mesh2->mPath );
             TEST_ASSERT( mesh1->mIndex == 0 );
             TEST_ASSERT( mesh3->mIndex == 1 );
         }
@@ -64,56 +67,51 @@ namespace fan
         {
             const std::string meshName;
             Mesh2D* mesh2D = new Mesh2D;
-            meshManager.Add( mesh2D, meshName );
-            TEST_ASSERT( meshManager.Get( meshName ) == mesh2D );
-            meshManager.Remove( meshName );
-            TEST_ASSERT( meshManager.Get( meshName ) == nullptr );
-            TEST_ASSERT( meshManager.Empty() );
+            mMeshManager.Add( mesh2D, meshName );
+            TEST_ASSERT( mMeshManager.Get( meshName ) == mesh2D );
+            mMeshManager.Remove( meshName );
+            TEST_ASSERT( mMeshManager.Get( meshName ) == nullptr );
+            TEST_ASSERT( mMeshManager.Empty() );
         }
 
         void TestClear() {
             Mesh2D* mesh1 = new Mesh2D;;
-            meshManager.Add( mesh1, "mesh1" );
+            mMeshManager.Add( mesh1, "mesh1" );
+            TEST_ASSERT( ! mMeshManager.Empty() );
             Device * device = nullptr;
-            meshManager.Clear( *device );
-            TEST_ASSERT( meshManager.Empty() );
+            mMeshManager.Clear( *device );
+            TEST_ASSERT( mMeshManager.Empty() );
         }
 
-        void TestBuffersCreation()
+        void TestCreate()
         {
             Mesh2D* mesh1 = new Mesh2D;
-            Mesh2D* mesh2 = new Mesh2D;
 
             TEST_ASSERT( ! mesh1->mBuffersOutdated  );
-            TEST_ASSERT( ! mesh2->mBuffersOutdated  );
 
-            meshManager.Add( mesh1, "mesh1" );
-            meshManager.Add( mesh2, "mesh2" );
+            mMeshManager.Add( mesh1, "mesh1" );
 
             mesh1->LoadFromVertices({});
-            mesh2->LoadFromVertices({});
 
             TEST_ASSERT( mesh1->mBuffersOutdated );
-            TEST_ASSERT( mesh2->mBuffersOutdated );
 
             Device * device = nullptr;
-            meshManager.CreateBuffers( *device );
+            mMeshManager.Create( *device );
 
             TEST_ASSERT( ! mesh1->mBuffersOutdated  );
-            TEST_ASSERT( ! mesh2->mBuffersOutdated  );
         }
 
-        void TestBuffersDestruction()
+        void TestDestroy()
         {
             Mesh2D* mesh1 = new Mesh2D;;
             const std::string meshName = "toto";
-            meshManager.Add( mesh1, meshName );
-            TEST_ASSERT( meshManager.DestroyListSize() == 0 );
-            meshManager.Remove( meshName );
-            TEST_ASSERT( meshManager.DestroyListSize() == 3 );
+            mMeshManager.Add( mesh1, meshName );
+            TEST_ASSERT( mMeshManager.DestroyListSize() == 0 );
+            mMeshManager.Remove( meshName );
+            TEST_ASSERT( mMeshManager.DestroyListSize() == 1 );
             Device * device = nullptr;
-            meshManager.Clear( * device );
-            TEST_ASSERT( meshManager.DestroyListSize() == 0 );
+            mMeshManager.Clear( * device );
+            TEST_ASSERT( mMeshManager.DestroyListSize() == 0 );
         }
     };
 }

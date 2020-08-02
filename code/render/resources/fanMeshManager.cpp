@@ -1,7 +1,7 @@
-#include "render/fanMeshManager.hpp"
+#include "fanMeshManager.hpp"
 
 #include <filesystem>
-#include "render/fanMesh.hpp"
+#include "fanMesh.hpp"
 #include "render/fanRenderResourcePtr.hpp"
 #include "render/core/fanDevice.hpp"
 #include "core/fanDebug.hpp"
@@ -9,16 +9,6 @@
 
 namespace fan
 {
-    //========================================================================================================
-    //========================================================================================================
-    MeshManager::~MeshManager()
-    {
-        if( ! mMeshes.empty() || ! mDestroyList.empty() )
-        {
-            Debug::Warning() << "Mesh manager was not cleared before destroy" << Debug::Endl();
-        }
-    }
-
     //========================================================================================================
     //========================================================================================================
     Mesh* MeshManager::Get( const std::string& _path ) const
@@ -59,7 +49,7 @@ namespace fan
         if( mesh->LoadFromFile( cleanPath ) )
         {
             mesh->mIndex = (int)mMeshes.size();
-            mMeshes.push_back( { mesh } );
+            mMeshes.push_back( mesh );
             return mesh;
         }
         delete mesh;
@@ -74,7 +64,7 @@ namespace fan
         _mesh->mIndex = (int)mMeshes.size();
         _mesh->mPath = _name;
         _mesh->mExternallyOwned = true;
-        mMeshes.push_back( { _mesh } );
+        mMeshes.push_back( _mesh );
     }
 
     //========================================================================================================
@@ -87,17 +77,7 @@ namespace fan
             if( mMeshes[meshIndex]->mPath == cleanPath )
             {
                 (*mMeshes.rbegin())->mIndex = meshIndex;
-
-                for( int i = 0; i < SwapChain::s_maxFramesInFlight; i++ )
-                {
-                    mDestroyList.push_back( mMeshes[meshIndex]->mIndexBuffer[i] );
-                    mDestroyList.push_back( mMeshes[meshIndex]->mVertexBuffer[i] );
-                }
-                if( ! mMeshes[meshIndex]->mExternallyOwned )
-                {
-                    delete mMeshes[meshIndex];
-                }
-
+                mDestroyList.push_back( mMeshes[meshIndex] );
                 mMeshes[meshIndex] = mMeshes[mMeshes.size() - 1];
                 mMeshes.pop_back();
                 return;
@@ -111,36 +91,41 @@ namespace fan
     {
         for ( Mesh* mesh : mMeshes )
         {
-            mesh->DestroyBuffers( _device );
+            mesh->Destroy( _device );
             if( ! mesh->mExternallyOwned )
             {
                 delete mesh;
             }
         }
         mMeshes.clear();
-        DestroyBuffers( _device );
+        Destroy( _device );
     }
 
     //========================================================================================================
     //========================================================================================================
-    void MeshManager::CreateBuffers( Device& _device )
+    void MeshManager::Create( Device& _device )
     {
         for( Mesh * mesh : mMeshes )
         {
             if( mesh->mBuffersOutdated )
             {
-                mesh->CreateBuffers( _device );
+                mesh->Create( _device );
             }
         }
     }
 
     //========================================================================================================
     //========================================================================================================
-    void MeshManager::DestroyBuffers( Device& _device )
+    void MeshManager::Destroy( Device& _device )
     {
-        for( Buffer& buffer : mDestroyList )
+        for( Mesh* mesh : mDestroyList )
         {
-            buffer.Destroy( _device );
+            mesh->Destroy( _device );
+            if( ! mesh->mExternallyOwned )
+            {
+                Debug::Log( mesh->mPath );
+                delete mesh;
+            }
         }
         mDestroyList.clear();
     }

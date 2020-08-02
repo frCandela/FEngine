@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ecs/fanEcsSingleton.hpp"
-#include "render/fanMesh.hpp"
+#include "render/resources/fanMesh.hpp"
 
 namespace fan
 {

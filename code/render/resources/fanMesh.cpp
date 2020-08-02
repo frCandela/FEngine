@@ -1,4 +1,4 @@
-#include "render/fanMesh.hpp"
+#include "fanMesh.hpp"
 
 #include "render/fanGLTFImporter.hpp"
 #include "render/core/fanDevice.hpp"
@@ -135,7 +135,7 @@ namespace fan
 
     //========================================================================================================
     //========================================================================================================
-    void Mesh::DestroyBuffers( Device & _device )
+    void Mesh::Destroy( Device & _device )
     {
         for( int i = 0 ; i < SwapChain::s_maxFramesInFlight; i++)
         {
@@ -146,11 +146,11 @@ namespace fan
 
     //========================================================================================================
     //========================================================================================================
-    void Mesh::CreateBuffers( Device& _device )
+    void Mesh::Create( Device& _device )
     {
 	    mBuffersOutdated = false;
 
-        if ( mIndices.empty() ) { return; }
+        if ( mIndices.empty() || mVertices.empty() ) { return; }
 
         mCurrentBuffer = ( mCurrentBuffer + 1 ) % SwapChain::s_maxFramesInFlight;
 

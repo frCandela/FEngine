@@ -2,7 +2,7 @@
 
 #include "ecs/fanEcsComponent.hpp"
 #include "render/fanRenderResourcePtr.hpp"
-#include "render/fanMesh2D.hpp"
+#include "render/resources/fanMesh2D.hpp"
 
 namespace fan
 {

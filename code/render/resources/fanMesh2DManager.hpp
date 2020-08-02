@@ -23,13 +23,13 @@ namespace fan
         bool Empty() const { return mMeshes.empty(); }
 		int  MeshCount() const { return (int)mMeshes.size(); }
 
-        void CreateBuffers( Device& _device );
-        void DestroyBuffers( Device& _device );
+        void Create( Device& _device );
+        void Destroy( Device& _device );
 
         int DestroyListSize() const  { return (int)mDestroyList.size(); }
         const std::vector< Mesh2D * >& GetMeshes() const { return mMeshes; }
 	private:
 		std::vector< Mesh2D* > mMeshes;
-        std::vector< Buffer > mDestroyList;
+        std::vector< Mesh2D* > mDestroyList;
 	};
 }

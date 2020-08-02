@@ -2,7 +2,7 @@
 #include "core/time/fanProfiler.hpp"
 #include "scene/components/fanParticle.hpp"
 #include "scene/singletons/fanRenderWorld.hpp"
-#include "render/fanMesh.hpp"
+#include "render/resources/fanMesh.hpp"
 
 namespace fan
 {

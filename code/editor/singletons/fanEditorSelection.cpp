@@ -18,7 +18,7 @@
 #include "scene/systems/fanRaycast.hpp"
 #include "scene/systems/fanDrawDebug.hpp"
 #include "scene/fanSceneTags.hpp"
-#include "render/fanMesh.hpp"
+#include "render/resources/fanMesh.hpp"
 #include "ecs/fanEcsWorld.hpp"
 
 namespace fan

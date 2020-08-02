@@ -2,7 +2,7 @@
 
 #include "render/fanRenderResourcePtr.hpp"
 #include "render/core/fanTexture.hpp"
-#include "render/fanMesh.hpp"
+#include "render/resources/fanMesh.hpp"
 
 namespace fan
 {

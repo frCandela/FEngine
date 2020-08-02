@@ -3,7 +3,7 @@
 #include "core/resources/fanResource.hpp"
 #include "core/shapes/fanConvexHull.hpp"
 #include "render/fanVertex.hpp"
-#include "render/fanMesh2DManager.hpp"
+#include "fanMesh2DManager.hpp"
 #include "render/core/fanBuffer.hpp"
 #include "render/core/fanSwapChain.hpp"
 
@@ -17,8 +17,8 @@ namespace fan
 	{
 	public:
 		bool LoadFromVertices( const std::vector<UIVertex>&	_vertices );
-		void CreateBuffers( Device & _device );
-		void DestroyBuffers( Device & _device );
+		void Create( Device & _device );
+		void Destroy( Device & _device );
 
 		std::vector<UIVertex> mVertices;
 		std::string           mPath;

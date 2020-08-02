@@ -38,10 +38,14 @@ namespace fan
 
 		// creates renderer
 		m_renderer = new Renderer( m_window, Renderer::ViewType::Game );
-        RenderResources::SetupResources( m_renderer->mMeshManager, m_renderer->mMesh2DManager );
+        RenderResources::SetupResources( m_renderer->mMeshManager,
+                                         m_renderer->mMesh2DManager,
+                                         m_renderer->mTextureManager );
 
         RenderResources& renderResources = m_world.GetSingleton<RenderResources>();
-        renderResources.SetPointers(&m_renderer->mMeshManager,  &m_renderer->mMesh2DManager );
+        renderResources.SetPointers(&m_renderer->mMeshManager,
+                                    &m_renderer->mMesh2DManager,
+                                    &m_renderer->mTextureManager );
 
 		Prefab::s_resourceManager.Init();
 

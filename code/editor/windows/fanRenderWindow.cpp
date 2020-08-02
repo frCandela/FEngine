@@ -3,11 +3,12 @@
 #include "editor/fanModals.hpp"
 #include "core/time/fanProfiler.hpp"
 #include "network/singletons/fanTime.hpp"
-#include "scene/fanPrefab.hpp"
 #include "render/core/fanFrameBuffer.hpp"
 #include "render/core/fanTexture.hpp"
 #include "render/fanRenderer.hpp"
-#include "render/fanMesh.hpp"
+#include "render/resources/fanMesh.hpp"
+#include "scene/fanPrefab.hpp"
+#include "scene/singletons/fanRenderResources.hpp"
 
 namespace fan
 {
@@ -20,32 +21,33 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void RenderWindow::OnGui( EcsWorld& /*_world*/ )
+	void RenderWindow::OnGui( EcsWorld& _world )
 	{
 		SCOPED_PROFILE( render );
+
+		const RenderResources& renderResources = _world.GetSingleton<RenderResources>();
 
 		ImGui::Icon( GetIconType(), { 16,16 } ); ImGui::SameLine();
 		ImGui::Text( "Renderer" );
 
-		// Display mesh list
 		if ( ImGui::CollapsingHeader( "Loaded meshes : " ) )
 		{
-		    // @todo repair this using the new non static mesh manager
-			/*for ( const auto pair : Mesh::s_resourceManager.GetList() )
+			for ( Mesh * mesh : renderResources.mMeshManager->GetMeshes() )
 			{
-				ImGui::Text("ref: %d name: %s", pair.second->GetRefCount(), pair.second->GetPath().c_str() );
-			}*/
+				ImGui::Text("ref: %d name: %s", mesh->GetRefCount(), mesh->mPath.c_str() );
+			}
 		}
 
-		// display textures list
-		const std::vector< Texture* >& textures = Texture::s_resourceManager.GetList();
 		if ( ImGui::CollapsingHeader( "Loaded textures : " ) )
 		{
-			for ( int textureIndex = 0; textureIndex < (int)textures.size(); textureIndex++ )
+			for ( Texture * tex : renderResources.mTextureManager->GetTextures() )
 			{
-				const Texture* tex = textures[ textureIndex ];
-				ImGui::Text( "ref: %d size: %u x %u name: %s", tex->GetRefCount(), tex->mExtent.width, tex->mExtent.height, tex->mPath.c_str() );
-			}
+                ImGui::Text( "ref: %d size: %u x %u name: %s",
+                             tex->GetRefCount(),
+                             tex->mExtent.width,
+                             tex->mExtent.height,
+                             tex->mPath.c_str() );
+            }
 		}
 
 		// Display mesh list

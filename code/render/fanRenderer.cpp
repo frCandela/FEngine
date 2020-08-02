@@ -5,9 +5,9 @@
 #include "core/time/fanProfiler.hpp"
 #include "network/singletons/fanTime.hpp"
 #include "render/fanRenderGlobal.hpp"
-#include "render/fanMeshManager.hpp"
-#include "render/fanMesh2D.hpp"
-#include "render/fanMesh.hpp"
+#include "render/resources/fanMeshManager.hpp"
+#include "render/resources/fanMesh2D.hpp"
+#include "render/resources/fanMesh.hpp"
 #include "render/core/fanSwapChain.hpp"
 #include "render/core/fanInstance.hpp"
 #include "render/core/fanTexture.hpp"
@@ -17,23 +17,29 @@
 
 namespace fan
 {
-	//================================================================================================================================
-	//================================================================================================================================
-	Renderer::Renderer( Window& _window, const ViewType _viewType ) : mWindow( _window ), mDevice( _window.mDevice ), mViewType( _viewType )
-	{
+	//========================================================================================================
+	//========================================================================================================
+    Renderer::Renderer( Window& _window, const ViewType _viewType )
+            : mWindow( _window ), mDevice( _window.mDevice ), mViewType( _viewType )
+    {
 		const uint32_t imagesCount = mWindow.mSwapchain.mImagesCount;
 		mGameExtent = mWindow.mSwapchain.mExtent;
-		RenderPass& finalRenderPass = mViewType == ViewType::Editor ? mRenderPassImgui : mRenderPassPostprocess;
-
-		Texture::s_resourceManager.Init( mDevice );
+        RenderPass& finalRenderPass = ( mViewType == ViewType::Editor
+                ? mRenderPassImgui
+                : mRenderPassPostprocess );
 
 		CreateRenderPasses();		
 
 		mSamplerGameColor.Create( mDevice, 0, 1.f, VK_FILTER_LINEAR );
 		mSamplerPostprocessColor.Create( mDevice, 0, 1.f, VK_FILTER_LINEAR );
 		CreateFramebuffers( mWindow.mSwapchain.mExtent );
-		mFramebuffersSwapchain.CreateForSwapchain( mDevice, imagesCount, mWindow.mSwapchain.mExtent, finalRenderPass, mWindow.mSwapchain.mImageViews );
+        mFramebuffersSwapchain.CreateForSwapchain( mDevice,
+                                                   imagesCount,
+                                                   mWindow.mSwapchain.mExtent,
+                                                   finalRenderPass,
+                                                   mWindow.mSwapchain.mImageViews );
 
+        mTextureManager.Create( mDevice );
 		CreateTextureDescriptor();
 		CreateShaders();
 
@@ -41,15 +47,20 @@ namespace fan
 		mDrawUI.Create( mDevice, imagesCount );
 		mDrawModels.Create( mDevice, imagesCount );	
 		mDrawPostprocess.Create( mDevice, imagesCount, mImageViewGameColor );
-		mDrawImgui.Create( mDevice, imagesCount, finalRenderPass.mRenderPass, mWindow.mWindow, mWindow.mSwapchain.mExtent, mImageViewPostprocessColor );
+        mDrawImgui.Create( mDevice,
+                           imagesCount,
+                           finalRenderPass.mRenderPass,
+                           mWindow.mWindow,
+                           mWindow.mSwapchain.mExtent,
+                           mImageViewPostprocessColor );
 
-		CreatePipelines();
+        CreatePipelines();
 		CreateCommandBuffers();
 		RecordAllCommandBuffers();
 }
 
-	//================================================================================================================================
-	//================================================================================================================================	
+	//========================================================================================================
+	//========================================================================================================
 	Renderer::~Renderer()
 	{
 		vkDeviceWaitIdle( mDevice.mDevice );
@@ -61,8 +72,7 @@ namespace fan
 
 		mMeshManager.Clear( mDevice );
         mMesh2DManager.Clear( mDevice );
-
-		Texture::s_resourceManager.Clear();
+        mTextureManager.Clear( mDevice );
 
 		mDrawUI.Destroy( mDevice );
 
@@ -99,8 +109,8 @@ namespace fan
 		mDrawPostprocess.Destroy( mDevice );
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================	
+	//========================================================================================================
+	//========================================================================================================
 	void Renderer::CreateShaders()
 	{
 		mDrawDebug.mVertexShaderLines.Create( mDevice, "code/shaders/debugLines.vert" );
@@ -117,8 +127,8 @@ namespace fan
 		mDrawPostprocess.mFragmentShader.Create( mDevice, "code/shaders/postprocess.frag" );
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================	
+	//========================================================================================================
+	//========================================================================================================
 	void Renderer::DestroyShaders()
 	{
 		mDrawDebug.mVertexShaderLines		.Destroy( mDevice );
@@ -135,8 +145,8 @@ namespace fan
 		mDrawPostprocess.mFragmentShader	.Destroy( mDevice );
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================	
+	//========================================================================================================
+	//========================================================================================================
 	void Renderer::CreatePipelines()
 	{		
 		const PipelineConfig debugLinesPipelineConfig = mDrawDebug.GetPipelineConfigLines();
@@ -146,16 +156,34 @@ namespace fan
 		const PipelineConfig modelsPipelineConfig = mDrawModels.GetPipelineConfig( mDescriptorTextures );
 		const PipelineConfig uiPipelineConfig = mDrawUI.GetPipelineConfig( mDescriptorTextures );
 
-		mDrawDebug.mPipelineLines.Create(		mDevice, debugLinesPipelineConfig,				mGameExtent, mRenderPassGame.mRenderPass );
-		mDrawDebug.mPipelineLinesNDT.Create(	mDevice, debugLinesNoDepthTestPipelineConfig,	mGameExtent, mRenderPassGame.mRenderPass );
-		mDrawDebug.mPipelineTriangles.Create(	mDevice, debugTrianglesPipelineConfig,			mGameExtent, mRenderPassGame.mRenderPass );
-		mDrawModels.mPipeline.Create(			mDevice, modelsPipelineConfig, mGameExtent, mRenderPassGame.mRenderPass );
-		mDrawUI.mPipeline.Create(				mDevice, uiPipelineConfig, mGameExtent,		mRenderPassPostprocess.mRenderPass );
-		mDrawPostprocess.mPipeline.Create(		mDevice, ppPipelineConfig, mGameExtent,		mRenderPassPostprocess.mRenderPass );
+        mDrawDebug.mPipelineLines.Create( mDevice,
+                                          debugLinesPipelineConfig,
+                                          mGameExtent,
+                                          mRenderPassGame.mRenderPass );
+        mDrawDebug.mPipelineLinesNDT.Create( mDevice,
+                                             debugLinesNoDepthTestPipelineConfig,
+                                             mGameExtent,
+                                             mRenderPassGame.mRenderPass );
+        mDrawDebug.mPipelineTriangles.Create( mDevice,
+                                              debugTrianglesPipelineConfig,
+                                              mGameExtent,
+                                              mRenderPassGame.mRenderPass );
+        mDrawModels.mPipeline.Create( mDevice,
+                                      modelsPipelineConfig,
+                                      mGameExtent,
+                                      mRenderPassGame.mRenderPass );
+        mDrawUI.mPipeline.Create( mDevice,
+                                  uiPipelineConfig,
+                                  mGameExtent,
+                                  mRenderPassPostprocess.mRenderPass );
+        mDrawPostprocess.mPipeline.Create( mDevice,
+                                           ppPipelineConfig,
+                                           mGameExtent,
+                                           mRenderPassPostprocess.mRenderPass );
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================	
+	//========================================================================================================
+	//========================================================================================================
 	void Renderer::DestroyPipelines()
 	{
 		mDrawPostprocess.mPipeline.Destroy( mDevice );
@@ -166,11 +194,13 @@ namespace fan
 		mDrawDebug.mPipelineTriangles.Destroy( mDevice );
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================	
+	//========================================================================================================
+	//========================================================================================================
 	void Renderer::DrawFrame()
 	{
 		SCOPED_PROFILE( draw_frame );
+
+		bool textureCreated = false;
 
 		const VkResult result = mWindow.mSwapchain.AcquireNextImage( mDevice );
 		if ( result == VK_ERROR_OUT_OF_DATE_KHR )
@@ -192,21 +222,26 @@ namespace fan
 			Debug::Error( "Could not acquire next image" );
 		}
 		else
-		{
-			vkWaitForFences( mDevice.mDevice, 1, mWindow.mSwapchain.GetCurrentInFlightFence(), VK_TRUE, std::numeric_limits<uint64_t>::max() );
-			vkResetFences( mDevice.mDevice, 1, mWindow.mSwapchain.GetCurrentInFlightFence() );
-            mMeshManager.CreateBuffers( mDevice );
-            mMesh2DManager.CreateBuffers( mDevice );
-		}
+        {
+            vkWaitForFences( mDevice.mDevice,
+                             1,
+                             mWindow.mSwapchain.GetCurrentInFlightFence(),
+                             VK_TRUE,
+                             std::numeric_limits<uint64_t>::max() );
+            vkResetFences( mDevice.mDevice, 1, mWindow.mSwapchain.GetCurrentInFlightFence() );
+            mMeshManager.Create( mDevice );
+            mMesh2DManager.Create( mDevice );
+            textureCreated = mTextureManager.Create( mDevice );
+        }
 
-		ImGui::GetIO().DisplaySize = ImVec2( static_cast< float >( mWindow.mSwapchain.mExtent.width ), static_cast< float >( mWindow.mSwapchain.mExtent.height ) );
+        ImGui::GetIO().DisplaySize = ImVec2( static_cast< float >( mWindow.mSwapchain.mExtent.width ),
+                                             static_cast< float >( mWindow.mSwapchain.mExtent.height ) );
 
-		if ( Texture::s_resourceManager.IsModified() )
+		if ( textureCreated )
 		{
 			WaitIdle();
 			Debug::Log( "reload textures" );
 			CreateTextureDescriptor();
-			Texture::s_resourceManager.SetUnmodified();
 		}
 
 		const uint32_t currentFrame = mWindow.mSwapchain.mCurrentFrame;
@@ -225,8 +260,8 @@ namespace fan
 		}
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void Renderer::ResizeGame( VkExtent2D _extent )
 	{
 		WaitIdle();
@@ -245,16 +280,19 @@ namespace fan
 		mFramebuffersPostprocess.Destroy( mDevice );
 		CreateFramebuffers( _extent );
 
-		mDrawPostprocess.mDescriptorImage.Destroy( mDevice );
-		mDrawPostprocess.mDescriptorImage.Create( mDevice, &mImageViewGameColor.mImageView, 1, &mDrawPostprocess.mSampler.mSampler );
+        mDrawPostprocess.mDescriptorImage.Destroy( mDevice );
+        mDrawPostprocess.mDescriptorImage.Create( mDevice,
+                                                  &mImageViewGameColor.mImageView,
+                                                  1,
+                                                  &mDrawPostprocess.mSampler.mSampler );
 
 		mDrawImgui.UpdateGameImageDescriptor( mDevice, mImageViewPostprocessColor );
 
 		RecordAllCommandBuffers();
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void Renderer::ResizeSwapchain()
 	{
 		WaitIdle();
@@ -265,12 +303,18 @@ namespace fan
 			mGameExtent = extent;
 		}
 
-		Debug::Get() << Debug::Severity::highlight << "Resize renderer: " << extent.width << "x" << extent.height << Debug::Endl();
+		Debug::Highlight() << "Resize renderer: " << extent.width << "x" << extent.height << Debug::Endl();
 		mWindow.mSwapchain.Resize( mDevice , extent );
 
 		mFramebuffersSwapchain.Destroy( mDevice );
-		RenderPass& finalRenderPass = ( mViewType ==  ViewType::Editor ? mRenderPassImgui : mRenderPassPostprocess );
-		mFramebuffersSwapchain.CreateForSwapchain( mDevice, mWindow.mSwapchain.mImagesCount, extent, finalRenderPass, mWindow.mSwapchain.mImageViews );
+        RenderPass& finalRenderPass = ( mViewType == ViewType::Editor
+                ? mRenderPassImgui
+                : mRenderPassPostprocess );
+        mFramebuffersSwapchain.CreateForSwapchain( mDevice,
+                                                   mWindow.mSwapchain.mImagesCount,
+                                                   extent,
+                                                   finalRenderPass,
+                                                   mWindow.mSwapchain.mImageViews );
 
 		if( mViewType == ViewType::Editor )
 		{
@@ -282,8 +326,8 @@ namespace fan
 		}
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void Renderer::UpdateUniformBuffers( Device& _device, const size_t _index )
 	{		
 		mDrawPostprocess.UpdateUniformBuffers( _device, _index );
@@ -292,27 +336,31 @@ namespace fan
 		mDrawUI.UpdateUniformBuffers( _device, _index );
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void Renderer::WaitIdle()
 	{
 		vkDeviceWaitIdle( mDevice.mDevice );
 		Debug::Log( "Renderer idle" );
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
-	void Renderer::SetMainCamera( const glm::mat4 _projection, const glm::mat4 _view, const glm::vec3 _position )
-	{
+	//========================================================================================================
+	//========================================================================================================
+    void Renderer::SetMainCamera( const glm::mat4 _projection,
+                                  const glm::mat4 _view,
+                                  const glm::vec3 _position )
+    {
         SCOPED_PROFILE( set_main_camera );
-		mDrawModels.mUniforms.mUniformsProjView.view = _view;
-		mDrawModels.mUniforms.mUniformsProjView.proj = _projection;
-		mDrawModels.mUniforms.mUniformsProjView.proj[1][1] *= -1;
+        mDrawModels.mUniforms.mUniformsProjView.view = _view;
+        mDrawModels.mUniforms.mUniformsProjView.proj = _projection;
+        mDrawModels.mUniforms.mUniformsProjView.proj[1][1] *= -1;
 
-		mDrawModels.mUniforms.mUniformsCameraPosition.cameraPosition = _position;
+        mDrawModels.mUniforms.mUniformsCameraPosition.cameraPosition = _position;
 
-		UniformsDebug * debugUniforms[3] = { &mDrawDebug.mUniformsLines, &mDrawDebug.mUniformsLinesNDT, &mDrawDebug.mUniformsTriangles };
-		for( int i = 0; i < 3; i++ )
+        UniformsDebug* debugUniforms[3] = { &mDrawDebug.mUniformsLines,
+                                            &mDrawDebug.mUniformsLinesNDT,
+                                            &mDrawDebug.mUniformsTriangles };
+        for( int i = 0; i < 3; i++ )
 		{
 			debugUniforms[i]->model = glm::mat4( 1.0 );
 			debugUniforms[i]->view = _view;
@@ -321,74 +369,94 @@ namespace fan
 		}
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void  Renderer::SetDirectionalLights( const std::vector<RenderDataDirectionalLight>& _lightData )
 	{
         SCOPED_PROFILE( set_dir_lights );
 		mDrawModels.SetDirectionalLights( _lightData );
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void Renderer::SetPointLights( const std::vector<RenderDataPointLight>& _lightData )
 	{
         SCOPED_PROFILE( set_point_lights );
 		mDrawModels.SetPointLights( _lightData );
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void Renderer::SetDrawData( const std::vector<RenderDataModel>& _drawData )
 	{
         SCOPED_PROFILE(set_draw_data);
 		mDrawModels.SetDrawData( mDevice, mWindow.mSwapchain.mImagesCount,_drawData );
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void Renderer::SetUIDrawData( const std::vector<RenderDataUIMesh>& _drawData )
 	{
         SCOPED_PROFILE( set_ui_draw_data );
 		mDrawUI.SetUIDrawData( _drawData );
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
-	void Renderer::SetDebugDrawData( const std::vector<DebugVertex>& _debugLines, const std::vector<DebugVertex>& _debugLinesNoDepthTest, const std::vector<DebugVertex>& _debugTriangles )
-	{
+    //========================================================================================================
+    //========================================================================================================
+    void Renderer::SetDebugDrawData( const std::vector<DebugVertex>& _debugLines,
+                                     const std::vector<DebugVertex>& _debugLinesNoDepthTest,
+                                     const std::vector<DebugVertex>& _debugTriangles )
+    {
         SCOPED_PROFILE( set_debug_draw_data );
-		mDrawDebug.SetDebugDrawData( mWindow.mSwapchain.mCurrentFrame, mDevice, _debugLines, _debugLinesNoDepthTest, _debugTriangles );
-	}
+        mDrawDebug.SetDebugDrawData( mWindow.mSwapchain.mCurrentFrame,
+                                     mDevice,
+                                     _debugLines,
+                                     _debugLinesNoDepthTest,
+                                     _debugTriangles );
+    }
 
-	//================================================================================================================================
-	//================================================================================================================================
-	void Renderer::RecordSecondaryCommandBuffers( const uint32_t _index )
-	{
-		RenderPass& finalRenderPass = mViewType == ViewType::Editor ? mRenderPassImgui : mRenderPassPostprocess;
-		FrameBuffer& finalFramebuffer = mViewType == ViewType::Editor ? mFramebuffersPostprocess : mFramebuffersSwapchain;
+    //========================================================================================================
+    //========================================================================================================
+    void Renderer::RecordSecondaryCommandBuffers( const uint32_t _index )
+    {
+        RenderPass & finalRenderPass  = mViewType == ViewType::Editor
+                ? mRenderPassImgui
+                : mRenderPassPostprocess;
+        FrameBuffer& finalFramebuffer = mViewType == ViewType::Editor
+                ? mFramebuffersPostprocess
+                : mFramebuffersSwapchain;
 
-		mDrawModels.RecordCommandBuffer( _index, mRenderPassGame, mFrameBuffersGame, mGameExtent, mDescriptorTextures );
-		mDrawDebug.RecordCommandBuffer( _index, mRenderPassGame, mFrameBuffersGame, mGameExtent );		
-		mDrawUI.RecordCommandBuffer( _index, mRenderPassPostprocess, finalFramebuffer, mGameExtent, mDescriptorTextures );
-		mDrawImgui.RecordCommandBuffer( _index, mDevice, finalRenderPass, mFramebuffersSwapchain );
+        mDrawModels.RecordCommandBuffer( _index,
+                                         mRenderPassGame,
+                                         mFrameBuffersGame,
+                                         mGameExtent,
+                                         mDescriptorTextures );
+        mDrawDebug.RecordCommandBuffer( _index, mRenderPassGame, mFrameBuffersGame, mGameExtent );
+        mDrawUI.RecordCommandBuffer( _index,
+                                     mRenderPassPostprocess,
+                                     finalFramebuffer,
+                                     mGameExtent,
+                                     mDescriptorTextures );
+        mDrawImgui.RecordCommandBuffer( _index, mDevice, finalRenderPass, mFramebuffersSwapchain );
 	}
 	
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void Renderer::RecordAllCommandBuffers()
 	{
 		for( uint32_t i = 0; i < mWindow.mSwapchain.mImagesCount; i++ )
 		{
-			FrameBuffer& finalFramebuffer = mViewType == ViewType::Editor ? mFramebuffersPostprocess : mFramebuffersSwapchain;
-			mDrawPostprocess.RecordCommandBuffer( i, mRenderPassPostprocess, finalFramebuffer, mGameExtent );
-			RecordSecondaryCommandBuffers( i );
-			RecordPrimaryCommandBuffer( i );
+            FrameBuffer& finalFramebuffer = mViewType == ViewType::Editor
+                    ? mFramebuffersPostprocess
+                    : mFramebuffersSwapchain;
+            mDrawPostprocess.RecordCommandBuffer( i, mRenderPassPostprocess, finalFramebuffer, mGameExtent );
+            RecordSecondaryCommandBuffers( i );
+            RecordPrimaryCommandBuffer( i );
 		}
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void Renderer::RecordPrimaryCommandBuffer( const uint32_t _index )
 	{
 		SCOPED_PROFILE( primary );
@@ -400,16 +468,35 @@ namespace fan
 		clearValues[ 0 ].color = { mClearColor.r, mClearColor.g, mClearColor.b, mClearColor.a };
 		clearValues[ 1 ].depthStencil = { 1.0f, 0 };
 
-		FrameBuffer& finalFramebuffer = mViewType == ViewType::Editor ? mFramebuffersPostprocess : mFramebuffersSwapchain;
+        FrameBuffer& finalFramebuffer = mViewType == ViewType::Editor
+                ? mFramebuffersPostprocess
+                : mFramebuffersSwapchain;
 
-		VkRenderPassBeginInfo renderPassInfo =			  RenderPass::GetBeginInfo(	mRenderPassGame.mRenderPass,		mFrameBuffersGame.mFrameBuffers[_index], mGameExtent, clearValues.data(), (uint32_t)clearValues.size() );
-		VkRenderPassBeginInfo renderPassInfoPostprocess = RenderPass::GetBeginInfo( mRenderPassPostprocess.mRenderPass, finalFramebuffer.mFrameBuffers[_index], mGameExtent, clearValues.data(), (uint32_t)clearValues.size() );
-		VkRenderPassBeginInfo renderPassInfoImGui =		  RenderPass::GetBeginInfo( mRenderPassImgui.mRenderPass,		mFramebuffersSwapchain.mFrameBuffers[_index],	mWindow.mSwapchain.mExtent, clearValues.data(), (uint32_t)clearValues.size() );
+        VkRenderPassBeginInfo renderPassInfo = RenderPass::GetBeginInfo(
+                mRenderPassGame.mRenderPass,
+                mFrameBuffersGame.mFrameBuffers[_index],
+                mGameExtent,
+                clearValues.data(),
+                (uint32_t)clearValues.size() );
+        VkRenderPassBeginInfo renderPassInfoPostprocess = RenderPass::GetBeginInfo(
+                mRenderPassPostprocess.mRenderPass,
+                finalFramebuffer.mFrameBuffers[_index],
+                mGameExtent,
+                clearValues.data(),
+                (uint32_t)clearValues.size() );
+        VkRenderPassBeginInfo renderPassInfoImGui = RenderPass::GetBeginInfo(
+                mRenderPassImgui.mRenderPass,
+                mFramebuffersSwapchain.mFrameBuffers[_index],
+                mWindow.mSwapchain.mExtent,
+                clearValues.data(),
+                (uint32_t)clearValues.size() );
 
-		if( vkBeginCommandBuffer( commandBuffer, &commandBufferBeginInfo ) == VK_SUCCESS )
-		{
-			vkCmdBeginRenderPass( commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_SECONDARY_COMMAND_BUFFERS );
-			{
+        if( vkBeginCommandBuffer( commandBuffer, &commandBufferBeginInfo ) == VK_SUCCESS )
+        {
+            vkCmdBeginRenderPass( commandBuffer,
+                                  &renderPassInfo,
+                                  VK_SUBPASS_CONTENTS_SECONDARY_COMMAND_BUFFERS );
+            {
 				vkCmdExecuteCommands( commandBuffer, 1, &mDrawModels.mCommandBuffers.mBuffers[ _index ] );
 				if ( !mDrawDebug.HasNothingToDraw() )
 				{
@@ -417,8 +504,10 @@ namespace fan
 				}
 			} vkCmdEndRenderPass( commandBuffer );
 
-			vkCmdBeginRenderPass( commandBuffer, &renderPassInfoPostprocess, VK_SUBPASS_CONTENTS_SECONDARY_COMMAND_BUFFERS );
-			{
+            vkCmdBeginRenderPass( commandBuffer,
+                                  &renderPassInfoPostprocess,
+                                  VK_SUBPASS_CONTENTS_SECONDARY_COMMAND_BUFFERS );
+            {
 				vkCmdExecuteCommands( commandBuffer, 1, &mDrawPostprocess.mCommandBuffers.mBuffers[_index] );
 				vkCmdExecuteCommands( commandBuffer, 1, &mDrawUI.mCommandBuffers.mBuffers[_index] );
 
@@ -430,28 +519,31 @@ namespace fan
 
 			if( mViewType == ViewType::Editor )
 			{
-				vkCmdBeginRenderPass( commandBuffer, &renderPassInfoImGui, VK_SUBPASS_CONTENTS_SECONDARY_COMMAND_BUFFERS );
+                vkCmdBeginRenderPass( commandBuffer,
+                                      &renderPassInfoImGui,
+                                      VK_SUBPASS_CONTENTS_SECONDARY_COMMAND_BUFFERS );
 				vkCmdExecuteCommands( commandBuffer, 1, &mDrawImgui.mCommandBuffers.mBuffers[_index] );
 				vkCmdEndRenderPass( commandBuffer );
 			}
 
 			if ( vkEndCommandBuffer( commandBuffer ) != VK_SUCCESS )
 			{
-				Debug::Get() << Debug::Severity::error << "Could not record command buffer " << _index << "." << Debug::Endl();
+				Debug::Error() << "Could not record command buffer " << _index << "." << Debug::Endl();
 			}
 		}
 		else
 		{
-			Debug::Get() << Debug::Severity::error << "Could not record command buffer " << _index << "." << Debug::Endl();
+			Debug::Error() << "Could not record command buffer " << _index << "." << Debug::Endl();
 		}
 
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void Renderer::SubmitCommandBuffers()
 	{
-		std::vector<VkPipelineStageFlags> waitSemaphoreStages = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
+        std::vector<VkPipelineStageFlags> waitSemaphoreStages = {
+                VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
 
 		VkSubmitInfo submitInfo;
 		submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
@@ -464,15 +556,18 @@ namespace fan
 		submitInfo.signalSemaphoreCount = 1;
 		submitInfo.pSignalSemaphores = mWindow.mSwapchain.GetCurrentRenderFinishedSemaphore();
 
-		VkResult result = vkQueueSubmit( mDevice.mGraphicsQueue, 1, &submitInfo, *mWindow.mSwapchain.GetCurrentInFlightFence() );
+        VkResult result = vkQueueSubmit( mDevice.mGraphicsQueue,
+                                         1,
+                                         &submitInfo,
+                                         *mWindow.mSwapchain.GetCurrentInFlightFence() );
 		if ( result != VK_SUCCESS )
 		{
 			Debug::Error( "Could not submit draw command buffer " );
 		}
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void Renderer::ReloadShaders()
 	{
 		Debug::Highlight( "Reloading shaders" );
@@ -486,16 +581,16 @@ namespace fan
 		RecordAllCommandBuffers();
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void Renderer::ReloadIcons()
 	{
 		WaitIdle();
 		mDrawImgui.ReloadIcons( mDevice );
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void Renderer::CreateCommandBuffers()
 	{
 		const uint32_t count = mWindow.mSwapchain.mImagesCount;
@@ -508,83 +603,139 @@ namespace fan
 		mDrawDebug.mCommandBuffers.Create( mDevice, count, VK_COMMAND_BUFFER_LEVEL_SECONDARY );
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void Renderer::CreateRenderPasses()
-	{
-		// game
-		{
-			VkAttachmentDescription colorAtt = RenderPass::GetColorAttachment( mWindow.mSwapchain.mSurfaceFormat.format, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL );
-			VkAttachmentReference	colorAttRef = RenderPass::GetColorAttachmentReference( 0 );
-			VkAttachmentDescription depthAtt = RenderPass::GetDepthAttachment( mDevice.FindDepthFormat() );
-			VkAttachmentReference	depthAttRef = RenderPass::GetDepthAttachmentReference( 1 );
-			VkSubpassDescription	subpassDescription = RenderPass::GetSubpassDescription( &colorAttRef, 1, &depthAttRef );
-			VkSubpassDependency		subpassDependency = RenderPass::GetDependency();
+    {
+        // game
+        {
+            VkAttachmentDescription colorAtt           = RenderPass::GetColorAttachment( mWindow.mSwapchain.mSurfaceFormat.format,
+                                                                                         VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL );
+            VkAttachmentReference   colorAttRef        = RenderPass::GetColorAttachmentReference( 0 );
+            VkAttachmentDescription depthAtt           = RenderPass::GetDepthAttachment( mDevice.FindDepthFormat() );
+            VkAttachmentReference   depthAttRef        = RenderPass::GetDepthAttachmentReference( 1 );
+            VkSubpassDescription    subpassDescription = RenderPass::GetSubpassDescription( &colorAttRef,
+                                                                                            1,
+                                                                                            &depthAttRef );
+            VkSubpassDependency     subpassDependency  = RenderPass::GetDependency();
 
-			VkAttachmentDescription attachmentDescriptions[2] = { colorAtt, depthAtt };
-			mRenderPassGame.Create( mDevice, attachmentDescriptions, 2, &subpassDescription, 1, &subpassDependency, 1 );
-		}
+            VkAttachmentDescription attachmentDescriptions[2] = { colorAtt, depthAtt };
+            mRenderPassGame.Create( mDevice,
+                                    attachmentDescriptions,
+                                    2,
+                                    &subpassDescription,
+                                    1,
+                                    &subpassDependency,
+                                    1 );
+        }
 
-		// postprocess
-		{
-			const VkImageLayout ppLayout = ( mViewType == ViewType::Editor ? VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL : VK_IMAGE_LAYOUT_PRESENT_SRC_KHR );
-			VkAttachmentDescription colorAtt = RenderPass::GetColorAttachment( mWindow.mSwapchain.mSurfaceFormat.format, ppLayout );
-			VkAttachmentReference	colorAttRef = RenderPass::GetColorAttachmentReference( 0 );
-			VkSubpassDescription	subpassDescription = RenderPass::GetSubpassDescription( &colorAttRef, 1, VK_NULL_HANDLE );
-			VkSubpassDependency		subpassDependency = RenderPass::GetDependency();
-			mRenderPassPostprocess.Create( mDevice, &colorAtt, 1, &subpassDescription, 1, &subpassDependency, 1 );
-		}
+        // postprocess
+        {
+            const VkImageLayout     ppLayout           = ( mViewType == ViewType::Editor
+                    ? VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
+                    : VK_IMAGE_LAYOUT_PRESENT_SRC_KHR );
+            VkAttachmentDescription colorAtt  = RenderPass::GetColorAttachment(
+                    mWindow.mSwapchain.mSurfaceFormat.format,
+                    ppLayout );
+            VkAttachmentReference   colorAttRef        = RenderPass::GetColorAttachmentReference( 0 );
+            VkSubpassDescription    subpassDescription = RenderPass::GetSubpassDescription( &colorAttRef,
+                                                                                            1,
+                                                                                            VK_NULL_HANDLE );
+            VkSubpassDependency     subpassDependency  = RenderPass::GetDependency();
+            mRenderPassPostprocess.Create( mDevice,
+                                           &colorAtt,
+                                           1,
+                                           &subpassDescription,
+                                           1,
+                                           &subpassDependency,
+                                           1 );
+        }
 
-		// imgui
-		if( mViewType == ViewType::Editor )
-		{
-			VkAttachmentDescription colorAtt = RenderPass::GetColorAttachment( mWindow.mSwapchain.mSurfaceFormat.format, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR );
-			VkAttachmentReference	colorAttRef = RenderPass::GetColorAttachmentReference( 0 );
-			VkSubpassDescription	subpassDescription = RenderPass::GetSubpassDescription( &colorAttRef, 1, VK_NULL_HANDLE );
-			VkSubpassDependency		subpassDependency = RenderPass::GetDependency();
-			mRenderPassImgui.Create( mDevice, &colorAtt, 1, &subpassDescription, 1, &subpassDependency, 1);
-		}
-	}
+        // imgui
+        if( mViewType == ViewType::Editor )
+        {
+            VkAttachmentDescription colorAtt           = RenderPass::GetColorAttachment(
+                    mWindow.mSwapchain.mSurfaceFormat.format,
+                    VK_IMAGE_LAYOUT_PRESENT_SRC_KHR );
+            VkAttachmentReference   colorAttRef        = RenderPass::GetColorAttachmentReference( 0 );
+            VkSubpassDescription    subpassDescription = RenderPass::GetSubpassDescription( &colorAttRef,
+                                                                                            1,
+                                                                                            VK_NULL_HANDLE );
+            VkSubpassDependency     subpassDependency  = RenderPass::GetDependency();
+            mRenderPassImgui.Create( mDevice, &colorAtt, 1, &subpassDescription, 1, &subpassDependency, 1 );
+        }
+    }
 
-	//================================================================================================================================
-	//================================================================================================================================
-	void Renderer::CreateFramebuffers( const VkExtent2D _extent )
-	{	
-		const VkFormat depthFormat = mDevice.FindDepthFormat();
-		const VkFormat colorFormat = mWindow.mSwapchain.mSurfaceFormat.format;
-		const uint32_t imagesCount = mWindow.mSwapchain.mImagesCount;
+	//========================================================================================================
+	//========================================================================================================
+    void Renderer::CreateFramebuffers( const VkExtent2D _extent )
+    {
+        const VkFormat depthFormat  = mDevice.FindDepthFormat();
+        const VkFormat colorFormat  = mWindow.mSwapchain.mSurfaceFormat.format;
+        const uint32_t imagesCount  = mWindow.mSwapchain.mImagesCount;
 
-		// game color
-		mImageGameColor.Create( mDevice, colorFormat, _extent,
-			VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_STORAGE_BIT | VK_IMAGE_USAGE_INPUT_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
-			VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT
-		);
-		mImageViewGameColor.Create( mDevice, mImageGameColor.mImage, colorFormat, VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_VIEW_TYPE_2D );
-		// game depth
-		mImageGameDepth.Create( mDevice, depthFormat, _extent, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT );
-		mImageViewGameDepth.Create( mDevice, mImageGameDepth.mImage, depthFormat, VK_IMAGE_ASPECT_DEPTH_BIT, VK_IMAGE_VIEW_TYPE_2D );
-		{
-			VkCommandBuffer cmd = mDevice.BeginSingleTimeCommands();
-			mImageGameDepth.TransitionImageLayout( cmd, depthFormat, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL, 1 );
-			mDevice.EndSingleTimeCommands( cmd );
-		}
-		VkImageView gameViews[2] = { mImageViewGameColor.mImageView, mImageViewGameDepth.mImageView };
-		mFrameBuffersGame.Create( mDevice, imagesCount, _extent, mRenderPassGame, gameViews, 2 );
+        // game color
+        mImageGameColor.Create( mDevice, colorFormat, _extent,
+                                VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT |
+                                VK_IMAGE_USAGE_STORAGE_BIT |
+                                VK_IMAGE_USAGE_INPUT_ATTACHMENT_BIT |
+                                VK_IMAGE_USAGE_SAMPLED_BIT,
+                                VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT
+        );
+        mImageViewGameColor.Create( mDevice,
+                                    mImageGameColor.mImage,
+                                    colorFormat,
+                                    VK_IMAGE_ASPECT_COLOR_BIT,
+                                    VK_IMAGE_VIEW_TYPE_2D );
+        // game depth
+        mImageGameDepth.Create( mDevice,
+                                depthFormat,
+                                _extent,
+                                VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT,
+                                VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT );
+        mImageViewGameDepth.Create( mDevice,
+                                    mImageGameDepth.mImage,
+                                    depthFormat,
+                                    VK_IMAGE_ASPECT_DEPTH_BIT,
+                                    VK_IMAGE_VIEW_TYPE_2D );
+        {
+            VkCommandBuffer cmd = mDevice.BeginSingleTimeCommands();
+            mImageGameDepth.TransitionImageLayout( cmd,
+                                                   depthFormat,
+                                                   VK_IMAGE_LAYOUT_UNDEFINED,
+                                                   VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL,
+                                                   1 );
+            mDevice.EndSingleTimeCommands( cmd );
+        }
+        VkImageView    gameViews[2] = { mImageViewGameColor.mImageView, mImageViewGameDepth.mImageView };
+        mFrameBuffersGame.Create( mDevice, imagesCount, _extent, mRenderPassGame, gameViews, 2 );
 
-		// pp color		
-		mImagePostprocessColor.Create( mDevice, colorFormat, _extent,
-			VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_STORAGE_BIT | VK_IMAGE_USAGE_INPUT_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
-			VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT
-		);
-		mImageViewPostprocessColor.Create( mDevice, mImagePostprocessColor.mImage, colorFormat, VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_VIEW_TYPE_2D );
-		mFramebuffersPostprocess.Create( mDevice, imagesCount, _extent, mRenderPassPostprocess, &mImageViewPostprocessColor.mImageView, 1 );
-	}
+        // pp color
+        mImagePostprocessColor.Create( mDevice, colorFormat, _extent,
+                                       VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT |
+                                       VK_IMAGE_USAGE_STORAGE_BIT |
+                                       VK_IMAGE_USAGE_INPUT_ATTACHMENT_BIT |
+                                       VK_IMAGE_USAGE_SAMPLED_BIT,
+                                       VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT
+        );
+        mImageViewPostprocessColor.Create( mDevice,
+                                           mImagePostprocessColor.mImage,
+                                           colorFormat,
+                                           VK_IMAGE_ASPECT_COLOR_BIT,
+                                           VK_IMAGE_VIEW_TYPE_2D );
+        mFramebuffersPostprocess.Create( mDevice,
+                                         imagesCount,
+                                         _extent,
+                                         mRenderPassPostprocess,
+                                         &mImageViewPostprocessColor.mImageView,
+                                         1 );
+    }
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void Renderer::CreateTextureDescriptor()
 	{		
-		const std::vector< Texture* >& textures = Texture::s_resourceManager.GetList();
+		const std::vector< Texture* >& textures = mTextureManager.GetTextures();
 		std::vector< VkImageView > imageViews( textures.size() );
 		for ( int i = 0; i < (int)textures.size(); i++ )
 		{

@@ -1,9 +1,9 @@
 #pragma once
 
 #include "core/fanUnitTest.hpp"
-#include "render/fanMeshManager.hpp"
+#include "render/resources/fanMeshManager.hpp"
 #include "render/fanRenderGlobal.hpp"
-#include "render/fanMesh.hpp"
+#include "render/resources/fanMesh.hpp"
 #include "render/fanRenderResourcePtr.hpp"
 
 namespace fan
@@ -21,36 +21,37 @@ namespace fan
                     { &UnitTestMeshManager::TestMeshIndexing,       "Indexing" },
                     { &UnitTestMeshManager::TestClear,              "Clear" },
                     { &UnitTestMeshManager::TestResolveRscPtr,      "Resolve rsc ptr" },
-                    { &UnitTestMeshManager::TestBuffersCreation,    "Buffers creation" },
-                    { &UnitTestMeshManager::TestBuffersDestruction, "Buffers destruction" },
+                    { &UnitTestMeshManager::TestCreate,             "Create" },
+                    { &UnitTestMeshManager::TestDestroy,            "Destroy" },
             };
         }
         void Create() override {}
         void Destroy() override
         {
             Device * device = nullptr;  // when testing we dont generate gpu buffers
-            meshManager.Clear( *device );
+            mMeshManager.Clear( *device );
         }
 
-        MeshManager meshManager;
+        MeshManager mMeshManager;
 
         void TestLoadMesh()
         {
-            TEST_ASSERT( meshManager.Load( "toto" ) == nullptr );
+            TEST_ASSERT( mMeshManager.Load( "toto" ) == nullptr );
 
-            Mesh* meshCube = meshManager.GetOrLoad( RenderGlobal::s_meshCube );
+            Mesh* meshCube = mMeshManager.GetOrLoad( RenderGlobal::s_meshCube );
             TEST_ASSERT( meshCube != nullptr );
-            Mesh* meshPlane = meshManager.Load( RenderGlobal::s_meshPlane );
+            Mesh* meshPlane = mMeshManager.Load( RenderGlobal::s_meshPlane );
             TEST_ASSERT( meshPlane != nullptr );
 
-            TEST_ASSERT( meshManager.Get( RenderGlobal::s_meshCube ) == meshCube );
-            TEST_ASSERT( meshManager.Get( RenderGlobal::s_meshPlane ) == meshPlane );
+            TEST_ASSERT( mMeshManager.Get( RenderGlobal::s_meshCube ) == meshCube );
+            TEST_ASSERT( mMeshManager.Get( RenderGlobal::s_meshPlane ) == meshPlane );
 
             Mesh* testMesh = new Mesh();
             TEST_ASSERT( testMesh->mExternallyOwned == false );
             const std::string testMeshName = "test_mesh";
-            meshManager.Add( testMesh, testMeshName );
-            TEST_ASSERT( meshManager.Get( testMeshName ) == testMesh );
+            mMeshManager.Add( testMesh, testMeshName );
+            TEST_ASSERT( testMesh->mPath == testMeshName );
+            TEST_ASSERT( mMeshManager.Get( testMeshName ) == testMesh );
             TEST_ASSERT( testMesh->mExternallyOwned == true );
         }
 
@@ -59,45 +60,46 @@ namespace fan
             Mesh* generatedMesh = new Mesh();
             const std::string generatedMeshName = "generated_mesh";
 
-            Mesh* meshCube = meshManager.Load( RenderGlobal::s_meshCube );
-            meshManager.Add( generatedMesh, generatedMeshName );
-            Mesh* meshPlane = meshManager.Load( RenderGlobal::s_meshPlane );
+            Mesh* meshCube = mMeshManager.Load( RenderGlobal::s_meshCube );
+            mMeshManager.Add( generatedMesh, generatedMeshName );
+            Mesh* meshPlane = mMeshManager.Load( RenderGlobal::s_meshPlane );
 
             TEST_ASSERT( meshCube->mIndex == 0 );
             TEST_ASSERT( generatedMesh->mIndex == 1 );
             TEST_ASSERT( meshPlane->mIndex == 2 );
 
-            meshManager.Remove( RenderGlobal::s_meshCube );
+            mMeshManager.Remove( RenderGlobal::s_meshCube );
             TEST_ASSERT( meshPlane->mIndex == 0 );
             TEST_ASSERT( generatedMesh->mIndex == 1 );
         }
 
         void TestMeshDelete()
         {
-            meshManager.Load( RenderGlobal::s_meshCube );
-            meshManager.Remove( RenderGlobal::s_meshCube );
-            TEST_ASSERT( meshManager.Get( RenderGlobal::s_meshCube ) == nullptr );
+            mMeshManager.Load( RenderGlobal::s_meshCube );
+            mMeshManager.Remove( RenderGlobal::s_meshCube );
+            TEST_ASSERT( mMeshManager.Get( RenderGlobal::s_meshCube ) == nullptr );
         }
 
         void TestClear() {
-            meshManager.Load( RenderGlobal::s_meshCube );
+            mMeshManager.Load( RenderGlobal::s_meshCube );
             Device * device = nullptr;
-            meshManager.Clear( *device );
-            TEST_ASSERT( meshManager.Empty() );
+            TEST_ASSERT( ! mMeshManager.Empty() );
+            mMeshManager.Clear( *device );
+            TEST_ASSERT( mMeshManager.Empty() );
         }
 
         void TestResolveRscPtr()
         {
-            Mesh* meshCube = meshManager.Load( RenderGlobal::s_meshCube );
+            Mesh* meshCube = mMeshManager.Load( RenderGlobal::s_meshCube );
             MeshPtr rscPtr;
             TEST_ASSERT( ! rscPtr.IsValid() );
             rscPtr.Init( RenderGlobal::s_meshCube);
-            meshManager.ResolvePtr( rscPtr );
+            mMeshManager.ResolvePtr( rscPtr );
             TEST_ASSERT( rscPtr.IsValid() );
             TEST_ASSERT( meshCube == rscPtr.GetResource() );
         }
 
-        void TestBuffersCreation()
+        void TestCreate()
         {
             Mesh* mesh1 = new Mesh();
             Mesh* mesh2 = new Mesh();
@@ -105,30 +107,31 @@ namespace fan
             TEST_ASSERT( ! mesh1->mBuffersOutdated  );
             TEST_ASSERT( ! mesh2->mBuffersOutdated  );
 
-            meshManager.Add( mesh1, "mesh1" );
-            meshManager.Add( mesh2, "mesh2" );
+            mMeshManager.Add( mesh1, "mesh1" );
+            mMeshManager.Add( mesh2, "mesh2" );
 
             mesh1->LoadFromVertices({});
-            mesh2->LoadFromVertices({});
+            mesh2->LoadFromFile( RenderGlobal::s_meshCube );
+            mesh2->mVertices.clear();
 
             TEST_ASSERT( mesh1->mBuffersOutdated );
             TEST_ASSERT( mesh2->mBuffersOutdated );
 
             Device * device = nullptr;
-            meshManager.CreateBuffers( *device );
+            mMeshManager.Create( *device );
 
             TEST_ASSERT( ! mesh1->mBuffersOutdated  );
             TEST_ASSERT( ! mesh2->mBuffersOutdated  );
         }
 
-        void TestBuffersDestruction()
+        void TestDestroy()
         {
-            meshManager.Load( RenderGlobal::s_meshCube );
-            meshManager.Remove( RenderGlobal::s_meshCube );
-            TEST_ASSERT( meshManager.DestroyListSize() == 6 );
+            mMeshManager.Load( RenderGlobal::s_meshCube );
+            mMeshManager.Remove( RenderGlobal::s_meshCube );
+            TEST_ASSERT( mMeshManager.DestroyListSize() == 1 );
             Device * device = nullptr;
-            meshManager.Clear( * device );
-            TEST_ASSERT( meshManager.DestroyListSize() == 0 );
+            mMeshManager.Clear( * device );
+            TEST_ASSERT( mMeshManager.DestroyListSize() == 0 );
         }
     };
 }
