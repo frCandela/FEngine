@@ -2,7 +2,7 @@
 
 #include "render/resources/fanMesh.hpp"
 #include "render/resources/fanTexture.hpp"
-#include "render/fanRenderGlobal.hpp"
+#include "render/resources/fanMesh2D.hpp"
 #include "render/resources/fanTextureManager.hpp"
 #include "render/resources/fanMesh2DManager.hpp"
 

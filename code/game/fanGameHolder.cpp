@@ -1,3 +1,4 @@
+#include <scene/singletons/fanSceneResources.hpp>
 #include "fanGameHolder.hpp"
 
 #include "core/input/fanInputManager.hpp"
@@ -47,7 +48,9 @@ namespace fan
                                     &m_renderer->mMesh2DManager,
                                     &m_renderer->mTextureManager );
 
-		Prefab::s_resourceManager.Init();
+        SceneResources::SetupResources( mPrefabManager );
+        SceneResources& sceneResources = m_world.GetSingleton<SceneResources>();
+        sceneResources.SetPointers( &mPrefabManager );
 
 		// load scene
 		Scene& scene = m_world.GetSingleton<Scene>();
@@ -74,8 +77,8 @@ namespace fan
 		}
 
 		SerializedValues::Get().SaveValuesToDisk();
+		mPrefabManager.Clear();
 
-		Prefab::s_resourceManager.Clear();
 		delete m_renderer;
 		m_window.Destroy();
 	}

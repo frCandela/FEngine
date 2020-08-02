@@ -4,14 +4,11 @@
 #include "core/fanDebug.hpp"
 #include "scene/components/fanSceneNode.hpp"
 #include "scene/singletons/fanScene.hpp"
-#include "ecs/fanEcsWorld.hpp"
 #include "scene/singletons/fanScenePointers.hpp"
 
 namespace fan
 {
-	PrefabManager Prefab::s_resourceManager;
-
-	//================================================================================================================================
+    //================================================================================================================================
 	//================================================================================================================================
 	bool Prefab::CreateFromJson( const Json& _json )
 	{

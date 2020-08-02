@@ -2,7 +2,6 @@
 
 #include "core/resources/fanResource.hpp"
 #include "scene/fanSceneSerializable.hpp"
-#include "scene/fanPrefabManager.hpp"
 
 namespace fan
 {
@@ -16,8 +15,6 @@ namespace fan
 	class Prefab : public Resource
 	{
 	public:
-		static PrefabManager s_resourceManager;
-
 		bool CreateFromJson( const Json& _json );
 		bool CreateFromFile( const std::string& _path );
 		void CreateFromSceneNode( const SceneNode& _node );

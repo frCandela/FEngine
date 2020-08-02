@@ -6,10 +6,11 @@ WARNINGS_GLM_PUSH()
 WARNINGS_POP()
 #include "core/fanSerializedValues.hpp"
 #include "ecs/fanEcsWorld.hpp"
+#include "render/fanWindow.hpp"
+#include "scene/fanPrefabManager.hpp"
 #include "game/fanGameClient.hpp"
 #include "game/fanGameServer.hpp"
 #include "game/fanLaunchSettings.hpp"
-#include "render/fanWindow.hpp"
 
 namespace fan
 {
@@ -39,6 +40,7 @@ namespace fan
 	private:		
 		Renderer* m_renderer;
 		Window m_window;
+		PrefabManager mPrefabManager;
 		EcsWorld& m_world;
 		double m_lastRenderTime = 0.;
 		const LaunchSettings m_launchSettings;

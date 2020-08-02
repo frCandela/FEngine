@@ -16,9 +16,8 @@ namespace fan
     // 3D mesh composed of triangles
     // can have a convex hull computed for it
     //================================================================================================================================
-    class Mesh : public Resource
+    struct Mesh : public Resource
     {
-    public:
         bool RayCast( const btVector3 _origin, const btVector3 _dir, btVector3& _outIntersection ) const;
         bool LoadFromFile( const std::string& _path );
         bool LoadFromVertices( const std::vector<Vertex>& _vertices );

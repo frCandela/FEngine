@@ -7,8 +7,7 @@
 
 namespace fan
 {
-	class Mesh2D;
-	struct Device;
+	struct Mesh2D;
 
 	//================================================================================================================================
 	// Owns all the ui meshes of the engine
@@ -16,6 +15,10 @@ namespace fan
 	class Mesh2DManager
 	{
 	public:
+        Mesh2DManager(){}
+        Mesh2DManager( Mesh2DManager const& ) = delete;
+        Mesh2DManager& operator=( Mesh2DManager const& ) = delete;
+
 		void Clear( Device& _device );
         Mesh2D* Get( const std::string& _path ) const;
         void Add( Mesh2D* _mesh, const std::string& _name );
@@ -28,6 +31,7 @@ namespace fan
 
         int DestroyListSize() const  { return (int)mDestroyList.size(); }
         const std::vector< Mesh2D * >& GetMeshes() const { return mMeshes; }
+
 	private:
 		std::vector< Mesh2D* > mMeshes;
         std::vector< Mesh2D* > mDestroyList;

@@ -7,11 +7,11 @@
 namespace fan
 {
 
-	class Mesh;
+	struct Mesh;
 
 	//================================================================================================================================
 	// For importing GLTF file
-	// glTF™ is a specification for the efficient transmission and loading of 3D scenes and models by applications.
+	// glTFï¿½ is a specification for the efficient transmission and loading of 3D scenes and models by applications.
 	// It consist in a json header describing the data and binary (or base64) buffers
 	// Some nested structs are defined below to help extracting data from the json.
 	// see https://github.com/KhronosGroup/glTF

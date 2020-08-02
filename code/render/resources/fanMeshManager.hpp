@@ -9,13 +9,17 @@
 
 namespace fan
 {
-    class Mesh;
+    struct Mesh;
 
     //========================================================================================================
     //========================================================================================================
     class MeshManager
     {
     public:
+        MeshManager(){};
+        MeshManager( MeshManager const& ) = delete;
+        MeshManager& operator=( MeshManager const& ) = delete;
+
         Mesh*  Get( const std::string& _path ) const;
         Mesh*  Load( const std::string& _path );
         Mesh*  GetOrLoad( const std::string& _path );
@@ -31,6 +35,7 @@ namespace fan
         int DestroyListSize() const  { return (int)mDestroyList.size(); }
         const std::vector< Mesh * >& GetMeshes() const { return mMeshes; }
     private:
+
         std::vector< Mesh * > mMeshes;
         std::vector< Mesh * > mDestroyList;
     };

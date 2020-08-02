@@ -2,7 +2,6 @@
 
 #include "core/time/fanProfiler.hpp"
 #include "network/singletons/fanTime.hpp"
-#include "network/fanPacket.hpp"
 
 #include "scene/systems/fanSynchronizeMotionStates.hpp"
 #include "scene/systems/fanRegisterPhysics.hpp"
@@ -12,32 +11,18 @@
 #include "scene/systems/fanUpdateBounds.hpp"
 #include "scene/systems/fanUpdateTimers.hpp"
 #include "scene/systems/fanUpdateTransforms.hpp"
-#include "scene/components/fanSceneNode.hpp"
-#include "scene/components/fanTransform.hpp"
 #include "scene/components/fanCamera.hpp"
-#include "scene/components/fanBoxShape.hpp"
-#include "scene/components/fanRigidbody.hpp"
-#include "scene/components/fanMotionState.hpp"
 #include "scene/components/fanDirectionalLight.hpp"
 #include "scene/components/fanPointLight.hpp"
-#include "scene/components/fanParticle.hpp"
-#include "scene/components/fanSphereShape.hpp"
-#include "scene/components/fanBounds.hpp"
-#include "scene/components/fanExpirationTime.hpp"
-#include "scene/components/fanFollowTransform.hpp"
-#include "scene/components/ui/fanFollowTransformUI.hpp"
 #include "scene/singletons/fanScene.hpp"
-#include "scene/singletons/fanRenderWorld.hpp"
 #include "scene/singletons/fanRenderResources.hpp"
+#include "scene/singletons/fanSceneResources.hpp"
 #include "scene/singletons/fanScenePointers.hpp"
-#include "scene/singletons/fanPhysicsWorld.hpp"
 #include "scene/singletons/fanRenderDebug.hpp"
-#include "scene/fanSceneTags.hpp"
 
 #include "network/singletons/fanServerConnection.hpp"
 #include "network/singletons/fanLinkingContext.hpp"
 #include "network/singletons/fanHostManager.hpp"
-#include "network/singletons/fanTime.hpp"
 #include "network/singletons/fanSpawnManager.hpp"
 #include "network/components/fanLinkingContextUnregisterer.hpp"
 #include "network/components/fanHostGameData.hpp"
@@ -52,11 +37,8 @@
 
 #include "game/fanGameTags.hpp"
 #include "game/singletons/fanServerNetworkManager.hpp"
-#include "game/singletons/fanCollisionManager.hpp"
-#include "game/singletons/fanSolarEruption.hpp"
 #include "game/singletons/fanGameCamera.hpp"
 #include "game/singletons/fanSunLight.hpp"
-#include "game/singletons/fanGame.hpp"
 #include "game/systems/fanUpdatePlanets.hpp"
 #include "game/systems/fanUpdateSpaceships.hpp"
 #include "game/systems/fanUpdateGameCamera.hpp"
@@ -65,15 +47,7 @@
 #include "game/systems/fanUpdateEnergy.hpp"
 #include "game/systems/fanUpdateGameUI.hpp"
 #include "game/systems/fanParticlesOcclusion.hpp"
-#include "game/components/fanPlanet.hpp"
-#include "game/components/fanSpaceShip.hpp"
-#include "game/components/fanPlayerInput.hpp"
-#include "game/components/fanWeapon.hpp"
 #include "game/components/fanBullet.hpp"
-#include "game/components/fanBattery.hpp"
-#include "game/components/fanSolarPanel.hpp"
-#include "game/components/fanHealth.hpp"
-#include "game/components/fanSpaceshipUI.hpp"
 #include "game/components/fanDamage.hpp"
 
 namespace fan
@@ -126,6 +100,7 @@ namespace fan
 		// base singleton components
 		world.AddSingletonType<Scene>();
         world.AddSingletonType<RenderResources>();
+        world.AddSingletonType<SceneResources>();
 		world.AddSingletonType<RenderWorld>();
 		world.AddSingletonType<PhysicsWorld>();
 		world.AddSingletonType<ScenePointers>();

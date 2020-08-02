@@ -13,6 +13,8 @@ namespace fan
 	{
 	public:
         TextureManager();
+        TextureManager( TextureManager const& ) = delete;
+        TextureManager& operator=( TextureManager const& ) = delete;
 
         Texture*    Get( const std::string& _path ) const;
         Texture*    Load( const std::string& _path );

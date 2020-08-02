@@ -12,9 +12,8 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	class Mesh2D : public Resource
+	struct Mesh2D : public Resource
 	{
-	public:
 		bool LoadFromVertices( const std::vector<UIVertex>&	_vertices );
 		void Create( Device & _device );
 		void Destroy( Device & _device );

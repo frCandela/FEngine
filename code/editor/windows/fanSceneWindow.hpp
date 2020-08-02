@@ -32,10 +32,10 @@ namespace fan
 		SceneNode* m_lastSceneNodeRightClicked = nullptr;
 		bool m_expandSceneHierarchy = false;
 
-		void NewGameobjectModal( EcsWorld& _world );
-		void RenameGameobjectModal();
-		void ExportPrefabModal();
-		void ImportPrefabModal();
+		void NewSceneNodeModal( EcsWorld& _world );
+		void RenameSceneNodeModal();
+		void ExportPrefabModal( EcsWorld& _world );
+		void ImportPrefabModal( EcsWorld& _world );
 		void PopupRightClick( EcsWorld& _world );
 
 		void R_DrawSceneTree( SceneNode& _node, SceneNode*& _nodeRightClicked );

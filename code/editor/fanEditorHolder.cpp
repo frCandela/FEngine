@@ -1,4 +1,5 @@
 #include <scene/singletons/fanRenderResources.hpp>
+#include <scene/singletons/fanSceneResources.hpp>
 #include "editor/fanEditorHolder.hpp"
 
 #include "core/input/fanInputManager.hpp"
@@ -81,8 +82,7 @@ namespace fan
         RenderResources::SetupResources( m_renderer->mMeshManager,
                                          m_renderer->mMesh2DManager,
                                          m_renderer->mTextureManager );
-
-        Prefab::s_resourceManager.Init();;
+        SceneResources::SetupResources( mPrefabManager );
 
 
 		// Initialize editor components		
@@ -159,6 +159,9 @@ namespace fan
                                          &m_renderer->mMesh2DManager,
                                          &m_renderer->mTextureManager );
 
+            SceneResources& sceneResources = world.GetSingleton<SceneResources>();
+            sceneResources.SetPointers( &mPrefabManager );
+
 			Scene& scene = world.GetSingleton<Scene>();
 			EditorSelection& selection = world.GetSingleton<EditorSelection>();
 
@@ -203,7 +206,7 @@ namespace fan
 
 		SerializedValues::Get().SaveValuesToDisk();
 
-		Prefab::s_resourceManager.Clear();
+		mPrefabManager.Clear();
 
 		delete m_renderer;
 		m_window.Destroy();

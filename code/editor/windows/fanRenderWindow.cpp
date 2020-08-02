@@ -7,20 +7,21 @@
 #include "render/resources/fanTexture.hpp"
 #include "render/fanRenderer.hpp"
 #include "render/resources/fanMesh.hpp"
-#include "scene/fanPrefab.hpp"
+#include "scene/singletons/fanSceneResources.hpp"
 #include "scene/singletons/fanRenderResources.hpp"
+#include "scene/fanPrefabManager.hpp"
 
 namespace fan
 {
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	RenderWindow::RenderWindow( Renderer& _renderer )
 		: EditorWindow( "renderer", ImGui::IconType::RENDERER16 )
 		, m_renderer( _renderer )
 	{}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void RenderWindow::OnGui( EcsWorld& _world )
 	{
 		SCOPED_PROFILE( render );
@@ -53,7 +54,8 @@ namespace fan
 		// Display mesh list
 		if ( ImGui::CollapsingHeader( "Loaded prefabs : " ) )
 		{
-			for ( const auto pair : Prefab::s_resourceManager.GetList() )
+		    SceneResources& sceneResources = _world.GetSingleton<SceneResources>();
+			for ( const auto pair : sceneResources.mPrefabManager->GetList() )
 			{
 				ImGui::Text( "ref: %d name: %s", pair.second->GetRefCount(), pair.second->GetPath().c_str() );
 			}

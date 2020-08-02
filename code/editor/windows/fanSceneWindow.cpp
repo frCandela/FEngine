@@ -6,6 +6,7 @@
 #include "scene/fanDragnDrop.hpp"
 #include "render/resources/fanTextureManager.hpp"
 #include "scene/fanPrefabManager.hpp"
+#include "scene/singletons/fanSceneResources.hpp"
 #include "scene/singletons/fanScene.hpp"
 #include "scene/fanPrefab.hpp"
 #include "scene/singletons/fanPhysicsWorld.hpp"
@@ -224,27 +225,31 @@ namespace fan
 		if( newNodePopup )
 		{
 			ImGui::OpenPopup( "new_scenenode" );
-		} NewGameobjectModal( _world );
+		}
+        NewSceneNodeModal( _world );
 
 		// rename modal
 		if( renameNodePopup )
 		{
 			ImGui::OpenPopup( "rename_scenenode" );
-		} RenameGameobjectModal();
+		}
+        RenameSceneNodeModal();
 
 		// export to prefab modal
 		if( exportToPrefabPopup )
 		{
 			m_pathBuffer = "content/prefab";
 			ImGui::OpenPopup( "export_prefab" );
-		} ExportPrefabModal();
+		}
+		ExportPrefabModal( _world);
 
 		// load prefab popup
 		if( loadPrefabPopup )
 		{
 			m_pathBuffer = "content/prefab";
 			ImGui::OpenPopup( "import_prefab" );
-		} ImportPrefabModal(); 		
+		}
+		ImportPrefabModal( _world );
 	}
 
 	//========================================================================================================
@@ -307,8 +312,8 @@ namespace fan
 		{
 			for( int childIndex = 0; childIndex < (int)_node.childs.size(); childIndex++ )
 			{
-				SceneNode& child = world.GetComponent<SceneNode>( world.GetEntity( _node.childs[childIndex] ) );
-				R_DrawSceneTree( child, _nodeRightClicked );
+                SceneNode& child = world.GetComponent<SceneNode>( world.GetEntity( _node.childs[childIndex] ) );
+                R_DrawSceneTree( child, _nodeRightClicked );
 			}
 
 			ImGui::TreePop();
@@ -317,7 +322,7 @@ namespace fan
 
 	//========================================================================================================
 	//========================================================================================================
-	void SceneWindow::NewGameobjectModal( EcsWorld& _world )
+	void SceneWindow::NewSceneNodeModal( EcsWorld& _world )
 	{
 		ImGui::SetNextWindowSize( ImVec2( 200, 200 ) );
 		if( ImGui::BeginPopupModal( "new_scenenode" ) )
@@ -327,8 +332,11 @@ namespace fan
 				ImGui::SetKeyboardFocusHere();
 			}
 			bool enterPressed = false;
-			if( ImGui::InputText( "Name ", m_textBuffer, IM_ARRAYSIZE( m_textBuffer ), ImGuiInputTextFlags_EnterReturnsTrue ) )
-			{
+            if( ImGui::InputText( "Name ",
+                                  m_textBuffer,
+                                  IM_ARRAYSIZE( m_textBuffer ),
+                                  ImGuiInputTextFlags_EnterReturnsTrue ) )
+            {
 				enterPressed = true;
 			}
 			if( ImGui::Button( "Cancel" ) || ImGui::IsKeyPressed( GLFW_KEY_ESCAPE, false ) )
@@ -356,7 +364,7 @@ namespace fan
 
 	//========================================================================================================
 	//========================================================================================================
-	void SceneWindow::RenameGameobjectModal()
+	void SceneWindow::RenameSceneNodeModal()
 	{
 		ImGui::SetNextWindowSize( ImVec2( 200, 200 ) );
 		if( ImGui::BeginPopupModal( "rename_scenenode" ) )
@@ -367,8 +375,11 @@ namespace fan
 				ImGui::SetKeyboardFocusHere();
 			}
 			bool enterPressed = false;
-			if( ImGui::InputText( "New Name ", m_textBuffer, IM_ARRAYSIZE( m_textBuffer ), ImGuiInputTextFlags_EnterReturnsTrue ) )
-			{
+            if( ImGui::InputText( "New Name ",
+                                  m_textBuffer,
+                                  IM_ARRAYSIZE( m_textBuffer ),
+                                  ImGuiInputTextFlags_EnterReturnsTrue ) )
+            {
 				enterPressed = true;
 			}
 			if( ImGui::Button( "Cancel" ) || ImGui::IsKeyPressed( GLFW_KEY_ESCAPE, false ) )
@@ -392,11 +403,12 @@ namespace fan
 
 	//========================================================================================================
 	//========================================================================================================
-	void SceneWindow::ImportPrefabModal()
+	void SceneWindow::ImportPrefabModal( EcsWorld& _world )
 	{
 		if( ImGui::FanLoadFileModal( "import_prefab", RenderGlobal::sPrefabExtensions, m_pathBuffer ) )
 		{
-			Prefab* prefab = Prefab::s_resourceManager.LoadPrefab( m_pathBuffer.string() );
+            SceneResources& sceneResources = _world.GetSingleton<SceneResources>();
+			Prefab* prefab = sceneResources.mPrefabManager->LoadPrefab( m_pathBuffer.string() );
 			if( prefab != nullptr )
 			{
 				prefab->Instanciate( *m_lastSceneNodeRightClicked );
@@ -406,7 +418,7 @@ namespace fan
 
 	//========================================================================================================
 	//========================================================================================================
-	void SceneWindow::ExportPrefabModal()
+	void SceneWindow::ExportPrefabModal( EcsWorld& _world )
 	{
 		if( m_lastSceneNodeRightClicked == nullptr )
 		{
@@ -421,7 +433,8 @@ namespace fan
 			if( outStream.is_open() )
 			{
 				// Try to update the existing prefab if it exists
-				Prefab* prefab = Prefab::s_resourceManager.FindPrefab( m_pathBuffer.string() );
+                SceneResources& sceneResources = _world.GetSingleton<SceneResources>();
+				Prefab* prefab = sceneResources.mPrefabManager->FindPrefab( m_pathBuffer.string() );
 				if( prefab != nullptr )
 				{
 					prefab->CreateFromSceneNode( *m_lastSceneNodeRightClicked );

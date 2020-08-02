@@ -14,19 +14,23 @@ namespace fan
 	class PrefabManager
 	{
 	public:
-		void Init();
+        PrefabManager(){}
+        PrefabManager( PrefabManager const& ) = delete;
+        PrefabManager& operator=( PrefabManager const& ) = delete;
+
 		void Clear();
 
 		Prefab* FindPrefab( const std::string& _path );
 		Prefab* LoadPrefab( const std::string& _path );
 
 		const std::map< std::string, Prefab* >& GetList() { return m_prefabs; }
+		void ResolvePtr( ResourcePtr<Prefab>& _resourcePtr );
 	private:
+
 		std::map< std::string, Prefab* > m_prefabs;
 
 		void RegisterPrefab( Prefab* _prefab );
 
 		// Callbacks
-		void ResolvePtr( ResourcePtr<Prefab>& _resourcePtr );
 	};
 }
