@@ -18,16 +18,12 @@ namespace fan
 		bool CreateFromJson( const Json& _json );
 		bool CreateFromFile( const std::string& _path );
 		void CreateFromSceneNode( const SceneNode& _node );
-		SceneNode* Instanciate( SceneNode& _parent ) const;
+		SceneNode* Instantiate( SceneNode& _parent ) const;
 
-		const Json& GetJson() const { return m_json; }
-		std::string GetPath() const { return m_path; }
+		bool IsEmpty() const { return !mJson.contains( "prefab" ); }
+		void Clear() { mJson = Json(); }
 
-		bool IsEmpty() const { return !m_json.contains( "prefab" ); }
-		void Clear() { m_json = Json(); }
-
-	private:
-		Json m_json;
-		std::string m_path;		
+		Json        mJson;
+		std::string mPath;
 	};
 }

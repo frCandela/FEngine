@@ -74,7 +74,7 @@ namespace fan
 				// creates the bullet
 				if( *ownerWeapon.bulletPrefab != nullptr )
 				{
-					SceneNode& node = *ownerWeapon.bulletPrefab->Instanciate( scene.GetRootNode() );
+					SceneNode& node = *ownerWeapon.bulletPrefab->Instantiate( scene.GetRootNode() );
 					EcsEntity bulletID = _world.GetEntity( node.handle );
 
 					Transform& bulletTransform = _world.GetComponent<Transform>( bulletID );

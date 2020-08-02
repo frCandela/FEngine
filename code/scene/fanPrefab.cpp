@@ -16,7 +16,7 @@ namespace fan
 
 		if ( _json.contains( "prefab" ) )
 		{
-			m_json = _json;
+            mJson = _json;
 			return true;
 		}
 		else
@@ -36,16 +36,16 @@ namespace fan
 		if ( inStream.is_open() && inStream.good() )
 		{
 			Debug::Get() << Debug::Severity::log << "loading prefab: " << _path << Debug::Endl();
-			inStream >> m_json;
+			inStream >> mJson;
 
-			if ( m_json.contains( "prefab" ) )
+			if ( mJson.contains( "prefab" ) )
 			{
-				m_path = _path;
+                mPath = _path;
 				return true;
 			}
 			else
 			{
-				m_json = Json();
+                mJson = Json();
 				Debug::Warning() << "file is not a prefab: " << _path << Debug::Endl();
 				return false;
 			}
@@ -63,14 +63,14 @@ namespace fan
 	{
 		Clear();
 
-		Json& prefabJson = m_json[ "prefab" ];
+		Json& prefabJson = mJson[ "prefab" ];
 		Scene::R_SaveToJson( _node, prefabJson );
 		Scene::RemapSceneNodesIndices( prefabJson );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	SceneNode* Prefab::Instanciate( SceneNode& _parent ) const
+	SceneNode* Prefab::Instantiate( SceneNode& _parent ) const
 	{
 		if( IsEmpty() )
 		{
@@ -82,7 +82,7 @@ namespace fan
 			EcsWorld& world = *_parent.scene->world;
 			Scene& scene = world.GetSingleton<Scene>();
 			const EcsHandle handleOffset = world.GetNextHandle() - 1;
-			SceneNode& newNode = Scene::R_LoadFromJson( m_json["prefab"], scene, &_parent, handleOffset );
+			SceneNode& newNode = Scene::R_LoadFromJson( mJson["prefab"], scene, &_parent, handleOffset );
 			const EcsHandle maxHandle = Scene::R_FindMaximumHandle( _parent );
 			world.SetNextHandle( maxHandle + 1);
 			ScenePointers::ResolveComponentPointers( world, handleOffset );

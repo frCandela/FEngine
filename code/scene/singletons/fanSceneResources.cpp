@@ -1,5 +1,6 @@
 #include "scene/singletons/fanSceneResources.hpp"
 #include "scene/fanPrefabManager.hpp"
+#include "scene/fanPrefab.hpp"
 
 namespace fan
 {
@@ -39,19 +40,17 @@ namespace fan
     //========================================================================================================
     void SceneResources::OnGui( EcsWorld& /*_world*/, EcsSingleton& _singleton )
     {
-        SceneResources& sceneResources = static_cast<SceneResources&>( _singleton );
-
         ImGui::Indent();
         ImGui::Indent();
         {
             if( ImGui::CollapsingHeader( "prefabs" ) )
             {
-                (void) sceneResources;
-               /* const std::vector<Mesh*>& meshes = renderResources.mMeshManager->GetMeshes();
-                for( const Mesh         * mesh : meshes )
+                SceneResources& sceneResources = static_cast<SceneResources&>( _singleton );
+                const std::map<std::string, Prefab*>& prefabs = sceneResources.mPrefabManager->GetPrefabs();
+                for( auto pair : prefabs )
                 {
-                    ImGui::Text( mesh->mPath.c_str() );
-                }*/
+                    ImGui::Text( pair.second->mPath.c_str() );
+                }
             }
         }
         ImGui::Unindent();

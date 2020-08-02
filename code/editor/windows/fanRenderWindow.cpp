@@ -55,9 +55,9 @@ namespace fan
 		if ( ImGui::CollapsingHeader( "Loaded prefabs : " ) )
 		{
 		    SceneResources& sceneResources = _world.GetSingleton<SceneResources>();
-			for ( const auto pair : sceneResources.mPrefabManager->GetList() )
+			for ( const auto pair : sceneResources.mPrefabManager->GetPrefabs() )
 			{
-				ImGui::Text( "ref: %d name: %s", pair.second->GetRefCount(), pair.second->GetPath().c_str() );
+				ImGui::Text( "ref: %d name: %s", pair.second->GetRefCount(), pair.second->mPath.c_str() );
 			}
 		}
 

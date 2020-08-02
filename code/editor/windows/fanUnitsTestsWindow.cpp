@@ -2,10 +2,10 @@
 
 #include "core/fanDebug.hpp"
 #include "core/time/fanProfiler.hpp"
-#include "editor/unit_tests/fanUnitTestCurrency.hpp"
 #include "render/unit_tests/fanUnitTestMeshManager.hpp"
 #include "render/unit_tests/fanUnitTestMesh2DManager.hpp"
 #include "render/unit_tests/fanUnitTestTextureManager.hpp"
+#include "scene/unit_tests/fanUnitTestPrefabManager.hpp"
 
 namespace fan
 {
@@ -17,10 +17,10 @@ namespace fan
     //========================================================================================================
     std::vector<UnitTestsWindow::TestArgument> UnitTestsWindow::GetTests() {
         return {
-                { "Currency",           &UnitTestCurrency::RunTests,        mCurrencyResult },
                 { "Mesh manager",       &UnitTestMeshManager::RunTests,     mMeshManagerResult },
                 { "Mesh2D manager",     &UnitTestMesh2DManager::RunTests,   mMesh2DManagerResult },
                 { "Texture manager",    &UnitTestTextureManager::RunTests,  mTextureManagerResult },
+                { "Prefab manager",     &UnitTestPrefabManager::RunTests,   mPrefabManagerResult },
         };
     }
 

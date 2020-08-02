@@ -10,11 +10,11 @@
 
 namespace fan
 {
-	//================================================================================================================================
+	//========================================================================================================
 	// initializes the ComponentPtr from ids :
 	// - _sceneNodeID is the unique index of the target scene node on which the component is attached
 	// - _staticID is the static id of the component
-	//================================================================================================================================
+	//========================================================================================================
 	void ComponentPtrBase::CreateUnresolved( EcsHandle _handle )
 	{
 		handle = _handle;
@@ -27,16 +27,16 @@ namespace fan
 		}
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void ComponentPtrBase::Create( EcsHandle _handle )
 	{
 		handle = _handle;
 		assert( world->HasComponent( world->GetEntity( _handle ), type ) );
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void ComponentPtrBase::Clear()
 	{
 		handle = 0;
@@ -45,9 +45,9 @@ namespace fan
 
 namespace ImGui
 {
-	//================================================================================================================================
+	//========================================================================================================
  	// returns true if the component pointer changed value
-	//================================================================================================================================
+	//========================================================================================================
  	bool FanComponentBase( const char* _label, fan::ComponentPtrBase& _ptr )
  	{
 		fan::EcsWorld& world = *_ptr.world;
@@ -78,7 +78,7 @@ namespace ImGui
 			ImGui::FanBeginDragDropSourceComponent( world, node.handle, _ptr.type );
 		}
 		// dragndrop target for icon
-		ImGui::ComponentPayload payloadDropOnIcon = ImGui::FanBeginDragDropTargetComponent( world, _ptr.type );
+		ImGui::ComponentPayload payloadIcon = ImGui::FanBeginDragDropTargetComponent( world, _ptr.type );
  		
 		ImGui::SameLine();
  
@@ -97,10 +97,12 @@ namespace ImGui
 		}
 
 		// dragndrop target for button
-  		ImGui::ComponentPayload payloadDropOnButton = ImGui::FanBeginDragDropTargetComponent( world, _ptr.type );
-		if( payloadDropOnButton.handle != 0 || payloadDropOnIcon.handle != 0 )
+  		ImGui::ComponentPayload payloadButton = ImGui::FanBeginDragDropTargetComponent( world, _ptr.type );
+		if( payloadButton.handle != 0 || payloadIcon.handle != 0 )
 		{
-			ImGui::ComponentPayload & payload  = payloadDropOnButton.handle != 0 ? payloadDropOnButton : payloadDropOnIcon;
+            ImGui::ComponentPayload& payload = ( payloadButton.handle != 0
+                    ? payloadButton
+                    : payloadIcon );
 			_ptr.Create( payload.handle );
 			returnValue = true;
 		}
@@ -118,14 +120,16 @@ namespace ImGui
  		return returnValue;
  	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	bool FanPrefab( const char* _label, fan::PrefabPtr& _ptr )
 	{
 		bool returnValue = false;
 
 		fan::Prefab* prefab = *_ptr;
-		const std::string name = prefab == nullptr ? "null" : std::filesystem::path( prefab->GetPath() ).filename().string();
+		const std::string name = ( prefab == nullptr
+                ? "null"
+                : std::filesystem::path( prefab->mPath ).filename().string() );
 
 		// Set button icon & modal
 		const std::string modalName = std::string( "Find prefab (" ) + _label + ")";
@@ -153,7 +157,7 @@ namespace ImGui
 		// tooltip
 		if ( prefab != nullptr )
 		{
-			ImGui::FanToolTip( prefab->GetPath().c_str() );
+			ImGui::FanToolTip( prefab->mPath.c_str() );
 		}
 
 		// dragndrop		
@@ -171,8 +175,8 @@ namespace ImGui
 			returnValue = true;
 		}
 
-		if ( ImGui::FanLoadFileModal( modalName.c_str(), fan::RenderGlobal::sPrefabExtensions, m_pathBuffer ) )
-		{
+        if( ImGui::FanLoadFileModal( modalName.c_str(), fan::RenderGlobal::sPrefabExtensions, m_pathBuffer ) )
+        {
 			_ptr.Init( m_pathBuffer.string() );
 			_ptr.Resolve();
 			returnValue = true;

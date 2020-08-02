@@ -11,10 +11,9 @@ namespace fan
     //========================================================================================================
     Mesh* MeshManager::Get( const std::string& _path ) const
     {
-        const std::string cleanPath = std::filesystem::path( _path ).make_preferred().string();
         for( Mesh* mesh : mMeshes )
         {
-            if( mesh->mPath == cleanPath )
+            if( mesh->mPath == _path )
             {
                 return mesh;
             }
@@ -42,9 +41,8 @@ namespace fan
         if( mesh != nullptr ) { return mesh; }
 
         // Load
-        const std::string cleanPath = std::filesystem::path( _path ).make_preferred().string();
         mesh = new Mesh();
-        if( mesh->LoadFromFile( cleanPath ) )
+        if( mesh->LoadFromFile( _path ) )
         {
             mesh->mIndex = (int)mMeshes.size();
             mMeshes.push_back( mesh );
@@ -69,10 +67,9 @@ namespace fan
     //========================================================================================================
     void MeshManager::Remove( const std::string& _path )
     {
-        const std::string cleanPath = std::filesystem::path( _path ).make_preferred().string();
         for( int          meshIndex = 0; meshIndex < mMeshes.size(); meshIndex++ )
         {
-            if( mMeshes[meshIndex]->mPath == cleanPath )
+            if( mMeshes[meshIndex]->mPath == _path )
             {
                 (*mMeshes.rbegin())->mIndex = meshIndex;
                 mDestroyList.push_back( mMeshes[meshIndex] );

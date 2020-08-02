@@ -20,7 +20,7 @@ namespace fan
             using RunMethod = UnitTestResult ( * )();
             const char*      mName;
             RunMethod        mRunMethod;
-            UnitTestResult& mTestDisplay;
+            UnitTestResult&  mTestDisplay;
         };
 
         void OnGui( EcsWorld& _world ) override;
@@ -31,9 +31,9 @@ namespace fan
         static void RunTest( const TestArgument& _testArgument );
         static void ClearTest( const TestArgument& _testArgument );
 
-        UnitTestResult mCurrencyResult;
         UnitTestResult mMeshManagerResult;
         UnitTestResult mMesh2DManagerResult;
         UnitTestResult mTextureManagerResult;
+        UnitTestResult mPrefabManagerResult;
     };
 }

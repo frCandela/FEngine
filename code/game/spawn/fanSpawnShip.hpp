@@ -108,7 +108,7 @@ namespace fan
 				if( game.spaceshipPrefab != nullptr )
 				{
 					Scene& scene = _world.GetSingleton<Scene>();
-					SceneNode& spaceshipNode = *game.spaceshipPrefab->Instanciate( scene.GetRootNode() );
+					SceneNode& spaceshipNode = *game.spaceshipPrefab->Instantiate( scene.GetRootNode() );
 					EcsEntity spaceshipID = _world.GetEntity( spaceshipNode.handle );
 
 					_world.AddComponent<LinkingContextUnregisterer>( spaceshipID );

@@ -159,8 +159,9 @@ namespace fan
 				ImGui::Icon( ImGui::DIR_LIGHT16, { 16,16 } ); ImGui::SameLine();
 				if( ImGui::MenuItem( "Dir light" ) )
 				{
-					SceneNode& node = scene.CreateSceneNode( "directional_light", m_lastSceneNodeRightClicked );
-					const EcsEntity entity = world.GetEntity( node.handle );
+                    SceneNode& node = scene.CreateSceneNode( "directional_light",
+                                                             m_lastSceneNodeRightClicked );
+                    const EcsEntity entity = world.GetEntity( node.handle );
 					
 					Transform& transform = world.AddComponent<Transform>( entity );
 					transform.SetPosition( origin  );
@@ -408,10 +409,10 @@ namespace fan
 		if( ImGui::FanLoadFileModal( "import_prefab", RenderGlobal::sPrefabExtensions, m_pathBuffer ) )
 		{
             SceneResources& sceneResources = _world.GetSingleton<SceneResources>();
-			Prefab* prefab = sceneResources.mPrefabManager->LoadPrefab( m_pathBuffer.string() );
+			Prefab* prefab = sceneResources.mPrefabManager->Load( m_pathBuffer.string() );
 			if( prefab != nullptr )
 			{
-				prefab->Instanciate( *m_lastSceneNodeRightClicked );
+                prefab->Instantiate( *m_lastSceneNodeRightClicked );
 			}
 		}
 	}
@@ -434,17 +435,17 @@ namespace fan
 			{
 				// Try to update the existing prefab if it exists
                 SceneResources& sceneResources = _world.GetSingleton<SceneResources>();
-				Prefab* prefab = sceneResources.mPrefabManager->FindPrefab( m_pathBuffer.string() );
+				Prefab* prefab = sceneResources.mPrefabManager->Get( m_pathBuffer.string() );
 				if( prefab != nullptr )
 				{
 					prefab->CreateFromSceneNode( *m_lastSceneNodeRightClicked );
-					outStream << prefab->GetJson();
+					outStream << prefab->mJson;
 				}
 				else
 				{
 					Prefab newprefab;
 					newprefab.CreateFromSceneNode( *m_lastSceneNodeRightClicked );
-					outStream << newprefab.GetJson();
+					outStream << newprefab.mJson;
 				}
 
 				

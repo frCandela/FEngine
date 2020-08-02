@@ -45,7 +45,7 @@ namespace fan
 		// create explosion
 		const Transform& bulletTransform = world.GetComponent< Transform >( bulletID );
 		const Scene& scene = world.GetSingleton<Scene>();
-		const SceneNode& explosionNode = * bullet.explosionPrefab->Instanciate( scene.GetRootNode() );
+		const SceneNode& explosionNode = *bullet.explosionPrefab->Instantiate( scene.GetRootNode() );
 		const EcsEntity explosionID = world.GetEntity( explosionNode.handle );
 		Transform& explosionTransform = world.GetComponent< Transform >( explosionID );
 		explosionTransform.SetPosition( bulletTransform.GetPosition() );
