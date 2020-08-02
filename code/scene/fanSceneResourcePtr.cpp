@@ -171,7 +171,7 @@ namespace ImGui
 			returnValue = true;
 		}
 
-		if ( ImGui::FanLoadFileModal( modalName.c_str(), fan::RenderGlobal::s_prefabExtensions, m_pathBuffer ) )
+		if ( ImGui::FanLoadFileModal( modalName.c_str(), fan::RenderGlobal::sPrefabExtensions, m_pathBuffer ) )
 		{
 			_ptr.Init( m_pathBuffer.string() );
 			_ptr.Resolve();

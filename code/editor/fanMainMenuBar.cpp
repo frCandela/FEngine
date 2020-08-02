@@ -29,7 +29,7 @@ namespace fan
 		, m_showWireframe( false )
 		, m_showNormals( false )
 		, m_showLights( false )
-		, m_sceneExtensionFilter( RenderGlobal::s_sceneExtensions )
+		, m_sceneExtensionFilter( RenderGlobal::sSceneExtensions )
 	{
 		SerializedValues::Get().GetBool( "show_imguidemo", m_showImguiDemoWindow );
 	}
@@ -270,7 +270,7 @@ namespace fan
 		Scene& scene = _world.GetSingleton<Scene>();
 
 		// New scene
-		if ( ImGui::FanSaveFileModal( "New scene", RenderGlobal::s_sceneExtensions, m_pathBuffer ) )
+		if ( ImGui::FanSaveFileModal( "New scene", RenderGlobal::sSceneExtensions, m_pathBuffer ) )
 		{		
 			scene.New();
 			scene.path = m_pathBuffer.string();
@@ -284,7 +284,7 @@ namespace fan
 		}
 
 		// Save scene
-		if ( ImGui::FanSaveFileModal( "Save scene", RenderGlobal::s_sceneExtensions, m_pathBuffer ) )
+		if ( ImGui::FanSaveFileModal( "Save scene", RenderGlobal::sSceneExtensions, m_pathBuffer ) )
 		{
 			scene.path = m_pathBuffer.string();
 			Debug::Get() << Debug::Severity::log << "saving scene: " << scene.path << Debug::Endl();

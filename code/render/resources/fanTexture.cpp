@@ -1,4 +1,4 @@
-#include "render/core/fanTexture.hpp"
+#include "fanTexture.hpp"
 
 #include <algorithm>
 
@@ -13,8 +13,6 @@
 
 namespace fan
 {
-	TextureManager Texture::s_resourceManager;
-
 	//========================================================================================================
 	//========================================================================================================
 	void Texture::Destroy( Device& _device )

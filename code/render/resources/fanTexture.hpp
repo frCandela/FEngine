@@ -1,12 +1,12 @@
 #pragma once
 
+#include <string>
 #include "fanDisableWarnings.hpp"
 WARNINGS_GLM_PUSH()
 #include "glm/glm.hpp"
 WARNINGS_POP()
 #include "glfw/glfw3.h"
 #include "core/resources/fanResource.hpp"
-#include "render/resources/fanTextureManager.hpp"
 
 namespace fan
 {
@@ -17,8 +17,6 @@ namespace fan
 	//========================================================================================================
 	struct Texture : public Resource
 	{
-		static TextureManager s_resourceManager;		
-
 		VkImage			mImage		= VK_NULL_HANDLE;
 		VkImageView		mImageView	= VK_NULL_HANDLE;
 		VkDeviceMemory	mMemory		= VK_NULL_HANDLE;

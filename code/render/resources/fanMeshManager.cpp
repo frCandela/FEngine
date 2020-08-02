@@ -4,8 +4,6 @@
 #include "fanMesh.hpp"
 #include "render/fanRenderResourcePtr.hpp"
 #include "render/core/fanDevice.hpp"
-#include "core/fanDebug.hpp"
-
 
 namespace fan
 {
@@ -95,12 +93,12 @@ namespace fan
             delete mesh;
         }
         mMeshes.clear();
-        Destroy( _device );
+        DestroyRemovedMeshes( _device );
     }
 
     //========================================================================================================
     //========================================================================================================
-    void MeshManager::Create( Device& _device )
+    void MeshManager::CreateNewMeshes( Device& _device )
     {
         for( Mesh * mesh : mMeshes )
         {
@@ -113,7 +111,7 @@ namespace fan
 
     //========================================================================================================
     //========================================================================================================
-    void MeshManager::Destroy( Device& _device )
+    void MeshManager::DestroyRemovedMeshes( Device& _device )
     {
         for( Mesh* mesh : mDestroyList )
         {

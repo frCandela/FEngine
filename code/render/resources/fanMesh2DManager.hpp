@@ -23,8 +23,8 @@ namespace fan
         bool Empty() const { return mMeshes.empty(); }
 		int  MeshCount() const { return (int)mMeshes.size(); }
 
-        void Create( Device& _device );
-        void Destroy( Device& _device );
+        void CreateNewMeshes( Device& _device );
+        void DestroyRemovedMeshes( Device& _device );
 
         int DestroyListSize() const  { return (int)mDestroyList.size(); }
         const std::vector< Mesh2D * >& GetMeshes() const { return mMeshes; }

@@ -22,7 +22,7 @@ namespace fan
 
 			std::filesystem::directory_entry path( _path );
 			std::string extension = path.path().extension().generic_string();
-			std::string tmpPath = ( extension == ".frag" ? RenderGlobal::s_defaultFragmentShader : RenderGlobal::s_defaultVertexShader );
+			std::string tmpPath = ( extension == ".frag" ? RenderGlobal::sDefaultFragmentShader : RenderGlobal::sDefaultVertexShader );
 			Debug::Get() << Debug::Severity::log << "loading default shader " << tmpPath << Debug::Endl();
 			spirvCode = SpirvCompiler::Compile( tmpPath );
 

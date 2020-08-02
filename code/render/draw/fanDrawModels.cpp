@@ -5,7 +5,7 @@
 #include "render/resources/fanMesh.hpp"
 #include "render/core/fanRenderPass.hpp"
 #include "render/core/fanFrameBuffer.hpp"
-#include "render/core/fanTexture.hpp"
+#include "render/resources/fanTexture.hpp"
 #include "render/core/descriptors/fanDescriptorImages.hpp"
 
 namespace fan
@@ -285,7 +285,7 @@ namespace fan
     //========================================================================================================
     void DrawModels::SetPointLights( const std::vector<RenderDataPointLight>& _lightData )
     {
-        assert( _lightData.size() < RenderGlobal::s_maximumNumPointLights );
+        assert( _lightData.size() < RenderGlobal::sMaximumNumPointLights );
         mUniforms.mUniformsLights.pointLightNum = (uint32_t)_lightData.size();
         for( int i = 0; i < (int)_lightData.size(); ++i )
         {
@@ -304,7 +304,7 @@ namespace fan
     //========================================================================================================
     void DrawModels::SetDirectionalLights( const std::vector<RenderDataDirectionalLight>& _lightData )
     {
-        assert( _lightData.size() < RenderGlobal::s_maximumNumDirectionalLight );
+        assert( _lightData.size() < RenderGlobal::sMaximumNumDirectionalLight );
         mUniforms.mUniformsLights.dirLightsNum = (uint32_t)_lightData.size();
         for( int i = 0; i < (int)_lightData.size(); ++i )
         {

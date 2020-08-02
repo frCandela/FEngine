@@ -1,6 +1,6 @@
 #include "render/core/descriptors/fanDescriptorSampler.hpp"
 #include "render/core/fanDevice.hpp"
-#include "render/core/fanTexture.hpp"
+#include "render/resources/fanTexture.hpp"
 
 namespace fan
 {

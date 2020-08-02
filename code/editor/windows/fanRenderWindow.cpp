@@ -4,7 +4,7 @@
 #include "core/time/fanProfiler.hpp"
 #include "network/singletons/fanTime.hpp"
 #include "render/core/fanFrameBuffer.hpp"
-#include "render/core/fanTexture.hpp"
+#include "render/resources/fanTexture.hpp"
 #include "render/fanRenderer.hpp"
 #include "render/resources/fanMesh.hpp"
 #include "scene/fanPrefab.hpp"

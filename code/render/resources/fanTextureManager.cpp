@@ -2,7 +2,7 @@
 
 #include "render/fanRenderResourcePtr.hpp"
 #include "render/fanRenderGlobal.hpp"
-#include "render/core/fanTexture.hpp"
+#include "fanTexture.hpp"
 #include "render/core/fanDevice.hpp"
 
 namespace fan
@@ -97,7 +97,7 @@ namespace fan
             delete texture;
         }
         mTextures.clear();
-        Destroy( _device );
+        DestroyRemovedTextures( _device );
     }
 
     //========================================================================================================
@@ -116,7 +116,7 @@ namespace fan
 
     //========================================================================================================
     //========================================================================================================
-    bool TextureManager::Create( Device& _device )
+    bool TextureManager::CreateNewTextures( Device& _device )
     {
         bool textureCreated = false;
         for( Texture * texture : mTextures )
@@ -132,7 +132,7 @@ namespace fan
 
     //========================================================================================================
     //========================================================================================================
-    void TextureManager::Destroy( Device& _device )
+    void TextureManager::DestroyRemovedTextures( Device& _device )
     {
         for( Texture* texture : mDestroyList )
         {

@@ -1,8 +1,10 @@
 #include "fanRenderResources.hpp"
 
 #include "render/resources/fanMesh.hpp"
-#include "render/core/fanTexture.hpp"
+#include "render/resources/fanTexture.hpp"
 #include "render/fanRenderGlobal.hpp"
+#include "render/resources/fanTextureManager.hpp"
+#include "render/resources/fanMesh2DManager.hpp"
 
 namespace fan
 {

@@ -96,7 +96,7 @@ namespace fan
             TEST_ASSERT( mesh1->mBuffersOutdated );
 
             Device * device = nullptr;
-            mMeshManager.Create( *device );
+            mMeshManager.CreateNewMeshes( *device );
 
             TEST_ASSERT( ! mesh1->mBuffersOutdated  );
         }

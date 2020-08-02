@@ -56,12 +56,12 @@ namespace fan
             delete mesh;
         }
         mMeshes.clear();
-        Destroy( _device );
+        DestroyRemovedMeshes( _device );
     }
 
     //========================================================================================================
     //========================================================================================================
-    void Mesh2DManager::Create( Device& _device )
+    void Mesh2DManager::CreateNewMeshes( Device& _device )
     {
         for( Mesh2D * mesh : mMeshes )
         {
@@ -74,7 +74,7 @@ namespace fan
 
     //========================================================================================================
     //========================================================================================================
-    void Mesh2DManager::Destroy( Device& _device )
+    void Mesh2DManager::DestroyRemovedMeshes( Device& _device )
     {
         for( Mesh2D* mesh : mDestroyList )
         {

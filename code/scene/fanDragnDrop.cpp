@@ -6,7 +6,7 @@
 #include "scene/fanPrefab.hpp"
 #include "scene/singletons/fanScene.hpp"
 #include "ecs/fanEcsWorld.hpp"
-#include "render/core/fanTexture.hpp"
+#include "render/resources/fanTexture.hpp"
 #include "render/resources/fanMesh.hpp"
 
 namespace ImGui

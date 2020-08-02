@@ -1,7 +1,7 @@
 #include "scene/components/ui/fanUIRenderer.hpp"
 
 #include "render/fanRenderSerializable.hpp"
-#include "render/fanRenderGlobal.hpp"
+#include "render/resources/fanMesh2DManager.hpp"
 #include "core/input/fanInput.hpp"
 #include "scene/singletons/fanRenderResources.hpp"
 #include "editor/fanModals.hpp"

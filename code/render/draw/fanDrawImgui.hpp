@@ -8,7 +8,7 @@ WARNINGS_GLM_PUSH()
 WARNINGS_POP()
 #include "render/core/fanSampler.hpp"
 #include "render/core/fanShader.hpp"
-#include "render/core/fanTexture.hpp"
+#include "render/resources/fanTexture.hpp"
 #include "render/core/fanBuffer.hpp"
 #include "render/core/fanCommandBuffer.hpp"
 #include "render/core/fanPipeline.hpp"

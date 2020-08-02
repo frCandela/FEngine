@@ -8,16 +8,14 @@
 namespace fan
 {
 	//========================================================================================================
-	// global values for the renderer
 	//========================================================================================================
 	class RenderGlobal
 	{
 	public:
-		// editor
-		static const std::set<std::string>	s_meshExtensions;
-		static const std::set<std::string>	s_imagesExtensions;
-		static const std::set<std::string>	s_sceneExtensions;
-		static const std::set<std::string>	s_prefabExtensions;
+		static const std::set<std::string> sMeshExtensions;
+		static const std::set<std::string> sImagesExtensions;
+		static const std::set<std::string> sSceneExtensions;
+		static const std::set<std::string> sPrefabExtensions;
 
 		static const char* sDefaultMesh;
 		static const char* sDefaultTexture;
@@ -25,28 +23,27 @@ namespace fan
 		static const char* sDefaultIcons;
 		static const char* sDefaultImguiFont;
 
-		static const char* s_meshCone;
-		static const char* s_meshCube;
-		static const char* s_meshPlane;
-		static const char* s_meshSphere;
-		static const char* s_meshAxisCheck;
+		static const char* sMeshCone;
+		static const char* sMeshCube;
+		static const char* sMeshPlane;
+		static const char* sMeshSphere;
+		static const char* sMeshAxisCheck;
 
         static const char* sMesh2DQuad;
 
 		static const char* sTextureUVCheck;
 		static const char* sTextureWhite;
 
-		static const char* s_defaultVertexShader;
-		static const char* s_defaultFragmentShader;
-		static const char* s_imguiVertexShader;
-		static const char* s_imguiFragmentShader;
+		static const char* sDefaultVertexShader;
+		static const char* sDefaultFragmentShader;
+		static const char* sImguiVertexShader;
+		static const char* sImguiFragmentShader;
 
-		// rendering
-		static const uint32_t s_maximumNumPointLights = 16;
-		static const uint32_t s_maximumNumDirectionalLight = 4;
+		static const uint32_t sMaximumNumPointLights      = 16;
+		static const uint32_t sMaximumNumDirectionalLight = 4;
 
-		static const std::vector < const char* > s_desiredValidationLayers;
-		static const std::vector < const char* > s_desiredInstanceExtensions;
-		static const std::vector < const char* > s_desiredDeviceExtensions;
+		static const std::vector < const char* > sDesiredValidationLayers;
+		static const std::vector < const char* > sDesiredInstanceExtensions;
+		static const std::vector < const char* > sDesiredDeviceExtensions;
 	};
 }

@@ -80,8 +80,8 @@ namespace fan
 	//================================================================
 	struct UniformLights
 	{
-		UniformDirectionalLight dirLights[RenderGlobal::s_maximumNumDirectionalLight];
-		UniformPointLight		pointlights[RenderGlobal::s_maximumNumPointLights];
+		UniformDirectionalLight dirLights[RenderGlobal::sMaximumNumDirectionalLight];
+		UniformPointLight		pointlights[RenderGlobal::sMaximumNumPointLights];
 		uint32_t				dirLightsNum;
 		uint32_t				pointLightNum;
 	};

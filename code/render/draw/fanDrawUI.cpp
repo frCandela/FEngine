@@ -5,7 +5,7 @@
 #include "render/core/fanRenderPass.hpp"
 #include "render/core/fanFrameBuffer.hpp"
 #include "render/resources/fanMesh2D.hpp"
-#include "render/core/fanTexture.hpp"
+#include "render/resources/fanTexture.hpp"
 
 namespace fan
 {

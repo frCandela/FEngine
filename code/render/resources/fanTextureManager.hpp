@@ -23,8 +23,8 @@ namespace fan
         bool        Empty() const { return mTextures.empty(); }
         void	    ResolvePtr( ResourcePtr< Texture >& _resourcePtr );
 
-        bool        Create( Device& _device );
-        void        Destroy( Device& _device );
+        bool        CreateNewTextures( Device& _device );
+        void        DestroyRemovedTextures( Device& _device );
 
         int         DestroyListSize() const  { return (int)mDestroyList.size(); }
         const std::vector< Texture * >& GetTextures() const { return mTextures; }

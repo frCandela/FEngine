@@ -25,8 +25,8 @@ namespace fan
         bool   Empty() const { return mMeshes.empty(); }
         void   ResolvePtr( ResourcePtr<Mesh>& _resourcePtr );
 
-        void Create( Device& _device );
-        void Destroy( Device& _device );
+        void CreateNewMeshes( Device& _device );
+        void DestroyRemovedMeshes( Device& _device );
 
         int DestroyListSize() const  { return (int)mDestroyList.size(); }
         const std::vector< Mesh * >& GetMeshes() const { return mMeshes; }

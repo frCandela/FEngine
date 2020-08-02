@@ -19,7 +19,7 @@ namespace fan
 		int res = glfwVulkanSupported() == GLFW_TRUE;
 		( void ) res;
 		glfwExtensions = glfwGetRequiredInstanceExtensions( &glfwExtensionCount );
-		std::vector< const char* > desiredExtensions = RenderGlobal::s_desiredInstanceExtensions;
+		std::vector< const char* > desiredExtensions = RenderGlobal::sDesiredInstanceExtensions;
 
 		for ( unsigned glfwExtensionIndex = 0; glfwExtensionIndex < glfwExtensionCount; glfwExtensionIndex++ )
 		{
@@ -27,7 +27,7 @@ namespace fan
 		}
 
 		FindDesiredExtensions( desiredExtensions );	
-		FindDesiredValidationLayers( RenderGlobal::s_desiredValidationLayers );
+		FindDesiredValidationLayers( RenderGlobal::sDesiredValidationLayers );
 
 		VkApplicationInfo appInfo;
 		appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;

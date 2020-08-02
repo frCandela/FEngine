@@ -17,7 +17,7 @@ namespace fan
 		std::vector<VkExtensionProperties>	availableExtensions;
 		SelectPhysicalDevice( _instance, availableFeatures, availableExtensions );
 
-		std::vector< const char* > existingExtensions = GetDesiredExtensions( availableExtensions, RenderGlobal::s_desiredDeviceExtensions );
+		std::vector< const char* > existingExtensions = GetDesiredExtensions( availableExtensions, RenderGlobal::sDesiredDeviceExtensions );
 
 		uint32_t graphicsQueueFamilyIndex = 0, computeQueueFamilyIndex = 0, presentQueueFamilyIndex = 0;
 		GetQueueFamiliesIndices( _surface, graphicsQueueFamilyIndex, computeQueueFamilyIndex, presentQueueFamilyIndex );

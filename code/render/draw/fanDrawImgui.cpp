@@ -8,7 +8,7 @@
 #include "render/core/fanDevice.hpp"
 #include "render/core/fanShader.hpp"
 #include "render/core/fanBuffer.hpp"
-#include "render/core/fanTexture.hpp"
+#include "render/resources/fanTexture.hpp"
 #include "render/core/fanImageView.hpp"
 #include "render/core/fanFrameBuffer.hpp"
 #include "render/core/fanRenderPass.hpp"
@@ -230,8 +230,8 @@ namespace fan
 		ImGuiIO& io = ImGui::GetIO();
 		io.DisplaySize = ImVec2( static_cast< float >( _extent.width ), static_cast< float >( _extent.height ) );
 		io.DisplayFramebufferScale = ImVec2( 1.0f, 1.0f );
-		mVertexShader.Create( _device, RenderGlobal::s_imguiVertexShader );
-		mFragmentShader.Create( _device, RenderGlobal::s_imguiFragmentShader );
+		mVertexShader.Create( _device, RenderGlobal::sImguiVertexShader );
+		mFragmentShader.Create( _device, RenderGlobal::sImguiFragmentShader );
 
 		// Setup back-end capabilities flags
 		io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;         // We can honor GetMouseCursor() values (optional)

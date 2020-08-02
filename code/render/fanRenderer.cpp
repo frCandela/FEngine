@@ -5,12 +5,11 @@
 #include "core/time/fanProfiler.hpp"
 #include "network/singletons/fanTime.hpp"
 #include "render/fanRenderGlobal.hpp"
-#include "render/resources/fanMeshManager.hpp"
 #include "render/resources/fanMesh2D.hpp"
 #include "render/resources/fanMesh.hpp"
 #include "render/core/fanSwapChain.hpp"
 #include "render/core/fanInstance.hpp"
-#include "render/core/fanTexture.hpp"
+#include "render/resources/fanTexture.hpp"
 #include "render/core/fanDevice.hpp"
 #include "render/fanVertex.hpp"
 #include "render/fanWindow.hpp"
@@ -39,7 +38,7 @@ namespace fan
                                                    finalRenderPass,
                                                    mWindow.mSwapchain.mImageViews );
 
-        mTextureManager.Create( mDevice );
+        mTextureManager.CreateNewTextures( mDevice );
 		CreateTextureDescriptor();
 		CreateShaders();
 
@@ -229,9 +228,14 @@ namespace fan
                              VK_TRUE,
                              std::numeric_limits<uint64_t>::max() );
             vkResetFences( mDevice.mDevice, 1, mWindow.mSwapchain.GetCurrentInFlightFence() );
-            mMeshManager.Create( mDevice );
-            mMesh2DManager.Create( mDevice );
-            textureCreated = mTextureManager.Create( mDevice );
+
+            mMeshManager.DestroyRemovedMeshes( mDevice );
+            mMesh2DManager.DestroyRemovedMeshes( mDevice );
+            mTextureManager.DestroyRemovedTextures( mDevice );
+
+            mMeshManager.CreateNewMeshes( mDevice );
+            mMesh2DManager.CreateNewMeshes( mDevice );
+            textureCreated = mTextureManager.CreateNewTextures( mDevice );
         }
 
         ImGui::GetIO().DisplaySize = ImVec2( static_cast< float >( mWindow.mSwapchain.mExtent.width ),

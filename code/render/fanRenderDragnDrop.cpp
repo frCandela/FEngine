@@ -1,5 +1,5 @@
 #include "render/fanRenderDragnDrop.hpp"
-#include "render/core/fanTexture.hpp"
+#include "render/resources/fanTexture.hpp"
 #include "render/resources/fanMesh.hpp"
 #include "editor/fanImguiIcons.hpp"
 

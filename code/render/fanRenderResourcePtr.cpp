@@ -78,7 +78,7 @@ namespace ImGui
 		}
 
 		// Modal set value
-		if ( ImGui::FanLoadFileModal( modalName.c_str(), fan::RenderGlobal::s_imagesExtensions, m_pathBuffer ) )
+		if ( ImGui::FanLoadFileModal( modalName.c_str(), fan::RenderGlobal::sImagesExtensions, m_pathBuffer ) )
 		{
 			_ptr.Init( m_pathBuffer.string() );
 			_ptr.Resolve();
@@ -149,7 +149,7 @@ namespace ImGui
 			returnValue = true;
 		}
 
-		if ( ImGui::FanLoadFileModal( modalName.c_str(), fan::RenderGlobal::s_meshExtensions, m_pathBuffer ) )
+		if ( ImGui::FanLoadFileModal( modalName.c_str(), fan::RenderGlobal::sMeshExtensions, m_pathBuffer ) )
 		{
 			_ptr.Init( m_pathBuffer.string() );
 			_ptr.Resolve();

@@ -3,35 +3,35 @@
 
 namespace fan
 {
-	const std::set<std::string>	RenderGlobal::s_meshExtensions		= { ".gltf" };
-	const std::set<std::string>	RenderGlobal::s_imagesExtensions	= { ".png" };
-	const std::set<std::string>	RenderGlobal::s_sceneExtensions		= { ".scene" };
-	const std::set<std::string>	RenderGlobal::s_prefabExtensions	= { ".prefab" };
+	const std::set<std::string>	RenderGlobal::sMeshExtensions   = { ".gltf" };
+	const std::set<std::string>	RenderGlobal::sImagesExtensions = { ".png" };
+	const std::set<std::string>	RenderGlobal::sSceneExtensions  = { ".scene" };
+	const std::set<std::string>	RenderGlobal::sPrefabExtensions = { ".prefab" };
 
 	const char* RenderGlobal::sDefaultIcons     = "content/_default/texture/icons.png";
 	const char* RenderGlobal::sDefaultImguiFont = "content/_default/imgui_font.ttf";
 
-	const char* RenderGlobal::s_meshCone		= "content/_default/mesh/cone.gltf";
-	const char* RenderGlobal::s_meshCube		= "content/_default/mesh/cube.gltf";
-	const char* RenderGlobal::s_meshPlane		= "content/_default/mesh/plane.gltf";
-	const char* RenderGlobal::s_meshSphere		= "content/_default/mesh/sphere.gltf";
-	const char* RenderGlobal::s_meshAxisCheck	= "content/_default/mesh/axis_check_yup.gltf";
+	const char* RenderGlobal::sMeshCone      = "content/_default/mesh/cone.gltf";
+	const char* RenderGlobal::sMeshCube      = "content/_default/mesh/cube.gltf";
+	const char* RenderGlobal::sMeshPlane     = "content/_default/mesh/plane.gltf";
+	const char* RenderGlobal::sMeshSphere    = "content/_default/mesh/sphere.gltf";
+	const char* RenderGlobal::sMeshAxisCheck = "content/_default/mesh/axis_check_yup.gltf";
 
 	const char* RenderGlobal::sMesh2DQuad	= "2Dquad";
 
 	const char* RenderGlobal::sTextureUVCheck = "content/_default/texture/uv_checker.png";
 	const char* RenderGlobal::sTextureWhite   = "content/_default/texture/white.png";
 
-	const char* RenderGlobal::sDefaultMesh    = s_meshCube;
+	const char* RenderGlobal::sDefaultMesh    = sMeshCube;
 	const char* RenderGlobal::sDefaultTexture = "content/_default/texture/texture.png";
 	const char* RenderGlobal::sWhiteTexture   = "content/_default/texture/white32.png";
 
-	const char* RenderGlobal::s_defaultVertexShader		= "code/shaders/empty.vert";
-	const char* RenderGlobal::s_defaultFragmentShader	= "code/shaders/empty.frag";
-	const char* RenderGlobal::s_imguiVertexShader		= "code/shaders/imgui.vert";
-	const char* RenderGlobal::s_imguiFragmentShader		= "code/shaders/imgui.frag";
+	const char* RenderGlobal::sDefaultVertexShader   = "code/shaders/empty.vert";
+	const char* RenderGlobal::sDefaultFragmentShader = "code/shaders/empty.frag";
+	const char* RenderGlobal::sImguiVertexShader     = "code/shaders/imgui.vert";
+	const char* RenderGlobal::sImguiFragmentShader   = "code/shaders/imgui.frag";
 
-	const std::vector < const char* > RenderGlobal::s_desiredValidationLayers = {
+	const std::vector < const char* > RenderGlobal::sDesiredValidationLayers = {
 #ifndef NDEBUG	
 		"VK_LAYER_LUNARG_standard_validation"
 		, "VK_LAYER_LUNARG_assistant_layer"
@@ -45,13 +45,13 @@ namespace fan
 #endif
 	};
 
-	const std::vector < const char* > RenderGlobal::s_desiredInstanceExtensions =
+	const std::vector < const char* > RenderGlobal::sDesiredInstanceExtensions =
 	{
 		VK_EXT_DEBUG_REPORT_EXTENSION_NAME
 		, VK_KHR_SURFACE_EXTENSION_NAME
 	};	
 
-	const std::vector < const char* > RenderGlobal::s_desiredDeviceExtensions = {
+	const std::vector < const char* > RenderGlobal::sDesiredDeviceExtensions = {
 		VK_KHR_SWAPCHAIN_EXTENSION_NAME
 	};
 }

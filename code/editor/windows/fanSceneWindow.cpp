@@ -4,13 +4,7 @@
 #include "core/fanDebug.hpp"
 #include "scene/singletons/fanRenderResources.hpp"
 #include "scene/fanDragnDrop.hpp"
-#include "editor/fanModals.hpp"
-#include "editor/singletons/fanEditorSelection.hpp"
-#include "core/input/fanKeyboard.hpp"
-#include "core/time/fanProfiler.hpp"
-#include "core/input/fanInput.hpp"
-#include "core/input/fanMouse.hpp"
-#include "ecs/fanEcsWorld.hpp"
+#include "render/resources/fanTextureManager.hpp"
 #include "scene/fanPrefabManager.hpp"
 #include "scene/singletons/fanScene.hpp"
 #include "scene/fanPrefab.hpp"
@@ -25,7 +19,8 @@
 #include "scene/components/fanMotionState.hpp"
 #include "scene/components/fanBoxShape.hpp"
 #include "scene/components/fanParticleEmitter.hpp"
-#include "render/fanRenderGlobal.hpp"
+#include "editor/fanModals.hpp"
+#include "editor/singletons/fanEditorSelection.hpp"
 
 namespace fan
 {
@@ -113,7 +108,7 @@ namespace fan
 					transform.SetPosition( origin );
 
 					MeshRenderer& meshRenderer = world.AddComponent<MeshRenderer>( entity );
-					meshRenderer.mesh = renderResources.mMeshManager->GetOrLoad( RenderGlobal::s_meshSphere );
+					meshRenderer.mesh = renderResources.mMeshManager->GetOrLoad( RenderGlobal::sMeshSphere );
 					
 					Material& material = world.AddComponent<Material>( entity );
 
@@ -133,7 +128,7 @@ namespace fan
 					transform.SetPosition( origin );
 
 					MeshRenderer& meshRenderer = world.AddComponent<MeshRenderer>( entity );
-					meshRenderer.mesh = renderResources.mMeshManager->GetOrLoad( RenderGlobal::s_meshCube );
+					meshRenderer.mesh = renderResources.mMeshManager->GetOrLoad( RenderGlobal::sMeshCube );
 					Material& material = world.AddComponent<Material>( entity );
 					material.texture = renderResources.mTextureManager->Get( RenderGlobal::sTextureWhite );
 					onSelectSceneNode.Emmit( &node );
@@ -399,7 +394,7 @@ namespace fan
 	//========================================================================================================
 	void SceneWindow::ImportPrefabModal()
 	{
-		if( ImGui::FanLoadFileModal( "import_prefab", RenderGlobal::s_prefabExtensions, m_pathBuffer ) )
+		if( ImGui::FanLoadFileModal( "import_prefab", RenderGlobal::sPrefabExtensions, m_pathBuffer ) )
 		{
 			Prefab* prefab = Prefab::s_resourceManager.LoadPrefab( m_pathBuffer.string() );
 			if( prefab != nullptr )
@@ -418,7 +413,7 @@ namespace fan
 			return;
 		}
 
-		if( ImGui::FanSaveFileModal( "export_prefab", RenderGlobal::s_prefabExtensions, m_pathBuffer ) )
+		if( ImGui::FanSaveFileModal( "export_prefab", RenderGlobal::sPrefabExtensions, m_pathBuffer ) )
 		{
 			Debug::Log() << "Exporting prefab to " << m_pathBuffer.string() << Debug::Endl();
 

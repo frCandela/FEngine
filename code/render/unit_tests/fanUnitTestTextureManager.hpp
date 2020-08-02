@@ -116,7 +116,7 @@ namespace fan
             TEST_ASSERT( texture2->mBuffersOutdated );
 
             Device * device = nullptr;
-            mTextureManager.Create( *device );
+            mTextureManager.CreateNewTextures( *device );
 
             TEST_ASSERT( ! texture1->mBuffersOutdated  );
             TEST_ASSERT( ! texture2->mBuffersOutdated  );
