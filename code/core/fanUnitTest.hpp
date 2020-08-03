@@ -9,14 +9,23 @@ namespace fan
 {
     //========================================================================================================
     //========================================================================================================
-    #define TEST_ASSERT( _condition )               \
-    if( ! (_condition) ) {                          \
-        if( AssertUtils::sFanAssertBreakEnabled )   \
-        {                                           \
-            FAN_DEBUG_BREAK                         \
-        }                                           \
-        throw std::exception("test failed");        \
-    }
+    #ifdef NDEBUG
+        #define TEST_ASSERT( _condition )               \
+            if( ! (_condition) )                        \
+            {                                           \
+                throw std::exception("test failed");    \
+            }
+    #else
+        #define TEST_ASSERT( _condition )               \
+        if( ! (_condition) ) {                          \
+            if( AssertUtils::sFanAssertBreakEnabled )   \
+            {                                           \
+                FAN_DEBUG_BREAK                         \
+            }                                           \
+            throw std::exception("test failed");        \
+        }
+    #endif
+
 
     //========================================================================================================
     //========================================================================================================

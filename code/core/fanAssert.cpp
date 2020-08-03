@@ -3,15 +3,21 @@
 
 namespace fan
 {
+#ifndef NDEBUG
+
     bool AssertUtils::sFanAssertBreakEnabled = true;
 
-    void AssertUtils::LogAssertMessage(const char *_message)
+    //========================================================================================================
+    //========================================================================================================
+    void AssertUtils::LogAssertMessage( const char* _msg, const char* _func, int _line, const char* _file )
     {
         Debug::Error() << "Assert:"
-                    << _message
-                    << " func:" << __func__
-                    << " line:" << __LINE__
-                    << " file:" << __FILE__
+                    << _msg
+                    << " func:" << _func
+                    << " line:" << _line
+                    << " file:" << _file
                     << Debug::Endl();
     }
+
+#endif
 }

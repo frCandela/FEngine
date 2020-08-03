@@ -22,7 +22,9 @@ namespace fan
                 { "Mesh2D manager",     &UnitTestMesh2DManager::RunTests,   mMesh2DManagerResult },
                 { "Texture manager",    &UnitTestTextureManager::RunTests,  mTextureManagerResult },
                 { "Prefab manager",     &UnitTestPrefabManager::RunTests,   mPrefabManagerResult },
-                { "fanAssert",          &UnitTestFanAssert::RunTests,       mFanAssertResult },
+#ifndef NDEBUG
+                 { "fanAssert",          &UnitTestFanAssert::RunTests,       mFanAssertResult },
+#endif
         };
     }
 
@@ -44,8 +46,13 @@ namespace fan
         {
             for( const TestArgument& testArgument : tests ){ ClearTest( testArgument ); }
         }
-        ImGui::SameLine();
-        ImGui::Checkbox("enable break", &AssertUtils::sFanAssertBreakEnabled );
+#ifndef NDEBUG
+        if( System::HasDebugger())
+        {
+            ImGui::SameLine();
+            ImGui::Checkbox( "enable break", &AssertUtils::sFanAssertBreakEnabled );
+        }
+#endif
         ImGui::Spacing();
         for( const TestArgument& testArgument : tests ){ DrawUnitTest( testArgument ); }
     }
