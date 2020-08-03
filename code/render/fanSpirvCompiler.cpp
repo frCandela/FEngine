@@ -2,7 +2,6 @@
 
 #include "shaderc/shaderc.hpp"
 #include "core/fanDebug.hpp"
-#include <cassert>
 #include <filesystem>
 #include <fstream>
 

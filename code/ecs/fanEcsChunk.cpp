@@ -1,4 +1,5 @@
 #include "ecs/fanEcsChunk.hpp"
+#include "core/fanAssert.hpp"
 
 namespace fan
 {
@@ -16,8 +17,8 @@ namespace fan
 		size_t space = EcsChunkAllocator::chunkSize;
 		m_alignedBuffer = m_buffer;
 		void* result = std::align( _alignment, _componentSize, m_alignedBuffer, space );
-		assert( result != nullptr );
-		assert( result == m_alignedBuffer );
+		fanAssert( result != nullptr );
+		fanAssert( result == m_alignedBuffer );
 		(void)result;
 
 		m_capacity = int( space / _componentSize );
@@ -43,7 +44,7 @@ namespace fan
 	//================================================================================================================================
 	void* EcsChunk::At( const int _index )
 	{
-		assert( _index < m_size );
+		fanAssert( _index < m_size );
 		uint8_t* buffer = static_cast<uint8_t*>( m_alignedBuffer );
 		return &buffer[_index * m_componentSize];
 	}
@@ -52,7 +53,7 @@ namespace fan
 	//================================================================================================================================
 	void EcsChunk::Set( const int _index, void* _data )
 	{
-		assert( _index < m_size );
+        fanAssert( _index < m_size );
 		m_cpyFunction( At( _index ), _data, m_componentSize );
 	}
 
@@ -60,7 +61,7 @@ namespace fan
 	//================================================================================================================================
 	void EcsChunk::Remove( const int _index )
 	{
-		assert( _index < m_size );
+        fanAssert( _index < m_size );
 		// back swap
 		if( m_size != 1 && _index != m_size - 1 )
 		{
@@ -73,7 +74,7 @@ namespace fan
 	//================================================================================================================================
 	void EcsChunk::PushBack( void* _data )
 	{
-		assert( m_size < m_capacity );
+        fanAssert( m_size < m_capacity );
 		const int index = m_size;
 		m_size++;
 		Set( index, _data );
@@ -83,7 +84,7 @@ namespace fan
 	//================================================================================================================================
 	void EcsChunk::PopBack()
 	{
-		assert( m_size > 0 );
+        fanAssert( m_size > 0 );
 		m_size--;
 	}
 
@@ -91,7 +92,7 @@ namespace fan
 	//================================================================================================================================
 	void EcsChunk::EmplaceBack()
 	{
-		assert( m_size < m_capacity );
+        fanAssert( m_size < m_capacity );
 		m_size++;
 	}
 

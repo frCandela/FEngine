@@ -1,12 +1,11 @@
 #include "render/draw/fanDrawModels.hpp"
 
+#include "core/fanAssert.hpp"
 #include "core/fanDebug.hpp"
 #include "render/fanVertex.hpp"
 #include "render/resources/fanMesh.hpp"
 #include "render/core/fanRenderPass.hpp"
 #include "render/core/fanFrameBuffer.hpp"
-#include "render/resources/fanTexture.hpp"
-#include "render/core/descriptors/fanDescriptorImages.hpp"
 
 namespace fan
 {
@@ -285,7 +284,7 @@ namespace fan
     //========================================================================================================
     void DrawModels::SetPointLights( const std::vector<RenderDataPointLight>& _lightData )
     {
-        assert( _lightData.size() < RenderGlobal::sMaximumNumPointLights );
+       fanAssert( _lightData.size() < RenderGlobal::sMaximumNumPointLights );
         mUniforms.mUniformsLights.pointLightNum = (uint32_t)_lightData.size();
         for( int i = 0; i < (int)_lightData.size(); ++i )
         {
@@ -304,7 +303,7 @@ namespace fan
     //========================================================================================================
     void DrawModels::SetDirectionalLights( const std::vector<RenderDataDirectionalLight>& _lightData )
     {
-        assert( _lightData.size() < RenderGlobal::sMaximumNumDirectionalLight );
+       fanAssert( _lightData.size() < RenderGlobal::sMaximumNumDirectionalLight );
         mUniforms.mUniformsLights.dirLightsNum = (uint32_t)_lightData.size();
         for( int i = 0; i < (int)_lightData.size(); ++i )
         {
@@ -325,7 +324,7 @@ namespace fan
             DescriptorImages& _descriptorTextures,
             VkPipelineLayout _pipelineLayout )
     {
-        assert( _textureIndex < _descriptorTextures.mDescriptorSets.size() );
+       fanAssert( _textureIndex < _descriptorTextures.mDescriptorSets.size() );
 
         std::vector<VkDescriptorSet> descriptors = {
                 _descriptorTextures.mDescriptorSets[_textureIndex], _descriptorSampler.mDescriptorSet

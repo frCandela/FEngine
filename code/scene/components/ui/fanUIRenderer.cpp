@@ -29,7 +29,7 @@ namespace fan
         RenderResources& renderResources = _world.GetSingleton<RenderResources>();
 
        uiRenderer.mUiMesh = renderResources.mMesh2DManager->Get( RenderGlobal::sMesh2DQuad );
-       assert( uiRenderer.mUiMesh );
+      fanAssert( uiRenderer.mUiMesh );
 	}
 
 	//================================================================================================================================

@@ -1,7 +1,6 @@
 #pragma once
 
 #include <map>
-#include <cassert>
 #include "bullet/LinearMath/btVector3.h"
 #include "bullet/LinearMath/btTransform.h"
 

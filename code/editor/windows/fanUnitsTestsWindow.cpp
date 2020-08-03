@@ -45,7 +45,7 @@ namespace fan
             for( const TestArgument& testArgument : tests ){ ClearTest( testArgument ); }
         }
         ImGui::SameLine();
-        ImGui::Checkbox("enable break", &gFanAssertBreakEnabled );
+        ImGui::Checkbox("enable break", &AssertUtils::sFanAssertBreakEnabled );
         ImGui::Spacing();
         for( const TestArgument& testArgument : tests ){ DrawUnitTest( testArgument ); }
     }
@@ -118,7 +118,7 @@ namespace fan
                 ImGui::Icon(  ImGui::IconType::CHECK_SUCCESS16, iconSize, ImVec4( 0, 1, 0, 1 ) );
                 break;
             default:
-                assert( false );
+               fanAssert( false );
                 break;
         }
     }

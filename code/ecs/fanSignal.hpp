@@ -2,7 +2,7 @@
 
 #include <vector>
 #include <functional>
-#include <cassert>
+#include "core/fanAssert.hpp"
 #include "ecs/fanEcsWorld.hpp"
 
 namespace fan
@@ -61,7 +61,7 @@ namespace fan
         Connect( void( _ComponentType::* _method )( Args... ), EcsWorld& _world, const EcsHandle _handle )
         {
             static_assert( std::is_base_of<EcsComponent, _ComponentType>::value );
-            assert( _handle != 0 );
+            fanAssert( _handle != 0 );
 
             Connection connection;
             connection.mID     = _handle;

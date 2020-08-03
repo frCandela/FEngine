@@ -1,13 +1,12 @@
 #include "fanTexture.hpp"
 
 #include <algorithm>
-
 #pragma warning(push, 0)   
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 #pragma warning(pop)
-
 #include "core/fanDebug.hpp"
+#include "core/fanAssert.hpp"
 #include "render/core/fanDevice.hpp"
 #include "render/core/fanBuffer.hpp"
 
@@ -315,7 +314,7 @@ namespace fan
 	bool Texture::LoadFromFile( const std::string& _path )
 	{
         static_assert( sizeof(uint8_t) == sizeof( stbi_uc ) );
-        assert( mPixels == nullptr );
+       fanAssert( mPixels == nullptr );
 
 		mPath = _path;
 
@@ -340,7 +339,7 @@ namespace fan
     //========================================================================================================
     void Texture::LoadFromPixels( const uint8_t* _pixelsRGBA32, const VkExtent2D _extent, const uint32_t _mipLevels )
     {
-	    assert( mPixels == nullptr );
+	   fanAssert( mPixels == nullptr );
 
         mBuffersOutdated = true;
         if( _pixelsRGBA32 == nullptr ) { return; }

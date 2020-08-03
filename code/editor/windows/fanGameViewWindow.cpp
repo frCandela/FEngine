@@ -22,7 +22,7 @@ namespace fan
 		case LaunchSettings::Mode::EditorClient:		memcpy( m_gameWorldsStr, "client\0\0", 8 );			break;
 		case LaunchSettings::Mode::EditorServer:		memcpy( m_gameWorldsStr, "server\0\0", 8 );			break;
 		case LaunchSettings::Mode::EditorClientServer:	memcpy( m_gameWorldsStr, "client\0server\0\0,", 16 );	break;
-		default: assert( false ); break;
+		default:fanAssert( false ); break;
 		}
 	}
 

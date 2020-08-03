@@ -1,6 +1,5 @@
 #include "ecs/fanEcsChunkAllocator.hpp"
-
-#include <cassert>
+#include "core/fanAssert.hpp"
 
 namespace fan
 {
@@ -38,7 +37,7 @@ namespace fan
 	//================================================================================================================================
 	void EcsChunkAllocator::Free( void* _chunk )
 	{
-		assert( _chunk != nullptr );
+		fanAssert( _chunk != nullptr );
 		m_freeChunks.push_back( _chunk );
 	}
 }

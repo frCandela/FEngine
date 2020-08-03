@@ -1,6 +1,5 @@
 #include "render/core/fanFrameBuffer.hpp"
 
-#include <cassert>
 #include "core/fanDebug.hpp"
 #include "render/core/fanDevice.hpp"
 #include "render/core/fanRenderPass.hpp"

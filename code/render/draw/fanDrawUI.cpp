@@ -1,6 +1,7 @@
 #include "render/draw/fanDrawUI.hpp"
 
 #include "core/fanDebug.hpp"
+#include "core/fanAssert.hpp"
 #include "render/fanVertex.hpp"
 #include "render/core/fanRenderPass.hpp"
 #include "render/core/fanFrameBuffer.hpp"
@@ -154,7 +155,7 @@ namespace fan
                               DescriptorImages& _descriptorTextures,
                               VkPipelineLayout _pipelineLayout )
     {
-        assert( _textureIndex < _descriptorTextures.mDescriptorSets.size() );
+       fanAssert( _textureIndex < _descriptorTextures.mDescriptorSets.size() );
 
         std::vector<VkDescriptorSet> descriptors = {
                 _descriptorTextures.mDescriptorSets[_textureIndex], _descriptorSampler.mDescriptorSet

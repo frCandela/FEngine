@@ -1,8 +1,9 @@
 #include "fanTextureManager.hpp"
 
+#include "core/fanAssert.hpp"
 #include "render/fanRenderResourcePtr.hpp"
 #include "render/fanRenderGlobal.hpp"
-#include "fanTexture.hpp"
+#include "render/resources/fanTexture.hpp"
 #include "render/core/fanDevice.hpp"
 
 namespace fan
@@ -64,7 +65,7 @@ namespace fan
     //========================================================================================================
     void TextureManager::Add( Texture* _texture, const std::string& _name )
     {
-        assert( _texture != nullptr );
+       fanAssert( _texture != nullptr );
         _texture->mIndex = (int)mTextures.size();
         _texture->mPath = _name;
         mTextures.push_back( _texture );
@@ -104,7 +105,7 @@ namespace fan
     //========================================================================================================
     void TextureManager::ResolvePtr( ResourcePtr<Texture >& _resourcePtr )
     {
-        assert( ! _resourcePtr.IsValid() );
+       fanAssert( ! _resourcePtr.IsValid() );
 
         TexturePtr& texturePtr = static_cast< TexturePtr& >( _resourcePtr );
         Texture    * texture    = GetOrLoad( texturePtr.GetPath() );

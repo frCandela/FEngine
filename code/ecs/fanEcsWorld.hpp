@@ -1,7 +1,6 @@
 #pragma once
 
 #include <unordered_map>
-#include <cassert>
 #include "core/fanHash.hpp"
 #include "ecs/fanEcsEntity.hpp"
 #include "ecs/fanEcsComponent.hpp"

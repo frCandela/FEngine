@@ -1,25 +1,24 @@
+#pragma once
+
 #include "core/fanSystem.hpp"
-#include "core/fanDebug.hpp"
 
 namespace fan
 {
-    static bool gFanAssertBreakEnabled = true;
+    struct AssertUtils
+    {
+        static bool sFanAssertBreakEnabled;
+        static void LogAssertMessage( const char* _message );
+    };
 
-    #define fanAssertMsg( _expression, _msg )                               \
-        do                                                                  \
-        {                                                                   \
-            if( ! _expression )                                             \
-            {                                                               \
-                if( gFanAssertBreakEnabled ){ FAN_DEBUG_BREAK }             \
-                                                                            \
-                Debug::Error() << "Assert:"                                 \
-                    << _msg                                                 \
-                    << " func:" << __func__                                 \
-                    << " line:" << __LINE__                                 \
-                    << " file:" << __FILE__                                 \
-                    << Debug::Endl();                                       \
-            }                                                               \
-        }                                                                   \
+    #define fanAssertMsg( _expression, _msg )                                   \
+        do                                                                      \
+        {                                                                       \
+            if( ! (_expression) )                                               \
+            {                                                                   \
+                if( AssertUtils::sFanAssertBreakEnabled ){ FAN_DEBUG_BREAK }    \
+                AssertUtils::LogAssertMessage( _msg );                          \
+            }                                                                   \
+        }                                                                       \
         while( false )
 
     #define fanAssert( _expression ) fanAssertMsg( _expression, "" )

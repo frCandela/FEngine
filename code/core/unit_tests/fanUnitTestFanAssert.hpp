@@ -4,8 +4,6 @@
 #include "core/fanAssert.hpp"
 #include "core/fanDebug.hpp"
 
-#include <cassert>
-
 namespace fan
 {
     //========================================================================================================
@@ -70,8 +68,7 @@ namespace fan
             fanAssertMsg( false , "message" );
             TEST_ASSERT( logCounter == 1 );
             TEST_ASSERT( mlastLog.message ==
-            "Assert:message func:TestAssertMessage line:70 "
-            "file:D:\\FEngine\\code\\core/unit_tests/fanUnitTestFanAssert.hpp" )
+            "Assert:message func:LogAssertMessage line:13 file:..\\code\\core\\fanAssert.cpp" )
         }
     };
 }

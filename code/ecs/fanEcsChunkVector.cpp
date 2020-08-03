@@ -1,4 +1,5 @@
 #include "ecs/fanEcsChunkVector.hpp"
+#include "core/fanAssert.hpp"
 
 namespace fan
 {
@@ -20,8 +21,8 @@ namespace fan
 	{
 		const int chunkIndex = _index / m_chunkCapacity;
 		const int elementIndex = _index % m_chunkCapacity;
-		assert( chunkIndex < int( m_chunks.size() ) );
-		assert( elementIndex < m_chunks[chunkIndex].Size() );
+        fanAssert( chunkIndex < int( m_chunks.size() ) );
+        fanAssert( elementIndex < m_chunks[chunkIndex].Size() );
 
 		EcsChunk& chunk = m_chunks[chunkIndex];
 
@@ -52,8 +53,8 @@ namespace fan
 	{
 		const int chunkIndex = _index / m_chunkCapacity;
 		const int elementIndex = _index % m_chunkCapacity;
-		assert( chunkIndex < int( m_chunks.size() ) );
-		assert( elementIndex < m_chunks[chunkIndex].Size() );
+        fanAssert( chunkIndex < int( m_chunks.size() ) );
+        fanAssert( elementIndex < m_chunks[chunkIndex].Size() );
 
 		return m_chunks[chunkIndex].At( elementIndex );
 	}
@@ -111,7 +112,7 @@ namespace fan
 			m_chunks.pop_back();
 		}
 		m_chunks[0].Clear();
-		assert( m_chunks.size() == 1 );
-		assert( m_chunks[0].Empty() );
+        fanAssert( m_chunks.size() == 1 );
+        fanAssert( m_chunks[0].Empty() );
 	}
 }

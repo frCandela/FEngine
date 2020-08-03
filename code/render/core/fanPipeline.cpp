@@ -1,6 +1,7 @@
 #include "render/core/fanPipeline.hpp"
 
 #include "core/fanDebug.hpp"
+#include "core/fanAssert.hpp"
 #include "render/core/fanDevice.hpp"
 
 namespace fan
@@ -109,12 +110,12 @@ namespace fan
                            VkRenderPass _renderPass,
                            const bool _createCache )
     {
-        assert( mPipelineLayout == VK_NULL_HANDLE );
-        assert( mPipeline == VK_NULL_HANDLE );
+       fanAssert( mPipelineLayout == VK_NULL_HANDLE );
+       fanAssert( mPipeline == VK_NULL_HANDLE );
 
         if( _createCache )
         {
-            assert( mPipelineCache == VK_NULL_HANDLE );
+           fanAssert( mPipelineCache == VK_NULL_HANDLE );
             VkPipelineCacheCreateInfo pipelineCacheCreateInfo = {};
             pipelineCacheCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
             vkCreatePipelineCache( _device.mDevice, &pipelineCacheCreateInfo, nullptr, &mPipelineCache );
@@ -132,8 +133,8 @@ namespace fan
         scissor.offset = { 0, 0 };
         scissor.extent = _extent;
 
-        assert( _pipelineConfig.bindingDescription.size() > 0 );
-        assert( _pipelineConfig.attributeDescriptions.size() > 0 );
+       fanAssert( _pipelineConfig.bindingDescription.size() > 0 );
+       fanAssert( _pipelineConfig.attributeDescriptions.size() > 0 );
 
         VkPipelineVertexInputStateCreateInfo vertexInputStateCreateInfo = {};
         vertexInputStateCreateInfo.sType                           = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
