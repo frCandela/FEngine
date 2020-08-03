@@ -9,19 +9,13 @@ namespace fan
 {
     //========================================================================================================
     //========================================================================================================
-    struct UnitTestsUtils {
-        static bool sBreakWhenUnitTestFails;
-    };
-
-    //========================================================================================================
-    //========================================================================================================
-    #define TEST_ASSERT( _condition )                      \
-    if( ! (_condition) ) {                             \
-        if( UnitTestsUtils::sBreakWhenUnitTestFails )  \
-        {                                              \
-            FAN_DEBUG_BREAK                            \
-        }                                              \
-        throw std::exception("test failed");           \
+    #define TEST_ASSERT( _condition )        \
+    if( ! (_condition) ) {                   \
+        if( gFanAssertBreakEnabled )         \
+        {                                    \
+            FAN_DEBUG_BREAK                  \
+        }                                    \
+        throw std::exception("test failed"); \
     }
 
     //========================================================================================================

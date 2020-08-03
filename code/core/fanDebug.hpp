@@ -23,7 +23,7 @@ namespace fan
 			Severity	severity;
 			Type		type;
 			std::string message;
-			double time;
+			double      time;
 		};
 		Signal<LogItem> onNewLog;
 

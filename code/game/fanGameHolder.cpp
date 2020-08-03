@@ -148,7 +148,7 @@ namespace fan
 				if( loopDelayMilliseconds > 100 )
 				{
 					time.lastLogicTime = currentTime - time.logicDelta;
-					Debug::Warning() << "reset logic timer " << Debug::Endl();
+					//Debug::Warning() << "reset logic timer " << Debug::Endl();
 				}
 			}
 

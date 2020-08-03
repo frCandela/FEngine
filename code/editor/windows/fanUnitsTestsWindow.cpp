@@ -2,6 +2,7 @@
 
 #include "core/fanDebug.hpp"
 #include "core/time/fanProfiler.hpp"
+#include "core/unit_tests/fanUnitTestFanAssert.hpp"
 #include "render/unit_tests/fanUnitTestMeshManager.hpp"
 #include "render/unit_tests/fanUnitTestMesh2DManager.hpp"
 #include "render/unit_tests/fanUnitTestTextureManager.hpp"
@@ -21,6 +22,7 @@ namespace fan
                 { "Mesh2D manager",     &UnitTestMesh2DManager::RunTests,   mMesh2DManagerResult },
                 { "Texture manager",    &UnitTestTextureManager::RunTests,  mTextureManagerResult },
                 { "Prefab manager",     &UnitTestPrefabManager::RunTests,   mPrefabManagerResult },
+                { "fanAssert",          &UnitTestFanAssert::RunTests,       mFanAssertResult },
         };
     }
 
@@ -43,7 +45,7 @@ namespace fan
             for( const TestArgument& testArgument : tests ){ ClearTest( testArgument ); }
         }
         ImGui::SameLine();
-        ImGui::Checkbox("enable break", &UnitTestsUtils::sBreakWhenUnitTestFails );
+        ImGui::Checkbox("enable break", &gFanAssertBreakEnabled );
         ImGui::Spacing();
         for( const TestArgument& testArgument : tests ){ DrawUnitTest( testArgument ); }
     }

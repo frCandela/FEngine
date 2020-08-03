@@ -35,5 +35,6 @@ namespace fan
         UnitTestResult mMesh2DManagerResult;
         UnitTestResult mTextureManagerResult;
         UnitTestResult mPrefabManagerResult;
+        UnitTestResult mFanAssertResult;
     };
 }
