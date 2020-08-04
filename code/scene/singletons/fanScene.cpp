@@ -420,9 +420,12 @@ namespace fan
 				const Json& jComponent_i = jComponents[childIndex];				
 				unsigned staticIndex = 0;
 				Serializable::LoadUInt( jComponent_i, "component_type", staticIndex );
-				const EcsComponentInfo& info		= world.GetComponentInfo( staticIndex );
-				EcsComponent& component			    = world.AddComponent( entity, staticIndex );
-				info.load( component, jComponent_i );
+                const EcsComponentInfo* info		= world.SafeGetComponentInfo( staticIndex );
+                if( info != nullptr )
+                {
+                    EcsComponent& component = world.AddComponent( entity, staticIndex );
+                    info->load( component, jComponent_i );
+                }
 			}
 		}
 

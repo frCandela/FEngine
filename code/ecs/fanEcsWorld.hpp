@@ -87,7 +87,8 @@ namespace fan
 		EcsComponent&						GetComponent		( const EcsEntity _entity, const uint32_t _type );
 		EcsComponent&						IndexedGetComponent ( const EcsEntity _entity, const int _componentIndex );
 		const EcsComponentInfo&				IndexedGetComponentInfo( const int _componentIndex ) const;
-		const EcsComponentInfo&				GetComponentInfo( const uint32_t _type ) const	{ return  m_componentsInfo.at( GetIndex(_type) ); }
+		const EcsComponentInfo&				GetComponentInfo( const uint32_t _type ) const;
+        const EcsComponentInfo*			    SafeGetComponentInfo( const uint32_t _type ) const;
 		const std::vector< EcsComponentInfo >&	GetComponentInfos() const	{ return m_componentsInfo; }
 
 		// Entities

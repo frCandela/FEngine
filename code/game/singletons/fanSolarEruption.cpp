@@ -72,7 +72,7 @@ namespace fan
 			|| eruption.particleEmitter == nullptr
 			|| eruption.sunlightLight == nullptr )
 		{
-			Debug::Error() << "SolarEruption : missing component references." << Debug::Endl;
+			Debug::Error() << "SolarEruption : missing component references." << Debug::Endl();
 			eruption.enabled = false;
 		}
 
