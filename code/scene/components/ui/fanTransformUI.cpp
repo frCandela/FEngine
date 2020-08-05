@@ -23,8 +23,8 @@ namespace fan
 	{
 		TransformUI& transform = static_cast<TransformUI&>( _component );
 
-		transform.scale = glm::vec2(1.f, 1.f);
-		transform.position = glm::vec2( 0, 0 );
+		transform.mSize     = glm::ivec2( 100, 100);
+		transform.mPosition = glm::ivec2( 0, 0 );
 	}
 
 	//================================================================================================================================
@@ -35,13 +35,13 @@ namespace fan
 
 		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() );
 		{
-			if( ImGui::Button( "##TransUIPos" ) ){	transform.position = glm::vec2( 0, 0 ); } 
+			if( ImGui::Button( "##TransUIPos" ) ){	transform.mPosition = glm::vec2( 0, 0 ); }
 			ImGui::SameLine();
-			ImGui::DragFloat2( "position", &transform.position.x, 1, 0 );
+			ImGui::DragInt2( "position", &transform.mPosition.x, 1, 0 );
 
-			if( ImGui::Button( "##resetUIscale" ) ) { transform.scale = glm::vec2( 1.f, 1.f ); }
+			if( ImGui::Button( "##resetUIsize" ) ) { transform.mSize = glm::ivec2( 100, 100 ); }
 			ImGui::SameLine();
-			ImGui::DragFloat2( "scale##scaleUI", &transform.scale.x, 0.1f );
+			ImGui::DragInt2( "size##sizeUI", &transform.mSize.x, 0.1f );
 		}
 		ImGui::PopItemWidth();
 	}
@@ -52,8 +52,8 @@ namespace fan
 	{
 		const TransformUI& transform = static_cast<const TransformUI&>( _component );
 
-		Serializable::SaveIVec2( _json, "position", transform.position );
-		Serializable::SaveVec2( _json, "scale", transform.scale );
+		Serializable::SaveIVec2( _json, "position", transform.mPosition );
+		Serializable::SaveIVec2( _json, "size", transform.mSize );
 	}
 
 	//================================================================================================================================
@@ -61,7 +61,7 @@ namespace fan
 	void TransformUI::Load( EcsComponent& _component, const Json& _json )
 	{
 		TransformUI& transform = static_cast<TransformUI&>( _component );
-		Serializable::LoadVec2( _json, "position", transform.position );
-		Serializable::LoadVec2( _json, "scale", transform.scale );
+		Serializable::LoadIVec2( _json, "position", transform.mPosition );
+		Serializable::LoadIVec2( _json,"size", transform.mSize );
 	}
 }

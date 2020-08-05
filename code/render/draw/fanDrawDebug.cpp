@@ -136,7 +136,7 @@ namespace fan
 			if( vkBeginCommandBuffer( commandBuffer, &commandBufferBeginInfo ) == VK_SUCCESS )
 			{
 				VkDeviceSize offsets[] = { 0 };
-				if( mNumLines > 0 )
+				if( mNumLines > 0 && mVertexBuffersLines[_index].mBuffer != VK_NULL_HANDLE )
 				{
 					mPipelineLines.Bind( commandBuffer, _extent );
 					BindDescriptorsLines( commandBuffer, _index );
@@ -144,7 +144,7 @@ namespace fan
 					vkCmdBindVertexBuffers( commandBuffer, 0, 1, vertexBuffers, offsets );
 					vkCmdDraw( commandBuffer, static_cast<uint32_t>( mNumLines ), 1, 0, 0 );
 				}
-				if( mNumLinesNDT > 0 )
+				if( mNumLinesNDT > 0 && mVertexBuffersLinesNDT[_index].mBuffer != VK_NULL_HANDLE )
 				{
 					mPipelineLinesNDT.Bind( commandBuffer, _extent );
 					BindDescriptorsLinesNDT( commandBuffer, _index );
@@ -152,7 +152,7 @@ namespace fan
 					vkCmdBindVertexBuffers( commandBuffer, 0, 1, vertexBuffers, offsets );
 					vkCmdDraw( commandBuffer, static_cast<uint32_t>( mNumLinesNDT ), 1, 0, 0 );
 				}
-				if( mNumTriangles > 0 )
+				if( mNumTriangles > 0 && mVertexBuffersTriangles[_index].mBuffer != VK_NULL_HANDLE )
 				{
 					mPipelineTriangles.Bind( commandBuffer, _extent );
 					BindDescriptorsTriangles( commandBuffer, _index );

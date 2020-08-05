@@ -12,10 +12,10 @@
 
 namespace fan
 {
-	//==============================================================================================================================================================
+	//========================================================================================================
 	// Update the render world rendered meshes
-	//==============================================================================================================================================================
-	struct S_UpdateRenderWorldModels : EcsSystem
+	//========================================================================================================
+	struct SUpdateRenderWorldModels : EcsSystem
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world )
 		{
@@ -34,7 +34,8 @@ namespace fan
 			auto transformIt = _view.begin<Transform>();
 			auto materialIt = _view.begin<Material>();
 			// get all mesh and adds them to the render world
-			for( ; meshRendererIt != _view.end<MeshRenderer>(); ++meshRendererIt, ++transformIt, ++materialIt )
+            for( ; meshRendererIt != _view.end<MeshRenderer>();
+                   ++meshRendererIt, ++transformIt, ++materialIt )
 			{
 				MeshRenderer& meshRenderer = *meshRendererIt;
 				Transform& transform = *transformIt;
@@ -57,10 +58,10 @@ namespace fan
 		}
 	};
 
-	//==============================================================================================================================================================
-	// Update the render world rendered ui meshes
-	//==============================================================================================================================================================
-	struct 	S_UpdateRenderWorldUI : EcsSystem
+	//========================================================================================================
+    // Get all ui mesh and adds them to the render world
+	//========================================================================================================
+	struct 	SUpdateRenderWorldUI : EcsSystem
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world )
 		{
@@ -75,7 +76,7 @@ namespace fan
 
 			auto rendererIt = _view.begin<UIRenderer>();
 			auto transformIt = _view.begin<TransformUI>();
-			// get all mesh and adds them to the render world
+
 			for( ; rendererIt != _view.end<UIRenderer>(); ++rendererIt, ++transformIt )
 			{
 				UIRenderer& renderer = *rendererIt;
@@ -83,25 +84,23 @@ namespace fan
 
 				if( renderer.GetTexture() == nullptr ) { continue; }
 
-				const glm::vec2 textureSize ( renderer.GetTexture()->mExtent.width, renderer.GetTexture()->mExtent.height );
-				const glm::vec2 imageRatio = textureSize / renderWorld.targetSize;
-				const glm::vec2 positionRatio = 2.f * transform.position / renderWorld.targetSize;
+                const glm::vec2 size = glm::vec2( transform.mSize.x, transform.mSize.y );
+                const glm::vec2 pos = glm::vec2( transform.mPosition.x, transform.mPosition.y );
 
 				RenderDataUIMesh data;
 				data.mesh = renderer.mUiMesh;
-				data.scale = transform.scale * imageRatio;
-				data.position = positionRatio - glm::vec2( 1, 1 );
+                data.position = pos / renderWorld.targetSize * 2.f - glm::vec2( 1.f, 1.f );
+                data.scale = size / renderWorld.targetSize;
 				data.color = renderer.color.ToGLM();
 				data.textureIndex = renderer.GetTexture() != nullptr ? renderer.GetTexture()->mIndex : 0;
-
 				renderWorld.uiDrawData.push_back( data );
 			}
 		}
 	};
 
-	//==============================================================================================================================================================
+	//========================================================================================================
 	// Update the render world point lights
-	//==============================================================================================================================================================
+	//========================================================================================================
 	struct S_UpdateRenderWorldPointLights : EcsSystem
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world )
@@ -136,9 +135,9 @@ namespace fan
 		}
 	};
 
-	//==============================================================================================================================================================
+	//========================================================================================================
 	// Update the render world directional lights
-	//==============================================================================================================================================================
+	//========================================================================================================
 	struct S_UpdateRenderWorldDirectionalLights : EcsSystem
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world )

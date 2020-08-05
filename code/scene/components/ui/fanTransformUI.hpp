@@ -8,20 +8,19 @@ WARNINGS_POP()
 
 namespace fan
 {
-	//==============================================================================================================================================================
-	//==============================================================================================================================================================
+	//========================================================================================================
+	// 2D position in pixels
+	//========================================================================================================
 	struct TransformUI : public EcsComponent
 	{
 		ECS_COMPONENT( TransformUI )
-	public:
 		static void SetInfo( EcsComponentInfo& _info );
 		static void Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component );
 		static void OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component );
 		static void Save( const EcsComponent& _component, Json& _json );
 		static void Load( EcsComponent& _component, const Json& _json );
 
-		glm::vec2 position;
-		glm::vec2 scale;
+		glm::ivec2 mPosition;
+		glm::ivec2 mSize;
 	};
-	static constexpr size_t sizeof_transformUI = sizeof( TransformUI );
 }

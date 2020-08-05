@@ -7,7 +7,6 @@
 #include "core/input/fanInput.hpp"
 #include "network/singletons/fanTime.hpp"
 #include "render/fanRenderer.hpp"
-#include "network/singletons/fanTime.hpp"
 #include "editor/windows/fanPreferencesWindow.hpp"	
 #include "editor/windows/fanSingletonsWindow.hpp"
 #include "editor/windows/fanInspectorWindow.hpp"	
@@ -18,7 +17,6 @@
 #include "editor/windows/fanSceneWindow.hpp"	
 #include "editor/windows/fanGameViewWindow.hpp"
 #include "editor/windows/fanEcsWindow.hpp"
-#include "editor/windows/fanUnitsTestsWindow.hpp"
 #include "editor/singletons/fanEditorSelection.hpp"
 #include "editor/singletons/fanEditorCopyPaste.hpp"
 #include "editor/singletons/fanEditorGizmos.hpp"
@@ -26,22 +24,21 @@
 #include "editor/singletons/fanEditorCamera.hpp"
 #include "editor/singletons/fanEditorGrid.hpp"
 #include "scene/singletons/fanRenderWorld.hpp"
+#include "scene/singletons/fanInputMouse.hpp"
 #include "scene/components/fanPointLight.hpp"
 #include "scene/components/fanCamera.hpp"
 #include "scene/systems/fanUpdateTransforms.hpp"
 #include "scene/systems/fanDrawDebug.hpp"
 #include "scene/systems/fanUpdateRenderWorld.hpp"
 #include "scene/singletons/fanScene.hpp"
-#include "scene/singletons/fanScenePointers.hpp"
 #include "scene/fanSceneTags.hpp"
-#include "scene/fanPrefab.hpp"
 #include "game/singletons/fanGameCamera.hpp"
 #include "game/singletons/fanGame.hpp"
 
 namespace fan
 {
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	EditorHolder::EditorHolder( const LaunchSettings _settings, std::vector<EcsWorld*> _gameWorlds ) :
 		m_worlds( _gameWorlds )
 		, m_applicationShouldExit( false )
@@ -118,17 +115,18 @@ namespace fan
 		mMainMenuBar->onExit.Connect( &EditorHolder::Exit, this );
 
 		// Events linking
-		Input::Get().Manager().FindEvent( "reload_shaders" )->Connect( &Renderer::ReloadShaders, m_renderer );
-		Input::Get().Manager().FindEvent( "play_pause" )->Connect( &EditorHolder::OnCurrentGameSwitchPlayStop, this );
-		Input::Get().Manager().FindEvent( "copy" )->Connect( &EditorHolder::OnCurrentGameCopy, this );
-		Input::Get().Manager().FindEvent( "paste" )->Connect( &EditorHolder::OnCurrentGamePaste, this );
-		Input::Get().Manager().FindEvent( "show_ui" )->Connect( &EditorHolder::OnToogleShowUI, this );
-		Input::Get().Manager().FindEvent( "toogle_camera" )->Connect( &EditorHolder::OnCurrentGameToogleCamera, this );
-		Input::Get().Manager().FindEvent( "open_scene" )->Connect( &EditorHolder::OnCurrentGameOpen, this );
-		Input::Get().Manager().FindEvent( "save_scene" )->Connect( &EditorHolder::OnCurrentGameSave, this );
-		Input::Get().Manager().FindEvent( "reload_scene" )->Connect( &EditorHolder::OnCurrentGameReload, this );
-		Input::Get().Manager().FindEvent( "toogle_world" )->Connect( &EditorHolder::OnCycleCurrentGame, this );
-		Input::Get().Manager().FindEvent( "reload_icons" )->Connect( &Renderer::ReloadIcons, m_renderer );		
+        InputManager& manager = Input::Get().Manager();
+        manager.FindEvent( "reload_shaders" )->Connect( &Renderer::ReloadShaders, m_renderer );
+		manager.FindEvent( "play_pause" )->Connect( &EditorHolder::OnCurrentGameSwitchPlayStop, this );
+		manager.FindEvent( "copy" )->Connect( &EditorHolder::OnCurrentGameCopy, this );
+		manager.FindEvent( "paste" )->Connect( &EditorHolder::OnCurrentGamePaste, this );
+		manager.FindEvent( "show_ui" )->Connect( &EditorHolder::OnToogleShowUI, this );
+		manager.FindEvent( "toogle_camera" )->Connect( &EditorHolder::OnCurrentGameToogleCamera, this );
+		manager.FindEvent( "open_scene" )->Connect( &EditorHolder::OnCurrentGameOpen, this );
+		manager.FindEvent( "save_scene" )->Connect( &EditorHolder::OnCurrentGameSave, this );
+		manager.FindEvent( "reload_scene" )->Connect( &EditorHolder::OnCurrentGameReload, this );
+		manager.FindEvent( "toogle_world" )->Connect( &EditorHolder::OnCycleCurrentGame, this );
+		manager.FindEvent( "reload_icons" )->Connect( &Renderer::ReloadIcons, m_renderer );
 
 		mGameViewWindow->onSizeChanged.Connect( &Renderer::ResizeGame, m_renderer );
 		mGameViewWindow->onPlay.Connect( &EditorHolder::OnCurrentGameStart, this );
@@ -186,8 +184,8 @@ namespace fan
 		}
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	EditorHolder::~EditorHolder()
 	{
 		// Deletes ui
@@ -212,15 +210,15 @@ namespace fan
 		m_window.Destroy();
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void EditorHolder::Exit()
 	{
 		m_applicationShouldExit = true;
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void EditorHolder::Run()
 	{
 		// initializes timers
@@ -242,14 +240,15 @@ namespace fan
 		Debug::Log( "Exit application" );
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void EditorHolder::Step()
 	{
 		const double currentTime = Time::ElapsedSinceStartup();
 		const bool renderIsThisFrame = currentTime > m_lastRenderTime + Time::s_renderDelta;
 		const Time& currentWorldTime = GetCurrentWorld().GetSingleton<Time>();
-		const bool logicIsThisFrame = currentTime > currentWorldTime.lastLogicTime + currentWorldTime.logicDelta;
+        const bool logicIsThisFrame = currentTime >
+                                      currentWorldTime.lastLogicTime + currentWorldTime.logicDelta;
 
 		// Update all worlds
 		for( int worldIndex = 0; worldIndex < (int)m_worlds.size(); worldIndex++ )
@@ -268,27 +267,40 @@ namespace fan
 					// Update input
 					ImGui::GetIO().DeltaTime = time.logicDelta;
 					Input::Get().NewFrame();
-					Mouse::Get().Update( mGameViewWindow->GetPosition(), mGameViewWindow->GetSize(), mGameViewWindow->IsHovered() );
+					const btVector2 gamePosition = mGameViewWindow->GetPosition();
+                    const btVector2 gameSize = mGameViewWindow->GetSize();
+
+                    Mouse::Get().Update( gamePosition, gameSize, mGameViewWindow->IsHovered() );
 					Input::Get().Manager().PullEvents();
+
+					if( world.SafeGetSingletonInfo(InputMouse::s_type) != nullptr )
+                    {
+                        InputMouse& inputMouse = world.GetSingleton<InputMouse>();
+                        InputMouse::Update( inputMouse, { gamePosition[0], gamePosition[1] } );
+                    }
 				}
 
 				// checking the loop timing is not late
-				const double loopDelayMilliseconds = 1000. * ( currentTime - ( time.lastLogicTime + time.logicDelta ) );
-				if( loopDelayMilliseconds > 30 )
-				{
-					//Debug::Warning() << "logic is late of " << loopDelayMilliseconds << "ms" << Debug::Endl();
-					// if we are really really late, resets the timer
-					if( loopDelayMilliseconds > 100 )
-					{
-						time.lastLogicTime = currentTime - time.logicDelta;
-						//Debug::Warning() << "reset logic timer " << Debug::Endl();
-					}
-				}
+                const double loopDelayMilliseconds = 1000. *
+                                                     ( currentTime -
+                                                     ( time.lastLogicTime + time.logicDelta ) );
+                if( loopDelayMilliseconds > 30 )
+                {
+                    //Debug::Warning() << "logic is late of " << loopDelayMilliseconds << "ms" << Debug::Endl();
+                    // if we are really really late, resets the timer
+                    if( loopDelayMilliseconds > 100 )
+                    {
+                        time.lastLogicTime = currentTime - time.logicDelta;
+                        //Debug::Warning() << "reset logic timer " << Debug::Endl();
+                    }
+                }
 
-				// increase the logic time of a timeScaleDelta with n timeScaleIncrements
-				if( std::abs( time.timeScaleDelta ) >= time.timeScaleIncrement )
-				{
-					const float increment = time.timeScaleDelta > 0.f ? time.timeScaleIncrement : -time.timeScaleIncrement;
+                // increase the logic time of a timeScaleDelta with n timeScaleIncrements
+                if( std::abs( time.timeScaleDelta ) >= time.timeScaleIncrement )
+                {
+                    const float increment = time.timeScaleDelta > 0.f
+                            ? time.timeScaleIncrement
+                            : -time.timeScaleIncrement;
 					time.lastLogicTime -= increment;
 					time.timeScaleDelta -= increment;
 				}
@@ -301,7 +313,7 @@ namespace fan
 				if( m_showUI )
 				{					
 					world.Run<S_MoveFollowTransforms>();
-					world.Run<S_MoveFollowTransformsUI>();
+					world.Run<SMoveFollowTransformsUI>();
 				}
 
 				if( isCurrentWorld )
@@ -380,8 +392,8 @@ namespace fan
 		}
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void EditorHolder::GameStart( EcsWorld& _world )
 	{
 		Game& game = _world.GetSingleton<Game>();
@@ -407,8 +419,8 @@ namespace fan
 		}
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void  EditorHolder::GameStop( EcsWorld& _world )
 	{
 		Game& game = _world.GetSingleton<Game>();
@@ -440,7 +452,8 @@ namespace fan
 			// restore selection
 			if( prevSelectionHandle != 0 && scene.nodes.find( prevSelectionHandle ) != scene.nodes.end() )
 			{
-				fan::SceneNode& node = _world.GetComponent<fan::SceneNode>( _world.GetEntity( prevSelectionHandle ) );
+				fan::SceneNode& node = _world.GetComponent<fan::SceneNode>
+				                                        ( _world.GetEntity( prevSelectionHandle ) );
 
 				_world.GetSingleton<EditorSelection>().SetSelectedSceneNode( &node );
 			}
@@ -459,8 +472,8 @@ namespace fan
 		}
 	}	
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void  EditorHolder::GameResume( EcsWorld& _world )
 	{
 		Game& game = _world.GetSingleton<Game>();
@@ -471,8 +484,8 @@ namespace fan
 		}
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void  EditorHolder::GameStep( EcsWorld& _world, float _delta )
 	{
         SCOPED_PROFILE(game_step );
@@ -485,9 +498,9 @@ namespace fan
  		}		
 	}
 
-	//================================================================================================================================
+	//========================================================================================================
 	// Todo save camera position depending on the scene
-	//================================================================================================================================
+	//========================================================================================================
 	void EditorHolder::OnSceneLoad( Scene& _scene )
 	{
 		EcsWorld& world = *_scene.world;		
@@ -499,9 +512,9 @@ namespace fan
 		}
 	}
 
-	//================================================================================================================================
+	//========================================================================================================
 	// Updates the render world singleton component
-	//================================================================================================================================
+	//========================================================================================================
 	void EditorHolder::UpdateRenderWorld( Renderer& _renderer, EcsWorld& _world, const glm::vec2 _size )
 	{
         SCOPED_PROFILE( update_RW );
@@ -512,8 +525,8 @@ namespace fan
 		// update render data
         {
             SCOPED_PROFILE( update_render_data );
-            _world.Run<S_UpdateRenderWorldModels>();
-            _world.Run<S_UpdateRenderWorldUI>();
+            _world.Run<SUpdateRenderWorldModels>();
+            _world.Run<SUpdateRenderWorldUI>();
             _world.Run<S_UpdateRenderWorldPointLights>();
             _world.Run<S_UpdateRenderWorldDirectionalLights>();
         }
@@ -534,7 +547,9 @@ namespace fan
             _renderer.SetUIDrawData(renderWorld.uiDrawData);
             _renderer.SetPointLights(renderWorld.pointLights);
             _renderer.SetDirectionalLights(renderWorld.directionalLights);
-            _renderer.SetDebugDrawData(renderDebug.debugLines, renderDebug.debugLinesNoDepthTest, renderDebug.debugTriangles);
+            _renderer.SetDebugDrawData( renderDebug.debugLines,
+                                        renderDebug.debugLinesNoDepthTest,
+                                        renderDebug.debugTriangles );
         }
 
 		// Camera
@@ -553,15 +568,15 @@ namespace fan
         }
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void EditorHolder::OnCycleCurrentGame()
 	{
 		OnCurrentGameSelect( ( m_currentWorld + 1 ) % ( m_worlds.size() ) );
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void EditorHolder::OnCurrentGameSwitchPlayStop()
 	{
 		EcsWorld& world = GetCurrentWorld();
@@ -576,8 +591,8 @@ namespace fan
 		}
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void EditorHolder::UseEditorCamera( EcsWorld& _world )
 	{
 		Scene& scene = _world.GetSingleton<Scene>();
@@ -585,8 +600,8 @@ namespace fan
  		scene.SetMainCamera( editorCamera.cameraHandle );
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void EditorHolder::UseGameCamera( EcsWorld& _world )
 	{
 		Scene& scene = _world.GetSingleton<Scene>();
@@ -594,17 +609,17 @@ namespace fan
 		scene.SetMainCamera( gameCamera.cameraHandle );
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void EditorHolder::OnCurrentGameOpen() { mMainMenuBar->Open( GetCurrentWorld() ); }
 	void EditorHolder::OnCurrentGameReload() { mMainMenuBar->Reload( GetCurrentWorld() ); }
 	void EditorHolder::OnCurrentGameSave() { mMainMenuBar->Save( GetCurrentWorld() ); }
 	void EditorHolder::OnCurrentGameCopy() { GetCurrentWorld().GetSingleton<EditorCopyPaste>().OnCopy(); }
 	void EditorHolder::OnCurrentGamePaste() { GetCurrentWorld().GetSingleton<EditorCopyPaste>().OnPaste(); }
 
-	//================================================================================================================================
+	//========================================================================================================
 	// sets which ecs world will be displayed in the editor
-	//================================================================================================================================
+	//========================================================================================================
 	void EditorHolder::OnCurrentGameSelect( const int _index )
 	{
 		assert( _index < (int)m_worlds.size() );
@@ -622,9 +637,9 @@ namespace fan
 		mGameViewWindow->SetCurrentGameSelected( m_currentWorld );
 	}
 
-	//================================================================================================================================
+	//========================================================================================================
 	// toogle the camera between editor and game
-	//================================================================================================================================
+	//========================================================================================================
 	void EditorHolder::OnCurrentGameToogleCamera()
 	{
 		EcsWorld& world = GetCurrentWorld();
@@ -649,9 +664,9 @@ namespace fan
 		}
 	}
 
-	//================================================================================================================================
+	//========================================================================================================
 	// callback of the game view step button
-	//================================================================================================================================
+	//========================================================================================================
 	void EditorHolder::OnCurrentGameStep( )
 	{
 		EcsWorld& world = GetCurrentWorld();

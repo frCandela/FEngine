@@ -72,7 +72,7 @@ namespace fan
 	//==============================================================================================================================================================
 	// moves the 2D FollowTransforms after their targets
 	//==============================================================================================================================================================
-	struct S_MoveFollowTransformsUI : EcsSystem
+	struct SMoveFollowTransformsUI : EcsSystem
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world )
 		{
@@ -91,7 +91,7 @@ namespace fan
 				if( followTransform.locked && followTransform.targetTransform != nullptr )
 				{
 					TransformUI& target = *followTransform.targetTransform;
-					follow.position = target.position + followTransform.offset;
+					follow.mPosition = target.mPosition + followTransform.offset;
 				}
 			}
 		}

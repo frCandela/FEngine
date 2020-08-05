@@ -200,7 +200,7 @@ namespace fan
 			physicsWorld.dynamicsWorld->stepSimulation( _delta, 10, Time::s_physicsDelta );
 			world.Run<S_SynchronizeTransformFromMotionState>();
 			world.Run<S_MoveFollowTransforms>();
-			world.Run<S_MoveFollowTransformsUI>();			
+			world.Run<SMoveFollowTransformsUI>();
 
 			world.Run<S_FireWeapons>(			_delta );
 			world.Run<S_GenerateLightMesh>(		_delta );

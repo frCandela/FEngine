@@ -13,10 +13,10 @@ namespace fan
 	class Color;
 	struct btVector2;
 
-	//================================================================================================================================
+	//========================================================================================================
 	// holds global editor value that are saved/restored
 	// @todo put this in a singleton component in the editor ecs
-	//================================================================================================================================
+	//========================================================================================================
 	class SerializedValues : public Singleton<SerializedValues>
 	{
 	public:
@@ -45,7 +45,9 @@ namespace fan
 		bool GetString	( const char * _name, std::string&		_outString );
 
 		static void SaveWindowSizeAndPosition( const glm::ivec2 _position, const glm::ivec2 _size );
-		static void LoadWindowSizeAndPosition( const LaunchSettings& _settings, glm::ivec2& _outPosition, glm::ivec2& _outSize );
+        static void LoadWindowSizeAndPosition( const LaunchSettings& _settings,
+                                               glm::ivec2& _outPosition,
+                                               glm::ivec2& _outSize );
 
 	protected:
 		SerializedValues();

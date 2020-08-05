@@ -8,6 +8,7 @@
 #include "core/input/fanInput.hpp"
 #include "network/singletons/fanTime.hpp"
 #include "render/fanRenderer.hpp"
+#include "scene/singletons/fanInputMouse.hpp"
 #include "scene/singletons/fanRenderWorld.hpp"
 #include "scene/components/fanCamera.hpp"
 #include "scene/systems/fanUpdateTransforms.hpp"
@@ -15,14 +16,13 @@
 #include "scene/singletons/fanScene.hpp"
 #include "scene/singletons/fanRenderDebug.hpp"
 #include "scene/singletons/fanRenderResources.hpp"
-#include "scene/fanPrefab.hpp"
 #include "game/singletons/fanGameCamera.hpp"
 #include "game/singletons/fanGame.hpp"
 
 namespace fan
 {
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	GameHolder::GameHolder( const LaunchSettings _settings, EcsWorld& _world ) :
 		m_world( _world )
 		, m_applicationShouldExit( false )
@@ -64,8 +64,8 @@ namespace fan
 		}
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	GameHolder::~GameHolder()
 	{
 		// Serialize editor positions if it was not modified by a launch command
@@ -73,7 +73,8 @@ namespace fan
 		{
 			const VkExtent2D rendererSize = m_window.GetExtent();
 			const glm::ivec2 windowPosition = m_window.GetPosition();
-			SerializedValues::SaveWindowSizeAndPosition( windowPosition, { rendererSize.width, rendererSize.height } );
+            glm::ivec2 size = { rendererSize.width, rendererSize.height };
+            SerializedValues::SaveWindowSizeAndPosition( windowPosition, size );
 		}
 
 		SerializedValues::Get().SaveValuesToDisk();
@@ -83,15 +84,15 @@ namespace fan
 		m_window.Destroy();
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void GameHolder::Exit()
 	{
 		m_applicationShouldExit = true;
 	}
 	
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void GameHolder::Run()
 	{
 		// initializes timers
@@ -111,14 +112,15 @@ namespace fan
 		Debug::Log( "Exit application" );
 	}
 	
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void GameHolder::Step()
 	{
 		const double currentTime = Time::ElapsedSinceStartup();
 		const bool renderIsThisFrame = currentTime > m_lastRenderTime + Time::s_renderDelta;
 		const Time& currentWorldTime = m_world.GetSingleton<Time>();
-		const bool logicIsThisFrame = currentTime > currentWorldTime.lastLogicTime + currentWorldTime.logicDelta;
+        const bool logicIsThisFrame = currentTime >
+                                      currentWorldTime.lastLogicTime + currentWorldTime.logicDelta;
 
 		// Update all worlds
 
@@ -135,12 +137,17 @@ namespace fan
 			const glm::ivec2 position = m_window.GetPosition();
 			const VkExtent2D extent = m_window.GetExtent();
 
+            InputMouse& inputMouse = m_world.GetSingleton<InputMouse>();
+            InputMouse::Update( inputMouse, {0,0} );
 
-			Mouse::Get().Update( btVector2( (float)position.x, (float)position.y ), btVector2( (float)extent.width, (float)extent.height ), true );
-			Input::Get().Manager().PullEvents();			
+            Mouse::Get().Update( btVector2( (float)position.x, (float)position.y ),
+                                 btVector2( (float)extent.width, (float)extent.height ),
+                                 true );
+            Input::Get().Manager().PullEvents();
 
 			// checking the loop timing is not late
-			const double loopDelayMilliseconds = 1000. * ( currentTime - ( time.lastLogicTime + time.logicDelta ) );
+            const double loopDelayMilliseconds = 1000. * ( currentTime
+                                                           - ( time.lastLogicTime + time.logicDelta ) );
 			if( loopDelayMilliseconds > 30 )
 			{
 				//Debug::Warning() << "logic is late of " << loopDelayMilliseconds << "ms" << Debug::Endl();
@@ -155,8 +162,10 @@ namespace fan
 			// increase the logic time of a timeScaleDelta with n timeScaleIncrements
 			if( std::abs( time.timeScaleDelta ) >= time.timeScaleIncrement )
 			{
-				const float increment = time.timeScaleDelta > 0.f ? time.timeScaleIncrement : -time.timeScaleIncrement;
-				time.lastLogicTime -= increment;
+                const float increment = time.timeScaleDelta > 0.f
+                        ? time.timeScaleIncrement
+                        : -time.timeScaleIncrement;
+                time.lastLogicTime -= increment;
 				time.timeScaleDelta -= increment;
 			}
 
@@ -165,7 +174,7 @@ namespace fan
 			GameStep( m_world, time.logicDelta );
 
 			m_world.Run<S_MoveFollowTransforms>();
-			m_world.Run<S_MoveFollowTransformsUI>();			
+			m_world.Run<SMoveFollowTransformsUI>();
 
 			assert( logicIsThisFrame );
 
@@ -190,8 +199,10 @@ namespace fan
 			m_lastRenderTime = currentTime;
 
 			Time::RegisterFrameDrawn();	// used for stats
-			
-			UpdateRenderWorld( *m_renderer, m_world, { m_window.GetExtent().width, m_window.GetExtent().height } );
+
+            UpdateRenderWorld( *m_renderer,
+                               m_world,
+                               { m_window.GetExtent().width, m_window.GetExtent().height } );
 			m_renderer->DrawFrame();
 			Profiler::Get().End();
 			Profiler::Get().Begin();
@@ -213,8 +224,8 @@ namespace fan
 		}
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void GameHolder::GameStart( EcsWorld& _world )
 	{
 		Game& game = _world.GetSingleton<Game>();
@@ -233,8 +244,8 @@ namespace fan
 		scene.SetMainCamera( gameCamera.cameraHandle );		
 	}
 	
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void  GameHolder::GameStop( EcsWorld& _world )
 	{
 		Game& game = _world.GetSingleton<Game>();
@@ -247,8 +258,8 @@ namespace fan
 		}
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void  GameHolder::GameStep( EcsWorld& _world, float _delta )
 	{
  		Game& game = _world.GetSingleton<Game>();
@@ -260,9 +271,9 @@ namespace fan
  		}		
 	}
 
-	//================================================================================================================================
+	//========================================================================================================
 	// Updates the render world singleton component
-	//================================================================================================================================
+	//========================================================================================================
 	void GameHolder::UpdateRenderWorld( Renderer& _renderer, EcsWorld& _world, const glm::vec2 _size )
 	{
 		RenderWorld& renderWorld = _world.GetSingleton<RenderWorld>();
@@ -270,8 +281,8 @@ namespace fan
 		renderWorld.targetSize = _size;
 
 		// update render data
-		_world.Run<S_UpdateRenderWorldModels>();
-		_world.Run<S_UpdateRenderWorldUI>();
+		_world.Run<SUpdateRenderWorldModels>();
+		_world.Run<SUpdateRenderWorldUI>();
 		_world.Run<S_UpdateRenderWorldPointLights>();
 		_world.Run<S_UpdateRenderWorldDirectionalLights>();
 
@@ -289,7 +300,9 @@ namespace fan
 		_renderer.SetUIDrawData( renderWorld.uiDrawData );
 		_renderer.SetPointLights( renderWorld.pointLights );
 		_renderer.SetDirectionalLights( renderWorld.directionalLights );
-		_renderer.SetDebugDrawData( renderDebug.debugLines, renderDebug.debugLinesNoDepthTest, renderDebug.debugTriangles );
+        _renderer.SetDebugDrawData( renderDebug.debugLines,
+                                    renderDebug.debugLinesNoDepthTest,
+                                    renderDebug.debugTriangles );
 
 		// Camera
 		Scene& scene = _world.GetSingleton<Scene>();

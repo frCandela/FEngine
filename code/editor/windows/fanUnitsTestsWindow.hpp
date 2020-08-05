@@ -36,5 +36,6 @@ namespace fan
         UnitTestResult mTextureManagerResult;
         UnitTestResult mPrefabManagerResult;
         UnitTestResult mFanAssertResult;
+        UnitTestResult mButtonResult;
     };
 }

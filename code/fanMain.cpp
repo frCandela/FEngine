@@ -134,10 +134,10 @@ int main( int _argc, char* _argv[] )
 // 	args.push_back( "600" );
 // 	args.push_back( "-main_loop_sleep" );
 // 	args.push_back( "1" );
-	args.push_back( "-autoplay" );
-	args.push_back( "1" );
+//	args.push_back( "-autoplay" );
+//	args.push_back( "1" );
  	args.push_back( "-scene" );
-  	args.push_back( "content/scenes/game00.scene" );
+    args.push_back( "content/scenes/test.scene" );
 	args.push_back( "-editor_client_server" );
 	//args.push_back( "-client" );
 

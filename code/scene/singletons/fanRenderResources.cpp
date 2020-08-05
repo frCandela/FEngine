@@ -57,7 +57,7 @@ namespace fan
     Mesh2D* RenderResources::CreateMesh2DQuad()
     {
         Mesh2D* mesh2D = new Mesh2D();
-        std::vector<UIVertex> vertices = { // tmp make a 2D quad
+        std::vector<UIVertex> vertices = {
                 UIVertex( glm::vec2( +2.f, +0.f ), glm::vec2( +1.f, +0.f ) ),
                 UIVertex( glm::vec2( +0.f, +0.f ), glm::vec2( +0.f, +0.f ) ),
                 UIVertex( glm::vec2( +2.f, +2.f ), glm::vec2( +1.f, +1.f ) ),

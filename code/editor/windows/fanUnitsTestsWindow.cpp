@@ -7,6 +7,7 @@
 #include "render/unit_tests/fanUnitTestMesh2DManager.hpp"
 #include "render/unit_tests/fanUnitTestTextureManager.hpp"
 #include "scene/unit_tests/fanUnitTestPrefabManager.hpp"
+#include "scene/unit_tests/components/fanUnitTestButton.hpp"
 
 namespace fan
 {
@@ -25,6 +26,7 @@ namespace fan
 #ifndef NDEBUG
                  { "fanAssert",          &UnitTestFanAssert::RunTests,       mFanAssertResult },
 #endif
+                { "UI button",          &UnitTestButton::RunTests,          mButtonResult },
         };
     }
 

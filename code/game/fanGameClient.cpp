@@ -13,10 +13,12 @@
 #include "scene/systems/fanUpdateBounds.hpp"
 #include "scene/systems/fanUpdateTimers.hpp"
 #include "scene/systems/fanUpdateTransforms.hpp"
+#include "scene/systems/fanRaycastUI.hpp"
 #include "scene/components/fanCamera.hpp"
 #include "scene/components/fanDirectionalLight.hpp"
 #include "scene/components/fanPointLight.hpp"
 #include "scene/singletons/fanScene.hpp"
+#include "scene/singletons/fanInputMouse.hpp"
 #include "scene/singletons/fanRenderResources.hpp"
 #include "scene/singletons/fanSceneResources.hpp"
 #include "scene/singletons/fanScenePointers.hpp"
@@ -80,6 +82,7 @@ namespace fan
 		world.AddComponentType<FollowTransform>();
 		world.AddComponentType<ProgressBar>();
 		world.AddComponentType<FollowTransformUI>();
+		world.AddComponentType<Button>();
 		// game components
 		world.AddComponentType<Planet>();
 		world.AddComponentType<SpaceShip>();
@@ -109,6 +112,7 @@ namespace fan
 		world.AddSingletonType<PhysicsWorld>();
 		world.AddSingletonType<ScenePointers>();
 		world.AddSingletonType<RenderDebug>();
+		world.AddSingletonType<InputMouse>();
 		// game singleton components
 		world.AddSingletonType<SunLight>();
 		world.AddSingletonType<GameCamera>();
@@ -265,7 +269,9 @@ namespace fan
 			physicsWorld.dynamicsWorld->stepSimulation( _delta, 10, Time::s_physicsDelta );
 			world.Run<S_SynchronizeTransformFromMotionState>();
 			world.Run<S_MoveFollowTransforms>();
-			world.Run<S_MoveFollowTransformsUI>();
+			world.Run<SMoveFollowTransformsUI>();
+
+            world.Run<SRaycastButtons>();
 			
 			world.Run<S_FireWeapons>(			 _delta );
 			world.Run<S_GenerateLightMesh>(		 _delta );

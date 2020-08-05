@@ -7,8 +7,8 @@
 
 namespace fan
 {
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void FollowTransformUI::SetInfo( EcsComponentInfo& _info )
 	{
 		_info.icon = ImGui::IconType::FOLLOW_TRANSFORM_UI16;
@@ -20,8 +20,8 @@ namespace fan
 		_info.name = "follow transform ui";
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void FollowTransformUI::Init( EcsWorld& _world, EcsEntity /*_entity*/, EcsComponent& _component )
 	{
 		// clear
@@ -31,9 +31,9 @@ namespace fan
 		followTransform.locked = true;
 	}
 
-	//================================================================================================================================
+	//========================================================================================================
 	// calculates the new local transform from the follower & target transforms
-	//================================================================================================================================
+	//========================================================================================================
 	void FollowTransformUI::UpdateOffset( EcsWorld& _world, EcsEntity _entityID )
 	{
 		assert( _world.HasComponent<FollowTransformUI>( _entityID ) );
@@ -44,7 +44,7 @@ namespace fan
 		{
 			TransformUI& target = *follower.targetTransform;
 			TransformUI& follow = _world.GetComponent<TransformUI>( _entityID );
-			follower.offset = follow.position - target.position;
+			follower.offset = follow.mPosition - target.mPosition;
 		}
 		else
 		{
@@ -52,8 +52,8 @@ namespace fan
 		}
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void FollowTransformUI::OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component )
 	{
 		FollowTransformUI& followTransform = static_cast<FollowTransformUI&>( _component );
@@ -76,22 +76,20 @@ namespace fan
 		ImGui::FanShowHelpMarker( "press L to toggle" );
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void FollowTransformUI::Save( const EcsComponent& _component, Json& _json )
 	{
 		const FollowTransformUI& followTransform = static_cast<const FollowTransformUI&>( _component );
 		Serializable::SaveComponentPtr( _json, "target_transform", followTransform.targetTransform );
-		Serializable::SaveVec2( _json, "offset", ToBullet( followTransform.offset ) );
+		Serializable::SaveIVec2( _json, "offset", followTransform.offset );
 	}
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void FollowTransformUI::Load( EcsComponent& _component, const Json& _json )
 	{
 		FollowTransformUI& followTransform = static_cast<FollowTransformUI&>( _component );
 		Serializable::LoadComponentPtr( _json, "target_transform", followTransform.targetTransform );
-		btVector2 tmpVec2;
-		Serializable::LoadVec2( _json, "offset", tmpVec2 );
-		followTransform.offset = ToGLM( tmpVec2 );
+		Serializable::LoadIVec2( _json, "offset", followTransform.offset );
 	}
 }

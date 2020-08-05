@@ -100,7 +100,7 @@ namespace fan
 				// Set ui position
 				glm::vec2 screenPos = ToGLM( camera.WorldPosToScreen( cameraTransform, transform.GetPosition() ) );
 				glm::vec2 pixelPosition = renderWorld.targetSize * 0.5f * ( screenPos + glm::vec2( 1.f, 1.f ) );
-				ui.uiRootTransform->position = pixelPosition + ui.uiOffset;
+				ui.uiRootTransform->mPosition = pixelPosition + ui.uiOffset;
 			}
 		}
 	};
