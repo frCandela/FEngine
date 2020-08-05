@@ -17,8 +17,18 @@ namespace fan
         static void Init( EcsWorld& _world, EcsSingleton& _singleton );
         static void OnGui( EcsWorld& _world, EcsSingleton& _singleton );
 
-        glm::ivec2 mPosition;
+        enum Button
+        {
+            button1, button2, button3, button4, button5, button6, button7, button8, count,
+            buttonLeft = button1,
+            buttonRight = button2,
+            buttonMiddle = button3
+        };
 
-        static void Update( InputMouse& _mouse, const glm::ivec2 _sceenPos );
+        glm::ivec2 mPosition;
+        bool       mPressed[ Button::count ];
+        bool       mDown   [ Button::count];
+
+        static void Update( InputMouse& _mouse, const glm::ivec2 _screenPos );
     };
 }

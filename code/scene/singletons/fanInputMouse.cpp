@@ -5,6 +5,8 @@
 
 namespace fan
 {
+    static_assert( InputMouse::Button::count == GLFW_MOUSE_BUTTON_LAST + 1 );
+
     //========================================================================================================
     //========================================================================================================
     void InputMouse::SetInfo( EcsSingletonInfo& _info )
@@ -19,17 +21,25 @@ namespace fan
     //========================================================================================================
     void InputMouse::Init( EcsWorld& /*_world*/, EcsSingleton& _singleton )
     {
-        InputMouse& inputMouse = static_cast<InputMouse&>( _singleton );
-        (void) inputMouse;
+        InputMouse& mouse = static_cast<InputMouse&>( _singleton );
+        mouse.mPosition = {0,0};
+
+        for( int i=0 ; i < Button::count; i++ )
+        {
+            mouse.mPressed[i] = false;
+            mouse.mDown[i] = false;
+        }
     }
 
     //========================================================================================================
     //========================================================================================================
-    void InputMouse::Update(  InputMouse& _mouse, const glm::ivec2 _sceenPos )
+    void InputMouse::Update(  InputMouse& _mouse, const glm::ivec2 _screenPos )
     {
         double x, y;
         glfwGetCursorPos( Input::Get().Window(), &x, &y );
-        _mouse.mPosition = glm::ivec2( (int)x, (int)y ) - _sceenPos;
+        _mouse.mPosition = glm::ivec2( (int)x, (int)y ) - _screenPos;
+
+
     }
 
     //========================================================================================================

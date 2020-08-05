@@ -8,6 +8,7 @@
 #include "render/unit_tests/fanUnitTestTextureManager.hpp"
 #include "scene/unit_tests/fanUnitTestPrefabManager.hpp"
 #include "scene/unit_tests/components/fanUnitTestButton.hpp"
+#include "scene/unit_tests/fanUnitTestGlfwMouse.hpp"
 
 namespace fan
 {
@@ -27,6 +28,7 @@ namespace fan
                  { "fanAssert",          &UnitTestFanAssert::RunTests,       mFanAssertResult },
 #endif
                 { "UI button",          &UnitTestButton::RunTests,          mButtonResult },
+                { "Glfw mouse",         &UnitTestGlfwMouse::RunTests,       mGlfwMouseResult },
         };
     }
 

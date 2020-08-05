@@ -37,5 +37,6 @@ namespace fan
         UnitTestResult mPrefabManagerResult;
         UnitTestResult mFanAssertResult;
         UnitTestResult mButtonResult;
+        UnitTestResult mGlfwMouseResult;
     };
 }
