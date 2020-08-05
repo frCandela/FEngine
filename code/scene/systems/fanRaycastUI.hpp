@@ -1,15 +1,13 @@
 #include "ecs/fanEcsSystem.hpp"
 #include "scene/components/ui/fanButtonUI.hpp"
 #include "scene/components/ui/fanTransformUI.hpp"
-#include "scene/singletons/fanRenderWorld.hpp"
+#include "scene/singletons/fanInputMouse.hpp"
 
 namespace fan
 {
-    class EcsWorld;
-
     //========================================================================================================
     //========================================================================================================
-    struct SRaycastButtons : EcsSystem
+    struct SHoverButtons : EcsSystem
     {
         static EcsSignature GetSignature( const EcsWorld& _world )
         {
@@ -18,7 +16,7 @@ namespace fan
 
         static void Run( EcsWorld& _world, const EcsView& _view )
         {
-            RenderWorld& renderWorld = _world.GetSingleton<RenderWorld>();
+            InputMouse& mouse = _world.GetSingleton<InputMouse>();
 
             auto buttonIt = _view.begin<Button>();
             auto transformUIIt = _view.begin<TransformUI>();
@@ -27,11 +25,11 @@ namespace fan
                 Button& button = *buttonIt;
                 TransformUI& transform = *transformUIIt;
 
-                button.mIsHovered = ! button.mIsHovered;
-
-                (void)button;
-                (void)transform;
-                (void)renderWorld;
+                button.mIsHovered = mouse.mPosition.x >= transform.mPosition.x &&
+                                    mouse.mPosition.y >= transform.mPosition.y &&
+                                    mouse.mPosition.x < transform.mPosition.x + transform.mSize.x &&
+                                    mouse.mPosition.y < transform.mPosition.y + transform.mSize.y;
+                button.mPressed = button.mIsHovered && mouse.mPressed[0];
             }
         }
     };

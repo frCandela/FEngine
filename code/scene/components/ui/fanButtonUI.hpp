@@ -21,10 +21,6 @@ namespace fan
 
 		Color   mColor;
 		bool    mIsHovered;
-
-		/*ComponentPtr<TransformUI> targetUiTransform;
-		float	progress;
-		float	maxScale;*/
-
+        bool    mPressed;
 	};
 }

@@ -25,6 +25,7 @@ namespace fan
         Button& button = static_cast<Button&>( _component );
         button.mColor = Color::White;
         button.mIsHovered = false;
+        button.mPressed = false;
 	}
 
 	//========================================================================================================
