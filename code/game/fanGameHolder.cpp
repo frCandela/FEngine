@@ -43,6 +43,9 @@ namespace fan
                                          m_renderer->mMesh2DManager,
                                          m_renderer->mTextureManager );
 
+        Mouse2& mouse = m_world.GetSingleton<Mouse2>();
+        mouse.mWindow = m_window.mWindow;
+
         RenderResources& renderResources = m_world.GetSingleton<RenderResources>();
         renderResources.SetPointers(&m_renderer->mMeshManager,
                                     &m_renderer->mMesh2DManager,
@@ -134,14 +137,15 @@ namespace fan
 			ImGui::GetIO().DeltaTime = time.logicDelta;
 			Input::Get().NewFrame();
 
-			const glm::ivec2 position = m_window.GetPosition();
+			const glm::ivec2 iPos = m_window.GetPosition();
+            const glm::vec2 windowPosition = glm::vec2( (float)iPos.x, (float)iPos.y );
 			const VkExtent2D extent = m_window.GetExtent();
+            const glm::vec2 windowSize = glm::vec2( (float)extent.width, (float)extent.height );
 
-            InputMouse& inputMouse = m_world.GetSingleton<InputMouse>();
-            InputMouse::Update( inputMouse, {0,0} );
+            Mouse2::NextFrame( m_window.mWindow, windowPosition, windowSize );
 
-            Mouse::Get().Update( btVector2( (float)position.x, (float)position.y ),
-                                 btVector2( (float)extent.width, (float)extent.height ),
+            Mouse::Get().Update( btVector2( windowPosition.x, windowPosition.y ),
+                                 btVector2( windowSize.x, windowSize.y ),
                                  true );
             Input::Get().Manager().PullEvents();
 

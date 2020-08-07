@@ -20,11 +20,11 @@ namespace fan
 
 		btVector2	GetDelta()		 { return m_delta; }
 		btVector2	GetDeltaScroll() { return m_deltaScroll; }
-		btVector2	GetScreenSpacePosition( const bool _localToGameWindow = true );
+		btVector2	GetScreenSpacePosition();
 		btVector2	GetPosition( const bool _localToGameWindow = true );
 
 		void SetCursor( const CursorState _state );
-		void LockCursor( const bool _state, const btVector2& _position = Get().m_position );
+		void LockCursor( const bool _state );
 
 		bool GetButtonDown( const int _GLFW_MOUSE_BUTTON, const bool _overrideUI = false );
 		bool GetButtonPressed( const int _GLFW_MOUSE_BUTTON, const bool _overrideUI = false );

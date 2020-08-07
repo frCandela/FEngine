@@ -9,16 +9,21 @@ WARNINGS_POP()
 #include "render/core/fanSwapChain.hpp"
 #include "render/core/fanInstance.hpp"
 #include "render/core/fanDevice.hpp"
+#include "scene/singletons/fanInputMouse.hpp"
 
 namespace fan
 {
-
-	//================================================================================================================================
+	//========================================================================================================
 	// Abstraction of the glfw window
-	//================================================================================================================================
+	//========================================================================================================
 	class Window
 	{
 	public:
+        struct InputData
+        {
+            Mouse2 mMouse;
+        };
+
 		void Create( const char* _name, const glm::ivec2 _size, const glm::ivec2 _position );
 		void Destroy();
 
@@ -26,10 +31,16 @@ namespace fan
 		glm::ivec2	GetPosition() const;
 		bool		IsOpen() const;
 
+        static InputData& GetInputData( GLFWwindow* _window );
+        using GetWindowUserPtrFunc = void* ( * )( GLFWwindow* _window );
+        static GetWindowUserPtrFunc sGetWindowUserPtr;
+
 		GLFWwindow*		mWindow = nullptr;
 		Instance		mInstance;
 		Device			mDevice;
 		SwapChain		mSwapchain;
 		VkSurfaceKHR	mSurface;
+        InputData       mWindowData;
+
 	};
 }

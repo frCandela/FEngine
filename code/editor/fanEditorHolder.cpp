@@ -157,6 +157,9 @@ namespace fan
                                          &m_renderer->mMesh2DManager,
                                          &m_renderer->mTextureManager );
 
+            Mouse2& mouse = world.GetSingleton<Mouse2>();
+            mouse.mWindow = m_window.mWindow;
+
             SceneResources& sceneResources = world.GetSingleton<SceneResources>();
             sceneResources.SetPointers( &mPrefabManager );
 
@@ -267,17 +270,12 @@ namespace fan
 					// Update input
 					ImGui::GetIO().DeltaTime = time.logicDelta;
 					Input::Get().NewFrame();
-					const btVector2 gamePosition = mGameViewWindow->GetPosition();
+					const btVector2 gamePos  = mGameViewWindow->GetPosition();
                     const btVector2 gameSize = mGameViewWindow->GetSize();
 
-                    Mouse::Get().Update( gamePosition, gameSize, mGameViewWindow->IsHovered() );
+                    Mouse::Get().Update( gamePos, gameSize, mGameViewWindow->IsHovered() );
+                    Mouse2::NextFrame( m_window.mWindow, ToGLM(gamePos), ToGLM(gameSize) );
 					Input::Get().Manager().PullEvents();
-
-					if( world.SafeGetSingletonInfo(InputMouse::s_type) != nullptr )
-                    {
-                        InputMouse& inputMouse = world.GetSingleton<InputMouse>();
-                        InputMouse::Update( inputMouse, { gamePosition[0], gamePosition[1] } );
-                    }
 				}
 
 				// checking the loop timing is not late

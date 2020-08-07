@@ -1,21 +1,31 @@
 #pragma once
 
+#include "glfw/glfw3.h"
 #include "fanDisableWarnings.hpp"
 WARNINGS_GLM_PUSH()
 #include "glm/glm.hpp"
 WARNINGS_POP()
 #include "ecs/fanEcsSingleton.hpp"
 
+struct GLFWwindow;
+
 namespace fan
 {
     //========================================================================================================
-    //========================================================================================================
-    struct InputMouse : public EcsSingleton
+    //=================================================================i=======================================
+    struct Mouse2 : public EcsSingleton
     {
         ECS_SINGLETON( InputMouse )
         static void SetInfo( EcsSingletonInfo& _info );
         static void Init( EcsWorld& _world, EcsSingleton& _singleton );
         static void OnGui( EcsWorld& _world, EcsSingleton& _singleton );
+
+        enum CursorState
+        {
+            disabled = GLFW_CURSOR_DISABLED,
+            hidden   = GLFW_CURSOR_HIDDEN,
+            normal   = GLFW_CURSOR_NORMAL
+        };
 
         enum Button
         {
@@ -25,10 +35,25 @@ namespace fan
             buttonMiddle = button3
         };
 
-        glm::ivec2 mPosition;
-        bool       mPressed[ Button::count ];
-        bool       mDown   [ Button::count];
+        glm::vec2   mLocalPosition;
+        glm::vec2   mPosition;
+        glm::vec2   mScrollDelta;
+        glm::vec2   mPositionDelta;
+        glm::vec2   mScreenPosition;
+        glm::vec2   mScreenSize;
+        bool        mLocked;
+        bool        mPressed [ Mouse2::count ];
+        bool        mReleased[ Mouse2::count ];
+        bool        mDown    [ Mouse2::count ];
+        GLFWwindow * mWindow = nullptr;
 
-        static void Update( InputMouse& _mouse, const glm::ivec2 _screenPos );
+
+        void Clear();
+        glm::vec2 Mouse2::LocalScreenSpacePosition() const;
+
+        static void NextFrame( GLFWwindow* _window, const glm::vec2 _position, const glm::vec2 _size );
+        static void MouseCallback( GLFWwindow* _window, double _x, double _y );
+        static void MouseButtonCallback( GLFWwindow* _window, int _button, int _action, int _mods );
+        static void ScrollCallback( GLFWwindow* _window, double _xoffset, double _yoffset );
     };
 }

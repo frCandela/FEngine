@@ -112,7 +112,7 @@ namespace fan
 		world.AddSingletonType<PhysicsWorld>();
 		world.AddSingletonType<ScenePointers>();
 		world.AddSingletonType<RenderDebug>();
-		world.AddSingletonType<InputMouse>();
+		world.AddSingletonType<Mouse2>();
 		// game singleton components
 		world.AddSingletonType<SunLight>();
 		world.AddSingletonType<GameCamera>();

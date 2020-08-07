@@ -16,7 +16,7 @@ namespace fan
 
         static void Run( EcsWorld& _world, const EcsView& _view )
         {
-            InputMouse& mouse = _world.GetSingleton<InputMouse>();
+            Mouse2& mouse = _world.GetSingleton<Mouse2>();
 
             auto buttonIt = _view.begin<Button>();
             auto transformUIIt = _view.begin<TransformUI>();

@@ -1,11 +1,12 @@
 #include "render/fanWindow.hpp"
 
 #include "core/fanDebug.hpp"
-#include "render/core/fanDevice.hpp"
 #include "core/input/fanInput.hpp"
 
 namespace fan
 {
+    Window::GetWindowUserPtrFunc Window::sGetWindowUserPtr = &glfwGetWindowUserPointer;
+
 	//================================================================================================================================
 	//================================================================================================================================
 	void Window::Create( const char* _name, const glm::ivec2 _size, const glm::ivec2 _position )
@@ -23,7 +24,10 @@ namespace fan
 		mDevice.Create( mInstance, mSurface );
 		mSwapchain.Create( mDevice, mSurface, { (uint32_t)_size.x, (uint32_t)_size.y } );
 
+		glfwSetWindowUserPointer( mWindow, &mWindowData );
+
 		Input::Get().Setup( mWindow );
+
 	}
 
 	//======================================================c==========================================================================
@@ -40,6 +44,16 @@ namespace fan
 
 		mInstance.Destroy();
 	}
+
+    //================================================================================================================================
+    //================================================================================================================================
+    Window::InputData& Window::GetInputData( GLFWwindow* _window )
+    {
+        fanAssert( _window != nullptr );
+        void* data = ( *Window::sGetWindowUserPtr )( _window );
+        fanAssert( data != nullptr );
+        return *static_cast<InputData*>(data);
+    }
 
 	//================================================================================================================================
 	//================================================================================================================================	

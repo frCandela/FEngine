@@ -70,12 +70,9 @@ namespace fan
 	//================================================================================================================================
 	// Coordinate between -1.f and 1.f
 	//================================================================================================================================
-	btVector2 Mouse::GetScreenSpacePosition( const bool _localToGameWindow )
+	btVector2 Mouse::GetScreenSpacePosition()
 	{
-		const btVector2 offset = _localToGameWindow ? m_windowOffset : btVector2::Zero();
-		const btVector2 size = _localToGameWindow ? m_windowSize : Input::Get().WindowSizeF();
-
-		btVector2 ratio = 2.f * ( m_position - offset ) / size - btVector2( 1.f, 1.f );
+		btVector2 ratio = 2.f * ( m_position - m_windowOffset ) / m_windowSize - btVector2( 1.f, 1.f );
 		ratio.setX( std::clamp( ratio.x(), -1.f, 1.f ) );
 		ratio.setY( std::clamp( ratio.y(), -1.f, 1.f ) );
 		return ratio;
@@ -91,11 +88,11 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Mouse::LockCursor( const bool _state, const btVector2& _position )
+	void Mouse::LockCursor( const bool _state )
 	{
 		if ( m_lockCursor != _state )
 		{
-			m_lockPosition = _position;
+			m_lockPosition = m_position;
 			m_lockCursor = _state;
 			glfwSetCursorPos( Input::Get().Window(), m_lockPosition.x(), m_lockPosition.y() );
 		}
