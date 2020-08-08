@@ -4,11 +4,10 @@
 #include "core/input/fanInputManager.hpp"
 #include "core/time/fanProfiler.hpp"
 #include "core/math/fanMathUtils.hpp"
-#include "core/input/fanMouse.hpp"
 #include "core/input/fanInput.hpp"
 #include "network/singletons/fanTime.hpp"
 #include "render/fanRenderer.hpp"
-#include "scene/singletons/fanInputMouse.hpp"
+#include "scene/singletons/fanMouse.hpp"
 #include "scene/singletons/fanRenderWorld.hpp"
 #include "scene/components/fanCamera.hpp"
 #include "scene/systems/fanUpdateTransforms.hpp"
@@ -36,15 +35,13 @@ namespace fan
 		glm::ivec2 windowSize;
 		SerializedValues::LoadWindowSizeAndPosition( _settings, windowPosition, windowSize );		
 		m_window.Create( _settings.windowName.c_str(), windowSize, windowPosition );
+        Mouse::SetCallbacks( m_window.mWindow );
 
 		// creates renderer
 		m_renderer = new Renderer( m_window, Renderer::ViewType::Game );
         RenderResources::SetupResources( m_renderer->mMeshManager,
                                          m_renderer->mMesh2DManager,
                                          m_renderer->mTextureManager );
-
-        Mouse2& mouse = m_world.GetSingleton<Mouse2>();
-        mouse.mWindow = m_window.mWindow;
 
         RenderResources& renderResources = m_world.GetSingleton<RenderResources>();
         renderResources.SetPointers(&m_renderer->mMeshManager,
@@ -135,19 +132,17 @@ namespace fan
 
 			// Update input
 			ImGui::GetIO().DeltaTime = time.logicDelta;
-			Input::Get().NewFrame();
+
 
 			const glm::ivec2 iPos = m_window.GetPosition();
             const glm::vec2 windowPosition = glm::vec2( (float)iPos.x, (float)iPos.y );
 			const VkExtent2D extent = m_window.GetExtent();
             const glm::vec2 windowSize = glm::vec2( (float)extent.width, (float)extent.height );
 
-            Mouse2::NextFrame( m_window.mWindow, windowPosition, windowSize );
-
-            Mouse::Get().Update( btVector2( windowPosition.x, windowPosition.y ),
-                                 btVector2( windowSize.x, windowSize.y ),
-                                 true );
+            Mouse::NextFrame( m_window.mWindow, windowPosition, windowSize ); /*todo true window hovered*/
+            Input::Get().NewFrame();
             Input::Get().Manager().PullEvents();
+            m_world.GetSingleton<Mouse>().UpdateData( m_window.mWindow );
 
 			// checking the loop timing is not late
             const double loopDelayMilliseconds = 1000. * ( currentTime

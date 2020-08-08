@@ -1,8 +1,8 @@
 #include "ecs/fanEcsSystem.hpp"
-#include "core/input/fanMouse.hpp"
 #include "core/shapes/fanRay.hpp"
 #include "core/input/fanInputManager.hpp"
 #include "core/input/fanInput.hpp"
+#include "scene/singletons/fanMouse.hpp"
 #include "scene/components/fanTransform.hpp"
 #include "game/components/fanPlayerInput.hpp"
 #include "game/components/fanPlayerController.hpp"
@@ -27,6 +27,7 @@ namespace fan
 			if( _delta == 0.f ) { return; }
 
 			const Scene& scene = _world.GetSingleton<Scene>();
+            const Mouse& mouse = _world.GetSingleton<Mouse>();
 			const EcsEntity cameraID = _world.GetEntity( scene.mainCameraHandle );
 			const Transform& cameraTransform = _world.GetComponent<Transform>( cameraID );
 			const Camera& camera = _world.GetComponent<Camera>( cameraID );
@@ -43,10 +44,12 @@ namespace fan
 				input.boost = Input::Get().Manager().GetAxis( "game_boost" );
 				input.fire = Input::Get().Manager().GetAxis( "game_fire" );
 
-				btVector3 mouseWorldPos = camera.ScreenPosToRay( cameraTransform, Mouse::Get().GetScreenSpacePosition() ).origin; // Get mouse world pos
-				mouseWorldPos.setY( 0 );
-				btVector3 mouseDir = mouseWorldPos - transform.GetPosition();// Get mouse direction
-				mouseDir.normalize();
+                btVector3 mouseWorldPos = camera.ScreenPosToRay(
+                        cameraTransform,
+                        ToBullet( mouse.LocalScreenSpacePosition() ) ).origin;
+                mouseWorldPos.setY( 0 );
+                btVector3 mouseDir = mouseWorldPos - transform.GetPosition();// Get mouse direction
+                mouseDir.normalize();
 				input.orientation = mouseDir;
 			}
 		}

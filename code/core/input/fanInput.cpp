@@ -1,6 +1,5 @@
 #include "core/input/fanInput.hpp"
 #include "core/input/fanKeyboard.hpp"
-#include "core/input/fanMouse.hpp"
 #include "core/input/fanInputManager.hpp"
 
 namespace fan
@@ -27,9 +26,6 @@ namespace fan
 		glfwGetCursorPos( _window, &x, &y );
 
 		glfwSetFramebufferSizeCallback( _window, Input::WindowSizeCallback );
-		glfwSetCursorPosCallback( _window, Mouse::MouseCallback );
-		glfwSetMouseButtonCallback( _window, Mouse::MouseButtonCallback );
-		glfwSetScrollCallback( _window, Mouse::ScrollCallback );
 		glfwSetKeyCallback( _window, Keyboard::KeyCallback );
 		glfwSetCharCallback( _window, Keyboard::CharCallback );
 	}

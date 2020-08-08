@@ -1,8 +1,6 @@
 #include "editor/windows/fanConsoleWindow.hpp"
 #include "core/input/fanKeyboard.hpp"
 #include "core/time/fanProfiler.hpp"
-#include "core/input/fanInput.hpp"
-#include "core/input/fanMouse.hpp"
 #include "network/singletons/fanTime.hpp"
 
 namespace fan

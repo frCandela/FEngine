@@ -2,7 +2,7 @@
 
 #include "core/fanUnitTest.hpp"
 #include "render/fanWindow.hpp"
-#include "scene/singletons/fanInputMouse.hpp"
+#include "scene/singletons/fanMouse.hpp"
 
 namespace fan
 {
@@ -22,6 +22,7 @@ namespace fan
                      { &UnitTestMouse::TestLockCursor,                  "Lock cursor" },
                      { &UnitTestMouse::TestPositionDelta,               "Position delta" },
                      { &UnitTestMouse::TestPositionLocalScreenSpace,    "Position local screen space" },
+                     { &UnitTestMouse::TestWIndowHovered,               "Window hovered" },
             };
         }
 
@@ -47,115 +48,115 @@ namespace fan
 
         void TestButtonPressed()
         {
-            Mouse2& mouse = mInputData.mMouse;
+            Mouse     & mouse  = mInputData.mMouse;
             GLFWwindow* window = GetWindow();
 
-            TEST_ASSERT( !mouse.mPressed[Mouse2::button1] );
-            Mouse2::MouseButtonCallback( window, 0, GLFW_PRESS, -1 );
-            TEST_ASSERT( mouse.mPressed[Mouse2::button1] );
-            Mouse2::NextFrame( window, glm::vec2( 0.f, 0.f ), glm::vec2( 0.f, 0.f ) );
-            TEST_ASSERT( ! mouse.mPressed[Mouse2::button1] );
+            TEST_ASSERT( !mouse.mPressed[Mouse::button1] );
+            Mouse::MouseButtonCallback( window, 0, GLFW_PRESS, -1 );
+            TEST_ASSERT( mouse.mPressed[Mouse::button1] );
+            Mouse::NextFrame( window, glm::vec2( 0.f, 0.f ), glm::vec2( 0.f, 0.f ) );
+            TEST_ASSERT( ! mouse.mPressed[Mouse::button1] );
         }
 
         void TestButtonReleased()
         {
-            Mouse2& mouse = mInputData.mMouse;
+            Mouse     & mouse  = mInputData.mMouse;
             GLFWwindow* window = GetWindow();
 
-            TEST_ASSERT( !mouse.mReleased[Mouse2::button1] );
-            Mouse2::MouseButtonCallback( window, 0, GLFW_RELEASE, -1 );
-            TEST_ASSERT( mouse.mReleased[Mouse2::button1] );
-            Mouse2::NextFrame( window, glm::vec2( 0.f, 0.f ), glm::vec2( 0.f, 0.f ) );
-            TEST_ASSERT( ! mouse.mReleased[Mouse2::button1] );
+            TEST_ASSERT( !mouse.mReleased[Mouse::button1] );
+            Mouse::MouseButtonCallback( window, 0, GLFW_RELEASE, -1 );
+            TEST_ASSERT( mouse.mReleased[Mouse::button1] );
+            Mouse::NextFrame( window, glm::vec2( 0.f, 0.f ), glm::vec2( 0.f, 0.f ) );
+            TEST_ASSERT( ! mouse.mReleased[Mouse::button1] );
         }
 
         void TestButtonDown()
         {
-            Mouse2& mouse = mInputData.mMouse;
+            Mouse     & mouse  = mInputData.mMouse;
             GLFWwindow* window = GetWindow();
 
-            TEST_ASSERT( !mouse.mDown[Mouse2::button1] );
-            Mouse2::MouseButtonCallback( window, 0, GLFW_PRESS, -1 );
-            TEST_ASSERT( mouse.mDown[Mouse2::button1] );
-            Mouse2::NextFrame( window, glm::vec2( 0.f, 0.f ), glm::vec2( 0.f, 0.f ) );
-            TEST_ASSERT( mouse.mDown[Mouse2::button1] );
-            Mouse2::MouseButtonCallback( window, 0, GLFW_RELEASE, -1 );
-            TEST_ASSERT( ! mouse.mDown[Mouse2::button1] );
+            TEST_ASSERT( !mouse.mDown[Mouse::button1] );
+            Mouse::MouseButtonCallback( window, 0, GLFW_PRESS, -1 );
+            TEST_ASSERT( mouse.mDown[Mouse::button1] );
+            Mouse::NextFrame( window, glm::vec2( 0.f, 0.f ), glm::vec2( 0.f, 0.f ) );
+            TEST_ASSERT( mouse.mDown[Mouse::button1] );
+            Mouse::MouseButtonCallback( window, 0, GLFW_RELEASE, -1 );
+            TEST_ASSERT( ! mouse.mDown[Mouse::button1] );
         }
 
         void TestScroll()
         {
-            Mouse2& mouse = mInputData.mMouse;
+            Mouse     & mouse  = mInputData.mMouse;
             GLFWwindow* window = GetWindow();
 
             TEST_ASSERT( mouse.mScrollDelta == glm::vec2( 0.f, 0.f ) );
-            Mouse2::ScrollCallback( window, 1., 2. );
+            Mouse::ScrollCallback( window, 1., 2. );
             TEST_ASSERT( mouse.mScrollDelta == glm::vec2( 1.f, 2.f ) );
-            Mouse2::ScrollCallback( window, 2., 3. );
+            Mouse::ScrollCallback( window, 2., 3. );
             TEST_ASSERT( mouse.mScrollDelta == glm::vec2( 3.f, 5.f ) );
-            Mouse2::NextFrame( window, glm::vec2( 0.f, 0.f ), glm::vec2( 0.f, 0.f ) );
+            Mouse::NextFrame( window, glm::vec2( 0.f, 0.f ), glm::vec2( 0.f, 0.f ) );
             TEST_ASSERT( mouse.mScrollDelta == glm::vec2( 0.f, 0.f ) );
         }
 
         void TestPosition()
         {
-            Mouse2& mouse = mInputData.mMouse;
+            Mouse     & mouse  = mInputData.mMouse;
             GLFWwindow* window = GetWindow();
 
             // full window position
             TEST_ASSERT( mouse.mPosition == glm::vec2( 0.f, 0.f ) );
-            Mouse2::MouseCallback( window, 200., 300. );
+            Mouse::MouseCallback( window, 200., 300. );
             TEST_ASSERT( mouse.mPosition == glm::vec2( 200.f, 300.f ) );
-            Mouse2::NextFrame( window, glm::vec2( 0.f, 0.f ), glm::vec2( 0.f, 0.f ) );
+            Mouse::NextFrame( window, glm::vec2( 0.f, 0.f ), glm::vec2( 0.f, 0.f ) );
             TEST_ASSERT( mouse.mPosition == glm::vec2( 200.f, 300.f ) );
-            Mouse2::MouseCallback( window, 600., 100. );
+            Mouse::MouseCallback( window, 600., 100. );
             TEST_ASSERT( mouse.mPosition == glm::vec2( 600.f, 100.f ) );
         }
 
         void TestLocalPosition()
         {
-            Mouse2& mouse = mInputData.mMouse;
+            Mouse     & mouse  = mInputData.mMouse;
             GLFWwindow* window = GetWindow();
 
             TEST_ASSERT( mouse.mScreenPosition == glm::vec2(0,0) );
             TEST_ASSERT( mouse.mLocalPosition == glm::vec2(0,0) );
             const glm::vec2 screenpos = glm::vec2( 100.f, 200.f );
-            Mouse2::NextFrame( window, screenpos, glm::vec2( 0.f, 0.f ));
+            Mouse::NextFrame( window, screenpos, glm::vec2( 0.f, 0.f ));
             TEST_ASSERT( mouse.mScreenPosition == screenpos );
             TEST_ASSERT( mouse.mLocalPosition == ( mouse.mPosition - screenpos ) );
-            Mouse2::MouseCallback( window, 500., 200. );
+            Mouse::MouseCallback( window, 500., 200. );
             TEST_ASSERT( mouse.mLocalPosition == ( mouse.mPosition - screenpos ) );
         }
 
         void TestLockCursor()
         {
-            Mouse2& mouse = mInputData.mMouse;
+            Mouse     & mouse  = mInputData.mMouse;
             GLFWwindow* window = GetWindow();
 
-            TEST_ASSERT( ! mouse.mLocked  );
-            Mouse2::MouseCallback( window, 100., 200. );
+            TEST_ASSERT( ! mouse.sLocked  );
+            Mouse::MouseCallback( window, 100., 200. );
             TEST_ASSERT( mouse.mPosition == glm::vec2( 100.f, 200.f ) );
-            mouse.mLocked = true;
-            Mouse2::MouseCallback( window, 200., 300. );
+            mouse.sLocked = true;
+            Mouse::MouseCallback( window, 200., 300. );
             TEST_ASSERT( mouse.mPosition == glm::vec2( 100.f, 200.f ) );
             TEST_ASSERT( mouse.mPositionDelta == glm::vec2( 100.f, 100.f ) );
         }
 
         void TestPositionDelta()
         {
-            Mouse2& mouse = mInputData.mMouse;
+            Mouse     & mouse  = mInputData.mMouse;
             GLFWwindow* window = GetWindow();
 
             TEST_ASSERT( mouse.mPositionDelta == glm::vec2( 0.f,0.f ) );
-            Mouse2::MouseCallback( window, 10., 20. );
+            Mouse::MouseCallback( window, 10., 20. );
             TEST_ASSERT( mouse.mPositionDelta == glm::vec2( 10.f,20.f ) );
-            Mouse2::NextFrame( window, glm::vec2(0,0), glm::vec2( 0.f, 0.f ) );
+            Mouse::NextFrame( window, glm::vec2( 0, 0), glm::vec2( 0.f, 0.f ) );
             TEST_ASSERT( mouse.mPositionDelta == glm::vec2( 0.f,0.f ) );
         }
 
         void TestPositionLocalScreenSpace()
         {
-            Mouse2& mouse = mInputData.mMouse;
+            Mouse     & mouse  = mInputData.mMouse;
             GLFWwindow* window = GetWindow();
 
             TEST_ASSERT( mouse.mScreenPosition == glm::vec2( 0.f,0.f ) );
@@ -163,19 +164,37 @@ namespace fan
             TEST_ASSERT( mouse.mLocalPosition == glm::vec2( 0.f,0.f ) );
             const glm::vec2 winPos = glm::vec2(10,20);
             const glm::vec2 winSize = glm::vec2(30,40);
-            Mouse2::NextFrame( window, winPos, winSize );
-            Mouse2::MouseCallback( window, winPos.x + winSize.x / 2.f,  winPos.y + winSize.y / 2.f );
+            Mouse::NextFrame( window, winPos, winSize );
+            Mouse::MouseCallback( window, winPos.x + winSize.x / 2.f, winPos.y + winSize.y / 2.f );
             TEST_ASSERT( mouse.LocalScreenSpacePosition() == glm::vec2( 0.f,0.f ) );
-            Mouse2::MouseCallback( window, winPos.x, winPos.y );
+            Mouse::MouseCallback( window, winPos.x, winPos.y );
             TEST_ASSERT( mouse.LocalScreenSpacePosition() == glm::vec2( -1.f,-1.f ) );
-            Mouse2::MouseCallback( window, winPos.x + winSize.x,  winPos.y + winSize.y );
+            Mouse::MouseCallback( window, winPos.x + winSize.x, winPos.y + winSize.y );
             TEST_ASSERT( mouse.LocalScreenSpacePosition() == glm::vec2( 1.f,1.f ) );
-            Mouse2::MouseCallback( window, -1000., 1000. );
+            Mouse::MouseCallback( window, -1000., 1000. );
             TEST_ASSERT( mouse.LocalScreenSpacePosition() == glm::vec2( -1.f,1.f ) );
-            Mouse2::MouseCallback( window, 1000., -1000. );
+            Mouse::MouseCallback( window, 1000., -1000. );
             TEST_ASSERT( mouse.LocalScreenSpacePosition() == glm::vec2( 1.f,-1.f ) );
-            Mouse2::NextFrame( window, glm::vec2( 0.f,0.f ), glm::vec2( 0.f,0.f ) );
+            Mouse::NextFrame( window, glm::vec2( 0.f, 0.f ), glm::vec2( 0.f, 0.f ) );
             TEST_ASSERT( mouse.LocalScreenSpacePosition() == glm::vec2( 0.f,0.f ) );
+        }
+
+        void TestWIndowHovered()
+        {
+            Mouse     & mouse  = mInputData.mMouse;
+            GLFWwindow* window = GetWindow();
+            TEST_ASSERT( mouse.mWindowHovered == false );
+            const glm::vec2 winPos = glm::vec2(10,20);
+            const glm::vec2 winSize = glm::vec2(30,40);
+            Mouse::NextFrame( window, winPos, winSize );
+            Mouse::MouseCallback( window, winPos.x, winPos.y );
+            TEST_ASSERT( mouse.mWindowHovered == true );
+            Mouse::MouseCallback( window, winPos.x + winSize.x, winPos.y + winSize.y );
+            TEST_ASSERT( mouse.mWindowHovered == false );
+            Mouse::MouseCallback( window, winPos.x + winSize.x - 1, winPos.y + winSize.y - 1 );
+            TEST_ASSERT( mouse.mWindowHovered == true );
+            Mouse::NextFrame( window, glm::vec2( 0, 0), winSize );
+            TEST_ASSERT( mouse.mWindowHovered == false );
         }
 
     };

@@ -13,7 +13,7 @@ namespace fan
 {
     //========================================================================================================
     //=================================================================i=======================================
-    struct Mouse2 : public EcsSingleton
+    struct Mouse : public EcsSingleton
     {
         ECS_SINGLETON( InputMouse )
         static void SetInfo( EcsSingletonInfo& _info );
@@ -41,19 +41,23 @@ namespace fan
         glm::vec2   mPositionDelta;
         glm::vec2   mScreenPosition;
         glm::vec2   mScreenSize;
-        bool        mLocked;
-        bool        mPressed [ Mouse2::count ];
-        bool        mReleased[ Mouse2::count ];
-        bool        mDown    [ Mouse2::count ];
-        GLFWwindow * mWindow = nullptr;
-
+        bool        mWindowHovered;
+        static bool sLocked;
+        bool        mPressed [ Mouse::count ];
+        bool        mReleased[ Mouse::count ];
+        bool        mDown    [ Mouse::count ];
 
         void Clear();
-        glm::vec2 Mouse2::LocalScreenSpacePosition() const;
+        void UpdateData( GLFWwindow* _window );
+        glm::vec2 LocalScreenSpacePosition() const;
 
         static void NextFrame( GLFWwindow* _window, const glm::vec2 _position, const glm::vec2 _size );
+        static void SetCallbacks( GLFWwindow* _window );
         static void MouseCallback( GLFWwindow* _window, double _x, double _y );
         static void MouseButtonCallback( GLFWwindow* _window, int _button, int _action, int _mods );
         static void ScrollCallback( GLFWwindow* _window, double _xoffset, double _yoffset );
+
+    private:
+        bool IsWindowHovered() const;
     };
 }

@@ -1,19 +1,18 @@
 #include "editor/singletons/fanEditorCamera.hpp"
 
-#include "core/input/fanMouse.hpp"
 #include "core/input/fanInput.hpp"
 #include "core/input/fanInputManager.hpp"
 #include "core/shapes/fanRay.hpp"
 #include "scene/components/fanTransform.hpp"
 #include "scene/components/fanCamera.hpp"
 #include "scene/components/fanSceneNode.hpp"
+#include "scene/singletons/fanMouse.hpp"
 #include "scene/singletons/fanScene.hpp"
-#include "ecs/fanEcsWorld.hpp"
 
 namespace fan
 {
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void EditorCamera::SetInfo( EcsSingletonInfo& _info )
 	{
 		_info.icon = ImGui::CAMERA16;
@@ -22,8 +21,8 @@ namespace fan
 		_info.name = "editor camera";
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void EditorCamera::Init( EcsWorld& /*_world*/, EcsSingleton& _component )
 	{
 		EditorCamera& editorCamera = static_cast<EditorCamera&>( _component );
@@ -34,8 +33,8 @@ namespace fan
 		editorCamera.xySensitivity = btVector2( 0.005f, 0.005f );
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void EditorCamera::OnGui( EcsWorld&, EcsSingleton& _component )
 	{
 		EditorCamera& editorCamera = static_cast<EditorCamera&>( _component );
@@ -50,28 +49,23 @@ namespace fan
 	}
 
 
-	//================================================================================================================================
+	//========================================================================================================
 	// updates the editor camera position & rotation
-	//================================================================================================================================
+	//========================================================================================================
 	void EditorCamera::Update( EcsWorld& _world, const float _delta )
 	{
-		EditorCamera& editorCamera = _world.GetSingleton<EditorCamera>();
+        Mouse& mouse = _world.GetSingleton<Mouse>();
+        if( !mouse.mWindowHovered )             { return; }
+        if( mouse.mPressed[Mouse::button2] )    { mouse.sLocked = true; }
+        if( !mouse.mDown[Mouse::button2] )      { mouse.sLocked = false; }
+        if( !mouse.sLocked )                    { return; }
+
+        EditorCamera& editorCamera = _world.GetSingleton<EditorCamera>();
 		const EcsEntity cameraEntity = _world.GetEntity( editorCamera.cameraHandle );
 		Transform& cameraTransform = _world.GetComponent<Transform>( cameraEntity );
 		Camera&	cameraCamera = _world.GetComponent<Camera>( cameraEntity );
 
-
-		if( Mouse::Get().GetButtonPressed( Mouse::button1 ) )
-		{
-			Mouse::Get().LockCursor( true );
-		}
-		if( Mouse::Get().GetButtonDown( Mouse::button1, true ) == false )
-		{
-			Mouse::Get().LockCursor( false );
-		}
-
 		btVector3 position = cameraTransform.GetPosition();
-
 		float forwardAxis	= Input::Get().Manager().GetAxis( "editor_forward" );
 		float upAxis		= Input::Get().Manager().GetAxis( "editor_up" );
 		float leftAxis		= Input::Get().Manager().GetAxis( "editor_left" );
@@ -89,14 +83,15 @@ namespace fan
 		position += _delta * realSpeed * forwardAxis * cameraTransform.Forward();	// Camera goes forward
 
 		// Camera rotation
-		const btVector2 mouseDelta = Mouse::Get().GetDelta();
-		const btVector2 mousePos = Mouse::Get().GetPosition();
-		if( Mouse::Get().GetButtonDown( Mouse::button1 ) )
+		const glm::vec2 mouseDelta = mouse.mPositionDelta;
+		const glm::vec2 mousePos = mouse.mLocalPosition;
+		if( mouse.mDown[ Mouse::button2 ] )
 		{
 			// Rotation depending on mouse movement
 			const float invertAxis = -1;
-			const btQuaternion rotationY( btVector3::Up(), -editorCamera.xySensitivity.x() * mouseDelta.x() );
-			const btQuaternion rotationX( invertAxis * cameraTransform.Left(), -editorCamera.xySensitivity.y() * mouseDelta.y() );
+			const btQuaternion rotationY( btVector3::Up(), -editorCamera.xySensitivity.x() * mouseDelta.x );
+            const btQuaternion rotationX( invertAxis * cameraTransform.Left(),
+                                          -editorCamera.xySensitivity.y() * mouseDelta.y );
 			cameraTransform.SetRotationQuat( rotationX * rotationY * cameraTransform.GetRotationQuat() );
 
 			// Remove roll
@@ -119,10 +114,10 @@ namespace fan
 		btVector3 offset = ray.origin + 0.1f * ray.direction;
 	}
 
-	//================================================================================================================================
+	//========================================================================================================
 	// creates the editor camera entity & components
 	// setups the EditorCamera singleton
-	//================================================================================================================================
+	//========================================================================================================
 	void EditorCamera::CreateEditorCamera( EcsWorld& _world )
 	{
 		Scene& scene = _world.GetSingleton< Scene >();

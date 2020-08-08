@@ -1,15 +1,12 @@
 #include "editor/fanModals.hpp"
 
 #include <sstream>
-#include "core/input/fanInput.hpp"
 #include "core/input/fanKeyboard.hpp"
-#include "core/input/fanMouse.hpp"
-#include "imgui/imgui.h"
 #include "imgui/imgui_internal.h"
 
-//================================================================================================================================
+//============================================================================================================
 // Extracts the file name of a path without the extension
-//================================================================================================================================
+//============================================================================================================
 std::string std::filesystem::file_name( const std::filesystem::path& _path )
 {
 	if ( std::filesystem::is_directory( _path ) == true || _path.has_filename() == false )
@@ -28,16 +25,16 @@ std::string std::filesystem::file_name( const std::filesystem::path& _path )
 
 namespace ImGui
 {
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void FanShowHelpMarker( const char* _desc )
 	{
 		ImGui::TextDisabled( "(?)" );
 		FanToolTip( _desc );
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void FanToolTip( const char* _desc )
 	{
 		if ( ImGui::IsItemHovered() )
@@ -50,8 +47,8 @@ namespace ImGui
 		}
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	bool impl::FilesSelector(
 		const std::set< std::string >& _extensionWhiteList
 		, std::filesystem::path& _path )
@@ -65,7 +62,11 @@ namespace ImGui
 		{
 
 			// '.' Selectable to go to the parent 
-			if ( _path != "." && ImGui::Selectable( ".", false, ImGuiSelectableFlags_DontClosePopups | ImGuiSelectableFlags_AllowDoubleClick ) )
+            if( _path != "." &&
+                ImGui::Selectable( ".",
+                                   false,
+                                   ImGuiSelectableFlags_DontClosePopups |
+                                   ImGuiSelectableFlags_AllowDoubleClick ) )
 			{
 				_path = std::filesystem::directory_entry( _path.parent_path() );
 				if ( _path.empty() )
@@ -75,7 +76,9 @@ namespace ImGui
 			}
 
 			// Lists all directories
-			const std::filesystem::path dir = std::filesystem::is_directory( _path ) ? _path : _path.parent_path(); // iterates on a dir, bot a file
+            const std::filesystem::path dir = std::filesystem::is_directory( _path )
+                    ? _path
+                    : _path.parent_path(); // iterates on a dir, bot a file
 			for ( const std::filesystem::path& childPath : std::filesystem::directory_iterator( dir ) )
 			{
 
@@ -91,7 +94,10 @@ namespace ImGui
 					{
 						ImGui::PushStyleColor( ImGuiCol_Text, ( ImVec4 ) ( ImColor( 1.0f, 0.712f, 0.0f ) ) );
 					}
-					if ( ImGui::Selectable( filename.c_str(), false, ImGuiSelectableFlags_DontClosePopups | ImGuiSelectableFlags_AllowDoubleClick ) )
+                    if( ImGui::Selectable( filename.c_str(),
+                                           false,
+                                           ImGuiSelectableFlags_DontClosePopups |
+                                           ImGuiSelectableFlags_AllowDoubleClick ) )
 					{
 						_path = std::filesystem::directory_entry( childPath );
 
@@ -113,9 +119,11 @@ namespace ImGui
 		return returnValue;
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
-	bool FanSaveFileModal( const char* _popupName, const std::set<std::string>& _extensionWhiteList, std::filesystem::path& _outCurrentPath )
+	//========================================================================================================
+	//========================================================================================================
+    bool FanSaveFileModal( const char* _popupName,
+                           const std::set<std::string>& _extensionWhiteList,
+                           std::filesystem::path& _outCurrentPath )
 	{
 		bool returnValue = false;
 
@@ -143,7 +151,10 @@ namespace ImGui
 				extensionIndex = 0;
 			}
 			bool enterPressed = false;
-			if ( ImGui::InputText( "name", buffer, IM_ARRAYSIZE( buffer ), ImGuiInputTextFlags_EnterReturnsTrue ) )
+            if( ImGui::InputText( "name",
+                                  buffer,
+                                  IM_ARRAYSIZE( buffer ),
+                                  ImGuiInputTextFlags_EnterReturnsTrue ) )
 			{
 				enterPressed = true;
 			}
@@ -200,8 +211,8 @@ namespace ImGui
 		return returnValue;
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	bool FanLoadFileModal(
 		const char* _popupName,
 		const std::set<std::string>& _extensionWhiteList,
@@ -230,8 +241,9 @@ namespace ImGui
 			ImGui::Text( _path.string().c_str() );
 			ImGui::Separator();
 
-
-			if ( itemDoubleClicked == true || ImGui::Button( "Ok" ) || ImGui::IsKeyPressed( GLFW_KEY_ENTER, false ) )
+            if( itemDoubleClicked == true ||
+                ImGui::Button( "Ok" ) ||
+                ImGui::IsKeyPressed( GLFW_KEY_ENTER, false ) )
 			{
 				if ( std::filesystem::is_regular_file( _path ) )
 				{
@@ -250,16 +262,16 @@ namespace ImGui
 		return returnValue;
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void PushReadOnly()
 	{
 		ImGui::PushItemFlag( ImGuiItemFlags_Disabled, true );
 		ImGui::PushStyleVar( ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f );
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void PopReadOnly()
 	{
 		ImGui::PopItemFlag();

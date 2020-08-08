@@ -9,7 +9,7 @@ WARNINGS_POP()
 #include "render/core/fanSwapChain.hpp"
 #include "render/core/fanInstance.hpp"
 #include "render/core/fanDevice.hpp"
-#include "scene/singletons/fanInputMouse.hpp"
+#include "scene/singletons/fanMouse.hpp"
 
 namespace fan
 {
@@ -21,7 +21,8 @@ namespace fan
 	public:
         struct InputData
         {
-            Mouse2 mMouse;
+            GLFWwindow * mWindow = nullptr;
+            Mouse mMouse;
         };
 
 		void Create( const char* _name, const glm::ivec2 _size, const glm::ivec2 _position );
@@ -39,8 +40,8 @@ namespace fan
 		Instance		mInstance;
 		Device			mDevice;
 		SwapChain		mSwapchain;
-		VkSurfaceKHR	mSurface;
-        InputData       mWindowData;
+		VkSurfaceKHR    mSurface;
+        InputData       mInputData;
 
 	};
 }

@@ -18,7 +18,7 @@
 #include "scene/components/fanDirectionalLight.hpp"
 #include "scene/components/fanPointLight.hpp"
 #include "scene/singletons/fanScene.hpp"
-#include "scene/singletons/fanInputMouse.hpp"
+#include "scene/singletons/fanMouse.hpp"
 #include "scene/singletons/fanRenderResources.hpp"
 #include "scene/singletons/fanSceneResources.hpp"
 #include "scene/singletons/fanScenePointers.hpp"
@@ -112,7 +112,7 @@ namespace fan
 		world.AddSingletonType<PhysicsWorld>();
 		world.AddSingletonType<ScenePointers>();
 		world.AddSingletonType<RenderDebug>();
-		world.AddSingletonType<Mouse2>();
+		world.AddSingletonType<Mouse>();
 		// game singleton components
 		world.AddSingletonType<SunLight>();
 		world.AddSingletonType<GameCamera>();

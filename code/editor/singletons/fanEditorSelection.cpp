@@ -4,7 +4,6 @@
 #include "core/input/fanInput.hpp"
 #include "core/input/fanInputManager.hpp"
 #include "core/time/fanProfiler.hpp"
-#include "core/input/fanMouse.hpp"
 #include "core/shapes/fanRay.hpp"
 #include "core/fanDebug.hpp"
 #include "scene/components/fanSceneNode.hpp"
@@ -14,6 +13,7 @@
 #include "scene/components/fanDirectionalLight.hpp"
 #include "scene/components/fanFollowTransform.hpp"
 #include "scene/components/ui/fanFollowTransformUI.hpp"
+#include "scene/singletons/fanMouse.hpp"
 #include "scene/singletons/fanScene.hpp"
 #include "scene/systems/fanRaycast.hpp"
 #include "scene/systems/fanDrawDebug.hpp"
@@ -113,14 +113,16 @@ namespace fan
 		}
 
 		// mouse selection
- 		if ( !mouseCaptured && _gameWindowHovered && Mouse::Get().GetButtonPressed( Mouse::button0 ) )
+        EcsWorld& world = *m_currentScene->world;
+        Mouse   & mouse = world.GetSingleton<Mouse>();
+        if( !mouseCaptured && _gameWindowHovered && mouse.mPressed[ Mouse::buttonLeft ] )
  		{
-			EcsWorld& world = *m_currentScene->world;
 			EcsEntity cameraID = world.GetEntity( m_currentScene->mainCameraHandle );
 			const Transform& cameraTransform = world.GetComponent<Transform>( cameraID );
 			const Camera& camera = world.GetComponent<Camera>( cameraID );
 
- 			const Ray ray = camera.ScreenPosToRay( cameraTransform, Mouse::Get().GetScreenSpacePosition() );
+            const Ray ray = camera.ScreenPosToRay( cameraTransform,
+                                                   ToBullet( mouse.LocalScreenSpacePosition() ) );
 
 			// raycast on bounds
 			std::vector<EcsEntity> results;
@@ -150,7 +152,6 @@ namespace fan
 		// draw collision shapes, lights @migration
 		if( m_selectedNodeHandle != 0 )
 		{
-			EcsWorld& world = *m_currentScene->world;
 			const EcsEntity selectedEntity = world.GetEntity( m_selectedNodeHandle );
 			S_DrawDebugCollisionShapes::DrawCollisionShape( world, selectedEntity );
 

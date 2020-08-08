@@ -3,7 +3,6 @@
 #include "editor/fanEditorHolder.hpp"
 
 #include "core/input/fanInputManager.hpp"
-#include "core/input/fanMouse.hpp"
 #include "core/input/fanInput.hpp"
 #include "network/singletons/fanTime.hpp"
 #include "render/fanRenderer.hpp"
@@ -24,7 +23,8 @@
 #include "editor/singletons/fanEditorCamera.hpp"
 #include "editor/singletons/fanEditorGrid.hpp"
 #include "scene/singletons/fanRenderWorld.hpp"
-#include "scene/singletons/fanInputMouse.hpp"
+#include "scene/singletons/fanMouse.hpp"
+#include "scene/singletons/fanMouse.hpp"
 #include "scene/components/fanPointLight.hpp"
 #include "scene/components/fanCamera.hpp"
 #include "scene/systems/fanUpdateTransforms.hpp"
@@ -73,6 +73,7 @@ namespace fan
 		glm::ivec2 windowSize;
 		SerializedValues::LoadWindowSizeAndPosition( _settings, windowPosition, windowSize );
 		m_window.Create( _settings.windowName.c_str(), windowSize, windowPosition );
+        Mouse::SetCallbacks( m_window.mWindow );
 
 		// creates renderer
 		m_renderer = new Renderer( m_window, Renderer::ViewType::Editor );
@@ -156,9 +157,6 @@ namespace fan
             renderResources.SetPointers( &m_renderer->mMeshManager,
                                          &m_renderer->mMesh2DManager,
                                          &m_renderer->mTextureManager );
-
-            Mouse2& mouse = world.GetSingleton<Mouse2>();
-            mouse.mWindow = m_window.mWindow;
 
             SceneResources& sceneResources = world.GetSingleton<SceneResources>();
             sceneResources.SetPointers( &mPrefabManager );
@@ -269,13 +267,14 @@ namespace fan
 				{
 					// Update input
 					ImGui::GetIO().DeltaTime = time.logicDelta;
-					Input::Get().NewFrame();
 					const btVector2 gamePos  = mGameViewWindow->GetPosition();
                     const btVector2 gameSize = mGameViewWindow->GetSize();
-
-                    Mouse::Get().Update( gamePos, gameSize, mGameViewWindow->IsHovered() );
-                    Mouse2::NextFrame( m_window.mWindow, ToGLM(gamePos), ToGLM(gameSize) );
+                    //todo mGameViewWindow->IsHovered()
+                    Mouse::NextFrame( m_window.mWindow, ToGLM( gamePos), ToGLM( gameSize) );
+                    Input::Get().NewFrame();
 					Input::Get().Manager().PullEvents();
+                    world.GetSingleton<Mouse>().UpdateData( m_window.mWindow );
+
 				}
 
 				// checking the loop timing is not late
