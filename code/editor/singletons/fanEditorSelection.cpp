@@ -143,10 +143,6 @@ namespace fan
 				SceneNode& sceneNode = world.GetComponent<SceneNode>( results[index] );
 				SetSelectedSceneNode( &sceneNode );
 			}
-			else
-			{
-				SetSelectedSceneNode( nullptr );
-			}
  		}
 
 		// draw collision shapes, lights @migration

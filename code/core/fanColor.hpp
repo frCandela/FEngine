@@ -36,6 +36,7 @@ namespace fan
 		static const Color White;
 		static const Color Black;
 		static const Color Grey;
+        static const Color sDarkGrey;
 		static const Color Yellow;
 		static const Color Magenta;
 		static const Color Cyan;

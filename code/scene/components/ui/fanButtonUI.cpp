@@ -23,9 +23,10 @@ namespace fan
 	void Button::Init( EcsWorld& /*_world*/, EcsEntity /*_entity*/, EcsComponent& _component )
 	{
         Button& button = static_cast<Button&>( _component );
-        button.mColor = Color::White;
+        button.mColorHovered = Color::Grey;
+        button.mColorPressed = Color::sDarkGrey;
         button.mIsHovered = false;
-        button.mPressed = false;
+        button.mIsPressed = false;
 	}
 
 	//========================================================================================================
@@ -36,9 +37,11 @@ namespace fan
 
 		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() );
 		{
-            ImGui::ColorEdit4( "color1", (float*)&button.mColor[0], ImGui::fanColorEditFlags );
+            ImGui::ColorEdit4( "color hovered", (float*)&button.mColorHovered[0], ImGui::fanColorEditFlags );
+            ImGui::ColorEdit4( "color pressed", (float*)&button.mColorPressed[0], ImGui::fanColorEditFlags );
             ImGui::PushReadOnly();
             ImGui::Checkbox("is hovered", &button.mIsHovered );
+            ImGui::Checkbox("is pressed", &button.mIsPressed );
             ImGui::PopReadOnly();
 		}
 		ImGui::PopItemWidth();
@@ -46,21 +49,19 @@ namespace fan
 
 	//========================================================================================================
 	//========================================================================================================
-	void Button::Save( const EcsComponent& _component, Json& /*_json*/ )
+	void Button::Save( const EcsComponent& _component, Json& _json )
 	{
 		const Button& button = static_cast<const Button&>( _component );
-        (void)button;
-		//Serializable::SaveComponentPtr( _json, "target_ui_transform", progressBar.targetUiTransform );
-		//Serializable::SaveFloat( _json, "max_scale", progressBar.maxScale );
+		Serializable::SaveColor( _json, "color_hovered", button.mColorHovered );
+        Serializable::SaveColor( _json, "color_pressed", button.mColorPressed );
 	}
 
 	//========================================================================================================
 	//========================================================================================================
-	void Button::Load( EcsComponent& _component, const Json& /*_json*/ )
+	void Button::Load( EcsComponent& _component, const Json& _json )
 	{
         Button& button = static_cast<Button&>( _component );
-        (void)button;
-		//Serializable::LoadComponentPtr( _json, "target_ui_transform", progressBar.targetUiTransform );
-		//Serializable::LoadFloat( _json, "max_scale", progressBar.maxScale );
+        Serializable::LoadColor( _json, "color_hovered", button.mColorHovered );
+        Serializable::LoadColor( _json, "color_pressed", button.mColorPressed );
 	}
 }

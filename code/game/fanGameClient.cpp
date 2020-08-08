@@ -272,6 +272,7 @@ namespace fan
 			world.Run<SMoveFollowTransformsUI>();
 
             world.Run<SHoverButtons>();
+            world.Run<SHighlightButtons>();
 			
 			world.Run<S_FireWeapons>(			 _delta );
 			world.Run<S_GenerateLightMesh>(		 _delta );

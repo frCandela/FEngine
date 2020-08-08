@@ -7,20 +7,20 @@
 
 namespace fan
 {
-	//================================================================================================================================
-	//================================================================================================================================
-	class Button : public EcsComponent
+	//========================================================================================================
+	//========================================================================================================
+	struct Button : public EcsComponent
 	{
 		ECS_COMPONENT( Button )
-	public:
 		static void SetInfo( EcsComponentInfo& _info );
 		static void Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component );
 		static void OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component );
 		static void Save( const EcsComponent& _component, Json& _json );
 		static void Load( EcsComponent& _component, const Json& _json );
 
-		Color   mColor;
+		Color   mColorHovered;
+        Color   mColorPressed;
 		bool    mIsHovered;
-        bool    mPressed;
+        bool    mIsPressed;
 	};
 }
