@@ -38,5 +38,7 @@ namespace fan
         UnitTestResult mFanAssertResult;
         UnitTestResult mButtonResult;
         UnitTestResult mGlfwMouseResult;
+        UnitTestResult mSignalResult;
+
     };
 }

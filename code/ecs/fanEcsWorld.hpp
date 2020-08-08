@@ -9,8 +9,6 @@
 #include "ecs/fanEcsArchetype.hpp"
 #include "ecs/fanEcsView.hpp"
 
-#include "core/fanOwlMemcpy.hpp"
-
 namespace fan
 {
 	struct EcsView;
@@ -214,7 +212,6 @@ namespace fan
         info.copy = std::is_trivially_copyable<_ComponentType>::value
                 ? &std::memcpy
                 : &_ComponentType::Info::Memcpy;
-        //info.copy		= std::is_trivially_copyable<_ComponentType>::value ? &MemcpyCustom : &_ComponentType::Info::Memcpy;
 		info.init = &_ComponentType::Init;
 		info.size = _ComponentType::Info::s_size;
 		info.alignment = _ComponentType::Info::s_alignment;

@@ -6,6 +6,7 @@
 #include "editor/fanImguiIcons.hpp"
 #include "ecs/fanEcsEntity.hpp"
 #include "ecs/fanEcsTypes.hpp"
+#include "ecs/fanSlot.hpp"
 #include "fanJson.hpp"
 
 namespace sf
@@ -29,7 +30,11 @@ namespace fan
 		static constexpr const char* s_name		{ #_ComponentType		  };						\
 		static constexpr uint32_t	 s_type		{ SSID( #_ComponentType ) };						\
 		static EcsComponent& Instanciate( void* _buffer ) { return *new( _buffer ) T(); }			\
-	    static void* Memcpy( void* _dst, const void* _src, size_t /*_count*/ ){	new( _dst )T( *static_cast<const T*>( _src ) ); return _dst; } \
+	    static void* Memcpy( void* _dst, const void* _src, size_t /*_count*/ )                      \
+	    {	                                                                                        \
+	        new( _dst )T( *static_cast<const T*>( _src ) );                                         \
+	        return _dst;                                                                            \
+        }                                                                                           \
 	};																								\
 	using Info = EcsComponentInfoImpl< _ComponentType >;											
 	
@@ -43,29 +48,30 @@ namespace fan
 	{
 		enum ComponentFlags { 
 			None = 0, 
-			RollbackNoOverwrite = 1 // when a rollback happen, the old rollback states are not overwritten with the resimulated ones
+			RollbackNoOverwrite = 1 // on a rollback, old rollback states are not overwritten with new ones
 		};
 
-		std::string		name;
-		ImGui::IconType icon = ImGui::IconType::NONE;	// editor icon
-		EngineGroups		group = EngineGroups::None;		// editor group
-		const char*		editorPath = "";				// editor path ( for the addComponent ) popup of the inspector
-		uint32_t		type;		
-		int				index;
-		uint32_t		size;
-		uint32_t		alignment;
-		int				flags = ComponentFlags::None;
+		std::string		        name;
+		ImGui::IconType         icon = ImGui::IconType::NONE;	// editor icon
+		EngineGroups		    group = EngineGroups::None;	    // editor group
+		const char*		        editorPath = "";				// editor path for the addComponent menu
+		uint32_t                type;
+		int                     index;
+		uint32_t                size;
+		uint32_t                alignment;
+		int                     flags = ComponentFlags::None;
+		std::vector<SlotBase*>  mSlots;                         // callable methods
 
-		void ( *init )( EcsWorld&, EcsEntity, EcsComponent& ) = nullptr;			// called at the creation of the component
-		void ( *destroy )( EcsWorld&, EcsEntity, EcsComponent& ) = nullptr;			// called at the destruction of the component
-		void ( *onGui )( EcsWorld&, EcsEntity, EcsComponent& ) = nullptr;			// called by the editor for gui display
-		void ( *save )( const EcsComponent&, Json& ) = nullptr;						// Serializes the component when the scene is saved
-		void ( *load )( EcsComponent&, const Json& ) = nullptr;						// Deserializes the component the scene is loaded ( after the init )
-		void ( *netSave ) ( const EcsComponent&, sf::Packet& _packet ) = nullptr;	// Serializes the component into a packet to send over network
-		void ( *netLoad ) ( EcsComponent&, sf::Packet& _packet ) = nullptr;			// Deserializes the component from a packet
-		void ( *rollbackSave ) ( const EcsComponent&, sf::Packet& _packet ) = nullptr;	// Serializes the component rollback data
-		void ( *rollbackLoad ) ( EcsComponent&, sf::Packet& _packet ) = nullptr;		// Deserializes the component component rollback data
-		EcsComponent& ( *construct )( void* ) = nullptr;							// for constructing components
-		void* ( *copy )( void* _dst, const void* _src, size_t _count ) = nullptr;	// for copying components
+		void ( *init )( EcsWorld&, EcsEntity, EcsComponent& ) = nullptr;			// called at creation
+		void ( *destroy )( EcsWorld&, EcsEntity, EcsComponent& ) = nullptr;			// called at destruction
+		void ( *onGui )( EcsWorld&, EcsEntity, EcsComponent& ) = nullptr;			// draw gui
+		void ( *save )( const EcsComponent&, Json& ) = nullptr;						// Serialize to json
+		void ( *load )( EcsComponent&, const Json& ) = nullptr;						// Deserialize from json
+		void ( *netSave ) ( const EcsComponent&, sf::Packet& _packet ) = nullptr;	// Serialize to packet
+		void ( *netLoad ) ( EcsComponent&, sf::Packet& _packet ) = nullptr;		    // Deserialize from packet
+		void ( *rollbackSave ) ( const EcsComponent&, sf::Packet& _packet ) = nullptr;// Serializes rollback
+		void ( *rollbackLoad ) ( EcsComponent&, sf::Packet& _packet ) = nullptr;	  // Deserializes rollback
+		EcsComponent& ( *construct )( void* ) = nullptr;
+		void* ( *copy )( void* _dst, const void* _src, size_t _count ) = nullptr;
 	};
 }

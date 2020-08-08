@@ -9,6 +9,7 @@
 #include "scene/unit_tests/fanUnitTestPrefabManager.hpp"
 #include "scene/unit_tests/components/fanUnitTestButton.hpp"
 #include "scene/unit_tests/fanUnitTestMouse.hpp"
+#include "ecs/unit_tests/fanUnitTestSignal.hpp"
 
 namespace fan
 {
@@ -29,6 +30,7 @@ namespace fan
 #endif
                 { "UI button",          &UnitTestButton::RunTests,          mButtonResult },
                 { "Mouse", &UnitTestMouse::RunTests, mGlfwMouseResult },
+                { "Signal", &UnitTestSignal::RunTests, mSignalResult },
         };
     }
 
