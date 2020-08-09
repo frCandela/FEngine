@@ -6,8 +6,8 @@ namespace fan
 {
     #ifdef NDEBUG
 
-        #define fanAssertMsg
-        #define fanAssert
+        #define fanAssertMsg( _expression, _msg )
+        #define fanAssert( _expression )
 
     #else
 

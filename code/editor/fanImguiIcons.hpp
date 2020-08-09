@@ -38,6 +38,7 @@ namespace ImGui
         CHECK_NEUTRAL16,
         CHECK_FAILED16,
         CHECK_SUCCESS16,
+        SIGNAL_SLOT16,
 
 		// scene components
 		IMAGE16,
@@ -58,6 +59,7 @@ namespace ImGui
 		INPUT16,
 		FOLLOW_TRANSFORM_UI16,
 		EXPIRATION16,
+        BUTTON16,
 
 		// singletons
 		TIME16,

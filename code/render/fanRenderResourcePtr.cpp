@@ -39,7 +39,7 @@ namespace ImGui
 		ImGui::SameLine();
 
 		// name button 
-		const float width = 0.6f * ImGui::GetWindowWidth() - ImGui::GetCursorPosX() + 8;
+		const float width = 0.6f * ImGui::GetWindowWidth() - ImGui::GetCursorPosX() + 23;
 		ImGui::Button( name.c_str(), ImVec2( width, 0.f ) ); ImGui::SameLine();
 		ImGui::FanBeginDragDropSourceTexture( texture );
 

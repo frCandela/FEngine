@@ -271,10 +271,10 @@ namespace fan
 
 		// SceneNode dragndrop target empty selectable -> place dragged below
 		ImGui::ComponentPayload payload = ImGui::FanBeginDragDropTargetComponent<SceneNode>( world );
-		if( payload.handle != 0 )
+		if( payload.mHandle != 0 )
 		{
-			assert( payload.type == SceneNode::Info::s_type );
-			SceneNode& nodeDrop1 = scene.world->GetComponent<SceneNode>( scene.world->GetEntity( payload.handle) );
+			assert( payload.mComponentType == SceneNode::Info::s_type );
+			SceneNode& nodeDrop1 = scene.world->GetComponent<SceneNode>( scene.world->GetEntity( payload.mHandle) );
 			if( &nodeDrop1 != &_node )
 			{
 				nodeDrop1.InsertBelow( _node );
@@ -302,10 +302,10 @@ namespace fan
 
 		// SceneNode dragndrop target scene node name -> place as child
 		ImGui::ComponentPayload payload2 = ImGui::FanBeginDragDropTargetComponent<SceneNode>( world );
-		if( payload2.handle != 0 )
+		if( payload2.mHandle != 0 )
 		{
-			assert( payload2.type == SceneNode::Info::s_type );
-			SceneNode& nodeDrop2 = world.GetComponent<SceneNode>( world.GetEntity( payload2.handle ) );
+			assert( payload2.mComponentType == SceneNode::Info::s_type );
+			SceneNode& nodeDrop2 = world.GetComponent<SceneNode>( world.GetEntity( payload2.mHandle ) );
 			nodeDrop2.SetParent( &_node );
 		}
 

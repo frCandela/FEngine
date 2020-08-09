@@ -1,16 +1,16 @@
 #include "scene/fanDragnDrop.hpp"
 
+#include "core/fanAssert.hpp"
 #include "core/fanDebug.hpp"
-#include "editor/fanImguiIcons.hpp"
 #include "scene/components/fanSceneNode.hpp"
 #include "scene/fanPrefab.hpp"
 #include "scene/singletons/fanScene.hpp"
-#include "ecs/fanEcsWorld.hpp"
 #include "render/resources/fanTexture.hpp"
-#include "render/resources/fanMesh.hpp"
 
 namespace ImGui
 {
+    const std::string ComponentPayload::sPrefix = "cpnt_";
+
 	//========================================================================================================
 	//========================================================================================================
 	void FanBeginDragDropSourcePrefab( fan::Prefab* _prefab, ImGuiDragDropFlags _flags )
@@ -55,7 +55,7 @@ namespace ImGui
 		{
 			const fan::EcsComponentInfo& info = _world.GetComponentInfo( _type );
 
-			std::string nameid = std::string( "dragndrop_" ) + std::to_string( info.type);
+			std::string nameid = ComponentPayload::sPrefix + std::to_string( info.type);
 			ComponentPayload payload = { _handle , _type };
 			ImGui::SetDragDropPayload( nameid.c_str(), &payload, sizeof( payload ) );
 			ImGui::Icon( info.icon, { 16,16 } ); ImGui::SameLine();
@@ -64,30 +64,60 @@ namespace ImGui
 		}		
 	}
 
+    //========================================================================================================
+    //========================================================================================================
+    bool ComponentPayload::IsComponentPayload( const ImGuiPayload* _payload )
+    {
+        std::string dataTypeStr = _payload->DataType;
+        if( dataTypeStr.size() < ComponentPayload::sPrefix.size() ) { return false; }
+
+        const std::string subString = dataTypeStr.substr( 0, ComponentPayload::sPrefix.size() );
+        return subString == ComponentPayload::sPrefix;
+    }
+
 	//========================================================================================================
+	// if _type == 0 accepts all components types
 	//========================================================================================================
 	ComponentPayload FanBeginDragDropTargetComponent( fan::EcsWorld& _world, uint32_t _type )
 	{
+	    using namespace fan;
+
  		if( ImGui::BeginDragDropTarget() )
- 		{  			
+ 		{
+			std::string nameid;
+ 		    // accept all components
+ 			if( _type == 0 )
+			{
+                const ImGuiPayload* preGetPayload = ImGui::GetDragDropPayload();
+                if( preGetPayload != nullptr && ComponentPayload::IsComponentPayload( preGetPayload ) )
+                {
+                    nameid = preGetPayload->DataType;
+                }
+			}
+
+            // accept only components of a given type
+			if( nameid.empty() )
+			{
+				nameid = ComponentPayload::sPrefix + std::to_string( _type );
+			}
+
 			// Drop payload component
- 			std::string nameid = std::string( "dragndrop_" ) + std::to_string( _type );
  			const ImGuiPayload* imGuiPayload = ImGui::AcceptDragDropPayload( nameid.c_str() );
  			if( imGuiPayload != nullptr )
  			{
- 				assert( imGuiPayload->DataSize == sizeof( ComponentPayload ) );
+				fanAssert( imGuiPayload->DataSize == sizeof( ComponentPayload ) );
 				return *(ComponentPayload*)imGuiPayload->Data;
  			}
 
  			// Drop payload scene node
-			nameid = std::string( "dragndrop_" ) + std::to_string( fan::SceneNode::Info::s_type );
+			nameid = ComponentPayload::sPrefix + std::to_string( fan::SceneNode::Info::s_type );
 			imGuiPayload = ImGui::AcceptDragDropPayload( nameid.c_str() );
 			if( imGuiPayload != nullptr )
 			{
 				// find the component and assigns it if it exists
-				assert( imGuiPayload->DataSize == sizeof( ComponentPayload ) );
+				fanAssert( imGuiPayload->DataSize == sizeof( ComponentPayload ) );
 				ComponentPayload& payload = *(ComponentPayload*)imGuiPayload->Data;
-				if( _world.HasComponent( _world.GetEntity( payload.handle ), _type ) )
+				if( _world.HasComponent( _world.GetEntity( payload.mHandle ), _type ) )
 				{
 					return payload;
 				}

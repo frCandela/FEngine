@@ -86,14 +86,15 @@ namespace fan
 		template <typename _ComponentType > void			    RemoveComponent		( const EcsEntity _entity );
 		template <typename _ComponentType > bool			    HasComponent		( const EcsEntity _entity );
 		template< typename _ComponentType >	_ComponentType& GetComponent		( const EcsEntity _entity );
-		EcsComponent&					AddComponent		( const EcsEntity _entity, const uint32_t _type );
-		void							RemoveComponent		( const EcsEntity _entity, const uint32_t _type );
-		bool							HasComponent		( const EcsEntity _entity, const uint32_t _type );
-		EcsComponent&					GetComponent		( const EcsEntity _entity, const uint32_t _type );
+		EcsComponent&			AddComponent		( const EcsEntity _entity, const uint32_t _type );
+		void					RemoveComponent		( const EcsEntity _entity, const uint32_t _type );
+		bool					HasComponent		( const EcsEntity _entity, const uint32_t _type );
+        bool					IndexedHasComponent	( const EcsEntity _entity, const int _componentindex );
+		EcsComponent&			GetComponent		( const EcsEntity _entity, const uint32_t _type );
 		EcsComponent&			IndexedGetComponent ( const EcsEntity _entity, const int _componentIndex );
-		const EcsComponentInfo&				IndexedGetComponentInfo( const int _componentIndex ) const;
-		const EcsComponentInfo&				GetComponentInfo( const uint32_t _type ) const;
-        const EcsComponentInfo*			    SafeGetComponentInfo( const uint32_t _type ) const;
+		const EcsComponentInfo&	IndexedGetComponentInfo( const int _componentIndex ) const;
+		const EcsComponentInfo&	GetComponentInfo( const uint32_t _type ) const;
+        const EcsComponentInfo*	SafeGetComponentInfo( const uint32_t _type ) const;
 		const std::vector< EcsComponentInfo >&	GetComponentInfos() const	{ return m_componentsInfo; }
 
 		// Entities

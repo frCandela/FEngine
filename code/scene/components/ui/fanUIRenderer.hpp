@@ -18,12 +18,16 @@ namespace fan
 		static void Save( const EcsComponent& _component, Json& _json );
 		static void Load( EcsComponent& _component, const Json& _json );
 
-		Mesh2D*    mUiMesh;
-		Color      color;
-		TexturePtr texture;
+		Mesh2D*     mUiMesh;
+		Color       color;
+		TexturePtr  texture;
+		bool        mVisible;
 
 		glm::ivec2	GetTextureSize() const;
 		Texture*	GetTexture() const { return *texture; }
+
+		// Slots
+        static void Show( EcsComponent& _component );
+        static void Hide( EcsComponent& _component );
 	};
-	static constexpr size_t sizeof_UIRenderer = sizeof( UIRenderer );
 }

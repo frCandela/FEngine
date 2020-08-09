@@ -18,8 +18,11 @@ namespace ImGui
 	//================================================================================================================================
 	struct ComponentPayload
 	{
-		fan::EcsHandle handle = 0;
-		uint32_t type = 0;
+	    static const std::string sPrefix;
+		fan::EcsHandle           mHandle        = 0;
+		uint32_t                 mComponentType = 0;
+
+		static bool IsComponentPayload( const ImGuiPayload * _payload );
 	};
 
 	void				FanBeginDragDropSourcePrefab( fan::Prefab * _prefab, ImGuiDragDropFlags _flags = ImGuiDragDropFlags_None );

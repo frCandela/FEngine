@@ -45,6 +45,7 @@ namespace ImGui
         ,DECL_ICON( 16.f, 5, 0 )  // CHECK_NEUTRAL16,
         ,DECL_ICON( 16.f, 6, 0 )  // CHECK_FAILED16,
         ,DECL_ICON( 16.f, 7, 0 )  // CHECK_SUCCESS16,
+        ,DECL_ICON( 16.f, 8, 0 )  // SIGNAL_SLOT16,
 
 		// scene components
 		,DECL_ICON( 16.f, 0, 8 )  // IMAGE16,
@@ -65,6 +66,7 @@ namespace ImGui
 		,DECL_ICON( 16.f, 15, 8 ) // INPUT16
 		,DECL_ICON( 16.f, 16, 8 ) // FOLLOW_TRANSFORM_UI16
 		,DECL_ICON( 16.f, 17, 8 ) // EXPIRATION16
+		,DECL_ICON( 16.f, 18, 8 ) // BUTTON16
 
 		,DECL_ICON( 16.f, 0, 2 ) // TIME16
 		,DECL_ICON( 16.f, 1, 2 ) // SPAWN16

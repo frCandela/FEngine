@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <iostream>
 #include <functional>
 #include "core/fanAssert.hpp"
 #include "ecs/fanEcsWorld.hpp"
@@ -34,13 +35,11 @@ namespace fan
                       EcsWorld& _world,
                       const EcsHandle _handle );
 
-        void Connect( EcsWorld& _world,
-                      const EcsHandle _handle,
-                      uint32_t _type,
-                      SlotBase* _slot );
+        bool Connect(  EcsWorld& _world, SlotPtr& _slotPtr );
 
         void Emmit( Args... _args );
         void Clear();
+        int ConnectionsCount() const { return (int)mConnections.size(); }
         void Disconnect( const size_t _ID );
         int GetType() const{ return TemplateType::Type<Args...>(); }
 
@@ -88,24 +87,27 @@ namespace fan
     //========================================================================================================
     //========================================================================================================
     template< typename... Args >
-    void Signal<Args...>::Connect( EcsWorld& _world,
-                                   const EcsHandle _handle,
-                                   uint32_t _type,
-                                   SlotBase* _slot )
+    bool Signal<Args...>::Connect( EcsWorld& _world, SlotPtr& _slotPtr )
     {
-        fanAssert( _handle != 0 );
-        fanAssert( _slot->GetType() == GetType() );
-        Slot<Args...>* slot = static_cast< Slot<Args...>* >(_slot);
+        if( _slotPtr.GetType() != GetType()) { return false; }
+
+        const SlotPtr::SlotCallData * _callData = &_slotPtr.Data();
 
         Connection connection;
-        connection.mID     = _handle;
-        connection.mLambda  = [&_world, slot, _type, _handle]( Args... _args )
+        connection.mID      = (size_t)_callData;
+        connection.mLambda  = [ &_world, _callData ]( Args... _args )
         {
-            EcsComponent& component = _world.GetComponent( _world.GetEntity( _handle ), _type );
-            //( component ).*( method ) )( _args... );
-           (*slot->mMethod)( component, _args...);
+            if( _callData->mHandle != 0 && _callData->mSlot != nullptr )
+            {
+                Slot<Args...>* slot = static_cast< Slot<Args...>* >(_callData->mSlot);
+                EcsEntity entity = _world.GetEntity( _callData->mHandle );
+                EcsComponent& component = _world.GetComponent( entity, _callData->mComponentType );
+                (*slot->mMethod)( component, _args...);
+            }
         };
         mConnections.push_back( connection );
+
+        return true;
     }
 
     //========================================================================================================

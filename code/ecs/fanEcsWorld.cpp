@@ -374,18 +374,25 @@ namespace fan
 	//========================================================================================================
 	//========================================================================================================
 	bool EcsWorld::HasComponent( const EcsEntity _entity, const uint32_t _type )
+    {
+        const int componentIndex = GetIndex( _type );
+        return IndexedHasComponent( _entity, componentIndex );
+    }
+
+    //========================================================================================================
+    //========================================================================================================
+    bool EcsWorld::IndexedHasComponent( const EcsEntity _entity, const int _componentindex )
 	{
-		const int componentIndex = GetIndex( _type );
 		if( _entity.archetype == &m_transitionArchetype )
 		{
 			const EcsEntityData& entityData = _entity.archetype->GetEntityData(_entity.index);
             fanAssert( entityData.transitionIndex != -1 );
 			const EcsTransition& transition = m_transitions[entityData.transitionIndex];
-			return transition.signatureAdd[componentIndex];
+			return transition.signatureAdd[_componentindex];
 		}
 		else
 		{
-			if( _entity.archetype->GetSignature()[componentIndex] )
+			if( _entity.archetype->GetSignature()[_componentindex] )
 			{
 				return true;
 			}
@@ -395,7 +402,7 @@ namespace fan
 				if( entityData.transitionIndex != -1 )
 				{
 					const EcsTransition& transition = m_transitions[entityData.transitionIndex];
-					return transition.signatureAdd[componentIndex];
+					return transition.signatureAdd[_componentindex];
 				}
 				else
 				{
@@ -454,6 +461,7 @@ namespace fan
     {
 	    return  m_componentsInfo.at( GetIndex(_type) );
     }
+
     //========================================================================================================
     //========================================================================================================
     const EcsComponentInfo* EcsWorld::SafeGetComponentInfo( const uint32_t _type ) const

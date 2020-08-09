@@ -98,12 +98,12 @@ namespace ImGui
 
 		// dragndrop target for button
   		ImGui::ComponentPayload payloadButton = ImGui::FanBeginDragDropTargetComponent( world, _ptr.type );
-		if( payloadButton.handle != 0 || payloadIcon.handle != 0 )
+		if( payloadButton.mHandle != 0 || payloadIcon.mHandle != 0 )
 		{
-            ImGui::ComponentPayload& payload = ( payloadButton.handle != 0
+            ImGui::ComponentPayload& payload = ( payloadButton.mHandle != 0
                     ? payloadButton
                     : payloadIcon );
-			_ptr.Create( payload.handle );
+			_ptr.Create( payload.mHandle );
 			returnValue = true;
 		}
  

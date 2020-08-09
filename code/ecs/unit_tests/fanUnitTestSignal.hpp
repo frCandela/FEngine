@@ -47,8 +47,9 @@ namespace fan
     public:
         static std::vector<TestMethod> GetTests()
         {
-            return { { &UnitTestSignal::TestConnect, "Connect " },
-                     { &UnitTestSignal::TestReceiver, "Receiver" },
+            return { { &UnitTestSignal::TestConnect,    "Connect " },
+                     { &UnitTestSignal::TestSlotPtr,    "Slot ptr" },
+                     { &UnitTestSignal::TestSignalSlot, "Signal slot" },
             };
         }
         void Create() override {}
@@ -81,7 +82,28 @@ namespace fan
             TEST_ASSERT( testStruct2.mValue == 4 );
         }
 
-        void TestReceiver()
+        void TestSlotPtr()
+        {
+            EcsWorld * world = nullptr;
+            EcsHandle handle = 1;
+            Slot<> slot("null", nullptr );
+            SlotPtr slotPtr;
+            TEST_ASSERT( ! slotPtr.IsValid() );
+            Signal<int>     signalInt;
+            slotPtr.Init( *world, signalInt.GetType() );
+            TEST_ASSERT( ! slotPtr.IsValid() );
+            TEST_ASSERT( slotPtr.GetType() == signalInt.GetType() );
+            slotPtr.Set( handle, TestComponent::Info::s_type, slot );
+            TEST_ASSERT( slotPtr.IsValid() );
+
+            // the data should move when the component is moved around in memory
+            uint8_t data[ sizeof(SlotPtr) ];
+            std::memcpy( data, &slotPtr, sizeof(SlotPtr) );
+            SlotPtr* slotPtrCpy = (SlotPtr*)data;
+            TEST_ASSERT( &slotPtrCpy->Data() == &slotPtr.Data() );
+        }
+
+        void TestSignalSlot()
         {
             EcsWorld world;
             world.AddComponentType<TestComponent>();
@@ -91,20 +113,26 @@ namespace fan
 
             TestComponent& testComponent = world.AddComponent<TestComponent>(entity);
 
-            SlotBase* slotInt = new Slot<int>( "test int", &TestComponent::SetValueInt );
-
             Signal<int>     signalInt;
-            signalInt.Connect( world, handle, TestComponent::Info::s_type, slotInt );
+            Slot<int> slotInt ( "test int", &TestComponent::SetValueInt );
+            SlotPtr slotPtrInt;
+            slotPtrInt.Init( world, signalInt.GetType() );
+            slotPtrInt.Set( handle, TestComponent::Info::s_type, slotInt );
+
+            signalInt.Connect( world, slotPtrInt );
             TEST_ASSERT( testComponent.mValueInt == 0 );
             signalInt.Emmit(12);
             TEST_ASSERT( testComponent.mValueInt == 12 );
-            signalInt.Disconnect( handle );
+            signalInt.Disconnect( (size_t)&slotPtrInt.Data() );
             signalInt.Emmit(25);
             TEST_ASSERT( testComponent.mValueInt == 12 );
 
-            SlotBase* slotFloat = new Slot<float>( "test float", &TestComponent::SetValueFloat );
             Signal<float>   signalFloat;
-            signalFloat.Connect( world, handle, TestComponent::Info::s_type, slotFloat );
+            Slot<float>slotFloat( "test float", &TestComponent::SetValueFloat );
+            SlotPtr slotPtrFloat;
+            slotPtrFloat.Init( world, signalFloat.GetType() );
+            slotPtrFloat.Set( handle, TestComponent::Info::s_type, slotFloat );
+            signalFloat.Connect( world, slotPtrFloat );
             TEST_ASSERT( testComponent.mValueFloat == 0 );
             signalFloat.Emmit(13.f);
             TEST_ASSERT( testComponent.mValueFloat == 13.f );
@@ -112,9 +140,6 @@ namespace fan
             signalFloat.Clear();
             signalFloat.Emmit(14.f);
             TEST_ASSERT( testComponent.mValueFloat == 13.f );
-
-            delete slotFloat;
-            delete slotInt;
         }
     };
 }

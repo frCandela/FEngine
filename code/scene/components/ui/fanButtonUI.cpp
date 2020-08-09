@@ -1,6 +1,4 @@
 #include "scene/components/ui/fanButtonUI.hpp"
-
-#include "scene/fanSceneSerializable.hpp"
 #include "editor/fanModals.hpp"
 
 namespace fan
@@ -9,7 +7,7 @@ namespace fan
 	//========================================================================================================
 	void Button::SetInfo( EcsComponentInfo& _info )
 	{
-		_info.icon = ImGui::NONE;
+		_info.icon = ImGui::BUTTON16;
 		_info.group = EngineGroups::SceneUI;
 		_info.onGui = &Button::OnGui;
 		_info.load = &Button::Load;
@@ -20,31 +18,16 @@ namespace fan
 
 	//========================================================================================================
 	//========================================================================================================
-	void Button::Init( EcsWorld& /*_world*/, EcsEntity /*_entity*/, EcsComponent& _component )
+	void Button::Init( EcsWorld& _world, EcsEntity /*_entity*/, EcsComponent& _component )
 	{
         Button& button = static_cast<Button&>( _component );
         button.mColorHovered = Color::Grey;
         button.mColorPressed = Color::sDarkGrey;
         button.mIsHovered = false;
         button.mIsPressed = false;
-	}
-
-	//========================================================================================================
-	//========================================================================================================
-	void Button::OnGui( EcsWorld& /*_world*/, EcsEntity /*_entityID*/, EcsComponent& _component )
-	{
-        Button& button = static_cast<Button&>( _component );
-
-		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() );
-		{
-            ImGui::ColorEdit4( "color hovered", (float*)&button.mColorHovered[0], ImGui::fanColorEditFlags );
-            ImGui::ColorEdit4( "color pressed", (float*)&button.mColorPressed[0], ImGui::fanColorEditFlags );
-            ImGui::PushReadOnly();
-            ImGui::Checkbox("is hovered", &button.mIsHovered );
-            ImGui::Checkbox("is pressed", &button.mIsPressed );
-            ImGui::PopReadOnly();
-		}
-		ImGui::PopItemWidth();
+        button.mSlotPtr.Init( _world, button.mPressed.GetType() );
+        button.mPressed.Clear();
+        button.mPressed.Connect( _world, button.mSlotPtr );
 	}
 
 	//========================================================================================================
@@ -64,4 +47,28 @@ namespace fan
         Serializable::LoadColor( _json, "color_hovered", button.mColorHovered );
         Serializable::LoadColor( _json, "color_pressed", button.mColorPressed );
 	}
+
+    //========================================================================================================
+    //========================================================================================================
+    void Button::OnGui( EcsWorld& _world, EcsEntity /*_entityID*/, EcsComponent& _component )
+    {
+        Button& button = static_cast<Button&>( _component );
+
+        ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() );
+         if( ImGui::Button( "##color hovered reset" ) ){ button.mColorHovered = Color::Grey; }
+         ImGui::SameLine();
+         ImGui::ColorEdit4( "color hovered", (float*)&button.mColorHovered[0], ImGui::fanColorEditFlags );
+         if( ImGui::Button( "##color pressed reset" ) ){ button.mColorPressed = Color::sDarkGrey; }
+         ImGui::SameLine();
+         ImGui::ColorEdit4( "color pressed", (float*)&button.mColorPressed[0], ImGui::fanColorEditFlags );
+        ImGui::PopItemWidth();
+
+         ImGui::PushReadOnly();
+         ImGui::Checkbox("is hovered", &button.mIsHovered );
+         ImGui::SameLine();
+         ImGui::Checkbox("is pressed", &button.mIsPressed );
+         ImGui::PopReadOnly();
+
+         ImGui::FanSlotPtr("pressed", _world, button.mSlotPtr );
+    }
 }

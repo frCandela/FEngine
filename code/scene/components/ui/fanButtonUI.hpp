@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ecs/fanEcsComponent.hpp"
+#include "ecs/fanSlot.hpp"
 #include "scene/components/ui/fanTransformUI.hpp"
 #include "scene/fanSceneResourcePtr.hpp"
 #include "core/fanColor.hpp"
@@ -22,5 +23,8 @@ namespace fan
         Color   mColorPressed;
 		bool    mIsHovered;
         bool    mIsPressed;
+
+        Signal<> mPressed;
+        SlotPtr mSlotPtr;
 	};
 }
