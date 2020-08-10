@@ -83,7 +83,10 @@ namespace fan
 							if( gameData.spaceshipHandle == 0 )
 							{
 								gameData.spaceshipHandle = SpawnShip::SpawnSpaceship( _world, true, true );
-								linkingContext.AddEntity( gameData.spaceshipHandle, spaceshipID );
+								if( gameData.spaceshipHandle != 0 )
+                                {
+                                    linkingContext.AddEntity( gameData.spaceshipHandle, spaceshipID );
+                                }
 							}
 						}
 						else
@@ -141,6 +144,12 @@ namespace fan
 						_world.AddComponent<PlayerController>( spaceshipID );
 						_world.AddComponent<ClientRollback>( spaceshipID );
 					}
+
+
+                    fanAssert( _world.HasComponent<Transform>( spaceshipID ));
+                    fanAssert( _world.HasComponent<Rigidbody>( spaceshipID ));
+                    fanAssert( _world.HasComponent<MotionState>( spaceshipID ));
+					fanAssert( _world.HasComponent<BoxShape>( spaceshipID ));
 
 					if( _world.HasComponent<Transform>( spaceshipID )
 						&& _world.HasComponent<Rigidbody>( spaceshipID )

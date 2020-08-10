@@ -1,26 +1,27 @@
 #pragma  once
 
 #include "ecs/fanEcsComponent.hpp"
-#include "fanDisableWarnings.hpp"
-WARNINGS_GLM_PUSH()
-#include "glm/glm.hpp"
-WARNINGS_POP()
+#include "scene/fanSceneResourcePtr.hpp"
+#include "scene/components/ui/fanUITransform.hpp"
 
 namespace fan
 {
 	//========================================================================================================
-	// 2D position in pixels
+	// makes a ui transform follow another ui transform
 	//========================================================================================================
-	struct TransformUI : public EcsComponent
+	struct UIFollowTransform : public EcsComponent
 	{
-		ECS_COMPONENT( TransformUI )
+		ECS_COMPONENT( UIFollowTransform )
 		static void SetInfo( EcsComponentInfo& _info );
 		static void Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component );
 		static void OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component );
 		static void Save( const EcsComponent& _component, Json& _json );
 		static void Load( EcsComponent& _component, const Json& _json );
 
-		glm::ivec2 mPosition;
-		glm::ivec2 mSize;
+		ComponentPtr<UITransform> mTarget;
+		glm::ivec2                mOffset;
+		bool                      mlocked;
+
+		static void UpdateOffset( EcsWorld& _world, EcsEntity _entityID );
 	};
 }

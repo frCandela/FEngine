@@ -1,6 +1,6 @@
 #include "ecs/fanEcsSystem.hpp"
-#include "scene/components/ui/fanButtonUI.hpp"
-#include "scene/components/ui/fanTransformUI.hpp"
+#include "scene/components/ui/fanUIButton.hpp"
+#include "scene/components/ui/fanUITransform.hpp"
 #include "scene/components/ui/fanUIRenderer.hpp"
 #include "scene/singletons/fanMouse.hpp"
 #include "core/fanDebug.hpp"
@@ -13,19 +13,19 @@ namespace fan
     {
         static EcsSignature GetSignature( const EcsWorld& _world )
         {
-            return	_world.GetSignature<Button>() | _world.GetSignature<TransformUI>();
+            return _world.GetSignature<UIButton>() | _world.GetSignature<UITransform>();
         }
 
         static void Run( EcsWorld& _world, const EcsView& _view )
         {
             Mouse& mouse = _world.GetSingleton<Mouse>();
 
-            auto buttonIt = _view.begin<Button>();
-            auto transformUIIt = _view.begin<TransformUI>();
-            for( ; buttonIt != _view.end<Button>(); ++buttonIt, ++transformUIIt )
+            auto buttonIt = _view.begin<UIButton>();
+            auto transformUIIt = _view.begin<UITransform>();
+            for( ; buttonIt != _view.end<UIButton>(); ++buttonIt, ++transformUIIt )
             {
-                Button& button = *buttonIt;
-                TransformUI& transform = *transformUIIt;
+                UIButton   & button    = *buttonIt;
+                UITransform& transform = *transformUIIt;
 
                 button.mIsHovered = mouse.mLocalPosition.x >= transform.mPosition.x &&
                                     mouse.mLocalPosition.y >= transform.mPosition.y &&
@@ -47,20 +47,20 @@ namespace fan
     {
         static EcsSignature GetSignature( const EcsWorld& _world )
         {
-            return	_world.GetSignature<Button>() | _world.GetSignature<UIRenderer>();
+            return _world.GetSignature<UIButton>() | _world.GetSignature<UIRenderer>();
         }
 
         static void Run( EcsWorld& /*_world*/, const EcsView& _view )
         {
-            auto buttonIt = _view.begin<Button>();
+            auto buttonIt = _view.begin<UIButton>();
             auto uiRendererIt = _view.begin<UIRenderer>();
-            for( ; buttonIt != _view.end<Button>(); ++buttonIt, ++uiRendererIt )
+            for( ; buttonIt != _view.end<UIButton>(); ++buttonIt, ++uiRendererIt )
             {
-                Button& button = *buttonIt;
+                UIButton  & button     = *buttonIt;
                 UIRenderer& uiRenderer = *uiRendererIt;
-                if( button.mIsPressed )     { uiRenderer.color = button.mColorPressed; }
-                else if( button.mIsHovered ){ uiRenderer.color = button.mColorHovered; }
-                else                        { uiRenderer.color = Color::White; }
+                if( button.mIsPressed )     { uiRenderer.mColor = button.mColorPressed; }
+                else if( button.mIsHovered ){ uiRenderer.mColor = button.mColorHovered; }
+                else                        { uiRenderer.mColor = Color::White; }
             }
         }
     };

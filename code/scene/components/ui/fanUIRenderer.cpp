@@ -19,8 +19,6 @@ namespace fan
 		_info.save = &UIRenderer::Save;
 		_info.editorPath = "ui/";
 		_info.name = "ui renderer";
-		_info.mSlots.push_back( new Slot<>( "show", &UIRenderer::Show ));
-        _info.mSlots.push_back( new Slot<>( "hide", &UIRenderer::Hide ));
 	}
 
 	//================================================================================================================================
@@ -30,10 +28,10 @@ namespace fan
         RenderResources& renderResources = _world.GetSingleton<RenderResources>();
 
 		UIRenderer& uiRenderer = static_cast<UIRenderer&>( _component );
-        uiRenderer.mUiMesh = renderResources.mMesh2DManager->Get( RenderGlobal::sMesh2DQuad );
+        uiRenderer.mMesh2D  = renderResources.mMesh2DManager->Get( RenderGlobal::sMesh2DQuad );
         uiRenderer.mVisible = true;
-        uiRenderer.color = Color::White;
-        fanAssert( uiRenderer.mUiMesh );
+        uiRenderer.mColor   = Color::White;
+        fanAssert( uiRenderer.mMesh2D );
 	}
 
     //================================================================================================================================
@@ -41,8 +39,8 @@ namespace fan
     void UIRenderer::Save( const EcsComponent& _component, Json& _json )
     {
         const UIRenderer& ui = static_cast<const UIRenderer&>( _component );
-        Serializable::SaveColor( _json, "color", ui.color );
-        Serializable::SaveTexturePtr( _json, "texture_path", ui.texture );
+        Serializable::SaveColor( _json, "color", ui.mColor );
+        Serializable::SaveTexturePtr( _json, "texture_path", ui.mTexture );
     }
 
     //================================================================================================================================
@@ -50,32 +48,16 @@ namespace fan
     void UIRenderer::Load( EcsComponent& _component, const Json& _json )
     {
         UIRenderer& ui = static_cast<UIRenderer&>( _component );
-        Serializable::LoadColor( _json, "color", ui.color );
-        Serializable::LoadTexturePtr( _json, "texture_path", ui.texture );
+        Serializable::LoadColor( _json, "color", ui.mColor );
+        Serializable::LoadTexturePtr( _json, "texture_path", ui.mTexture );
     }
 
     //================================================================================================================================
     //================================================================================================================================
     glm::ivec2	UIRenderer::GetTextureSize() const
     {
-        return *texture != nullptr ? glm::ivec2( texture->mExtent.width, texture->mExtent.height ) : glm::ivec2( 0, 0 );
+        return *mTexture != nullptr ? glm::ivec2( mTexture->mExtent.width, mTexture->mExtent.height ) : glm::ivec2( 0, 0 );
     }
-
-    //================================================================================================================================
-    //================================================================================================================================
-    void UIRenderer::Show( EcsComponent& _component )
-    {
-        UIRenderer& ui = (UIRenderer&)_component;
-        ui.mVisible = true;
-    }
-    //================================================================================================================================
-    //================================================================================================================================
-    void UIRenderer::Hide( EcsComponent& _component )
-    {
-        UIRenderer& ui = (UIRenderer&)_component;
-        ui.mVisible   = false;
-    }
-
 
     //================================================================================================================================
 	//================================================================================================================================
@@ -90,12 +72,12 @@ namespace fan
 			// color
 			if( ImGui::Button( "##TransPos" ) )
 			{
-				ui.color = Color::White;
+				ui.mColor = Color::White;
 			} ImGui::SameLine();
-			ImGui::ColorEdit4( "color", ui.color.Data(), ImGui::fanColorEditFlags );
+			ImGui::ColorEdit4( "color", ui.mColor.Data(), ImGui::fanColorEditFlags );
 
 			// texture
-			ImGui::FanTexturePtr( "ui texture", ui.texture );
+			ImGui::FanTexturePtr( "ui texture", ui.mTexture );
 			ImGui::Checkbox("visible", &ui.mVisible );
 
 		} ImGui::PopItemWidth();

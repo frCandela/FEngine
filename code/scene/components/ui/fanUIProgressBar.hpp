@@ -1,27 +1,26 @@
-#pragma  once
+#pragma once
 
 #include "ecs/fanEcsComponent.hpp"
+#include "scene/components/ui/fanUITransform.hpp"
 #include "scene/fanSceneResourcePtr.hpp"
-#include "scene/components/ui/fanTransformUI.hpp"
 
 namespace fan
 {
 	//========================================================================================================
-	// makes a ui transform follow another ui transform
 	//========================================================================================================
-	struct FollowTransformUI : public EcsComponent
+	struct UIProgressBar : public EcsComponent
 	{
-		ECS_COMPONENT( FollowTransformUI )
+		ECS_COMPONENT( UIProgressBar )
 		static void SetInfo( EcsComponentInfo& _info );
 		static void Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component );
 		static void OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component );
 		static void Save( const EcsComponent& _component, Json& _json );
 		static void Load( EcsComponent& _component, const Json& _json );
 
-		ComponentPtr<TransformUI> targetTransform;
-		glm::ivec2 offset;
-		bool locked;
+		ComponentPtr<UITransform> mTargetTransform;
+		float                     mProgress; // between 0-1
+		int                       mMaxSize;  // in pixels
 
-		static void UpdateOffset( EcsWorld& _world, EcsEntity _entityID );
+		void SetProgress( const float _progress );
 	};
 }

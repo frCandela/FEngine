@@ -62,12 +62,15 @@ namespace  fan
         if( _componentType != 0 && !_slotName.empty() )
         {
             const EcsComponentInfo* info = mWorld->SafeGetComponentInfo( _componentType );
-            for( SlotBase* slotBase : info->mSlots )
+            if( info != nullptr )
             {
-                if( slotBase->mName == _slotName )
+                for( SlotBase* slotBase : info->mSlots )
                 {
-                    slot = slotBase;
-                    break;
+                    if( slotBase->mName == _slotName )
+                    {
+                        slot = slotBase;
+                        break;
+                    }
                 }
             }
         }

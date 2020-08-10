@@ -1,26 +1,26 @@
-#include "scene/components/ui/fanButtonUI.hpp"
+#include "scene/components/ui/fanUIButton.hpp"
 #include "editor/fanModals.hpp"
 
 namespace fan
 {
 	//========================================================================================================
 	//========================================================================================================
-	void Button::SetInfo( EcsComponentInfo& _info )
+	void UIButton::SetInfo( EcsComponentInfo& _info )
 	{
 		_info.icon = ImGui::BUTTON16;
 		_info.group = EngineGroups::SceneUI;
-		_info.onGui = &Button::OnGui;
-		_info.load = &Button::Load;
-		_info.save = &Button::Save;
+		_info.onGui = &UIButton::OnGui;
+		_info.load = &UIButton::Load;
+		_info.save = &UIButton::Save;
 		_info.editorPath = "ui/";
-		_info.name = "button ui";
+		_info.name = "ui button";
 	}
 
 	//========================================================================================================
 	//========================================================================================================
-	void Button::Init( EcsWorld& _world, EcsEntity /*_entity*/, EcsComponent& _component )
+	void UIButton::Init( EcsWorld& _world, EcsEntity /*_entity*/, EcsComponent& _component )
 	{
-        Button& button = static_cast<Button&>( _component );
+        UIButton& button = static_cast<UIButton&>( _component );
         button.mColorHovered = Color::Grey;
         button.mColorPressed = Color::sDarkGrey;
         button.mIsHovered = false;
@@ -32,9 +32,9 @@ namespace fan
 
 	//========================================================================================================
 	//========================================================================================================
-	void Button::Save( const EcsComponent& _component, Json& _json )
+	void UIButton::Save( const EcsComponent& _component, Json& _json )
 	{
-		const Button& button = static_cast<const Button&>( _component );
+		const UIButton& button = static_cast<const UIButton&>( _component );
 		Serializable::SaveColor( _json, "color_hovered", button.mColorHovered );
         Serializable::SaveColor( _json, "color_pressed", button.mColorPressed );
         Serializable::SaveSlotPtr( _json, "pressed", button.mSlotPtr );
@@ -42,9 +42,9 @@ namespace fan
 
 	//========================================================================================================
 	//========================================================================================================
-	void Button::Load( EcsComponent& _component, const Json& _json )
+	void UIButton::Load( EcsComponent& _component, const Json& _json )
 	{
-        Button& button = static_cast<Button&>( _component );
+        UIButton& button = static_cast<UIButton&>( _component );
         Serializable::LoadColor( _json, "color_hovered", button.mColorHovered );
         Serializable::LoadColor( _json, "color_pressed", button.mColorPressed );
         Serializable::LoadSlotPtr(  _json, "pressed", button.mSlotPtr );
@@ -52,9 +52,9 @@ namespace fan
 
     //========================================================================================================
     //========================================================================================================
-    void Button::OnGui( EcsWorld& _world, EcsEntity /*_entityID*/, EcsComponent& _component )
+    void UIButton::OnGui( EcsWorld& _world, EcsEntity /*_entityID*/, EcsComponent& _component )
     {
-        Button& button = static_cast<Button&>( _component );
+        UIButton& button = static_cast<UIButton&>( _component );
 
         ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() );
          if( ImGui::Button( "##color hovered reset" ) ){ button.mColorHovered = Color::Grey; }

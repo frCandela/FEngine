@@ -53,11 +53,11 @@ namespace fan
 
 				if( signalRatio < 0.5f )
 				{
-					ui.signalRenderer->color = Color( 1.f, 2.f * signalRatio, 0.f, 1.f ); // red to orange
+					ui.signalRenderer->mColor = Color( 1.f, 2.f * signalRatio, 0.f, 1.f ); // red to orange
 				}
 				else
 				{
-					ui.signalRenderer->color = Color( 1.f - signalRatio, 1.f, 0.f, 1.f ); // orange to green
+					ui.signalRenderer->mColor = Color( 1.f - signalRatio, 1.f, 0.f, 1.f ); // orange to green
 				}
 
 				// Update health progress bar

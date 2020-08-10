@@ -3,9 +3,9 @@
 #include "ecs/fanEcsComponent.hpp"
 #include "scene/fanSceneResourcePtr.hpp"
 #include "scene/components/ui/fanUIRenderer.hpp"
-#include "scene/components/ui/fanProgressBar.hpp"
+#include "scene/components/ui/fanUIProgressBar.hpp"
 #include "scene/components/fanSceneNode.hpp"
-#include "scene/components/ui/fanTransformUI.hpp"
+#include "scene/components/ui/fanUITransform.hpp"
 
 namespace fan
 {
@@ -22,11 +22,11 @@ namespace fan
 		static void Save( const EcsComponent& _component, Json& _json );
 		static void Load( EcsComponent& _component, const Json& _json );
 
-		glm::vec2 uiOffset;
-		ComponentPtr<TransformUI> uiRootTransform;
-		ComponentPtr<ProgressBar> healthProgress;
-		ComponentPtr<ProgressBar> energyProgress;
-		ComponentPtr<ProgressBar> signalProgress;
-		ComponentPtr<UIRenderer>  signalRenderer;
+		glm::vec2                   uiOffset;
+		ComponentPtr<UITransform>   uiRootTransform;
+		ComponentPtr<UIProgressBar> healthProgress;
+		ComponentPtr<UIProgressBar> energyProgress;
+		ComponentPtr<UIProgressBar> signalProgress;
+		ComponentPtr<UIRenderer>    signalRenderer;
 	};
 }

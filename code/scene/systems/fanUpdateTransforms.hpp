@@ -1,8 +1,8 @@
 #include "ecs/fanEcsSystem.hpp"
 #include "scene/components/fanTransform.hpp"
 #include "scene/components/fanFollowTransform.hpp"
-#include "scene/components/ui/fanFollowTransformUI.hpp"
-#include "scene/components/ui/fanTransformUI.hpp"
+#include "scene/components/ui/fanUIFollowTransform.hpp"
+#include "scene/components/ui/fanUITransform.hpp"
 
 namespace fan
 {
@@ -76,22 +76,22 @@ namespace fan
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world )
 		{
-			return	_world.GetSignature<TransformUI>() | _world.GetSignature<FollowTransformUI>();
+			return _world.GetSignature<UITransform>() | _world.GetSignature<UIFollowTransform>();
 		}
 
 		static void Run( EcsWorld& /*_world*/, const EcsView& _view )
 		{
-			auto transformUiIt = _view.begin<TransformUI>();
-			auto followTransformIt = _view.begin<FollowTransformUI>();
-			for( ; transformUiIt != _view.end<TransformUI>(); ++transformUiIt, ++followTransformIt )
+			auto transformUiIt = _view.begin<UITransform>();
+			auto followTransformIt = _view.begin<UIFollowTransform>();
+			for( ; transformUiIt != _view.end<UITransform>(); ++transformUiIt, ++followTransformIt )
 			{
-				TransformUI& follow = *transformUiIt;
-				const FollowTransformUI& followTransform = *followTransformIt;
+				UITransform            & follow          = *transformUiIt;
+				const UIFollowTransform& followTransform = *followTransformIt;
 
-				if( followTransform.locked && followTransform.targetTransform != nullptr )
+				if( followTransform.mlocked && followTransform.mTarget != nullptr )
 				{
-					TransformUI& target = *followTransform.targetTransform;
-					follow.mPosition = target.mPosition + followTransform.offset;
+					UITransform& target = *followTransform.mTarget;
+					follow.mPosition = target.mPosition + followTransform.mOffset;
 				}
 			}
 		}

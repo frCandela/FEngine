@@ -1,4 +1,4 @@
-#include "scene/components/ui/fanProgressBar.hpp"
+#include "scene/components/ui/fanUIProgressBar.hpp"
 
 #include "scene/fanSceneSerializable.hpp"
 
@@ -6,22 +6,22 @@ namespace fan
 {
 	//========================================================================================================
 	//========================================================================================================
-	void ProgressBar::SetInfo( EcsComponentInfo& _info )
+	void UIProgressBar::SetInfo( EcsComponentInfo& _info )
 	{
 		_info.icon = ImGui::IconType::UI_PROGRESS_BAR16;
 		_info.group = EngineGroups::SceneUI;
-		_info.onGui = &ProgressBar::OnGui;
-		_info.load = &ProgressBar::Load;
-		_info.save = &ProgressBar::Save;
+		_info.onGui = &UIProgressBar::OnGui;
+		_info.load = &UIProgressBar::Load;
+		_info.save = &UIProgressBar::Save;
 		_info.editorPath = "ui/";
-		_info.name = "progress bar";
+		_info.name = "ui progress bar";
 	}
 
 	//========================================================================================================
 	//========================================================================================================
-	void ProgressBar::Init( EcsWorld& _world, EcsEntity /*_entity*/, EcsComponent& _component )
+	void UIProgressBar::Init( EcsWorld& _world, EcsEntity /*_entity*/, EcsComponent& _component )
 	{
-		ProgressBar& progressBar = static_cast<ProgressBar&>( _component );
+		UIProgressBar& progressBar = static_cast<UIProgressBar&>( _component );
 		progressBar.mProgress = 1.f;
 		progressBar.mMaxSize  = 100;
 		progressBar.mTargetTransform.Init( _world );
@@ -29,42 +29,25 @@ namespace fan
 
 	//========================================================================================================
 	//========================================================================================================
-	void ProgressBar::OnGui( EcsWorld& /*_world*/, EcsEntity /*_entityID*/, EcsComponent& _component )
+	void UIProgressBar::Save( const EcsComponent& _component, Json& _json )
 	{
-		ProgressBar& progressBar = static_cast<ProgressBar&>( _component );
-
-		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() );
-		{
-			bool update = false;
-			update |= ImGui::DragFloat( "progress", &progressBar.mProgress, 0.01f, 0.f, 1.f );
-			update |= ImGui::DragInt( "max width", &progressBar.mMaxSize, 0.01f );
-			update |= ImGui::FanComponent( "target transform", progressBar.mTargetTransform );
-
-			if( update ) { progressBar. SetProgress( progressBar.mProgress ); }
-		} ImGui::PopItemWidth();
-	}
-
-	//========================================================================================================
-	//========================================================================================================
-	void ProgressBar::Save( const EcsComponent& _component, Json& _json )
-	{
-		const ProgressBar& progressBar = static_cast<const ProgressBar&>( _component );
+		const UIProgressBar& progressBar = static_cast<const UIProgressBar&>( _component );
 		Serializable::SaveComponentPtr( _json, "target_ui_transform", progressBar.mTargetTransform );
 		Serializable::SaveInt( _json, "max_size", progressBar.mMaxSize );
 	}
 
 	//========================================================================================================
 	//========================================================================================================
-	void ProgressBar::Load( EcsComponent& _component, const Json& _json )
+	void UIProgressBar::Load( EcsComponent& _component, const Json& _json )
 	{
-		ProgressBar& progressBar = static_cast<ProgressBar&>( _component );
+		UIProgressBar& progressBar = static_cast<UIProgressBar&>( _component );
 		Serializable::LoadComponentPtr( _json, "target_ui_transform", progressBar.mTargetTransform );
 		Serializable::LoadInt( _json, "max_size", progressBar.mMaxSize );
 	}
 
 	//========================================================================================================
 	//========================================================================================================
-	void  ProgressBar::SetProgress( const float _progress )
+	void  UIProgressBar::SetProgress( const float _progress )
 	{
         mProgress = _progress;
 		if ( mTargetTransform != nullptr )
@@ -72,4 +55,21 @@ namespace fan
             mTargetTransform->mSize.x = int( mProgress * mMaxSize );
 		}
 	}
+
+    //========================================================================================================
+    //========================================================================================================
+    void UIProgressBar::OnGui( EcsWorld& /*_world*/, EcsEntity /*_entityID*/, EcsComponent& _component )
+    {
+        UIProgressBar& progressBar = static_cast<UIProgressBar&>( _component );
+
+        ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() );
+        {
+            bool update = false;
+            update |= ImGui::DragFloat( "progress", &progressBar.mProgress, 0.01f, 0.f, 1.f );
+            update |= ImGui::DragInt( "max width", &progressBar.mMaxSize, 0.01f );
+            update |= ImGui::FanComponent( "target transform", progressBar.mTargetTransform );
+
+            if( update ) { progressBar. SetProgress( progressBar.mProgress ); }
+        } ImGui::PopItemWidth();
+    }
 }

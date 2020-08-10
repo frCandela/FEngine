@@ -17,8 +17,8 @@
 #include "scene/components/fanCamera.hpp"
 #include "scene/components/fanDirectionalLight.hpp"
 #include "scene/components/fanPointLight.hpp"
+#include "scene/components/ui/fanUILayout.hpp"
 #include "scene/singletons/fanScene.hpp"
-#include "scene/singletons/fanMouse.hpp"
 #include "scene/singletons/fanRenderResources.hpp"
 #include "scene/singletons/fanSceneResources.hpp"
 #include "scene/singletons/fanScenePointers.hpp"
@@ -54,7 +54,7 @@
 #include "game/systems/fanParticlesOcclusion.hpp"
 #include "game/components/fanBullet.hpp"
 #include "game/components/fanDamage.hpp"
-#include "game/components/ui/fanMainMenu.hpp"
+#include "game/components/ui/fanUIMainMenu.hpp"
 
 namespace fan
 {
@@ -76,14 +76,15 @@ namespace fan
 		world.AddComponentType<MotionState>();
 		world.AddComponentType<BoxShape>();
 		world.AddComponentType<SphereShape>();
-		world.AddComponentType<TransformUI>();
+		world.AddComponentType<UITransform>();
 		world.AddComponentType<UIRenderer>();
 		world.AddComponentType<Bounds>();
 		world.AddComponentType<ExpirationTime>();
 		world.AddComponentType<FollowTransform>();
-		world.AddComponentType<ProgressBar>();
-		world.AddComponentType<FollowTransformUI>();
-		world.AddComponentType<Button>();
+		world.AddComponentType<UIProgressBar>();
+		world.AddComponentType<UIFollowTransform>();
+		world.AddComponentType<UIButton>();
+        world.AddComponentType<UILayout>();
 		// game components
 		world.AddComponentType<Planet>();
 		world.AddComponentType<SpaceShip>();
@@ -96,7 +97,7 @@ namespace fan
 		world.AddComponentType<SpaceshipUI>();
 		world.AddComponentType<Damage>();
 		world.AddComponentType<PlayerController>();
-        world.AddComponentType<MainMenu>();
+        world.AddComponentType<UIMainMenu>();
 		// network components
 		world.AddComponentType<ReliabilityLayer>();
 		world.AddComponentType<ClientConnection>();

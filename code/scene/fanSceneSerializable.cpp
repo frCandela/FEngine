@@ -1,9 +1,7 @@
 #include "scene/fanSceneSerializable.hpp"
 
 #include "scene/fanSceneResourcePtr.hpp"
-#include "scene/fanPrefab.hpp"
 #include "scene/singletons/fanScenePointers.hpp"
-#include "ecs/fanSlot.hpp"
 
 namespace fan
 {
@@ -27,13 +25,13 @@ namespace fan
 	bool Serializable::LoadComponentPtr( const Json& _json, const char* _name, ComponentPtrBase& _outPtr )
 	{
 		const Json* token = FindToken(_json, _name);
-		if (token != nullptr)
-		{
-			assert( _outPtr.type == ( *token )["component_type"] );
-			_outPtr.CreateUnresolved( (*token)["handle"] );
-			return true;
-		}
-		return false;
+		if (token == nullptr ) { return false; }
+
+        uint32_t    componentType = ( *token )["component_type"];
+		if(_outPtr.type != componentType ) { return false; }
+
+		_outPtr.CreateUnresolved( (*token)["handle"] );
+		return true;
 	}
 
 	//========================================================================================================

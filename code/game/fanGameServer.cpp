@@ -71,13 +71,13 @@ namespace fan
 		world.AddComponentType<MotionState>();
 		world.AddComponentType<BoxShape>();
 		world.AddComponentType<SphereShape>();
-		world.AddComponentType<TransformUI>();
+		world.AddComponentType<UITransform>();
 		world.AddComponentType<UIRenderer>();
 		world.AddComponentType<Bounds>();
 		world.AddComponentType<ExpirationTime>();
 		world.AddComponentType<FollowTransform>();
-		world.AddComponentType<ProgressBar>();
-		world.AddComponentType<FollowTransformUI>();
+		world.AddComponentType<UIProgressBar>();
+		world.AddComponentType<UIFollowTransform>();
 		// game components
 		world.AddComponentType<Planet>();
 		world.AddComponentType<SpaceShip>();

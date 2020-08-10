@@ -28,10 +28,10 @@ namespace fan
 	//================================================================================================================================
 	void LinkingContext::AddEntity( const EcsHandle _handle, const NetID _netID )
 	{
-		assert( _handle != 0 );
-		assert( _netID != 0 );
-		assert( ecsHandleToNetID.find( _handle ) == ecsHandleToNetID.end() );
-		assert( netIDToEcsHandle.find( _netID ) == netIDToEcsHandle.end() );		
+		fanAssert( _handle != 0 );
+		fanAssert( _netID != 0 );
+		fanAssert( ecsHandleToNetID.find( _handle ) == ecsHandleToNetID.end() );
+		fanAssert( netIDToEcsHandle.find( _netID ) == netIDToEcsHandle.end() );
 		netIDToEcsHandle[_netID] = _handle;
 		ecsHandleToNetID[_handle] = _netID;
 	}

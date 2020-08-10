@@ -73,7 +73,7 @@ namespace ImGui
     std::string FanGuiSlotPtr::GenerateStrComboSlots() const
     {
         std::stringstream ssSlots;
-        if( !mComponentsInfo[mComponentIndex]->mSlots.empty() )
+        if( ! mComponentsInfo.empty() && !mComponentsInfo[mComponentIndex]->mSlots.empty() )
         {
             for( int i = 0; i < mComponentsInfo[mComponentIndex]->mSlots.size(); i++ )
             {
@@ -99,7 +99,7 @@ namespace ImGui
                 return i;
             }
         }
-        return -1;
+        return 0;
     }
 
     //========================================================================================================

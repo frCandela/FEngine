@@ -5,7 +5,7 @@
 #include "scene/components/fanTransform.hpp"
 #include "scene/components/fanSceneNode.hpp"
 #include "scene/components/fanMaterial.hpp"
-#include "scene/components/ui/fanTransformUI.hpp"
+#include "scene/components/ui/fanUITransform.hpp"
 #include "scene/components/ui/fanUIRenderer.hpp"
 #include "scene/components/fanPointLight.hpp"
 #include "scene/components/fanDirectionalLight.hpp"
@@ -66,7 +66,7 @@ namespace fan
 		static EcsSignature GetSignature( const EcsWorld& _world )
 		{
 			return _world.GetSignature<UIRenderer>()
-				| _world.GetSignature<TransformUI>();
+				| _world.GetSignature<UITransform>();
 		}
 
 		static void Run( EcsWorld& _world, const EcsView& _view )
@@ -75,12 +75,12 @@ namespace fan
 			renderWorld.uiDrawData.clear();
 
 			auto rendererIt = _view.begin<UIRenderer>();
-			auto transformIt = _view.begin<TransformUI>();
+			auto transformIt = _view.begin<UITransform>();
 
 			for( ; rendererIt != _view.end<UIRenderer>(); ++rendererIt, ++transformIt )
 			{
-				UIRenderer& renderer = *rendererIt;
-				const TransformUI& transform = *transformIt;
+				UIRenderer       & renderer  = *rendererIt;
+				const UITransform& transform = *transformIt;
 
 				if( renderer.GetTexture() == nullptr || ! renderer.mVisible) { continue; }
 
@@ -88,10 +88,10 @@ namespace fan
                 const glm::vec2 pos = glm::vec2( transform.mPosition.x, transform.mPosition.y );
 
 				RenderDataUIMesh data;
-				data.mesh = renderer.mUiMesh;
+				data.mesh = renderer.mMesh2D;
                 data.position = pos / renderWorld.targetSize * 2.f - glm::vec2( 1.f, 1.f );
                 data.scale = size / renderWorld.targetSize;
-				data.color = renderer.color.ToGLM();
+				data.color = renderer.mColor.ToGLM();
 				data.textureIndex = renderer.GetTexture() != nullptr ? renderer.GetTexture()->mIndex : 0;
 				renderWorld.uiDrawData.push_back( data );
 			}
