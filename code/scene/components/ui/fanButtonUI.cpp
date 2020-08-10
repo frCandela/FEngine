@@ -1,6 +1,5 @@
 #include "scene/components/ui/fanButtonUI.hpp"
 #include "editor/fanModals.hpp"
-#include "scene/fanSceneSerializable.hpp"
 
 namespace fan
 {

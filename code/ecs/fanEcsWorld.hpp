@@ -48,6 +48,7 @@ namespace fan
 		void Clear();
 		int  NumComponents() const	{ return int( m_componentsInfo.size() ); }
 		int  GetIndex( const uint32_t  _type ) const;
+		void ReloadInfos();
 
 		// Handles
 		EcsEntity	GetEntity		( const EcsHandle _handle ){ return m_handles.at( _handle ); }
@@ -152,6 +153,7 @@ namespace fan
 
 		// Registers singleton info
 		EcsSingletonInfo info;
+        info.setInfo = &_SingletonType::SetInfo;
 		_SingletonType::SetInfo( info );
 		info.init = &_SingletonType::Init;
 		info.type = _SingletonType::s_type;
@@ -218,6 +220,7 @@ namespace fan
 		info.alignment = _ComponentType::Info::s_alignment;
 		info.type = _ComponentType::Info::s_type;
 		info.index = nextTypeIndex;
+		info.setInfo = &_ComponentType::SetInfo;
 		_ComponentType::SetInfo( info );
 		m_componentsInfo.push_back( info );
 

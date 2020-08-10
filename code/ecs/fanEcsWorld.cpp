@@ -210,6 +210,24 @@ namespace fan
 
 	}
 
+    //========================================================================================================
+    //========================================================================================================
+    void EcsWorld::ReloadInfos()
+    {
+	    for( auto it = m_singletonInfos.begin(); it != m_singletonInfos.end(); it++ )
+        {
+	        EcsSingletonInfo& info = it->second;
+
+            (*info.setInfo)( info );
+        }
+
+        for( EcsComponentInfo& info : m_componentsInfo )
+        {
+            info.mSlots.clear();
+            (*info.setInfo)( info );
+        }
+    }
+
 	//========================================================================================================
 	//========================================================================================================
 	EcsHandle	EcsWorld::AddHandle( const EcsEntity _entity )

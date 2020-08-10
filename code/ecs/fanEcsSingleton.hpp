@@ -48,6 +48,7 @@ namespace fan
 		EngineGroups	group = EngineGroups::None;
 
 		void ( *init ) ( EcsWorld&, EcsSingleton& ) = nullptr;
+        void ( *setInfo ) ( EcsSingletonInfo& ) = nullptr;
 		void ( *onGui ) ( EcsWorld&, EcsSingleton& ) = nullptr;
 		void ( *save ) ( const EcsSingleton&, Json& ) = nullptr;
 		void ( *load ) ( EcsSingleton&, const Json& ) = nullptr;

@@ -54,6 +54,7 @@
 #include "game/systems/fanParticlesOcclusion.hpp"
 #include "game/components/fanBullet.hpp"
 #include "game/components/fanDamage.hpp"
+#include "game/components/ui/fanMainMenu.hpp"
 
 namespace fan
 {
@@ -95,6 +96,7 @@ namespace fan
 		world.AddComponentType<SpaceshipUI>();
 		world.AddComponentType<Damage>();
 		world.AddComponentType<PlayerController>();
+        world.AddComponentType<MainMenu>();
 		// network components
 		world.AddComponentType<ReliabilityLayer>();
 		world.AddComponentType<ClientConnection>();

@@ -62,7 +62,8 @@ namespace fan
 		int                     flags = ComponentFlags::None;
 		std::vector<SlotBase*>  mSlots;                         // callable methods
 
-		void ( *init )( EcsWorld&, EcsEntity, EcsComponent& ) = nullptr;			// called at creation
+		void ( *init )( EcsWorld&, EcsEntity, EcsComponent& ) = nullptr;			// called once at creation
+        void ( *setInfo ) ( EcsComponentInfo& ) = nullptr;                          // called once at startup
 		void ( *destroy )( EcsWorld&, EcsEntity, EcsComponent& ) = nullptr;			// called at destruction
 		void ( *onGui )( EcsWorld&, EcsEntity, EcsComponent& ) = nullptr;			// draw gui
 		void ( *save )( const EcsComponent&, Json& ) = nullptr;						// Serialize to json

@@ -145,6 +145,11 @@ namespace fan
 					onReloadIcons.Emmit();
 				}
 
+                if ( ImGui::MenuItem( "Reload ecs infos" ) )
+                {
+                    _world.ReloadInfos();
+                }
+
 				ImGui::Separator();
 
 				if ( ImGui::MenuItem( "Exit" ) )
