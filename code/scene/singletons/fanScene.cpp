@@ -154,9 +154,7 @@ namespace fan
 		nodes.clear();
 		rootNodeHandle = 0;
 		mainCameraHandle = 0;
-
-		ScenePointers& scenePointers = world->GetSingleton<ScenePointers>();
-		scenePointers.unresolvedComponentPtr.clear();
+        ScenePointers::Clear( world->GetSingleton<ScenePointers>() );
 	}
 
 	//================================================================================================================================

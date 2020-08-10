@@ -47,11 +47,32 @@ namespace  fan
 
     //========================================================================================================
     //========================================================================================================
-    void SlotPtr::Set( EcsHandle _handle, uint32_t _componentType, SlotBase& _slot )
+    void SlotPtr::Set( EcsHandle _handle, uint32_t _componentType, SlotBase* _slot )
     {
         mCallData->mHandle        = _handle;
         mCallData->mComponentType = _componentType;
-        mCallData->mSlot          = &_slot;
+        mCallData->mSlot          = _slot;
+    }
+
+    //========================================================================================================
+    //========================================================================================================
+    void SlotPtr::Set( EcsHandle _handle, uint32_t _componentType, const std::string& _slotName )
+    {
+        SlotBase* slot = nullptr;
+        if( _componentType != 0 && !_slotName.empty() )
+        {
+            const EcsComponentInfo* info = mWorld->SafeGetComponentInfo( _componentType );
+            for( SlotBase* slotBase : info->mSlots )
+            {
+                if( slotBase->mName == _slotName )
+                {
+                    slot = slotBase;
+                    break;
+                }
+            }
+        }
+
+        Set( _handle, _componentType, slot );
     }
 }
 
@@ -66,7 +87,7 @@ namespace ImGui
         {
             const fan::EcsComponentInfo& info = _world.GetComponentInfo( payload.mComponentType );
             fan::SlotBase * slot = info.mSlots.empty() ? nullptr : info.mSlots[0];
-            _slotPtr.Set( payload.mHandle, payload.mComponentType, *slot );
+            _slotPtr.Set( payload.mHandle, payload.mComponentType, slot );
             return true;
         }
         return false;
@@ -100,7 +121,7 @@ namespace ImGui
                 const fan::EcsHandle handle = _ptr.Data().mHandle;
                 const uint32_t componentType = info->type;
                 fan::SlotBase * slot = info->mSlots.empty() ? nullptr : info->mSlots[0];
-                _ptr.Set( handle, componentType, *slot );
+                _ptr.Set( handle, componentType, slot );
             }
         }
         ImGui::FanToolTip("target component");
@@ -118,7 +139,7 @@ namespace ImGui
                 const uint32_t componentType = _ptr.Data().mComponentType;
                 const fan::EcsComponentInfo* info = guiSlot.mComponentsInfo[ guiSlot.mComponentIndex ];
                 fan::SlotBase * slot = info->mSlots[ guiSlot.mSlotIndex ];
-                _ptr.Set( handle, componentType, *slot );
+                _ptr.Set( handle, componentType, slot );
             }
         }
         ImGui::FanToolTip("target slot");

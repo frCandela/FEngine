@@ -12,7 +12,7 @@ namespace fan
     //========================================================================================================
     struct TemplateType
     {
-        enum ArgsType{ Void0, Int1, Float1, Float2, UnSupported };
+        enum ArgsType{ UnSupported = -1, Void0 = 0, Int1, Float1, Float2 };
 
         template< typename... T >
         static int Type()
@@ -51,8 +51,9 @@ namespace fan
 
     //========================================================================================================
     //========================================================================================================
-    struct SlotPtr
+    class SlotPtr
     {
+    public:
         struct SlotCallData
         {
             EcsHandle mHandle        = 0;
@@ -65,15 +66,19 @@ namespace fan
         bool IsValid() const;
         void Clear();
         void Init( EcsWorld& _world, int _argsType );
-        void Set( EcsHandle _handle, uint32_t _componentType, SlotBase& _slot );
+        void Set( EcsHandle _handle, uint32_t _componentType, SlotBase* _slot );
+        void Set( EcsHandle _handle, uint32_t _componentType, const std::string& _slotName );
         int GetType() const { return mArgsType; }
         const SlotCallData& Data() const { return *mCallData; }
+        EcsWorld& World() const { return *mWorld; }
 
     private:
         int mArgsType = TemplateType::UnSupported;
         SlotCallData* mCallData = nullptr;
         EcsWorld    * mWorld    = nullptr;
     };
+
+
 }
 
 namespace ImGui

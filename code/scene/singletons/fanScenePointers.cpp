@@ -1,13 +1,13 @@
+#include "ecs/fanSlot.hpp"
 #include "scene/singletons/fanScenePointers.hpp"
-
 #include "scene/components/fanSceneNode.hpp"
 #include "scene/singletons/fanScene.hpp"
-#include "ecs/fanEcsWorld.hpp"
+#include "scene/fanSceneResourcePtr.hpp"
 
 namespace fan
 {
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void ScenePointers::SetInfo( EcsSingletonInfo& _info )
 	{
 		_info.icon = ImGui::PTR16;
@@ -16,38 +16,53 @@ namespace fan
 		_info.name = "scene pointers";
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void ScenePointers::Init( EcsWorld& /*_world*/, EcsSingleton& _component )
 	{
 		ScenePointers& scenePointers = static_cast<ScenePointers&>( _component );
-		scenePointers.unresolvedComponentPtr.clear();
+		scenePointers.mUnresolvedComponentPtr.clear();
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void ScenePointers::OnGui( EcsWorld&, EcsSingleton& _component )
 	{
 		ScenePointers& scenePointers = static_cast<ScenePointers&>( _component );
 		ImGui::Indent(); ImGui::Indent();
 		{
-			ImGui::Text( "unresolved component pointers: %d", scenePointers.unresolvedComponentPtr.size() );
+			ImGui::Text( "unresolved component pointers: %d", scenePointers.mUnresolvedComponentPtr.size() );
 		}
 		ImGui::Unindent(); ImGui::Unindent();
 	}
 
-	//================================================================================================================================
+    //========================================================================================================
+    //========================================================================================================
+    void ScenePointers::Clear( ScenePointers& _scenePointers )
+	{
+        _scenePointers.mUnresolvedComponentPtr.clear();
+        _scenePointers.mUnresolvedComponentPtr.clear();
+	}
+
+	//========================================================================================================
 	// Initializes all unresolved ComponentPointers with the corresponding  sceneNode & component of the scene
 	// When instancing from prefab, scene nodes unique ids are offset by the greatest id in the scene
 	// it is then necessary to offset the id of pointers as well using the field _idOffset
-	//================================================================================================================================
+	//========================================================================================================
 	void  ScenePointers::ResolveComponentPointers( EcsWorld& _world, const uint32_t _idOffset )
 	{
 		ScenePointers& scenePointers = _world.GetSingleton<ScenePointers>();
-		for ( ComponentPtrBase* componentPtr : scenePointers.unresolvedComponentPtr )
+		for ( ComponentPtrBase* componentPtr : scenePointers.mUnresolvedComponentPtr )
 		{
 			componentPtr->handle += _idOffset;
 		}
-		scenePointers.unresolvedComponentPtr.clear();
+		scenePointers.mUnresolvedComponentPtr.clear();
+
+        for( SlotPtr* slotPtr : scenePointers.mUnresolvedSlotPtr )
+        {
+            const SlotPtr::SlotCallData& data = slotPtr->Data();
+            slotPtr->Set( data.mHandle + _idOffset, data.mComponentType, data.mSlot );
+        }
+        scenePointers.mUnresolvedSlotPtr.clear();
 	}
 }

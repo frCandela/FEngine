@@ -79,6 +79,7 @@ namespace fan
 			{
 				EcsWorld& world = *selectedSceneNode->scene->world;
 				world.Kill( world.GetEntity( selectedSceneNode->handle ) );
+				Deselect();
 			}
 		}
 	}

@@ -93,7 +93,7 @@ namespace fan
             slotPtr.Init( *world, signalInt.GetType() );
             TEST_ASSERT( ! slotPtr.IsValid() );
             TEST_ASSERT( slotPtr.GetType() == signalInt.GetType() );
-            slotPtr.Set( handle, TestComponent::Info::s_type, slot );
+            slotPtr.Set( handle, TestComponent::Info::s_type, &slot );
             TEST_ASSERT( slotPtr.IsValid() );
 
             // the data should move when the component is moved around in memory
@@ -117,7 +117,7 @@ namespace fan
             Slot<int> slotInt ( "test int", &TestComponent::SetValueInt );
             SlotPtr slotPtrInt;
             slotPtrInt.Init( world, signalInt.GetType() );
-            slotPtrInt.Set( handle, TestComponent::Info::s_type, slotInt );
+            slotPtrInt.Set( handle, TestComponent::Info::s_type, &slotInt );
 
             signalInt.Connect( world, slotPtrInt );
             TEST_ASSERT( testComponent.mValueInt == 0 );
@@ -131,7 +131,7 @@ namespace fan
             Slot<float>slotFloat( "test float", &TestComponent::SetValueFloat );
             SlotPtr slotPtrFloat;
             slotPtrFloat.Init( world, signalFloat.GetType() );
-            slotPtrFloat.Set( handle, TestComponent::Info::s_type, slotFloat );
+            slotPtrFloat.Set( handle, TestComponent::Info::s_type, &slotFloat );
             signalFloat.Connect( world, slotPtrFloat );
             TEST_ASSERT( testComponent.mValueFloat == 0 );
             signalFloat.Emmit(13.f);

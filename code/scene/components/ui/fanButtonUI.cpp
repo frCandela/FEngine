@@ -1,5 +1,6 @@
 #include "scene/components/ui/fanButtonUI.hpp"
 #include "editor/fanModals.hpp"
+#include "scene/fanSceneSerializable.hpp"
 
 namespace fan
 {
@@ -37,6 +38,7 @@ namespace fan
 		const Button& button = static_cast<const Button&>( _component );
 		Serializable::SaveColor( _json, "color_hovered", button.mColorHovered );
         Serializable::SaveColor( _json, "color_pressed", button.mColorPressed );
+        Serializable::SaveSlotPtr( _json, "pressed", button.mSlotPtr );
 	}
 
 	//========================================================================================================
@@ -46,6 +48,7 @@ namespace fan
         Button& button = static_cast<Button&>( _component );
         Serializable::LoadColor( _json, "color_hovered", button.mColorHovered );
         Serializable::LoadColor( _json, "color_pressed", button.mColorPressed );
+        Serializable::LoadSlotPtr(  _json, "pressed", button.mSlotPtr );
 	}
 
     //========================================================================================================

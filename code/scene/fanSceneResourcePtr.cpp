@@ -23,7 +23,7 @@ namespace fan
 		if( _handle != 0 )
 		{
 			ScenePointers& scenePointers = world->GetSingleton<ScenePointers>();
-			scenePointers.unresolvedComponentPtr.push_back( this );
+			scenePointers.mUnresolvedComponentPtr.push_back( this );
 		}
 	}
 

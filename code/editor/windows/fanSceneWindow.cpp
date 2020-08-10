@@ -261,7 +261,8 @@ namespace fan
 		Scene& scene = world.GetSingleton<Scene>();
 
 		std::stringstream ss;
-		ss << "##" << _node.name; // @ todo create some sort of unique id not based on name
+		ss << "##" << _node.name;
+		ImGui::PushID( _node.handle );
 
 		if( ImGui::IsWindowAppearing() || m_expandSceneHierarchy == true )
 		{
@@ -308,6 +309,8 @@ namespace fan
 			SceneNode& nodeDrop2 = world.GetComponent<SceneNode>( world.GetEntity( payload2.mHandle ) );
 			nodeDrop2.SetParent( &_node );
 		}
+
+		ImGui::PopID();
 
 		if( isOpen )
 		{

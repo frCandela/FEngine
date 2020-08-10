@@ -1,7 +1,6 @@
 #pragma once
 
 #include "ecs/fanEcsSingleton.hpp"
-#include "scene/fanSceneResourcePtr.hpp"
 
 namespace fan
 {
@@ -9,6 +8,8 @@ namespace fan
 	struct SceneNode;
 	struct Scene;
 	class Prefab;
+	struct ComponentPtrBase;
+    class SlotPtr;
 
 	//================================================================================================================================
 	// Contains all scene pointers that need to be resolved
@@ -22,8 +23,10 @@ namespace fan
 		static void Init( EcsWorld& _world, EcsSingleton& _component );
 		static void OnGui( EcsWorld&, EcsSingleton& _component );
 
-		std::vector< ComponentPtrBase* > unresolvedComponentPtr;
+		std::vector< SlotPtr* >          mUnresolvedSlotPtr;
+        std::vector< ComponentPtrBase* > mUnresolvedComponentPtr;
 
+        static void Clear( ScenePointers& _scenePointers );
 		static void ResolveComponentPointers( EcsWorld& _world, const uint32_t _idOffset );
 	};
 }
