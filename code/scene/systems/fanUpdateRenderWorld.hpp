@@ -93,8 +93,14 @@ namespace fan
                 data.scale = size / renderWorld.targetSize;
 				data.color = renderer.mColor.ToGLM();
 				data.textureIndex = renderer.GetTexture() != nullptr ? renderer.GetTexture()->mIndex : 0;
+				data.mDepth = renderer.mDepth;
 				renderWorld.uiDrawData.push_back( data );
 			}
+
+			auto sortFunc = [](RenderDataUIMesh& _a, RenderDataUIMesh& _b) {
+                return _a.mDepth > _b.mDepth;
+            };
+			std::sort( renderWorld.uiDrawData.begin(), renderWorld.uiDrawData.end(), sortFunc );
 		}
 	};
 

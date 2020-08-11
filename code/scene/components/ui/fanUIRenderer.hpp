@@ -21,6 +21,7 @@ namespace fan
 		Color      mColor;
 		TexturePtr mTexture;
 		bool       mVisible;
+		int        mDepth;
 
 		glm::ivec2	GetTextureSize() const;
 		Texture*	GetTexture() const { return *mTexture; }

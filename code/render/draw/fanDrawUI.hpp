@@ -25,6 +25,7 @@ namespace fan
 		glm::vec2 scale;
 		glm::vec4 color;
 		uint32_t textureIndex;
+		int      mDepth = 0;
 	};
 
 	//================================================================

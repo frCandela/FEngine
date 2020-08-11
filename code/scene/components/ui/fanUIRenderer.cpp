@@ -31,6 +31,7 @@ namespace fan
         uiRenderer.mMesh2D  = renderResources.mMesh2DManager->Get( RenderGlobal::sMesh2DQuad );
         uiRenderer.mVisible = true;
         uiRenderer.mColor   = Color::White;
+        uiRenderer.mDepth   = 0;
         fanAssert( uiRenderer.mMesh2D );
 	}
 
@@ -41,6 +42,8 @@ namespace fan
         const UIRenderer& ui = static_cast<const UIRenderer&>( _component );
         Serializable::SaveColor( _json, "color", ui.mColor );
         Serializable::SaveTexturePtr( _json, "texture_path", ui.mTexture );
+        Serializable::SaveBool( _json, "visible", ui.mVisible );
+        Serializable::SaveInt( _json, "depth", ui.mDepth );
     }
 
     //================================================================================================================================
@@ -50,6 +53,8 @@ namespace fan
         UIRenderer& ui = static_cast<UIRenderer&>( _component );
         Serializable::LoadColor( _json, "color", ui.mColor );
         Serializable::LoadTexturePtr( _json, "texture_path", ui.mTexture );
+        Serializable::LoadBool( _json, "visible", ui.mVisible );
+        Serializable::LoadInt( _json, "depth", ui.mDepth );
     }
 
     //================================================================================================================================
@@ -79,6 +84,9 @@ namespace fan
 			// texture
 			ImGui::FanTexturePtr( "ui texture", ui.mTexture );
 			ImGui::Checkbox("visible", &ui.mVisible );
+            if( ImGui::Button( "##depth ui" ) ){	ui.mDepth = 0 ; }
+            ImGui::SameLine();
+			ImGui::DragInt("depth", &ui.mDepth, 1, 0, 1024 );
 
 		} ImGui::PopItemWidth();
 	}
