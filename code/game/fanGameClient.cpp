@@ -14,10 +14,12 @@
 #include "scene/systems/fanUpdateTimers.hpp"
 #include "scene/systems/fanUpdateTransforms.hpp"
 #include "scene/systems/fanRaycastUI.hpp"
+#include "scene/systems/fanAlignUI.hpp"
 #include "scene/components/fanCamera.hpp"
 #include "scene/components/fanDirectionalLight.hpp"
 #include "scene/components/fanPointLight.hpp"
 #include "scene/components/ui/fanUILayout.hpp"
+#include "scene/components/ui/fanUIAlign.hpp"
 #include "scene/singletons/fanScene.hpp"
 #include "scene/singletons/fanRenderResources.hpp"
 #include "scene/singletons/fanSceneResources.hpp"
@@ -85,6 +87,7 @@ namespace fan
 		world.AddComponentType<UIFollowTransform>();
 		world.AddComponentType<UIButton>();
         world.AddComponentType<UILayout>();
+        world.AddComponentType<UIAlign>();
 		// game components
 		world.AddComponentType<Planet>();
 		world.AddComponentType<SpaceShip>();
@@ -274,6 +277,7 @@ namespace fan
 			world.Run<S_MoveFollowTransforms>();
 			world.Run<SMoveFollowTransformsUI>();
 
+            world.Run<SAlignUI>();
             world.Run<SHoverButtons>();
             world.Run<SHighlightButtons>();
 			

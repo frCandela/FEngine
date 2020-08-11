@@ -7,7 +7,7 @@
 #include "render/unit_tests/fanUnitTestMesh2DManager.hpp"
 #include "render/unit_tests/fanUnitTestTextureManager.hpp"
 #include "scene/unit_tests/fanUnitTestPrefabManager.hpp"
-#include "scene/unit_tests/components/fanUnitTestButton.hpp"
+#include "scene/unit_tests/components/fanUnitTestUIAlign.hpp"
 #include "scene/unit_tests/fanUnitTestMouse.hpp"
 #include "ecs/unit_tests/fanUnitTestSignal.hpp"
 
@@ -28,9 +28,9 @@ namespace fan
 #ifndef NDEBUG
                  { "fanAssert",          &UnitTestFanAssert::RunTests,       mFanAssertResult },
 #endif
-                { "UI button",          &UnitTestButton::RunTests,          mButtonResult },
-                { "Mouse", &UnitTestMouse::RunTests, mGlfwMouseResult },
-                { "Signal", &UnitTestSignal::RunTests, mSignalResult },
+                { "UI align",   &UnitTestUIAlign::RunTests, mAlignResult },
+                { "Mouse",      &UnitTestMouse::RunTests, mGlfwMouseResult },
+                { "Signal",     &UnitTestSignal::RunTests, mSignalResult },
         };
     }
 
