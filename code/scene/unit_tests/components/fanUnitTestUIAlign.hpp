@@ -17,6 +17,7 @@ namespace fan
         static std::vector<TestMethod> GetTests()
         {
             return { { &UnitTestUIAlign::TestAlignCornersNoRatio,  "Align corners no ratio" },
+                     { &UnitTestUIAlign::TestAlignRatio,  "Align ratio" },
             };
         }
         void Create() override
@@ -54,6 +55,8 @@ namespace fan
 
         void TestAlignCornersNoRatio()
         {
+            TEST_ASSERT(mChildAlign->mOffset == glm::vec2(0.f,0.f) );
+
             mChildAlign->mCorner = UIAlign::TopLeft;
             mWorld.Run<SAlignUI>();
             TEST_ASSERT( mChildTransform->mPosition == glm::ivec2(10,20) );
@@ -69,6 +72,27 @@ namespace fan
             mChildAlign->mCorner = UIAlign::BottomRight;
             mWorld.Run<SAlignUI>();
             TEST_ASSERT( mChildTransform->mPosition == glm::ivec2(40,90) );
+        }
+
+        void TestAlignRatio()
+        {
+            mChildAlign->mCorner = UIAlign::TopLeft;
+            mChildAlign->mDirection = UIAlign::Horizontal;
+            mChildAlign->mOffset.x = 0.5f;
+            mWorld.Run<SAlignUI>();
+            TEST_ASSERT( mChildTransform->mPosition == glm::ivec2(25,20) );
+
+            mChildAlign->mCorner = UIAlign::TopLeft;
+            mChildAlign->mDirection = UIAlign::Vertical;
+            mChildAlign->mOffset.y = 0.5f;
+            mWorld.Run<SAlignUI>();
+            TEST_ASSERT( mChildTransform->mPosition == glm::ivec2(10,55) );
+
+            mChildAlign->mCorner = UIAlign::TopLeft;
+            mChildAlign->mDirection = UIAlign::HorizontalVertical;
+            mChildAlign->mOffset = glm::vec2( 0.5f, 0.5f );
+            mWorld.Run<SAlignUI>();
+            TEST_ASSERT( mChildTransform->mPosition == glm::ivec2(25,55) );
         }
     };
 }

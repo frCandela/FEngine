@@ -24,13 +24,12 @@ namespace fan
         };
         enum AlignDirection : int
         {
-            Horizontal, Vertical
+            Horizontal, Vertical, HorizontalVertical
         };
 
         ComponentPtr<UITransform>   mParent;
         AlignCorner                 mCorner;
         AlignDirection              mDirection;
-		float                       mRatio; // [0.f, 1.f]
-
+		glm::vec2                   mOffset; // in pixel or in size ratio
 	};
 }

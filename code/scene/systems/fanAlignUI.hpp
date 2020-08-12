@@ -45,6 +45,19 @@ namespace fan
                         break;
                     default: fanAssert(false); break;
                 }
+
+                switch( align.mDirection )
+                {
+                    case UIAlign::Horizontal:
+                        childTransform.mPosition.x += int( align.mOffset.x * float( pSize.x - cSize.x ) );
+                        break;
+                    case UIAlign::Vertical:
+                        childTransform.mPosition.y += int( align.mOffset.y * float( pSize.y - cSize.y ) );
+                        break;
+                    case UIAlign::HorizontalVertical:
+                        childTransform.mPosition += glm::ivec2 ( align.mOffset * glm::vec2 ( pSize - cSize ) );
+                        break;
+                }
             }
         }
     };

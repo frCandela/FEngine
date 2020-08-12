@@ -23,7 +23,7 @@ namespace fan
         UIAlign& align = static_cast<UIAlign&>( _component );
         align.mCorner = AlignCorner::TopLeft;
         align.mDirection = AlignDirection::Vertical;
-        align.mRatio = 0.f; // [0.f, 1.f]
+        align.mOffset = glm::vec2( 0.f, 0.f );
         align.mParent.Init( _world );
 	}
 
@@ -35,7 +35,7 @@ namespace fan
         Serializable::SaveComponentPtr( _json, "parent", align.mParent );
         Serializable::SaveInt( _json, "corner", align.mCorner );
         Serializable::SaveInt( _json, "direction", align.mDirection );
-        Serializable::SaveFloat( _json, "ratio", align.mRatio );
+        Serializable::SaveVec2( _json, "ratio", align.mOffset );
 	}
 
 	//========================================================================================================
@@ -46,7 +46,7 @@ namespace fan
         Serializable::LoadComponentPtr( _json, "parent", align.mParent );
         Serializable::LoadInt( _json, "corner", (int&)align.mCorner );
         Serializable::LoadInt( _json, "direction", (int&)align.mDirection );
-        Serializable::LoadFloat( _json, "ratio", align.mRatio );
+        Serializable::LoadVec2( _json, "ratio", align.mOffset );
     }
 
     //========================================================================================================
@@ -59,10 +59,25 @@ namespace fan
 
         ImGui::FanComponent("parent", align.mParent );
         ImGui::Combo("corner", (int*)&align.mCorner, "TopLeft\0TopRight\0BottomLeft\0BottomRight\0\0" );
-        ImGui::Combo("direction", (int*)&align.mDirection, "Horizontal\0Vertical\0\0" );
-        ImGui::DragFloat("ratio", &align.mRatio, 0.01f, 0.f, 1.f );
-
+        ImGui::Combo("direction", (int*)&align.mDirection, "Horizontal\0Vertical\0HorizontalVertical\0\0" );
         ImGui::PopItemWidth();
 
+        ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() );
+        if( ImGui::Button( "##resetRatio" ) ){	align.mOffset = glm::vec2( 0, 0 ); }
+        ImGui::SameLine();
+        switch( align.mDirection )
+        {
+            case Horizontal:
+                ImGui::DragFloat( "offset ratio", &align.mOffset.x, 0.01f, -1.f, 1.f );
+                break;
+            case Vertical:
+                ImGui::DragFloat( "offset ratio", &align.mOffset.y, 0.01f, -1.f, 1.f );
+                break;
+            case HorizontalVertical:
+                ImGui::DragFloat2( "offset ratio", &align.mOffset.x, 0.01f, -1.f, 1.f );
+                break;
+            default: fanAssert( false); break;
+        }
+        ImGui::PopItemWidth();
     }
 }
