@@ -77,7 +77,6 @@ namespace fan
 		world.AddComponentType<ExpirationTime>();
 		world.AddComponentType<FollowTransform>();
 		world.AddComponentType<UIProgressBar>();
-		world.AddComponentType<UIFollowTransform>();
 		// game components
 		world.AddComponentType<Planet>();
 		world.AddComponentType<SpaceShip>();
@@ -201,8 +200,7 @@ namespace fan
 			world.Run<S_SynchronizeMotionStateFromTransform>();
 			physicsWorld.dynamicsWorld->stepSimulation( _delta, 10, Time::s_physicsDelta );
 			world.Run<S_SynchronizeTransformFromMotionState>();
-			world.Run<S_MoveFollowTransforms>();
-			world.Run<SMoveFollowTransformsUI>();
+			world.Run<SMoveFollowTransforms>();
 
 			world.Run<S_FireWeapons>(			_delta );
 			world.Run<S_GenerateLightMesh>(		_delta );

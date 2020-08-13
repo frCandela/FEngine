@@ -16,8 +16,9 @@ namespace fan
     public:
         static std::vector<TestMethod> GetTests()
         {
-            return { { &UnitTestUIAlign::TestAlignCornersNoRatio,  "Align corners no ratio" },
-                     { &UnitTestUIAlign::TestAlignRatio,  "Align ratio" },
+            return { { &UnitTestUIAlign::TestAlignCornersNoOffset, "Align corners no offset" },
+                     { &UnitTestUIAlign::TestAlignOffsetRatio,     "Align offset ratio" },
+                     { &UnitTestUIAlign::TestAlignOffsetPixels,    "Align offset pixels" },
             };
         }
         void Create() override
@@ -53,7 +54,7 @@ namespace fan
         UITransform* mChildTransform;
         UIAlign* mChildAlign;
 
-        void TestAlignCornersNoRatio()
+        void TestAlignCornersNoOffset()
         {
             TEST_ASSERT(mChildAlign->mOffset == glm::vec2(0.f,0.f) );
 
@@ -74,8 +75,10 @@ namespace fan
             TEST_ASSERT( mChildTransform->mPosition == glm::ivec2(40,90) );
         }
 
-        void TestAlignRatio()
+        void TestAlignOffsetRatio()
         {
+            mChildAlign->mUnitType = UIAlign::Ratio;
+
             mChildAlign->mCorner = UIAlign::TopLeft;
             mChildAlign->mDirection = UIAlign::Horizontal;
             mChildAlign->mOffset.x = 0.5f;
@@ -93,6 +96,29 @@ namespace fan
             mChildAlign->mOffset = glm::vec2( 0.5f, 0.5f );
             mWorld.Run<SAlignUI>();
             TEST_ASSERT( mChildTransform->mPosition == glm::ivec2(25,55) );
+        }
+
+        void TestAlignOffsetPixels()
+        {
+            mChildAlign->mUnitType = UIAlign::Pixels;
+
+            mChildAlign->mCorner = UIAlign::TopLeft;
+            mChildAlign->mDirection = UIAlign::Horizontal;
+            mChildAlign->mOffset.x = 1.f;
+            mWorld.Run<SAlignUI>();
+            TEST_ASSERT( mChildTransform->mPosition == glm::ivec2(11,20) );
+
+            mChildAlign->mCorner = UIAlign::TopLeft;
+            mChildAlign->mDirection = UIAlign::Vertical;
+            mChildAlign->mOffset.y = 2.f;
+            mWorld.Run<SAlignUI>();
+            TEST_ASSERT( mChildTransform->mPosition == glm::ivec2(10,22) );
+
+            mChildAlign->mCorner = UIAlign::TopLeft;
+            mChildAlign->mDirection = UIAlign::HorizontalVertical;
+            mChildAlign->mOffset = glm::vec2( 1.f, 2.f );
+            mWorld.Run<SAlignUI>();
+            TEST_ASSERT( mChildTransform->mPosition == glm::ivec2(11,22) );
         }
     };
 }

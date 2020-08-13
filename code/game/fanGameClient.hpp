@@ -14,7 +14,7 @@ namespace fan
 		void Stop();
 		void Step( const float _delta );
 		EcsWorld			  world;
-		void RollbackResimulate();
+		void RollbackResimulate( const float _delta );
 
 		static void CreateGameAxes();
 	};

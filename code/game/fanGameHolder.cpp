@@ -172,8 +172,7 @@ namespace fan
 
 			GameStep( m_world, time.logicDelta );
 
-			m_world.Run<S_MoveFollowTransforms>();
-			m_world.Run<SMoveFollowTransformsUI>();
+			m_world.Run<SMoveFollowTransforms>();
 
 			assert( logicIsThisFrame );
 
@@ -262,12 +261,9 @@ namespace fan
 	void  GameHolder::GameStep( EcsWorld& _world, float _delta )
 	{
  		Game& game = _world.GetSingleton<Game>();
- 		if( game.state == Game::PLAYING )
- 		{
- 			const float delta = ( game.state == Game::PLAYING ? _delta : 0.f );
- 			if( game.gameServer != nullptr ) game.gameServer->Step( delta );
- 			else							 game.gameClient->Step( delta );
- 		}		
+ 		const float delta = ( game.state == Game::PLAYING ? _delta : 0.f );
+ 		if( game.gameServer != nullptr ) { game.gameServer->Step( delta ); }
+ 		else							 { game.gameClient->Step( delta ); }
 	}
 
 	//========================================================================================================

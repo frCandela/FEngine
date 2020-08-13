@@ -379,7 +379,7 @@ namespace fan
 			world->SetNextHandle( maxHandle );
 
 			ScenePointers::ResolveComponentPointers( *world, handleOffset );
-			world->Run<S_InitFollowTransforms>();
+			world->Run<SInitFollowTransforms>();
 
 			onLoad.Emmit( *this );
 			world->ApplyTransitions();

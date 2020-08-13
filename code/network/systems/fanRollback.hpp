@@ -63,10 +63,13 @@ namespace fan
 			return _world.GetSignature<ClientRollback>();
 		}
 
-		static void Run( EcsWorld& _world, const EcsView& _view )
+		static void Run( EcsWorld& _world, const EcsView& _view, const float _delta )
 		{
+		    if( _delta == 0 ){ return; }
+
 			// get the last server state frame index
 			const ClientNetworkManager& netManager = _world.GetSingleton<ClientNetworkManager>();
+			if( netManager.persistentHandle == 0 ){ return; }
 			const EcsEntity entity = _world.GetEntity( netManager.persistentHandle );
 			const ClientGameData& clientData = _world.GetComponent<ClientGameData>( entity );
 			const FrameIndex lastFrameIndex = clientData.lastServerState.frameIndex;

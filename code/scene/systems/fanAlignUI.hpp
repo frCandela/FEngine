@@ -28,34 +28,40 @@ namespace fan
                 const glm::ivec2& pPos = parentTransform.mPosition;
                 const glm::ivec2& pSize = parentTransform.mSize;
                 const glm::ivec2& cSize = childTransform.mSize;
+                glm::ivec2& cPos = childTransform.mPosition;
+
+                // set position relative to the selected corner
                 switch( align.mCorner )
                 {
                     case UIAlign::TopLeft:
-                        childTransform.mPosition = parentTransform.mPosition;
+                        cPos = parentTransform.mPosition;
                         break;
                     case UIAlign::TopRight:
-                        childTransform.mPosition = glm::ivec2( pPos.x + pSize.x - cSize.x, pPos.y);
+                        cPos = glm::ivec2( pPos.x + pSize.x - cSize.x, pPos.y);
                         break;
                     case UIAlign::BottomLeft:
-                        childTransform.mPosition = glm::ivec2( pPos.x, pPos.y + pSize.y - cSize.y);
+                        cPos = glm::ivec2( pPos.x, pPos.y + pSize.y - cSize.y);
                         break;
                     case UIAlign::BottomRight:
-                        childTransform.mPosition = glm::ivec2( pPos.x + pSize.x - cSize.x,
-                                                               pPos.y + pSize.y - cSize.y );
+                        cPos = glm::ivec2( pPos.x + pSize.x - cSize.x, pPos.y + pSize.y - cSize.y );
                         break;
                     default: fanAssert(false); break;
                 }
 
+                // offset the position
+                glm::vec2 offsetMultiplier = align.mUnitType == UIAlign::UnitType::Ratio  ?
+                                            glm::vec2( pSize - cSize ) :
+                                            glm::vec2( 1.f, 1.f );
                 switch( align.mDirection )
                 {
                     case UIAlign::Horizontal:
-                        childTransform.mPosition.x += int( align.mOffset.x * float( pSize.x - cSize.x ) );
+                        cPos.x += int( align.mOffset.x * offsetMultiplier.x );
                         break;
                     case UIAlign::Vertical:
-                        childTransform.mPosition.y += int( align.mOffset.y * float( pSize.y - cSize.y ) );
+                        cPos.y += int( align.mOffset.y * offsetMultiplier.y );
                         break;
                     case UIAlign::HorizontalVertical:
-                        childTransform.mPosition += glm::ivec2 ( align.mOffset * glm::vec2 ( pSize - cSize ) );
+                        cPos += glm::ivec2 ( align.mOffset * offsetMultiplier );
                         break;
                 }
             }

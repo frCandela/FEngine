@@ -309,8 +309,7 @@ namespace fan
 				// ui & debug
 				if( m_showUI )
 				{					
-					world.Run<S_MoveFollowTransforms>();
-					world.Run<SMoveFollowTransformsUI>();
+					world.Run<SMoveFollowTransforms>();
 				}
 
 				if( isCurrentWorld )
@@ -487,12 +486,10 @@ namespace fan
 	{
         SCOPED_PROFILE(game_step );
  		Game& game = _world.GetSingleton<Game>();
- 		if( game.state == Game::PLAYING )
- 		{
- 			const float delta = ( game.state == Game::PLAYING ? _delta : 0.f );
- 			if( game.gameServer != nullptr ) game.gameServer->Step( delta );
- 			else							 game.gameClient->Step( delta );
- 		}		
+ 		const float delta = ( game.state == Game::PLAYING ? _delta : 0.f );
+ 		if( game.gameServer != nullptr ) { game.gameServer->Step( delta ); }
+ 		else							 { game.gameClient->Step( delta ); }
+
 	}
 
 	//========================================================================================================

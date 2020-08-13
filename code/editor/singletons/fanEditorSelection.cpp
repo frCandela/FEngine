@@ -12,14 +12,10 @@
 #include "scene/components/fanPointLight.hpp"
 #include "scene/components/fanDirectionalLight.hpp"
 #include "scene/components/fanFollowTransform.hpp"
-#include "scene/components/ui/fanUIFollowTransform.hpp"
 #include "scene/singletons/fanMouse.hpp"
 #include "scene/singletons/fanScene.hpp"
 #include "scene/systems/fanRaycast.hpp"
 #include "scene/systems/fanDrawDebug.hpp"
-#include "scene/fanSceneTags.hpp"
-#include "render/resources/fanMesh.hpp"
-#include "ecs/fanEcsWorld.hpp"
 
 namespace fan
 {
@@ -211,15 +207,6 @@ namespace fan
 				follower.locked = !follower.locked;
 				FollowTransform::UpdateLocalTransform( world, entity );
 			}
-
-			// FollowTransformUI
-			if( world.HasComponent<UIFollowTransform>( entity ) )
-			{
-				UIFollowTransform& follower = world.GetComponent<UIFollowTransform>( entity );
-				follower.mlocked = !follower.mlocked;
-				UIFollowTransform::UpdateOffset( world, entity );
-			}
 		}
-		
 	}
 }

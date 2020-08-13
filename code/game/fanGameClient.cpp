@@ -84,7 +84,6 @@ namespace fan
 		world.AddComponentType<ExpirationTime>();
 		world.AddComponentType<FollowTransform>();
 		world.AddComponentType<UIProgressBar>();
-		world.AddComponentType<UIFollowTransform>();
 		world.AddComponentType<UIButton>();
         world.AddComponentType<UILayout>();
         world.AddComponentType<UIAlign>();
@@ -181,8 +180,10 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void GameClient::RollbackResimulate()
+	void GameClient::RollbackResimulate( const float _delta )
 	{
+	    if( _delta == 0.f ) { return; }
+
 		ClientNetworkManager& netManager = world.GetSingleton<ClientNetworkManager>();
 		const EcsEntity persistentID = world.GetEntity( netManager.persistentHandle );
 		ClientGameData& gameData = world.GetComponent<ClientGameData>( persistentID );
@@ -249,9 +250,9 @@ namespace fan
 		{
 			SCOPED_PROFILE( scene_update );			
 			world.Run<S_ClientReceive>( _delta );
-			world.Run<S_RollbackRemoveOldStates>();
+			world.Run<S_RollbackRemoveOldStates>( _delta );
 
-			RollbackResimulate();
+			RollbackResimulate( _delta );
 
 			if( _delta > 0.f )
 			{
@@ -274,8 +275,7 @@ namespace fan
 			world.Run<S_SynchronizeMotionStateFromTransform>();
 			physicsWorld.dynamicsWorld->stepSimulation( _delta, 10, Time::s_physicsDelta );
 			world.Run<S_SynchronizeTransformFromMotionState>();
-			world.Run<S_MoveFollowTransforms>();
-			world.Run<SMoveFollowTransformsUI>();
+			world.Run<SMoveFollowTransforms>();
 
             world.Run<SAlignUI>();
             world.Run<SHoverButtons>();

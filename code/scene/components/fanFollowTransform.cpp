@@ -44,7 +44,7 @@ namespace fan
 		{
 			Transform& target = *follower.targetTransform;
 			Transform& follow = _world.GetComponent<Transform>( _entityID );
-			follower.localTransform = S_InitFollowTransforms::GetLocalTransform( target.transform, follow.transform );
+			follower.localTransform = SInitFollowTransforms::GetLocalTransform( target.transform, follow.transform );
 		}
 		else
 		{

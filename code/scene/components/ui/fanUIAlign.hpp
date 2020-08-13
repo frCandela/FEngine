@@ -18,18 +18,14 @@ namespace fan
 		static void Save( const EcsComponent& _component, Json& _json );
 		static void Load( EcsComponent& _component, const Json& _json );
 
-        enum AlignCorner : int
-        {
-            TopLeft, TopRight, BottomLeft, BottomRight,
-        };
-        enum AlignDirection : int
-        {
-            Horizontal, Vertical, HorizontalVertical
-        };
+        enum AlignCorner    : int { TopLeft, TopRight, BottomLeft, BottomRight };
+        enum AlignDirection : int { Horizontal, Vertical, HorizontalVertical   };
+        enum UnitType       : int { Ratio, Pixels   };
 
         ComponentPtr<UITransform>   mParent;
         AlignCorner                 mCorner;
         AlignDirection              mDirection;
+        UnitType                    mUnitType;
 		glm::vec2                   mOffset; // in pixel or in size ratio
 	};
 }
