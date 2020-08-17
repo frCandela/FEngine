@@ -1,6 +1,7 @@
 #include "ecs/fanEcsSystem.hpp"
 #include "scene/components/ui/fanUITransform.hpp"
 #include "scene/components/ui/fanUIAlign.hpp"
+#include "scene/singletons/fanRenderWorld.hpp"
 
 namespace fan
 {
@@ -13,8 +14,10 @@ namespace fan
             return _world.GetSignature<UITransform>() | _world.GetSignature<UIAlign>();
         }
 
-        static void Run( EcsWorld& /*_world*/, const EcsView& _view )
+        static void Run( EcsWorld& _world, const EcsView& _view )
         {
+            RenderWorld& renderWorld = _world.GetSingleton<RenderWorld>();
+
             auto alignIt = _view.begin<UIAlign>();
             auto transformUIIt = _view.begin<UITransform>();
             for( ; alignIt != _view.end<UIAlign>(); ++alignIt, ++transformUIIt )
@@ -22,11 +25,22 @@ namespace fan
                 UIAlign   &  align          = *alignIt;
                 UITransform& childTransform = *transformUIIt;
 
-                if( align.mParent == nullptr ) { continue; }
+                glm::ivec2 pPos;
+                glm::ivec2 pSize;
+                if( align.mParent == nullptr )
+                {
+                    pPos = glm::ivec2(0,0);
+                    pSize = glm::ivec2( renderWorld.targetSize );
+                }
+                else
+                {
+                    const UITransform& parentTransform = *align.mParent;
+                    pPos = parentTransform.mPosition;
+                    pSize  = parentTransform.mSize;
+                }
 
-                UITransform& parentTransform = *align.mParent;
-                const glm::ivec2& pPos = parentTransform.mPosition;
-                const glm::ivec2& pSize = parentTransform.mSize;
+
+
                 const glm::ivec2& cSize = childTransform.mSize;
                 glm::ivec2& cPos = childTransform.mPosition;
 
@@ -34,7 +48,7 @@ namespace fan
                 switch( align.mCorner )
                 {
                     case UIAlign::TopLeft:
-                        cPos = parentTransform.mPosition;
+                        cPos = pPos;
                         break;
                     case UIAlign::TopRight:
                         cPos = glm::ivec2( pPos.x + pSize.x - cSize.x, pPos.y);

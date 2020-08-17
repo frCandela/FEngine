@@ -70,8 +70,6 @@ namespace fan
 	{
 		UIRenderer& ui = static_cast<UIRenderer&>( _component );
 
-		const btVector2 windowSize = Input::Get().WindowSizeF();
-
 		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() );
 		{
 			// color

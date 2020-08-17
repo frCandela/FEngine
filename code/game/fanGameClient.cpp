@@ -14,12 +14,11 @@
 #include "scene/systems/fanUpdateTimers.hpp"
 #include "scene/systems/fanUpdateTransforms.hpp"
 #include "scene/systems/fanRaycastUI.hpp"
-#include "scene/systems/fanAlignUI.hpp"
+#include "scene/systems/fanUpdateUIAlign.hpp"
+#include "scene/systems/fanUpdateUILayouts.hpp"
 #include "scene/components/fanCamera.hpp"
 #include "scene/components/fanDirectionalLight.hpp"
 #include "scene/components/fanPointLight.hpp"
-#include "scene/components/ui/fanUILayout.hpp"
-#include "scene/components/ui/fanUIAlign.hpp"
 #include "scene/singletons/fanScene.hpp"
 #include "scene/singletons/fanRenderResources.hpp"
 #include "scene/singletons/fanSceneResources.hpp"
@@ -278,6 +277,7 @@ namespace fan
 			world.Run<SMoveFollowTransforms>();
 
             world.Run<SAlignUI>();
+            world.Run<SUpdateUILayouts>();
             world.Run<SHoverButtons>();
             world.Run<SHighlightButtons>();
 			

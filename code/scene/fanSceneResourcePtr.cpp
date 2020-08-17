@@ -32,7 +32,7 @@ namespace fan
 	void ComponentPtrBase::Create( EcsHandle _handle )
 	{
 		handle = _handle;
-		assert( world->HasComponent( world->GetEntity( _handle ), type ) );
+		fanAssert( world->HasComponent( world->GetEntity( _handle ), type ) );
 	}
 
 	//========================================================================================================
@@ -83,7 +83,7 @@ namespace ImGui
 		ImGui::SameLine();
  
  		// name button 
- 		float width = 0.6f * ImGui::GetWindowWidth() - ImGui::GetCursorPosX() + 8;
+ 		float width = 0.6f * ImGui::GetWindowWidth() - ImGui::GetCursorPosX() + 23;
 		if( ImGui::Button( name.c_str(), ImVec2( width, 0.f ) ) )
 		{
 			// @todo select target in the editor

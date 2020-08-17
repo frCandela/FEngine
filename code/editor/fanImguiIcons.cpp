@@ -46,6 +46,12 @@ namespace ImGui
         ,DECL_ICON( 16.f, 6, 0 )  // CHECK_FAILED16,
         ,DECL_ICON( 16.f, 7, 0 )  // CHECK_SUCCESS16,
         ,DECL_ICON( 16.f, 8, 0 )  // SIGNAL_SLOT16,
+        ,DECL_ICON( 16.f, 9, 0 )  // PLUS16,
+        ,DECL_ICON( 16.f, 10, 0 ) // MINUS16
+
+        // small
+        ,DECL_ICON( 8.f, 0, 2 )  // PLUS8,
+        ,DECL_ICON( 8.f, 1, 2 ) // MINUS8
 
 		// scene components
 		,DECL_ICON( 16.f, 0, 8 )  // IMAGE16,

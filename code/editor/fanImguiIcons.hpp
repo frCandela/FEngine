@@ -39,6 +39,12 @@ namespace ImGui
         CHECK_FAILED16,
         CHECK_SUCCESS16,
         SIGNAL_SLOT16,
+        PLUS16,
+        MINUS16,
+
+        // small
+        PLUS8,
+        MINUS8,
 
 		// scene components
 		IMAGE16,

@@ -21,6 +21,7 @@ namespace fan
         void Create( EcsHandle _handle );
         void CreateUnresolved( EcsHandle _handle );
         void Clear();
+        bool IsValid() const{ return type != 0 && handle != 0; }
         EcsComponent& operator*() const { return world->GetComponent( world->GetEntity( handle ), type ); }
         EcsComponent* operator->() const { return &( **this ); /* use operator* */ }
 

@@ -36,7 +36,6 @@ namespace fan
         UnitTestResult mTextureManagerResult;
         UnitTestResult mPrefabManagerResult;
         UnitTestResult mFanAssertResult;
-        UnitTestResult mAlignResult;
         UnitTestResult mGlfwMouseResult;
         UnitTestResult mSignalResult;
 
