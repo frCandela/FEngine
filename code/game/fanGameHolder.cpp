@@ -139,10 +139,11 @@ namespace fan
 			const VkExtent2D extent = m_window.GetExtent();
             const glm::vec2 windowSize = glm::vec2( (float)extent.width, (float)extent.height );
 
-            Mouse::NextFrame( m_window.mWindow, windowPosition, windowSize ); /*todo true window hovered*/
+            Mouse::NextFrame( m_window.mWindow, glm::vec2(0,0) , windowSize ); /*todo true window hovered*/
             Input::Get().NewFrame();
             Input::Get().Manager().PullEvents();
-            m_world.GetSingleton<Mouse>().UpdateData( m_window.mWindow );
+            Mouse& mouse = m_world.GetSingleton<Mouse>();
+            mouse.UpdateData( m_window.mWindow );
 
 			// checking the loop timing is not late
             const double loopDelayMilliseconds = 1000. * ( currentTime
@@ -180,10 +181,16 @@ namespace fan
 			{
 				// ImGui render
 				ImGui::NewFrame();
-				// in game debug ui here
-				ImGui::Begin( "toto" );
-				ImGui::Text( "hello!" );
-				ImGui::End();
+
+                {
+                    // in game debug ui here
+                    ImGui::Begin( "toto" );
+                    ImGuiIO& io = ImGui::GetIO();
+                    ImGui::Text( "imMouse %f %f", io.MousePos.x, io.MousePos.y );
+                    ImGui::Text( "mouse   %f %f", mouse.mLocalPosition.x, mouse.mLocalPosition.y );
+                    ImGui::End();
+                }
+
 				ImGui::Render();
 			}			
 			m_world.ApplyTransitions();
