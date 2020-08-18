@@ -14,7 +14,7 @@ WARNINGS_POP()
 
 namespace fan
 {
-	class EcsWorld;
+	class GameBase;
 	class Renderer;
 	class Window;
 	struct Scene;
@@ -30,7 +30,7 @@ namespace fan
 	public:
 		Signal <> onLPPSynch;
 
-		GameHolder( const LaunchSettings _settings, EcsWorld&  _world );
+		GameHolder( const LaunchSettings _settings, GameBase& _game );
 		~GameHolder();
 
 		void Run();
@@ -38,18 +38,17 @@ namespace fan
 		void Step();
 			   
 	private:		
-		Renderer* m_renderer;
-		Window m_window;
-		PrefabManager mPrefabManager;
-		EcsWorld& m_world;
-		double m_lastRenderTime = 0.;
-		const LaunchSettings m_launchSettings;
+		Renderer*            mRenderer;
+		Window               mWindow;
+		PrefabManager        mPrefabManager;
+        GameBase&            mGame;
+		double               mLastRenderTime = 0.;
+		const LaunchSettings mLaunchSettings;
+		bool                 mApplicationShouldExit;
 
-		bool m_applicationShouldExit;
-
-		static void GameStart( EcsWorld& _world );
-		static void GameStop( EcsWorld& _world );
-		static void GameStep( EcsWorld& _world, const float _delta );		
-		static void UpdateRenderWorld( Renderer& _renderer, EcsWorld& _world, const glm::vec2 _size );
+		void GameStart();
+		void GameStop();
+		void GameStep( const float _delta );
+		void UpdateRenderWorld( Renderer& _renderer, EcsWorld& _world, const glm::vec2 _size );
 	};
 }

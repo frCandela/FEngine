@@ -1,6 +1,7 @@
 #include <scene/singletons/fanSceneResources.hpp>
 #include "fanGameHolder.hpp"
 
+#include "core/fanDebug.hpp"
 #include "core/input/fanInputManager.hpp"
 #include "core/time/fanProfiler.hpp"
 #include "core/math/fanMathUtils.hpp"
@@ -22,11 +23,13 @@ namespace fan
 {
 	//========================================================================================================
 	//========================================================================================================
-	GameHolder::GameHolder( const LaunchSettings _settings, EcsWorld& _world ) :
-		m_world( _world )
-		, m_applicationShouldExit( false )
-		, m_launchSettings( _settings )
+	GameHolder::GameHolder( const LaunchSettings _settings, GameBase& _game ) :
+            mGame( _game )
+		, mApplicationShouldExit( false )
+		, mLaunchSettings( _settings )
 	{
+        _game.Init();
+
 		SerializedValues::Get().LoadKeyBindings();
 		GameClient::CreateGameAxes();
 
@@ -34,33 +37,31 @@ namespace fan
 		glm::ivec2 windowPosition;
 		glm::ivec2 windowSize;
 		SerializedValues::LoadWindowSizeAndPosition( _settings, windowPosition, windowSize );		
-		m_window.Create( _settings.windowName.c_str(), windowSize, windowPosition );
-        Mouse::SetCallbacks( m_window.mWindow );
+		mWindow.Create( _settings.windowName.c_str(), windowSize, windowPosition );
+        Mouse::SetCallbacks( mWindow.mWindow );
 
 		// creates renderer
-		m_renderer = new Renderer( m_window, Renderer::ViewType::Game );
-        RenderResources::SetupResources( m_renderer->mMeshManager,
-                                         m_renderer->mMesh2DManager,
-                                         m_renderer->mTextureManager );
+		mRenderer = new Renderer( mWindow, Renderer::ViewType::Game );
+        RenderResources::SetupResources( mRenderer->mMeshManager,
+                                         mRenderer->mMesh2DManager,
+                                         mRenderer->mTextureManager );
 
-        RenderResources& renderResources = m_world.GetSingleton<RenderResources>();
-        renderResources.SetPointers(&m_renderer->mMeshManager,
-                                    &m_renderer->mMesh2DManager,
-                                    &m_renderer->mTextureManager );
+        RenderResources& renderResources = mGame.mWorld.GetSingleton<RenderResources>();
+        renderResources.SetPointers(&mRenderer->mMeshManager,
+                                    &mRenderer->mMesh2DManager,
+                                    &mRenderer->mTextureManager );
 
         SceneResources::SetupResources( mPrefabManager );
-        SceneResources& sceneResources = m_world.GetSingleton<SceneResources>();
+        SceneResources& sceneResources = mGame.mWorld.GetSingleton<SceneResources>();
         sceneResources.SetPointers( &mPrefabManager );
 
 		// load scene
-		Scene& scene = m_world.GetSingleton<Scene>();
+		Scene& scene = mGame.mWorld.GetSingleton<Scene>();
 		scene.New();
 		if( !_settings.loadScene.empty() )
 		{
 			scene.LoadFrom( _settings.loadScene );
-
-			// auto play the scene
-			GameStart( m_world );			
+			GameStart();
 		}
 	}
 
@@ -69,10 +70,10 @@ namespace fan
 	GameHolder::~GameHolder()
 	{
 		// Serialize editor positions if it was not modified by a launch command
-		if( m_launchSettings.window_size == glm::ivec2( -1, -1 ) )
+		if( mLaunchSettings.window_size == glm::ivec2( -1, -1 ) )
 		{
-			const VkExtent2D rendererSize = m_window.GetExtent();
-			const glm::ivec2 windowPosition = m_window.GetPosition();
+			const VkExtent2D rendererSize = mWindow.GetExtent();
+			const glm::ivec2 windowPosition = mWindow.GetPosition();
             glm::ivec2 size = { rendererSize.width, rendererSize.height };
             SerializedValues::SaveWindowSizeAndPosition( windowPosition, size );
 		}
@@ -80,15 +81,15 @@ namespace fan
 		SerializedValues::Get().SaveValuesToDisk();
 		mPrefabManager.Clear();
 
-		delete m_renderer;
-		m_window.Destroy();
+		delete mRenderer;
+		mWindow.Destroy();
 	}
 
 	//========================================================================================================
 	//========================================================================================================
 	void GameHolder::Exit()
 	{
-		m_applicationShouldExit = true;
+        mApplicationShouldExit = true;
 	}
 	
 	//========================================================================================================
@@ -96,14 +97,14 @@ namespace fan
 	void GameHolder::Run()
 	{
 		// initializes timers
-		m_lastRenderTime = Time::ElapsedSinceStartup();
-		Time& time = m_world.GetSingleton<Time>();
+		mLastRenderTime = Time::ElapsedSinceStartup();
+		Time& time = mGame.mWorld.GetSingleton<Time>();
 		time.lastLogicTime = Time::ElapsedSinceStartup();
 		
 		Profiler::Get().Begin();
 
 		// main loop
-		while( m_applicationShouldExit == false && m_window.IsOpen() == true )
+		while( mApplicationShouldExit == false && mWindow.IsOpen() == true )
 		{
 			Step();
 		}
@@ -117,33 +118,30 @@ namespace fan
 	void GameHolder::Step()
 	{
 		const double currentTime = Time::ElapsedSinceStartup();
-		const bool renderIsThisFrame = currentTime > m_lastRenderTime + Time::s_renderDelta;
-		const Time& currentWorldTime = m_world.GetSingleton<Time>();
+		const bool renderIsThisFrame = currentTime > mLastRenderTime + Time::s_renderDelta;
+		Time& time = mGame.mWorld.GetSingleton<Time>();
         const bool logicIsThisFrame = currentTime >
-                                      currentWorldTime.lastLogicTime + currentWorldTime.logicDelta;
-
-		// Update all worlds
+                                      time.lastLogicTime + time.logicDelta;
 
 		// runs logic, renders ui
-		Time& time = m_world.GetSingleton<Time>();
 		while( currentTime > time.lastLogicTime + time.logicDelta )
 		{
-			m_world.GetSingleton<RenderDebug>().Clear();
+            mGame.mWorld.GetSingleton<RenderDebug>().Clear();
 
 			// Update input
 			ImGui::GetIO().DeltaTime = time.logicDelta;
 
 
-			const glm::ivec2 iPos = m_window.GetPosition();
+			const glm::ivec2 iPos = mWindow.GetPosition();
             const glm::vec2 windowPosition = glm::vec2( (float)iPos.x, (float)iPos.y );
-			const VkExtent2D extent = m_window.GetExtent();
+			const VkExtent2D extent = mWindow.GetExtent();
             const glm::vec2 windowSize = glm::vec2( (float)extent.width, (float)extent.height );
 
-            Mouse::NextFrame( m_window.mWindow, glm::vec2(0,0) , windowSize ); /*todo true window hovered*/
+            Mouse::NextFrame( mWindow.mWindow, glm::vec2( 0, 0) , windowSize ); /*todo true window hovered*/
             Input::Get().NewFrame();
             Input::Get().Manager().PullEvents();
-            Mouse& mouse = m_world.GetSingleton<Mouse>();
-            mouse.UpdateData( m_window.mWindow );
+            Mouse& mouse = mGame.mWorld.GetSingleton<Mouse>();
+            mouse.UpdateData( mWindow.mWindow );
 
 			// checking the loop timing is not late
             const double loopDelayMilliseconds = 1000. * ( currentTime
@@ -171,9 +169,9 @@ namespace fan
 
 			time.lastLogicTime += time.logicDelta;
 
-			GameStep( m_world, time.logicDelta );
+			GameStep( time.logicDelta );
 
-			m_world.Run<SMoveFollowTransforms>();
+            mGame.mWorld.Run<SMoveFollowTransforms>();
 
 			assert( logicIsThisFrame );
 
@@ -192,8 +190,8 @@ namespace fan
                 }
 
 				ImGui::Render();
-			}			
-			m_world.ApplyTransitions();
+			}
+            mGame.mWorld.ApplyTransitions();
 		}		
 
 		onLPPSynch.Emmit();	
@@ -201,20 +199,20 @@ namespace fan
 		// Render world		
 		if( renderIsThisFrame && logicIsThisFrame )
 		{
-			m_lastRenderTime = currentTime;
+            mLastRenderTime = currentTime;
 
 			Time::RegisterFrameDrawn();	// used for stats
 
-            UpdateRenderWorld( *m_renderer,
-                               m_world,
-                               { m_window.GetExtent().width, m_window.GetExtent().height } );
-			m_renderer->DrawFrame();
+            UpdateRenderWorld( *mRenderer,
+                               mGame.mWorld,
+                               { mWindow.GetExtent().width, mWindow.GetExtent().height } );
+			mRenderer->DrawFrame();
 			Profiler::Get().End();
 			Profiler::Get().Begin();
 		}
 
 		// sleep for the rest of the frame
-		if( m_launchSettings.mainLoopSleep )
+		if( mLaunchSettings.mainLoopSleep )
 		{
 			// @todo repair this to work with multiple worlds running 
 // 				const double minSleepTime = 1;
@@ -231,46 +229,43 @@ namespace fan
 
 	//========================================================================================================
 	//========================================================================================================
-	void GameHolder::GameStart( EcsWorld& _world )
+	void GameHolder::GameStart()
 	{
-		Game& game = _world.GetSingleton<Game>();
-		assert( game.state == Game::STOPPED );
+		Game& game = mGame.mWorld.GetSingleton<Game>();
+		assert( game.mState == Game::STOPPED );
 		// saves the scene before playing
-		Scene& scene = _world.GetSingleton<Scene>();
+		Scene& scene = mGame.mWorld.GetSingleton<Scene>();
 		assert( !scene.path.empty() );
 		scene.Save();
 		Debug::Highlight() << game.name << ": play" << Debug::Endl();
-		game.state = Game::PLAYING;
+		game.mState = Game::PLAYING;
 
-		if( game.gameServer != nullptr ) game.gameServer->Start();
-		else							 game.gameClient->Start();
+        mGame.Start();
 
-		GameCamera& gameCamera = _world.GetSingleton<GameCamera>();
+		GameCamera& gameCamera = mGame.mWorld.GetSingleton<GameCamera>();
 		scene.SetMainCamera( gameCamera.cameraHandle );		
 	}
 	
 	//========================================================================================================
 	//========================================================================================================
-	void  GameHolder::GameStop( EcsWorld& _world )
+	void  GameHolder::GameStop()
 	{
-		Game& game = _world.GetSingleton<Game>();
-		if( game.state == Game::PLAYING || game.state == Game::PAUSED )
+		Game& game = mGame.mWorld.GetSingleton<Game>();
+		if( game.mState == Game::PLAYING || game.mState == Game::PAUSED )
 		{
 			Debug::Highlight() << game.name << ": stopped" << Debug::Endl();
-			game.state = Game::STOPPED;
-			if( game.gameServer != nullptr ) game.gameServer->Stop();
-			else							 game.gameClient->Stop();
+			game.mState = Game::STOPPED;
+            mGame.Stop();
 		}
 	}
 
 	//========================================================================================================
 	//========================================================================================================
-	void  GameHolder::GameStep( EcsWorld& _world, float _delta )
+	void  GameHolder::GameStep( const float _delta )
 	{
- 		Game& game = _world.GetSingleton<Game>();
- 		const float delta = ( game.state == Game::PLAYING ? _delta : 0.f );
- 		if( game.gameServer != nullptr ) { game.gameServer->Step( delta ); }
- 		else							 { game.gameClient->Step( delta ); }
+ 		Game& game = mGame.mWorld.GetSingleton<Game>();
+ 		const float delta = ( game.mState == Game::PLAYING ? _delta : 0.f );
+        mGame.Step( delta );
 	}
 
 	//========================================================================================================

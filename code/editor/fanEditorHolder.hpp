@@ -15,18 +15,7 @@ WARNINGS_POP()
 
 namespace fan
 {
-	class PreferencesWindow;
-	class InspectorWindow;
-	class SingletonsWindow;
-	class ProfilerWindow;
 	class GameViewWindow;
-	class ConsoleWindow;
-	class NetworkWindow;
-	class RenderWindow;
-	class EditorWindow;
-	class SceneWindow;
-	class UnitTestsWindow;
-	class EcsWindow;
 	class MainMenuBar;
 	class EcsWorld;
 	class Renderer;
@@ -42,9 +31,9 @@ namespace fan
 	class EditorHolder
 	{
 	public:
-		Signal <> onLPPSynch;
+		Signal <> mOnLPPSynch;
 
-		EditorHolder( const LaunchSettings _settings, std::vector<EcsWorld*>  _gameWorlds );
+		EditorHolder( const LaunchSettings _settings, std::vector<GameBase*>  _games );
 		~EditorHolder();
 
 		void Run();
@@ -52,44 +41,31 @@ namespace fan
 		void Step();
 			   
 	private:		
-		Renderer* m_renderer;
-		Window   m_window;
-		PrefabManager mPrefabManager;
+		Renderer*               mRenderer;
+		Window                  mWindow;
+		PrefabManager           mPrefabManager;
+		std::vector<GameBase*>  mGames;
+		int                     mCurrentGame    = 0;
+		double                  mLastRenderTime = 0.;
+		const LaunchSettings    mLaunchSettings;
+        bool                    mApplicationShouldExit;
+        bool                    mShowUi = true;
 
-		std::vector<EcsWorld*> m_worlds; 
-		int m_currentWorld = 0;
-		double m_lastRenderTime = 0.;
-		const LaunchSettings m_launchSettings;
-
-		// UI elements
         MainMenuBar      *mMainMenuBar;
-        PreferencesWindow*mPreferencesWindow;
-        SingletonsWindow *mSingletonsWindow;
-        InspectorWindow  *mInspectorWindow;
-        ProfilerWindow   *mProfilerWindow;
-        NetworkWindow    *mNetworkWindow;
-        ConsoleWindow    *mConsoleWindow;
-        RenderWindow     *mRenderWindow;
-        SceneWindow      *mSceneWindow;
         GameViewWindow   *mGameViewWindow;
-        EcsWindow        *mEcsWindow;
-        UnitTestsWindow  *mUnitTestsWindow;
 
-		bool m_applicationShouldExit;
-		bool m_showUI = true;
-
-		EcsWorld& GetCurrentWorld() { return *m_worlds[ m_currentWorld ]; }
+		GameBase& GetCurrentGame() { return *mGames[ mCurrentGame ]; }
 		
 		static void UseEditorCamera( EcsWorld& _world );
 		static void UseGameCamera( EcsWorld& _world );
 
 		void OnCycleCurrentGame();
 		void OnCurrentGameSwitchPlayStop();
-		void OnCurrentGameStart() { GameStart( GetCurrentWorld() ); }
-		void OnCurrentGameStop() { GameStop( GetCurrentWorld() ); }
-		void OnCurrentGamePause() { GamePause( GetCurrentWorld() ); }
-		void OnCurrentGameResume() { GameResume( GetCurrentWorld() ); }
-		void OnCurrentGameStep( const float _delta ) { GameStep( GetCurrentWorld(), _delta ); }
+		void OnCurrentGameStart() { GameStart( GetCurrentGame() ); }
+		void OnCurrentGameStop() { GameStop( GetCurrentGame() ); }
+		void OnCurrentGamePause() { GamePause( GetCurrentGame() ); }
+		void OnCurrentGameResume() { GameResume( GetCurrentGame() ); }
+		void OnCurrentGameStep( const float _delta ) { GameStep( GetCurrentGame(), _delta ); }
 		void OnCurrentGameStep();
 		void OnCurrentGameToogleCamera();
 		void OnCurrentGameOpen();
@@ -99,14 +75,14 @@ namespace fan
 		void OnCurrentGamePaste();
 		void OnCurrentGameSelect( const int _index );
 
-		static void GameStart( EcsWorld& _world );
-		static void GameStop( EcsWorld& _world );
-		static void GamePause( EcsWorld& _world );
-		static void GameResume( EcsWorld& _world );
-		static void GameStep( EcsWorld& _world, const float _delta );		
-		static void UpdateRenderWorld( Renderer& _renderer, EcsWorld& _world, const glm::vec2 _size );
+		static void GameStart(  GameBase& _game );
+		static void GameStop(   GameBase& _game );
+		static void GamePause(  GameBase& _game );
+		static void GameResume( GameBase& _game );
+		static void GameStep(   GameBase& _game, const float _delta );
+		static void UpdateRenderWorld( Renderer& _renderer, GameBase& _game, const glm::vec2 _size );
 
 		void OnSceneLoad( Scene& _scene );
-		void OnToogleShowUI() { m_showUI = !m_showUI; }
+		void OnToogleShowUI() { mShowUi = !mShowUi; }
 	};
 }

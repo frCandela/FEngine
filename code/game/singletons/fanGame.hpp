@@ -6,18 +6,15 @@
 
 namespace fan
 {
-	struct GameClient;
-	struct GameServer;
+    class GameBase;
 
-	//================================================================================================================================
+	//========================================================================================================
 	// Contains game data & a reference to the game client or server depending on which is used
 	// allows saving properties of the game into the scene & edition of parameters from the editor
-	// @todo, put time related stuff in a singleton in the scene lib
-	//================================================================================================================================	
+	//========================================================================================================
 	struct Game : public EcsSingleton
 	{
 		ECS_SINGLETON( Game )
-	public:
 		static void SetInfo( EcsSingletonInfo& _info );
 		static void Init( EcsWorld& _world, EcsSingleton& _component );
 		static void OnGui( EcsWorld&, EcsSingleton& _component );
@@ -25,15 +22,15 @@ namespace fan
 		static void Load( EcsSingleton& _component, const Json& _json );
 
 		enum State { STOPPED, PLAYING, PAUSED };
+        enum Flags { None = 0, Server = 1 };
 
-		State	    state;
+		State       mState;
 		std::string name;
-		PrefabPtr	spaceshipPrefab;
+		uint32_t    mFlags = Flags::None;
+		PrefabPtr   spaceshipPrefab;
 
-		// @hack for the editor, only one of these should be null
-		GameClient* gameClient = nullptr;
-		GameServer* gameServer = nullptr;
+		GameBase* mGame = nullptr;
 
-		bool IsServer() const { return gameServer != nullptr; }
+		bool IsServer() const { return mFlags & Flags::Server; }
 	};
 }

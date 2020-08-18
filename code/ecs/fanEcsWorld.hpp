@@ -43,6 +43,10 @@ namespace fan
 	class EcsWorld
 	{
 	public:
+        EcsWorld(){}
+        EcsWorld( EcsWorld const& ) = delete;
+        EcsWorld& operator=( EcsWorld const& ) = delete;
+
 		// Global
 		void ApplyTransitions();
 		void Clear();
@@ -63,7 +67,7 @@ namespace fan
 		// Singletons
 		template <typename _SingletonType >	void		AddSingletonType();
 		template< typename _SingletonType > _SingletonType& GetSingleton();
-        EcsSingleton& GetSingleton( const uint32_t _type ) { return *m_singletons[_type]; }
+        EcsSingleton& GetSingleton( const uint32_t _type ) { return *m_singletons.at(_type); }
         const EcsSingleton& GetSingleton( const uint32_t _type ) const { return *m_singletons.at( _type ); }
         const EcsSingletonInfo& GetSingletonInfo( const uint32_t _type ) const
         {

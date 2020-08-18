@@ -18,7 +18,7 @@ namespace fan
 	//================================================================================================================================
 	void Game::Init( EcsWorld& /*_world*/, EcsSingleton& _component ){
 		Game& gameData = static_cast<Game&>( _component );
-		gameData.state = STOPPED;
+		gameData.mState = STOPPED;
 		gameData.spaceshipPrefab.Set( nullptr );
 	}
 
@@ -57,9 +57,9 @@ namespace fan
 
 			// game state
 			std::string stateStr =
-				gameData.state == Game::STOPPED ? "stopped" :
-				gameData.state == Game::PLAYING ? "playing" :
-				gameData.state == Game::PAUSED ? "paused" : "error";
+                                gameData.mState == Game::STOPPED ? "stopped" :
+                                        gameData.mState == Game::PLAYING ? "playing" :
+                                                gameData.mState == Game::PAUSED ? "paused" : "error";
 			ImGui::Text( "game state : %s", stateStr.c_str() );
 
 			ImGui::FanPrefab( "spaceship", gameData.spaceshipPrefab );

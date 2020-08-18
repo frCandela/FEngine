@@ -59,154 +59,152 @@
 
 namespace fan
 {
-	//================================================================================================================================
-	//================================================================================================================================
-	GameClient::GameClient( const std::string _name )
+	//========================================================================================================
+	//========================================================================================================
+	void GameClient::Init()
 	{
 		// base components
-		world.AddComponentType<SceneNode>();
-		world.AddComponentType<Transform>();
-		world.AddComponentType<DirectionalLight>();
-		world.AddComponentType<PointLight>();
-		world.AddComponentType<MeshRenderer>();
-		world.AddComponentType<Material>();
-		world.AddComponentType<Camera>();
-		world.AddComponentType<ParticleEmitter>();
-		world.AddComponentType<Particle>();
-		world.AddComponentType<Rigidbody>();
-		world.AddComponentType<MotionState>();
-		world.AddComponentType<BoxShape>();
-		world.AddComponentType<SphereShape>();
-		world.AddComponentType<UITransform>();
-		world.AddComponentType<UIRenderer>();
-		world.AddComponentType<Bounds>();
-		world.AddComponentType<ExpirationTime>();
-		world.AddComponentType<FollowTransform>();
-		world.AddComponentType<UIProgressBar>();
-		world.AddComponentType<UIButton>();
-        world.AddComponentType<UILayout>();
-        world.AddComponentType<UIAlign>();
+		mWorld.AddComponentType<SceneNode>();
+		mWorld.AddComponentType<Transform>();
+		mWorld.AddComponentType<DirectionalLight>();
+		mWorld.AddComponentType<PointLight>();
+		mWorld.AddComponentType<MeshRenderer>();
+		mWorld.AddComponentType<Material>();
+		mWorld.AddComponentType<Camera>();
+		mWorld.AddComponentType<ParticleEmitter>();
+		mWorld.AddComponentType<Particle>();
+		mWorld.AddComponentType<Rigidbody>();
+		mWorld.AddComponentType<MotionState>();
+		mWorld.AddComponentType<BoxShape>();
+		mWorld.AddComponentType<SphereShape>();
+		mWorld.AddComponentType<UITransform>();
+		mWorld.AddComponentType<UIRenderer>();
+		mWorld.AddComponentType<Bounds>();
+		mWorld.AddComponentType<ExpirationTime>();
+		mWorld.AddComponentType<FollowTransform>();
+		mWorld.AddComponentType<UIProgressBar>();
+		mWorld.AddComponentType<UIButton>();
+        mWorld.AddComponentType<UILayout>();
+        mWorld.AddComponentType<UIAlign>();
 		// game components
-		world.AddComponentType<Planet>();
-		world.AddComponentType<SpaceShip>();
-		world.AddComponentType<PlayerInput>();
-		world.AddComponentType<Weapon>();
-		world.AddComponentType<Bullet>();
-		world.AddComponentType<Battery>();
-		world.AddComponentType<SolarPanel>();
-		world.AddComponentType<Health>();
-		world.AddComponentType<SpaceshipUI>();
-		world.AddComponentType<Damage>();
-		world.AddComponentType<PlayerController>();
-        world.AddComponentType<UIMainMenu>();
+		mWorld.AddComponentType<Planet>();
+		mWorld.AddComponentType<SpaceShip>();
+		mWorld.AddComponentType<PlayerInput>();
+		mWorld.AddComponentType<Weapon>();
+		mWorld.AddComponentType<Bullet>();
+		mWorld.AddComponentType<Battery>();
+		mWorld.AddComponentType<SolarPanel>();
+		mWorld.AddComponentType<Health>();
+		mWorld.AddComponentType<SpaceshipUI>();
+		mWorld.AddComponentType<Damage>();
+		mWorld.AddComponentType<PlayerController>();
+        mWorld.AddComponentType<UIMainMenu>();
 		// network components
-		world.AddComponentType<ReliabilityLayer>();
-		world.AddComponentType<ClientConnection>();
-		world.AddComponentType<ClientReplication>();
-		world.AddComponentType<ClientRPC>();
-		world.AddComponentType<ClientGameData>();
-		world.AddComponentType<ClientRollback>();
-		world.AddComponentType<LinkingContextUnregisterer>();
+		mWorld.AddComponentType<ReliabilityLayer>();
+		mWorld.AddComponentType<ClientConnection>();
+		mWorld.AddComponentType<ClientReplication>();
+		mWorld.AddComponentType<ClientRPC>();
+		mWorld.AddComponentType<ClientGameData>();
+		mWorld.AddComponentType<ClientRollback>();
+		mWorld.AddComponentType<LinkingContextUnregisterer>();
 
 		// base singleton components
-		world.AddSingletonType<Scene>();
-        world.AddSingletonType<RenderResources>();
-        world.AddSingletonType<SceneResources>();
-		world.AddSingletonType<RenderWorld>();
-		world.AddSingletonType<PhysicsWorld>();
-		world.AddSingletonType<ScenePointers>();
-		world.AddSingletonType<RenderDebug>();
-		world.AddSingletonType<Mouse>();
+		mWorld.AddSingletonType<Scene>();
+        mWorld.AddSingletonType<RenderResources>();
+        mWorld.AddSingletonType<SceneResources>();
+		mWorld.AddSingletonType<RenderWorld>();
+		mWorld.AddSingletonType<PhysicsWorld>();
+		mWorld.AddSingletonType<ScenePointers>();
+		mWorld.AddSingletonType<RenderDebug>();
+		mWorld.AddSingletonType<Mouse>();
 		// game singleton components
-		world.AddSingletonType<SunLight>();
-		world.AddSingletonType<GameCamera>();
-		world.AddSingletonType<CollisionManager>();
-		world.AddSingletonType<Game>();
-		world.AddSingletonType<SolarEruption>();
-		world.AddSingletonType<SpawnManager>();
-		world.AddSingletonType<ClientNetworkManager>();
-		// network singleton components		
-		world.AddSingletonType<LinkingContext>();
-		world.AddSingletonType<Time>();
-		
-		world.AddTagType<tag_sunlight_occlusion>();
-		
-		// @hack
-		Game& gameSingleton = world.GetSingleton<Game>();
-		gameSingleton.gameClient = this;
-		gameSingleton.name = _name;
+		mWorld.AddSingletonType<SunLight>();
+		mWorld.AddSingletonType<GameCamera>();
+		mWorld.AddSingletonType<CollisionManager>();
+		mWorld.AddSingletonType<Game>();
+		mWorld.AddSingletonType<SolarEruption>();
+		mWorld.AddSingletonType<SpawnManager>();
+		mWorld.AddSingletonType<ClientNetworkManager>();
+		// network singleton components
+		mWorld.AddSingletonType<LinkingContext>();
+		mWorld.AddSingletonType<Time>();
+
+		mWorld.AddTagType<tag_sunlight_occlusion>();
+
+        Game& game = mWorld.GetSingleton<Game>();
+        game.name = "client";
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void GameClient::Start()
 	{
-		ClientNetworkManager& netManager = world.GetSingleton<ClientNetworkManager>();
-		netManager.Start( world );
+		ClientNetworkManager& netManager = mWorld.GetSingleton<ClientNetworkManager>();
+		netManager.Start( mWorld );
 
 		// Init game
-		world.Run<S_RegisterAllRigidbodies>();
-		GameCamera::CreateGameCamera( world );
-		SolarEruption::Start( world );
+        mWorld.Run<S_RegisterAllRigidbodies>();
+		GameCamera::CreateGameCamera( mWorld );
+		SolarEruption::Start( mWorld );
 
-        Game& game = world.GetSingleton<Game>();
-        MeshManager& meshManager = *world.GetSingleton<RenderResources>().mMeshManager;
-        SunLight& sunLight = world.GetSingleton<SunLight>();
-        RenderWorld& renderWorld = world.GetSingleton<RenderWorld>();
+        Game& game = mWorld.GetSingleton<Game>();
+        MeshManager& meshManager = *mWorld.GetSingleton<RenderResources>().mMeshManager;
+        SunLight& sunLight = mWorld.GetSingleton<SunLight>();
+        RenderWorld& renderWorld = mWorld.GetSingleton<RenderWorld>();
         meshManager.Add( sunLight.mesh, "sunlight_mesh_" + game.name );
         meshManager.Add( renderWorld.particlesMesh, "particles_mesh_" + game.name );
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void  GameClient::Stop()
 	{
 		// clears the physics world
-		world.Run<S_UnregisterAllRigidbodies>();
+        mWorld.Run<S_UnregisterAllRigidbodies>();
 
 		// clears the particles mesh
-		RenderWorld& renderWorld = world.GetSingleton<RenderWorld>();
-        SunLight& sunLight = world.GetSingleton<SunLight>();
-        MeshManager& meshManager = *world.GetSingleton<RenderResources>().mMeshManager;
+		RenderWorld& renderWorld = mWorld.GetSingleton<RenderWorld>();
+        SunLight& sunLight = mWorld.GetSingleton<SunLight>();
+        MeshManager& meshManager = *mWorld.GetSingleton<RenderResources>().mMeshManager;
         meshManager.Remove( sunLight.mesh->mPath );
         meshManager.Remove( renderWorld.particlesMesh->mPath );
 
-		GameCamera::DeleteGameCamera( world );
+		GameCamera::DeleteGameCamera( mWorld );
 
-		ClientNetworkManager& netManager = world.GetSingleton<ClientNetworkManager>();
-		netManager.Stop( world );
+		ClientNetworkManager& netManager = mWorld.GetSingleton<ClientNetworkManager>();
+		netManager.Stop( mWorld );
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void GameClient::RollbackResimulate( const float _delta )
 	{
 	    if( _delta == 0.f ) { return; }
 
-		ClientNetworkManager& netManager = world.GetSingleton<ClientNetworkManager>();
-		const EcsEntity persistentID = world.GetEntity( netManager.persistentHandle );
-		ClientGameData& gameData = world.GetComponent<ClientGameData>( persistentID );
+		ClientNetworkManager& netManager = mWorld.GetSingleton<ClientNetworkManager>();
+		const EcsEntity persistentID = mWorld.GetEntity( netManager.persistentHandle );
+		ClientGameData& gameData = mWorld.GetComponent<ClientGameData>( persistentID );
 		if( !gameData.spaceshipSynced )
 		{
-			Time& time = world.GetSingleton<Time>();
+			Time& time = mWorld.GetSingleton<Time>();
 			const FrameIndex lastFrame = time.frameIndex;
 			const FrameIndex firstFrame = gameData.lastServerState.frameIndex;
-			world.Run<S_RollbackInit>();
+            mWorld.Run<S_RollbackInit>();
 			Debug::Highlight() << "rollback to frame " << firstFrame << Debug::Endl();
 
 			// Rollback at the frame we took the snapshot of the player game state
 			time.frameIndex = firstFrame;
 
 			// reset world to first frame		
-			PhysicsWorld& physicsWorld = world.GetSingleton<PhysicsWorld>();
+			PhysicsWorld& physicsWorld = mWorld.GetSingleton<PhysicsWorld>();
 			physicsWorld.Reset();
-			world.Run<S_RollbackRestoreState>( firstFrame );
-			const EcsEntity spaceshipID = world.GetEntity( gameData.spaceshipHandle );
-			Rigidbody& rigidbody = world.GetComponent<Rigidbody>( spaceshipID );
+            mWorld.Run<S_RollbackRestoreState>( firstFrame );
+			const EcsEntity spaceshipID = mWorld.GetEntity( gameData.spaceshipHandle );
+			Rigidbody& rigidbody = mWorld.GetComponent<Rigidbody>( spaceshipID );
 			physicsWorld.dynamicsWorld->removeRigidBody( rigidbody.rigidbody );
 			physicsWorld.dynamicsWorld->addRigidBody( rigidbody.rigidbody );
 			rigidbody.ClearForces();
-			Transform& transform = world.GetComponent<Transform>( spaceshipID );
+			Transform& transform = mWorld.GetComponent<Transform>( spaceshipID );
 			rigidbody.SetVelocity( gameData.lastServerState.velocity );
 			rigidbody.SetAngularVelocity( gameData.lastServerState.angularVelocity );
 			transform.SetPosition( gameData.lastServerState.position );
@@ -222,17 +220,17 @@ namespace fan
 			{
 				time.frameIndex++;
 
-				world.Run<S_RollbackRestoreState>( time.frameIndex );
+                mWorld.Run<S_RollbackRestoreState>( time.frameIndex );
 
-				world.Run<S_MovePlanets>( delta );
-				world.Run<S_MoveSpaceships>( delta );
+                mWorld.Run<S_MovePlanets>( delta );
+                mWorld.Run<S_MoveSpaceships>( delta );
 
-				world.Run<S_SynchronizeMotionStateFromTransform>();
+                mWorld.Run<S_SynchronizeMotionStateFromTransform>();
 				physicsWorld.dynamicsWorld->stepSimulation( time.logicDelta, 10, Time::s_physicsDelta );
-				world.Run<S_SynchronizeTransformFromMotionState>();
+                mWorld.Run<S_SynchronizeTransformFromMotionState>();
 
-				world.Run<S_ClientSaveState>( delta );
-				world.Run<S_RollbackStateSave>( delta );
+                mWorld.Run<S_ClientSaveState>( delta );
+                mWorld.Run<S_RollbackStateSave>( delta );
 			}
 
 			gameData.spaceshipSynced = true;
@@ -240,16 +238,16 @@ namespace fan
 		}
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void  GameClient::Step( const float _delta )
 	{		
-		Time& time = world.GetSingleton<Time>();
+		Time& time = mWorld.GetSingleton<Time>();
 
 		{
-			SCOPED_PROFILE( scene_update );			
-			world.Run<S_ClientReceive>( _delta );
-			world.Run<S_RollbackRemoveOldStates>( _delta );
+			SCOPED_PROFILE( scene_update );
+            mWorld.Run<S_ClientReceive>( _delta );
+            mWorld.Run<S_RollbackRemoveOldStates>( _delta );
 
 			RollbackResimulate( _delta );
 
@@ -258,64 +256,64 @@ namespace fan
 				time.frameIndex++;
 			}
 
-			world.Run<S_ProcessTimedOutPackets>();
-			world.Run<S_ClientDetectServerTimeout>( _delta );
-			world.Run<S_ClientRunReplication>(		_delta );
-			SpawnManager::Update( world );
+            mWorld.Run<S_ProcessTimedOutPackets>();
+            mWorld.Run<S_ClientDetectServerTimeout>( _delta );
+            mWorld.Run<S_ClientRunReplication>(		_delta );
+			SpawnManager::Update( mWorld );
 
 			// update
-			world.Run<S_RefreshPlayerInput>( _delta );
-			world.Run<S_ClientSaveInput>( _delta );
-			world.Run<S_MovePlanets>( _delta );
-			world.Run<S_MoveSpaceships>( _delta );
+            mWorld.Run<S_RefreshPlayerInput>( _delta );
+            mWorld.Run<S_ClientSaveInput>( _delta );
+            mWorld.Run<S_MovePlanets>( _delta );
+            mWorld.Run<S_MoveSpaceships>( _delta );
 
 			// physics & transforms
-			PhysicsWorld& physicsWorld = world.GetSingleton<PhysicsWorld>();
-			world.Run<S_SynchronizeMotionStateFromTransform>();
+			PhysicsWorld& physicsWorld = mWorld.GetSingleton<PhysicsWorld>();
+            mWorld.Run<S_SynchronizeMotionStateFromTransform>();
 			physicsWorld.dynamicsWorld->stepSimulation( _delta, 10, Time::s_physicsDelta );
-			world.Run<S_SynchronizeTransformFromMotionState>();
-			world.Run<SMoveFollowTransforms>();
+            mWorld.Run<S_SynchronizeTransformFromMotionState>();
+            mWorld.Run<SMoveFollowTransforms>();
 
-            world.Run<SAlignUI>();
-            world.Run<SUpdateUILayouts>();
-            world.Run<SHoverButtons>();
-            world.Run<SHighlightButtons>();
+            mWorld.Run<SAlignUI>();
+            mWorld.Run<SUpdateUILayouts>();
+            mWorld.Run<SHoverButtons>();
+            mWorld.Run<SHighlightButtons>();
 			
-			world.Run<S_FireWeapons>(			 _delta );
-			world.Run<S_GenerateLightMesh>(		 _delta );
-			world.Run<S_UpdateSolarPannels>(	 _delta );
-			world.Run<S_RechargeBatteries>(		 _delta );
-			world.Run<S_UpdateExpirationTimes>(	 _delta );
-			world.Run<S_EruptionDamage>(		 _delta );
-			world.Run<S_UpdateGameUiValues>(	 _delta );
-			world.Run<S_UpdateGameUiPosition>(	 _delta );
-			SolarEruption::Step(world,			 _delta );
-			world.Run<S_PlayerDeath>(			 _delta );
+			mWorld.Run<S_FireWeapons>(			 _delta );
+			mWorld.Run<S_GenerateLightMesh>(		 _delta );
+			mWorld.Run<S_UpdateSolarPannels>(	 _delta );
+			mWorld.Run<S_RechargeBatteries>(		 _delta );
+			mWorld.Run<S_UpdateExpirationTimes>(	 _delta );
+			mWorld.Run<S_EruptionDamage>(		 _delta );
+			mWorld.Run<S_UpdateGameUiValues>(	 _delta );
+			mWorld.Run<S_UpdateGameUiPosition>(	 _delta );
+			SolarEruption::Step( mWorld,			 _delta );
+            mWorld.Run<S_PlayerDeath>(			 _delta );
 
 			// late update
-			const RenderWorld& renderWorld = world.GetSingleton<RenderWorld>();
+			const RenderWorld& renderWorld = mWorld.GetSingleton<RenderWorld>();
 			if( !renderWorld.isHeadless )
 			{
-				world.Run<S_ParticlesOcclusion>( _delta );
-				world.Run<S_UpdateParticles>( _delta );
-				world.Run<S_EmitParticles>( _delta );
-				world.Run<S_GenerateParticles>( _delta );
-				world.Run<S_UpdateBoundsFromRigidbody>( _delta );
-				world.Run<S_UpdateBoundsFromModel>();
-				world.Run<S_UpdateBoundsFromTransform>();
-				world.Run<S_UpdateGameCamera>( _delta );
+				mWorld.Run<S_ParticlesOcclusion>( _delta );
+				mWorld.Run<S_UpdateParticles>( _delta );
+				mWorld.Run<S_EmitParticles>( _delta );
+				mWorld.Run<S_GenerateParticles>( _delta );
+				mWorld.Run<S_UpdateBoundsFromRigidbody>( _delta );
+				mWorld.Run<S_UpdateBoundsFromModel>();
+				mWorld.Run<S_UpdateBoundsFromTransform>();
+				mWorld.Run<S_UpdateGameCamera>( _delta );
 			}
 
-			world.Run<S_ClientSaveState>(	_delta );
-			world.Run<S_RollbackStateSave>( _delta );
+            mWorld.Run<S_ClientSaveState>(	_delta );
+            mWorld.Run<S_RollbackStateSave>( _delta );
 
-			world.Run<S_ClientSend>(		_delta );
+            mWorld.Run<S_ClientSend>(		_delta );
 		}
 	}
 
-	//================================================================================================================================
+	//========================================================================================================
 	// Creates the joystick/keyboard axes in the input manager
-	//================================================================================================================================
+	//========================================================================================================
 	void GameClient::CreateGameAxes()
 	{
 		Input::Get().Manager().CreateKeyboardAxis( "game_forward", Keyboard::W, Keyboard::S );

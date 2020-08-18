@@ -53,99 +53,98 @@
 
 namespace fan
 {
-	//================================================================================================================================
-	//================================================================================================================================
-	GameServer::GameServer( const std::string _name )
+	//========================================================================================================
+	//========================================================================================================
+	void GameServer::Init()
 	{
 		// base components
-		world.AddComponentType<SceneNode>();
-		world.AddComponentType<Transform>();
-		world.AddComponentType<DirectionalLight>();
-		world.AddComponentType<PointLight>();
-		world.AddComponentType<MeshRenderer>();
-		world.AddComponentType<Material>();
-		world.AddComponentType<Camera>();
-		world.AddComponentType<ParticleEmitter>();
-		world.AddComponentType<Particle>();
-		world.AddComponentType<Rigidbody>();
-		world.AddComponentType<MotionState>();
-		world.AddComponentType<BoxShape>();
-		world.AddComponentType<SphereShape>();
-		world.AddComponentType<UITransform>();
-		world.AddComponentType<UIRenderer>();
-		world.AddComponentType<Bounds>();
-		world.AddComponentType<ExpirationTime>();
-		world.AddComponentType<FollowTransform>();
-		world.AddComponentType<UIProgressBar>();
+		mWorld.AddComponentType<SceneNode>();
+		mWorld.AddComponentType<Transform>();
+		mWorld.AddComponentType<DirectionalLight>();
+		mWorld.AddComponentType<PointLight>();
+		mWorld.AddComponentType<MeshRenderer>();
+		mWorld.AddComponentType<Material>();
+		mWorld.AddComponentType<Camera>();
+		mWorld.AddComponentType<ParticleEmitter>();
+		mWorld.AddComponentType<Particle>();
+		mWorld.AddComponentType<Rigidbody>();
+		mWorld.AddComponentType<MotionState>();
+		mWorld.AddComponentType<BoxShape>();
+		mWorld.AddComponentType<SphereShape>();
+		mWorld.AddComponentType<UITransform>();
+		mWorld.AddComponentType<UIRenderer>();
+		mWorld.AddComponentType<Bounds>();
+		mWorld.AddComponentType<ExpirationTime>();
+		mWorld.AddComponentType<FollowTransform>();
+		mWorld.AddComponentType<UIProgressBar>();
 		// game components
-		world.AddComponentType<Planet>();
-		world.AddComponentType<SpaceShip>();
-		world.AddComponentType<PlayerInput>();
-		world.AddComponentType<Weapon>();
-		world.AddComponentType<Bullet>();
-		world.AddComponentType<Battery>();
-		world.AddComponentType<SolarPanel>();
-		world.AddComponentType<Health>();
-		world.AddComponentType<SpaceshipUI>();
-		world.AddComponentType<Damage>();
+		mWorld.AddComponentType<Planet>();
+		mWorld.AddComponentType<SpaceShip>();
+		mWorld.AddComponentType<PlayerInput>();
+		mWorld.AddComponentType<Weapon>();
+		mWorld.AddComponentType<Bullet>();
+		mWorld.AddComponentType<Battery>();
+		mWorld.AddComponentType<SolarPanel>();
+		mWorld.AddComponentType<Health>();
+		mWorld.AddComponentType<SpaceshipUI>();
+		mWorld.AddComponentType<Damage>();
 		// net components
-		world.AddComponentType<HostGameData>();
-		world.AddComponentType<HostConnection>();
-		world.AddComponentType<HostReplication>();
-		world.AddComponentType<ReliabilityLayer>();
-		world.AddComponentType<HostPersistentHandle>();
-		world.AddComponentType<EntityReplication>();
-		world.AddComponentType<LinkingContextUnregisterer>();
+		mWorld.AddComponentType<HostGameData>();
+		mWorld.AddComponentType<HostConnection>();
+		mWorld.AddComponentType<HostReplication>();
+		mWorld.AddComponentType<ReliabilityLayer>();
+		mWorld.AddComponentType<HostPersistentHandle>();
+		mWorld.AddComponentType<EntityReplication>();
+		mWorld.AddComponentType<LinkingContextUnregisterer>();
 
 		// base singleton components
-		world.AddSingletonType<Scene>();
-        world.AddSingletonType<RenderResources>();
-        world.AddSingletonType<SceneResources>();
-		world.AddSingletonType<RenderWorld>();
-		world.AddSingletonType<PhysicsWorld>();
-		world.AddSingletonType<ScenePointers>();
-		world.AddSingletonType<RenderDebug>();
-        world.AddSingletonType<Mouse>();
+		mWorld.AddSingletonType<Scene>();
+        mWorld.AddSingletonType<RenderResources>();
+        mWorld.AddSingletonType<SceneResources>();
+		mWorld.AddSingletonType<RenderWorld>();
+		mWorld.AddSingletonType<PhysicsWorld>();
+		mWorld.AddSingletonType<ScenePointers>();
+		mWorld.AddSingletonType<RenderDebug>();
+        mWorld.AddSingletonType<Mouse>();
 		// game singleton components
-		world.AddSingletonType<SunLight>();
-		world.AddSingletonType<GameCamera>();
-		world.AddSingletonType<CollisionManager>();
-		world.AddSingletonType<Game>();
-		world.AddSingletonType<SolarEruption>();
-		world.AddSingletonType<SpawnManager>();
-		world.AddSingletonType<ServerNetworkManager>();
+		mWorld.AddSingletonType<SunLight>();
+		mWorld.AddSingletonType<GameCamera>();
+		mWorld.AddSingletonType<CollisionManager>();
+		mWorld.AddSingletonType<Game>();
+		mWorld.AddSingletonType<SolarEruption>();
+		mWorld.AddSingletonType<SpawnManager>();
+		mWorld.AddSingletonType<ServerNetworkManager>();
 		// net singleton components
-		world.AddSingletonType<ServerConnection>();
-		world.AddSingletonType<LinkingContext>();
-		world.AddSingletonType<HostManager>();
-		world.AddSingletonType<Time>();
-		
-		world.AddTagType<tag_sunlight_occlusion>();
+		mWorld.AddSingletonType<ServerConnection>();
+		mWorld.AddSingletonType<LinkingContext>();
+		mWorld.AddSingletonType<HostManager>();
+		mWorld.AddSingletonType<Time>();
 
-		// @hack
-		Game& gameNotConst = world.GetSingleton<Game>();
-		gameNotConst.gameServer = this;
-		gameNotConst.name = _name;
+        mWorld.AddTagType<tag_sunlight_occlusion>();
+
+        Game& game = mWorld.GetSingleton<Game>();
+        game.name = "server";
+        game.mFlags |= Game::Flags::Server;
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void GameServer::Start()
 	{
-        ServerNetworkManager & netManager = world.GetSingleton<ServerNetworkManager>();
-		netManager.Start( world );
+        ServerNetworkManager & netManager = mWorld.GetSingleton<ServerNetworkManager>();
+		netManager.Start( mWorld );
 
-		world.Run<S_RegisterAllRigidbodies>();
-		GameCamera::CreateGameCamera( world );
-		SolarEruption::Start( world );
+        mWorld.Run<S_RegisterAllRigidbodies>();
+		GameCamera::CreateGameCamera( mWorld );
+		SolarEruption::Start( mWorld );
 
-		SolarEruption& eruption = world.GetSingleton<SolarEruption>();
-		eruption.ScheduleNextEruption( world );
+		SolarEruption& eruption = mWorld.GetSingleton<SolarEruption>();
+		eruption.ScheduleNextEruption( mWorld );
 
-		Game & game = world.GetSingleton<Game>();
-        MeshManager& meshManager = *world.GetSingleton<RenderResources>().mMeshManager;
-        SunLight& sunLight = world.GetSingleton<SunLight>();
-        RenderWorld& renderWorld = world.GetSingleton<RenderWorld>();
+		Game & game = mWorld.GetSingleton<Game>();
+        MeshManager& meshManager = *mWorld.GetSingleton<RenderResources>().mMeshManager;
+        SunLight& sunLight = mWorld.GetSingleton<SunLight>();
+        RenderWorld& renderWorld = mWorld.GetSingleton<RenderWorld>();
         meshManager.Add( sunLight.mesh, "sunlight_mesh_" + game.name );
         meshManager.Add( renderWorld.particlesMesh, "particles_mesh_" + game.name );
 	}
@@ -155,25 +154,25 @@ namespace fan
 	void  GameServer::Stop()
 	{
 		// clears the physics world
-		world.Run<S_UnregisterAllRigidbodies>();
+        mWorld.Run<S_UnregisterAllRigidbodies>();
 
 		// clears the registered mesh
-		RenderWorld& renderWorld = world.GetSingleton<RenderWorld>();
-        SunLight& sunLight = world.GetSingleton<SunLight>();
-        MeshManager& meshManager = *world.GetSingleton<RenderResources>().mMeshManager;
+		RenderWorld& renderWorld = mWorld.GetSingleton<RenderWorld>();
+        SunLight& sunLight = mWorld.GetSingleton<SunLight>();
+        MeshManager& meshManager = *mWorld.GetSingleton<RenderResources>().mMeshManager;
         meshManager.Remove( sunLight.mesh->mPath );
         meshManager.Remove( renderWorld.particlesMesh->mPath );
 
-		GameCamera::DeleteGameCamera( world );
-        ServerNetworkManager & netManager = world.GetSingleton<ServerNetworkManager>();
-		netManager.Stop( world );
+		GameCamera::DeleteGameCamera( mWorld );
+        ServerNetworkManager & netManager = mWorld.GetSingleton<ServerNetworkManager>();
+		netManager.Stop( mWorld );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void  GameServer::Step( const float _delta )
 	{		
-		Time& time = world.GetSingleton<Time>();
+		Time& time = mWorld.GetSingleton<Time>();
 
 		if( _delta > 0.f )
 		{
@@ -183,54 +182,54 @@ namespace fan
 		{
 			SCOPED_PROFILE( scene_update );
 
-			S_ServerReceive::Run( world, _delta );
-			world.Run<S_ProcessTimedOutPackets>	();
-			world.Run<S_DetectHostTimout>		();
-			world.Run<S_HostSpawnShip>			( _delta );
-			world.Run<S_HostSyncFrame>			( _delta );
-			SpawnManager			::Update( world );
+			S_ServerReceive::Run( mWorld, _delta );
+            mWorld.Run<S_ProcessTimedOutPackets>	();
+            mWorld.Run<S_DetectHostTimout>		();
+            mWorld.Run<S_HostSpawnShip>			( _delta );
+            mWorld.Run<S_HostSyncFrame>			( _delta );
+			SpawnManager			::Update( mWorld );
 
 			// update	
-			world.Run<S_HostUpdateInput>( _delta );
-			world.Run<S_MovePlanets>	( _delta );
-			world.Run<S_MoveSpaceships> ( _delta );
+			mWorld.Run<S_HostUpdateInput>( _delta );
+			mWorld.Run<S_MovePlanets>	( _delta );
+			mWorld.Run<S_MoveSpaceships> ( _delta );
 
 			// physics & transforms
-			PhysicsWorld& physicsWorld = world.GetSingleton<PhysicsWorld>();
-			world.Run<S_SynchronizeMotionStateFromTransform>();
+			PhysicsWorld& physicsWorld = mWorld.GetSingleton<PhysicsWorld>();
+            mWorld.Run<S_SynchronizeMotionStateFromTransform>();
 			physicsWorld.dynamicsWorld->stepSimulation( _delta, 10, Time::s_physicsDelta );
-			world.Run<S_SynchronizeTransformFromMotionState>();
-			world.Run<SMoveFollowTransforms>();
+			mWorld.Run<S_SynchronizeTransformFromMotionState>();
+			mWorld.Run<SMoveFollowTransforms>();
 
-			world.Run<S_FireWeapons>(			_delta );
-			world.Run<S_GenerateLightMesh>(		_delta );
-			world.Run<S_UpdateSolarPannels>(	_delta );
-			world.Run<S_RechargeBatteries>(		_delta );
-			world.Run<S_UpdateExpirationTimes>(	_delta );
-			world.Run<S_EruptionDamage>(		_delta );
-			world.Run<S_UpdateGameUiValues>(	_delta );
-			world.Run<S_UpdateGameUiPosition>(	_delta );
-			SolarEruption::Step( world,			_delta );
-			world.Run<S_PlayerDeath>(			_delta );
+			mWorld.Run<S_FireWeapons>(			_delta );
+			mWorld.Run<S_GenerateLightMesh>(		_delta );
+			mWorld.Run<S_UpdateSolarPannels>(	_delta );
+			mWorld.Run<S_RechargeBatteries>(		_delta );
+			mWorld.Run<S_UpdateExpirationTimes>(	_delta );
+			mWorld.Run<S_EruptionDamage>(		_delta );
+			mWorld.Run<S_UpdateGameUiValues>(	_delta );
+			mWorld.Run<S_UpdateGameUiPosition>(	_delta );
+			SolarEruption::Step( mWorld,			_delta );
+            mWorld.Run<S_PlayerDeath>(			_delta );
 
 			// late update
-			const RenderWorld& renderWorld = world.GetSingleton<RenderWorld>();
+			const RenderWorld& renderWorld = mWorld.GetSingleton<RenderWorld>();
 			if( ! renderWorld.isHeadless )
 			{
 				SCOPED_PROFILE( game_late );
-				world.Run<S_ParticlesOcclusion>(		_delta );
-				world.Run<S_UpdateParticles>(			_delta );
-				world.Run<S_EmitParticles>(				_delta );
-				world.Run<S_GenerateParticles>(			_delta );
-				world.Run<S_UpdateBoundsFromRigidbody>( _delta );
-				world.Run<S_UpdateBoundsFromModel>();
-				world.Run<S_UpdateBoundsFromTransform>();
-				world.Run<S_UpdateGameCamera>(			_delta );
+				mWorld.Run<S_ParticlesOcclusion>(		_delta );
+				mWorld.Run<S_UpdateParticles>(			_delta );
+				mWorld.Run<S_EmitParticles>(				_delta );
+				mWorld.Run<S_GenerateParticles>(			_delta );
+				mWorld.Run<S_UpdateBoundsFromRigidbody>( _delta );
+				mWorld.Run<S_UpdateBoundsFromModel>();
+				mWorld.Run<S_UpdateBoundsFromTransform>();
+				mWorld.Run<S_UpdateGameCamera>(			_delta );
 			}
 
-			world.Run<S_HostSaveState>( _delta );
-			world.Run<S_UpdateReplication>();
-			world.Run<S_ServerSend>( _delta );
+			mWorld.Run<S_HostSaveState>( _delta );
+			mWorld.Run<S_UpdateReplication>();
+			mWorld.Run<S_ServerSend>( _delta );
 		}
 	}
 }

@@ -6,7 +6,7 @@
 #include "fanLaunchArguments.h"
 #include "game/fanGameClient.hpp"
 #include "game/fanGameServer.hpp"
-#include "game/fanGameHolder.hpp"
+#include "scene/fanGameHolder.hpp"
 #include "editor/fanEditorHolder.hpp"
 
 
@@ -35,11 +35,11 @@ namespace fan
 				_settings.windowName = _settings.windowName + "_editor_client";
 
 				// attaches an editor to a game client and runs it
-				fan::GameClient client( "client" );
-				fan::EditorHolder editor( _settings, { &client.world } );
+				fan::GameClient client;
+				fan::EditorHolder editor( _settings, { &client } );
 				if( _settings.enableLivepp )
 				{
-					editor.onLPPSynch.Connect( &LPPMain::OnSync, this );
+					editor.mOnLPPSynch.Connect( &LPPMain::OnSync, this );
 				}
 				editor.Run();
 			} 
@@ -49,11 +49,11 @@ namespace fan
 				_settings.windowName = _settings.windowName + "_editor_server";
 
 				// attaches an editor to a game server and runs it
-				fan::GameServer server( "server" );
-				fan::EditorHolder editor( _settings, { &server.world } );
+				fan::GameServer server;
+				fan::EditorHolder editor( _settings, { &server } );
 				if( _settings.enableLivepp )
 				{
-					editor.onLPPSynch.Connect( &LPPMain::OnSync, this );
+					editor.mOnLPPSynch.Connect( &LPPMain::OnSync, this );
 				}
 				editor.Run();
 			} 
@@ -63,12 +63,12 @@ namespace fan
 				_settings.windowName = _settings.windowName + "_editor_client_server";
 
 				// attaches an editor to a game client and runs it
-				fan::GameClient client( "client" );
-				fan::GameServer server( "server" );
-				fan::EditorHolder editor( _settings, { &client.world, &server.world } );
+				fan::GameClient client;
+				fan::GameServer server;
+				fan::EditorHolder editor( _settings, { &client, &server } );
 				if( _settings.enableLivepp )
 				{
-					editor.onLPPSynch.Connect( &LPPMain::OnSync, this );
+					editor.mOnLPPSynch.Connect( &LPPMain::OnSync, this );
 				}
 				editor.Run();
 			} break;
@@ -77,8 +77,8 @@ namespace fan
 				_settings.windowName = _settings.windowName + "_client";
 
 				// attaches an editor to a game client and runs it
-				fan::GameClient client( "client" );
-				fan::GameHolder gameHolder( _settings, client.world );
+				fan::GameClient client;
+				fan::GameHolder gameHolder( _settings, client );
 				if( _settings.enableLivepp )
 				{
 					gameHolder.onLPPSynch.Connect( &LPPMain::OnSync, this );
@@ -87,11 +87,11 @@ namespace fan
 			} break;
 			case LaunchSettings::Mode::Server:
 			{
-				_settings.windowName = _settings.windowName + "_client";
+				_settings.windowName = _settings.windowName + "_server";
 
 				// attaches an editor to a game client and runs it
-				fan::GameServer server( "server" );
-				fan::GameHolder gameHolder( _settings, server.world );
+				fan::GameServer server;
+				fan::GameHolder gameHolder( _settings, server );
 				if( _settings.enableLivepp )
 				{
 					gameHolder.onLPPSynch.Connect( &LPPMain::OnSync, this );

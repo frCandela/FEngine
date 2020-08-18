@@ -7,13 +7,7 @@
 
 namespace fan
 {
-	struct GameClient;
-	struct GameServer;
-
 	//================================================================================================================================
-	// Contains game data & a reference to the game client or server depending on which is used
-	// allows saving properties of the game into the scene & edition of parameters from the editor
-	// @todo, put time related stuff in a singleton in the scene lib
 	//================================================================================================================================	
 	struct Time : public EcsSingleton
 	{
@@ -23,7 +17,7 @@ namespace fan
 		static void Init( EcsWorld& _world, EcsSingleton& _component );
 		static void OnGui( EcsWorld&, EcsSingleton& _component );
 
-		FrameIndex	frameIndex;			// the index of the current time
+		FrameIndex	frameIndex;			// the index of the current frame
 		FrameIndex	frameStart;			// the index of the first frame of the game
 		float		logicDelta;			// time between two frames in seconds
 		float		timeScaleDelta;		// (seconds) accelerate, decelerates the logic frame rate to resync frame index with server

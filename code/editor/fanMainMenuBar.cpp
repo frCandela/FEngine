@@ -302,7 +302,7 @@ namespace fan
 	void MainMenuBar::New( EcsWorld& _world )
 	{
 		Game& game = _world.GetSingleton<Game>();
-		if( game.state != Game::STOPPED )
+		if( game.mState != Game::STOPPED )
 		{
 			Debug::Warning() << "creating scenes is disabled in play mode" << Debug::Endl();
 			return;
@@ -317,7 +317,7 @@ namespace fan
 	void MainMenuBar::Open( EcsWorld& _world )
 	{
 		Game& game = _world.GetSingleton<Game>();
-		if( game.state != Game::STOPPED )
+		if( game.mState != Game::STOPPED )
 		{
 			Debug::Warning() << "loading scenes is disabled in play mode" << Debug::Endl();
 			return;
@@ -341,7 +341,7 @@ namespace fan
 			return;
 		}
 
-		if( game.state == Game::STOPPED )
+		if( game.mState == Game::STOPPED )
 		{
 			EditorSelection& editorSelection = _world.GetSingleton<EditorSelection>();
 
@@ -380,7 +380,7 @@ namespace fan
 		Game& game = _world.GetSingleton<Game>();
 		Scene& scene = _world.GetSingleton<Scene>();
 
-		if( game.state != Game::STOPPED )
+		if( game.mState != Game::STOPPED )
 		{
 			Debug::Warning() << "saving is disabled in play mode" << Debug::Endl();
 			return;

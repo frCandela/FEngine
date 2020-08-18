@@ -47,7 +47,7 @@ namespace fan
 
 			const ImVec4 disabledColor = ImVec4( 0.3f, 0.3f, 0.3f, 0.3f );
 
-			if ( game.state == Game::STOPPED )
+			if ( game.mState == Game::STOPPED )
 			{
 				// Play
 				if ( ImGui::ButtonIcon( ImGui::PLAY16, { 16,16 }, -1, ImVec4( 0, 0, 0, 0 ), ImVec4( 1.f, 1.f, 1.f, 1.f ) ) )
@@ -65,20 +65,20 @@ namespace fan
 			}
 
 			const ImVec4 pauseTint
-				= game.state == Game::PLAYING ? ImVec4( 1.f, 1.f, 1.f, 1.f )
-				: game.state == Game::PAUSED ? ImVec4( 0.9f, 0.9f, 0.9f, 1.f )
+				= game.mState == Game::PLAYING ? ImVec4( 1.f, 1.f, 1.f, 1.f )
+				: game.mState == Game::PAUSED ? ImVec4( 0.9f, 0.9f, 0.9f, 1.f )
 				: disabledColor;
 
 			// Pause
 			if ( ImGui::ButtonIcon( ImGui::PAUSE16, { 16,16 }, -1, ImVec4( 0, 0, 0, 0.f ), pauseTint ) )
 			{
-				if ( game.state == Game::PLAYING ) { onPause.Emmit(); }
-				else if ( game.state == Game::PAUSED ) { onResume.Emmit(); }
+				if ( game.mState == Game::PLAYING ) { onPause.Emmit(); }
+				else if ( game.mState == Game::PAUSED ) { onResume.Emmit(); }
 			}
 
 			// Step
-			const ImVec4 stepTint = game.state == Game::PAUSED ? ImVec4( 1.f, 1.f, 1.f, 1.f ) : disabledColor;
-			if ( ImGui::ButtonIcon( ImGui::STEP16, { 16,16 }, -1, ImVec4( 0, 0, 0, 0 ), stepTint ) && game.state == Game::PAUSED )
+			const ImVec4 stepTint = game.mState == Game::PAUSED ? ImVec4( 1.f, 1.f, 1.f, 1.f ) : disabledColor;
+			if ( ImGui::ButtonIcon( ImGui::STEP16, { 16,16 }, -1, ImVec4( 0, 0, 0, 0 ), stepTint ) && game.mState == Game::PAUSED )
 			{
 				onStep.Emmit();
 			}
