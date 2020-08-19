@@ -8,7 +8,6 @@
 #include "core/input/fanInput.hpp"
 #include "network/singletons/fanTime.hpp"
 #include "render/fanRenderer.hpp"
-#include "scene/singletons/fanMouse.hpp"
 #include "scene/singletons/fanRenderWorld.hpp"
 #include "scene/components/fanCamera.hpp"
 #include "scene/systems/fanUpdateTransforms.hpp"
@@ -23,7 +22,7 @@ namespace fan
 {
 	//========================================================================================================
 	//========================================================================================================
-	GameHolder::GameHolder( const LaunchSettings _settings, GameBase& _game ) :
+	GameHolder::GameHolder( const LaunchSettings _settings, IGame& _game ) :
             mGame( _game )
 		, mApplicationShouldExit( false )
 		, mLaunchSettings( _settings )
@@ -61,8 +60,11 @@ namespace fan
 		if( !_settings.loadScene.empty() )
 		{
 			scene.LoadFrom( _settings.loadScene );
-			GameStart();
-		}
+            mGame.Start();
+			UseGameCamera( mGame );
+            GameCamera& gameCamera = _game.mWorld.GetSingleton<GameCamera>();
+            scene.SetMainCamera( gameCamera.cameraHandle );
+        }
 	}
 
 	//========================================================================================================
@@ -169,11 +171,11 @@ namespace fan
 
 			time.lastLogicTime += time.logicDelta;
 
-			GameStep( time.logicDelta );
+            mGame.Step( time.logicDelta );
 
             mGame.mWorld.Run<SMoveFollowTransforms>();
 
-			assert( logicIsThisFrame );
+            fanAssert( logicIsThisFrame );
 
 			if( renderIsThisFrame )
 			{
@@ -227,46 +229,14 @@ namespace fan
 		}
 	}
 
-	//========================================================================================================
-	//========================================================================================================
-	void GameHolder::GameStart()
-	{
-		Game& game = mGame.mWorld.GetSingleton<Game>();
-		assert( game.mState == Game::STOPPED );
-		// saves the scene before playing
-		Scene& scene = mGame.mWorld.GetSingleton<Scene>();
-		assert( !scene.path.empty() );
-		scene.Save();
-		Debug::Highlight() << game.name << ": play" << Debug::Endl();
-		game.mState = Game::PLAYING;
-
-        mGame.Start();
-
-		GameCamera& gameCamera = mGame.mWorld.GetSingleton<GameCamera>();
-		scene.SetMainCamera( gameCamera.cameraHandle );		
-	}
-	
-	//========================================================================================================
-	//========================================================================================================
-	void  GameHolder::GameStop()
-	{
-		Game& game = mGame.mWorld.GetSingleton<Game>();
-		if( game.mState == Game::PLAYING || game.mState == Game::PAUSED )
-		{
-			Debug::Highlight() << game.name << ": stopped" << Debug::Endl();
-			game.mState = Game::STOPPED;
-            mGame.Stop();
-		}
-	}
-
-	//========================================================================================================
-	//========================================================================================================
-	void  GameHolder::GameStep( const float _delta )
-	{
- 		Game& game = mGame.mWorld.GetSingleton<Game>();
- 		const float delta = ( game.mState == Game::PLAYING ? _delta : 0.f );
-        mGame.Step( delta );
-	}
+    //========================================================================================================
+    //========================================================================================================
+    void GameHolder::UseGameCamera( IGame& _game )
+    {
+        Scene& scene = _game.mWorld.GetSingleton<Scene>();
+        GameCamera& gameCamera = _game.mWorld.GetSingleton<GameCamera>();
+        scene.SetMainCamera( gameCamera.cameraHandle );
+    }
 
 	//========================================================================================================
 	// Updates the render world singleton component

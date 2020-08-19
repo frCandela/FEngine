@@ -1,22 +1,19 @@
 #include "editor/fanMainMenuBar.hpp"
 
 #include "core/fanDebug.hpp"
+#include "core/fanSerializedValues.hpp"
+#include "core/input/fanInput.hpp"
+#include "core/time/fanProfiler.hpp"
+#include "network/singletons/fanTime.hpp"
+#include "render/fanRenderGlobal.hpp"
+#include "scene/singletons/fanScene.hpp"
+#include "scene/components/fanSceneNode.hpp"
+#include "scene/components/fanTransform.hpp"
 #include "editor/singletons/fanEditorGrid.hpp"
 #include "editor/windows/fanEditorWindow.hpp"
 #include "editor/singletons/fanEditorSelection.hpp"
 #include "editor/fanModals.hpp"
-#include "core/fanSerializedValues.hpp"
-#include "core/input/fanInput.hpp"
-#include "core/input/fanInputManager.hpp"
-#include "core/time/fanProfiler.hpp"
-#include "network/singletons/fanTime.hpp"
-#include "ecs/fanEcsWorld.hpp"
-#include "scene/singletons/fanScene.hpp"
-#include "scene/components/fanSceneNode.hpp"
-#include "scene/components/fanTransform.hpp"
-#include "network/singletons/fanTime.hpp"
-#include "game/singletons/fanGame.hpp"
-#include "render/fanRenderGlobal.hpp"
+#include "editor/singletons/fanEditorPlayState.hpp"
 
 namespace fan
 {
@@ -301,8 +298,8 @@ namespace fan
 	//================================================================================================================================
 	void MainMenuBar::New( EcsWorld& _world )
 	{
-		Game& game = _world.GetSingleton<Game>();
-		if( game.mState != Game::STOPPED )
+        const EditorPlayState& playState = _world.GetSingleton<EditorPlayState>();
+		if( playState.mState != EditorPlayState::STOPPED )
 		{
 			Debug::Warning() << "creating scenes is disabled in play mode" << Debug::Endl();
 			return;
@@ -316,8 +313,8 @@ namespace fan
 	//================================================================================================================================
 	void MainMenuBar::Open( EcsWorld& _world )
 	{
-		Game& game = _world.GetSingleton<Game>();
-		if( game.mState != Game::STOPPED )
+        const EditorPlayState& playState = _world.GetSingleton<EditorPlayState>();
+		if( playState.mState != EditorPlayState::STOPPED )
 		{
 			Debug::Warning() << "loading scenes is disabled in play mode" << Debug::Endl();
 			return;
@@ -332,7 +329,6 @@ namespace fan
 	//================================================================================================================================
 	void MainMenuBar::Reload( EcsWorld& _world )
 	{
-		Game& game = _world.GetSingleton<Game>();
 		Scene& scene = _world.GetSingleton<Scene>();
 
 		if( scene.path.empty() )
@@ -341,7 +337,8 @@ namespace fan
 			return;
 		}
 
-		if( game.mState == Game::STOPPED )
+        const EditorPlayState& playState = _world.GetSingleton<EditorPlayState>();
+		if( playState.mState == EditorPlayState::STOPPED )
 		{
 			EditorSelection& editorSelection = _world.GetSingleton<EditorSelection>();
 
@@ -377,10 +374,10 @@ namespace fan
 	//================================================================================================================================
 	void MainMenuBar::Save( EcsWorld& _world )
 	{
-		Game& game = _world.GetSingleton<Game>();
 		Scene& scene = _world.GetSingleton<Scene>();
 
-		if( game.mState != Game::STOPPED )
+        const EditorPlayState& playState = _world.GetSingleton<EditorPlayState>();
+		if( playState.mState != EditorPlayState::STOPPED )
 		{
 			Debug::Warning() << "saving is disabled in play mode" << Debug::Endl();
 			return;

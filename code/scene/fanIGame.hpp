@@ -6,12 +6,12 @@ namespace fan
 {
     //========================================================================================================
     //========================================================================================================
-    class GameBase
+    class IGame
     {
     public:
-        GameBase(){}
-        GameBase( GameBase const& ) = delete;
-        GameBase& operator=( GameBase const& ) = delete;
+        IGame(){}
+        IGame( IGame const& ) = delete;
+        IGame& operator=( IGame const& ) = delete;
 
         virtual void Init() = 0;
         virtual void Start() = 0;

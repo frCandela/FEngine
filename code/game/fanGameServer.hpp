@@ -1,12 +1,12 @@
 #pragma once
 
-#include "scene/fanGameBase.hpp"
+#include "scene/fanIGame.hpp"
 
 namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	class GameServer : public GameBase
+	class GameServer : public IGame
 	{
 	public:
 		void Init() override;

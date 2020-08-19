@@ -33,7 +33,7 @@ namespace fan
 	public:
 		Signal <> mOnLPPSynch;
 
-		EditorHolder( const LaunchSettings _settings, std::vector<GameBase*>  _games );
+		EditorHolder( const LaunchSettings _settings, std::vector<IGame*>  _games );
 		~EditorHolder();
 
 		void Run();
@@ -42,30 +42,28 @@ namespace fan
 			   
 	private:		
 		Renderer*               mRenderer;
-		Window                  mWindow;
-		PrefabManager           mPrefabManager;
-		std::vector<GameBase*>  mGames;
-		int                     mCurrentGame    = 0;
-		double                  mLastRenderTime = 0.;
-		const LaunchSettings    mLaunchSettings;
-        bool                    mApplicationShouldExit;
-        bool                    mShowUi = true;
+		Window               mWindow;
+		PrefabManager        mPrefabManager;
+		std::vector<IGame*>  mGames;
+		int                  mCurrentGame    = 0;
+		double               mLastRenderTime = 0.;
+		const LaunchSettings mLaunchSettings;
+        bool                 mApplicationShouldExit;
+        bool                 mShowUi = true;
 
         MainMenuBar      *mMainMenuBar;
         GameViewWindow   *mGameViewWindow;
 
-		GameBase& GetCurrentGame() { return *mGames[ mCurrentGame ]; }
+		IGame& GetCurrentGame() { return *mGames[ mCurrentGame ]; }
 		
 		static void UseEditorCamera( EcsWorld& _world );
-		static void UseGameCamera( EcsWorld& _world );
 
 		void OnCycleCurrentGame();
 		void OnCurrentGameSwitchPlayStop();
-		void OnCurrentGameStart() { GameStart( GetCurrentGame() ); }
+		void OnCurrentGameStart();
 		void OnCurrentGameStop() { GameStop( GetCurrentGame() ); }
 		void OnCurrentGamePause() { GamePause( GetCurrentGame() ); }
 		void OnCurrentGameResume() { GameResume( GetCurrentGame() ); }
-		void OnCurrentGameStep( const float _delta ) { GameStep( GetCurrentGame(), _delta ); }
 		void OnCurrentGameStep();
 		void OnCurrentGameToogleCamera();
 		void OnCurrentGameOpen();
@@ -75,12 +73,11 @@ namespace fan
 		void OnCurrentGamePaste();
 		void OnCurrentGameSelect( const int _index );
 
-		static void GameStart(  GameBase& _game );
-		static void GameStop(   GameBase& _game );
-		static void GamePause(  GameBase& _game );
-		static void GameResume( GameBase& _game );
-		static void GameStep(   GameBase& _game, const float _delta );
-		static void UpdateRenderWorld( Renderer& _renderer, GameBase& _game, const glm::vec2 _size );
+		static void GameStart( IGame& _game );
+		static void GameStop( IGame& _game );
+		static void GamePause( IGame& _game );
+		static void GameResume( IGame& _game );
+		static void UpdateRenderWorld( Renderer& _renderer, IGame& _game, const glm::vec2 _size );
 
 		void OnSceneLoad( Scene& _scene );
 		void OnToogleShowUI() { mShowUi = !mShowUi; }

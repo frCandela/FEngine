@@ -1,5 +1,6 @@
 #include <scene/singletons/fanRenderResources.hpp>
 #include <scene/singletons/fanSceneResources.hpp>
+#include <editor/singletons/fanEditorPlayState.hpp>
 #include "editor/fanEditorHolder.hpp"
 
 #include "core/input/fanInputManager.hpp"
@@ -15,6 +16,7 @@
 #include "editor/windows/fanSceneWindow.hpp"	
 #include "editor/windows/fanGameViewWindow.hpp"
 #include "editor/windows/fanEcsWindow.hpp"
+#include "editor/singletons/fanEditorPlayState.hpp"
 #include "editor/singletons/fanEditorSelection.hpp"
 #include "editor/singletons/fanEditorCopyPaste.hpp"
 #include "editor/singletons/fanEditorGizmos.hpp"
@@ -26,22 +28,22 @@
 #include "scene/components/fanCamera.hpp"
 #include "scene/systems/fanUpdateTransforms.hpp"
 #include "scene/systems/fanDrawDebug.hpp"
+#include "scene/fanGameHolder.hpp"
 #include "scene/systems/fanUpdateRenderWorld.hpp"
 #include "scene/singletons/fanScene.hpp"
 #include "scene/fanSceneTags.hpp"
-#include "game/singletons/fanGameCamera.hpp"
 #include "game/singletons/fanGame.hpp"
 
 namespace fan
 {
 	//========================================================================================================
 	//========================================================================================================
-	EditorHolder::EditorHolder( const LaunchSettings _settings, std::vector<GameBase*> _games ) :
+	EditorHolder::EditorHolder( const LaunchSettings _settings, std::vector<IGame*> _games ) :
             mGames( _games )
 		, mApplicationShouldExit( false )
 		, mLaunchSettings( _settings )
 	{
-        for( GameBase* gameBase : mGames )
+        for( IGame* gameBase : mGames )
         {
             fanAssert( gameBase != nullptr );
             gameBase->Init();
@@ -132,9 +134,10 @@ namespace fan
         // Loop over all worlds to initialize them
 		for ( int gameIndex = 0; gameIndex < (int)mGames.size() ; gameIndex++)
 		{
-			GameBase& game = *mGames[gameIndex];
+			IGame   & game  = *mGames[gameIndex];
 			EcsWorld& world = game.mWorld;
 
+            world.AddSingletonType<EditorPlayState>();
 			world.AddSingletonType<EditorCamera>();
 			world.AddSingletonType<EditorGrid>();
 			world.AddSingletonType<EditorSelection>();
@@ -172,6 +175,7 @@ namespace fan
 				if( _settings.autoPlay )
 				{
 					GameStart( game );
+                    GameHolder::UseGameCamera( game );
 				}
 			}
 		}
@@ -216,7 +220,7 @@ namespace fan
 	{
 		// initializes timers
 		mLastRenderTime = Time::ElapsedSinceStartup();
-		for( GameBase* game : mGames )
+		for( IGame* game : mGames )
 		{
 			Time& time = game->mWorld.GetSingleton<Time>();
 			time.lastLogicTime = Time::ElapsedSinceStartup();
@@ -246,7 +250,7 @@ namespace fan
 		// Update all worlds
 		for( int gameIndex = 0; gameIndex < (int)mGames.size(); gameIndex++ )
 		{
-		    GameBase& game = *mGames[gameIndex];
+		    IGame   & game  = *mGames[gameIndex];
 			EcsWorld& world = game.mWorld;
 			const bool isCurrentWorld = ( &game == &GetCurrentGame() );
 
@@ -295,9 +299,10 @@ namespace fan
 					time.timeScaleDelta -= increment;
 				}
 
-				time.lastLogicTime += time.logicDelta;		
+				time.lastLogicTime += time.logicDelta;
 
-				GameStep( game, time.logicDelta );
+                const EditorPlayState& playState = world.GetSingleton<EditorPlayState>();
+                game.Step( playState.mState == EditorPlayState::PLAYING ? time.logicDelta : 0.f  );
 
 				// ui & debug
 				if( mShowUi )
@@ -336,7 +341,7 @@ namespace fan
                         {
                             SCOPED_PROFILE( ImGui_render );
 						    ImGui::NewFrame();
-						    mMainMenuBar->Draw( world );
+						    mMainMenuBar->Draw( game.mWorld );
 						    ImGui::Render();
                         }
 					}
@@ -382,104 +387,116 @@ namespace fan
 
 	//========================================================================================================
 	//========================================================================================================
-	void EditorHolder::GameStart( GameBase& _game )
+	void EditorHolder::GameStart( IGame& _game )
 	{
-		Game& game = _game.mWorld.GetSingleton<Game>();
-		if( game.mState == Game::STOPPED )
-		{
-			// saves the scene before playing
-			Scene& scene = _game.mWorld.GetSingleton<Scene>();
-			if( scene.path.empty() )
-			{
-				Debug::Warning() << "please save the scene before playing" << Debug::Endl();
-				return;
-			}
+        // saves the scene before playing
+        Scene& scene = _game.mWorld.GetSingleton<Scene>();
+        if( scene.path.empty() )
+        {
+            Debug::Warning() << "please save the scene before playing" << Debug::Endl();
+            return;
+        }
 
-			scene.Save();
-
-			Debug::Highlight() << game.name << ": play" << Debug::Endl();
-			game.mState = Game::PLAYING;
-
-			_game.Start();
-
-			UseGameCamera( _game.mWorld );
-		}
+        EditorPlayState& playState = _game.mWorld.GetSingleton<EditorPlayState>();
+        if( playState.mState == EditorPlayState::STOPPED )
+        {
+            scene.Save();
+            Game& game = _game.mWorld.GetSingleton<Game>();
+            Debug::Highlight() << game.name << ": start" << Debug::Endl();
+            playState.mState = EditorPlayState::PLAYING;
+            _game.Start();
+        }
 	}
 
+    //========================================================================================================
+    //========================================================================================================
+    struct SceneRestoreState
+    {
+        SceneRestoreState( Scene& _scene ) : mScene( _scene ) {}
+        void Save()
+        {
+            EcsWorld& world = *mScene.world;
+
+            // Saves the camera position for restoring it later
+            const EcsEntity oldCameraID = world.GetEntity( mScene.mainCameraHandle );
+            mPrevCameraTransform = world.GetComponent<Transform>( oldCameraID ).transform;
+            // save old selection
+            SceneNode* prevSelectionNode = world.GetSingleton<EditorSelection>().GetSelectedSceneNode();
+            mPrevSelectionHandle = prevSelectionNode != nullptr ? prevSelectionNode->handle : 0;
+        }
+
+        void Restore() const
+        {
+            EcsWorld& world = *mScene.world;
+
+            // restore camera transform
+            const EcsEntity newCameraID = world.GetEntity( mScene.mainCameraHandle );
+            world.GetComponent<Transform>( newCameraID ).transform = mPrevCameraTransform;
+
+            // restore selection
+            if( mPrevSelectionHandle != 0 && mScene.nodes.find( mPrevSelectionHandle ) != mScene.nodes.end() )
+            {
+                fan::SceneNode& node = world.GetComponent<fan::SceneNode>
+                        ( world.GetEntity( mPrevSelectionHandle ) );
+
+                world.GetSingleton<EditorSelection>().SetSelectedSceneNode( &node );
+            }
+        }
+
+        Scene& mScene;
+        EcsHandle   mPrevSelectionHandle = 0;
+        btTransform mPrevCameraTransform;
+    };
+
 	//========================================================================================================
 	//========================================================================================================
-	void  EditorHolder::GameStop( GameBase& _game )
+	void  EditorHolder::GameStop( IGame& _game )
 	{
 	    EcsWorld& world = _game.mWorld;
-		Game& game = world.GetSingleton<Game>();
-		if( game.mState == Game::PLAYING || game.mState == Game::PAUSED )
+
+        EditorPlayState& playState = _game.mWorld.GetSingleton<EditorPlayState>();
+		if( playState.mState == EditorPlayState::PLAYING || playState.mState == EditorPlayState::PAUSED )
 		{
 			UseEditorCamera( world );
 
-			Scene& scene = world.GetSingleton<Scene>();
+            Scene& scene = world.GetSingleton<Scene>();
+            SceneRestoreState restoreState( scene );
+			restoreState.Save();
 
-			// Saves the camera position for restoring it later
-			const EcsEntity oldCameraID = world.GetEntity( scene.mainCameraHandle );
-			const btTransform oldCameraTransform = world.GetComponent<Transform>( oldCameraID ).transform;
-
-			// save old selection
-			SceneNode* prevSelectionNode = world.GetSingleton<EditorSelection>().GetSelectedSceneNode();
-			const uint32_t prevSelectionHandle = prevSelectionNode != nullptr ? prevSelectionNode->handle : 0;
-
+		    Game& game = world.GetSingleton<Game>();
 			Debug::Highlight() << game.name << ": stopped" << Debug::Endl();
-			game.mState = Game::STOPPED;
-
+            playState.mState = EditorPlayState::STOPPED;
 			_game.Stop();
-
 			scene.LoadFrom( scene.path ); // reload the scene 
 
-			// restore camera transform
-			const EcsEntity newCameraID = world.GetEntity( scene.mainCameraHandle );
-            world.GetComponent<Transform>( newCameraID ).transform = oldCameraTransform;
-
-			// restore selection
-			if( prevSelectionHandle != 0 && scene.nodes.find( prevSelectionHandle ) != scene.nodes.end() )
-			{
-				fan::SceneNode& node = world.GetComponent<fan::SceneNode>
-				                                        ( world.GetEntity( prevSelectionHandle ) );
-
-                world.GetSingleton<EditorSelection>().SetSelectedSceneNode( &node );
-			}
+            restoreState.Restore();
 		}
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void  EditorHolder::GamePause( GameBase& _game )
+	void  EditorHolder::GamePause( IGame& _game )
 	{
-		Game& game = _game.mWorld.GetSingleton<Game>();
-		if( game.mState == Game::PLAYING )
+        EditorPlayState& playState = _game.mWorld.GetSingleton<EditorPlayState>();
+		if( playState.mState == EditorPlayState::PLAYING )
 		{
+            Game& game = _game.mWorld.GetSingleton<Game>();
 			Debug::Highlight() << game.name << ": paused" << Debug::Endl();
-			game.mState = Game::PAUSED;
+            playState.mState = EditorPlayState::PAUSED;
 		}
 	}	
 
 	//========================================================================================================
 	//========================================================================================================
-	void  EditorHolder::GameResume( GameBase& _game )
+	void  EditorHolder::GameResume( IGame& _game )
 	{
-		Game& game = _game.mWorld.GetSingleton<Game>();
-		if( game.mState == Game::PAUSED )
+        EditorPlayState& playState = _game.mWorld.GetSingleton<EditorPlayState>();
+		if( playState.mState == EditorPlayState::PAUSED )
 		{
+		    Game& game = _game.mWorld.GetSingleton<Game>();
 			Debug::Highlight() << game.name << ": resumed" << Debug::Endl();
-			game.mState = Game::PLAYING;
+            playState.mState = EditorPlayState::PLAYING;
 		}
-	}
-
-	//========================================================================================================
-	//========================================================================================================
-	void  EditorHolder::GameStep( GameBase& _game, float _delta )
-	{
-        SCOPED_PROFILE(game_step );
- 		Game& game = _game.mWorld.GetSingleton<Game>();
- 		const float delta = ( game.mState == Game::PLAYING ? _delta : 0.f );
- 		_game.Step( delta );
 	}
 
 	//========================================================================================================
@@ -499,7 +516,7 @@ namespace fan
 	//========================================================================================================
 	// Updates the render world singleton component
 	//========================================================================================================
-	void EditorHolder::UpdateRenderWorld( Renderer& _renderer, GameBase& _game, const glm::vec2 _size )
+	void EditorHolder::UpdateRenderWorld( Renderer& _renderer, IGame& _game, const glm::vec2 _size )
 	{
 	    EcsWorld& world = _game.mWorld;
 
@@ -561,15 +578,25 @@ namespace fan
 		OnCurrentGameSelect( ( mCurrentGame + 1 ) % ( mGames.size() ) );
 	}
 
+    //========================================================================================================
+    //========================================================================================================
+    void EditorHolder::OnCurrentGameStart()
+    {
+	    IGame& game = GetCurrentGame();
+        GameStart( game );
+        GameHolder::UseGameCamera( game );
+    }
+
 	//========================================================================================================
 	//========================================================================================================
 	void EditorHolder::OnCurrentGameSwitchPlayStop()
 	{
-	    GameBase& game = GetCurrentGame();
-		Game& gameState = game.mWorld.GetSingleton<Game>();
-		if( gameState.mState == Game::STOPPED )
+	    IGame& game      = GetCurrentGame();
+        const EditorPlayState& playState = game.mWorld.GetSingleton<EditorPlayState>();
+		if( playState.mState == EditorPlayState::STOPPED )
 		{
 			GameStart( game );
+            GameHolder::UseGameCamera( game );
 		}
 		else
 		{
@@ -584,15 +611,6 @@ namespace fan
 		Scene& scene = _world.GetSingleton<Scene>();
 		EditorCamera& editorCamera = _world.GetSingleton<EditorCamera>();
  		scene.SetMainCamera( editorCamera.cameraHandle );
-	}
-
-	//========================================================================================================
-	//========================================================================================================
-	void EditorHolder::UseGameCamera( EcsWorld& _world )
-	{
-		Scene& scene = _world.GetSingleton<Scene>();
-		GameCamera& gameCamera = _world.GetSingleton<GameCamera>();
-		scene.SetMainCamera( gameCamera.cameraHandle );
 	}
 
 	//========================================================================================================
@@ -621,7 +639,7 @@ namespace fan
 		// Set all to headless except the current
 		for( int gameIndex = 0; gameIndex < (int)mGames.size(); gameIndex++ )
 		{
-		    GameBase& game = *mGames[gameIndex];
+		    IGame      & game        = *mGames[gameIndex];
 			RenderWorld& renderWorld = game.mWorld.GetSingleton<RenderWorld>();
 			renderWorld.isHeadless = ( gameIndex != mCurrentGame );
 		}
@@ -634,10 +652,11 @@ namespace fan
 	//========================================================================================================
 	void EditorHolder::OnCurrentGameToogleCamera()
 	{
-		EcsWorld& world = GetCurrentGame().mWorld;
+	    IGame& currentGame = GetCurrentGame();
+		EcsWorld& world = currentGame.mWorld;
 
-		Game& game = world.GetSingleton<Game>();
-		if( game.mState == Game::STOPPED )
+        const EditorPlayState& playState = world.GetSingleton<EditorPlayState>();
+		if( playState.mState == EditorPlayState::STOPPED )
 		{
 			Debug::Warning() << "You cannot toogle camera outside of play mode" << Debug::Endl();
 			return;
@@ -648,7 +667,7 @@ namespace fan
 
 		if( scene.mainCameraHandle == editorCamera.cameraHandle )
 		{
-			UseGameCamera( world );
+			GameHolder::UseGameCamera( currentGame );
 		}
 		else
 		{
@@ -661,8 +680,8 @@ namespace fan
 	//========================================================================================================
 	void EditorHolder::OnCurrentGameStep( )
 	{
-		GameBase& game = GetCurrentGame();
-		Time& time = game.mWorld.GetSingleton<Time>();
+		IGame& game = GetCurrentGame();
+		Time & time = game.mWorld.GetSingleton<Time>();
         game.Step( time.logicDelta );
 	}
 }

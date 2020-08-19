@@ -6,7 +6,7 @@
 
 namespace fan
 {
-    class GameBase;
+    class IGame;
 
 	//========================================================================================================
 	// Contains game data & a reference to the game client or server depending on which is used
@@ -21,15 +21,12 @@ namespace fan
 		static void Save( const EcsSingleton& _component, Json& _json );
 		static void Load( EcsSingleton& _component, const Json& _json );
 
-		enum State { STOPPED, PLAYING, PAUSED };
         enum Flags { None = 0, Server = 1 };
 
-		State       mState;
+
 		std::string name;
 		uint32_t    mFlags = Flags::None;
 		PrefabPtr   spaceshipPrefab;
-
-		GameBase* mGame = nullptr;
 
 		bool IsServer() const { return mFlags & Flags::Server; }
 	};

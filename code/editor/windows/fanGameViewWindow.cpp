@@ -3,11 +3,12 @@
 #include "network/singletons/fanTime.hpp"
 #include "scene/singletons/fanScene.hpp"
 #include "game/singletons/fanGame.hpp"
+#include "editor/singletons/fanEditorPlayState.hpp"
 
 namespace fan
 {
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	GameViewWindow::GameViewWindow( const LaunchSettings::Mode _launchMode )
 		: EditorWindow( "game view", ImGui::IconType::JOYSTICK16 )
 		, m_isHovered( false )
@@ -17,19 +18,25 @@ namespace fan
 		// compute game world str for
 		switch( _launchMode )
 		{
-		case LaunchSettings::Mode::EditorClient:		memcpy( m_gameWorldsStr, "client\0\0", 8 );			break;
-		case LaunchSettings::Mode::EditorServer:		memcpy( m_gameWorldsStr, "server\0\0", 8 );			break;
-		case LaunchSettings::Mode::EditorClientServer:	memcpy( m_gameWorldsStr, "client\0server\0\0,", 16 );	break;
-		default:fanAssert( false ); break;
+            case LaunchSettings::Mode::EditorClient:
+                memcpy( m_gameWorldsStr, "client\0\0", 8 );
+                break;
+            case LaunchSettings::Mode::EditorServer:
+                memcpy( m_gameWorldsStr, "server\0\0", 8 );
+                break;
+            case LaunchSettings::Mode::EditorClientServer:
+                memcpy( m_gameWorldsStr, "client\0server\0\0,", 16 );
+                break;
+            default:
+                fanAssert( false );
+                break;
 		}
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void GameViewWindow::OnGui( EcsWorld& _world )
 	{
-		Game& game = _world.GetSingleton<Game>();
-
 		// update window size
 		const ImVec2 imGuiSize = ImGui::GetContentRegionAvail();
 		btVector2 size = btVector2( imGuiSize.x, imGuiSize.y );
@@ -47,11 +54,16 @@ namespace fan
 
 			const ImVec4 disabledColor = ImVec4( 0.3f, 0.3f, 0.3f, 0.3f );
 
-			if ( game.mState == Game::STOPPED )
+            const EditorPlayState& playState = _world.GetSingleton<EditorPlayState>();
+			if ( playState.mState == EditorPlayState::STOPPED )
 			{
 				// Play
-				if ( ImGui::ButtonIcon( ImGui::PLAY16, { 16,16 }, -1, ImVec4( 0, 0, 0, 0 ), ImVec4( 1.f, 1.f, 1.f, 1.f ) ) )
-				{
+                if( ImGui::ButtonIcon( ImGui::PLAY16,
+                                       { 16, 16 },
+                                       -1,
+                                       ImVec4( 0, 0, 0, 0 ),
+                                       ImVec4( 1.f, 1.f, 1.f, 1.f ) ) )
+                {
 					onPlay.Emmit();
 				}
 			}
@@ -65,20 +77,23 @@ namespace fan
 			}
 
 			const ImVec4 pauseTint
-				= game.mState == Game::PLAYING ? ImVec4( 1.f, 1.f, 1.f, 1.f )
-				: game.mState == Game::PAUSED ? ImVec4( 0.9f, 0.9f, 0.9f, 1.f )
+				= playState.mState == EditorPlayState::PLAYING ? ImVec4( 1.f, 1.f, 1.f, 1.f )
+				: playState.mState == EditorPlayState::PAUSED ? ImVec4( 0.9f, 0.9f, 0.9f, 1.f )
 				: disabledColor;
 
 			// Pause
 			if ( ImGui::ButtonIcon( ImGui::PAUSE16, { 16,16 }, -1, ImVec4( 0, 0, 0, 0.f ), pauseTint ) )
 			{
-				if ( game.mState == Game::PLAYING ) { onPause.Emmit(); }
-				else if ( game.mState == Game::PAUSED ) { onResume.Emmit(); }
+				if ( playState.mState == EditorPlayState::PLAYING ) { onPause.Emmit(); }
+				else if ( playState.mState == EditorPlayState::PAUSED ) { onResume.Emmit(); }
 			}
 
-			// Step
-			const ImVec4 stepTint = game.mState == Game::PAUSED ? ImVec4( 1.f, 1.f, 1.f, 1.f ) : disabledColor;
-			if ( ImGui::ButtonIcon( ImGui::STEP16, { 16,16 }, -1, ImVec4( 0, 0, 0, 0 ), stepTint ) && game.mState == Game::PAUSED )
+            // Step
+            const ImVec4 stepTint = playState.mState == EditorPlayState::PAUSED
+                    ? ImVec4( 1.f, 1.f, 1.f, 1.f )
+                    : disabledColor;
+            if( ImGui::ButtonIcon( ImGui::STEP16, { 16, 16 }, -1, ImVec4( 0, 0, 0, 0 ), stepTint ) &&
+                playState.mState == EditorPlayState::PAUSED )
 			{
 				onStep.Emmit();
 			}

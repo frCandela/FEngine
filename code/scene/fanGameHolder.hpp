@@ -14,13 +14,13 @@ WARNINGS_POP()
 
 namespace fan
 {
-	class GameBase;
+	class IGame;
 	class Renderer;
 	class Window;
 	struct Scene;
 
 	//================================================================================================================================
-	// This holder displays the game as it will be in retail.
+	// This holder displays the game
 	// Auto load a scene & dispays it, no editor features
 	// Contains an ecsWorld, window & renderer
 	// runs the main loop & manages events
@@ -30,25 +30,23 @@ namespace fan
 	public:
 		Signal <> onLPPSynch;
 
-		GameHolder( const LaunchSettings _settings, GameBase& _game );
+		GameHolder( const LaunchSettings _settings, IGame& _game );
 		~GameHolder();
 
 		void Run();
 		void Exit();
 		void Step();
-			   
-	private:		
+
+        static void UseGameCamera( IGame& _game );
+	private:
 		Renderer*            mRenderer;
 		Window               mWindow;
 		PrefabManager        mPrefabManager;
-        GameBase&            mGame;
+        IGame&               mGame;
 		double               mLastRenderTime = 0.;
 		const LaunchSettings mLaunchSettings;
 		bool                 mApplicationShouldExit;
 
-		void GameStart();
-		void GameStop();
-		void GameStep( const float _delta );
 		void UpdateRenderWorld( Renderer& _renderer, EcsWorld& _world, const glm::vec2 _size );
 	};
 }
