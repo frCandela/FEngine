@@ -6,11 +6,8 @@
 
 namespace fan
 {
-    class IGame;
-
 	//========================================================================================================
-	// Contains game data & a reference to the game client or server depending on which is used
-	// allows saving properties of the game into the scene & edition of parameters from the editor
+	// Some global game data
 	//========================================================================================================
 	struct Game : public EcsSingleton
 	{
@@ -21,13 +18,7 @@ namespace fan
 		static void Save( const EcsSingleton& _component, Json& _json );
 		static void Load( EcsSingleton& _component, const Json& _json );
 
-        enum Flags { None = 0, Server = 1 };
-
-
-		std::string name;
-		uint32_t    mFlags = Flags::None;
-		PrefabPtr   spaceshipPrefab;
-
-		bool IsServer() const { return mFlags & Flags::Server; }
+		bool      mIsServer = false;
+		PrefabPtr mSpaceshipPrefab;
 	};
 }

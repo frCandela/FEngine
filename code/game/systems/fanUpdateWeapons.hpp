@@ -63,7 +63,7 @@ namespace fan
 					spawn::SpawnBullet::Instanciate( _world, ownerID, bulletPosition, bulletVelocity );
 
 					// Adds bullet to the spawn manager for spawning on hosts
-					if( game.IsServer() )
+					if( game.mIsServer )
 					{
 						// spawn on all hosts
 						const EcsHandle hostHandle = _world.GetComponent<HostPersistentHandle>( spaceshipEntity ).handle;

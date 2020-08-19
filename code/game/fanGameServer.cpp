@@ -57,6 +57,8 @@ namespace fan
 	//========================================================================================================
 	void GameServer::Init()
 	{
+        mName = "server";
+
 		// base components
 		mWorld.AddComponentType<SceneNode>();
 		mWorld.AddComponentType<Transform>();
@@ -123,8 +125,7 @@ namespace fan
         mWorld.AddTagType<tag_sunlight_occlusion>();
 
         Game& game = mWorld.GetSingleton<Game>();
-        game.name = "server";
-        game.mFlags |= Game::Flags::Server;
+        game.mIsServer = true;
 	}
 
 	//========================================================================================================
@@ -141,16 +142,15 @@ namespace fan
 		SolarEruption& eruption = mWorld.GetSingleton<SolarEruption>();
 		eruption.ScheduleNextEruption( mWorld );
 
-		Game & game = mWorld.GetSingleton<Game>();
         MeshManager& meshManager = *mWorld.GetSingleton<RenderResources>().mMeshManager;
         SunLight& sunLight = mWorld.GetSingleton<SunLight>();
         RenderWorld& renderWorld = mWorld.GetSingleton<RenderWorld>();
-        meshManager.Add( sunLight.mesh, "sunlight_mesh_" + game.name );
-        meshManager.Add( renderWorld.particlesMesh, "particles_mesh_" + game.name );
+        meshManager.Add( sunLight.mesh, "sunlight_mesh_" + mName );
+        meshManager.Add( renderWorld.particlesMesh, "particles_mesh_" + mName );
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void  GameServer::Stop()
 	{
 		// clears the physics world
@@ -168,8 +168,8 @@ namespace fan
 		netManager.Stop( mWorld );
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void  GameServer::Step( const float _delta )
 	{		
 		Time& time = mWorld.GetSingleton<Time>();

@@ -401,8 +401,7 @@ namespace fan
         if( playState.mState == EditorPlayState::STOPPED )
         {
             scene.Save();
-            Game& game = _game.mWorld.GetSingleton<Game>();
-            Debug::Highlight() << game.name << ": start" << Debug::Endl();
+            Debug::Highlight() << _game.mName << ": start" << Debug::Endl();
             playState.mState = EditorPlayState::PLAYING;
             _game.Start();
         }
@@ -463,8 +462,7 @@ namespace fan
             SceneRestoreState restoreState( scene );
 			restoreState.Save();
 
-		    Game& game = world.GetSingleton<Game>();
-			Debug::Highlight() << game.name << ": stopped" << Debug::Endl();
+			Debug::Highlight() << _game.mName << ": stopped" << Debug::Endl();
             playState.mState = EditorPlayState::STOPPED;
 			_game.Stop();
 			scene.LoadFrom( scene.path ); // reload the scene 
@@ -480,8 +478,7 @@ namespace fan
         EditorPlayState& playState = _game.mWorld.GetSingleton<EditorPlayState>();
 		if( playState.mState == EditorPlayState::PLAYING )
 		{
-            Game& game = _game.mWorld.GetSingleton<Game>();
-			Debug::Highlight() << game.name << ": paused" << Debug::Endl();
+			Debug::Highlight() << _game.mName << ": paused" << Debug::Endl();
             playState.mState = EditorPlayState::PAUSED;
 		}
 	}	
@@ -493,14 +490,12 @@ namespace fan
         EditorPlayState& playState = _game.mWorld.GetSingleton<EditorPlayState>();
 		if( playState.mState == EditorPlayState::PAUSED )
 		{
-		    Game& game = _game.mWorld.GetSingleton<Game>();
-			Debug::Highlight() << game.name << ": resumed" << Debug::Endl();
+			Debug::Highlight() << _game.mName << ": resumed" << Debug::Endl();
             playState.mState = EditorPlayState::PLAYING;
 		}
 	}
 
 	//========================================================================================================
-	// Todo save camera position depending on the scene
 	//========================================================================================================
 	void EditorHolder::OnSceneLoad( Scene& _scene )
 	{

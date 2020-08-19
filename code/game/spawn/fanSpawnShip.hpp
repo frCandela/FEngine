@@ -64,7 +64,7 @@ namespace fan
 				// do not spawn twice
 				if( linkingContext.netIDToEcsHandle.find( spaceshipID ) == linkingContext.netIDToEcsHandle.end() )
 				{
-					if( game.IsServer() )
+					if( game.mIsServer )
 					{
 						HostGameData& hostData = _world.GetComponent<HostGameData>( _world.GetEntity( playerID ) );
 						hostData.spaceshipHandle = SpawnShip::SpawnSpaceship( _world, true, false, playerID );
@@ -108,10 +108,10 @@ namespace fan
 			{
 				// spawn the spaceship	
 				Game& game = _world.GetSingleton< Game >();
-				if( game.spaceshipPrefab != nullptr )
+				if( game.mSpaceshipPrefab != nullptr )
 				{
 					Scene& scene = _world.GetSingleton<Scene>();
-					SceneNode& spaceshipNode = *game.spaceshipPrefab->Instantiate( scene.GetRootNode() );
+					SceneNode& spaceshipNode = *game.mSpaceshipPrefab->Instantiate( scene.GetRootNode() );
 					EcsEntity spaceshipID = _world.GetEntity( spaceshipNode.handle );
 
 					_world.AddComponent<LinkingContextUnregisterer>( spaceshipID );
@@ -186,7 +186,7 @@ namespace fan
 				}
 				else
 				{
-					Debug::Error() << game.name << " spaceship prefab is null" << Debug::Endl();
+					Debug::Error() << "spaceship prefab is null" << Debug::Endl();
 					return 0;
 				}
 			}

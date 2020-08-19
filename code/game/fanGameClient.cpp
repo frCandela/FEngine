@@ -63,6 +63,8 @@ namespace fan
 	//========================================================================================================
 	void GameClient::Init()
 	{
+        mName = "client";
+
 		// base components
 		mWorld.AddComponentType<SceneNode>();
 		mWorld.AddComponentType<Transform>();
@@ -130,9 +132,6 @@ namespace fan
 		mWorld.AddSingletonType<Time>();
 
 		mWorld.AddTagType<tag_sunlight_occlusion>();
-
-        Game& game = mWorld.GetSingleton<Game>();
-        game.name = "client";
 	}
 
 	//========================================================================================================
@@ -147,12 +146,11 @@ namespace fan
 		GameCamera::CreateGameCamera( mWorld );
 		SolarEruption::Start( mWorld );
 
-        Game& game = mWorld.GetSingleton<Game>();
         MeshManager& meshManager = *mWorld.GetSingleton<RenderResources>().mMeshManager;
         SunLight& sunLight = mWorld.GetSingleton<SunLight>();
         RenderWorld& renderWorld = mWorld.GetSingleton<RenderWorld>();
-        meshManager.Add( sunLight.mesh, "sunlight_mesh_" + game.name );
-        meshManager.Add( renderWorld.particlesMesh, "particles_mesh_" + game.name );
+        meshManager.Add( sunLight.mesh, "sunlight_mesh_" + mName );
+        meshManager.Add( renderWorld.particlesMesh, "particles_mesh_" + mName );
 	}
 
 	//========================================================================================================

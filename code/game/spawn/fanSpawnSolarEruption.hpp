@@ -36,7 +36,7 @@ namespace fan
 				eruption.SpawnEruptionNow();
 
 				Game& game = _world.GetSingleton<Game>();
-				if( game.IsServer() )
+				if( game.mIsServer )
 				{
 					eruption.ScheduleNextEruption( _world );
 				}

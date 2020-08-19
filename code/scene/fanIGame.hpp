@@ -18,6 +18,7 @@ namespace fan
         virtual void Stop() = 0;
         virtual void Step( const float _delta ) = 0;
 
-        EcsWorld mWorld;
+        EcsWorld    mWorld;
+        std::string mName;
     };
 }
