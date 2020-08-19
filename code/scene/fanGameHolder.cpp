@@ -15,8 +15,6 @@
 #include "scene/singletons/fanScene.hpp"
 #include "scene/singletons/fanRenderDebug.hpp"
 #include "scene/singletons/fanRenderResources.hpp"
-#include "game/singletons/fanGameCamera.hpp"
-#include "game/singletons/fanGame.hpp"
 
 namespace fan
 {
@@ -61,9 +59,6 @@ namespace fan
 		{
 			scene.LoadFrom( _settings.loadScene );
             mGame.Start();
-			UseGameCamera( mGame );
-            GameCamera& gameCamera = _game.mWorld.GetSingleton<GameCamera>();
-            scene.SetMainCamera( gameCamera.cameraHandle );
         }
 	}
 
@@ -228,15 +223,6 @@ namespace fan
 // 				}
 		}
 	}
-
-    //========================================================================================================
-    //========================================================================================================
-    void GameHolder::UseGameCamera( IGame& _game )
-    {
-        Scene& scene = _game.mWorld.GetSingleton<Scene>();
-        GameCamera& gameCamera = _game.mWorld.GetSingleton<GameCamera>();
-        scene.SetMainCamera( gameCamera.cameraHandle );
-    }
 
 	//========================================================================================================
 	// Updates the render world singleton component

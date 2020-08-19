@@ -58,6 +58,7 @@ namespace fan
 	void GameServer::Init()
 	{
         mName = "server";
+        mOnSwitchToGameCamera.Connect( &GameServer::SwitchToGameCamera, this );
 
 		// base components
 		mWorld.AddComponentType<SceneNode>();
@@ -136,7 +137,10 @@ namespace fan
 		netManager.Start( mWorld );
 
         mWorld.Run<S_RegisterAllRigidbodies>();
-		GameCamera::CreateGameCamera( mWorld );
+        GameCamera& gameCamera = GameCamera::CreateGameCamera( mWorld );
+        Scene& scene = mWorld.GetSingleton<Scene>();
+        scene.SetMainCamera( gameCamera.cameraHandle );
+
 		SolarEruption::Start( mWorld );
 
 		SolarEruption& eruption = mWorld.GetSingleton<SolarEruption>();
@@ -232,4 +236,13 @@ namespace fan
 			mWorld.Run<S_ServerSend>( _delta );
 		}
 	}
+
+    //========================================================================================================
+    //========================================================================================================
+    void GameServer::SwitchToGameCamera()
+    {
+        GameCamera& gameCamera = mWorld.GetSingleton<GameCamera>();
+        Scene& scene = mWorld.GetSingleton<Scene>();
+        scene.SetMainCamera( gameCamera.cameraHandle );
+    }
 }

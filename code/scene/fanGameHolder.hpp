@@ -37,7 +37,6 @@ namespace fan
 		void Exit();
 		void Step();
 
-        static void UseGameCamera( IGame& _game );
 	private:
 		Renderer*            mRenderer;
 		Window               mWindow;

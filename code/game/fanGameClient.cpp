@@ -64,6 +64,7 @@ namespace fan
 	void GameClient::Init()
 	{
         mName = "client";
+        mOnSwitchToGameCamera.Connect( &GameClient::SwitchToGameCamera, this );
 
 		// base components
 		mWorld.AddComponentType<SceneNode>();
@@ -143,7 +144,10 @@ namespace fan
 
 		// Init game
         mWorld.Run<S_RegisterAllRigidbodies>();
-		GameCamera::CreateGameCamera( mWorld );
+        GameCamera& gameCamera = GameCamera::CreateGameCamera( mWorld );
+        Scene& scene = mWorld.GetSingleton<Scene>();
+        scene.SetMainCamera( gameCamera.cameraHandle );
+
 		SolarEruption::Start( mWorld );
 
         MeshManager& meshManager = *mWorld.GetSingleton<RenderResources>().mMeshManager;
@@ -326,5 +330,14 @@ namespace fan
 		Input::Get().Manager().CreateJoystickAxis( "gamejs_axis_boost", 0, Joystick::RIGHT_Y );
 		Input::Get().Manager().CreateJoystickAxis( "gamejs_axis_fire", 0, Joystick::RIGHT_TRIGGER );
 		Input::Get().Manager().CreateJoystickButtons( "gamejs_axis_stop", 0, Joystick::A );
+	}
+
+    //========================================================================================================
+    //========================================================================================================
+    void GameClient::SwitchToGameCamera()
+	{
+        GameCamera& gameCamera = mWorld.GetSingleton<GameCamera>();
+        Scene& scene = mWorld.GetSingleton<Scene>();
+        scene.SetMainCamera( gameCamera.cameraHandle );
 	}
 }

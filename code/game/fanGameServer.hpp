@@ -13,5 +13,8 @@ namespace fan
         void Start() override;
         void Stop() override;
         void Step( const float _delta ) override;
+
+	private:
+        void SwitchToGameCamera();
 	};					  
 }

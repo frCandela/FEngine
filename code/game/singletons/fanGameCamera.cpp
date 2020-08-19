@@ -70,7 +70,7 @@ namespace fan
 	// creates the game camera entity & components
 	// setups the GameCamera singleton
 	//================================================================================================================================
-	void GameCamera::CreateGameCamera( EcsWorld & _world )
+    GameCamera& GameCamera::CreateGameCamera( EcsWorld & _world )
 	{
 		Scene& scene = _world.GetSingleton<Scene>();
 		SceneNode& cameraNode = scene.CreateSceneNode( "game_camera", &scene.GetRootNode() );
@@ -86,6 +86,8 @@ namespace fan
 
 		GameCamera& gameCamera = _world.GetSingleton<GameCamera>();
 		gameCamera.cameraHandle = cameraNode.handle;
+
+		return gameCamera;
 	}
 
 	//================================================================================================================================

@@ -14,7 +14,11 @@ namespace fan
         void Stop() override;
         void Step( const float _delta ) override;
 
-		void RollbackResimulate( const float _delta );
 		static void CreateGameAxes();
+
+	private:
+		void RollbackResimulate( const float _delta );
+        void SwitchToGameCamera();
+
 	};
 }

@@ -5,7 +5,6 @@
 
 namespace fan
 {
-	struct SceneNode;
 	class EcsWorld;
 
 	//================================================================================================================================
@@ -26,7 +25,7 @@ namespace fan
 		btVector2	marginRatio;
 		float		minOrthoSize;
 
-		static void CreateGameCamera( EcsWorld& _world );
-		static void DeleteGameCamera( EcsWorld& _world );
+		static GameCamera& CreateGameCamera( EcsWorld& _world );
+		static void        DeleteGameCamera( EcsWorld& _world );
 	};
 }

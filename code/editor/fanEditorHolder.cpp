@@ -16,7 +16,6 @@
 #include "editor/windows/fanSceneWindow.hpp"	
 #include "editor/windows/fanGameViewWindow.hpp"
 #include "editor/windows/fanEcsWindow.hpp"
-#include "editor/singletons/fanEditorPlayState.hpp"
 #include "editor/singletons/fanEditorSelection.hpp"
 #include "editor/singletons/fanEditorCopyPaste.hpp"
 #include "editor/singletons/fanEditorGizmos.hpp"
@@ -28,11 +27,9 @@
 #include "scene/components/fanCamera.hpp"
 #include "scene/systems/fanUpdateTransforms.hpp"
 #include "scene/systems/fanDrawDebug.hpp"
-#include "scene/fanGameHolder.hpp"
 #include "scene/systems/fanUpdateRenderWorld.hpp"
 #include "scene/singletons/fanScene.hpp"
 #include "scene/fanSceneTags.hpp"
-#include "game/singletons/fanGame.hpp"
 
 namespace fan
 {
@@ -175,7 +172,6 @@ namespace fan
 				if( _settings.autoPlay )
 				{
 					GameStart( game );
-                    GameHolder::UseGameCamera( game );
 				}
 			}
 		}
@@ -579,7 +575,6 @@ namespace fan
     {
 	    IGame& game = GetCurrentGame();
         GameStart( game );
-        GameHolder::UseGameCamera( game );
     }
 
 	//========================================================================================================
@@ -591,7 +586,6 @@ namespace fan
 		if( playState.mState == EditorPlayState::STOPPED )
 		{
 			GameStart( game );
-            GameHolder::UseGameCamera( game );
 		}
 		else
 		{
@@ -662,7 +656,7 @@ namespace fan
 
 		if( scene.mainCameraHandle == editorCamera.cameraHandle )
 		{
-			GameHolder::UseGameCamera( currentGame );
+		    currentGame.mOnSwitchToGameCamera.Emmit();
 		}
 		else
 		{

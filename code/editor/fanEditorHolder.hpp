@@ -41,7 +41,7 @@ namespace fan
 		void Step();
 			   
 	private:		
-		Renderer*               mRenderer;
+		Renderer*            mRenderer;
 		Window               mWindow;
 		PrefabManager        mPrefabManager;
 		std::vector<IGame*>  mGames;

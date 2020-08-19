@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ecs/fanSignal.hpp"
 #include "ecs/fanEcsWorld.hpp"
 
 namespace fan
@@ -20,5 +21,7 @@ namespace fan
 
         EcsWorld    mWorld;
         std::string mName;
+
+        Signal<> mOnSwitchToGameCamera;
     };
 }
