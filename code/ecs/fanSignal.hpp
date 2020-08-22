@@ -89,7 +89,7 @@ namespace fan
     template< typename... Args >
     bool Signal<Args...>::Connect( EcsWorld& _world, SlotPtr& _slotPtr )
     {
-        if( _slotPtr.GetType() != GetType()) { return false; }
+        if( _slotPtr.GetArgsType() != GetType()) { return false; }
 
         const SlotPtr::SlotCallData * _callData = &_slotPtr.Data();
 
@@ -97,16 +97,30 @@ namespace fan
         connection.mID      = (size_t)_callData;
         connection.mLambda  = [ &_world, _callData ]( Args... _args )
         {
-            if( _callData->mHandle != 0 && _callData->mSlot != nullptr )
+            if( _callData->mSlot == nullptr ){ return; }
+
+            Slot<Args...>* slot = static_cast< Slot<Args...>* >(_callData->mSlot);
+            switch( slot->mTargetType )
             {
-                Slot<Args...>* slot = static_cast< Slot<Args...>* >(_callData->mSlot);
-                EcsEntity entity = _world.GetEntity( _callData->mHandle );
-                EcsComponent& component = _world.GetComponent( entity, _callData->mComponentType );
-                (*slot->mMethod)( component, _args...);
+                case SlotBase::TargetType::Component:
+                    if( _callData->mHandle != 0  )
+                    {
+                        EcsEntity entity = _world.GetEntity( _callData->mHandle );
+                        EcsComponent& component = _world.GetComponent( entity, _callData->mType );
+                        (*slot->mMethod.mMethodComponent )( component, _args...);
+                    }
+                break;
+                case  SlotBase::TargetType::Singleton:{
+                    EcsSingleton& singleton = _world.GetSingleton( _callData->mType );
+                    (*slot->mMethod.mMethodSingleton )( singleton, _args...);
+                } break;
+                default :
+                    fanAssert( false );
+                    break;
             }
         };
-        mConnections.push_back( connection );
 
+        mConnections.push_back( connection );
         return true;
     }
 

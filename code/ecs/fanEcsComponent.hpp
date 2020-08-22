@@ -6,7 +6,6 @@
 #include "editor/fanImguiIcons.hpp"
 #include "ecs/fanEcsEntity.hpp"
 #include "ecs/fanEcsTypes.hpp"
-#include "ecs/fanSlot.hpp"
 #include "fanJson.hpp"
 
 namespace sf
@@ -37,9 +36,8 @@ namespace fan
         }                                                                                           \
 	};																								\
 	using Info = EcsComponentInfoImpl< _ComponentType >;											
-	
 
-
+    struct SlotBase;
 	class EcsWorld;
 
 	//================================

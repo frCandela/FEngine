@@ -54,8 +54,8 @@ namespace fan
     {
         const SlotPtr::SlotCallData& data = _ptr.Data();
         _json[_name]["handle"] = data.mHandle;
-        _json[_name]["component_type"] = data.mComponentType;
-        _json[_name]["args_type"] =  ( data.mSlot != nullptr ? data.mSlot->GetType() : -1 );
+        _json[_name]["type"] = data.mType;
+        _json[_name]["args_type"] = _ptr.GetArgsType();
         _json[_name]["slot"] = ( data.mSlot != nullptr ?  data.mSlot->mName : "" );
     }
 
@@ -67,15 +67,22 @@ namespace fan
         if( token == nullptr ){ return false; }
 
         EcsHandle   handle        = ( *token )["handle"];
-        uint32_t    componentType = ( *token )["component_type"];
-        std::string slotName = "";
+        uint32_t    type = ( *token )["type"];
 
+        std::string slotName = "";
         int argsType = ( *token )["args_type"];
-        if( argsType == _outPtr.GetType() )
+        if( argsType == _outPtr.GetArgsType() )
         {
             slotName= ( *token )["slot"];
+            if( handle != 0 )
+            {
+                _outPtr.SetComponentSlot( handle, type, slotName );
+            }
+            else
+            {
+                _outPtr.SetSingletonSlot( type, slotName );
+            }
         }
-        _outPtr.Set( handle, componentType, slotName );
 
         if( handle != 0 )
         {

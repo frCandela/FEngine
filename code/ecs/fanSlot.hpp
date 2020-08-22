@@ -2,10 +2,11 @@
 
 #include <string>
 #include "ecs/fanEcsTypes.hpp"
+#include "ecs/fanEcsComponent.hpp"
+#include "ecs/fanEcsSingleton.hpp"
 
 namespace fan
 {
-    struct EcsComponent;
     class EcsWorld;
 
     //========================================================================================================
@@ -30,8 +31,11 @@ namespace fan
     //========================================================================================================
     struct SlotBase
     {
-        virtual int GetType() const = 0;
+        virtual int GetArgsType() const = 0;
+        enum TargetType{ Singleton, Component, Invalid };
+
         std::string mName;
+        TargetType  mTargetType = TargetType::Invalid;
     };
 
     //========================================================================================================
@@ -39,14 +43,31 @@ namespace fan
     template < typename... T >
     struct Slot : public SlotBase
     {
-        using Method = void(*)( EcsComponent&, T... );
-        Method  mMethod;
 
-        Slot( std::string _name, Method _method ) : mMethod( _method)
+        using MethodComponent = void(*)( EcsComponent&, T... );
+        using MethodSingleton = void(*)( EcsSingleton&, T... );
+        union
+        {
+            MethodComponent mMethodComponent;
+            MethodSingleton mMethodSingleton;
+        }
+        mMethod;
+
+        Slot( std::string _name, MethodComponent _method )
         {
             mName = _name;
+            mMethod.mMethodComponent = _method;
+            mTargetType = TargetType::Component;
         }
-        int GetType() const override{ return TemplateType::Type<T...>(); }
+
+        Slot( std::string _name, MethodSingleton _method )
+        {
+            mName = _name;
+            mMethod.mMethodSingleton = _method;
+            mTargetType = TargetType::Singleton;
+        }
+
+        int GetArgsType() const override{ return TemplateType::Type<T...>(); }
     };
 
     //========================================================================================================
@@ -56,22 +77,25 @@ namespace fan
     public:
         struct SlotCallData
         {
-            EcsHandle mHandle        = 0;
-            uint32_t  mComponentType = 0;
+            EcsHandle mHandle = 0;
+            uint32_t  mType = 0; // componentType or singletonType
             SlotBase* mSlot = nullptr;
         };
 
         SlotPtr();
         ~SlotPtr();
-        bool IsValid() const;
+        bool IsValid() const { return mCallData->mType != 0; }
         void Clear();
         void Init( EcsWorld& _world, int _argsType );
-        void Set( EcsHandle _handle, uint32_t _componentType, SlotBase* _slot );
-        void Set( EcsHandle _handle, uint32_t _componentType, const std::string& _slotName );
-        int GetType() const { return mArgsType; }
+        void SetComponentSlot( EcsHandle _handle, uint32_t _componentType, SlotBase* _slot );
+        void SetComponentSlot( EcsHandle _handle, uint32_t _componentType, const std::string& _slotName );
+        void SetSingletonSlot( uint32_t _singletonType, SlotBase* _slot );
+        void SetSingletonSlot( uint32_t _singletonType, const std::string& _slotName );
+        int  GetArgsType() const { return mArgsType; }
         const SlotCallData& Data() const { return *mCallData; }
         EcsWorld& World() const { return *mWorld; }
-
+        bool IsSingletonSlot() const { return IsValid() && mCallData->mHandle == 0; }
+        bool IsComponentSlot() const { return IsValid() && mCallData->mHandle != 0; }
     private:
         int mArgsType = TemplateType::UnSupported;
         SlotCallData* mCallData = nullptr;

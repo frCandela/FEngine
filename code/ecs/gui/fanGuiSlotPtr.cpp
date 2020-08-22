@@ -1,119 +1,147 @@
 #include "ecs/gui/fanGuiSlotPtr.hpp"
-#include "scene/components/fanSceneNode.hpp"
 #include <sstream>
 
 namespace ImGui
 {
-    //========================================================================================================
-    //========================================================================================================
-    void FanGuiSlotPtr::GenerateFrom( fan::SlotPtr& _ptr )
-    {
-        if( _ptr.IsValid() )
-        {
-            mEntity = mWorld.GetEntity( _ptr.Data().mHandle );
-            mSceneNodeName = mWorld.GetComponent<fan::SceneNode>( mEntity ).name;
-            GenerateComponentInfos( mComponentsInfo );
-            mComponentIndex = GetComponentIndex( _ptr );
-            mComboComponentsStr = GenerateStrComboComponents();
-            mComboSlotsStr = GenerateStrComboSlots();
-            mSlotIndex = GetSlotIndex( _ptr );
-        }
-        else
-        {
-            mSceneNodeName         = "null";
-            mComponentIndex        = 0;
-            mSlotIndex          = 0;
-            mComboComponentsStr = GetNullString();
-            mComboSlotsStr      = GetNullString();
-        }
-    }
 
     //========================================================================================================
     //========================================================================================================
-    std::string FanGuiSlotPtr::GetNullString()
+    bool HasCompatibleSlots( const std::vector<fan::SlotBase*>& _slots, const int _argsType )
     {
-        std::string str;
-        str = "null00";
-        str[str.size() - 1] = '\0';
-        str[str.size() - 2] = '\0';
-        return str;
-    }
-
-    //========================================================================================================
-    //========================================================================================================
-    void FanGuiSlotPtr::GenerateComponentInfos( std::vector<const fan::EcsComponentInfo*>& _infos ) const
-    {
-        _infos.clear();
-        _infos.reserve( mWorld.NumComponents() );
-        for( int i = 0; i < mWorld.NumComponents(); ++i )
+        for( fan::SlotBase * slot : _slots )
         {
-            if( mWorld.IndexedHasComponent( mEntity, i ) )
+            if( slot->GetArgsType() == _argsType )
             {
-                const fan::EcsComponentInfo& info = mWorld.IndexedGetComponentInfo( i );
-                _infos.push_back( &info );
+                return true;
             }
         }
+        return false;
     }
 
     //========================================================================================================
     //========================================================================================================
-    std::string FanGuiSlotPtr::GenerateStrComboComponents() const
+    void FanPopupSetSingletonSlot::Open()
     {
-        std::stringstream ssComponentsCombo;
-        for( const fan::EcsComponentInfo* info : mComponentsInfo )
-        {
-            ssComponentsCombo << info->name << '\0';
-        }
-        ssComponentsCombo << '\0';
-        return ssComponentsCombo.str();
+        ImGui::OpenPopup( sName );
     }
 
     //========================================================================================================
     //========================================================================================================
-    std::string FanGuiSlotPtr::GenerateStrComboSlots() const
+    void FanPopupSetSingletonSlot::Draw( fan::EcsWorld& _world , fan::SlotPtr& _slotPtr )
     {
-        std::stringstream ssSlots;
-        if( ! mComponentsInfo.empty() && !mComponentsInfo[mComponentIndex]->mSlots.empty() )
+        ImGui::SetNextWindowSize( { 400, 400 } );
+        if( ImGui::BeginPopupModal( sName,
+                                    NULL,
+                                    ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove ) )
         {
-            for( int i = 0; i < mComponentsInfo[mComponentIndex]->mSlots.size(); i++ )
+            if( ImGui::BeginChild( "child_area", { 370, 330 }, true ) )
             {
-                const fan::SlotBase* slot = mComponentsInfo[mComponentIndex]->mSlots[i];
-                ssSlots << slot->mName << '\0';
+                bool didNotDrawAnything = true;
+                std::vector<fan::EcsSingletonInfo> infos = _world.GetVectorSingletonInfo();
+                for( fan::EcsSingletonInfo& info : infos )
+                {
+                    if( !HasCompatibleSlots( info.mSlots, _slotPtr.GetArgsType() ) ){ continue; }
+
+                    didNotDrawAnything = false;
+                    // display the slot
+                    ImGui::Icon( info.icon, { 16, 16 }, fan::GroupsColors::GetColor( info.group ) );
+                    ImGui::SameLine();
+                    if( ImGui::TreeNode( info.name.c_str() ) )
+                    {
+                        ImGui::Indent();
+                        for( fan::SlotBase* slot : info.mSlots )
+                        {
+                            if( slot->GetArgsType() != _slotPtr.GetArgsType() ){ continue; }
+                            if( ImGui::Selectable( slot->mName.c_str() ) )
+                            {
+                                _slotPtr.SetSingletonSlot( info.type, slot );
+                                ImGui::CloseCurrentPopup();
+                            }
+                        }
+                        ImGui::Unindent();
+                        ImGui::TreePop();
+                    }
+                }
+                if( didNotDrawAnything )
+                {
+                    ImGui::Text("no compatible slot available");
+                }
+                ImGui::EndChild();
             }
-            ssSlots << '\0';
-            return ssSlots.str();
+            if( ImGui::Button( "cancel" ) )
+            {
+                ImGui::CloseCurrentPopup();
+            }
+            ImGui::EndPopup();
         }
-        return GetNullString();
     }
 
     //========================================================================================================
     //========================================================================================================
-    int  FanGuiSlotPtr::GetComponentIndex( const fan::SlotPtr& _ptr ) const
+    void FanPopupSetComponentSlot::Open()
     {
-        // Get components
-        for( int i = 0; i < mComponentsInfo.size(); ++i )
-        {
-            const fan::EcsComponentInfo* info = mComponentsInfo[i];
-            if( info->type == _ptr.Data().mComponentType )
-            {
-                return i;
-            }
-        }
-        return 0;
+        ImGui::OpenPopup( sName );
     }
 
     //========================================================================================================
     //========================================================================================================
-    int FanGuiSlotPtr::GetSlotIndex( const fan::SlotPtr& _ptr ) const
+    void FanPopupSetComponentSlot::Draw( fan::EcsWorld& _world , fan::SlotPtr& _slotPtr )
     {
-        for( int i = 0; i < mComponentsInfo[mComponentIndex]->mSlots.size(); i++ )
+        ImGui::SetNextWindowSize( { 400, 400 } );
+        if( ImGui::BeginPopupModal( sName,
+                                    NULL,
+                                    ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove ) )
         {
-            const fan::SlotBase* slot = mComponentsInfo[mComponentIndex]->mSlots[i];
-            if( _ptr.Data().mSlot == slot )
+            if( ! _slotPtr.IsComponentSlot() )
             {
-                return i;
+                ImGui::CloseCurrentPopup();
+                ImGui::EndPopup();
+                return;
             }
+
+            if( ImGui::BeginChild( "child_area", { 370, 330 }, true ) )
+            {
+                std::vector<fan::EcsComponentInfo*> infos;
+
+                fan::EcsEntity entity = _world.GetEntity( _slotPtr.Data().mHandle );
+                bool didNotDrawAnything = true;
+                for( int componentIndex = 0; componentIndex < _world.NumComponents(); ++componentIndex )
+                {
+                    if( !_world.IndexedHasComponent( entity, componentIndex ) ){ continue; }
+                    const fan::EcsComponentInfo& info = _world.IndexedGetComponentInfo( componentIndex );
+                    if( !HasCompatibleSlots( info.mSlots, _slotPtr.GetArgsType() ) ){ continue; }
+
+                    didNotDrawAnything = false;
+                    ImGui::Icon( info.icon, { 16, 16 }, fan::GroupsColors::GetColor( info.group ) );
+                    ImGui::SameLine();
+                    if( ImGui::TreeNode( info.name.c_str() ) )
+                    {
+                        ImGui::Indent();
+                        for( fan::SlotBase* slot : info.mSlots )
+                        {
+                            if( slot->GetArgsType() != _slotPtr.GetArgsType() ){ continue; }
+                            if( ImGui::Selectable( slot->mName.c_str() ) )
+                            {
+                                const fan::EcsHandle handle = _slotPtr.Data().mHandle;
+                                _slotPtr.SetComponentSlot( handle, info.type, slot );
+                                ImGui::CloseCurrentPopup();
+                            }
+                        }
+                        ImGui::Unindent();
+                        ImGui::TreePop();
+                    }
+                }
+                if( didNotDrawAnything )
+                {
+                    ImGui::Text("no compatible slot available");
+                }
+                ImGui::EndChild();
+            }
+            if( ImGui::Button( "cancel" ) )
+            {
+                ImGui::CloseCurrentPopup();
+            }
+            ImGui::EndPopup();
         }
-        return 0;
     }
 }

@@ -22,7 +22,6 @@ namespace fan
 	//================================================================================================================================
 	// This holder displays the game
 	// Auto load a scene & dispays it, no editor features
-	// Contains an ecsWorld, window & renderer
 	// runs the main loop & manages events
 	//================================================================================================================================	
 	class GameHolder

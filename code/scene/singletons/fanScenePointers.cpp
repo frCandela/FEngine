@@ -61,7 +61,7 @@ namespace fan
         for( SlotPtr* slotPtr : scenePointers.mUnresolvedSlotPtr )
         {
             const SlotPtr::SlotCallData& data = slotPtr->Data();
-            slotPtr->Set( data.mHandle + _idOffset, data.mComponentType, data.mSlot );
+            slotPtr->SetComponentSlot( data.mHandle + _idOffset, data.mType, data.mSlot );
         }
         scenePointers.mUnresolvedSlotPtr.clear();
 	}

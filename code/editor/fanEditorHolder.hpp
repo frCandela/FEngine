@@ -22,12 +22,11 @@ namespace fan
 	class Window;
 	struct Scene;
 
-	//================================================================================================================================
+	//========================================================================================================
 	// base class that contains everything
 	// contains a game, a renderer, editions windows/ui and references on EcsWorld
-	// One EcsWorld is and instance of the game, there can be multiple EcsWorlds for client and server to run in the same process
-	// The m_currentWorld variable is the index of the world that is currently edited
-	//================================================================================================================================	
+	// here can be multiple IGame for client and server to run in the same process
+	//========================================================================================================
 	class EditorHolder
 	{
 	public:

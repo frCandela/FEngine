@@ -272,7 +272,7 @@ namespace fan
 
 		// SceneNode dragndrop target empty selectable -> place dragged below
 		ImGui::ComponentPayload payload = ImGui::FanBeginDragDropTargetComponent<SceneNode>( world );
-		if( payload.mHandle != 0 )
+		if( payload.IsValid() )
 		{
 			assert( payload.mComponentType == SceneNode::Info::s_type );
 			SceneNode& nodeDrop1 = scene.world->GetComponent<SceneNode>( scene.world->GetEntity( payload.mHandle) );
@@ -303,7 +303,7 @@ namespace fan
 
 		// SceneNode dragndrop target scene node name -> place as child
 		ImGui::ComponentPayload payload2 = ImGui::FanBeginDragDropTargetComponent<SceneNode>( world );
-		if( payload2.mHandle != 0 )
+		if( payload2.IsValid() )
 		{
 			assert( payload2.mComponentType == SceneNode::Info::s_type );
 			SceneNode& nodeDrop2 = world.GetComponent<SceneNode>( world.GetEntity( payload2.mHandle ) );

@@ -2,31 +2,27 @@
 
 #include "ecs/fanSlot.hpp"
 #include "ecs/fanEcsWorld.hpp"
+#include "core/fanAssert.hpp"
+#include "editor/fanGroupsColors.hpp"
 
 namespace ImGui
 {
     //========================================================================================================
     //========================================================================================================
-    struct FanGuiSlotPtr
+    struct FanPopupSetSingletonSlot
     {
-        FanGuiSlotPtr( fan::EcsWorld& _world ) : mWorld( _world ){}
-        void GenerateFrom( fan::SlotPtr& _ptr );
+        static constexpr char * sName = "Select singleton and slot";
+        static void Open();
+        static void Draw( fan::EcsWorld& _world , fan::SlotPtr& _slotPtr );
+    };
 
-        fan::EcsWorld&                            mWorld;
-        fan::EcsEntity                            mEntity;
-        std::string                               mSceneNodeName;
-        int                                       mComponentIndex;
-        int                                       mSlotIndex;
-        std::string                               mComboComponentsStr;
-        std::string                               mComboSlotsStr;
-        std::vector<const fan::EcsComponentInfo*> mComponentsInfo;
+    //========================================================================================================
+    //========================================================================================================
+    struct FanPopupSetComponentSlot
+    {
+        static constexpr const char * sName = "Select component and slot";
 
-    private:
-        static std::string GetNullString();
-        void GenerateComponentInfos( std::vector<const fan::EcsComponentInfo*>& _infos ) const;
-        std::string GenerateStrComboComponents() const;
-        std::string GenerateStrComboSlots() const;
-        int  GetComponentIndex( const fan::SlotPtr& _ptr ) const;
-        int  GetSlotIndex( const fan::SlotPtr& _ptr ) const;
+        static void Open();
+        static void Draw( fan::EcsWorld& _world, fan::SlotPtr& _slotPtr );
     };
 }

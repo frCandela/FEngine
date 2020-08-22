@@ -31,6 +31,12 @@ namespace fan
                                     mouse.mLocalPosition.y >= transform.mPosition.y &&
                                     mouse.mLocalPosition.x < transform.mPosition.x + transform.mSize.x &&
                                     mouse.mLocalPosition.y < transform.mPosition.y + transform.mSize.y;
+                if( button.mIsHovered )
+                {
+                    ImGui::GetIO().WantCaptureMouse = true;
+                }
+
+
                 if( button.mIsHovered && mouse.mPressed[Mouse::buttonLeft] )
                 {
                     button.mIsPressed = true;

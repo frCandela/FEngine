@@ -2,6 +2,7 @@
 #include "ecs/fanEcsWorld.hpp"
 #include "ecs/gui/fanGuiSlotPtr.hpp"
 #include "scene/fanDragnDrop.hpp"
+#include "scene/components/fanSceneNode.hpp"
 #include "editor/fanModals.hpp"
 
 namespace  fan
@@ -23,17 +24,10 @@ namespace  fan
 
     //========================================================================================================
     //========================================================================================================
-    bool SlotPtr::IsValid() const
-    {
-        return mCallData->mHandle != 0 && mCallData->mComponentType != 0;
-    }
-
-    //========================================================================================================
-    //========================================================================================================
     void SlotPtr::Clear()
     {
         mCallData->mHandle        = 0;
-        mCallData->mComponentType = 0;
+        mCallData->mType = 0;
         mCallData->mSlot          = nullptr;
     }
 
@@ -47,16 +41,17 @@ namespace  fan
 
     //========================================================================================================
     //========================================================================================================
-    void SlotPtr::Set( EcsHandle _handle, uint32_t _componentType, SlotBase* _slot )
+    void SlotPtr::SetComponentSlot( EcsHandle _handle, uint32_t _componentType, SlotBase* _slot )
     {
-        mCallData->mHandle        = _handle;
-        mCallData->mComponentType = _componentType;
-        mCallData->mSlot          = _slot;
+        fanAssert( mWorld->SafeGetComponentInfo( _componentType ) != nullptr );
+        mCallData->mHandle = _handle;
+        mCallData->mType = _componentType;
+        mCallData->mSlot = _slot;
     }
 
     //========================================================================================================
     //========================================================================================================
-    void SlotPtr::Set( EcsHandle _handle, uint32_t _componentType, const std::string& _slotName )
+    void SlotPtr::SetComponentSlot( EcsHandle _handle, uint32_t _componentType, const std::string& _slotName )
     {
         SlotBase* slot = nullptr;
         if( _componentType != 0 && !_slotName.empty() )
@@ -74,8 +69,40 @@ namespace  fan
                 }
             }
         }
+        SetComponentSlot( _handle, _componentType, slot );
+    }
 
-        Set( _handle, _componentType, slot );
+    //========================================================================================================
+    //========================================================================================================
+    void SlotPtr::SetSingletonSlot( uint32_t _singletonType, SlotBase* _slot )
+    {
+        fanAssert( mWorld->SafeGetSingletonInfo( _singletonType ) != nullptr );
+        mCallData->mHandle = 0;
+        mCallData->mType = _singletonType;
+        mCallData->mSlot = _slot;
+    }
+
+    //========================================================================================================
+    //========================================================================================================
+    void SlotPtr::SetSingletonSlot( uint32_t _singletonType, const std::string& _slotName )
+    {
+        SlotBase* slot = nullptr;
+        if( _singletonType != 0 && !_slotName.empty() )
+        {
+            const EcsSingletonInfo* info = mWorld->SafeGetSingletonInfo( _singletonType );
+            if( info != nullptr )
+            {
+                for( SlotBase* slotBase : info->mSlots )
+                {
+                    if( slotBase->mName == _slotName )
+                    {
+                        slot = slotBase;
+                        break;
+                    }
+                }
+            }
+        }
+        SetSingletonSlot( _singletonType, slot );
     }
 }
 
@@ -83,72 +110,113 @@ namespace ImGui
 {
     //========================================================================================================
     //========================================================================================================
-    bool FanDragDropTargetSlot( fan::EcsWorld& _world, fan::SlotPtr& _slotPtr )
+    void DrawTooltipSingleton( fan::EcsWorld& _world, fan::SlotPtr& _ptr )
     {
-        ImGui::ComponentPayload payload = ImGui::FanBeginDragDropTargetComponent( _world, 0 );
-        if( payload.mHandle != 0  && payload.mComponentType != 0)
-        {
-            const fan::EcsComponentInfo& info = _world.GetComponentInfo( payload.mComponentType );
-            fan::SlotBase * slot = info.mSlots.empty() ? nullptr : info.mSlots[0];
-            _slotPtr.Set( payload.mHandle, payload.mComponentType, slot );
-            return true;
-        }
-        return false;
+        ImGui::BeginTooltip();
+        const fan::EcsSingletonInfo& targetSingletonInfo =
+                                           _world.GetSingletonInfo( _ptr.Data().mType );
+        ImGui::Icon( targetSingletonInfo.icon,
+                     { 16, 16 },
+                     fan::GroupsColors::GetColor( targetSingletonInfo.group ) );
+        ImGui::SameLine();
+        ImGui::Text( "target singleton: %s", targetSingletonInfo.name.c_str() );
+        const std::string targetSlotName = _ptr.Data().mSlot == nullptr ?
+                "null :" :
+                _ptr.Data().mSlot->mName;
+        ImGui::Icon( ImGui::IconType::SIGNAL_SLOT16, { 16, 16 } );
+        ImGui::SameLine();
+        ImGui::Text( "target slot     : %s", targetSlotName.c_str() );
+        ImGui::EndTooltip();
+    }
+
+    //========================================================================================================
+    //========================================================================================================
+    void DrawTooltipComponent( fan::EcsWorld& _world, fan::SlotPtr& _ptr )
+    {
+        ImGui::BeginTooltip();
+        fan::EcsEntity entity = _world.GetEntity( _ptr.Data().mHandle );
+        const fan::EcsComponentInfo& sceneNodeInfo =
+                                           _world.GetComponentInfo( fan::SceneNode::Info::s_type );
+        ImGui::Icon( sceneNodeInfo.icon,
+                     { 16, 16 },
+                     fan::GroupsColors::GetColor( sceneNodeInfo.group ) );
+        const fan::SceneNode& sceneNode = _world.GetComponent<fan::SceneNode>( entity );
+        ImGui::SameLine();
+        ImGui::Text( "scene node      : %s", sceneNode.name.c_str() );
+
+        const fan::EcsComponentInfo& targetComponentInfo =
+                                           _world.GetComponentInfo( _ptr.Data().mType );
+        ImGui::Icon( targetComponentInfo.icon,
+                     { 16, 16 },
+                     fan::GroupsColors::GetColor( targetComponentInfo.group ) );
+        ImGui::SameLine();
+        ImGui::Text( "target component: %s", targetComponentInfo.name.c_str() );
+        const std::string targetSlotName = _ptr.Data().mSlot == nullptr ?
+                "null :" :
+                _ptr.Data().mSlot->mName;
+        ImGui::Icon( ImGui::IconType::SIGNAL_SLOT16, { 16, 16 } );
+        ImGui::SameLine();
+        ImGui::Text( "target slot     : %s", targetSlotName.c_str() );
+        ImGui::EndTooltip();
     }
 
     //========================================================================================================
     //========================================================================================================
     void FanSlotPtr( const char* _label, fan::EcsWorld& _world, fan::SlotPtr& _ptr )
     {
-        FanGuiSlotPtr guiSlot( _world );
-        guiSlot.GenerateFrom( _ptr );
+        if( ImGui::ButtonIcon( ImGui::IconType::SIGNAL_SLOT16, { 16, 16 } ) )
+        {
+            _ptr.Clear();
+        }
+        ImGui::FanToolTip( "clear slot" );
 
-        ImGui::ButtonIcon( ImGui::IconType::SIGNAL_SLOT16, {16,16} );
-        ImGui::FanToolTip("signal");
         ImGui::SameLine();
+        const float width = 0.6f * ImGui::GetWindowWidth() - 16;
 
-        const float width = 0.2f * ImGui::GetWindowWidth() - 2.f * 5.33f; // 16/3 = 5.33
+        std::string text = "null";
+        if(_ptr.IsValid() )
+        {
+            if( _ptr.IsSingletonSlot() )
+            {
+                fan::EcsSingletonInfo info = _world.GetSingletonInfo( _ptr.Data().mType );
+                const std::string slotName = _ptr.Data().mSlot == nullptr ? "null" : _ptr.Data().mSlot->mName;
+                text = info.name + "::" + slotName;
+            }
+            else
+            {
+                fanAssert( _ptr.IsComponentSlot() );
+                fan::EcsComponentInfo info = _world.GetComponentInfo( _ptr.Data().mType );
+                const std::string slotName = _ptr.Data().mSlot == nullptr ? "null" : _ptr.Data().mSlot->mName;
 
-        ImGui::Button( guiSlot.mSceneNodeName.c_str(), ImVec2( width, 0.f ) );
-        ImGui::FanToolTip("target scene node");
-        FanDragDropTargetSlot( _world, _ptr );
+                text = info.name + "::" + slotName;
+            }
+        }
+
+        if( ImGui::Button( text.c_str(), ImVec2( width, 0.f ) ) )
+        {
+            if( _ptr.IsComponentSlot() ){ FanPopupSetComponentSlot::Open(); }
+            else                        { FanPopupSetSingletonSlot::Open(); }
+        }
         if( ImGui::IsItemClicked( ImGuiMouseButton_Right ) ){ _ptr.Clear(); }
-
-        ImGui::SameLine();
-        ImGui::PushItemWidth( width );
-        if( ImGui::Combo( "##componentType", &guiSlot.mComponentIndex, guiSlot.mComboComponentsStr.c_str() ) )
+        if( ImGui::IsItemHovered() )
         {
-            if( _ptr.IsValid() && ! guiSlot.mComponentsInfo.empty() )
-            {
-                const fan::EcsComponentInfo* info = guiSlot.mComponentsInfo[ guiSlot.mComponentIndex ];
-                const fan::EcsHandle handle = _ptr.Data().mHandle;
-                const uint32_t componentType = info->type;
-                fan::SlotBase * slot = info->mSlots.empty() ? nullptr : info->mSlots[0];
-                _ptr.Set( handle, componentType, slot );
-            }
+            if( _ptr.IsSingletonSlot() )        { DrawTooltipSingleton( _world, _ptr ); }
+            else if( _ptr.IsComponentSlot() )   { DrawTooltipComponent( _world, _ptr ); }
         }
-        ImGui::FanToolTip("target component");
-        ImGui::PopItemWidth();
 
-        ImGui::SameLine();
-        ImGui::PushItemWidth( width );
-        if( ImGui::Combo( "##slot", &guiSlot.mSlotIndex, guiSlot.mComboSlotsStr.c_str() ) )
+        ComponentPayload payload = ImGui::FanBeginDragDropTargetComponent<fan::SceneNode>( _world );
+        if( payload.IsValid() )
         {
-            if( _ptr.IsValid() &&
-                !guiSlot.mComponentsInfo.empty() &&
-                !guiSlot.mComponentsInfo[guiSlot.mComponentIndex]->mSlots.empty() )
-            {
-                const fan::EcsHandle handle = _ptr.Data().mHandle;
-                const uint32_t componentType = _ptr.Data().mComponentType;
-                const fan::EcsComponentInfo* info = guiSlot.mComponentsInfo[ guiSlot.mComponentIndex ];
-                fan::SlotBase * slot = info->mSlots[ guiSlot.mSlotIndex ];
-                _ptr.Set( handle, componentType, slot );
-            }
+            _ptr.SetComponentSlot( payload.mHandle, payload.mComponentType, nullptr );
+            FanPopupSetComponentSlot::Open();
         }
-        ImGui::FanToolTip("target slot");
-        ImGui::PopItemWidth();
 
         ImGui::SameLine();
         ImGui::Text( _label );
+        ImGui::SameLine();
+        ImGui::FanShowHelpMarker("drag a scene node to add a component slot");
+
+        FanPopupSetSingletonSlot::Draw( _world, _ptr );
+        FanPopupSetComponentSlot::Draw( _world, _ptr );
     }
 }

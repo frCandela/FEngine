@@ -3,6 +3,7 @@
 #include "core/fanDebug.hpp"
 #include "core/time/fanProfiler.hpp"
 #include "ecs/fanEcsWorld.hpp"
+#include "scene/fanDragnDrop.hpp"
 #include "editor/fanGroupsColors.hpp"
 
 namespace fan
@@ -28,12 +29,17 @@ namespace fan
 			ImGui::SetCursorPosY( ImGui::GetCursorPosY() - 3 );		// resets the cursor
 			if( ImGui::CollapsingHeader( info.name.c_str() ) )
 			{
+			    ImGui::FanBeginDragDropSourceSingleton( _world, info.type );
 				// draws gui 
 				if( info.onGui != nullptr )
 				{
 					info.onGui( _world, _world.GetSingleton( info.type ) );
 				}
-			}			
+			}
+			else
+            {
+                ImGui::FanBeginDragDropSourceSingleton( _world, info.type );
+            }
 		}
 	}
 }

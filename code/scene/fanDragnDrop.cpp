@@ -6,10 +6,12 @@
 #include "scene/fanPrefab.hpp"
 #include "scene/singletons/fanScene.hpp"
 #include "render/resources/fanTexture.hpp"
+#include "editor/fanGroupsColors.hpp"
 
 namespace ImGui
 {
     const std::string ComponentPayload::sPrefix = "cpnt_";
+    const std::string SingletonPayload::sPrefix = "sing_";
 
 	//========================================================================================================
 	//========================================================================================================
@@ -58,11 +60,30 @@ namespace ImGui
 			std::string nameid = ComponentPayload::sPrefix + std::to_string( info.type);
 			ComponentPayload payload = { _handle , _type };
 			ImGui::SetDragDropPayload( nameid.c_str(), &payload, sizeof( payload ) );
-			ImGui::Icon( info.icon, { 16,16 } ); ImGui::SameLine();
-			ImGui::Text("%s : %s", info.name.c_str(), info.name.c_str() );
+			ImGui::Icon( info.icon, { 16,16 }, fan::GroupsColors::GetColor( info.group ) );
+			ImGui::SameLine();
+			ImGui::Text( info.name.c_str() );
 			ImGui::EndDragDropSource();
 		}		
 	}
+
+    //========================================================================================================
+    //========================================================================================================
+    void FanBeginDragDropSourceSingleton( fan::EcsWorld& _world, uint32_t _type, ImGuiDragDropFlags _flags )
+    {
+        if( ImGui::BeginDragDropSource( _flags ) )
+        {
+            const fan::EcsSingletonInfo& info = _world.GetSingletonInfo( _type );
+
+            std::string nameid = SingletonPayload::sPrefix + std::to_string( info.type );
+            SingletonPayload payload = { _type };
+            ImGui::SetDragDropPayload( nameid.c_str(), &payload, sizeof( payload ) );
+            ImGui::Icon( info.icon, { 16,16 }, fan::GroupsColors::GetColor( info.group ) );
+            ImGui::SameLine();
+            ImGui::Text( info.name.c_str() );
+            ImGui::EndDragDropSource();
+        }
+    }
 
     //========================================================================================================
     //========================================================================================================
@@ -75,6 +96,17 @@ namespace ImGui
         return subString == ComponentPayload::sPrefix;
     }
 
+    //========================================================================================================
+    //========================================================================================================
+    bool SingletonPayload::IsSingletonPayload( const ImGuiPayload* _payload )
+    {
+        std::string dataTypeStr = _payload->DataType;
+        if( dataTypeStr.size() < SingletonPayload::sPrefix.size() ){ return false; }
+
+        const std::string subString = dataTypeStr.substr( 0, SingletonPayload::sPrefix.size() );
+        return subString == SingletonPayload::sPrefix;
+    }
+
 	//========================================================================================================
 	// if _type == 0 accepts all components types
 	//========================================================================================================
@@ -85,8 +117,7 @@ namespace ImGui
  		if( ImGui::BeginDragDropTarget() )
  		{
 			std::string nameid;
- 		    // accept all components
- 			if( _type == 0 )
+ 			if( _type == 0 ) // accept all components
 			{
                 const ImGuiPayload* preGetPayload = ImGui::GetDragDropPayload();
                 if( preGetPayload != nullptr && ComponentPayload::IsComponentPayload( preGetPayload ) )

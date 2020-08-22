@@ -106,7 +106,6 @@ namespace fan
 			Step();
 		}
 
-		// Exit sequence
 		Debug::Log( "Exit application" );
 	}
 	
