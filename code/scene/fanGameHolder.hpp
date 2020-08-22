@@ -8,6 +8,7 @@ WARNINGS_POP()
 #include "ecs/fanEcsWorld.hpp"
 #include "render/fanWindow.hpp"
 #include "scene/fanPrefabManager.hpp"
+#include "scene/fanFullscreen.hpp"
 #include "game/fanGameClient.hpp"
 #include "game/fanGameServer.hpp"
 #include "game/fanLaunchSettings.hpp"
@@ -41,10 +42,12 @@ namespace fan
 		Window               mWindow;
 		PrefabManager        mPrefabManager;
         IGame&               mGame;
+        FullScreen           mFullScreen;
 		double               mLastRenderTime = 0.;
 		const LaunchSettings mLaunchSettings;
 		bool                 mApplicationShouldExit;
 
 		void UpdateRenderWorld( Renderer& _renderer, EcsWorld& _world, const glm::vec2 _size );
+        void GetInitialWindowPositionAndSize( glm::ivec2& _position, glm::ivec2& _size ) const;
 	};
 }

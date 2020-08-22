@@ -31,10 +31,9 @@ namespace fan
 		GameClient::CreateGameAxes();
 
 		// creates window
-		glm::ivec2 windowPosition;
-		glm::ivec2 windowSize;
-		SerializedValues::LoadWindowSizeAndPosition( _settings, windowPosition, windowSize );		
-		mWindow.Create( _settings.windowName.c_str(), windowSize, windowPosition );
+		glm::ivec2 windowPosition, windowSize;
+        GetInitialWindowPositionAndSize( windowPosition, windowSize );
+		mWindow.Create( _settings.windowName.c_str(), windowPosition, windowSize );
         Mouse::SetCallbacks( mWindow.mWindow );
 
 		// creates renderer
@@ -66,18 +65,7 @@ namespace fan
 	//========================================================================================================
 	GameHolder::~GameHolder()
 	{
-		// Serialize editor positions if it was not modified by a launch command
-		if( mLaunchSettings.window_size == glm::ivec2( -1, -1 ) )
-		{
-			const VkExtent2D rendererSize = mWindow.GetExtent();
-			const glm::ivec2 windowPosition = mWindow.GetPosition();
-            glm::ivec2 size = { rendererSize.width, rendererSize.height };
-            SerializedValues::SaveWindowSizeAndPosition( windowPosition, size );
-		}
-
-		SerializedValues::Get().SaveValuesToDisk();
 		mPrefabManager.Clear();
-
 		delete mRenderer;
 		mWindow.Destroy();
 	}
@@ -176,14 +164,9 @@ namespace fan
 				// ImGui render
 				ImGui::NewFrame();
 
-                {
-                    // in game debug ui here
-                    ImGui::Begin( "toto" );
-                    ImGuiIO& io = ImGui::GetIO();
-                    ImGui::Text( "imMouse %f %f", io.MousePos.x, io.MousePos.y );
-                    ImGui::Text( "mouse   %f %f", mouse.mLocalPosition.x, mouse.mLocalPosition.y );
-                    ImGui::End();
-                }
+                ImGui::Begin( "test" );
+                mFullScreen.OnGui( mWindow );
+                ImGui::End();
 
 				ImGui::Render();
 			}
@@ -268,4 +251,14 @@ namespace fan
 			ToGLM( cameraTransform.GetPosition() )
 		);
 	}
+
+    //========================================================================================================
+    //========================================================================================================
+    void GameHolder::GetInitialWindowPositionAndSize( glm::ivec2& _position, glm::ivec2& _size ) const
+    {
+        _position = mLaunchSettings.window_position;
+        _size = mLaunchSettings.window_size;
+        if( _position == glm::ivec2( 0, 0 ) ) { SerializedValues::LoadWindowPosition( _position ); }
+        if( _size == glm::ivec2( 0, 0 ) )     { SerializedValues::LoadWindowSize( _size ); }
+    }
 }

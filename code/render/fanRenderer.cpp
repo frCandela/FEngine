@@ -308,7 +308,7 @@ namespace fan
 		}
 
 		Debug::Highlight() << "Resize renderer: " << extent.width << "x" << extent.height << Debug::Endl();
-		mWindow.mSwapchain.Resize( mDevice , extent );
+		mWindow.mSwapchain.Resize( mDevice, mWindow.mSurface, extent );
 
 		mFramebuffersSwapchain.Destroy( mDevice );
         RenderPass& finalRenderPass = ( mViewType == ViewType::Editor

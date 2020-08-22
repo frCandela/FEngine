@@ -6,6 +6,7 @@
 namespace fan
 {
 	class Renderer;
+    class FullScreen;
 
 	//================================================================================================================================
 	// shortcut & axis edition
@@ -14,16 +15,19 @@ namespace fan
 	class PreferencesWindow : public EditorWindow
 	{
 	public:
-		PreferencesWindow( Renderer& _renderer );
+		PreferencesWindow( Renderer& _renderer, FullScreen& _fullScreen );
 		~PreferencesWindow();
-	
+
+        static void SetDefaultColors();
 	protected:
 		void OnGui( EcsWorld& _world ) override;
 
 	private:
-		Renderer& m_renderer;
+		Renderer& mRenderer;
+        FullScreen& mFullScreen;
 
 		void DrawJoysticks();
 		void DrawShortcuts();
+        static void LogColorsCppInitCode();
 	};
 }

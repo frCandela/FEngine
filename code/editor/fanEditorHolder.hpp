@@ -9,6 +9,7 @@ WARNINGS_POP()
 #include "ecs/fanEcsWorld.hpp"
 #include "render/fanWindow.hpp"
 #include "scene/fanPrefabManager.hpp"
+#include "scene/fanFullscreen.hpp"
 #include "game/fanGameClient.hpp"
 #include "game/fanGameServer.hpp"
 #include "game/fanLaunchSettings.hpp"
@@ -43,6 +44,7 @@ namespace fan
 		Renderer*            mRenderer;
 		Window               mWindow;
 		PrefabManager        mPrefabManager;
+		FullScreen           mFullScreen;
 		std::vector<IGame*>  mGames;
 		int                  mCurrentGame    = 0;
 		double               mLastRenderTime = 0.;

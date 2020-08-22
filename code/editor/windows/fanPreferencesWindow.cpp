@@ -1,33 +1,33 @@
 #include "editor/windows/fanPreferencesWindow.hpp"
 
-#include "render/fanRenderer.hpp"
 #include "core/fanColor.hpp"
-#include "core/input/fanInputManager.hpp"
 #include "core/input/fanInput.hpp"
-#include "core/input/fanKeyboard.hpp"
-#include "core/input/fanJoystick.hpp"
 #include "core/fanSerializedValues.hpp"
 #include "core/time/fanProfiler.hpp"
-#include "core/input/fanAxis.hpp"
+#include "core/fanDebug.hpp"
+#include "scene/fanFullscreen.hpp"
+#include "render/fanRenderer.hpp"
 #include "editor/fanModals.hpp"
 #include "editor/fanGroupsColors.hpp"
 
 namespace fan
 {
-	//================================================================================================================================
-	//================================================================================================================================
-	PreferencesWindow::PreferencesWindow( Renderer& _renderer )
-		: EditorWindow( "preferences", ImGui::IconType::PREFERENCES16 )
-		, m_renderer( _renderer )
-	{
+	//========================================================================================================
+    //========================================================================================================
+    PreferencesWindow::PreferencesWindow( Renderer& _renderer, FullScreen& _fullScreen ) :
+            EditorWindow( "preferences", ImGui::IconType::PREFERENCES16 ),
+            mRenderer( _renderer ),
+            mFullScreen( _fullScreen )
+    {
 		// loads clear color
 		Color clearColor;
 		if( SerializedValues::Get().GetColor( "clear_color", clearColor ) )
 		{
-			m_renderer.mClearColor = clearColor.ToGLM();
+            mRenderer.mClearColor = clearColor.ToGLM();
 		}
 
 		// loads imgui colors
+        PreferencesWindow::SetDefaultColors();
 		ImGuiStyle& style = ImGui::GetStyle();
 		for ( int i = 0; i < ImGuiCol_COUNT; i++ )
 		{
@@ -48,14 +48,14 @@ namespace fan
 			{
 				GroupsColors::s_colors[i] = color.ToImGui();
 			}
-		}		
+		}
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	PreferencesWindow::~PreferencesWindow()
 	{
-		SerializedValues::Get().SetColor( "clear_color", m_renderer.mClearColor );
+		SerializedValues::Get().SetColor( "clear_color", mRenderer.mClearColor );
 
 		// saves imgui colors
 		ImGuiStyle& style = ImGui::GetStyle();
@@ -73,8 +73,8 @@ namespace fan
 		}
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void PreferencesWindow::OnGui( EcsWorld& /*_world*/ )
 	{
 		SCOPED_PROFILE( preferences );
@@ -86,15 +86,16 @@ namespace fan
 		if ( ImGui::CollapsingHeader( "Rendering" ) )
 		{
 			ImGui::Indent();
+		    mFullScreen.OnGui( mRenderer.mWindow );
 			// Filter color
-			glm::vec4& color = m_renderer.mDrawPostprocess.mUniforms.color;
+			glm::vec4& color = mRenderer.mDrawPostprocess.mUniforms.color;
 			ImGui::ColorEdit3( "Filter##1", &color[ 0 ], ImGui::fanColorEditFlags );
 
 			// Clear color
-			glm::vec4 clearColor = m_renderer.mClearColor;
+			glm::vec4 clearColor = mRenderer.mClearColor;
 			if ( ImGui::ColorEdit3( "Clear color", &clearColor.r, ImGui::fanColorEditFlags ) )
 			{
-				m_renderer.mClearColor = clearColor;
+                mRenderer.mClearColor = clearColor;
 			}
 			ImGui::Unindent();
 		}
@@ -111,6 +112,8 @@ namespace fan
 				ImGui::ColorEdit4( name, ( float* ) &style.Colors[ i ], ImGui::fanColorEditFlags );
 				ImGui::PopID();
 			}
+            if( ImGui::Button("log colors cpp code")){ LogColorsCppInitCode(); }
+
 			ImGui::Unindent();
 		}
 
@@ -131,9 +134,8 @@ namespace fan
 		DrawJoysticks();
 		DrawShortcuts();
 	}
-
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void PreferencesWindow::DrawShortcuts()
 	{
 		// INPUT
@@ -259,4 +261,86 @@ namespace fan
 		}
 
 	}
+
+    //================================================================================================================================
+    //================================================================================================================================
+    void PreferencesWindow::LogColorsCppInitCode()
+    {
+        ImGuiStyle& style = ImGui::GetStyle();
+        for ( int i = 0; i < ImGuiCol_COUNT; i++ )
+        {
+            const char* name = ImGui::GetStyleColorName( i );
+            ImVec4 color = style.Colors[ i ];
+            Debug::Log() << "style.Colors[ "
+                    << "ImGuiCol_" << name
+                    << " ] = { "
+                    << "(float)" << color.x << ", "
+                    << "(float)" << color.y << ", "
+                    << "(float)" << color.z << ", "
+                    << "(float)" << color.w << " }; "
+                    << Debug::Endl();
+
+            ImGui::PushID( i );
+            ImGui::ColorEdit4( name, ( float* ) &style.Colors[ i ], ImGui::fanColorEditFlags );
+            ImGui::PopID();
+        }
+    }
+
+    //================================================================================================================================
+    //================================================================================================================================
+    void PreferencesWindow::SetDefaultColors()
+    {
+        ImGuiStyle& style = ImGui::GetStyle();
+        // code generated using PreferencesWindow::LogColorsCppInitCode
+        style.Colors[ ImGuiCol_Text ] = { (float)0.635294, (float)0.635294, (float)0.635294, (float)1 };
+        style.Colors[ ImGuiCol_TextDisabled ] = { (float)0.5, (float)0.5, (float)0.5, (float)1 };
+        style.Colors[ ImGuiCol_WindowBg ] = { (float)0.131201, (float)0.131188, (float)0.131188, (float)1 };
+        style.Colors[ ImGuiCol_ChildBg ] = { (float)1, (float)1, (float)1, (float)0 };
+        style.Colors[ ImGuiCol_PopupBg ] = { (float)0.08, (float)0.08, (float)0.08, (float)0.94 };
+        style.Colors[ ImGuiCol_Border ] = { (float)0.172522, (float)0.172539, (float)0.172529, (float)1 };
+        style.Colors[ ImGuiCol_BorderShadow ] = { (float)0.0001, (float)9.999e-05, (float)9.999e-05, (float)0 };
+        style.Colors[ ImGuiCol_FrameBg ] = { (float)0.247059, (float)0.247059, (float)0.247059, (float)0.541176 };
+        style.Colors[ ImGuiCol_FrameBgHovered ] = { (float)0.509804, (float)0.509804, (float)0.509804, (float)0.4 };
+        style.Colors[ ImGuiCol_FrameBgActive ] = { (float)0.564706, (float)0.564706, (float)0.564706, (float)0.670588 };
+        style.Colors[ ImGuiCol_TitleBg ] = { (float)0.0941176, (float)0.0941176, (float)0.0941176, (float)1 };
+        style.Colors[ ImGuiCol_TitleBgActive ] = { (float)0.0950447, (float)0.0950352, (float)0.0950352, (float)1 };
+        style.Colors[ ImGuiCol_TitleBgCollapsed ] = { (float)0, (float)0, (float)0, (float)1 };
+        style.Colors[ ImGuiCol_MenuBarBg ] = { (float)0.14, (float)0.14, (float)0.14, (float)1 };
+        style.Colors[ ImGuiCol_ScrollbarBg ] = { (float)0.02, (float)0.02, (float)0.02, (float)0.53 };
+        style.Colors[ ImGuiCol_ScrollbarGrab ] = { (float)0.31, (float)0.31, (float)0.31, (float)1 };
+        style.Colors[ ImGuiCol_ScrollbarGrabHovered ] = { (float)0.41, (float)0.41, (float)0.41, (float)1 };
+        style.Colors[ ImGuiCol_ScrollbarGrabActive ] = { (float)0.51, (float)0.51, (float)0.51, (float)1 };
+        style.Colors[ ImGuiCol_CheckMark ] = { (float)0.403922, (float)1, (float)0.67451, (float)1 };
+        style.Colors[ ImGuiCol_SliderGrab ] = { (float)0.658824, (float)0.658824, (float)0.658824, (float)1 };
+        style.Colors[ ImGuiCol_SliderGrabActive ] = { (float)0.454902, (float)1, (float)0.756863, (float)1 };
+        style.Colors[ ImGuiCol_Button ] = { (float)0.537255, (float)0.537255, (float)0.537255, (float)0.4 };
+        style.Colors[ ImGuiCol_ButtonHovered ] = { (float)0.415686, (float)0.415686, (float)0.415686, (float)1 };
+        style.Colors[ ImGuiCol_ButtonActive ] = { (float)0.482353, (float)0.482353, (float)0.482353, (float)1 };
+        style.Colors[ ImGuiCol_Header ] = { (float)0.321569, (float)0.321569, (float)0.321569, (float)0.309804 };
+        style.Colors[ ImGuiCol_HeaderHovered ] = { (float)0.352941, (float)0.352941, (float)0.352941, (float)0.8 };
+        style.Colors[ ImGuiCol_HeaderActive ] = { (float)0.396078, (float)0.396078, (float)0.396078, (float)1 };
+        style.Colors[ ImGuiCol_Separator ] = { (float)0.439216, (float)0.439216, (float)0.439216, (float)0.501961 };
+        style.Colors[ ImGuiCol_SeparatorHovered ] = { (float)0.498039, (float)0.498039, (float)0.498039, (float)0.780392 };
+        style.Colors[ ImGuiCol_SeparatorActive ] = { (float)0.509804, (float)0.509804, (float)0.509804, (float)1 };
+        style.Colors[ ImGuiCol_ResizeGrip ] = { (float)0.360784, (float)0.360784, (float)0.360784, (float)0.25098 };
+        style.Colors[ ImGuiCol_ResizeGripHovered ] = { (float)0.478431, (float)0.478431, (float)0.478431, (float)0.670588 };
+        style.Colors[ ImGuiCol_ResizeGripActive ] = { (float)0.4, (float)0.4, (float)0.4, (float)0.94902 };
+        style.Colors[ ImGuiCol_Tab ] = { (float)0.18, (float)0.35, (float)0.58, (float)0.862 };
+        style.Colors[ ImGuiCol_TabHovered ] = { (float)0.26, (float)0.59, (float)0.98, (float)0.8 };
+        style.Colors[ ImGuiCol_TabActive ] = { (float)0.2, (float)0.41, (float)0.68, (float)1 };
+        style.Colors[ ImGuiCol_TabUnfocused ] = { (float)0.068, (float)0.102, (float)0.148, (float)0.9724 };
+        style.Colors[ ImGuiCol_TabUnfocusedActive ] = { (float)0.136, (float)0.262, (float)0.424, (float)1 };
+        style.Colors[ ImGuiCol_DockingPreview ] = { (float)0.26, (float)0.59, (float)0.98, (float)0.7 };
+        style.Colors[ ImGuiCol_DockingEmptyBg ] = { (float)0.2, (float)0.2, (float)0.2, (float)1 };
+        style.Colors[ ImGuiCol_PlotLines ] = { (float)0.529412, (float)0.529412, (float)0.529412, (float)1 };
+        style.Colors[ ImGuiCol_PlotLinesHovered ] = { (float)1, (float)0.43, (float)0.35, (float)1 };
+        style.Colors[ ImGuiCol_PlotHistogram ] = { (float)0.9, (float)0.7, (float)0, (float)1 };
+        style.Colors[ ImGuiCol_PlotHistogramHovered ] = { (float)1, (float)0.6, (float)0, (float)1 };
+        style.Colors[ ImGuiCol_TextSelectedBg ] = { (float)0.26, (float)0.59, (float)0.98, (float)0.35 };
+        style.Colors[ ImGuiCol_DragDropTarget ] = { (float)1, (float)1, (float)0, (float)0.9 };
+        style.Colors[ ImGuiCol_NavHighlight ] = { (float)0.26, (float)0.59, (float)0.98, (float)1 };
+        style.Colors[ ImGuiCol_NavWindowingHighlight ] = { (float)1, (float)1, (float)1, (float)0.7 };
+        style.Colors[ ImGuiCol_NavWindowingDimBg ] = { (float)0.8, (float)0.8, (float)0.8, (float)0.2 };
+        style.Colors[ ImGuiCol_ModalWindowDimBg ] = { (float)0.8, (float)0.8, (float)0.8, (float)0.35 };
+    }
 }

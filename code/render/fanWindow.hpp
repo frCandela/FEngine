@@ -25,17 +25,26 @@ namespace fan
             Mouse mMouse;
         };
 
-		void Create( const char* _name, const glm::ivec2 _size, const glm::ivec2 _position );
-		void Destroy();
+		void Create( const char* _name, const glm::ivec2 _position, const glm::ivec2 _size );
+        void CreateGLFWWIndow(const char* _name, const glm::ivec2 _position, const glm::ivec2 _size);
+        void PostCreateWindow(const glm::ivec2 _size);
+        void SetFullscreen();
+        void SetWindowed(  const glm::ivec2 _position, const glm::ivec2 _size );
 
-		VkExtent2D	GetExtent()	 const;
+		void Destroy();
+        void DestroyWindow();
+
+        VkExtent2D	GetExtent()	 const;
+        glm::ivec2	GetSize()	 const;
 		glm::ivec2	GetPosition() const;
 		bool		IsOpen() const;
+        bool        IsFullscreen() const;
 
+        static void MakeValidPositionAndSize( glm::ivec2& _position,  glm::ivec2& _size );
         static InputData& GetInputData( GLFWwindow* _window );
+
         using GetWindowUserPtrFunc = void* ( * )( GLFWwindow* _window );
         static GetWindowUserPtrFunc sGetWindowUserPtr;
-
 		GLFWwindow*		mWindow = nullptr;
 		Instance		mInstance;
 		Device			mDevice;

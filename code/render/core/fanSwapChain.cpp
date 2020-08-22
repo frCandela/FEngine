@@ -10,21 +10,19 @@ namespace fan
 	//================================================================================================================================
 	void SwapChain::Create( Device& _device, VkSurfaceKHR _surface, VkExtent2D _desiredSize )
 	{
-		assert( mSurface == VK_NULL_HANDLE );
-		assert( mSwapchain == VK_NULL_HANDLE );
+		fanAssert( mSwapchain == VK_NULL_HANDLE );
 
-		mSurface = _surface;
-		CreateSwapChain( _device, _desiredSize );
+		CreateSwapChain( _device, _surface, _desiredSize );
 		CreateSemaphores( _device );
 		CreateImageViews( _device );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void SwapChain::Resize( Device& _device, VkExtent2D _desiredSize )
+	void SwapChain::Resize( Device& _device, VkSurfaceKHR _surface, VkExtent2D _desiredSize )
 	{
 		mCurrentFrame = 0;
-		CreateSwapChain( _device, _desiredSize );
+		CreateSwapChain( _device, _surface, _desiredSize );
 		for( uint32_t imageIndex = 0; imageIndex < mImagesCount; imageIndex++ )
 		{
 			mImageViews[imageIndex].Destroy( _device );
@@ -86,15 +84,15 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	VkPresentModeKHR SwapChain::FindDesiredPresentMode( Device& _device, const VkPresentModeKHR _desiredPresentMode ) const
+	VkPresentModeKHR SwapChain::FindDesiredPresentMode( Device& _device, VkSurfaceKHR _surface, const VkPresentModeKHR _desiredPresentMode ) const
 	{
 		std::vector<VkPresentModeKHR>	supportedPresentModes;
 
 		uint32_t presentModeCount;
-		vkGetPhysicalDeviceSurfacePresentModesKHR( _device.mPhysicalDevice, mSurface, &presentModeCount, nullptr );
+		vkGetPhysicalDeviceSurfacePresentModesKHR( _device.mPhysicalDevice, _surface, &presentModeCount, nullptr );
 		supportedPresentModes.clear();
 		supportedPresentModes.resize( presentModeCount );
-		vkGetPhysicalDeviceSurfacePresentModesKHR( _device.mPhysicalDevice, mSurface, &presentModeCount, supportedPresentModes.data() );
+		vkGetPhysicalDeviceSurfacePresentModesKHR( _device.mPhysicalDevice, _surface, &presentModeCount, supportedPresentModes.data() );
 
 		for ( int presentModeIndex = 0; presentModeIndex < (int)supportedPresentModes.size(); presentModeIndex++ )
 		{
@@ -156,13 +154,13 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	VkSurfaceFormatKHR SwapChain::FindDesiredSurfaceFormat( Device& _device, VkSurfaceFormatKHR _desiredSurfaceFormat ) const
+	VkSurfaceFormatKHR SwapChain::FindDesiredSurfaceFormat( Device& _device, VkSurfaceKHR _surface, VkSurfaceFormatKHR _desiredSurfaceFormat ) const
 	{
 		uint32_t formatsCount;
-		vkGetPhysicalDeviceSurfaceFormatsKHR( _device.mPhysicalDevice, mSurface, &formatsCount, nullptr );
+		vkGetPhysicalDeviceSurfaceFormatsKHR( _device.mPhysicalDevice, _surface, &formatsCount, nullptr );
 		std::vector<VkSurfaceFormatKHR> supportedSurfaceFormats;
 		supportedSurfaceFormats.resize( formatsCount );
-		vkGetPhysicalDeviceSurfaceFormatsKHR( _device.mPhysicalDevice, mSurface, &formatsCount, supportedSurfaceFormats.data() );
+		vkGetPhysicalDeviceSurfaceFormatsKHR( _device.mPhysicalDevice, _surface, &formatsCount, supportedSurfaceFormats.data() );
 
 		if ( supportedSurfaceFormats.size() == 1 && supportedSurfaceFormats[ 0 ].format == VK_FORMAT_UNDEFINED )
 		{
@@ -191,15 +189,15 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void SwapChain::CreateSwapChain( Device& _device, VkExtent2D _desiredSize )
+	void SwapChain::CreateSwapChain( Device& _device, VkSurfaceKHR _surface, VkExtent2D _desiredSize )
 	{
 		VkSurfaceCapabilitiesKHR surfaceCapabilities;
-		vkGetPhysicalDeviceSurfaceCapabilitiesKHR( _device.mPhysicalDevice, mSurface, &surfaceCapabilities );
+		vkGetPhysicalDeviceSurfaceCapabilitiesKHR( _device.mPhysicalDevice, _surface, &surfaceCapabilities );
 
-		mImagesCount						   = FindDesiredNumberOfImages( surfaceCapabilities, s_maxFramesInFlight );
+		mImagesCount					   = FindDesiredNumberOfImages( surfaceCapabilities, s_maxFramesInFlight );
 		mExtent							   = FindDesiredImagesSize( surfaceCapabilities, _desiredSize );
-		mSurfaceFormat					   = FindDesiredSurfaceFormat( _device, { VK_FORMAT_R8G8B8A8_UNORM , VK_COLOR_SPACE_SRGB_NONLINEAR_KHR } );
-		const VkPresentModeKHR presentMode = FindDesiredPresentMode( _device, VK_PRESENT_MODE_MAILBOX_KHR );
+		mSurfaceFormat					   = FindDesiredSurfaceFormat( _device, _surface, { VK_FORMAT_R8G8B8A8_UNORM , VK_COLOR_SPACE_SRGB_NONLINEAR_KHR } );
+		const VkPresentModeKHR presentMode = FindDesiredPresentMode( _device, _surface, VK_PRESENT_MODE_MAILBOX_KHR );
 		const VkImageUsageFlags imageUsage = FindDesiredImageUsage( surfaceCapabilities, VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT );
 
 		VkSwapchainKHR oldSwapchain = mSwapchain;
@@ -208,7 +206,7 @@ namespace fan
 		swapchainCreateInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
 		swapchainCreateInfo.pNext = nullptr;
 		swapchainCreateInfo.flags = 0;
-		swapchainCreateInfo.surface = mSurface;
+		swapchainCreateInfo.surface = _surface;
 		swapchainCreateInfo.minImageCount = mImagesCount;
 		swapchainCreateInfo.imageFormat = mSurfaceFormat.format;
 		swapchainCreateInfo.imageColorSpace = mSurfaceFormat.colorSpace;

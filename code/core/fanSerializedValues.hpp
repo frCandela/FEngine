@@ -2,7 +2,10 @@
 
 #include "core/fanSingleton.hpp"
 #include "fanJson.hpp"
-#include "game/fanLaunchSettings.hpp"
+#include "fanDisableWarnings.hpp"
+WARNINGS_GLM_PUSH()
+#include "glm/vec2.hpp"
+WARNINGS_POP()
 
 class btQuaternion;
 class btVector3;
@@ -44,11 +47,10 @@ namespace fan
 		bool GetBool	( const char * _name, bool&				_outBool );
 		bool GetString	( const char * _name, std::string&		_outString );
 
-		static void SaveWindowSizeAndPosition( const glm::ivec2 _position, const glm::ivec2 _size );
-        static void LoadWindowSizeAndPosition( const LaunchSettings& _settings,
-                                               glm::ivec2& _outPosition,
-                                               glm::ivec2& _outSize );
-
+		static void SaveWindowSize( const glm::ivec2 _size );
+        static void LoadWindowSize( glm::ivec2& _outSize );
+        static void SaveWindowPosition( const glm::ivec2 _position );
+        static void LoadWindowPosition( glm::ivec2& _outPosition );
 	protected:
 		SerializedValues();
 
