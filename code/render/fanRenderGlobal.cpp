@@ -10,6 +10,8 @@ namespace fan
 
 	const char* RenderGlobal::sDefaultIcons     = "content/_default/texture/icons.png";
 	const char* RenderGlobal::sDefaultImguiFont = "content/_default/imgui_font.ttf";
+    const char* RenderGlobal::sDefaultGameFont = "content/fonts/Vera.ttf";
+
 
 	const char* RenderGlobal::sMeshCone      = "content/_default/mesh/cone.gltf";
 	const char* RenderGlobal::sMeshCube      = "content/_default/mesh/cube.gltf";

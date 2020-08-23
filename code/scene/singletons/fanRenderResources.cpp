@@ -1,10 +1,10 @@
 #include "fanRenderResources.hpp"
 
 #include "render/resources/fanMesh.hpp"
-#include "render/resources/fanTexture.hpp"
 #include "render/resources/fanMesh2D.hpp"
 #include "render/resources/fanTextureManager.hpp"
 #include "render/resources/fanMesh2DManager.hpp"
+#include "render/fanFont.hpp"
 
 namespace fan
 {
@@ -30,18 +30,21 @@ namespace fan
     //========================================================================================================
     void RenderResources::SetPointers( MeshManager* _meshManager,
                                        Mesh2DManager* _mesh2DManager,
-                                       TextureManager* _textureManager )
+                                       TextureManager* _textureManager,
+                                       Font* _font  )
     {
         mMeshManager   = _meshManager;
         mMesh2DManager = _mesh2DManager;
         mTextureManager = _textureManager;
+        mFont = _font;
     }
 
     //========================================================================================================
     //========================================================================================================
     void RenderResources::SetupResources( MeshManager& _meshManager,
                                           Mesh2DManager& _mesh2DManager,
-                                          TextureManager& _textureManager )
+                                          TextureManager& _textureManager,
+                                          Font& _font )
     {
         ResourcePtr<Mesh>::s_onResolve.Connect( &MeshManager::ResolvePtr, &_meshManager );
         ResourcePtr< Texture >::s_onResolve.Connect( &TextureManager::ResolvePtr, &_textureManager );
@@ -50,6 +53,11 @@ namespace fan
         Mesh2D* quad2D = RenderResources::CreateMesh2DQuad();
         _mesh2DManager.Add( quad2D, RenderGlobal::sMesh2DQuad );
         _textureManager.Load( RenderGlobal::sWhiteTexture );
+
+        Font::InitFreetype();
+        _font.LoadFont( RenderGlobal::sDefaultGameFont );
+        _font.SetHeight( 34 );
+        _textureManager.Add( _font.GenerateAtlas(), "font48" ) ;
     }
 
     //========================================================================================================

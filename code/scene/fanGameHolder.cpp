@@ -40,12 +40,14 @@ namespace fan
 		mRenderer = new Renderer( mWindow, Renderer::ViewType::Game );
         RenderResources::SetupResources( mRenderer->mMeshManager,
                                          mRenderer->mMesh2DManager,
-                                         mRenderer->mTextureManager );
+                                         mRenderer->mTextureManager,
+                                         mRenderer->mDefaultFont );
 
         RenderResources& renderResources = mGame.mWorld.GetSingleton<RenderResources>();
         renderResources.SetPointers(&mRenderer->mMeshManager,
                                     &mRenderer->mMesh2DManager,
-                                    &mRenderer->mTextureManager );
+                                    &mRenderer->mTextureManager,
+                                    &mRenderer->mDefaultFont );
 
         SceneResources::SetupResources( mPrefabManager );
         SceneResources& sceneResources = mGame.mWorld.GetSingleton<SceneResources>();

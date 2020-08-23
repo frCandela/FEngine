@@ -22,6 +22,7 @@ namespace fan
 		static const char* sWhiteTexture;
 		static const char* sDefaultIcons;
 		static const char* sDefaultImguiFont;
+        static const char* sDefaultGameFont;
 
 		static const char* sMeshCone;
 		static const char* sMeshCube;

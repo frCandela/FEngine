@@ -20,15 +20,14 @@ namespace fan
         Font(){}
         ~Font(){ FT_Done_Face( mFace ); }
         bool LoadFont( const std::string _path );
+        bool SetHeight( const int _pixelHeight );
+        Texture* GenerateAtlas();
         bool LoadChar( const char _char );
-        void SetHeight( const int _pixelHeight );
 
         static bool InitFreetype();
         static void ClearFreetype();
-
-        Texture * mTexture = nullptr;
     private:
-        struct Character {
+        struct Glyph {
             int        mTextureID;
             glm::ivec2 mSize;    // pixels
             glm::ivec2 mBearing; // pixels
@@ -36,8 +35,12 @@ namespace fan
         };
 
         static FT_Library   sFreetypeLib;
-        FT_Face             mFace;
-        std::map<char, Character> mCharacters;
+        static const int    sNumAsciiCharacters = 128;
+        static const int    sSizeAtlas = 16;
+        static_assert( sSizeAtlas * sSizeAtlas >= sNumAsciiCharacters );
 
+        FT_Face                 mFace;
+        std::map<char, Glyph>   mGlyphs;
+        int                     mPixelHeight = 0;
     };
 }

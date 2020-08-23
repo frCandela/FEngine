@@ -83,7 +83,8 @@ namespace fan
         mRenderer = new Renderer( mWindow, Renderer::ViewType::Editor );
         RenderResources::SetupResources( mRenderer->mMeshManager,
                                          mRenderer->mMesh2DManager,
-                                         mRenderer->mTextureManager );
+                                         mRenderer->mTextureManager,
+                                         mRenderer->mDefaultFont );
         SceneResources::SetupResources( mPrefabManager );
 
 
@@ -151,7 +152,8 @@ namespace fan
             RenderResources& renderResources = world.GetSingleton<RenderResources>();
             renderResources.SetPointers( &mRenderer->mMeshManager,
                                          &mRenderer->mMesh2DManager,
-                                         &mRenderer->mTextureManager );
+                                         &mRenderer->mTextureManager,
+                                         &mRenderer->mDefaultFont);
 
             SceneResources& sceneResources = world.GetSingleton<SceneResources>();
             sceneResources.SetPointers( &mPrefabManager );
@@ -338,36 +340,17 @@ namespace fan
                             SCOPED_PROFILE( ImGui_render );
                             ImGui::NewFrame();
                             mMainMenuBar->Draw( game.mWorld );
-                           if( ImGui::Begin( "test" ) )
-                            {
-                                static Font font;
-                                if( ImGui::Button("init freetype")){
-                                    Font::InitFreetype();
-                                }
-                                if( ImGui::Button("load font")){
-                                    font.LoadFont( "content/fonts/Vera.ttf" );
-                                }
-                                static int sHeight = 48;
-                                ImGui::DragInt("height", &sHeight);
-                                ImGui::SameLine();
-                                if( ImGui::Button("set height")){
-                                    font.SetHeight( sHeight );
-                                }
-
-                                static char inChar[2] = "a";
-                                ImGui::InputText( "char", inChar, 2 );
-                                ImGui::SameLine();
-                                if( ImGui::Button("load char")){
-                                    mRenderer->WaitIdle();
-                                    mRenderer->mTextureManager.Remove("font");
-                                    mRenderer->mTextureManager.DestroyRemovedTextures( mRenderer->mDevice );
-                                    font.LoadChar( inChar[0] );
-                                    mRenderer->mTextureManager.Add( font.mTexture, "font" );
-                                    font.mTexture = nullptr;
-                                }
-
-                                ImGui::End();
-                            }
+                            if( ImGui::Begin( "test" ) )
+                             {
+                                 if( ImGui::Button("load char")){
+                                     mRenderer->WaitIdle();
+                                     mRenderer->mTextureManager.Remove("font48");
+                                     mRenderer->mTextureManager.DestroyRemovedTextures( mRenderer->mDevice );
+                                     mRenderer->mTextureManager.Add(
+                                             mRenderer->mDefaultFont.GenerateAtlas(), "font48" );
+                                 }
+                                 ImGui::End();
+                             }
                             ImGui::Render();
                         }
                     }

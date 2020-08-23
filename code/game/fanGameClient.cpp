@@ -16,10 +16,10 @@
 #include "scene/systems/fanRaycastUI.hpp"
 #include "scene/systems/fanUpdateUIAlign.hpp"
 #include "scene/systems/fanUpdateUILayouts.hpp"
+#include "scene/systems/fanUpdateUIText.hpp"
 #include "scene/components/fanCamera.hpp"
 #include "scene/components/fanDirectionalLight.hpp"
 #include "scene/components/fanPointLight.hpp"
-#include "scene/components/ui/fanUIText.hpp"
 #include "scene/singletons/fanScene.hpp"
 #include "scene/singletons/fanRenderResources.hpp"
 #include "scene/singletons/fanSceneResources.hpp"
@@ -282,7 +282,8 @@ namespace fan
             mWorld.Run<SUpdateUILayouts>();
             mWorld.Run<SHoverButtons>();
             mWorld.Run<SHighlightButtons>();
-			
+            mWorld.Run<SUpdateUIText>();
+
 			mWorld.Run<S_FireWeapons>(			 _delta );
 			mWorld.Run<S_GenerateLightMesh>(		 _delta );
 			mWorld.Run<S_UpdateSolarPannels>(	 _delta );
