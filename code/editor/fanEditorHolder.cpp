@@ -71,8 +71,8 @@ namespace fan
         // creates window
         glm::ivec2 windowPosition = mLaunchSettings.window_position;
         glm::ivec2 windowSize = mLaunchSettings.window_size;
-        if( windowPosition == glm::ivec2(0,0) ){ SerializedValues::LoadWindowPosition( windowPosition ); }
-        if( windowSize == glm::ivec2(0,0) ){ SerializedValues::LoadWindowSize( windowSize ); }
+        if( windowPosition == glm::ivec2(-1,-1) ){ SerializedValues::LoadWindowPosition( windowPosition ); }
+        if( windowSize == glm::ivec2(-1,-1) ){ SerializedValues::LoadWindowSize( windowSize ); }
         mWindow.Create( _settings.windowName.c_str(), windowPosition, windowSize );
         mFullScreen.SavePreviousPositionAndSize( mWindow );
 
@@ -187,11 +187,11 @@ namespace fan
         delete mMainMenuBar;
 
         // Save window position/size if it was not modified by a launch command
-        if( mLaunchSettings.window_size == glm::ivec2( 0, 0 ) )
+        if( mLaunchSettings.window_size == glm::ivec2( -1, -1 ) )
         {
             SerializedValues::SaveWindowSize( mWindow.GetSize() );
         }
-        if( mLaunchSettings.window_position == glm::ivec2( 0, 0 ) )
+        if( mLaunchSettings.window_position == glm::ivec2( -1, -1 ) )
         {
             SerializedValues::SaveWindowPosition( mWindow.GetPosition() );
         }
