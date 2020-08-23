@@ -7,7 +7,7 @@ namespace fan
 	//========================================================================================================
 	void UIAlign::SetInfo( EcsComponentInfo& _info )
 	{
-		_info.icon = ImGui::IconType::NONE;
+		_info.icon = ImGui::IconType::Align16;
 		_info.group = EngineGroups::SceneUI;
 		_info.onGui = &UIAlign::OnGui;
 		_info.load = &UIAlign::Load;

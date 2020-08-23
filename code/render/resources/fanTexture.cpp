@@ -337,18 +337,21 @@ namespace fan
 
     //========================================================================================================
     //========================================================================================================
-    void Texture::LoadFromPixels( const uint8_t* _pixelsRGBA32, const VkExtent2D _extent, const uint32_t _mipLevels )
+    void Texture::LoadFromPixels( const uint8_t* _pixelsRGBA32,
+                                  const glm::ivec2 _size,
+                                  const uint32_t _mipLevels )
     {
-	   fanAssert( mPixels == nullptr );
+	    fanAssert( mPixels == nullptr );
+	    fanAssert( _mipLevels >= 1 );
 
         mBuffersOutdated = true;
         if( _pixelsRGBA32 == nullptr ) { return; }
 
-	    const size_t size = _extent.width * _extent.height * 4 * sizeof( uint8_t );
+	    const size_t size = _size.x * _size.y * 4 * sizeof( uint8_t );
 	    mPixels = (uint8_t*) malloc( size ); // I use malloc to be able to free it using stbi_image_free()
 	    memcpy( mPixels, _pixelsRGBA32, size );
         mMipLevels = _mipLevels;
-        mExtent = _extent;
+        mExtent =  {(uint32_t)_size.x, (uint32_t)_size.y };
 
     }
 

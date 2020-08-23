@@ -73,6 +73,10 @@ namespace ImGui
 		,DECL_ICON( 16.f, 16, 8 ) // FOLLOW_TRANSFORM_UI16
 		,DECL_ICON( 16.f, 17, 8 ) // EXPIRATION16
 		,DECL_ICON( 16.f, 18, 8 ) // BUTTON16
+		,DECL_ICON( 16.f, 19, 8 ) // Text16,
+		,DECL_ICON( 16.f, 20, 8 ) // Layout16
+		,DECL_ICON( 16.f, 21, 8 ) // Align16
+
 
 		,DECL_ICON( 16.f, 0, 2 ) // TIME16
 		,DECL_ICON( 16.f, 1, 2 ) // SPAWN16
@@ -95,7 +99,8 @@ namespace ImGui
 		,DECL_ICON( 16.f, 4, 10 )  // SPACE_SHIP16,
 		,DECL_ICON( 16.f, 5, 10 )  // PLANET16,		
 		,DECL_ICON( 16.f, 6, 10 )  // SUN16,	
-		,DECL_ICON( 16.f, 7, 10 )  // SUN_RED16,	
+		,DECL_ICON( 16.f, 7, 10 )  // SUN_RED16,
+		,DECL_ICON( 16.f, 8, 10 )  // MainMenu16
 
 		//network
 		,DECL_ICON( 16.f, 0, 12 )  // RELIABILITY_LAYER16,	

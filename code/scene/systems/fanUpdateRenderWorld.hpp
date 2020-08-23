@@ -87,7 +87,7 @@ namespace fan
                 const glm::vec2 size = glm::vec2( transform.mSize.x, transform.mSize.y );
                 const glm::vec2 pos = glm::vec2( transform.mPosition.x, transform.mPosition.y );
 
-				RenderDataUIMesh data;
+				RenderDataMesh2D data;
 				data.mesh = renderer.mMesh2D;
                 data.position = pos / renderWorld.targetSize * 2.f - glm::vec2( 1.f, 1.f );
                 data.scale = size / renderWorld.targetSize;
@@ -97,7 +97,7 @@ namespace fan
 				renderWorld.uiDrawData.push_back( data );
 			}
 
-			auto sortFunc = [](RenderDataUIMesh& _a, RenderDataUIMesh& _b) {
+			auto sortFunc = []( RenderDataMesh2D& _a, RenderDataMesh2D& _b) {
                 return _a.mDepth > _b.mDepth;
             };
 			std::sort( renderWorld.uiDrawData.begin(), renderWorld.uiDrawData.end(), sortFunc );

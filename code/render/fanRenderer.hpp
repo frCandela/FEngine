@@ -57,7 +57,7 @@ namespace fan
 		void SetDirectionalLights( const std::vector<RenderDataDirectionalLight>& _lightData );
 		void SetPointLights( const std::vector<RenderDataPointLight>& _lightData );
 		void SetDrawData( const std::vector<RenderDataModel>& _drawData );
-		void SetUIDrawData( const std::vector<RenderDataUIMesh>& _drawData );
+		void SetUIDrawData( const std::vector<RenderDataMesh2D>& _drawData );
 		void SetDebugDrawData( const std::vector<DebugVertex>& _debugLines, const std::vector<DebugVertex>& _debugLinesNoDepthTest, const std::vector<DebugVertex>& _debugTriangles );
 
 		MeshManager     mMeshManager;

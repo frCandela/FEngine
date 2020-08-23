@@ -7,7 +7,7 @@ namespace fan
 	//========================================================================================================
 	void UILayout::SetInfo( EcsComponentInfo& _info )
 	{
-		_info.icon = ImGui::IconType::NONE;
+		_info.icon = ImGui::IconType::Layout16;
 		_info.group = EngineGroups::SceneUI;
 		_info.onGui = &UILayout::OnGui;
 		_info.load = &UILayout::Load;

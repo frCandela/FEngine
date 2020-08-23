@@ -19,6 +19,7 @@
 #include "scene/components/fanCamera.hpp"
 #include "scene/components/fanDirectionalLight.hpp"
 #include "scene/components/fanPointLight.hpp"
+#include "scene/components/ui/fanUIText.hpp"
 #include "scene/singletons/fanScene.hpp"
 #include "scene/singletons/fanRenderResources.hpp"
 #include "scene/singletons/fanSceneResources.hpp"
@@ -89,6 +90,7 @@ namespace fan
 		mWorld.AddComponentType<UIButton>();
         mWorld.AddComponentType<UILayout>();
         mWorld.AddComponentType<UIAlign>();
+        mWorld.AddComponentType<UIText>();
 		// game components
 		mWorld.AddComponentType<Planet>();
 		mWorld.AddComponentType<SpaceShip>();

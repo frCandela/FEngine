@@ -1,6 +1,7 @@
 #include "editor/fanModals.hpp"
 
 #include <sstream>
+#include <core/fanDebug.hpp>
 #include "core/input/fanKeyboard.hpp"
 #include "imgui/imgui_internal.h"
 
@@ -222,9 +223,24 @@ namespace ImGui
 		bool returnValue = false;
 
 		ImGui::SetNextWindowSize( { 316,400 } );
-		if ( ImGui::BeginPopupModal( _popupName ) )
+
+		if ( ImGui::BeginPopupModal( _popupName, NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove ) )
 		{
-			ImGui::BeginChild( "load_scene_hierarchy", { 300,300 }, true );
+            static char overrideTextBuffer[64];
+            ImGui::PushItemWidth(220);
+            ImGui::InputText("##override", overrideTextBuffer, 64 );
+            ImGui::PopItemWidth();
+            ImGui::SameLine();
+            if( ImGui::Button("override"))
+            {
+                ImGui::CloseCurrentPopup();
+                _path = overrideTextBuffer;
+                fan::Debug::Log( _path.string() );
+                ImGui::EndPopup();
+                return true;
+            }
+
+			ImGui::BeginChild( "files_region", { 300,280 }, true );
 			std::filesystem::directory_entry newEntry;
 			bool itemDoubleClicked = impl::FilesSelector( _extensionWhiteList, _path );
 			if ( std::filesystem::is_directory( newEntry ) )

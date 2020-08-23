@@ -7,6 +7,7 @@
 #include "core/input/fanInput.hpp"
 #include "network/singletons/fanTime.hpp"
 #include "render/fanRenderer.hpp"
+#include "render/fanFont.hpp"
 #include "editor/windows/fanPreferencesWindow.hpp"	
 #include "editor/windows/fanSingletonsWindow.hpp"
 #include "editor/windows/fanInspectorWindow.hpp"	
@@ -337,10 +338,36 @@ namespace fan
                             SCOPED_PROFILE( ImGui_render );
                             ImGui::NewFrame();
                             mMainMenuBar->Draw( game.mWorld );
-                           /*if( ImGui::Begin( "test" ) )
+                           if( ImGui::Begin( "test" ) )
                             {
+                                static Font font;
+                                if( ImGui::Button("init freetype")){
+                                    Font::InitFreetype();
+                                }
+                                if( ImGui::Button("load font")){
+                                    font.LoadFont( "content/fonts/Vera.ttf" );
+                                }
+                                static int sHeight = 48;
+                                ImGui::DragInt("height", &sHeight);
+                                ImGui::SameLine();
+                                if( ImGui::Button("set height")){
+                                    font.SetHeight( sHeight );
+                                }
+
+                                static char inChar[2] = "a";
+                                ImGui::InputText( "char", inChar, 2 );
+                                ImGui::SameLine();
+                                if( ImGui::Button("load char")){
+                                    mRenderer->WaitIdle();
+                                    mRenderer->mTextureManager.Remove("font");
+                                    mRenderer->mTextureManager.DestroyRemovedTextures( mRenderer->mDevice );
+                                    font.LoadChar( inChar[0] );
+                                    mRenderer->mTextureManager.Add( font.mTexture, "font" );
+                                    font.mTexture = nullptr;
+                                }
+
                                 ImGui::End();
-                            }*/
+                            }
                             ImGui::Render();
                         }
                     }

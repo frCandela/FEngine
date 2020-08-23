@@ -62,8 +62,6 @@ namespace fan
 
 			mDescriptorSets.resize( _count );
 			vkAllocateDescriptorSets( _device.mDevice, &descriptorSetAllocateInfo, mDescriptorSets.data() );
-
-			Debug::Log() << " allocated " << _count << Debug::Endl();
 		}
 
 		{

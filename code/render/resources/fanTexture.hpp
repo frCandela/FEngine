@@ -31,7 +31,7 @@ namespace fan
 
         void LoadFromPixels(
                 const uint8_t* _pixelsRGBA32,
-                const VkExtent2D _extent,
+                const glm::ivec2 _size,
                 const uint32_t _mipLevels );
 		bool LoadFromFile( const std::string& _path );
 		void Create( Device& _device );

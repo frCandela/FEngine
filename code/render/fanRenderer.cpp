@@ -399,7 +399,7 @@ namespace fan
 
 	//========================================================================================================
 	//========================================================================================================
-	void Renderer::SetUIDrawData( const std::vector<RenderDataUIMesh>& _drawData )
+	void Renderer::SetUIDrawData( const std::vector<RenderDataMesh2D>& _drawData )
 	{
         SCOPED_PROFILE( set_ui_draw_data );
 		mDrawUI.SetUIDrawData( _drawData );

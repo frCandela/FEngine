@@ -7,7 +7,7 @@ namespace fan
 	//================================================================================================================================
 	void UIMainMenu::SetInfo( EcsComponentInfo& _info )
 	{
-		_info.icon = ImGui::IconType::NONE;
+		_info.icon = ImGui::IconType::MainMenu16;
 		_info.group = EngineGroups::Game;
 		_info.onGui = &UIMainMenu::OnGui;
 		_info.load = &UIMainMenu::Load;

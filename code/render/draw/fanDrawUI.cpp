@@ -177,12 +177,12 @@ namespace fan
 
     //========================================================================================================
     //========================================================================================================
-    void DrawUI::SetUIDrawData( const std::vector<RenderDataUIMesh>& _drawData )
+    void DrawUI::SetUIDrawData( const std::vector<RenderDataMesh2D>& _drawData )
     {
         mDrawData.resize( _drawData.size() );
         for( int meshIndex = 0; meshIndex < (int)_drawData.size(); meshIndex++ )
         {
-            const RenderDataUIMesh& uiData = _drawData[meshIndex];
+            const RenderDataMesh2D& uiData = _drawData[meshIndex];
 
             mDrawData[meshIndex].mesh                      = uiData.mesh;
             mDrawData[meshIndex].textureIndex              = uiData.textureIndex;

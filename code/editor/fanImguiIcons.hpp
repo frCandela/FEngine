@@ -66,6 +66,9 @@ namespace ImGui
 		FOLLOW_TRANSFORM_UI16,
 		EXPIRATION16,
         BUTTON16,
+        Text16,
+        Layout16,
+        Align16,
 
 		// singletons
 		TIME16,
@@ -90,6 +93,7 @@ namespace ImGui
 		PLANET16,
 		SUN16,
 		SUN_RED16,
+		MainMenu16,
 
 		// network
 		RELIABILITY_LAYER16,

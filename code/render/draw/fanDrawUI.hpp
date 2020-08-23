@@ -18,7 +18,7 @@ namespace fan
 
 	//================================================================
 	//================================================================
-	struct RenderDataUIMesh
+	struct RenderDataMesh2D
 	{
 		Mesh2D* mesh;
 		glm::vec2 position;
@@ -77,7 +77,7 @@ namespace fan
 		void UpdateUniformBuffers( Device& _device, const size_t _index );
 		void RecordCommandBuffer( const size_t _index, RenderPass& _renderPass, FrameBuffer& _framebuffer, VkExtent2D _extent, DescriptorImages& _descriptorTextures );
 		void BindTexture( VkCommandBuffer _commandBuffer, const uint32_t _textureIndex, DescriptorSampler& _descriptorSampler, DescriptorImages& _descriptorTextures, VkPipelineLayout _pipelineLayout );
-		void SetUIDrawData( const std::vector<RenderDataUIMesh>& _drawData );
+		void SetUIDrawData( const std::vector<RenderDataMesh2D>& _drawData );
 		PipelineConfig	GetPipelineConfig( DescriptorImages& _descriptorImages ) const;
 	};
 }
