@@ -82,7 +82,12 @@ namespace fan
 				UIRenderer       & renderer  = *rendererIt;
 				const UITransform& transform = *transformIt;
 
-				if( renderer.GetTexture() == nullptr || ! renderer.mVisible) { continue; }
+                if( renderer.GetTexture() == nullptr ||
+                    !renderer.mVisible ||
+                    renderer.mMesh2D == nullptr )
+				{
+				    continue;
+				}
 
                 const glm::vec2 size = glm::vec2( transform.mSize.x, transform.mSize.y );
                 const glm::vec2 pos = glm::vec2( transform.mPosition.x, transform.mPosition.y );

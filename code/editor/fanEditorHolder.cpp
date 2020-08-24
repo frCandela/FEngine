@@ -342,10 +342,19 @@ namespace fan
                             mMainMenuBar->Draw( game.mWorld );
                             if( ImGui::Begin( "test" ) )
                              {
+                                char buffer[10] = "";
+                                if( ImGui::InputText("char", buffer, 4 ) )
+                                {
+                                    //Debug::Log("aaa");
+                                }
                                  if( ImGui::Button("load char")){
                                      mRenderer->WaitIdle();
                                      mRenderer->mTextureManager.Remove("font48");
                                      mRenderer->mTextureManager.DestroyRemovedTextures( mRenderer->mDevice );
+
+
+
+
                                      mRenderer->mTextureManager.Add(
                                              mRenderer->mDefaultFont.GenerateAtlas(), "font48" );
                                  }

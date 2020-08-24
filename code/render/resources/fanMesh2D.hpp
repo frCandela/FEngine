@@ -20,8 +20,7 @@ namespace fan
 
 		std::vector<UIVertex> mVertices;
 		std::string           mPath;
-		Buffer                mVertexBuffer[ SwapChain::s_maxFramesInFlight ];
-		uint32_t              mCurrentBuffer = 0;
+		Buffer                mVertexBuffer;
         int                   mIndex = -1;
 		bool                  mHostVisible = false;
         bool                  mBuffersOutdated  = false;

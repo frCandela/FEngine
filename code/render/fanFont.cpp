@@ -1,5 +1,5 @@
 #include "render/fanFont.hpp"
-
+#include "SFML/System/Utf.hpp"
 #include "core/fanDebug.hpp"
 
 namespace fan
@@ -30,9 +30,16 @@ namespace fan
     {
         if( FT_New_Face( sFreetypeLib, _path.c_str(), 0, &mFace ) )
         {
-            Debug::Log( "ERROR::FREETYPE: Failed to load font" );
+            Debug::Error( "Freetype: Failed to load font" );
             return false;
         }
+
+        if( FT_Select_Charmap( mFace, FT_ENCODING_UNICODE ) )
+        {
+            Debug::Error( "Freetype: font has no unicode charmap" );
+            return false;
+        }
+
         return true;
     }
 
@@ -45,62 +52,110 @@ namespace fan
             Debug::Error() << "Font::SetHeight " << _pixelHeight << " failed" << Debug::Endl();
             return false;
         }
-        mPixelHeight = _pixelHeight;
+        mGlyphSize = _pixelHeight;
         return true;
+    }
+
+
+    //========================================================================================================
+    //========================================================================================================
+    void Font::ToUTF8( const std::string& _str, std::vector<uint32_t >& _outUnicode )
+    {
+        _outUnicode.clear();
+        std::string::const_iterator it = _str.begin();
+        while ( it != _str.end())
+        {
+            uint32_t codepoint;
+            it = sf::Utf8::decode(it, _str.end(), codepoint );
+            _outUnicode.push_back(codepoint);
+        }
     }
 
     //========================================================================================================
     //========================================================================================================
-    bool Font::LoadChar( const char _char )
+    const Font::Glyph& Font::GetGlyph( const uint32_t _codepoint ) const
     {
-        if (FT_Load_Char( mFace, _char, FT_LOAD_RENDER))
+        auto it = mGlyphs.find( _codepoint );
+        if( it == mGlyphs.end() )
         {
-            std::cout << "ERROR::FREETYPE: Failed to load Glyph" << std::endl;
-            return false;
+            std::vector<uint32_t> defaultUnicode;
+            Font::ToUTF8( "?", defaultUnicode );
+            it = mGlyphs.find( defaultUnicode[0] );
         }
-        fanAssert( mFace->glyph->bitmap.pixel_mode == FT_PIXEL_MODE_GRAY);
-        fanAssert( mFace->glyph->bitmap.num_grays == 256 );
+        fanAssert( it != mGlyphs.end() );
+        return it->second;
+    }
 
-        return true;
+    //========================================================================================================
+    //========================================================================================================
+    int FindAtlasSize( const size_t _numElements )
+    {
+        size_t size = 1;
+        while( size * size < _numElements )
+        {
+            size *= 2;
+        }
+        return (int)size;
     }
 
     //========================================================================================================
     //========================================================================================================
     Texture* Font::GenerateAtlas()
     {
-        fanAssert( mPixelHeight != 0 );
+        fanAssert( mGlyphSize != 0 );
+        fanAssert( mFace->charmap != nullptr );
 
-        const size_t bufferPixelSize = mPixelHeight * sSizeAtlas;
+        std::vector< FT_ULong > unicodeCharacters;
+        FT_UInt index;
+        FT_ULong character = FT_Get_First_Char( mFace, &index);
+        while( true )
+        {
+            unicodeCharacters.push_back( character );
+            character = FT_Get_Next_Char(mFace, character, &index);
+            if (!index) break;
+        }
+
+        mAtlasSize = FindAtlasSize( unicodeCharacters.size() );
+        const size_t bufferPixelSize = mGlyphSize * mAtlasSize;
         uint8_t * buffer = new uint8_t[ bufferPixelSize * bufferPixelSize * 4 ];
         Texture * texture = new Texture();
 
         glm::ivec2 glyphCoord(0,0);
-        for ( int  i = 0; i < 256; i++)
+        for ( int  i = 0; i < unicodeCharacters.size(); i++)
         {
             fanAssert( i < 256 );
-            char character = (char)i;
-            if( ! LoadChar( character ) )
+            const unsigned long charcode = unicodeCharacters[i];
+            const unsigned glyphIndex  =  FT_Get_Char_Index( mFace, charcode );
+            if( FT_Load_Glyph( mFace, glyphIndex,  FT_LOAD_DEFAULT  ) != 0 )
             {
+                Debug::Log("error");
                 continue;
             }
 
+            if( FT_Render_Glyph( mFace->glyph, FT_RENDER_MODE_NORMAL  ) != 0 )
+            {
+                Debug::Log("error");
+                continue;
+            }
+
+            const glm::ivec2 glyphSize   = glm::ivec2( mFace->glyph->bitmap.width, mFace->glyph->bitmap.rows);
+            if( glyphSize.x > mGlyphSize || glyphSize.y > mGlyphSize ){ continue; }
+
+            const glm::ivec2 glyphOrigin = mGlyphSize * glyphCoord;
+            const glm::ivec2 glyphBearing = glm::ivec2(mFace->glyph->bitmap_left, mFace->glyph->bitmap_top);
             Glyph glyph = {
-                    character,
-                    glm::ivec2(mFace->glyph->bitmap.width, mFace->glyph->bitmap.rows),
-                    glm::ivec2(mFace->glyph->bitmap_left, mFace->glyph->bitmap_top),
+                    glyphOrigin,
+                    glyphSize,
+                    glyphBearing,
                     mFace->glyph->advance.x
             };
-            mGlyphs.insert(std::pair<char, Glyph>( character, glyph) );
+            mGlyphs[charcode] = glyph;
 
-            fanAssert( glyph.mSize.x <= mPixelHeight);
-            fanAssert( glyph.mSize.y <= mPixelHeight);
-
-            const glm::ivec2 glyphOrigin = mPixelHeight * glyphCoord;
-            for( int x = 0; x < glyph.mSize.x; x++ )
+            for( int x = 0; x < glyph.mUVSize.x; x++ )
             {
-                for( int y = 0; y < glyph.mSize.y; y++ )
+                for( int y = 0; y < glyph.mUVSize.y; y++ )
                 {
-                    const size_t glyphLocalOffset = y * glyph.mSize.x + x;
+                    const size_t glyphLocalOffset = y * glyph.mUVSize.x + x;
                     const char greyLevel = mFace->glyph->bitmap.buffer[ glyphLocalOffset ];
 
                     glm::ivec2   pixel = glyphOrigin + glm::ivec2( x, y );
@@ -113,7 +168,7 @@ namespace fan
             }
 
             glyphCoord.x++;
-            if( glyphCoord.x >= sSizeAtlas )
+            if( glyphCoord.x >= mAtlasSize )
             {
                 glyphCoord.x = 0;
                 glyphCoord.y++;

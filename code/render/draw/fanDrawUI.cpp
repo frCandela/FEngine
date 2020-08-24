@@ -117,7 +117,7 @@ namespace fan
             {
                 UIDrawData drawData = mDrawData[meshIndex];
                 Mesh2D* mesh = drawData.mesh;
-                VkBuffer vertexBuffers[] = { mesh->mVertexBuffer[mesh->mCurrentBuffer].mBuffer };
+                VkBuffer vertexBuffers[] = { mesh->mVertexBuffer.mBuffer };
                 BindDescriptors( commandBuffer, _index, meshIndex );
                 vkCmdBindVertexBuffers( commandBuffer, 0, 1, vertexBuffers, offsets );
                 BindTexture( commandBuffer,

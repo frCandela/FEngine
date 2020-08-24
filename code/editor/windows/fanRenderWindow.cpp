@@ -7,6 +7,7 @@
 #include "render/resources/fanTexture.hpp"
 #include "render/fanRenderer.hpp"
 #include "render/resources/fanMesh.hpp"
+#include "render/resources/fanMesh2D.hpp"
 #include "scene/singletons/fanSceneResources.hpp"
 #include "scene/singletons/fanRenderResources.hpp"
 #include "scene/fanPrefabManager.hpp"
@@ -31,13 +32,21 @@ namespace fan
 		ImGui::Icon( GetIconType(), { 16,16 } ); ImGui::SameLine();
 		ImGui::Text( "Renderer" );
 
-		if ( ImGui::CollapsingHeader( "Loaded meshes : " ) )
+		if ( ImGui::CollapsingHeader( "Loaded 3D meshes : " ) )
 		{
 			for ( Mesh * mesh : renderResources.mMeshManager->GetMeshes() )
 			{
 				ImGui::Text("ref: %d name: %s", mesh->GetRefCount(), mesh->mPath.c_str() );
 			}
 		}
+
+        if ( ImGui::CollapsingHeader( "Loaded 2D meshes : " ) )
+        {
+            for ( Mesh2D * mesh : renderResources.mMesh2DManager->GetMeshes() )
+            {
+                ImGui::Text("name: %s", mesh->mPath.c_str() );
+            }
+        }
 
 		if ( ImGui::CollapsingHeader( "Loaded textures : " ) )
 		{

@@ -1,5 +1,9 @@
+#include "ecs/fanEcsWorld.hpp"
+#include "render/resources/fanMesh2D.hpp"
+#include "render/resources/fanMesh2DManager.hpp"
 #include "scene/components/ui/fanUIText.hpp"
 #include "scene/fanSceneSerializable.hpp"
+#include "scene/singletons/fanRenderResources.hpp"
 
 namespace fan
 {
@@ -18,10 +22,13 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void UIText::Init( EcsWorld& /*_world*/, EcsEntity /*_entity*/, EcsComponent& _component )
+	void UIText::Init( EcsWorld& _world, EcsEntity /*_entity*/, EcsComponent& _component )
 	{
         UIText& uiText = static_cast<UIText&>( _component );
         uiText.mText  = "";
+        uiText.mModified = true; 
+        uiText.mMesh2D = new Mesh2D();
+        _world.GetSingleton<RenderResources>().mMesh2DManager->Add( uiText.mMesh2D, "text_mesh" );
 	}
 
     //================================================================================================================================
@@ -52,6 +59,7 @@ namespace fan
 			if( ImGui::Button( "##clear_text" ) )
 			{
                 uiText.mText.clear();
+                uiText.mModified = true;
 			}
 			ImGui::SameLine();
 			static const size_t maxSize = 64;
@@ -60,7 +68,9 @@ namespace fan
 			if( ImGui::InputText("text", mTextBuffer, 64 ) )
             {
                 uiText.mText = mTextBuffer;
+                uiText.mModified = true;
             }
+            ImGui::Checkbox("modified", &uiText.mModified );
 		} ImGui::PopItemWidth();
 	}
 }
