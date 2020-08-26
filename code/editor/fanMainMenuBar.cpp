@@ -17,26 +17,19 @@
 
 namespace fan
 {
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	MainMenuBar::MainMenuBar()
 		: mSceneExtensionFilter( RenderGlobal::sSceneExtensions )
 	{
 		SerializedValues::Get().GetBool( "show_imguidemo", mShowImguiDemoWindow );
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	MainMenuBar::~MainMenuBar()
 	{
 		SerializedValues::Get().SetBool( "show_imguidemo", mShowImguiDemoWindow );
-
-		// @todo fix this
-// 		SerializedValues::Get().SetBool( "editor_grid_show", m_editorGrid->isVisible );
-// 		SerializedValues::Get().SetFloat( "editor_grid_spacing", m_editorGrid->spacing );
-// 		SerializedValues::Get().SetInt( "editor_grid_linesCount", m_editorGrid->linesCount );
-// 		SerializedValues::Get().SetColor( "editor_grid_color", m_editorGrid->color );
-// 		SerializedValues::Get().SetVec3( "editor_grid_offset", m_editorGrid->offset );
 
 		for ( int windowIndex = 0; windowIndex < (int)m_editorWindows.size(); windowIndex++ )
 		{
@@ -44,17 +37,17 @@ namespace fan
 		}
 	}
 
-	//================================================================================================================================
+	//========================================================================================================
 	// All editor windows are drawn & deleted with the main menubar
-	//================================================================================================================================
+	//========================================================================================================
 	void MainMenuBar::SetWindows( std::vector< EditorWindow* > _editorWindows )
 	{
 		m_editorWindows = _editorWindows;
 	}
 
-	//================================================================================================================================
+	//========================================================================================================
 	// Draws the main menu bar and the editor windows
-	//================================================================================================================================
+	//========================================================================================================
 	void MainMenuBar::Draw( EcsWorld& _world )
 	{
 		SCOPED_PROFILE( main_bar );
@@ -72,7 +65,10 @@ namespace fan
 			ImGui::SetNextWindowViewport( viewport->ID );
 			ImGui::PushStyleVar( ImGuiStyleVar_WindowRounding, 0.0f );
 			ImGui::PushStyleVar( ImGuiStyleVar_WindowBorderSize, 0.0f );
-			window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
+            window_flags |= ImGuiWindowFlags_NoTitleBar |
+                            ImGuiWindowFlags_NoCollapse |
+                            ImGuiWindowFlags_NoResize |
+                            ImGuiWindowFlags_NoMove;
 			window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
 		}
 		bool p_open = true;
@@ -187,12 +183,8 @@ namespace fan
 			if ( ImGui::BeginMenu( "Grid" ) )
 			{
 				ImGui::PushItemWidth( 150.f );
-				ImGui::Text( "fixme" );
-// 				ImGui::MenuItem( "visible", nullptr, &m_editorGrid->isVisible ); // @todo fixme
-// 				ImGui::DragFloat( "spacing", &m_editorGrid->spacing, 0.25f, 0.f, 100.f );
-// 				ImGui::DragInt( "lines count", &m_editorGrid->linesCount, 1.f, 0, 1000 );
-// 				ImGui::ColorEdit3( "color", &m_editorGrid->color[ 0 ], ImGui::fanColorEditFlags );
-// 				ImGui::DragFloat3( "offset", &m_editorGrid->offset[ 0 ] );
+                EditorGrid& grid = _world.GetSingleton<EditorGrid>();
+                EditorGrid::OnGui( _world, grid );		;
 				ImGui::PopItemWidth();
 
 				ImGui::EndMenu();
@@ -200,7 +192,10 @@ namespace fan
 
 			// Framerate
 			ImGui::SameLine( ImGui::GetWindowWidth() - 60 );
-			if ( ImGui::BeginMenu( std::to_string( Time::s_realFramerateLastSecond ).c_str(), false ) ) { ImGui::EndMenu(); }
+			if ( ImGui::BeginMenu( std::to_string( Time::s_realFramerateLastSecond ).c_str(), false ) )
+			{
+			    ImGui::EndMenu();
+			}
 			ImGui::FanToolTip( " Framerate. (Right click to set)" );
 
 			if ( ImGui::IsItemClicked( 1 ) )
@@ -260,8 +255,8 @@ namespace fan
 		DrawModals( _world );
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void MainMenuBar::DrawModals( EcsWorld& _world )
 	{
 		Scene& scene = _world.GetSingleton<Scene>();
@@ -276,7 +271,7 @@ namespace fan
 		// Open scenes
 		if ( ImGui::FanLoadFileModal( "Open scene", mSceneExtensionFilter, mPathBuffer ) )
 		{
-			Debug::Get() << Debug::Severity::log << "loading scene: " << mPathBuffer.string() << Debug::Endl();
+			Debug::Log() << "loading scene: " << mPathBuffer.string() << Debug::Endl();
 			scene.LoadFrom( mPathBuffer.string() );
 		}
 
@@ -289,8 +284,8 @@ namespace fan
 		}
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void MainMenuBar::New( EcsWorld& _world )
 	{
         const EditorPlayState& playState = _world.GetSingleton<EditorPlayState>();
@@ -304,8 +299,8 @@ namespace fan
         mOpenNewScenePopupLater = true;
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void MainMenuBar::Open( EcsWorld& _world )
 	{
         const EditorPlayState& playState = _world.GetSingleton<EditorPlayState>();
@@ -319,9 +314,9 @@ namespace fan
         mOpenLoadScenePopupLater = true;
 	}
 
-	//================================================================================================================================
+	//========================================================================================================
 	// reload the scene
-	//================================================================================================================================
+	//========================================================================================================
 	void MainMenuBar::Reload( EcsWorld& _world )
 	{
 		Scene& scene = _world.GetSingleton<Scene>();
@@ -355,7 +350,8 @@ namespace fan
 			// restore selection
 			if( prevSelectionHandle != 0 && scene.mNodes.find( prevSelectionHandle) != scene.mNodes.end() )
 			{
-				fan::SceneNode& node = _world.GetComponent<fan::SceneNode>( _world.GetEntity( prevSelectionHandle ) );
+			    EcsEntity entity = _world.GetEntity( prevSelectionHandle );
+				fan::SceneNode& node = _world.GetComponent<fan::SceneNode>( entity );
 				editorSelection.SetSelectedSceneNode( &node );				
 			}
 		}
@@ -365,8 +361,8 @@ namespace fan
 		}
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void MainMenuBar::Save( EcsWorld& _world )
 	{
 		Scene& scene = _world.GetSingleton<Scene>();
@@ -389,8 +385,8 @@ namespace fan
 		}
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void MainMenuBar::SaveAs()
 	{
         mPathBuffer              = "./content/scenes/";
