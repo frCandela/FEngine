@@ -163,7 +163,7 @@ namespace fan
 			const std::string buffer = bufferPositions.GetBuffer( viewPositions, m_loadedBuffers[ viewPositions.buffer ] );
 			const glm::vec3* positionsArray = ( const glm::vec3* )buffer.data();
 			meshVertices.resize( accessorPositions.count );
-			for ( int i = 0; i < (int)meshVertices.size(); i++ ) { meshVertices[ i ].pos = positionsArray[ i ]; }
+			for ( int i = 0; i < (int)meshVertices.size(); i++ ) { meshVertices[ i ].mPos = positionsArray[ i ]; }
 		}
 
 		// Load normals
@@ -180,11 +180,11 @@ namespace fan
 			const std::string buffer = bufferNormals.GetBuffer( viewNormals, m_loadedBuffers[ viewNormals.buffer ] );
 			const glm::vec3* normalsArray = ( const glm::vec3* )buffer.data();
 			assert( (int)meshVertices.size() == accessorNormals.count );
-			for ( int i = 0; i < (int)meshVertices.size(); i++ ) { meshVertices[ i ].normal = normalsArray[ i ]; }
+			for ( int i = 0; i < (int)meshVertices.size(); i++ ) { meshVertices[ i ].mNormal = normalsArray[ i ]; }
 		}
 		else
 		{
-			for ( int i = 0; i < (int)meshVertices.size(); i++ ) { meshVertices[ i ].normal = glm::vec3( 0, 0, 1 ); }
+			for ( int i = 0; i < (int)meshVertices.size(); i++ ) { meshVertices[ i ].mNormal = glm::vec3( 0, 0, 1 ); }
 		}
 
 		// load textcoords 0
@@ -201,15 +201,15 @@ namespace fan
 			const std::string buffer = bufferTexcoord0.GetBuffer( viewTexcoords0, m_loadedBuffers[ viewTexcoords0.buffer ] );
 			const glm::vec2* texcoords0Array = ( const glm::vec2* )buffer.data();
 			assert( (int)meshVertices.size() == accessorTexcoords0.count );
-			for ( int i = 0; i < (int)meshVertices.size(); i++ ) { meshVertices[ i ].uv = texcoords0Array[ i ]; }
+			for ( int i = 0; i < (int)meshVertices.size(); i++ ) { meshVertices[ i ].mUv = texcoords0Array[ i ]; }
 		}
 		else
 		{
-			for ( int i = 0; i < (int)meshVertices.size(); i++ ) { meshVertices[ i ].uv = glm::vec2( 0, 0 ); }
+			for ( int i = 0; i < (int)meshVertices.size(); i++ ) { meshVertices[ i ].mUv = glm::vec2( 0, 0 ); }
 		}
 
 		// load colors
-		for ( int i = 0; i < (int)meshVertices.size(); i++ ) { meshVertices[ i ].color = glm::vec3( 1, 1, 1 ); }
+		for ( int i = 0; i < (int)meshVertices.size(); i++ ) { meshVertices[ i ].mColor = glm::vec3( 1, 1, 1 ); }
 
 		return true;
 	}

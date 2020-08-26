@@ -45,7 +45,7 @@ namespace fan
 		Scene& scene = _world.GetSingleton<Scene>();
 
 		ImGui::Icon( GetIconType(), { 16,16 } ); ImGui::SameLine();
-		ImGui::Text( scene.path.c_str() );
+		ImGui::Text( scene.mPath.c_str() );
  		ImGui::Separator();
 
 		// Draws all scene nodes
@@ -81,7 +81,7 @@ namespace fan
 			{
 				assert( m_lastSceneNodeRightClicked != nullptr );
 				Scene& scene = *m_lastSceneNodeRightClicked->scene;
-				EcsWorld& world = *scene.world;				
+				EcsWorld& world = *scene.mWorld;
 				btVector3 origin = btVector3::Zero();
 				const EcsEntity parentID = world.GetEntity( m_lastSceneNodeRightClicked->handle );
 				if( world.HasComponent<Transform>( parentID ) )
@@ -216,7 +216,7 @@ namespace fan
 			ImGui::Separator();
 			if( ImGui::Selectable( "Delete" ) && m_lastSceneNodeRightClicked != nullptr )
 			{
-				EcsWorld& world = *m_lastSceneNodeRightClicked->scene->world;
+				EcsWorld& world = *m_lastSceneNodeRightClicked->scene->mWorld;
 				world.Kill( world.GetEntity( m_lastSceneNodeRightClicked->handle ) );
 			}
 			ImGui::EndPopup();
@@ -257,7 +257,7 @@ namespace fan
 	//========================================================================================================
 	void SceneWindow::R_DrawSceneTree( SceneNode& _node, SceneNode*& _nodeRightClicked )
 	{
-		EcsWorld& world = *_node.scene->world;
+		EcsWorld& world = *_node.scene->mWorld;
 		Scene& scene = world.GetSingleton<Scene>();
 
 		std::stringstream ss;
@@ -275,7 +275,7 @@ namespace fan
 		if( payload.IsValid() )
 		{
 			assert( payload.mComponentType == SceneNode::Info::s_type );
-			SceneNode& nodeDrop1 = scene.world->GetComponent<SceneNode>( scene.world->GetEntity( payload.mHandle) );
+			SceneNode& nodeDrop1 = scene.mWorld->GetComponent<SceneNode>( scene.mWorld->GetEntity( payload.mHandle) );
 			if( &nodeDrop1 != &_node )
 			{
 				nodeDrop1.InsertBelow( _node );

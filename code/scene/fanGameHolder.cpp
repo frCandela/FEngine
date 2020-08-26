@@ -237,13 +237,14 @@ namespace fan
 		_renderer.SetUIDrawData( renderWorld.uiDrawData );
 		_renderer.SetPointLights( renderWorld.pointLights );
 		_renderer.SetDirectionalLights( renderWorld.directionalLights );
-        _renderer.SetDebugDrawData( renderDebug.debugLines,
-                                    renderDebug.debugLinesNoDepthTest,
-                                    renderDebug.debugTriangles );
+        _renderer.SetDebugDrawData( renderDebug.mDebugLines,
+                                    renderDebug.mDebugLinesNoDepthTest,
+                                    renderDebug.mDebugTriangles,
+                                    renderDebug.mDebugLines2D);
 
 		// Camera
 		Scene& scene = _world.GetSingleton<Scene>();
-		EcsEntity cameraID = _world.GetEntity( scene.mainCameraHandle );
+		EcsEntity cameraID = _world.GetEntity( scene.mMainCameraHandle );
 		Camera& camera = _world.GetComponent<Camera>( cameraID );
 		camera.aspectRatio = _size[0] / _size[1];
 		Transform& cameraTransform = _world.GetComponent<Transform>( cameraID );

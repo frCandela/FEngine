@@ -40,8 +40,8 @@ namespace fan
 	{
 		SceneNode& node = static_cast<SceneNode&>( _component );
 		Scene& scene = _world.GetSingleton<Scene>();
-		scene.onDeleteSceneNode.Emmit( &node );
-		scene.nodes.erase( node.handle );
+		scene.mOnDeleteSceneNode.Emmit( &node );
+		scene.mNodes.erase( node.handle );
 
 		// removes from parent
 		if( node.parentHandle != 0 )
@@ -95,11 +95,11 @@ namespace fan
 	void SceneNode::OnGui( EcsWorld& /*_world*/, EcsEntity /*_entityID*/, EcsComponent& _component )
 	{
 		SceneNode& node = static_cast<SceneNode&>( _component );
-		EcsWorld& world = * node.scene->world;
+		EcsWorld& world = * node.scene->mWorld;
 		EcsEntity entity = world.GetEntity( node.handle );
 
 		ImGui::Text( "name      : %s", node.name.c_str() );
-		ImGui::Text( "scene     : %s", node.scene->path.empty()	? "<no path>" : node.scene->path.c_str() );
+		ImGui::Text( "scene     : %s", node.scene->mPath.empty()	? "<no path>" : node.scene->mPath.c_str() );
 		ImGui::Text( "handle    : %u", node.handle );
 		ImGui::Text( "entity id : %u", entity );
 	}
@@ -198,7 +198,7 @@ namespace fan
 	SceneNode& SceneNode::GetParent() const
 	{
 		assert( parentHandle != 0 );
-		return scene->world->GetComponent<SceneNode>( scene->world->GetEntity( parentHandle ) );
+		return scene->mWorld->GetComponent<SceneNode>( scene->mWorld->GetEntity( parentHandle ) );
 	}
 
 	//================================================================================================================================
@@ -233,7 +233,7 @@ namespace fan
 	//================================================================================================================================
 	void SceneNode::GetDescendantsOf( SceneNode& _root, std::vector<SceneNode*>& _outList )
 	{
-		EcsWorld& world = *_root.scene->world;
+		EcsWorld& world = *_root.scene->mWorld;
 
 		_outList.clear();
 		std::stack<EcsHandle> stack;

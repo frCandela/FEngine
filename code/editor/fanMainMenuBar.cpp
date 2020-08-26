@@ -19,23 +19,17 @@ namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	MainMenuBar::MainMenuBar() 
-		: m_showImguiDemoWindow( true )
-		, m_showAABB( false )
-		, m_showHull( false )
-		, m_showWireframe( false )
-		, m_showNormals( false )
-		, m_showLights( false )
-		, m_sceneExtensionFilter( RenderGlobal::sSceneExtensions )
+	MainMenuBar::MainMenuBar()
+		: mSceneExtensionFilter( RenderGlobal::sSceneExtensions )
 	{
-		SerializedValues::Get().GetBool( "show_imguidemo", m_showImguiDemoWindow );
+		SerializedValues::Get().GetBool( "show_imguidemo", mShowImguiDemoWindow );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	MainMenuBar::~MainMenuBar()
 	{
-		SerializedValues::Get().SetBool( "show_imguidemo", m_showImguiDemoWindow );
+		SerializedValues::Get().SetBool( "show_imguidemo", mShowImguiDemoWindow );
 
 		// @todo fix this
 // 		SerializedValues::Get().SetBool( "editor_grid_show", m_editorGrid->isVisible );
@@ -98,9 +92,9 @@ namespace fan
 		}
 
 		// Draw imgui demo
-		if ( m_showImguiDemoWindow )
+		if ( mShowImguiDemoWindow )
 		{
-			ImGui::ShowDemoWindow( &m_showImguiDemoWindow );
+			ImGui::ShowDemoWindow( &mShowImguiDemoWindow );
 		}
 
 		// Draw main menu  bar
@@ -161,7 +155,7 @@ namespace fan
 			if ( ImGui::BeginMenu( "Tools" ) )
 			{
 				ImGui::Icon( ImGui::IMGUI16, { 16,16 } ); ImGui::SameLine();
-				ImGui::MenuItem( "Imgui demo", nullptr, &m_showImguiDemoWindow );
+				ImGui::MenuItem( "Imgui demo", nullptr, &mShowImguiDemoWindow );
 
 				for ( size_t windowIndex = 0; windowIndex < m_editorWindows.size(); windowIndex++ )
 				{
@@ -179,11 +173,12 @@ namespace fan
 			// Editor
 			if ( ImGui::BeginMenu( "View" ) )
 			{
-				if ( ImGui::MenuItem( "show hull", nullptr, &m_showHull ) ) {}
-				if ( ImGui::MenuItem( "show AABB", nullptr, &m_showAABB ) ) {}
-				if ( ImGui::MenuItem( "show wireframe", nullptr, &m_showWireframe ) ) {}
-				if ( ImGui::MenuItem( "show normals", nullptr, &m_showNormals ) ) {}
-				if( ImGui::MenuItem(  "show lights", nullptr, &m_showLights ) ) {}
+				if ( ImGui::MenuItem( "show hull", nullptr, &mShowHull ) ) {}
+				if ( ImGui::MenuItem( "show AABB", nullptr, &mShowAABB ) ) {}
+				if ( ImGui::MenuItem( "show wireframe", nullptr, &mShowWireframe ) ) {}
+				if ( ImGui::MenuItem( "show normals", nullptr, &mShowNormals ) ) {}
+				if( ImGui::MenuItem(  "show lights", nullptr, &mShowLights ) ) {}
+                if( ImGui::MenuItem(  "show ui bounds", nullptr, &mShowUiBounds ) ) {}
 				
 				ImGui::EndMenu();
 			}
@@ -242,23 +237,23 @@ namespace fan
 
 
 		// Open scene popup
-		if ( m_openNewScenePopupLater == true )
+		if ( mOpenNewScenePopupLater == true )
 		{
-			m_openNewScenePopupLater = false;
+            mOpenNewScenePopupLater = false;
 			ImGui::OpenPopup( "New scene" );
 		}
 
 		// Open scene popup
-		if ( m_openLoadScenePopupLater == true )
+		if ( mOpenLoadScenePopupLater == true )
 		{
-			m_openLoadScenePopupLater = false;
+            mOpenLoadScenePopupLater = false;
 			ImGui::OpenPopup( "Open scene" );
 		}
 
 		// Save scene popup
-		if ( m_openSaveScenePopupLater == true )
+		if ( mOpenSaveScenePopupLater == true )
 		{
-			m_openSaveScenePopupLater = false;
+            mOpenSaveScenePopupLater = false;
 			ImGui::OpenPopup( "Save scene" );
 		}
 
@@ -272,24 +267,24 @@ namespace fan
 		Scene& scene = _world.GetSingleton<Scene>();
 
 		// New scene
-		if ( ImGui::FanSaveFileModal( "New scene", RenderGlobal::sSceneExtensions, m_pathBuffer ) )
+		if ( ImGui::FanSaveFileModal( "New scene", RenderGlobal::sSceneExtensions, mPathBuffer ) )
 		{		
 			scene.New();
-			scene.path = m_pathBuffer.string();
+			scene.mPath = mPathBuffer.string();
 		}
 
 		// Open scenes
-		if ( ImGui::FanLoadFileModal( "Open scene", m_sceneExtensionFilter, m_pathBuffer ) )
+		if ( ImGui::FanLoadFileModal( "Open scene", mSceneExtensionFilter, mPathBuffer ) )
 		{
-			Debug::Get() << Debug::Severity::log << "loading scene: " << m_pathBuffer.string() << Debug::Endl();
-			scene.LoadFrom( m_pathBuffer.string() );
+			Debug::Get() << Debug::Severity::log << "loading scene: " << mPathBuffer.string() << Debug::Endl();
+			scene.LoadFrom( mPathBuffer.string() );
 		}
 
 		// Save scene
-		if ( ImGui::FanSaveFileModal( "Save scene", RenderGlobal::sSceneExtensions, m_pathBuffer ) )
+		if ( ImGui::FanSaveFileModal( "Save scene", RenderGlobal::sSceneExtensions, mPathBuffer ) )
 		{
-			scene.path = m_pathBuffer.string();
-			Debug::Get() << Debug::Severity::log << "saving scene: " << scene.path << Debug::Endl();
+			scene.mPath = mPathBuffer.string();
+			Debug::Get() << Debug::Severity::log << "saving scene: " << scene.mPath << Debug::Endl();
 			scene.Save();
 		}
 	}
@@ -305,8 +300,8 @@ namespace fan
 			return;
 		}
 
-		m_pathBuffer = "./content/scenes/";
-		m_openNewScenePopupLater = true;
+        mPathBuffer             = "./content/scenes/";
+        mOpenNewScenePopupLater = true;
 	}
 
 	//================================================================================================================================
@@ -320,8 +315,8 @@ namespace fan
 			return;
 		}
 
-		m_pathBuffer = "./content/scenes/";
-		m_openLoadScenePopupLater = true;
+        mPathBuffer              = "./content/scenes/";
+        mOpenLoadScenePopupLater = true;
 	}
 
 	//================================================================================================================================
@@ -331,7 +326,7 @@ namespace fan
 	{
 		Scene& scene = _world.GetSingleton<Scene>();
 
-		if( scene.path.empty() )
+		if( scene.mPath.empty() )
 		{
 			Debug::Warning( "you cannot reload a scene that is not saved." );
 			return;
@@ -343,22 +338,22 @@ namespace fan
 			EditorSelection& editorSelection = _world.GetSingleton<EditorSelection>();
 
 			// save old camera transform
-			const EcsEntity oldCameraID = _world.GetEntity( scene.mainCameraHandle );
+			const EcsEntity oldCameraID = _world.GetEntity( scene.mMainCameraHandle );
 			btTransform oldCameraTransform = _world.GetComponent<Transform>( oldCameraID ).transform;
 
 			// save old selection
 			SceneNode* prevSelectionNode = editorSelection.GetSelectedSceneNode();
 			const EcsHandle prevSelectionHandle= prevSelectionNode != nullptr ? prevSelectionNode->handle : 0;
 
-			Debug::Get() << Debug::Severity::log << "loading scene: " << scene.path << Debug::Endl();
-			scene.LoadFrom( scene.path );
+			Debug::Get() << Debug::Severity::log << "loading scene: " << scene.mPath << Debug::Endl();
+			scene.LoadFrom( scene.mPath );
 
 			// restore camera
-			const EcsEntity newCameraID = _world.GetEntity( scene.mainCameraHandle );
+			const EcsEntity newCameraID = _world.GetEntity( scene.mMainCameraHandle );
 			_world.GetComponent<Transform>( newCameraID ).transform = oldCameraTransform;
 
 			// restore selection
-			if( prevSelectionHandle != 0 && scene.nodes.find(prevSelectionHandle) != scene.nodes.end() )
+			if( prevSelectionHandle != 0 && scene.mNodes.find( prevSelectionHandle) != scene.mNodes.end() )
 			{
 				fan::SceneNode& node = _world.GetComponent<fan::SceneNode>( _world.GetEntity( prevSelectionHandle ) );
 				editorSelection.SetSelectedSceneNode( &node );				
@@ -383,9 +378,9 @@ namespace fan
 			return;
 		}
 
-		if ( ! scene.path.empty() )
+		if ( ! scene.mPath.empty() )
 		{
-			Debug::Get() << Debug::Severity::log << "saving scene: " << scene.path << Debug::Endl();
+			Debug::Get() << Debug::Severity::log << "saving scene: " << scene.mPath << Debug::Endl();
 			scene.Save();
 		}
 		else
@@ -398,7 +393,7 @@ namespace fan
 	//================================================================================================================================
 	void MainMenuBar::SaveAs()
 	{
-		m_pathBuffer = "./content/scenes/";
-		m_openSaveScenePopupLater = true;
+        mPathBuffer              = "./content/scenes/";
+        mOpenSaveScenePopupLater = true;
 	}
 }

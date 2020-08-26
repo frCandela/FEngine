@@ -80,6 +80,7 @@ namespace fan
 		mDrawDebug.mPipelineLines.Destroy( mDevice );
 		mDrawDebug.mPipelineLinesNDT.Destroy( mDevice );
 		mDrawDebug.mPipelineTriangles.Destroy( mDevice );
+        mDrawDebug.mPipelineLines2D.Destroy( mDevice );
 
 		DestroyShaders();
 
@@ -118,6 +119,8 @@ namespace fan
 		mDrawDebug.mFragmentShaderLinesNDT.Create( mDevice, "code/shaders/debugLines.frag" );
 		mDrawDebug.mVertexShaderTriangles.Create( mDevice, "code/shaders/debugTriangles.vert" );
 		mDrawDebug.mFragmentShaderTriangles.Create( mDevice, "code/shaders/debugTriangles.frag" );
+        mDrawDebug.mVertexShaderLines2D.Create( mDevice, "code/shaders/debugLines2D.vert" );
+        mDrawDebug.mFragmentShaderLines2D.Create( mDevice, "code/shaders/debugLines2D.frag" );
 		mDrawModels.mVertexShader.Create( mDevice, "code/shaders/models.vert" );
 		mDrawModels.mFragmentShader.Create( mDevice, "code/shaders/models.frag" );
 		mDrawUI.mVertexShader.Create( mDevice, "code/shaders/ui.vert" );
@@ -136,6 +139,8 @@ namespace fan
 		mDrawDebug.mFragmentShaderLinesNDT	.Destroy( mDevice );
 		mDrawDebug.mVertexShaderTriangles	.Destroy( mDevice );
 		mDrawDebug.mFragmentShaderTriangles	.Destroy( mDevice );
+        mDrawDebug.mVertexShaderLines2D		.Destroy( mDevice );
+        mDrawDebug.mFragmentShaderLines2D	.Destroy( mDevice );
 		mDrawModels.mVertexShader			.Destroy( mDevice );
 		mDrawModels.mFragmentShader			.Destroy( mDevice );
 		mDrawUI.mVertexShader				.Destroy( mDevice );
@@ -151,6 +156,7 @@ namespace fan
 		const PipelineConfig debugLinesPipelineConfig = mDrawDebug.GetPipelineConfigLines();
 		const PipelineConfig debugLinesNoDepthTestPipelineConfig = mDrawDebug.GetPipelineConfigLinesNDT();
 		const PipelineConfig debugTrianglesPipelineConfig = mDrawDebug.GetPipelineConfigTriangles();
+        const PipelineConfig debugLines2DPipelineConfig = mDrawDebug.GetPipelineConfigLines2D();
 		const PipelineConfig ppPipelineConfig = mDrawPostprocess.GetPipelineConfig();
 		const PipelineConfig modelsPipelineConfig = mDrawModels.GetPipelineConfig( mDescriptorTextures );
 		const PipelineConfig uiPipelineConfig = mDrawUI.GetPipelineConfig( mDescriptorTextures );
@@ -171,6 +177,10 @@ namespace fan
                                       modelsPipelineConfig,
                                       mGameExtent,
                                       mRenderPassGame.mRenderPass );
+        mDrawDebug.mPipelineLines2D.Create( mDevice,
+                                          debugLines2DPipelineConfig,
+                                          mGameExtent,
+                                          mRenderPassPostprocess.mRenderPass );
         mDrawUI.mPipeline.Create( mDevice,
                                   uiPipelineConfig,
                                   mGameExtent,
@@ -191,6 +201,7 @@ namespace fan
 		mDrawDebug.mPipelineLines.Destroy( mDevice );
 		mDrawDebug.mPipelineLinesNDT.Destroy( mDevice );
 		mDrawDebug.mPipelineTriangles.Destroy( mDevice );
+        mDrawDebug.mPipelineLines2D.Destroy( mDevice );
 	}
 
 	//========================================================================================================
@@ -291,6 +302,7 @@ namespace fan
                                                   &mDrawPostprocess.mSampler.mSampler );
 
 		mDrawImgui.UpdateGameImageDescriptor( mDevice, mImageViewPostprocessColor );
+        mDrawDebug.mUniformsLines2D.mScreenSize = { mGameExtent.width, mGameExtent.height };
 
 		RecordAllCommandBuffers();
 	}
@@ -409,14 +421,16 @@ namespace fan
     //========================================================================================================
     void Renderer::SetDebugDrawData( const std::vector<DebugVertex>& _debugLines,
                                      const std::vector<DebugVertex>& _debugLinesNoDepthTest,
-                                     const std::vector<DebugVertex>& _debugTriangles )
+                                     const std::vector<DebugVertex>& _debugTriangles,
+                                     const std::vector<DebugVertex2D>& _debugLines2D  )
     {
         SCOPED_PROFILE( set_debug_draw_data );
         mDrawDebug.SetDebugDrawData( mWindow.mSwapchain.mCurrentFrame,
                                      mDevice,
                                      _debugLines,
                                      _debugLinesNoDepthTest,
-                                     _debugTriangles );
+                                     _debugTriangles,
+                                     _debugLines2D);
     }
 
     //========================================================================================================
@@ -436,6 +450,7 @@ namespace fan
                                          mGameExtent,
                                          mDescriptorTextures );
         mDrawDebug.RecordCommandBuffer( _index, mRenderPassGame, mFrameBuffersGame, mGameExtent );
+        mDrawDebug.RecordCommandBuffer2D( _index, mRenderPassPostprocess, finalFramebuffer, mGameExtent );
         mDrawUI.RecordCommandBuffer( _index,
                                      mRenderPassPostprocess,
                                      finalFramebuffer,
@@ -512,8 +527,13 @@ namespace fan
                                   &renderPassInfoPostprocess,
                                   VK_SUBPASS_CONTENTS_SECONDARY_COMMAND_BUFFERS );
             {
+
 				vkCmdExecuteCommands( commandBuffer, 1, &mDrawPostprocess.mCommandBuffers.mBuffers[_index] );
 				vkCmdExecuteCommands( commandBuffer, 1, &mDrawUI.mCommandBuffers.mBuffers[_index] );
+                if ( mDrawDebug.mNumLines2D != 0 )
+                {
+                    vkCmdExecuteCommands( commandBuffer, 1, &mDrawDebug.mCommandBuffers2D.mBuffers[_index] );
+                }
 
 				if( mViewType == ViewType::Game )
 				{
@@ -605,6 +625,7 @@ namespace fan
 		mDrawUI.mCommandBuffers.Create( mDevice, count, VK_COMMAND_BUFFER_LEVEL_SECONDARY );
 		mDrawPostprocess.mCommandBuffers.Create( mDevice, count, VK_COMMAND_BUFFER_LEVEL_SECONDARY );
 		mDrawDebug.mCommandBuffers.Create( mDevice, count, VK_COMMAND_BUFFER_LEVEL_SECONDARY );
+        mDrawDebug.mCommandBuffers2D.Create( mDevice, count, VK_COMMAND_BUFFER_LEVEL_SECONDARY );
 	}
 
 	//========================================================================================================

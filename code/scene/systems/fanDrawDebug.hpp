@@ -4,15 +4,17 @@
 #include "scene/components/fanMeshRenderer.hpp"
 #include "scene/components/fanBoxShape.hpp"
 #include "scene/components/fanSphereShape.hpp"
+#include "scene/components/ui/fanUITransform.hpp"
 #include "scene/singletons/fanRenderDebug.hpp"
+#include "scene/singletons/fanScene.hpp"
 
 namespace fan
 {
 	class EcsWorld;
 
-	//==============================================================================================================================================================
+	//========================================================================================================
 	// Draw the bounds of all scene nodes 
-	//==============================================================================================================================================================
+	//========================================================================================================
 	struct S_DrawDebugBounds : EcsSystem
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world )
@@ -31,9 +33,9 @@ namespace fan
 		}
 	};
 
-	//==============================================================================================================================================================
+	//========================================================================================================
 	// Draw the normals of all models 
-	//==============================================================================================================================================================
+	//========================================================================================================
 	struct S_DrawDebugNormals : EcsSystem
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world )
@@ -59,8 +61,8 @@ namespace fan
 					for( int index = 0; index < (int)indices.size(); index++ )
 					{
 						const Vertex& vertex = vertices[indices[index]];
-						const btVector3 position = ToBullet( modelMat * glm::vec4( vertex.pos, 1.f ) );
-						const btVector3 normal = ToBullet( normalMat * glm::vec4( vertex.normal, 1.f ) );
+						const btVector3 position = ToBullet( modelMat * glm::vec4( vertex.mPos, 1.f ) );
+						const btVector3 normal = ToBullet( normalMat * glm::vec4( vertex.mNormal, 1.f ) );
                         RenderDebug & renderDebug = _world.GetSingleton<RenderDebug>();
                         renderDebug.DebugLine( position, position + 0.1f * normal, Color::Green );
 					}
@@ -69,9 +71,9 @@ namespace fan
 		}
 	};
 
-	//==============================================================================================================================================================
+	//========================================================================================================
 	// Draw all the models in wireframe
-	//==============================================================================================================================================================
+	//========================================================================================================
 	struct S_DrawDebugWireframe : EcsSystem
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world )
@@ -95,9 +97,9 @@ namespace fan
 
 					for( int index = 0; index < (int)indices.size() / 3; index++ )
 					{
-						const btVector3 v0 = ToBullet( modelMat * glm::vec4( vertices[indices[3 * index + 0]].pos, 1.f ) );
-						const btVector3 v1 = ToBullet( modelMat * glm::vec4( vertices[indices[3 * index + 1]].pos, 1.f ) );
-						const btVector3 v2 = ToBullet( modelMat * glm::vec4( vertices[indices[3 * index + 2]].pos, 1.f ) );
+						const btVector3 v0 = ToBullet( modelMat * glm::vec4( vertices[indices[3 * index + 0]].mPos, 1.f ) );
+						const btVector3 v1 = ToBullet( modelMat * glm::vec4( vertices[indices[3 * index + 1]].mPos, 1.f ) );
+						const btVector3 v2 = ToBullet( modelMat * glm::vec4( vertices[indices[3 * index + 2]].mPos, 1.f ) );
 						_world.GetSingleton<RenderDebug>().DebugLine( v0, v1, Color::Yellow );
 						_world.GetSingleton<RenderDebug>().DebugLine( v1, v2, Color::Yellow );
 						_world.GetSingleton<RenderDebug>().DebugLine( v2, v0, Color::Yellow );
@@ -107,9 +109,9 @@ namespace fan
 		}
 	};
 
-	//==============================================================================================================================================================
+	//========================================================================================================
 	// Draw all the models convex hull in wireframe
-	//==============================================================================================================================================================
+	//========================================================================================================
 	struct S_DrawDebugHull : EcsSystem
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world )
@@ -278,4 +280,38 @@ namespace fan
 			}
 		}
 	};
+
+
+    //==============================================================================================================================================================
+    //==============================================================================================================================================================
+    struct S_DrawDebugUiBounds : EcsSystem
+    {
+        static EcsSignature GetSignature( const EcsWorld& _world )
+        {
+            return _world.GetSignature<UITransform>();
+        }
+        static void Run( EcsWorld& _world, const EcsView& _view )
+        {
+            RenderDebug& renderDebug = _world.GetSingleton<RenderDebug>();
+
+            auto transformIt = _view.begin<UITransform>();
+            for( ; transformIt != _view.end<UITransform>(); ++transformIt )
+            {
+                UITransform transform = *transformIt;
+                const glm::ivec2& p = transform.mPosition;
+                const glm::ivec2& s = transform.mSize;
+
+                const glm::ivec2 tl = p;
+                const glm::ivec2 tr = p + glm::ivec2(s.x, 0);
+                const glm::ivec2 bl = p + glm::ivec2(0, s.y);
+                const glm::ivec2 br = p + s;
+
+                renderDebug.DebugLine2D( tl, tr , Color::Green );
+                renderDebug.DebugLine2D( tr, br , Color::Green );
+                renderDebug.DebugLine2D( br, bl , Color::Green );
+                renderDebug.DebugLine2D( bl, tl , Color::Green );
+            }
+        }
+    };
+
 }

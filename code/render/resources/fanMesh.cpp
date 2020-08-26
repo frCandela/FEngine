@@ -101,7 +101,7 @@ namespace fan
 		for ( int point = 0; point < (int)mVertices.size(); point++ )
 		{
 			Vertex& vertex = mVertices[ point ];
-			pointCloud.push_back( btVector3( vertex.pos.x, vertex.pos.y, vertex.pos.z ) );
+			pointCloud.push_back( btVector3( vertex.mPos.x, vertex.mPos.y, vertex.mPos.z ) );
 		}
 		mConvexHull.ComputeQuickHull( pointCloud );
 	}
@@ -115,9 +115,9 @@ namespace fan
 		float closestDistance = std::numeric_limits<float>::max();
 		for ( int triIndex = 0; triIndex < (int)mIndices.size() / 3; triIndex++ )
 		{
-			const btVector3 v0 = ToBullet( mVertices[ mIndices[ 3 * triIndex + 0 ] ].pos );
-			const btVector3 v1 = ToBullet( mVertices[ mIndices[ 3 * triIndex + 1 ] ].pos );
-			const btVector3 v2 = ToBullet( mVertices[ mIndices[ 3 * triIndex + 2 ] ].pos );
+			const btVector3 v0 = ToBullet( mVertices[ mIndices[ 3 * triIndex + 0 ] ].mPos );
+			const btVector3 v1 = ToBullet( mVertices[ mIndices[ 3 * triIndex + 1 ] ].mPos );
+			const btVector3 v2 = ToBullet( mVertices[ mIndices[ 3 * triIndex + 2 ] ].mPos );
 			const Triangle triangle( v0, v1, v2 );
 
 			if ( triangle.RayCast( _origin, _direction, intersection ) )

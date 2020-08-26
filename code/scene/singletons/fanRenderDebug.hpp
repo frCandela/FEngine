@@ -21,9 +21,10 @@ namespace fan
 		static void OnGui( EcsWorld&, EcsSingleton& _component );
 
 		// vertex data
-		std::vector<DebugVertex> debugLines;
-		std::vector<DebugVertex> debugLinesNoDepthTest;
-		std::vector<DebugVertex> debugTriangles;
+		std::vector<DebugVertex>    mDebugLines;
+		std::vector<DebugVertex>    mDebugLinesNoDepthTest;
+		std::vector<DebugVertex>   mDebugTriangles;
+        std::vector<DebugVertex2D> mDebugLines2D;
 
 		void Clear();
 		void DebugPoint( const btVector3 _pos, const Color _color );
@@ -36,5 +37,7 @@ namespace fan
 		void DebugSphere( const btTransform _transform, const float _radius, const Color _color, const bool _depthTestEnable = true );
 		void DebugCone( const btTransform _transform, const float _radius, const float _height, const int _numSubdivisions, const Color _color );
 		void DebugAABB( const AABB& _aabb, const Color _color );
+        void DebugLine2D( const glm::ivec2 _start, const glm::ivec2 _end, const Color _color );
+
 	};
 }

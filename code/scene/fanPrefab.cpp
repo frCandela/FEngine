@@ -79,7 +79,7 @@ namespace fan
 		}
 		else
 		{
-			EcsWorld& world = *_parent.scene->world;
+			EcsWorld& world = *_parent.scene->mWorld;
 			Scene& scene = world.GetSingleton<Scene>();
 			const EcsHandle handleOffset = world.GetNextHandle() - 1;
 			SceneNode& newNode = Scene::R_LoadFromJson( mJson["prefab"], scene, &_parent, handleOffset );

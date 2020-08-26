@@ -18,7 +18,6 @@ namespace fan
 	struct Scene : public EcsSingleton
 	{
 		ECS_SINGLETON( Scene )
-	public:
 		static void SetInfo( EcsSingletonInfo& _info );
 		static void Init( EcsWorld& _world, EcsSingleton& _component );
 		static void OnGui( EcsWorld&, EcsSingleton& _component );
@@ -36,18 +35,17 @@ namespace fan
 		static SceneNode&   R_LoadFromJson( const Json& _json, Scene& _scene, SceneNode* _parent, const uint32_t _handleOffset );
 		static void			RemapSceneNodesIndices( Json& _json );
 
-		Signal< Scene& >		onClear;
-		Signal< Scene& >		onLoad;
-		Signal< SceneNode* >	onDeleteSceneNode;
+		Signal< Scene& >     mOnClear;
+		Signal< Scene& >     mOnLoad;
+		Signal< SceneNode* > mOnDeleteSceneNode;
 
-		EcsWorld* const			 world = nullptr;
-		std::string				 path;
-		EcsHandle 				 rootNodeHandle;
-		EcsHandle				 mainCameraHandle;
-		std::set<EcsHandle>      nodes;
+		EcsWorld* const		mWorld = nullptr;
+		std::string         mPath;
+		EcsHandle           mRootNodeHandle;
+		EcsHandle           mMainCameraHandle;
+		std::set<EcsHandle> mNodes;
 
 		SceneNode& GetRootNode() const;
-		SceneNode& GetMainCamera() const;
 
 		// slots
 		static void Test1( EcsSingleton& _singleton );

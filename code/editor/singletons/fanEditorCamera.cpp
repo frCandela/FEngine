@@ -131,7 +131,7 @@ namespace fan
 		_world.AddComponent< Camera >( cameraID );
 
 		transform.SetPosition( btVector3( 0, 0, -2 ) );
-		scene.mainCameraHandle = cameraNode.handle;
+		scene.mMainCameraHandle = cameraNode.handle;
 
 		// set editor camera singleton
 		EditorCamera& editorCamera = _world.GetSingleton<EditorCamera>();

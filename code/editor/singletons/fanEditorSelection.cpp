@@ -42,7 +42,7 @@ namespace fan
 	{
 		Input::Get().Manager().FindEvent( "delete" )->Connect( &EditorSelection::DeleteSelection, this );
 		Input::Get().Manager().FindEvent( "toogle_follow_transform_lock" )->Connect( &EditorSelection::OnToogleTransformLock, this );
- 		_scene.onDeleteSceneNode.Connect( &EditorSelection::OnSceneNodeDeleted, this );
+ 		_scene.mOnDeleteSceneNode.Connect( &EditorSelection::OnSceneNodeDeleted, this );
 	}
 
 	//================================================================================================================================
@@ -55,7 +55,7 @@ namespace fan
 		}
 		else
 		{
-			EcsWorld& world = *m_currentScene->world;
+			EcsWorld& world = *m_currentScene->mWorld;
 			return &world.GetComponent<SceneNode>( world.GetEntity( m_selectedNodeHandle ) );
 		}
 	}
@@ -73,7 +73,7 @@ namespace fan
 			}
 			else
 			{
-				EcsWorld& world = *selectedSceneNode->scene->world;
+				EcsWorld& world = *selectedSceneNode->scene->mWorld;
 				world.Kill( world.GetEntity( selectedSceneNode->handle ) );
 				Deselect();
 			}
@@ -90,9 +90,9 @@ namespace fan
 
 		// translation gizmo on selected scene node
 		SceneNode* selectedSceneNode = GetSelectedSceneNode();
-		if ( selectedSceneNode != nullptr && selectedSceneNode->handle != m_currentScene->mainCameraHandle )
+		if ( selectedSceneNode != nullptr && selectedSceneNode->handle != m_currentScene->mMainCameraHandle )
 		{
-			EcsWorld& world = *selectedSceneNode->scene->world;
+			EcsWorld& world = *selectedSceneNode->scene->mWorld;
 			EcsEntity entity = world.GetEntity( selectedSceneNode->handle );
 			if( world.HasComponent<Transform>( entity ) )
 			{
@@ -110,11 +110,11 @@ namespace fan
 		}
 
 		// mouse selection
-        EcsWorld& world = *m_currentScene->world;
+        EcsWorld& world = *m_currentScene->mWorld;
         Mouse   & mouse = world.GetSingleton<Mouse>();
         if( !mouseCaptured && _gameWindowHovered && mouse.mPressed[ Mouse::buttonLeft ] )
  		{
-			EcsEntity cameraID = world.GetEntity( m_currentScene->mainCameraHandle );
+			EcsEntity cameraID = world.GetEntity( m_currentScene->mMainCameraHandle );
 			const Transform& cameraTransform = world.GetComponent<Transform>( cameraID );
 			const Camera& camera = world.GetComponent<Camera>( cameraID );
 
@@ -197,7 +197,7 @@ namespace fan
 		SceneNode* selectedSceneNode = GetSelectedSceneNode();
 		if( selectedSceneNode != nullptr )
 		{
-			EcsWorld& world = *selectedSceneNode->scene->world;
+			EcsWorld& world = *selectedSceneNode->scene->mWorld;
 			EcsEntity entity = world.GetEntity( selectedSceneNode->handle );
 
 			// FollowTransform

@@ -42,9 +42,8 @@ namespace fan
         Mouse& mouse = m_world->GetSingleton<Mouse>();
 
 		// Get main camera data
-		SceneNode& cameraNode = scene.GetMainCamera();
-		EcsWorld& world = *cameraNode.scene->world;
-		const EcsEntity id = world.GetEntity( cameraNode.handle );
+		EcsWorld& world = *scene.mWorld;
+		const EcsEntity id = world.GetEntity( scene.mMainCameraHandle );
 		const Transform & cameraTransform = world.GetComponent<Transform>( id );
 		const Camera& camera = world.GetComponent<Camera>( id );
 

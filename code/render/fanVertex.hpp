@@ -11,49 +11,64 @@ WARNINGS_POP()
 
 namespace fan
 {
-	//================================================================================================================================
+	//========================================================================================================
 	// vulkan vertex definitions
-	//================================================================================================================================
+	//========================================================================================================
 	struct Vertex
 	{
-		glm::vec3 pos;
-		glm::vec3 normal;
-		glm::vec3 color;
-		glm::vec2 uv;
+		glm::vec3 mPos;
+		glm::vec3 mNormal;
+		glm::vec3 mColor;
+		glm::vec2 mUv;
 
 		static std::vector <VkVertexInputBindingDescription>	GetBindingDescription();
 		static std::vector<VkVertexInputAttributeDescription>	GetAttributeDescriptions();
 
 		bool operator==( const Vertex& _other ) const
 		{
-			return pos == _other.pos && normal == _other.normal && color == _other.color && uv == _other.uv;
+			return mPos == _other.mPos && mNormal == _other.mNormal && mColor == _other.mColor && mUv == _other.mUv;
 		}
 	};
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	struct DebugVertex
 	{
-		glm::vec3 pos;
-		glm::vec3 normal;
-		glm::vec4 color;
+		glm::vec3 mPos;
+		glm::vec3 mNormal;
+		glm::vec4 mColor;
 		DebugVertex() {}
 		DebugVertex( const glm::vec3 _pos, const glm::vec3 _normal, const glm::vec4 _color );
 		static std::vector <VkVertexInputBindingDescription>	GetBindingDescription();
 		static std::vector<VkVertexInputAttributeDescription>	GetAttributeDescriptions();
 	};
 
-	//================================================================================================================================
-	//================================================================================================================================
+    //========================================================================================================
+    //========================================================================================================
+    struct DebugVertex2D
+    {
+        glm::vec2 mPos;
+        glm::vec4 mColor;
+
+        DebugVertex2D( const glm::vec2 _pos = glm::vec2( 0.f, 0.f ),
+                       const glm::vec4 _color = Color::White.ToGLM() );
+        static std::vector<VkVertexInputBindingDescription>   GetBindingDescription();
+        static std::vector<VkVertexInputAttributeDescription> GetAttributeDescriptions();
+    };
+
+	//========================================================================================================
+	//========================================================================================================
 	struct UIVertex
 	{
-		glm::vec2 pos;
-		glm::vec2 uv;
-		glm::vec4 color;
+		glm::vec2 mPos;
+		glm::vec2 mUv;
+		glm::vec4 mColor;
 
-		UIVertex( const glm::vec2 _pos = glm::vec2( 0.f, 0.f ), const glm::vec2 _uv = glm::vec2( 0.f, 0.f ), const glm::vec4 _color = Color::White.ToGLM() );
-		static std::vector <VkVertexInputBindingDescription>	GetBindingDescription();
-		static std::vector<VkVertexInputAttributeDescription>	GetAttributeDescriptions();
+        UIVertex( const glm::vec2 _pos = glm::vec2( 0.f, 0.f ),
+                  const glm::vec2 _uv = glm::vec2( 0.f, 0.f ),
+                  const glm::vec4 _color = Color::White.ToGLM() );
+        static std::vector<VkVertexInputBindingDescription> GetBindingDescription();
+        static std::vector<VkVertexInputAttributeDescription> GetAttributeDescriptions();
 	};
 }
 
@@ -63,10 +78,10 @@ namespace std
 	{
 		size_t operator()( fan::Vertex const& vertex ) const
 		{
-			return ( ( hash<glm::vec3>()( vertex.pos ) ^
-				( hash<glm::vec3>()( vertex.normal ) << 1 ) ) >> 1 ) ^
-					 ( hash<glm::vec2>()( vertex.color ) << 1 ) ^
-				( hash<glm::vec2>()( vertex.uv ) << 1 );
+			return ( ( hash<glm::vec3>()( vertex.mPos ) ^
+                       ( hash<glm::vec3>()( vertex.mNormal ) << 1 ) ) >> 1 ) ^
+                   ( hash<glm::vec2>()( vertex.mColor ) << 1 ) ^
+                   ( hash<glm::vec2>()( vertex.mUv ) << 1 );
 		}
 	};
 }

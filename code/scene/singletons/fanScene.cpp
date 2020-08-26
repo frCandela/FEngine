@@ -40,11 +40,11 @@ namespace fan
 	void Scene::Init( EcsWorld& _world, EcsSingleton& _component )
 	{
 		Scene& scene = static_cast<Scene&>( _component );
-		scene.path = "";
-		scene.rootNodeHandle = 0;
-		scene.mainCameraHandle = 0;
-		scene.nodes.clear();
-		EcsWorld*& worldNoConst = const_cast<EcsWorld*&>( scene.world );
+		scene.mPath             = "";
+		scene.mRootNodeHandle   = 0;
+		scene.mMainCameraHandle = 0;
+		scene.mNodes.clear();
+		EcsWorld*& worldNoConst = const_cast<EcsWorld*&>( scene.mWorld );
 		worldNoConst = &_world;
 	}
 
@@ -75,11 +75,11 @@ namespace fan
 		Scene& scene = static_cast<Scene&>( _component );
 		ImGui::Indent(); ImGui::Indent();
 		{
-			ImGui::Text( "path: %s", scene.path.c_str() );
+			ImGui::Text( "path: %s", scene.mPath.c_str() );
 
 			if( ImGui::CollapsingHeader( "nodes" ) )
 			{
-				for( EcsHandle handle : scene.nodes )
+				for( EcsHandle handle : scene.mNodes )
 				{
 					SceneNode& sceneNode = _world.GetComponent<SceneNode>( _world.GetEntity( handle ) );
 					ImGui::Text( "%s : %d", sceneNode.name.c_str(), sceneNode.handle );
@@ -93,14 +93,7 @@ namespace fan
 	//================================================================================================================================
 	SceneNode& Scene::GetRootNode() const
 	{
-		return world->GetComponent<SceneNode>( world->GetEntity( rootNodeHandle ) );
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	SceneNode& Scene::GetMainCamera() const
-	{
-		return world->GetComponent<SceneNode>( world->GetEntity( mainCameraHandle ) );
+		return mWorld->GetComponent<SceneNode>( mWorld->GetEntity( mRootNodeHandle ) );
 	}
 
 	//================================================================================================================================
@@ -108,26 +101,26 @@ namespace fan
 	//================================================================================================================================
 	SceneNode& Scene::CreateSceneNode( const std::string _name, SceneNode* const _parentNode, EcsHandle _handle )
 	{		
-		assert( _parentNode != nullptr || rootNodeHandle == 0 ); // we can have only one root node
+		assert( _parentNode != nullptr || mRootNodeHandle == 0 ); // we can have only one root node
 
-		EcsEntity entity = world->CreateEntity();
+		EcsEntity entity = mWorld->CreateEntity();
 
 		// set entity handle
 		EcsHandle handle = 0;
 		if( _handle == 0 )
 		{
-			handle = world->AddHandle( entity );
+			handle = mWorld->AddHandle( entity );
 		}
 		else
 		{
-			world->SetHandle( entity, _handle );
+			mWorld->SetHandle( entity, _handle );
 			handle = _handle;
 		}
-		assert( nodes.find( handle ) == nodes.end() );
-		nodes.insert( handle );
+		assert( mNodes.find( handle ) == mNodes.end() );
+		mNodes.insert( handle );
 
-		SceneNode& sceneNode = world->AddComponent<SceneNode>( entity );
-		world->AddComponent<Bounds>( entity );
+		SceneNode& sceneNode = mWorld->AddComponent<SceneNode>( entity );
+		mWorld->AddComponent<Bounds>( entity );
 		sceneNode.AddFlag( SceneNode::BoundsOutdated );
 		if( _parentNode == nullptr ) // root node
 		{
@@ -142,7 +135,7 @@ namespace fan
 	//================================================================================================================================
 	EcsHandle Scene::R_FindMaximumHandle( SceneNode& _node )
 	{
-		EcsWorld& world = *_node.scene->world;
+		EcsWorld& world = *_node.scene->mWorld;
 
 		EcsHandle handle = _node.handle;
 		const std::vector<EcsHandle>& childs = _node.childs;
@@ -161,9 +154,9 @@ namespace fan
 	//================================================================================================================================
 	void Scene::SetMainCamera( const EcsHandle _cameraHandle )
 	{
-		if( _cameraHandle != mainCameraHandle )
+		if( _cameraHandle != mMainCameraHandle )
 		{
-			mainCameraHandle = _cameraHandle;
+            mMainCameraHandle = _cameraHandle;
 		}
 	}
 
@@ -171,13 +164,13 @@ namespace fan
 	//================================================================================================================================
 	void Scene::Clear()
 	{
-		onClear.Emmit(*this);
-		path = "";
-		world->Clear();
-		nodes.clear();
-		rootNodeHandle = 0;
-		mainCameraHandle = 0;
-        ScenePointers::Clear( world->GetSingleton<ScenePointers>() );
+		mOnClear.Emmit( *this);
+		mPath = "";
+		mWorld->Clear();
+		mNodes.clear();
+        mRootNodeHandle   = 0;
+        mMainCameraHandle = 0;
+        ScenePointers::Clear( mWorld->GetSingleton<ScenePointers>() );
 	}
 
 	//================================================================================================================================
@@ -186,16 +179,16 @@ namespace fan
 	{
 		Clear( );
 		SceneNode& rootNode = CreateSceneNode( "root", nullptr );
-		rootNodeHandle = rootNode.handle;
-		onLoad.Emmit( *this );
-		world->ApplyTransitions();
+        mRootNodeHandle = rootNode.handle;
+		mOnLoad.Emmit( *this );
+		mWorld->ApplyTransitions();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void Scene::Save( ) const
 	{
-		std::ofstream outStream( path );
+		std::ofstream outStream( mPath );
 		if ( outStream.is_open() )
 		{
 			Json json;
@@ -203,13 +196,13 @@ namespace fan
 			// scene global parameters
 			Json& jScene = json["scene"];
 			{
-				Serializable::SaveString( jScene, "path", path );
+				Serializable::SaveString( jScene, "path", mPath );
 			}
 
 			// save singleton components
 			Json& jSingletons = jScene["singletons"];
 			unsigned nextIndex = 0;
-			const std::vector< EcsSingletonInfo >& singletonsInfos = world->GetVectorSingletonInfo();
+			const std::vector< EcsSingletonInfo >& singletonsInfos = mWorld->GetVectorSingletonInfo();
 			for ( const EcsSingletonInfo& info : singletonsInfos )
 			{
 				if( info.save != nullptr )
@@ -217,7 +210,7 @@ namespace fan
 					Json& jSingleton_i = jSingletons[nextIndex++];
 					Serializable::SaveUInt( jSingleton_i, "singleton_id", info.type);
 					Serializable::SaveString( jSingleton_i, "singleton", info.name );
-					EcsSingleton& singleton = world->GetSingleton( info.type);
+					EcsSingleton& singleton = mWorld->GetSingleton( info.type);
 					info.save( singleton, jSingleton_i );
 				}
 			}
@@ -235,7 +228,7 @@ namespace fan
 	//================================================================================================================================
 	void Scene::R_SaveToJson( const SceneNode& _node, Json& _json )
 	{	
-		EcsWorld& world = *_node.scene->world;
+		EcsWorld& world = *_node.scene->mWorld;
 		Serializable::SaveString( _json, "name", _node.name );
 		Serializable::SaveUInt( _json, "handle", _node.handle );
 
@@ -365,7 +358,7 @@ namespace fan
 			// scene global parameters
 			const Json& jScene = sceneJson["scene"];
 			{
-				Serializable::LoadString( jScene, "path", path );
+				Serializable::LoadString( jScene, "path", mPath );
 			}
 
 			// load singleton components
@@ -377,10 +370,10 @@ namespace fan
 					const Json& jSingleton_i = jSingletons[childIndex];
 					unsigned staticIndex = 0;
 					Serializable::LoadUInt( jSingleton_i, "singleton_id", staticIndex );
-					const EcsSingletonInfo* info = world->SafeGetSingletonInfo( staticIndex );
+					const EcsSingletonInfo* info = mWorld->SafeGetSingletonInfo( staticIndex );
 					if( info != nullptr && info->load != nullptr )
 					{
-						EcsSingleton& singleton = world->GetSingleton( staticIndex );
+						EcsSingleton& singleton = mWorld->GetSingleton( staticIndex );
 						info->load( singleton, jSingleton_i );
 					}
 					else
@@ -394,18 +387,18 @@ namespace fan
 			const Json& jRoot = jScene["root"];
 			const EcsHandle handleOffset = 0; 
 			SceneNode&  rootNode = R_LoadFromJson( jRoot, *this, nullptr, handleOffset );
-			rootNodeHandle = rootNode.handle;
-			
-			path = _path;
+            mRootNodeHandle = rootNode.handle;
+
+			mPath = _path;
 			inStream.close();
 			const EcsHandle maxHandle = R_FindMaximumHandle( rootNode ) + 1;
-			world->SetNextHandle( maxHandle );
+			mWorld->SetNextHandle( maxHandle );
 
-			ScenePointers::ResolveComponentPointers( *world, handleOffset );
-			world->Run<SInitFollowTransforms>();
+			ScenePointers::ResolveComponentPointers( *mWorld, handleOffset );
+			mWorld->Run<SInitFollowTransforms>();
 
-			onLoad.Emmit( *this );
-			world->ApplyTransitions();
+			mOnLoad.Emmit( *this );
+			mWorld->ApplyTransitions();
 			return true;
 		}
 		else
@@ -422,7 +415,7 @@ namespace fan
 	SceneNode& Scene::R_LoadFromJson( const Json& _json, Scene& _scene, SceneNode* _parent, const uint32_t _handleOffset )
 	{
 		//ScopedTimer timer("load scene");
-		EcsWorld& world = *_scene.world;
+		EcsWorld& world = *_scene.mWorld;
 
 		EcsHandle nodeHandle;
 		Serializable::LoadUInt( _json, "handle", nodeHandle );
@@ -430,7 +423,7 @@ namespace fan
 		Serializable::LoadString( _json, "name", node.name );
 
 		// append id		
-		_scene.nodes.insert(node.handle);
+		_scene.mNodes.insert( node.handle);
 
 		// components
 		const Json& jComponents = _json["components"];

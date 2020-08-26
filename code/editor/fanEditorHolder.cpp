@@ -164,8 +164,8 @@ namespace fan
             selection.ConnectCallbacks( scene );
             sceneWindow.onSelectSceneNode.Connect( &EditorSelection::SetSelectedSceneNode, &selection );
 
-            scene.onLoad.Connect( &SceneWindow::OnExpandHierarchy, &sceneWindow );
-            scene.onLoad.Connect( &EditorHolder::OnSceneLoad, this );
+            scene.mOnLoad.Connect( &SceneWindow::OnExpandHierarchy, &sceneWindow );
+            scene.mOnLoad.Connect( &EditorHolder::OnSceneLoad, this );
 
             // load scene
             scene.New();
@@ -314,7 +314,7 @@ namespace fan
                     EditorCamera& editorCamera = world.GetSingleton<EditorCamera>();
                     Scene       & scene        = world.GetSingleton<Scene>();
                     // only update the editor camera when we are using it
-                    if( scene.mainCameraHandle == editorCamera.cameraHandle )
+                    if( scene.mMainCameraHandle == editorCamera.cameraHandle )
                     {
                         EditorCamera::Update( world, time.logicDelta );
                     }
@@ -328,6 +328,7 @@ namespace fan
                         if( mMainMenuBar->ShowNormals() ){ world.Run<S_DrawDebugNormals>(); }
                         if( mMainMenuBar->ShowAABB() ){ world.Run<S_DrawDebugBounds>(); }
                         if( mMainMenuBar->ShowHull() ){ world.Run<S_DrawDebugHull>(); }
+                        if( mMainMenuBar->ShowUiBounds() ){ world.Run<S_DrawDebugUiBounds>(); }
                         if( mMainMenuBar->ShowLights() )
                         {
                             world.Run<S_DrawDebugPointLights>();
@@ -340,26 +341,10 @@ namespace fan
                             SCOPED_PROFILE( ImGui_render );
                             ImGui::NewFrame();
                             mMainMenuBar->Draw( game.mWorld );
-                            if( ImGui::Begin( "test" ) )
-                             {
-                                char buffer[10] = "";
-                                if( ImGui::InputText("char", buffer, 4 ) )
-                                {
-                                    //Debug::Log("aaa");
-                                }
-                                 if( ImGui::Button("load char")){
-                                     mRenderer->WaitIdle();
-                                     mRenderer->mTextureManager.Remove("font48");
-                                     mRenderer->mTextureManager.DestroyRemovedTextures( mRenderer->mDevice );
-
-
-
-
-                                     mRenderer->mTextureManager.Add(
-                                             mRenderer->mDefaultFont.GenerateAtlas(), "font48" );
-                                 }
-                                 ImGui::End();
-                             }
+                            /*if( ImGui::Begin( "test" ) )
+                            {
+                                ImGui::End();
+                            }*/
                             ImGui::Render();
                         }
                     }
@@ -409,7 +394,7 @@ namespace fan
     {
         // saves the scene before playing
         Scene& scene = _game.mWorld.GetSingleton<Scene>();
-        if( scene.path.empty() )
+        if( scene.mPath.empty() )
         {
             Debug::Warning() << "please save the scene before playing" << Debug::Endl();
             return;
@@ -432,10 +417,10 @@ namespace fan
         SceneRestoreState( Scene& _scene ) : mScene( _scene ) {}
         void Save()
         {
-            EcsWorld& world = *mScene.world;
+            EcsWorld& world = *mScene.mWorld;
 
             // Saves the camera position for restoring it later
-            const EcsEntity oldCameraID = world.GetEntity( mScene.mainCameraHandle );
+            const EcsEntity oldCameraID = world.GetEntity( mScene.mMainCameraHandle );
             mPrevCameraTransform = world.GetComponent<Transform>( oldCameraID ).transform;
             // save old selection
             SceneNode* prevSelectionNode = world.GetSingleton<EditorSelection>().GetSelectedSceneNode();
@@ -444,14 +429,14 @@ namespace fan
 
         void Restore() const
         {
-            EcsWorld& world = *mScene.world;
+            EcsWorld& world = *mScene.mWorld;
 
             // restore camera transform
-            const EcsEntity newCameraID = world.GetEntity( mScene.mainCameraHandle );
+            const EcsEntity newCameraID = world.GetEntity( mScene.mMainCameraHandle );
             world.GetComponent<Transform>( newCameraID ).transform = mPrevCameraTransform;
 
             // restore selection
-            if( mPrevSelectionHandle != 0 && mScene.nodes.find( mPrevSelectionHandle ) != mScene.nodes.end() )
+            if( mPrevSelectionHandle != 0 && mScene.mNodes.find( mPrevSelectionHandle ) != mScene.mNodes.end() )
             {
                 fan::SceneNode& node = world.GetComponent<fan::SceneNode>
                         ( world.GetEntity( mPrevSelectionHandle ) );
@@ -483,7 +468,7 @@ namespace fan
             Debug::Highlight() << _game.mName << ": stopped" << Debug::Endl();
             playState.mState = EditorPlayState::STOPPED;
             _game.Stop();
-            scene.LoadFrom( scene.path ); // reload the scene
+            scene.LoadFrom( scene.mPath ); // reload the scene
 
             restoreState.Restore();
         }
@@ -517,7 +502,7 @@ namespace fan
     //========================================================================================================
     void EditorHolder::OnSceneLoad( Scene& _scene )
     {
-        EcsWorld& world = *_scene.world;
+        EcsWorld& world = *_scene.mWorld;
         EditorCamera::CreateEditorCamera( world );
 
         if( &world == &GetCurrentGame().mWorld )
@@ -563,16 +548,17 @@ namespace fan
             _renderer.SetUIDrawData( renderWorld.uiDrawData );
             _renderer.SetPointLights( renderWorld.pointLights );
             _renderer.SetDirectionalLights( renderWorld.directionalLights );
-            _renderer.SetDebugDrawData( renderDebug.debugLines,
-                                        renderDebug.debugLinesNoDepthTest,
-                                        renderDebug.debugTriangles );
+            _renderer.SetDebugDrawData( renderDebug.mDebugLines,
+                                        renderDebug.mDebugLinesNoDepthTest,
+                                        renderDebug.mDebugTriangles,
+                                        renderDebug.mDebugLines2D);
         }
 
         // Camera
         {
             SCOPED_PROFILE( update_camera );
             Scene& scene = world.GetSingleton<Scene>();
-            EcsEntity cameraID = world.GetEntity( scene.mainCameraHandle );
+            EcsEntity cameraID = world.GetEntity( scene.mMainCameraHandle );
             Camera& camera = world.GetComponent<Camera>( cameraID );
             camera.aspectRatio = _size[0] / _size[1];
             Transform& cameraTransform = world.GetComponent<Transform>( cameraID );
@@ -676,7 +662,7 @@ namespace fan
         Scene       & scene        = world.GetSingleton<Scene>();
         EditorCamera& editorCamera = world.GetSingleton<EditorCamera>();
 
-        if( scene.mainCameraHandle == editorCamera.cameraHandle )
+        if( scene.mMainCameraHandle == editorCamera.cameraHandle )
         {
             currentGame.mOnSwitchToGameCamera.Emmit();
         }
