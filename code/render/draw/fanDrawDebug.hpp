@@ -18,7 +18,7 @@ namespace fan
 {
 	//================================================================
 	//================================================================
-	struct UniformsDebug
+	struct UniformsMVPColor
 	{
 		glm::mat4 model;
 		glm::mat4 view;
@@ -28,7 +28,7 @@ namespace fan
 
     //================================================================
     //================================================================
-    struct UniformsDebugLines2D
+    struct UniformsScreenSize
     {
         glm::vec2 mScreenSize;
     };
@@ -41,26 +41,22 @@ namespace fan
 	//================================================================================================================================
 	struct DrawDebug
 	{
-		Pipeline			 mPipelineLines;
-		Pipeline			 mPipelineLinesNDT;
-		Pipeline			 mPipelineTriangles;
-        Pipeline			 mPipelineLines2D;
-		Shader				 mFragmentShaderLines;
-		Shader				 mVertexShaderLines;
-		Shader				 mFragmentShaderLinesNDT;
-		Shader				 mVertexShaderLinesNDT;
-		Shader				 mFragmentShaderTriangles;
-		Shader				 mVertexShaderTriangles;
-        Shader				 mFragmentShaderLines2D;
-        Shader				 mVertexShaderLines2D;
-		UniformsDebug		 mUniformsLines;
-		UniformsDebug		 mUniformsLinesNDT;
-		UniformsDebug		 mUniformsTriangles;
-        UniformsDebugLines2D mUniformsLines2D;
-		DescriptorUniforms	 mDescriptorLines;
-		DescriptorUniforms	 mDescriptorLinesNDT;
-		DescriptorUniforms	 mDescriptorTriangles;
-        DescriptorUniforms   mDescriptorLines2D;
+		Pipeline		    mPipelineLines;
+		Pipeline		    mPipelineLinesNDT;
+		Pipeline            mPipelineTriangles;
+        Pipeline            mPipelineLines2D;
+		Shader              mFragmentShaderLines;
+		Shader              mVertexShaderLines;
+		Shader              mFragmentShaderLinesNDT;
+		Shader              mVertexShaderLinesNDT;
+		Shader              mFragmentShaderTriangles;
+		Shader              mVertexShaderTriangles;
+        Shader              mFragmentShaderLines2D;
+        Shader              mVertexShaderLines2D;
+		UniformsMVPColor    mUniformsMVPColor;
+        UniformsScreenSize  mUniformsScreenSize;
+		DescriptorUniforms  mDescriptorMVPColor;
+        DescriptorUniforms  mDescriptorScreenSize;
 
 		CommandBuffer		mCommandBuffers;
         CommandBuffer		mCommandBuffers2D;
@@ -77,10 +73,6 @@ namespace fan
 		void Create( Device& _device, uint32_t _imagesCount );
 		void Destroy( Device& _device );
 		void UpdateUniformBuffers( Device& _device, const size_t _index );
-		void BindDescriptorsLines( VkCommandBuffer _commandBuffer, const size_t _index );
-		void BindDescriptorsLinesNDT( VkCommandBuffer _commandBuffer, const size_t _index );
-		void BindDescriptorsTriangles( VkCommandBuffer _commandBuffer, const size_t _index );
-        void BindDescriptorsLines2D( VkCommandBuffer _commandBuffer, const size_t _index );
         bool HasNothingToDraw() const
         {
             return mNumLines == 0 &&

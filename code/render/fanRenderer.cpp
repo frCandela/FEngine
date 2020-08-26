@@ -291,7 +291,7 @@ namespace fan
                                                   &mDrawPostprocess.mSampler.mSampler );
 
 		mDrawImgui.UpdateGameImageDescriptor( mDevice, mImageViewPostprocessColor );
-        mDrawDebug.mUniformsLines2D.mScreenSize = { mGameExtent.width, mGameExtent.height };
+        mDrawDebug.mUniformsScreenSize.mScreenSize = { mGameExtent.width, mGameExtent.height };
 
 		RecordAllCommandBuffers();
 	}
@@ -362,16 +362,10 @@ namespace fan
 
         mDrawModels.mUniforms.mUniformsCameraPosition.cameraPosition = _position;
 
-        UniformsDebug* debugUniforms[3] = { &mDrawDebug.mUniformsLines,
-                                            &mDrawDebug.mUniformsLinesNDT,
-                                            &mDrawDebug.mUniformsTriangles };
-        for( int i = 0; i < 3; i++ )
-		{
-			debugUniforms[i]->model = glm::mat4( 1.0 );
-			debugUniforms[i]->view = _view;
-			debugUniforms[i]->proj = mDrawModels.mUniforms.mUniformsProjView.proj;
-			debugUniforms[i]->color = glm::vec4( 1, 1, 1, 1 );
-		}
+		mDrawDebug.mUniformsMVPColor.model = glm::mat4( 1.0 );
+		mDrawDebug.mUniformsMVPColor.view = _view;
+		mDrawDebug.mUniformsMVPColor.proj = mDrawModels.mUniforms.mUniformsProjView.proj;
+		mDrawDebug.mUniformsMVPColor.color = glm::vec4( 1, 1, 1, 1 );
 	}
 
 	//========================================================================================================

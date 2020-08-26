@@ -16,29 +16,16 @@ namespace fan
 		mVertexBuffersTriangles.resize( _imagesCount );
         mVertexBuffersLines2D.resize( _imagesCount );
 
-        mDescriptorLines.AddUniformBinding( _device,
+        mDescriptorMVPColor.AddUniformBinding( _device,
                                             _imagesCount,
                                             VK_SHADER_STAGE_VERTEX_BIT,
-                                            sizeof( UniformsDebug ) );
-        mDescriptorLines.Create( _device, _imagesCount );
-
-        mDescriptorLinesNDT.AddUniformBinding( _device,
-                                               _imagesCount,
-                                               VK_SHADER_STAGE_VERTEX_BIT,
-                                               sizeof( UniformsDebug ) );
-        mDescriptorLinesNDT.Create( _device, _imagesCount );
-
-        mDescriptorTriangles.AddUniformBinding( _device,
-                                                _imagesCount,
-                                                VK_SHADER_STAGE_VERTEX_BIT,
-                                                sizeof( UniformsDebug ) );
-		mDescriptorTriangles.Create( _device, _imagesCount );
-
-        mDescriptorLines2D.AddUniformBinding( _device,
-                                            _imagesCount,
-                                            VK_SHADER_STAGE_VERTEX_BIT,
-                                            sizeof( UniformsDebug ) );
-        mDescriptorLines2D.Create( _device, _imagesCount );
+                                            sizeof( UniformsMVPColor ) );
+        mDescriptorMVPColor.Create( _device, _imagesCount );
+        mDescriptorScreenSize.AddUniformBinding( _device,
+                                                 _imagesCount,
+                                                 VK_SHADER_STAGE_VERTEX_BIT,
+                                                 sizeof( UniformsMVPColor ) );
+        mDescriptorScreenSize.Create( _device, _imagesCount );
 	}
 
 	//========================================================================================================
@@ -50,10 +37,8 @@ namespace fan
         mPipelineTriangles.Destroy( _device );
         mPipelineLines2D.Destroy( _device );
 
-		mDescriptorLines.Destroy( _device );
-		mDescriptorLinesNDT.Destroy( _device );
-		mDescriptorTriangles.Destroy( _device );
-        mDescriptorLines2D.Destroy( _device );
+		mDescriptorMVPColor.Destroy( _device );
+        mDescriptorScreenSize.Destroy( _device );
 
         fanAssert(  ( mVertexBuffersLines.size() == mVertexBuffersLinesNDT.size() ) &&
                     ( mVertexBuffersLines.size() == mVertexBuffersTriangles.size() ) &&
@@ -75,39 +60,14 @@ namespace fan
 	//========================================================================================================
 	void DrawDebug::UpdateUniformBuffers( Device& _device, const size_t _index )
 	{
-		mDescriptorLines.SetData( _device, 0, _index, &mUniformsLines, sizeof( UniformsDebug ), 0 );
-		mDescriptorLinesNDT.SetData( _device, 0, _index, &mUniformsLinesNDT, sizeof( UniformsDebug ), 0 );
-		mDescriptorTriangles.SetData( _device, 0, _index, &mUniformsTriangles, sizeof( UniformsDebug ), 0 );
-        mDescriptorLines2D.SetData( _device, 0, _index, &mUniformsLines2D, sizeof( UniformsDebug ), 0 );
+		mDescriptorMVPColor.SetData( _device, 0, _index, &mUniformsMVPColor, sizeof( UniformsMVPColor ), 0 );
+        mDescriptorScreenSize.SetData( _device,
+                                       0,
+                                       _index,
+                                       &mUniformsScreenSize,
+                                       sizeof( UniformsMVPColor ),
+                                       0 );
 	}
-
-	//========================================================================================================
-	//========================================================================================================
-	void DrawDebug::BindDescriptorsLines( VkCommandBuffer _commandBuffer, const size_t _index )
-	{
-		mDescriptorLines.Bind( _commandBuffer, mPipelineLines.mPipelineLayout, _index );
-	}
-
-	//========================================================================================================
-	//========================================================================================================
-	void DrawDebug::BindDescriptorsLinesNDT( VkCommandBuffer _commandBuffer, const size_t _index )
-	{
-		mDescriptorLinesNDT.Bind( _commandBuffer, mPipelineLinesNDT.mPipelineLayout, _index );
-	}
-
-	//========================================================================================================
-	//========================================================================================================
-	void DrawDebug::BindDescriptorsTriangles( VkCommandBuffer _commandBuffer, const size_t _index )
-	{
-		mDescriptorTriangles.Bind( _commandBuffer, mPipelineTriangles.mPipelineLayout, _index );
-	}
-
-    //========================================================================================================
-    //========================================================================================================
-    void DrawDebug::BindDescriptorsLines2D( VkCommandBuffer _commandBuffer, const size_t _index )
-    {
-        mDescriptorLines2D.Bind( _commandBuffer, mPipelineLines2D.mPipelineLayout, _index );
-    }
 
 	//========================================================================================================
 	//========================================================================================================
@@ -119,7 +79,7 @@ namespace fan
 		config.attributeDescriptions                 = DebugVertex::GetAttributeDescriptions();
 		config.inputAssemblyStateInfo.topology       = VK_PRIMITIVE_TOPOLOGY_LINE_LIST;
 		config.depthStencilStateInfo.depthTestEnable =  VK_TRUE;
-		config.descriptorSetLayouts                  = { mDescriptorLines.mDescriptorSetLayout };
+		config.descriptorSetLayouts                  = { mDescriptorMVPColor.mDescriptorSetLayout };
 		config.rasterizationStateInfo.cullMode       = VK_CULL_MODE_NONE;
 		
 		return config;
@@ -135,7 +95,7 @@ namespace fan
 		config.attributeDescriptions                 = DebugVertex::GetAttributeDescriptions();
 		config.inputAssemblyStateInfo.topology       = VK_PRIMITIVE_TOPOLOGY_LINE_LIST;
 		config.depthStencilStateInfo.depthTestEnable = VK_TRUE;
-		config.descriptorSetLayouts                  = { mDescriptorLinesNDT.mDescriptorSetLayout };
+		config.descriptorSetLayouts                  = { mDescriptorMVPColor.mDescriptorSetLayout };
 		config.rasterizationStateInfo.cullMode       = VK_CULL_MODE_NONE;
 
 		return config;
@@ -151,7 +111,7 @@ namespace fan
 		config.attributeDescriptions                 = DebugVertex::GetAttributeDescriptions();
 		config.inputAssemblyStateInfo.topology       = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
 		config.depthStencilStateInfo.depthTestEnable = VK_FALSE;
-		config.descriptorSetLayouts                  = { mDescriptorTriangles.mDescriptorSetLayout };
+		config.descriptorSetLayouts                  = { mDescriptorMVPColor.mDescriptorSetLayout };
 		config.rasterizationStateInfo.cullMode       = VK_CULL_MODE_NONE;
 
 		return config;
@@ -167,7 +127,7 @@ namespace fan
         config.attributeDescriptions                 = DebugVertex2D::GetAttributeDescriptions();
         config.inputAssemblyStateInfo.topology       = VK_PRIMITIVE_TOPOLOGY_LINE_LIST;
         config.depthStencilStateInfo.depthTestEnable =  VK_FALSE;
-        config.descriptorSetLayouts                  = { mDescriptorLines2D.mDescriptorSetLayout };
+        config.descriptorSetLayouts                  = { mDescriptorScreenSize.mDescriptorSetLayout };
         config.rasterizationStateInfo.cullMode       = VK_CULL_MODE_NONE;
 
         return config;
@@ -194,7 +154,7 @@ namespace fan
 				if( mNumLines > 0 && mVertexBuffersLines[_index].mBuffer != VK_NULL_HANDLE )
 				{
 					mPipelineLines.Bind( commandBuffer, _extent );
-					BindDescriptorsLines( commandBuffer, _index );
+                    mDescriptorMVPColor.Bind( commandBuffer, mPipelineLines.mPipelineLayout, _index );
 					VkBuffer vertexBuffers[] = { mVertexBuffersLines[_index].mBuffer };
 					vkCmdBindVertexBuffers( commandBuffer, 0, 1, vertexBuffers, offsets );
 					vkCmdDraw( commandBuffer, static_cast<uint32_t>( mNumLines ), 1, 0, 0 );
@@ -202,7 +162,7 @@ namespace fan
 				if( mNumLinesNDT > 0 && mVertexBuffersLinesNDT[_index].mBuffer != VK_NULL_HANDLE )
 				{
 					mPipelineLinesNDT.Bind( commandBuffer, _extent );
-					BindDescriptorsLinesNDT( commandBuffer, _index );
+                    mDescriptorMVPColor.Bind( commandBuffer, mPipelineLinesNDT.mPipelineLayout, _index );
 					VkBuffer vertexBuffers[] = { mVertexBuffersLinesNDT[_index].mBuffer };
 					vkCmdBindVertexBuffers( commandBuffer, 0, 1, vertexBuffers, offsets );
 					vkCmdDraw( commandBuffer, static_cast<uint32_t>( mNumLinesNDT ), 1, 0, 0 );
@@ -210,7 +170,7 @@ namespace fan
 				if( mNumTriangles > 0 && mVertexBuffersTriangles[_index].mBuffer != VK_NULL_HANDLE )
 				{
 					mPipelineTriangles.Bind( commandBuffer, _extent );
-					BindDescriptorsTriangles( commandBuffer, _index );
+                    mDescriptorMVPColor.Bind( commandBuffer, mPipelineTriangles.mPipelineLayout, _index );
 					VkBuffer vertexBuffers[] = { mVertexBuffersTriangles[_index].mBuffer };
 					vkCmdBindVertexBuffers( commandBuffer, 0, 1, vertexBuffers, offsets );
 					vkCmdDraw( commandBuffer, static_cast<uint32_t>( mNumTriangles ), 1, 0, 0 );
@@ -249,7 +209,7 @@ namespace fan
                 if( mNumLines2D > 0 && mVertexBuffersLines2D[_index].mBuffer != VK_NULL_HANDLE )
                 {
                     mPipelineLines2D.Bind( commandBuffer, _extent );
-                    BindDescriptorsLines2D( commandBuffer, _index );
+                    mDescriptorScreenSize.Bind( commandBuffer, mPipelineLines2D.mPipelineLayout, _index );
                     VkBuffer vertexBuffers[] = { mVertexBuffersLines2D[_index].mBuffer };
                     vkCmdBindVertexBuffers( commandBuffer, 0, 1, vertexBuffers, offsets );
                     vkCmdDraw( commandBuffer, static_cast<uint32_t>( mNumLines2D ), 1, 0, 0 );
