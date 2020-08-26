@@ -27,6 +27,7 @@ namespace fan
 	//================================================================================================================================
 	void DrawPostprocess::Destroy( Device& _device )
 	{
+        mPipeline.Destroy( _device );
 		mSampler.Destroy( _device );
 		mDescriptorUniform.Destroy( _device );
 		mDescriptorImage.Destroy( _device );

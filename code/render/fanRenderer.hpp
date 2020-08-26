@@ -76,7 +76,7 @@ namespace fan
 		glm::vec4		mClearColor = glm::vec4( 0.f, 0.f, 0.2f, 1.f );;
 		CommandBuffer	mPrimaryCommandBuffers;
 
-		// data
+		// draw units
 		DrawModels		mDrawModels;
 		DrawDebug		mDrawDebug;
 		DrawUI			mDrawUI;

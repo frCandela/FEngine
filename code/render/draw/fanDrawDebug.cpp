@@ -45,6 +45,11 @@ namespace fan
 	//========================================================================================================
 	void DrawDebug::Destroy( Device& _device )
 	{
+        mPipelineLines.Destroy( _device );
+        mPipelineLinesNDT.Destroy( _device );
+        mPipelineTriangles.Destroy( _device );
+        mPipelineLines2D.Destroy( _device );
+
 		mDescriptorLines.Destroy( _device );
 		mDescriptorLinesNDT.Destroy( _device );
 		mDescriptorTriangles.Destroy( _device );

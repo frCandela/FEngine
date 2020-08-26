@@ -68,19 +68,13 @@ namespace fan
 		mDrawModels.Destroy( mDevice );
 		mDrawUI.mPipeline.Destroy( mDevice );
 		mDrawDebug.Destroy( mDevice );
+		mDrawUI.Destroy( mDevice );
+        mDrawPostprocess.Destroy( mDevice );
 
 		mMeshManager.Clear( mDevice );
         mMesh2DManager.Clear( mDevice );
         mTextureManager.Clear( mDevice );
-
-		mDrawUI.Destroy( mDevice );
-
 		mDescriptorTextures.Destroy( mDevice );
-
-		mDrawDebug.mPipelineLines.Destroy( mDevice );
-		mDrawDebug.mPipelineLinesNDT.Destroy( mDevice );
-		mDrawDebug.mPipelineTriangles.Destroy( mDevice );
-        mDrawDebug.mPipelineLines2D.Destroy( mDevice );
 
 		DestroyShaders();
 
@@ -91,22 +85,17 @@ namespace fan
 		mSamplerGameColor.Destroy( mDevice );
 		mImageGameColor.Destroy( mDevice );
 		mImageViewGameColor.Destroy( mDevice );
-
 		// pp frame buffers & attachements
 		mFramebuffersPostprocess.Destroy( mDevice );
 		mSamplerPostprocessColor.Destroy( mDevice );
 		mImagePostprocessColor.Destroy( mDevice );
 		mImageViewPostprocessColor.Destroy( mDevice );
-		
 		// render passes
 		mRenderPassGame.Destroy( mDevice );
 		mRenderPassPostprocess.Destroy( mDevice );
 		mRenderPassImgui.Destroy( mDevice );
 
 		mFramebuffersSwapchain.Destroy( mDevice );
-
-		mDrawPostprocess.mPipeline.Destroy( mDevice );
-		mDrawPostprocess.Destroy( mDevice );
 	}
 
 	//========================================================================================================
