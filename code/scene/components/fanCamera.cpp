@@ -12,13 +12,13 @@ namespace fan
 	//========================================================================================================
 	void Camera::SetInfo( EcsComponentInfo& _info )
 	{
-		_info.icon = ImGui::IconType::CAMERA16;
-		_info.group = EngineGroups::Scene;
-		_info.onGui = &Camera::OnGui;
-		_info.load = &Camera::Load;
-		_info.save = &Camera::Save;
-		_info.editorPath = "/";
-		_info.name = "camera";
+		_info.mIcon       = ImGui::IconType::CAMERA16;
+		_info.mGroup      = EngineGroups::Scene;
+		_info.onGui       = &Camera::OnGui;
+		_info.load        = &Camera::Load;
+		_info.save        = &Camera::Save;
+		_info.mEditorPath = "/";
+		_info.mName       = "camera";
 	}
 
 	//========================================================================================================

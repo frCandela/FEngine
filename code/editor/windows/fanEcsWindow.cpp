@@ -37,8 +37,8 @@ namespace fan
 		// Global
 		if( ImGui::CollapsingHeader( "Global" ) )
 		{
-			ImGui::Text( "num chunks     : %d", EcsChunk::s_allocator.Size() );
-			ImGui::Text( "total size (Mo): %.1f", float( EcsChunk::s_allocator.Size() * EcsChunk::s_allocator.chunkSize ) * 0.000001f );
+			ImGui::Text( "num chunks     : %d", EcsChunk::sAllocator.Size() );
+			ImGui::Text( "total size (Mo): %.1f", float( EcsChunk::sAllocator.Size() * EcsChunk::sAllocator.sChunkSize ) * 0.000001f );
 		}
 
 		// Archetypes
@@ -70,7 +70,7 @@ namespace fan
 					std::stringstream ss;
 					for (int i = 0; i < archetype->Size() ; i++)
 					{
-						ss <<archetype->GetEntityData( i ).handle << " ";
+						ss <<archetype->GetEntityData( i ).mHandle << " ";
 					}
 					ImGui::TextUnformatted( ss.str().c_str() );
 					ImGui::PopTextWrapPos();
@@ -86,9 +86,9 @@ namespace fan
 					{
 						const EcsComponentInfo& info = infos[componentIndex];
 						std::stringstream ss;
-						ImGui::Icon( info.icon, { 16,16 }, GroupsColors::GetColor( info.group ) ); ImGui::SameLine();
-						ss << info.name.c_str();
-						for( int i = 0; i < 19 - (int)info.name.size(); i++ )
+						ImGui::Icon( info.mIcon, { 16, 16 }, GroupsColors::GetColor( info.mGroup ) ); ImGui::SameLine();
+						ss << info.mName.c_str();
+						for( int i = 0; i < 19 - (int)info.mName.size(); i++ )
 						{
 							ss << " ";
 						}
@@ -102,8 +102,8 @@ namespace fan
 
 
 						std::stringstream ssTooltip;
-						ssTooltip << info.name << '\n';
-						ssTooltip << "component size: " << info.size;
+						ssTooltip << info.mName << '\n';
+						ssTooltip << "component size: " << info.mSize;
 						ImGui::FanToolTip( ssTooltip.str().c_str() );
 					}
 				}
@@ -132,9 +132,9 @@ namespace fan
 				ImGui::Text( "%d", i++ );		ImGui::NextColumn();
 				ImGui::Text( "%d", handle );	ImGui::NextColumn();
 				std::stringstream ss;
-				ss << entity.archetype->GetSignature();
+				ss << entity.mArchetype->GetSignature();
 				ImGui::Text( "%s", ss.str().c_str() );	ImGui::NextColumn();
-				ImGui::Text( "%d", entity.index );	ImGui::NextColumn();
+				ImGui::Text( "%d", entity.mIndex );	ImGui::NextColumn();
 			}
 			ImGui::Columns( 1 );
 		}

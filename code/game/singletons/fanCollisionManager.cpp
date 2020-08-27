@@ -16,9 +16,9 @@ namespace fan
 	//========================================================================================================
 	void CollisionManager::SetInfo( EcsSingletonInfo& _info )
 	{
-		_info.icon = ImGui::RIGIDBODY16;
-		_info.group = EngineGroups::Game;
-		_info.name = "collision manager";
+		_info.mIcon  = ImGui::RIGIDBODY16;
+		_info.mGroup = EngineGroups::Game;
+		_info.mName  = "collision manager";
 	}
 
 	//========================================================================================================

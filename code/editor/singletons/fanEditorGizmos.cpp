@@ -17,9 +17,9 @@ namespace fan
 	//========================================================================================================
 	void EditorGizmos::SetInfo( EcsSingletonInfo& _info )
 	{
-		_info.name = "editor gizmo";
-		_info.icon = ImGui::GIZMOS16;
-		_info.group = EngineGroups::Editor;
+		_info.mName  = "editor gizmo";
+		_info.mIcon  = ImGui::GIZMOS16;
+		_info.mGroup = EngineGroups::Editor;
 	}
 
 	//========================================================================================================

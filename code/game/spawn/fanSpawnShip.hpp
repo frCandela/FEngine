@@ -130,7 +130,7 @@ namespace fan
 					{						
 						_world.AddComponent<HostPersistentHandle>( spaceshipID ).mHandle = _persistentHandle;
 						EntityReplication& entityReplication = _world.AddComponent<EntityReplication>( spaceshipID );
-						entityReplication.mComponentTypes = { Transform::Info::s_type, Rigidbody::Info::s_type };
+						entityReplication.mComponentTypes = { Transform::Info::sType, Rigidbody::Info::sType };
 						entityReplication.mExclude        = _persistentHandle;
 					}
 

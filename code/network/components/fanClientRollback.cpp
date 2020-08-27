@@ -6,13 +6,13 @@ namespace fan
 	//========================================================================================================
 	void ClientRollback::SetInfo( EcsComponentInfo& _info )
 	{
-		_info.icon = ImGui::NETWORK16;
-		_info.group = EngineGroups::Network;
-		_info.onGui = &ClientRollback::OnGui;
-		_info.save = &ClientRollback::Save;
-		_info.load = &ClientRollback::Load;
-		_info.name = "client rollback";
-		_info.editorPath = "network/";
+		_info.mIcon       = ImGui::NETWORK16;
+		_info.mGroup      = EngineGroups::Network;
+		_info.onGui       = &ClientRollback::OnGui;
+		_info.save        = &ClientRollback::Save;
+		_info.load        = &ClientRollback::Load;
+		_info.mName       = "client rollback";
+		_info.mEditorPath = "network/";
 	}
 
 	//========================================================================================================

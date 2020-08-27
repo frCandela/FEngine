@@ -27,22 +27,22 @@ namespace fan
             if( info.onGui != nullptr )
             {
                 ImGui::SetCursorPosY( ImGui::GetCursorPosY() + 3);		// moves cursor lower to center the icon
-                ImGui::Icon( info.icon, { 16,16 }, GroupsColors::GetColor( info.group ) ); ImGui::SameLine();
+                ImGui::Icon( info.mIcon, { 16, 16 }, GroupsColors::GetColor( info.mGroup ) ); ImGui::SameLine();
                 ImGui::SetCursorPosY( ImGui::GetCursorPosY() - 3 );		// resets the cursor
-                if( ImGui::CollapsingHeader( info.name.c_str() ) )
+                if( ImGui::CollapsingHeader( info.mName.c_str() ) )
                 {
-                    ImGui::FanBeginDragDropSourceSingleton( _world, info.type );
+                    ImGui::FanBeginDragDropSourceSingleton( _world, info.mType );
                     // draws gui
                     if( info.onGui != nullptr )
                     {
                         ImGui::Indent(); ImGui::Indent();
-                        info.onGui( _world, _world.GetSingleton( info.type ) );
+                        info.onGui( _world, _world.GetSingleton( info.mType ) );
                         ImGui::Unindent(); ImGui::Unindent();
                     }
                 }
                 else
                 {
-                    ImGui::FanBeginDragDropSourceSingleton( _world, info.type );
+                    ImGui::FanBeginDragDropSourceSingleton( _world, info.mType );
                 }
 			}
 		}

@@ -23,9 +23,9 @@ namespace fan
 	//========================================================================================================
 	void EditorSelection::SetInfo( EcsSingletonInfo& _info )
 	{
-		_info.name = "editor selection";
-		_info.icon = ImGui::SELECTION16;
-		_info.group = EngineGroups::Editor;
+		_info.mName  = "editor selection";
+		_info.mIcon  = ImGui::SELECTION16;
+		_info.mGroup = EngineGroups::Editor;
 	}
 
 	//========================================================================================================

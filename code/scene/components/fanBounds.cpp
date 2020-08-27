@@ -6,8 +6,8 @@ namespace fan
 	//========================================================================================================
 	void Bounds::SetInfo( EcsComponentInfo& _info )
 	{
-		_info.group = EngineGroups::Scene;
-		_info.name = "bounds";
+		_info.mGroup = EngineGroups::Scene;
+		_info.mName  = "bounds";
 	}
 
 	//========================================================================================================

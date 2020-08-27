@@ -2,6 +2,7 @@
 
 #include <unordered_map>
 #include "core/fanHash.hpp"
+#include "core/fanAssert.hpp"
 #include "ecs/fanEcsEntity.hpp"
 #include "ecs/fanEcsComponent.hpp"
 #include "ecs/fanEcsSingleton.hpp"
@@ -21,10 +22,10 @@ namespace fan
 
 	struct EcsTransition
 	{
-		EcsEntity	  entity;
-		EcsSignature  signatureAdd = EcsSignature( 0 );		// bit to 1 means add component
-		EcsSignature  signatureRemove = EcsSignature( 0 );	// bit to 1 means remove component
-		bool isDead = false;
+		EcsEntity    mEntity;
+		EcsSignature mSignatureAdd    = EcsSignature( 0 );		// bit to 1 means add component
+		EcsSignature mSignatureRemove = EcsSignature( 0 );	// bit to 1 means remove component
+		bool         mIsDead          = false;
 	};
 
 	//========================================================================================================
@@ -33,8 +34,8 @@ namespace fan
 	//========================================================================================================
 	struct DestroyedComponent
 	{
-		EcsEntity entity;
-		EcsComponent& component;
+		EcsEntity       mEntity;
+		EcsComponent&   mComponent;
 		void ( *destroy )( EcsWorld&, EcsEntity, EcsComponent& );
 	};
 
@@ -50,28 +51,28 @@ namespace fan
 		// Global
 		void ApplyTransitions();
 		void Clear();
-		int  NumComponents() const	{ return int( m_componentsInfo.size() ); }
+		int  NumComponents() const	{ return int( mComponentsInfo.size() ); }
 		int  GetIndex( const uint32_t  _type ) const;
 		void ReloadInfos();
 
 		// Handles
-		EcsEntity	GetEntity		( const EcsHandle _handle ){ return m_handles.at( _handle ); }
+		EcsEntity	GetEntity		( const EcsHandle _handle ){ return mHandles.at( _handle ); }
 		EcsHandle	AddHandle		( const EcsEntity _entity );
 		void		SetHandle		( const EcsEntity _entity, EcsHandle _handle );
 		EcsHandle	GetHandle		( const EcsEntity _entity ) const;
 		void		RemoveHandle	( const EcsEntity _entity );
-		EcsHandle	GetNextHandle() const { return m_nextHandle; }
-		void		SetNextHandle( const EcsHandle  _handle ) { m_nextHandle = _handle; }
-        bool HandleExists( const EcsHandle _handle ) { return m_handles.find( _handle ) != m_handles.end(); }
+		EcsHandle	GetNextHandle() const { return mNextHandle; }
+		void		SetNextHandle( const EcsHandle  _handle ) { mNextHandle = _handle; }
+        bool HandleExists( const EcsHandle _handle ) { return mHandles.find( _handle ) != mHandles.end(); }
 
 		// Singletons
 		template <typename _SingletonType >	void		AddSingletonType();
 		template< typename _SingletonType > _SingletonType& GetSingleton();
-        EcsSingleton& GetSingleton( const uint32_t _type ) { return *m_singletons.at(_type); }
-        const EcsSingleton& GetSingleton( const uint32_t _type ) const { return *m_singletons.at( _type ); }
+        EcsSingleton& GetSingleton( const uint32_t _type ) { return *mSingletons.at( _type); }
+        const EcsSingleton& GetSingleton( const uint32_t _type ) const { return *mSingletons.at( _type ); }
         const EcsSingletonInfo& GetSingletonInfo( const uint32_t _type ) const
         {
-            return m_singletonInfos.at( _type );
+            return mSingletonInfos.at( _type );
         }
 		const EcsSingletonInfo*			SafeGetSingletonInfo( const uint32_t _type ) const;
 		std::vector< EcsSingletonInfo >	GetVectorSingletonInfo() const;
@@ -100,7 +101,7 @@ namespace fan
 		const EcsComponentInfo&	IndexedGetComponentInfo( const int _componentIndex ) const;
 		const EcsComponentInfo&	GetComponentInfo( const uint32_t _type ) const;
         const EcsComponentInfo*	SafeGetComponentInfo( const uint32_t _type ) const;
-		const std::vector< EcsComponentInfo >&	GetComponentInfos() const	{ return m_componentsInfo; }
+		const std::vector< EcsComponentInfo >&	GetComponentInfos() const	{ return mComponentsInfo; }
 
 		// Entities
 		EcsEntity	CreateEntity();
@@ -112,36 +113,36 @@ namespace fan
 		template< typename _SystemType > EcsView							Match() const;
 
 		// Const accessors
-        const std::unordered_map<EcsHandle, EcsEntity>& GetHandles() const { return m_handles; }
-        const std::unordered_map<EcsSignature, EcsArchetype*>& GetArchetypes() const { return m_archetypes; }
-        const EcsArchetype& GetTransitionArchetype() const { return m_transitionArchetype; }
+        const std::unordered_map<EcsHandle, EcsEntity>& GetHandles() const { return mHandles; }
+        const std::unordered_map<EcsSignature, EcsArchetype*>& GetArchetypes() const { return mArchetypes; }
+        const EcsArchetype& GetTransitionArchetype() const { return mTransitionArchetype; }
 
     private:
         const EcsEntityData&  GetEntityData( const EcsEntity _entity ) const
         {
-            return _entity.archetype->GetEntityData( _entity.index );
+            return _entity.mArchetype->GetEntityData( _entity.mIndex );
         }
         EcsEntityData& GetEntityData( const EcsEntity _entity )
         {
-            return _entity.archetype->GetEntityData( _entity.index );
+            return _entity.mArchetype->GetEntityData( _entity.mIndex );
         }
 		EcsArchetype*		FindArchetype( const EcsSignature _signature );
 		EcsArchetype&		CreateArchetype( const EcsSignature _signature );
 		EcsTransition&		FindOrCreateTransition( const EcsEntity _entity );
 		
 
-		EcsHandle											m_nextHandle = 1;	// 0 is a null handle
-		int													m_nextTagIndex = ecsSignatureLength - 1;
-		EcsSignature										m_tagsMask;// signature of all tag types combined
-		EcsArchetype										m_transitionArchetype;
-		std::unordered_map< EcsSignature, EcsArchetype* >	m_archetypes;
-		std::unordered_map<uint32_t, int >					m_typeToIndex;
-		std::unordered_map< EcsHandle, EcsEntity >			m_handles;
-		std::unordered_map< uint32_t, EcsSingleton* >		m_singletons;
-		std::unordered_map< uint32_t, EcsSingletonInfo >	m_singletonInfos;
-		std::vector< EcsComponentInfo >						m_componentsInfo;
-		std::vector< EcsTransition >						m_transitions;
-		std::vector< DestroyedComponent >					m_destroyedComponents;
+		EcsHandle                                         mNextHandle   = 1;	// 0 is a null handle
+		int                                               mNextTagIndex = ecsSignatureLength - 1;
+		EcsSignature                                      mTagsMask;// signature of all tag types combined
+		EcsArchetype                                      mTransitionArchetype;
+		std::unordered_map< EcsSignature, EcsArchetype* > mArchetypes;
+		std::unordered_map<uint32_t, int >                mTypeToIndex;
+		std::unordered_map< EcsHandle, EcsEntity >        mHandles;
+		std::unordered_map< uint32_t, EcsSingleton* >     mSingletons;
+		std::unordered_map< uint32_t, EcsSingletonInfo >  mSingletonInfos;
+		std::vector< EcsComponentInfo >                   mComponentsInfo;
+		std::vector< EcsTransition >                      mTransitions;
+		std::vector< DestroyedComponent >                 mDestroyedComponents;
 	};
 
 	//========================================================================================================
@@ -149,19 +150,19 @@ namespace fan
 	template <typename _SingletonType >	void EcsWorld::AddSingletonType()
 	{
 		static_assert( std::is_base_of< EcsSingleton, _SingletonType>::value );
-		assert( m_singletons.find( _SingletonType::s_type ) == m_singletons.end() );
+        fanAssert( mSingletons.find( _SingletonType::Info::sType ) == mSingletons.end() );
 
 		// Creates the singleton component
 		_SingletonType* singleton = new _SingletonType();
-		m_singletons[_SingletonType::s_type] = singleton;
+        mSingletons[_SingletonType::Info::sType] = singleton;
 
 		// Registers singleton info
 		EcsSingletonInfo info;
         info.setInfo = &_SingletonType::SetInfo;
 		_SingletonType::SetInfo( info );
-		info.init = &_SingletonType::Init;
-		info.type = _SingletonType::s_type;
-		m_singletonInfos[_SingletonType::s_type] = info;
+		info.init  = &_SingletonType::Init;
+		info.mType = _SingletonType::Info::sType;
+        mSingletonInfos[_SingletonType::Info::sType] = info;
 
 		// init singleton
 		info.init( *this, *singleton );
@@ -172,7 +173,7 @@ namespace fan
 	template< typename _SingletonType > _SingletonType& EcsWorld::GetSingleton()
 	{
 		static_assert( std::is_base_of< EcsSingleton, _SingletonType >::value );
-		return static_cast<_SingletonType&>( GetSingleton( _SingletonType::s_type ) );
+		return static_cast<_SingletonType&>( GetSingleton( _SingletonType::Info::sType ) );
 	}
 
 	//========================================================================================================
@@ -180,11 +181,11 @@ namespace fan
 	template <typename _TagType > void EcsWorld::AddTagType()
 	{
 		static_assert( std::is_base_of< EcsTag, _TagType>::value );
-		assert( m_nextTagIndex >= NumComponents() );
-		const int newTagIndex = m_nextTagIndex--;
-		m_typeToIndex[_TagType::Info::s_type] = newTagIndex;
+		fanAssert( mNextTagIndex >= NumComponents() );
+		const int newTagIndex = mNextTagIndex--;
+        mTypeToIndex[_TagType::Info::sType] = newTagIndex;
 
-		m_tagsMask[newTagIndex] = 1;
+        mTagsMask[newTagIndex] = 1;
 	}
 
 	//========================================================================================================
@@ -192,7 +193,7 @@ namespace fan
 	template <typename _TagType > void EcsWorld::AddTag( const EcsEntity _entity )
 	{
 		static_assert( std::is_base_of< EcsTag, _TagType>::value );
-		AddTag( _entity, _TagType::Info::s_type );
+		AddTag( _entity, _TagType::Info::sType );
 	}
 
 	//========================================================================================================
@@ -200,7 +201,7 @@ namespace fan
 	template <typename _TagType > void EcsWorld::RemoveTag( const EcsEntity _entity )
 	{
 		static_assert( std::is_base_of< EcsTag, _TagType>::value );
-		RemoveTag( _entity, _TagType::Info::s_type );
+		RemoveTag( _entity, _TagType::Info::sType );
 	}
 
 	//========================================================================================================
@@ -210,27 +211,27 @@ namespace fan
 		static_assert( std::is_base_of< EcsComponent, _ComponentType>::value );
 
 		const int nextTypeIndex = NumComponents();
-		assert( m_nextTagIndex >= nextTypeIndex );
+		assert( mNextTagIndex >= nextTypeIndex );
 
 		// Set component info
 		EcsComponentInfo info;
-		info.name = _ComponentType::Info::s_name;
-		info.construct = &_ComponentType::Info::Instanciate;
-        info.copy = std::is_trivially_copyable<_ComponentType>::value
+		info.mName      = _ComponentType::Info::sName;
+		info.construct  = &_ComponentType::Info::Instanciate;
+        info.copy       = std::is_trivially_copyable<_ComponentType>::value
                 ? &std::memcpy
                 : &_ComponentType::Info::Memcpy;
-		info.init = &_ComponentType::Init;
-		info.size = _ComponentType::Info::s_size;
-		info.alignment = _ComponentType::Info::s_alignment;
-		info.type = _ComponentType::Info::s_type;
-		info.index = nextTypeIndex;
-		info.setInfo = &_ComponentType::SetInfo;
+		info.init       = &_ComponentType::Init;
+		info.mSize      = _ComponentType::Info::sSize;
+		info.mAlignment = _ComponentType::Info::sAlignment;
+		info.mType      = _ComponentType::Info::sType;
+		info.mIndex     = nextTypeIndex;
+		info.setInfo    = &_ComponentType::SetInfo;
 		_ComponentType::SetInfo( info );
-		m_componentsInfo.push_back( info );
+		mComponentsInfo.push_back( info );
 
-		m_typeToIndex[_ComponentType::Info::s_type] = nextTypeIndex;
+        mTypeToIndex[_ComponentType::Info::sType] = nextTypeIndex;
 
-		m_transitionArchetype.AddComponentType( info );
+		mTransitionArchetype.AddComponentType( info );
 	}
 
 	//========================================================================================================
@@ -238,7 +239,7 @@ namespace fan
 	template <typename _ComponentType > _ComponentType& EcsWorld::AddComponent( const EcsEntity _entity )
 	{
 		static_assert( std::is_base_of< EcsComponent, _ComponentType>::value );
-		return static_cast<_ComponentType&>( AddComponent( _entity, _ComponentType::Info::s_type ) );
+		return static_cast<_ComponentType&>( AddComponent( _entity, _ComponentType::Info::sType ) );
 	}
 
 	//========================================================================================================
@@ -246,7 +247,7 @@ namespace fan
 	template <typename _ComponentType > void EcsWorld::RemoveComponent( const EcsEntity _entity )
 	{
 		static_assert( std::is_base_of< EcsComponent, _ComponentType>::value );
-		RemoveComponent( _entity, _ComponentType::Info::s_type );
+		RemoveComponent( _entity, _ComponentType::Info::sType );
 	}
 
 	//========================================================================================================
@@ -254,7 +255,7 @@ namespace fan
 	template <typename _ComponentType > bool EcsWorld::HasComponent( const EcsEntity _entity )
 	{
 		static_assert( std::is_base_of< EcsComponent, _ComponentType>::value );
-		return HasComponent( _entity, _ComponentType::Info::s_type );
+		return HasComponent( _entity, _ComponentType::Info::sType );
 	}
 
 	//========================================================================================================
@@ -262,7 +263,7 @@ namespace fan
 	template< typename _ComponentType >	_ComponentType& EcsWorld::GetComponent( const EcsEntity _entity )
 	{
 		static_assert( std::is_base_of< EcsComponent, _ComponentType>::value );
-		return static_cast<_ComponentType&> ( GetComponent( _entity, _ComponentType::Info::s_type ) );
+		return static_cast<_ComponentType&> ( GetComponent( _entity, _ComponentType::Info::sType ) );
 	}
 
 	//========================================================================================================
@@ -279,7 +280,7 @@ namespace fan
 	{
         static_assert( std::is_base_of<EcsTag, _tagOrComponentType>::value ||
                        std::is_base_of<EcsComponent, _tagOrComponentType>::value );
-		return EcsSignature( 1 ) << m_typeToIndex.at( _tagOrComponentType::Info::s_type );
+		return EcsSignature( 1 ) << mTypeToIndex.at( _tagOrComponentType::Info::sType );
 	}
 
 	//========================================================================================================
@@ -291,12 +292,12 @@ namespace fan
 
 		const EcsSignature signature = _SystemType::GetSignature( *this );
 
-		EcsView view( m_typeToIndex, signature );
-		for( auto it = m_archetypes.begin(); it != m_archetypes.end(); ++it )
+		EcsView view( mTypeToIndex, signature );
+		for( auto it = mArchetypes.begin(); it != mArchetypes.end(); ++it )
 		{
 			if( ( it->first & signature ) == signature && !it->second->Empty() )
 			{
-				view.m_archetypes.push_back( it->second );
+				view.mArchetypes.push_back( it->second );
 			}
 		}
 		return view;

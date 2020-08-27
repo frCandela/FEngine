@@ -9,97 +9,92 @@ namespace fan
 	struct EcsView
 	{
 		EcsView( const std::unordered_map<uint32_t, int >& _typesToIndex, const EcsSignature _signature ) :
-			m_typesToIndex( _typesToIndex )
-			, m_signature( _signature )
+                mTypesToIndex( _typesToIndex )
+			, mSignature( _signature )
 		{
 		}
 
-		const std::unordered_map<uint32_t, int >& m_typesToIndex;
-		const EcsSignature m_signature;
-		std::vector<EcsArchetype*> m_archetypes;
-
-
 		//================================
 		//================================
-		template < typename _ComponentType >
+		template < typename ComponentType >
 		struct iterator
 		{
 			iterator( const EcsView& _view, const int _componentIndex )
 			{
 				if( _componentIndex == -1 )
 				{
-					m_archetypeIndex = uint16_t( _view.m_archetypes.size() ); // end() iterator
+                    mArchetypeIndex = uint16_t( _view.mArchetypes.size() ); // end() iterator
 				}
 				else
 				{
-					assert( _view.m_signature[_componentIndex] );
-					m_archetypes = _view.m_archetypes;
-					m_componentIndex = _componentIndex;
-					m_chunkIndex = 0;
-					m_elementIndex = 0;
-					m_archetypeIndex = 0;
-					if( !m_archetypes.empty() )
+					assert( _view.mSignature[_componentIndex] );
+                    mArchetypesList = _view.mArchetypes;
+                    mComponentIndex = _componentIndex;
+                    mChunkIndex     = 0;
+                    mElementIndex   = 0;
+                    mArchetypeIndex = 0;
+					if( !mArchetypesList.empty() )
 					{
-						m_currentArchetype = m_archetypes[m_archetypeIndex];
-						m_currentChunk = &m_currentArchetype->GetChunkVector( _componentIndex ).GetChunk( m_chunkIndex );
+                        mCurrentArchetype = mArchetypesList[mArchetypeIndex];
+                        mCurrentChunk     = &mCurrentArchetype->GetChunkVector( _componentIndex ).GetChunk( mChunkIndex );
 					}
 				}
 			}
 
 			inline bool operator!=( const iterator& _other ) const
 			{
-				return m_archetypeIndex != _other.m_archetypeIndex;
+				return mArchetypeIndex != _other.mArchetypeIndex;
 			}
 
 			void operator++() // prefix ++
 			{
-				++m_elementIndex;
-				if( m_elementIndex >= m_currentChunk->Size() )
+				++mElementIndex;
+				if( mElementIndex >= mCurrentChunk->Size() )
 				{
-					m_elementIndex = 0;
-					++m_chunkIndex;
+                    mElementIndex = 0;
+					++mChunkIndex;
 
-					if( m_chunkIndex < m_currentArchetype->GetChunkVector( m_componentIndex ).NumChunk() )
+					if( mChunkIndex < mCurrentArchetype->GetChunkVector( mComponentIndex ).NumChunk() )
 					{
-						m_currentChunk = &m_currentArchetype->GetChunkVector( m_componentIndex ).GetChunk( m_chunkIndex );
+                        mCurrentChunk = &mCurrentArchetype->GetChunkVector( mComponentIndex ).GetChunk( mChunkIndex );
 					}
 					else
 					{
-						m_chunkIndex = 0;
-						++m_archetypeIndex;
-						if( m_archetypeIndex < m_archetypes.size() )
+                        mChunkIndex = 0;
+						++mArchetypeIndex;
+						if( mArchetypeIndex < mArchetypesList.size() )
 						{
-							m_currentArchetype = m_archetypes[m_archetypeIndex];
-							m_currentChunk = &m_currentArchetype->GetChunkVector( m_componentIndex ).GetChunk( m_chunkIndex );
+                            mCurrentArchetype = mArchetypesList[mArchetypeIndex];
+                            mCurrentChunk     = &mCurrentArchetype->GetChunkVector( mComponentIndex ).GetChunk( mChunkIndex );
 						}
 					}
 				}
 			}
 
-			inline _ComponentType& operator*()
+			inline ComponentType& operator*()
 			{
-				return *static_cast<_ComponentType*>( m_currentChunk->At( m_elementIndex ) );
+				return *static_cast<ComponentType*>( mCurrentChunk->At( mElementIndex ) );
 			}
 
 			EcsEntity GetEntity() const
 			{
-				const uint32_t index = m_chunkIndex * m_currentChunk->Capacity() + m_elementIndex;
-				return { m_currentArchetype, index };
+				const uint32_t index = mChunkIndex * mCurrentChunk->Capacity() + mElementIndex;
+				return { mCurrentArchetype, index };
 			}
 		private:
-			std::vector< EcsArchetype* >	m_archetypes;
-			int								m_componentIndex;
-			uint16_t						m_archetypeIndex;
-			uint16_t						m_chunkIndex;
-			uint16_t						m_elementIndex;
-			EcsArchetype* m_currentArchetype;
-			EcsChunk* m_currentChunk;
+			std::vector< EcsArchetype* > mArchetypesList;
+			int                          mComponentIndex;
+			uint16_t                     mArchetypeIndex;
+			uint16_t                     mChunkIndex;
+			uint16_t                     mElementIndex;
+			EcsArchetype*                mCurrentArchetype;
+			EcsChunk*                    mCurrentChunk;
 		};
 
 		template < typename _ComponentType >
 		iterator<_ComponentType> begin() const
 		{
-			const int index = m_typesToIndex.at( _ComponentType::Info::s_type );
+			const int index = mTypesToIndex.at( _ComponentType::Info::sType );
 			return iterator<_ComponentType>( *this, index );
 		}
 
@@ -112,9 +107,9 @@ namespace fan
 		int Size() const
 		{
 			int size = 0;
-			for( int i = 0; i < (int)m_archetypes.size(); i++ )
+			for( int i = 0; i < (int)mArchetypes.size(); i++ )
 			{
-				size += m_archetypes[i]->Size();
+				size += mArchetypes[i]->Size();
 			}
 			return size;
 		}
@@ -123,5 +118,9 @@ namespace fan
 		{
 			return Size() == 0;
 		}
+
+        const std::unordered_map<uint32_t, int >& mTypesToIndex;
+        const EcsSignature                        mSignature;
+        std::vector<EcsArchetype*>                mArchetypes;
 	};
 }

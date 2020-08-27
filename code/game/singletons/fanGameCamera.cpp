@@ -12,12 +12,12 @@ namespace fan
 	//========================================================================================================
 	void GameCamera::SetInfo( EcsSingletonInfo& _info )
 	{
-		_info.icon = ImGui::CAMERA16;
-		_info.group = EngineGroups::Game;
-		_info.onGui = &GameCamera::OnGui;
-		_info.save = &GameCamera::Save;
-		_info.load = &GameCamera::Load;
-		_info.name = "game camera";
+		_info.mIcon  = ImGui::CAMERA16;
+		_info.mGroup = EngineGroups::Game;
+		_info.onGui  = &GameCamera::OnGui;
+		_info.save   = &GameCamera::Save;
+		_info.load   = &GameCamera::Load;
+		_info.mName  = "game camera";
 	}
 
 	//========================================================================================================

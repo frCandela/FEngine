@@ -5,9 +5,9 @@
 
 namespace fan
 {
-	static constexpr uint32_t ecsSignatureLength = 64; 
-	using EcsSignature = std::bitset<ecsSignatureLength>;
-	using EcsHandle = uint32_t;
+    static constexpr uint32_t ecsSignatureLength = 64;
+    using EcsSignature = std::bitset<ecsSignatureLength>;
+    using EcsHandle = uint32_t;
 
 	// theses groups are used to set the color of the singleton/components icons
 	enum class EngineGroups

@@ -10,17 +10,17 @@ namespace fan
 	//========================================================================================================
 	void Transform::SetInfo( EcsComponentInfo& _info )
 	{
-		_info.icon = ImGui::IconType::TRANSFORM16;
-		_info.group = EngineGroups::Scene;
-		_info.onGui = &Transform::OnGui;
-		_info.save = &Transform::Save;
-		_info.load = &Transform::Load;
-		_info.netSave = &Transform::NetSave;
-		_info.netLoad = &Transform::NetLoad;
+		_info.mIcon        = ImGui::IconType::TRANSFORM16;
+		_info.mGroup       = EngineGroups::Scene;
+		_info.onGui        = &Transform::OnGui;
+		_info.save         = &Transform::Save;
+		_info.load         = &Transform::Load;
+		_info.netSave      = &Transform::NetSave;
+		_info.netLoad      = &Transform::NetLoad;
 		_info.rollbackLoad = &Transform::RollbackLoad;
 		_info.rollbackSave = &Transform::RollbackSave;
-		_info.editorPath = "/";
-		_info.name = "transform";
+		_info.mEditorPath  = "/";
+		_info.mName        = "transform";
 	}
 
 	//========================================================================================================

@@ -15,10 +15,10 @@ namespace fan
 	//========================================================================================================
 	void EditorCamera::SetInfo( EcsSingletonInfo& _info )
 	{
-		_info.icon = ImGui::CAMERA16;
-		_info.group = EngineGroups::Editor;
-		_info.onGui = &EditorCamera::OnGui;
-		_info.name = "editor camera";
+		_info.mIcon  = ImGui::CAMERA16;
+		_info.mGroup = EngineGroups::Editor;
+		_info.onGui  = &EditorCamera::OnGui;
+		_info.mName  = "editor camera";
 	}
 
 	//========================================================================================================

@@ -58,6 +58,6 @@ namespace ImGui
 	ComponentPayload FanBeginDragDropTargetComponent( fan::EcsWorld& _world )
  	{
  		static_assert((std::is_base_of<fan::EcsComponent, _componentType>::value));
- 		return FanBeginDragDropTargetComponent( _world, _componentType::Info::s_type );
+ 		return FanBeginDragDropTargetComponent( _world, _componentType::Info::sType );
  	}
 }

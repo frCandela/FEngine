@@ -15,7 +15,7 @@ namespace fan
         ECS_SINGLETON( TestSingleton );
         static void SetInfo( EcsSingletonInfo& _info )
         {
-            _info.name = "test singleton";
+            _info.mName = "test singleton";
             _info.mSlots.push_back( new Slot<int>( "test int", &TestSingleton::SetValueInt ) );
         }
         static void	Init( EcsWorld& /*_world*/, EcsSingleton& _singleton )
@@ -38,7 +38,7 @@ namespace fan
         ECS_COMPONENT( TestComponent )
         static void SetInfo( EcsComponentInfo& _info )
         {
-            _info.name = "test";
+            _info.mName = "test";
             _info.mSlots.push_back( new Slot<int>( "test int", &TestComponent::SetValueInt ) );
             _info.mSlots.push_back( new Slot<float>( "test float", &TestComponent::SetValueFloat ) );
         }
@@ -130,7 +130,7 @@ namespace fan
             slotPtr.Init( mWorld, signalInt.GetType() );
             TEST_ASSERT( ! slotPtr.IsValid() );
             TEST_ASSERT( slotPtr.GetArgsType() == signalInt.GetType() );
-            slotPtr.SetComponentSlot( handle, TestComponent::Info::s_type, &slot );
+            slotPtr.SetComponentSlot( handle, TestComponent::Info::sType, &slot );
             TEST_ASSERT( slotPtr.IsValid() );
 
             // the data should move when the component is moved around in memory
@@ -149,7 +149,7 @@ namespace fan
             slotPtr.Init( mWorld, signalInt.GetType() );
             TEST_ASSERT( ! slotPtr.IsValid() );
             TEST_ASSERT( slotPtr.GetArgsType() == signalInt.GetType() );
-            slotPtr.SetSingletonSlot( TestSingleton::s_type, &slot );
+            slotPtr.SetSingletonSlot( TestSingleton::Info::sType, &slot );
             TEST_ASSERT( slotPtr.IsValid() );
         }
 
@@ -160,7 +160,7 @@ namespace fan
             TestComponent& testComponent = mWorld.AddComponent<TestComponent>(entity);
 
             // get slots
-            const EcsComponentInfo componentInfo = mWorld.GetComponentInfo( TestComponent::Info::s_type );
+            const EcsComponentInfo componentInfo = mWorld.GetComponentInfo( TestComponent::Info::sType );
             TEST_ASSERT( componentInfo.mSlots[0]->GetArgsType() == TemplateType::Type<int>() );
             Slot<int>& slotInt = * ( (Slot<int>*)componentInfo.mSlots[0] );
             TEST_ASSERT( componentInfo.mSlots[1]->GetArgsType() == TemplateType::Type<float>() );
@@ -169,7 +169,7 @@ namespace fan
             Signal<int>     signalInt;
             SlotPtr slotPtrInt;
             slotPtrInt.Init( mWorld, signalInt.GetType() );
-            slotPtrInt.SetComponentSlot( handle, TestComponent::Info::s_type, &slotInt );
+            slotPtrInt.SetComponentSlot( handle, TestComponent::Info::sType, &slotInt );
 
             signalInt.Connect( mWorld, slotPtrInt );
             TEST_ASSERT( testComponent.mValueInt == 0 );
@@ -182,7 +182,7 @@ namespace fan
             Signal<float>   signalFloat;
             SlotPtr slotPtrFloat;
             slotPtrFloat.Init( mWorld, signalFloat.GetType() );
-            slotPtrFloat.SetComponentSlot( handle, TestComponent::Info::s_type, &slotFloat );
+            slotPtrFloat.SetComponentSlot( handle, TestComponent::Info::sType, &slotFloat );
             signalFloat.Connect( mWorld, slotPtrFloat );
             TEST_ASSERT( testComponent.mValueFloat == 0 );
             signalFloat.Emmit(13.f);
@@ -198,14 +198,14 @@ namespace fan
             TestSingleton& testSingleton = mWorld.GetSingleton<TestSingleton>();
 
             // get slot
-            const EcsSingletonInfo& singletonInfo = mWorld.GetSingletonInfo( TestSingleton::s_type );
+            const EcsSingletonInfo& singletonInfo = mWorld.GetSingletonInfo( TestSingleton::Info::sType );
             TEST_ASSERT( singletonInfo.mSlots[0]->GetArgsType() == TemplateType::Type<int>() );
             Slot<int>& slotInt = * ( (Slot<int>*)singletonInfo.mSlots[0] );
 
             Signal<int>     signalInt;
             SlotPtr slotPtrInt;
             slotPtrInt.Init( mWorld, signalInt.GetType() );
-            slotPtrInt.SetSingletonSlot( TestSingleton::s_type, &slotInt );
+            slotPtrInt.SetSingletonSlot( TestSingleton::Info::sType, &slotInt );
 
             signalInt.Connect( mWorld, slotPtrInt );
             TEST_ASSERT( testSingleton.mValueInt == 0 );

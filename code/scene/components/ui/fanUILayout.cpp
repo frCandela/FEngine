@@ -7,13 +7,13 @@ namespace fan
 	//========================================================================================================
 	void UILayout::SetInfo( EcsComponentInfo& _info )
 	{
-		_info.icon = ImGui::IconType::Layout16;
-		_info.group = EngineGroups::SceneUI;
-		_info.onGui = &UILayout::OnGui;
-		_info.load = &UILayout::Load;
-		_info.save = &UILayout::Save;
-		_info.editorPath = "ui/";
-		_info.name = "ui layout";
+		_info.mIcon       = ImGui::IconType::Layout16;
+		_info.mGroup      = EngineGroups::SceneUI;
+		_info.onGui       = &UILayout::OnGui;
+		_info.load        = &UILayout::Load;
+		_info.save        = &UILayout::Save;
+		_info.mEditorPath = "ui/";
+		_info.mName       = "ui layout";
 	}
 
     //========================================================================================================

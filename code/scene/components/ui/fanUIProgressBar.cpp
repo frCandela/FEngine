@@ -6,13 +6,13 @@ namespace fan
 	//========================================================================================================
 	void UIProgressBar::SetInfo( EcsComponentInfo& _info )
 	{
-		_info.icon = ImGui::IconType::UI_PROGRESS_BAR16;
-		_info.group = EngineGroups::SceneUI;
-		_info.onGui = &UIProgressBar::OnGui;
-		_info.load = &UIProgressBar::Load;
-		_info.save = &UIProgressBar::Save;
-		_info.editorPath = "ui/";
-		_info.name = "ui progress bar";
+		_info.mIcon       = ImGui::IconType::UI_PROGRESS_BAR16;
+		_info.mGroup      = EngineGroups::SceneUI;
+		_info.onGui       = &UIProgressBar::OnGui;
+		_info.load        = &UIProgressBar::Load;
+		_info.save        = &UIProgressBar::Save;
+		_info.mEditorPath = "ui/";
+		_info.mName       = "ui progress bar";
 	}
 
 	//========================================================================================================

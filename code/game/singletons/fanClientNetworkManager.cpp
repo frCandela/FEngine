@@ -18,10 +18,10 @@ namespace fan
 	//========================================================================================================
 	void ClientNetworkManager::SetInfo( EcsSingletonInfo& _info )
 	{
-		_info.icon = ImGui::CLIENT_NET16;
-		_info.group = EngineGroups::GameNetwork;
-		_info.onGui = &ClientNetworkManager::OnGui;
-		_info.name = "client network manager";
+		_info.mIcon  = ImGui::CLIENT_NET16;
+		_info.mGroup = EngineGroups::GameNetwork;
+		_info.onGui  = &ClientNetworkManager::OnGui;
+		_info.mName  = "client network manager";
 	}
 
 	//========================================================================================================

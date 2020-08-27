@@ -8,13 +8,13 @@ namespace fan
 	//========================================================================================================
 	void Health::SetInfo( EcsComponentInfo& _info )
 	{
-		_info.icon = ImGui::IconType::HEART16;
-		_info.group = EngineGroups::Game;
-		_info.onGui = &Health::OnGui;
-		_info.load = &Health::Load;
-		_info.save = &Health::Save;
-		_info.editorPath = "game/";
-		_info.name = "health";
+		_info.mIcon       = ImGui::IconType::HEART16;
+		_info.mGroup      = EngineGroups::Game;
+		_info.onGui       = &Health::OnGui;
+		_info.load        = &Health::Load;
+		_info.save        = &Health::Save;
+		_info.mEditorPath = "game/";
+		_info.mName       = "health";
 	}
 
 	//========================================================================================================

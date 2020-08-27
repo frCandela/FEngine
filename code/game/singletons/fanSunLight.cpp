@@ -8,12 +8,12 @@ namespace fan
 	//========================================================================================================
 	void SunLight::SetInfo( EcsSingletonInfo& _info )
 	{
-		_info.icon = ImGui::SUN16;
-		_info.group = EngineGroups::Game;
-		_info.onGui = &SunLight::OnGui;
-		_info.save = &SunLight::Save;
-		_info.load = &SunLight::Load;
-		_info.name = "sun light";
+		_info.mIcon  = ImGui::SUN16;
+		_info.mGroup = EngineGroups::Game;
+		_info.onGui  = &SunLight::OnGui;
+		_info.save   = &SunLight::Save;
+		_info.load   = &SunLight::Load;
+		_info.mName  = "sun light";
 	}
 
 	//========================================================================================================

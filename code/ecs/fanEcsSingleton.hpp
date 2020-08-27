@@ -12,10 +12,14 @@ namespace fan
 {
     //========================================================================================================
     //========================================================================================================
-	#define ECS_SINGLETON( _SingletonType )										\
-	public:																		\
-		static constexpr const char* s_name		{ #_SingletonType		  };	\
-		static constexpr uint32_t	 s_type		{ SSID( #_SingletonType ) };	
+	#define ECS_SINGLETON( _SingletonType )								\
+    public:															    \
+	template <class T> struct EcsSingletonInfoImpl					    \
+	{																    \
+		static constexpr const char* sName{ #_SingletonType };			\
+		static constexpr uint32_t	 sType{ SSID( #_SingletonType ) };	\
+	};																    \
+	using Info = EcsSingletonInfoImpl< _SingletonType >;
 
     //========================================================================================================
     //========================================================================================================
@@ -41,11 +45,11 @@ namespace fan
 	//========================================================================================================
 	struct EcsSingletonInfo
 	{
-		std::string		        name;
-		uint32_t		        type;
-		ImGui::IconType         icon = ImGui::IconType::NONE;
-		EngineGroups	        group = EngineGroups::None;
-        std::vector<SlotBase*>  mSlots;                         // callable methods
+		std::string            mName;
+		uint32_t               mType;
+		ImGui::IconType        mIcon  = ImGui::IconType::NONE;
+		EngineGroups           mGroup = EngineGroups::None;
+        std::vector<SlotBase*> mSlots;                         // callable methods
 
 		void ( *init ) ( EcsWorld&, EcsSingleton& ) = nullptr;
         void ( *setInfo ) ( EcsSingletonInfo& ) = nullptr;

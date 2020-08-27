@@ -20,10 +20,10 @@ namespace fan
 	//========================================================================================================
 	void Scene::SetInfo( EcsSingletonInfo& _info )
 	{
-		_info.icon = ImGui::SCENE16;
-		_info.group = EngineGroups::Scene;
-		_info.onGui = &Scene::OnGui;
-		_info.name = "scene";
+		_info.mIcon  = ImGui::SCENE16;
+		_info.mGroup = EngineGroups::Scene;
+		_info.onGui  = &Scene::OnGui;
+		_info.mName  = "scene";
 		_info.mSlots.push_back( new Slot<>("Test1", &Scene::Test1 ));
         _info.mSlots.push_back( new Slot<>("Test2", &Scene::Test2 ));
         _info.mSlots.push_back( new Slot<int>("Test3", &Scene::Test3 ));
@@ -183,9 +183,9 @@ namespace fan
 				if( info.save != nullptr )
 				{
 					Json& jSingleton_i = jSingletons[nextIndex++];
-					Serializable::SaveUInt( jSingleton_i, "singleton_id", info.type);
-					Serializable::SaveString( jSingleton_i, "singleton", info.name );
-					EcsSingleton& singleton = mWorld->GetSingleton( info.type);
+					Serializable::SaveUInt( jSingleton_i, "singleton_id", info.mType);
+					Serializable::SaveString( jSingleton_i, "singleton", info.mName );
+					EcsSingleton& singleton = mWorld->GetSingleton( info.mType);
 					info.save( singleton, jSingleton_i );
 				}
 			}
@@ -214,15 +214,15 @@ namespace fan
 			unsigned nextIndex = 0;
 			for( const EcsComponentInfo& info : world.GetComponentInfos() )
 			{
-				if( ! world.HasComponent( entity, info.type ) ) { continue; }
+				if( ! world.HasComponent( entity, info.mType ) ) { continue; }
 
 				// if a save method is provided, saves the component
-				EcsComponent& component = world.GetComponent( entity, info.type );								
+				EcsComponent& component = world.GetComponent( entity, info.mType );
 				if( info.save != nullptr )
 				{
 					Json& jComponent_i = jComponents[nextIndex++];
-					Serializable::SaveUInt( jComponent_i, "component_type", info.type);
-					Serializable::SaveString( jComponent_i, "type_name", info.name );
+					Serializable::SaveUInt( jComponent_i, "component_type", info.mType);
+					Serializable::SaveString( jComponent_i, "type_name", info.mName );
 					info.save( component, jComponent_i );
 				}				
 			}

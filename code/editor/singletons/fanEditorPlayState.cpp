@@ -6,9 +6,9 @@ namespace fan
 	//========================================================================================================
 	void EditorPlayState::SetInfo( EcsSingletonInfo& _info )
 	{
-		_info.icon = ImGui::IconType::PLAY16;
-		_info.name = "editor play state";
-		_info.group = EngineGroups::Editor;
+		_info.mIcon  = ImGui::IconType::PLAY16;
+		_info.mName  = "editor play state";
+		_info.mGroup = EngineGroups::Editor;
 	}
 
 	//========================================================================================================

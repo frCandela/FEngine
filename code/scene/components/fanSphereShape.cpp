@@ -7,14 +7,14 @@ namespace fan
 	//========================================================================================================
 	void SphereShape::SetInfo( EcsComponentInfo& _info )
 	{
-		_info.icon = ImGui::IconType::SPHERE_SHAPE16;
-		_info.group = EngineGroups::ScenePhysics;
-		_info.onGui = &SphereShape::OnGui;
-		_info.destroy = &SphereShape::Destroy;
-		_info.load  = &SphereShape::Load;
-		_info.save  = &SphereShape::Save;
-		_info.editorPath = "/";
-		_info.name = "sphere shape";
+		_info.mIcon       = ImGui::IconType::SPHERE_SHAPE16;
+		_info.mGroup      = EngineGroups::ScenePhysics;
+		_info.onGui       = &SphereShape::OnGui;
+		_info.destroy     = &SphereShape::Destroy;
+		_info.load        = &SphereShape::Load;
+		_info.save        = &SphereShape::Save;
+		_info.mEditorPath = "/";
+		_info.mName       = "sphere shape";
 	}
 
 	//========================================================================================================

@@ -7,10 +7,10 @@ namespace fan
 	//========================================================================================================
 	void ClientReplication::SetInfo( EcsComponentInfo& _info )
 	{
-		_info.icon = ImGui::NETWORK16;
-		_info.group = EngineGroups::Network;
-		_info.onGui = &ClientReplication::OnGui;
-		_info.name = "client replication";
+		_info.mIcon  = ImGui::NETWORK16;
+		_info.mGroup = EngineGroups::Network;
+		_info.onGui  = &ClientReplication::OnGui;
+		_info.mName  = "client replication";
 	}
 
 	//========================================================================================================

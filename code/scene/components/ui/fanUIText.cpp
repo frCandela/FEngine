@@ -11,13 +11,13 @@ namespace fan
 	//========================================================================================================
 	void UIText::SetInfo( EcsComponentInfo& _info )
 	{
-		_info.icon = ImGui::IconType::Text16;
-		_info.group = EngineGroups::SceneUI;
-		_info.onGui = &UIText::OnGui;
-		_info.load = &UIText::Load;
-		_info.save = &UIText::Save;
-		_info.editorPath = "ui/";
-		_info.name = "ui text";
+		_info.mIcon       = ImGui::IconType::Text16;
+		_info.mGroup      = EngineGroups::SceneUI;
+		_info.onGui       = &UIText::OnGui;
+		_info.load        = &UIText::Load;
+		_info.save        = &UIText::Save;
+		_info.mEditorPath = "ui/";
+		_info.mName       = "ui text";
 	}
 
 	//========================================================================================================

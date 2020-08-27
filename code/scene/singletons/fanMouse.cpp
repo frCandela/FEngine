@@ -16,9 +16,9 @@ namespace fan
     //========================================================================================================
     void Mouse::SetInfo( EcsSingletonInfo& _info )
     {
-        _info.icon  = ImGui::IconType::INPUT16;
-        _info.group = EngineGroups::Scene;
-        _info.name  = "input mouse";
+        _info.mIcon  = ImGui::IconType::INPUT16;
+        _info.mGroup = EngineGroups::Scene;
+        _info.mName  = "input mouse";
         _info.onGui = &Mouse::OnGui;
     }
 

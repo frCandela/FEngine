@@ -9,12 +9,12 @@ namespace fan
 	//========================================================================================================
 	void SceneNode::SetInfo( EcsComponentInfo& _info )
 	{
-		_info.icon  = ImGui::IconType::GAMEOBJECT16;
-		_info.group = EngineGroups::Scene;
-		_info.onGui = &SceneNode::OnGui;
-		_info.destroy = &SceneNode::Destroy;
-		_info.editorPath = "/";
-		_info.name = "scene node";
+		_info.mIcon       = ImGui::IconType::GAMEOBJECT16;
+		_info.mGroup      = EngineGroups::Scene;
+		_info.onGui       = &SceneNode::OnGui;
+		_info.destroy     = &SceneNode::Destroy;
+		_info.mEditorPath = "/";
+		_info.mName       = "scene node";
 	}
 
 	//========================================================================================================

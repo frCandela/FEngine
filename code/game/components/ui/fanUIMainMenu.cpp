@@ -7,13 +7,13 @@ namespace fan
 	//========================================================================================================
 	void UIMainMenu::SetInfo( EcsComponentInfo& _info )
 	{
-		_info.icon = ImGui::IconType::MainMenu16;
-		_info.group = EngineGroups::Game;
-		_info.onGui = &UIMainMenu::OnGui;
-		_info.load = &UIMainMenu::Load;
-		_info.save = &UIMainMenu::Save;
-		_info.editorPath = "game/ui/";
-		_info.name = "main menu";
+		_info.mIcon       = ImGui::IconType::MainMenu16;
+		_info.mGroup      = EngineGroups::Game;
+		_info.onGui       = &UIMainMenu::OnGui;
+		_info.load        = &UIMainMenu::Load;
+		_info.save        = &UIMainMenu::Save;
+		_info.mEditorPath = "game/ui/";
+		_info.mName       = "main menu";
         _info.mSlots.push_back( new Slot<>("show_main", &UIMainMenu::OnShowMain ) );
         _info.mSlots.push_back( new Slot<>("show_option", &UIMainMenu::OnShowOptions ) );
         _info.mSlots.push_back( new Slot<>("show_credits", &UIMainMenu::OnShowCredits ) );

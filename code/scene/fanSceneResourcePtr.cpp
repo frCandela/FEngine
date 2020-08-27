@@ -59,15 +59,15 @@ namespace ImGui
 		std::string name;
 		if( _ptr.handle == 0 )
 		{
-			name = info.name + " : NULL";
+			name = info.mName + " : NULL";
 		}
 		else
 		{
 			fan::SceneNode& node = world.GetComponent<fan::SceneNode>( world.GetEntity( _ptr.handle ) );
-			name = info.name + " : " + node.mName;
+			name = info.mName + " : " + node.mName;
 		}		
  		// icon
- 		if (ImGui::ButtonIcon( info.icon, { 16,16 } ))
+ 		if (ImGui::ButtonIcon( info.mIcon, { 16, 16 } ))
  		{
  			returnValue = true;
  		}

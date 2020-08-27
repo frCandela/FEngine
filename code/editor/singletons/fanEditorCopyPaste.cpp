@@ -12,9 +12,9 @@ namespace fan
 	//========================================================================================================
 	void EditorCopyPaste::SetInfo( EcsSingletonInfo& _info )
 	{
-		_info.name = "editor copy/paste";
-		_info.icon = ImGui::COPY_PASTE16;
-		_info.group = EngineGroups::Editor;
+		_info.mName  = "editor copy/paste";
+		_info.mIcon  = ImGui::COPY_PASTE16;
+		_info.mGroup = EngineGroups::Editor;
 	}
 
 	//========================================================================================================

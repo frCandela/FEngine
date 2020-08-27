@@ -8,13 +8,13 @@ namespace fan
 	//========================================================================================================
 	void ParticleEmitter::SetInfo( EcsComponentInfo& _info )
 	{
-		_info.icon = ImGui::IconType::PARTICLES16;
-		_info.group = EngineGroups::Scene;
-		_info.onGui = &ParticleEmitter::OnGui;
-		_info.load = &ParticleEmitter::Load;
-		_info.save = &ParticleEmitter::Save;
-		_info.editorPath = "/";
-		_info.name = "particle emitter";
+		_info.mIcon       = ImGui::IconType::PARTICLES16;
+		_info.mGroup      = EngineGroups::Scene;
+		_info.onGui       = &ParticleEmitter::OnGui;
+		_info.load        = &ParticleEmitter::Load;
+		_info.save        = &ParticleEmitter::Save;
+		_info.mEditorPath = "/";
+		_info.mName       = "particle emitter";
 	}
 
 	//========================================================================================================

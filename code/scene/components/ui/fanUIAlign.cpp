@@ -7,13 +7,13 @@ namespace fan
 	//========================================================================================================
 	void UIAlign::SetInfo( EcsComponentInfo& _info )
 	{
-		_info.icon = ImGui::IconType::Align16;
-		_info.group = EngineGroups::SceneUI;
-		_info.onGui = &UIAlign::OnGui;
-		_info.load = &UIAlign::Load;
-		_info.save = &UIAlign::Save;
-		_info.editorPath = "ui/";
-		_info.name = "ui align";
+		_info.mIcon       = ImGui::IconType::Align16;
+		_info.mGroup      = EngineGroups::SceneUI;
+		_info.onGui       = &UIAlign::OnGui;
+		_info.load        = &UIAlign::Load;
+		_info.save        = &UIAlign::Save;
+		_info.mEditorPath = "ui/";
+		_info.mName       = "ui align";
 	}
 
 	//========================================================================================================

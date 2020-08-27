@@ -10,10 +10,10 @@ namespace fan
 	//========================================================================================================
 	void RenderDebug::SetInfo( EcsSingletonInfo& _info )
 	{
-		_info.icon = ImGui::RENDER_DEBUG16;
-		_info.group = EngineGroups::SceneRender;
-		_info.onGui = &RenderDebug::OnGui;
-		_info.name = "render debug";
+		_info.mIcon  = ImGui::RENDER_DEBUG16;
+		_info.mGroup = EngineGroups::SceneRender;
+		_info.onGui  = &RenderDebug::OnGui;
+		_info.mName  = "render debug";
 	}
 
 	//========================================================================================================

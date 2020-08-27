@@ -44,9 +44,9 @@ namespace ImGui
 
                     didNotDrawAnything = false;
                     // display the slot
-                    ImGui::Icon( info.icon, { 16, 16 }, fan::GroupsColors::GetColor( info.group ) );
+                    ImGui::Icon( info.mIcon, { 16, 16 }, fan::GroupsColors::GetColor( info.mGroup ) );
                     ImGui::SameLine();
-                    if( ImGui::TreeNode( info.name.c_str() ) )
+                    if( ImGui::TreeNode( info.mName.c_str() ) )
                     {
                         ImGui::Indent();
                         for( fan::SlotBase* slot : info.mSlots )
@@ -54,7 +54,7 @@ namespace ImGui
                             if( slot->GetArgsType() != _slotPtr.GetArgsType() ){ continue; }
                             if( ImGui::Selectable( slot->mName.c_str() ) )
                             {
-                                _slotPtr.SetSingletonSlot( info.type, slot );
+                                _slotPtr.SetSingletonSlot( info.mType, slot );
                                 ImGui::CloseCurrentPopup();
                             }
                         }
@@ -112,9 +112,9 @@ namespace ImGui
                     if( !HasCompatibleSlots( info.mSlots, _slotPtr.GetArgsType() ) ){ continue; }
 
                     didNotDrawAnything = false;
-                    ImGui::Icon( info.icon, { 16, 16 }, fan::GroupsColors::GetColor( info.group ) );
+                    ImGui::Icon( info.mIcon, { 16, 16 }, fan::GroupsColors::GetColor( info.mGroup ) );
                     ImGui::SameLine();
-                    if( ImGui::TreeNode( info.name.c_str() ) )
+                    if( ImGui::TreeNode( info.mName.c_str() ) )
                     {
                         ImGui::Indent();
                         for( fan::SlotBase* slot : info.mSlots )
@@ -123,7 +123,7 @@ namespace ImGui
                             if( ImGui::Selectable( slot->mName.c_str() ) )
                             {
                                 const fan::EcsHandle handle = _slotPtr.Data().mHandle;
-                                _slotPtr.SetComponentSlot( handle, info.type, slot );
+                                _slotPtr.SetComponentSlot( handle, info.mType, slot );
                                 ImGui::CloseCurrentPopup();
                             }
                         }

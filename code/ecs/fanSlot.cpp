@@ -115,11 +115,11 @@ namespace ImGui
         ImGui::BeginTooltip();
         const fan::EcsSingletonInfo& targetSingletonInfo =
                                            _world.GetSingletonInfo( _ptr.Data().mType );
-        ImGui::Icon( targetSingletonInfo.icon,
+        ImGui::Icon( targetSingletonInfo.mIcon,
                      { 16, 16 },
-                     fan::GroupsColors::GetColor( targetSingletonInfo.group ) );
+                     fan::GroupsColors::GetColor( targetSingletonInfo.mGroup ) );
         ImGui::SameLine();
-        ImGui::Text( "target singleton: %s", targetSingletonInfo.name.c_str() );
+        ImGui::Text( "target singleton: %s", targetSingletonInfo.mName.c_str() );
         const std::string targetSlotName = _ptr.Data().mSlot == nullptr ?
                 "null :" :
                 _ptr.Data().mSlot->mName;
@@ -136,21 +136,21 @@ namespace ImGui
         ImGui::BeginTooltip();
         fan::EcsEntity entity = _world.GetEntity( _ptr.Data().mHandle );
         const fan::EcsComponentInfo& sceneNodeInfo =
-                                           _world.GetComponentInfo( fan::SceneNode::Info::s_type );
-        ImGui::Icon( sceneNodeInfo.icon,
+                                           _world.GetComponentInfo( fan::SceneNode::Info::sType );
+        ImGui::Icon( sceneNodeInfo.mIcon,
                      { 16, 16 },
-                     fan::GroupsColors::GetColor( sceneNodeInfo.group ) );
+                     fan::GroupsColors::GetColor( sceneNodeInfo.mGroup ) );
         const fan::SceneNode& sceneNode = _world.GetComponent<fan::SceneNode>( entity );
         ImGui::SameLine();
         ImGui::Text( "scene node      : %s", sceneNode.mName.c_str() );
 
         const fan::EcsComponentInfo& targetComponentInfo =
                                            _world.GetComponentInfo( _ptr.Data().mType );
-        ImGui::Icon( targetComponentInfo.icon,
+        ImGui::Icon( targetComponentInfo.mIcon,
                      { 16, 16 },
-                     fan::GroupsColors::GetColor( targetComponentInfo.group ) );
+                     fan::GroupsColors::GetColor( targetComponentInfo.mGroup ) );
         ImGui::SameLine();
-        ImGui::Text( "target component: %s", targetComponentInfo.name.c_str() );
+        ImGui::Text( "target component: %s", targetComponentInfo.mName.c_str() );
         const std::string targetSlotName = _ptr.Data().mSlot == nullptr ?
                 "null :" :
                 _ptr.Data().mSlot->mName;
@@ -180,7 +180,7 @@ namespace ImGui
             {
                 fan::EcsSingletonInfo info = _world.GetSingletonInfo( _ptr.Data().mType );
                 const std::string slotName = _ptr.Data().mSlot == nullptr ? "null" : _ptr.Data().mSlot->mName;
-                text = info.name + "::" + slotName;
+                text = info.mName + "::" + slotName;
             }
             else
             {
@@ -188,7 +188,7 @@ namespace ImGui
                 fan::EcsComponentInfo info = _world.GetComponentInfo( _ptr.Data().mType );
                 const std::string slotName = _ptr.Data().mSlot == nullptr ? "null" : _ptr.Data().mSlot->mName;
 
-                text = info.name + "::" + slotName;
+                text = info.mName + "::" + slotName;
             }
         }
 

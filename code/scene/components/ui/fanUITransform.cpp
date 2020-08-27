@@ -8,13 +8,13 @@ namespace fan
 	//========================================================================================================
 	void UITransform::SetInfo( EcsComponentInfo& _info )
 	{
-		_info.icon = ImGui::IconType::UI_TRANSFORM16;
-		_info.group = EngineGroups::SceneUI;
-		_info.onGui = &UITransform::OnGui;
-		_info.load = &UITransform::Load;
-		_info.save = &UITransform::Save;
-		_info.editorPath = "ui/";
-		_info.name = "ui transform";
+		_info.mIcon       = ImGui::IconType::UI_TRANSFORM16;
+		_info.mGroup      = EngineGroups::SceneUI;
+		_info.onGui       = &UITransform::OnGui;
+		_info.load        = &UITransform::Load;
+		_info.save        = &UITransform::Save;
+		_info.mEditorPath = "ui/";
+		_info.mName       = "ui transform";
 	}
 
 	//========================================================================================================

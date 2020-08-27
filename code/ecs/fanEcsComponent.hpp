@@ -17,17 +17,17 @@ namespace fan
 {
 	struct EcsComponent {};
 
-	//================================
+	//========================================================================================================
 	// Memcpy is a placement new that uses a copy constructor.
 	// If the component is trivially copyable, it is replaced with a fast std::memcpy
-	//================================
+    //========================================================================================================
 	#define ECS_COMPONENT( _ComponentType)															\
 	public:																							\
 	template <class T> struct EcsComponentInfoImpl	{												\
-		static constexpr uint32_t	 s_size		{ sizeof( T )			  };						\
-		static constexpr uint32_t	 s_alignment{ alignof( T )			  };						\
-		static constexpr const char* s_name		{ #_ComponentType		  };						\
-		static constexpr uint32_t	 s_type		{ SSID( #_ComponentType ) };						\
+		static constexpr uint32_t	 sSize		{ sizeof( T )			  };						\
+		static constexpr uint32_t	 sAlignment { alignof( T )			  };						\
+		static constexpr const char* sName		{ #_ComponentType		  };						\
+		static constexpr uint32_t	 sType		{ SSID( #_ComponentType ) };						\
 		static EcsComponent& Instanciate( void* _buffer ) { return *new( _buffer ) T(); }			\
 	    static void* Memcpy( void* _dst, const void* _src, size_t /*_count*/ )                      \
 	    {	                                                                                        \
@@ -40,8 +40,8 @@ namespace fan
     struct SlotBase;
 	class EcsWorld;
 
-	//================================
-	//================================
+    //========================================================================================================
+    //========================================================================================================
 	struct EcsComponentInfo
 	{
 		enum ComponentFlags { 
@@ -49,16 +49,16 @@ namespace fan
 			RollbackNoOverwrite = 1 // on a rollback, old rollback states are not overwritten with new ones
 		};
 
-		std::string		        name;
-		ImGui::IconType         icon = ImGui::IconType::NONE;	// editor icon
-		EngineGroups		    group = EngineGroups::None;	    // editor group
-		const char*		        editorPath = "";				// editor path for the addComponent menu
-		uint32_t                type;
-		int                     index;
-		uint32_t                size;
-		uint32_t                alignment;
-		int                     flags = ComponentFlags::None;
-		std::vector<SlotBase*>  mSlots;                         // callable methods
+		std::string            mName;
+		ImGui::IconType        mIcon  = ImGui::IconType::NONE;	// editor icon
+		EngineGroups           mGroup = EngineGroups::None;	    // editor group
+		const char*		       mEditorPath = "";				// editor path for the addComponent menu
+		uint32_t               mType;
+		int                    mIndex;
+		uint32_t               mSize;
+		uint32_t               mAlignment;
+		int                    mFlags          = ComponentFlags::None;
+		std::vector<SlotBase*> mSlots;                         // callable methods
 
 		void ( *init )( EcsWorld&, EcsEntity, EcsComponent& ) = nullptr;			// called once at creation
         void ( *setInfo ) ( EcsComponentInfo& ) = nullptr;                          // called once at startup

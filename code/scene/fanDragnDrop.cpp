@@ -57,12 +57,12 @@ namespace ImGui
 		{
 			const fan::EcsComponentInfo& info = _world.GetComponentInfo( _type );
 
-			std::string nameid = ComponentPayload::sPrefix + std::to_string( info.type);
+			std::string nameid = ComponentPayload::sPrefix + std::to_string( info.mType);
 			ComponentPayload payload = { _handle , _type };
 			ImGui::SetDragDropPayload( nameid.c_str(), &payload, sizeof( payload ) );
-			ImGui::Icon( info.icon, { 16,16 }, fan::GroupsColors::GetColor( info.group ) );
+			ImGui::Icon( info.mIcon, { 16, 16 }, fan::GroupsColors::GetColor( info.mGroup ) );
 			ImGui::SameLine();
-			ImGui::Text( info.name.c_str() );
+			ImGui::Text( info.mName.c_str() );
 			ImGui::EndDragDropSource();
 		}		
 	}
@@ -75,12 +75,12 @@ namespace ImGui
         {
             const fan::EcsSingletonInfo& info = _world.GetSingletonInfo( _type );
 
-            std::string nameid = SingletonPayload::sPrefix + std::to_string( info.type );
+            std::string nameid = SingletonPayload::sPrefix + std::to_string( info.mType );
             SingletonPayload payload = { _type };
             ImGui::SetDragDropPayload( nameid.c_str(), &payload, sizeof( payload ) );
-            ImGui::Icon( info.icon, { 16,16 }, fan::GroupsColors::GetColor( info.group ) );
+            ImGui::Icon( info.mIcon, { 16, 16 }, fan::GroupsColors::GetColor( info.mGroup ) );
             ImGui::SameLine();
-            ImGui::Text( info.name.c_str() );
+            ImGui::Text( info.mName.c_str() );
             ImGui::EndDragDropSource();
         }
     }
@@ -141,7 +141,7 @@ namespace ImGui
  			}
 
  			// Drop payload scene node
-			nameid = ComponentPayload::sPrefix + std::to_string( fan::SceneNode::Info::s_type );
+			nameid = ComponentPayload::sPrefix + std::to_string( fan::SceneNode::Info::sType );
 			imGuiPayload = ImGui::AcceptDragDropPayload( nameid.c_str() );
 			if( imGuiPayload != nullptr )
 			{
@@ -157,7 +157,7 @@ namespace ImGui
 					const fan::EcsComponentInfo& info = _world.GetComponentInfo( _type );
                     fan::Debug::Warning()
                             << "dropped scene node doesn't have a "
-                            << info.name
+                            << info.mName
                             << " component" << fan::Debug::Endl();
 				}
 			}

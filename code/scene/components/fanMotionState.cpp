@@ -8,14 +8,14 @@ namespace fan
 	//========================================================================================================
 	void MotionState::SetInfo( EcsComponentInfo& _info )
 	{
-		_info.icon = ImGui::IconType::RIGIDBODY16;
-		_info.group = EngineGroups::ScenePhysics;
-		_info.destroy = &MotionState::Destroy;
-		_info.save = &MotionState::Save;
-		_info.load = &MotionState::Load;
-		_info.onGui = &MotionState::OnGui;
-		_info.editorPath = "/";
-		_info.name = "motion state";
+		_info.mIcon       = ImGui::IconType::RIGIDBODY16;
+		_info.mGroup      = EngineGroups::ScenePhysics;
+		_info.destroy     = &MotionState::Destroy;
+		_info.save        = &MotionState::Save;
+		_info.load        = &MotionState::Load;
+		_info.onGui       = &MotionState::OnGui;
+		_info.mEditorPath = "/";
+		_info.mName       = "motion state";
 	}
 
 	//========================================================================================================

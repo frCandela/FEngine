@@ -9,12 +9,12 @@ namespace fan
 	//========================================================================================================
 	void PhysicsWorld::SetInfo( EcsSingletonInfo& _info )
 	{
-		_info.icon = ImGui::RIGIDBODY16;
-		_info.group = EngineGroups::ScenePhysics;
-		_info.onGui = &PhysicsWorld::OnGui;
-		_info.save = &PhysicsWorld::Save;
-		_info.load = &PhysicsWorld::Load;
-		_info.name = "physics world";
+		_info.mIcon  = ImGui::RIGIDBODY16;
+		_info.mGroup = EngineGroups::ScenePhysics;
+		_info.onGui  = &PhysicsWorld::OnGui;
+		_info.save   = &PhysicsWorld::Save;
+		_info.load   = &PhysicsWorld::Load;
+		_info.mName  = "physics world";
 	}
 
 	//========================================================================================================

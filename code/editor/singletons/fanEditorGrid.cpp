@@ -12,12 +12,12 @@ namespace fan
 	//========================================================================================================
 	void EditorGrid::SetInfo( EcsSingletonInfo& _info )
 	{
-		_info.icon = ImGui::GRID16;
-		_info.name = "editor grid";
-		_info.group = EngineGroups::Editor;
-        _info.save = EditorGrid::Save;
-        _info.load = EditorGrid::Load;
-        _info.onGui = EditorGrid::OnGui;
+		_info.mIcon  = ImGui::GRID16;
+		_info.mName  = "editor grid";
+		_info.mGroup = EngineGroups::Editor;
+        _info.save   = EditorGrid::Save;
+        _info.load   = EditorGrid::Load;
+        _info.onGui  = EditorGrid::OnGui;
 	}
 
 	//========================================================================================================

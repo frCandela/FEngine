@@ -10,13 +10,13 @@ namespace fan
 	//========================================================================================================
 	void Planet::SetInfo( EcsComponentInfo& _info )
 	{
-		_info.icon = ImGui::IconType::PLANET16;
-		_info.group = EngineGroups::Game;
-		_info.onGui = &Planet::OnGui;
-		_info.load = &Planet::Load;
-		_info.save = &Planet::Save;
-		_info.editorPath = "game/";
-		_info.name = "planet";
+		_info.mIcon       = ImGui::IconType::PLANET16;
+		_info.mGroup      = EngineGroups::Game;
+		_info.onGui       = &Planet::OnGui;
+		_info.load        = &Planet::Load;
+		_info.save        = &Planet::Save;
+		_info.mEditorPath = "game/";
+		_info.mName       = "planet";
 	}
 
 	//========================================================================================================

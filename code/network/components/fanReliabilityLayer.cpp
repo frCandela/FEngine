@@ -9,10 +9,10 @@ namespace fan
 	//========================================================================================================
 	void ReliabilityLayer::SetInfo( EcsComponentInfo& _info )
 	{
-		_info.icon = ImGui::IconType::RELIABILITY_LAYER16;
-		_info.group = EngineGroups::Network;
-		_info.onGui = &ReliabilityLayer::OnGui;
-		_info.name = "reliability layer";
+		_info.mIcon  = ImGui::IconType::RELIABILITY_LAYER16;
+		_info.mGroup = EngineGroups::Network;
+		_info.onGui  = &ReliabilityLayer::OnGui;
+		_info.mName  = "reliability layer";
 	}
 
 	//========================================================================================================

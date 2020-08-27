@@ -9,10 +9,10 @@ namespace fan
 	//========================================================================================================
 	void HostReplication::SetInfo( EcsComponentInfo& _info )
 	{
-		_info.icon = ImGui::IconType::NETWORK16;
-		_info.group = EngineGroups::Network;
-		_info.onGui = &HostReplication::OnGui;
-		_info.name = "host replication";
+		_info.mIcon  = ImGui::IconType::NETWORK16;
+		_info.mGroup = EngineGroups::Network;
+		_info.onGui  = &HostReplication::OnGui;
+		_info.mName  = "host replication";
 	}
 
 	//========================================================================================================
@@ -49,7 +49,7 @@ namespace fan
 		PacketReplication packet;
 		packet.replicationType = PacketReplication::ReplicationType::SingletonComponent;
 		packet.packetData.clear();
-		packet.packetData << sf::Uint32( info.type);
+		packet.packetData << sf::Uint32( info.mType);
 		info.netSave( component, packet.packetData );
 
 		return packet;
@@ -82,7 +82,7 @@ namespace fan
 				 {
 					 const EcsComponentInfo& info = _world.GetComponentInfo( typeInfo );
 					 EcsComponent& component = _world.GetComponent( entity, typeInfo );
-					 packet.packetData << sf::Uint32( info.type );
+					 packet.packetData << sf::Uint32( info.mType );
 					 info.netSave( component, packet.packetData );
 				 }
 			 }

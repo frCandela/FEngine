@@ -37,7 +37,7 @@ namespace fan
     class ComponentPtr : public ComponentPtrBase
     {
     public:
-        ComponentPtr() : ComponentPtrBase( _componentType::Info::s_type ) {}
+        ComponentPtr() : ComponentPtrBase( _componentType::Info::sType ) {}
         _componentType& operator*() const
         {
             return static_cast<_componentType&>( world->GetComponent( world->GetEntity( handle ), type ));

@@ -3,116 +3,116 @@
 
 namespace fan
 {
-	//================================================================================================================================
-	//================================================================================================================================
-	void EcsChunkVector::Create( void* ( *_cpyFunction )( void*, const void*, size_t ), const int _componentSize, const int _alignment )
+	//========================================================================================================
+	//========================================================================================================
+	void EcsChunkVector::Create( CpyFunction _cpyFunction, const int _componentSize, const int _alignment )
 	{
-		m_cpyFunction = _cpyFunction;
-		m_componentSize = _componentSize;
-		m_alignment = _alignment;
-		m_chunks.emplace_back();
-		m_chunks.rbegin()->Create( m_cpyFunction, m_componentSize, m_alignment );
-		m_chunkCapacity = m_chunks.rbegin()->Capacity();
+        mCpyFunction   = _cpyFunction;
+        mComponentSize = _componentSize;
+        mAlignment     = _alignment;
+		mChunks.emplace_back();
+		mChunks.rbegin()->Create( mCpyFunction, mComponentSize, mAlignment );
+        mChunkCapacity = mChunks.rbegin()->Capacity();
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void EcsChunkVector::Remove( const int& _index )
 	{
-		const int chunkIndex = _index / m_chunkCapacity;
-		const int elementIndex = _index % m_chunkCapacity;
-        fanAssert( chunkIndex < int( m_chunks.size() ) );
-        fanAssert( elementIndex < m_chunks[chunkIndex].Size() );
+		const int chunkIndex = _index / mChunkCapacity;
+		const int elementIndex = _index % mChunkCapacity;
+        fanAssert( chunkIndex < int( mChunks.size() ) );
+        fanAssert( elementIndex < mChunks[chunkIndex].Size() );
 
-		EcsChunk& chunk = m_chunks[chunkIndex];
+		EcsChunk& chunk = mChunks[chunkIndex];
 
 		// Last chunk ? just remove the element & back swap locally in the chunk
-		if( chunkIndex == (int)m_chunks.size() - 1 )
+		if( chunkIndex == (int)mChunks.size() - 1 )
 		{
 			chunk.Remove( elementIndex );
 		}
 		else
 		{
 			// back swap the removed element with the last element of the last chunk
-			EcsChunk& lastChunk = *m_chunks.rbegin();
+			EcsChunk& lastChunk = *mChunks.rbegin();
 			chunk.Set( elementIndex, lastChunk.At( lastChunk.Size() - 1 ) );
 			lastChunk.PopBack();
 		}
 
-		EcsChunk& lastChunk = *m_chunks.rbegin();
-		if( lastChunk.Empty() && m_chunks.size() > 1 )
+		EcsChunk& lastChunk = *mChunks.rbegin();
+		if( lastChunk.Empty() && mChunks.size() > 1 )
 		{
 			lastChunk.Destroy();
-			m_chunks.pop_back();
+			mChunks.pop_back();
 		}
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void* EcsChunkVector::At( const int& _index )
 	{
-		const int chunkIndex = _index / m_chunkCapacity;
-		const int elementIndex = _index % m_chunkCapacity;
-        fanAssert( chunkIndex < int( m_chunks.size() ) );
-        fanAssert( elementIndex < m_chunks[chunkIndex].Size() );
+		const int chunkIndex = _index / mChunkCapacity;
+		const int elementIndex = _index % mChunkCapacity;
+        fanAssert( chunkIndex < int( mChunks.size() ) );
+        fanAssert( elementIndex < mChunks[chunkIndex].Size() );
 
-		return m_chunks[chunkIndex].At( elementIndex );
+		return mChunks[chunkIndex].At( elementIndex );
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	int EcsChunkVector::PushBack( void* _data )
 	{
 		// Create a new chunk if necessary
-		if( m_chunks.rbegin()->Full() )
+		if( mChunks.rbegin()->Full() )
 		{
-			m_chunks.emplace_back();
-			m_chunks.rbegin()->Create( m_cpyFunction, m_componentSize, m_alignment );
+			mChunks.emplace_back();
+			mChunks.rbegin()->Create( mCpyFunction, mComponentSize, mAlignment );
 		}
 
 		// Push to the last chunk
-		EcsChunk& chunk = *m_chunks.rbegin();
-		const int chunkIndex = int( m_chunks.size() - 1 );
+		EcsChunk& chunk = *mChunks.rbegin();
+		const int chunkIndex = int( mChunks.size() - 1 );
 		const int elementIndex = chunk.Size();
 		chunk.PushBack( _data );
-		return chunkIndex * m_chunkCapacity + elementIndex;
+		return chunkIndex * mChunkCapacity + elementIndex;
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	int EcsChunkVector::EmplaceBack()
 	{
 		// Create a new chunk if necessary
-		if( m_chunks.rbegin()->Full() )
+		if( mChunks.rbegin()->Full() )
 		{
-			m_chunks.emplace_back();
-			m_chunks.rbegin()->Create( m_cpyFunction, m_componentSize, m_alignment );
+			mChunks.emplace_back();
+			mChunks.rbegin()->Create( mCpyFunction, mComponentSize, mAlignment );
 		}
 
 		// Emplace to the last chunk
-		EcsChunk& chunk = *m_chunks.rbegin();
-		const int chunkIndex = int( m_chunks.size() - 1 );
+		EcsChunk& chunk = *mChunks.rbegin();
+		const int chunkIndex = int( mChunks.size() - 1 );
 		const int elementIndex = chunk.Size();
 		chunk.EmplaceBack();
-		return chunkIndex * m_chunkCapacity + elementIndex;
+		return chunkIndex * mChunkCapacity + elementIndex;
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void EcsChunkVector::Clear()
 	{
-		if( m_chunks.empty() )
+		if( mChunks.empty() )
 		{
 			return;
 		}
 
 		for( int i = NumChunk() - 1; i > 0; i-- )
 		{
-			m_chunks[i].Destroy();
-			m_chunks.pop_back();
+			mChunks[i].Destroy();
+			mChunks.pop_back();
 		}
-		m_chunks[0].Clear();
-        fanAssert( m_chunks.size() == 1 );
-        fanAssert( m_chunks[0].Empty() );
+		mChunks[0].Clear();
+        fanAssert( mChunks.size() == 1 );
+        fanAssert( mChunks[0].Empty() );
 	}
 }

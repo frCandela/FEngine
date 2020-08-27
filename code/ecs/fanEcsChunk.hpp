@@ -12,9 +12,10 @@ namespace fan
 	class EcsChunk
 	{
 	public:
-		static EcsChunkAllocator s_allocator;
+		static EcsChunkAllocator sAllocator;
+		using CpyFunc = void* ( * )( void*, const void*, size_t );
 
-		void	Create( void* ( *_cpyFunction )( void*, const void*, size_t ), const int _componentSize, const int _alignment );
+		void	Create( CpyFunc _cpyFunction, const int _componentSize, const int _alignment );
 		void	Destroy();
 		bool	Empty() const;
 		bool	Full() const;
@@ -27,13 +28,13 @@ namespace fan
 		void	PopBack();
 		void	EmplaceBack();
 		void	Clear();
-	private:
 
-		int		m_capacity = 0;
-		int		m_size = 0;
-		int		m_componentSize = 0;
-		void*	m_buffer = nullptr;
-		void*	m_alignedBuffer = nullptr;
-		void* ( *m_cpyFunction )( void*, const void*, size_t ) = nullptr;
+	private:
+		int     mCapacity      = 0;
+		int     mSize          = 0;
+		int     mComponentSize = 0;
+		void*	mBuffer        = nullptr;
+		void*	mAlignedBuffer = nullptr;
+        CpyFunc mCpyFunction = nullptr;
 	};
 }

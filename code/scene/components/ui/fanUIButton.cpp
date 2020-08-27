@@ -7,13 +7,13 @@ namespace fan
 	//========================================================================================================
 	void UIButton::SetInfo( EcsComponentInfo& _info )
 	{
-		_info.icon = ImGui::BUTTON16;
-		_info.group = EngineGroups::SceneUI;
-		_info.onGui = &UIButton::OnGui;
-		_info.load = &UIButton::Load;
-		_info.save = &UIButton::Save;
-		_info.editorPath = "ui/";
-		_info.name = "ui button";
+		_info.mIcon       = ImGui::BUTTON16;
+		_info.mGroup      = EngineGroups::SceneUI;
+		_info.onGui       = &UIButton::OnGui;
+		_info.load        = &UIButton::Load;
+		_info.save        = &UIButton::Save;
+		_info.mEditorPath = "ui/";
+		_info.mName       = "ui button";
 	}
 
 	//========================================================================================================

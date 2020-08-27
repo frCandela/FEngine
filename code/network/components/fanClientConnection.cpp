@@ -8,11 +8,11 @@ namespace fan
 	//========================================================================================================
 	void ClientConnection::SetInfo( EcsComponentInfo& _info )
 	{
-		_info.icon = ImGui::SOCKET16;
-		_info.group = EngineGroups::Network;
+		_info.mIcon   = ImGui::SOCKET16;
+		_info.mGroup  = EngineGroups::Network;
 		_info.destroy = &ClientConnection::Destroy;
-		_info.onGui = &ClientConnection::OnGui;
-		_info.name = "client connection";
+		_info.onGui   = &ClientConnection::OnGui;
+		_info.mName   = "client connection";
 	}
 
 	//========================================================================================================

@@ -8,13 +8,13 @@ namespace fan
 	//================================================================================================================================
 	void SpaceShip::SetInfo( EcsComponentInfo& _info )
 	{
-		_info.icon = ImGui::IconType::SPACE_SHIP16;
-		_info.group = EngineGroups::Game;
-		_info.onGui = &SpaceShip::OnGui;
-		_info.load = &SpaceShip::Load;
-		_info.save = &SpaceShip::Save;
-		_info.editorPath = "game/player/";
-		_info.name = "spaceship";
+		_info.mIcon       = ImGui::IconType::SPACE_SHIP16;
+		_info.mGroup      = EngineGroups::Game;
+		_info.onGui       = &SpaceShip::OnGui;
+		_info.load        = &SpaceShip::Load;
+		_info.save        = &SpaceShip::Save;
+		_info.mEditorPath = "game/player/";
+		_info.mName       = "spaceship";
 	}
 
 	//================================================================================================================================

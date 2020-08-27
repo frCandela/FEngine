@@ -17,12 +17,12 @@ namespace fan
 	//========================================================================================================
 	void SolarEruption::SetInfo( EcsSingletonInfo& _info )
 	{
-		_info.icon = ImGui::SUN_RED16;
-		_info.group = EngineGroups::Game;
-		_info.onGui = &SolarEruption::OnGui;
-		_info.save = &SolarEruption::Save;
-		_info.load = &SolarEruption::Load;
-		_info.name = "solar eruption";
+		_info.mIcon  = ImGui::SUN_RED16;
+		_info.mGroup = EngineGroups::Game;
+		_info.onGui  = &SolarEruption::OnGui;
+		_info.save   = &SolarEruption::Save;
+		_info.load   = &SolarEruption::Load;
+		_info.mName  = "solar eruption";
 	}
 
 	//========================================================================================================
@@ -90,7 +90,7 @@ namespace fan
 		// initialize particles tags
 		if( eruption.mParticleEmitter != nullptr )
 		{
-			const int tagIndex = _world.GetIndex( tag_sunlight_occlusion::Info::s_type );
+			const int tagIndex = _world.GetIndex( tag_sunlight_occlusion::Info::sType );
 			eruption.mParticleEmitter->mTagsSignature[tagIndex] = 1;
 		}
 	}

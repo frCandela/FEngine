@@ -46,27 +46,27 @@ namespace fan
 			
 			for( const EcsComponentInfo& info : _world.GetComponentInfos() )
 			{
-				if( !_world.HasComponent( entity, info.type ) ) { continue; }
+				if( !_world.HasComponent( entity, info.mType ) ) { continue; }
 
-				EcsComponent& component = _world.GetComponent( entity, info.type );
+				EcsComponent& component = _world.GetComponent( entity, info.mType );
 
 				if( info.onGui == nullptr ) { continue; }
 
  				ImGui::Separator();
 				 
  				// Icon
-				ImGui::Icon( info.icon, { 16,16 }, GroupsColors::GetColor( info.group ) ); ImGui::SameLine();
-				ImGui::FanBeginDragDropSourceComponent( _world, node.mHandle, info.type, ImGuiDragDropFlags_SourceAllowNullID );
-				ImGui::Text( "%s", info.name.c_str() );
- 				ImGui::FanBeginDragDropSourceComponent( _world, node.mHandle, info.type, ImGuiDragDropFlags_SourceAllowNullID );
+				ImGui::Icon( info.mIcon, { 16, 16 }, GroupsColors::GetColor( info.mGroup ) ); ImGui::SameLine();
+				ImGui::FanBeginDragDropSourceComponent( _world, node.mHandle, info.mType, ImGuiDragDropFlags_SourceAllowNullID );
+				ImGui::Text( "%s", info.mName.c_str() );
+ 				ImGui::FanBeginDragDropSourceComponent( _world, node.mHandle, info.mType, ImGuiDragDropFlags_SourceAllowNullID );
 
  				// Delete button	
 				std::stringstream ss;
-				ss << "X" << "##" << info.name;	// make unique id
+				ss << "X" << "##" << info.mName;	// make unique id
 				ImGui::SameLine( ImGui::GetWindowWidth() - 40 );
 				if( ImGui::Button( ss.str().c_str() ) )
 				{
-					_world.RemoveComponent( entity, info.type );
+					_world.RemoveComponent( entity, info.mType );
 				}
  				// Draw component
 				else
@@ -88,15 +88,15 @@ namespace fan
 	//================================================================================================================================
 	void InspectorWindow::NewComponentItem( EcsWorld& _world, const EcsComponentInfo& _info )
 	{
-		ImGui::Icon( _info.icon, { 16,16 }, GroupsColors::GetColor( _info.group ) ); ImGui::SameLine();
-		if( ImGui::MenuItem( _info.name.c_str() ) )
+		ImGui::Icon( _info.mIcon, { 16, 16 }, GroupsColors::GetColor( _info.mGroup ) ); ImGui::SameLine();
+		if( ImGui::MenuItem( _info.mName.c_str() ) )
 		{
 			// Create new EcsComponent 
 			EcsHandle handleSelected = _world.GetSingleton<EditorSelection>().mSelectedNodeHandle;
 			EcsEntity entity = _world.GetEntity( handleSelected );
-			if( !_world.HasComponent( entity, _info.type ) )
+			if( !_world.HasComponent( entity, _info.mType ) )
 			{
-				_world.AddComponent( entity, _info.type );
+				_world.AddComponent( entity, _info.mType );
 			}			
 			ImGui::CloseCurrentPopup();
 		}
@@ -114,7 +114,7 @@ namespace fan
 			std::vector< EcsComponentInfo > components = _world.GetComponentInfos();			
 			for( int i = (int)components.size() - 1; i >= 0; i-- )
 			{
-				if( std::string( components[i].editorPath ).empty() )
+				if( std::string( components[i].mEditorPath ).empty() )
 				{
 					components.erase( components.begin() + i );
 				}
@@ -125,7 +125,7 @@ namespace fan
 			componentsPath.reserve( components.size() );
 			for( int componentIndex = 0; componentIndex < (int)components.size(); componentIndex++ )
 			{
-				componentsPath.push_back(  components[componentIndex].editorPath );
+				componentsPath.push_back(  components[componentIndex].mEditorPath );
 			}
 
 			// Sort components paths

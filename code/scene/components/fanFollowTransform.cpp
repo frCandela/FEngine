@@ -9,13 +9,13 @@ namespace fan
 	//========================================================================================================
 	void FollowTransform::SetInfo( EcsComponentInfo& _info )
 	{
-		_info.icon = ImGui::IconType::FOLLOW_TRANSFORM;
-		_info.group = EngineGroups::Scene;
-		_info.onGui = &FollowTransform::OnGui;
-		_info.save = &FollowTransform::Save;
-		_info.load = &FollowTransform::Load;
-		_info.editorPath = "/";
-		_info.name = "follow transform";
+		_info.mIcon       = ImGui::IconType::FOLLOW_TRANSFORM;
+		_info.mGroup      = EngineGroups::Scene;
+		_info.onGui       = &FollowTransform::OnGui;
+		_info.save        = &FollowTransform::Save;
+		_info.load        = &FollowTransform::Load;
+		_info.mEditorPath = "/";
+		_info.mName       = "follow transform";
 	}
 
 	//========================================================================================================

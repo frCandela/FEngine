@@ -7,11 +7,11 @@ namespace fan
 	//========================================================================================================
 	void EntityReplication::SetInfo( EcsComponentInfo& _info )
 	{
-		_info.icon = ImGui::NETWORK16;
-		_info.group = EngineGroups::Network;
-		_info.onGui = &EntityReplication::OnGui;
-		_info.name = "replication";
-		_info.editorPath = "network/";
+		_info.mIcon       = ImGui::NETWORK16;
+		_info.mGroup      = EngineGroups::Network;
+		_info.onGui       = &EntityReplication::OnGui;
+		_info.mName       = "replication";
+		_info.mEditorPath = "network/";
 	}
 
 	//========================================================================================================
@@ -36,8 +36,8 @@ namespace fan
 			for ( uint32_t type : replication.mComponentTypes )
 			{
 				const EcsComponentInfo&  info = _world.GetComponentInfo( type );
-				ImGui::Icon( info.icon, { 16,16 } ); ImGui::SameLine();
-				ImGui::Text( "%s", info.name.c_str() );
+				ImGui::Icon( info.mIcon, { 16, 16 } ); ImGui::SameLine();
+				ImGui::Text( "%s", info.mName.c_str() );
 			}
 			ImGui::Unindent();
 		}

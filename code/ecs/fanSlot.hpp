@@ -96,8 +96,9 @@ namespace fan
         EcsWorld& World() const { return *mWorld; }
         bool IsSingletonSlot() const { return IsValid() && mCallData->mHandle == 0; }
         bool IsComponentSlot() const { return IsValid() && mCallData->mHandle != 0; }
+
     private:
-        int mArgsType = TemplateType::UnSupported;
+        int           mArgsType = TemplateType::UnSupported;
         SlotCallData* mCallData = nullptr;
         EcsWorld    * mWorld    = nullptr;
     };

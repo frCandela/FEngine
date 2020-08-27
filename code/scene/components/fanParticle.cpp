@@ -6,8 +6,8 @@ namespace fan
 	//========================================================================================================
 	void Particle::SetInfo( EcsComponentInfo& _info )
 	{
-		_info.name = "particle";
-		_info.group = EngineGroups::Scene;
+		_info.mName  = "particle";
+		_info.mGroup = EngineGroups::Scene;
 	}
 
 	//========================================================================================================

@@ -15,7 +15,7 @@ namespace fan
     //========================================================================================================
     struct Mouse : public EcsSingleton
     {
-        ECS_SINGLETON( InputMouse )
+        ECS_SINGLETON( Mouse )
         static void SetInfo( EcsSingletonInfo& _info );
         static void Init( EcsWorld& _world, EcsSingleton& _singleton );
         static void OnGui( EcsWorld& _world, EcsSingleton& _singleton );

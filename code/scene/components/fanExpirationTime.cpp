@@ -7,13 +7,13 @@ namespace fan
 	//========================================================================================================
 	void ExpirationTime::SetInfo( EcsComponentInfo& _info )
 	{
-		_info.icon = ImGui::IconType::EXPIRATION16;
-		_info.group = EngineGroups::Scene;
-		_info.onGui = &ExpirationTime::OnGui;
-		_info.load  = &ExpirationTime::Load;
-		_info.save  = &ExpirationTime::Save;
-		_info.editorPath = "/";
-		_info.name = "expiration time";
+		_info.mIcon       = ImGui::IconType::EXPIRATION16;
+		_info.mGroup      = EngineGroups::Scene;
+		_info.onGui       = &ExpirationTime::OnGui;
+		_info.load        = &ExpirationTime::Load;
+		_info.save        = &ExpirationTime::Save;
+		_info.mEditorPath = "/";
+		_info.mName       = "expiration time";
 	}
 
 	//========================================================================================================

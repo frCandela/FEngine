@@ -27,7 +27,7 @@ namespace fan
 			{			
 				ClientRollback& clientRollback = *clientRollbackIt;
 				const EcsEntity entity = clientRollbackIt.GetEntity();
-				const EcsSignature& signature = entity.archetype->GetSignature();
+				const EcsSignature& signature = entity.mArchetype->GetSignature();
 
 				// iterates over all components and saves rollback state
 				for (int i = 0; i < _world.NumComponents(); i++)
@@ -106,7 +106,7 @@ namespace fan
 			{				
 				ClientRollback& clientRollback = *clientRollbackIt;
 				const EcsEntity entity = clientRollbackIt.GetEntity();
-				const EcsSignature& signature = entity.archetype->GetSignature();
+				const EcsSignature& signature = entity.mArchetype->GetSignature();
 
 				// Iterates over all rollback Datas and load the ones with the correct frame index
 				for ( const ClientRollback::RollbackData& rollbackData : clientRollback.mRollbackDatas)
@@ -153,7 +153,7 @@ namespace fan
 				{
 					const ClientRollback::RollbackData& rollbackData = clientRollback.mRollbackDatas[i];
 					const EcsComponentInfo& componentInfo = _world.IndexedGetComponentInfo( rollbackData.mComponentIndex );
-					if( ( componentInfo.flags & EcsComponentInfo::RollbackNoOverwrite ) == 0 )
+					if( ( componentInfo.mFlags & EcsComponentInfo::RollbackNoOverwrite ) == 0 )
 					{
 						if( firstStateFound[rollbackData.mComponentIndex] )
 						{

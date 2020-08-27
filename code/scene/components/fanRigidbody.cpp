@@ -9,18 +9,18 @@ namespace fan
 	//========================================================================================================
 	void Rigidbody::SetInfo( EcsComponentInfo& _info )
 	{
-		_info.icon = ImGui::IconType::RIGIDBODY16;
-		_info.group = EngineGroups::ScenePhysics;
-		_info.onGui = &Rigidbody::OnGui;
+		_info.mIcon   = ImGui::IconType::RIGIDBODY16;
+		_info.mGroup  = EngineGroups::ScenePhysics;
+		_info.onGui   = &Rigidbody::OnGui;
 		_info.destroy = &Rigidbody::Destroy;
-		_info.load  = &Rigidbody::Load;
-		_info.save  = &Rigidbody::Save;
+		_info.load    = &Rigidbody::Load;
+		_info.save    = &Rigidbody::Save;
 		_info.netSave= &Rigidbody::NetSave;
-		_info.netLoad = &Rigidbody::NetLoad;
+		_info.netLoad      = &Rigidbody::NetLoad;
 		_info.rollbackLoad = &Rigidbody::RollbackLoad;
 		_info.rollbackSave = &Rigidbody::RollbackSave;
-		_info.editorPath = "/";
-		_info.name = "rigidbody";
+		_info.mEditorPath  = "/";
+		_info.mName        = "rigidbody";
 	}
 	   
 	//========================================================================================================
