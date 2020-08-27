@@ -6,29 +6,29 @@
 
 namespace fan
 {
-	//================================================================================================================================
+	//========================================================================================================
 	// an axis is an input value between -1.f and 1.f
 	// it can be bound to an analog joystick on a game pad or to two keys on a keyboard
-	//================================================================================================================================	
+	//========================================================================================================
 	class Axis
 	{
 	public:
-		enum Type { KEYBOARD, JOYSTICK_AXIS, JOYSTICK_BUTTONS };
+		enum Type { Keyboard, JoystickAxis, JoystickButton };
 		Axis();
 		Axis( const std::string& _name, const Type _type, const bool _invert = false );
 
-		void					SetInvert( const bool _invert ) { m_invert = _invert; }
+		void					SetInvert( const bool _invert ) { mInvert = _invert; }
 
 		float					GetValue( const int _joystickIDOverride = -1 ) const;
-		std::string				GetName() const				{ return m_name; };
-		bool					GetInvert() const			{ return m_invert; };
-		Type					GetType() const				{ return m_type; }
-		Keyboard::Key			GetKeyPositive() const		{ return m_keyPositive; }
-		Keyboard::Key			GetKeyNegative() const		{ return m_keyNegative; }
-		Joystick::Button		GetButtonPositive() const	{ return m_buttonPositive; }
-		Joystick::Button		GetButtonNegative() const	{ return m_buttonNegative; }
-		Joystick::JoystickID	GetJoystickID() const		{ return m_joystickID; }
-		Joystick::Axis			GetJoystickAxis() const		{ return m_joystickAxis; }
+		std::string				GetName() const				{ return mName; };
+		bool					GetInvert() const			{ return mInvert; };
+		Type					GetType() const				{ return mType; }
+		Keyboard::Key			GetKeyPositive() const		{ return mKeyPositive; }
+		Keyboard::Key			GetKeyNegative() const		{ return mKeyNegative; }
+		Joystick::Button		GetButtonPositive() const	{ return mButtonPositive; }
+		Joystick::Button		GetButtonNegative() const	{ return mButtonNegative; }
+		Joystick::JoystickID	GetJoystickID() const		{ return mJoystickId; }
+		Joystick::Axis			GetJoystickAxis() const		{ return mJoystickAxis; }
 		std::string				GetKeyPositiveName() const;
 		std::string				GetKeyNegativeName() const;
 
@@ -40,23 +40,16 @@ namespace fan
 		void  SetFromJoystickAxis( const Joystick::JoystickID _joystickID, const Joystick::Axis _joystickAxis );
 
 	private:
-		bool m_invert = false;
-		std::string m_name;
-		Type m_type;
+		bool        mInvert = false;
+		std::string mName;
+		Type        mType;
 
-		// KEYBOARD
-		Keyboard::Key    m_keyPositive = Keyboard::NONE;
-		Keyboard::Key    m_keyNegative = Keyboard::NONE;
-
-		// JoystickID
-		Joystick::JoystickID m_joystickID = -1;
-
-		// JOYSTICK_BUTTONS
-		Joystick::Button m_buttonPositive = -1;
-		Joystick::Button m_buttonNegative = -1;
-
-		// JOYSTICK_AXIS
-		Joystick::Axis		 m_joystickAxis = -1;
+		Keyboard::Key           mKeyPositive = Keyboard::NONE;
+		Keyboard::Key           mKeyNegative = Keyboard::NONE;
+		Joystick::JoystickID    mJoystickId = -1;
+		Joystick::Button        mButtonPositive = -1;
+		Joystick::Button        mButtonNegative = -1;
+		Joystick::Axis          mJoystickAxis = -1;
 	};
 }
 

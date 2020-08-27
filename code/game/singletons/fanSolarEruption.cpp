@@ -50,7 +50,7 @@ namespace fan
 			solarEruption.mStateParticlePerSecond[i] = 100.f;
 			solarEruption.mStateParticleSpeed[i]     = 3.f;
 			solarEruption.mStateParticleDuration[i]  = 3.f;
-			solarEruption.mStateParticleColor[i]     = Color::Magenta;
+			solarEruption.mStateParticleColor[i]     = Color::sMagenta;
 		}
 	}
 

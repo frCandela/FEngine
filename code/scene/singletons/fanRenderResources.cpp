@@ -46,8 +46,8 @@ namespace fan
                                           TextureManager& _textureManager,
                                           Font& _font )
     {
-        ResourcePtr<Mesh>::s_onResolve.Connect( &MeshManager::ResolvePtr, &_meshManager );
-        ResourcePtr< Texture >::s_onResolve.Connect( &TextureManager::ResolvePtr, &_textureManager );
+        ResourcePtr<Mesh>::sOnResolve.Connect( &MeshManager::ResolvePtr, &_meshManager );
+        ResourcePtr< Texture >::sOnResolve.Connect( &TextureManager::ResolvePtr, &_textureManager );
 
         _meshManager.Load( RenderGlobal::sDefaultMesh );
         Mesh2D* quad2D = RenderResources::CreateMesh2DQuad();

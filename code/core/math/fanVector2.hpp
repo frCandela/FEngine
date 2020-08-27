@@ -8,9 +8,10 @@ WARNINGS_POP()
 
 namespace fan
 {
-	//================================================================================================================================
-	// bullet physics has no 2D vector, @todo delete this and replace with glm::vec2 where needed
-	//================================================================================================================================
+	//========================================================================================================
+	// bullet physics has no 2D vector,
+	// @todo btVector2 MUST DIE !!! delete this and replace with glm::vec2 where needed
+	//========================================================================================================
 	struct btVector2
 	{
 	public:
@@ -69,7 +70,7 @@ namespace fan
 		btVector3 m_vector;
 	};
 
-	//================================================================================================================================
+	//========================================================================================================
 	btVector2 operator+( const btVector2& _v1, const btVector2& _v2 );
 	btVector2 operator-( const btVector2& _v1, const btVector2& _v2 );
 	btVector2 operator*( const btVector2& _v1, const btScalar& _value );

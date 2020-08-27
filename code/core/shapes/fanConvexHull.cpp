@@ -7,8 +7,8 @@
 
 namespace fan
 {
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void ConvexHull::ComputeBulletHull( const std::vector<btVector3>& _pointCloud )
 	{
 		Clear();
@@ -24,25 +24,25 @@ namespace fan
 		else
 		{
 			// Copy indices
-			m_indices.reserve( hull.mNumIndices );
+			mIndices.reserve( hull.mNumIndices );
 			for ( unsigned indexIndex = 0; indexIndex < hull.mNumIndices; indexIndex++ )
 			{
-				m_indices.push_back( ( uint32_t ) hull.m_Indices[ indexIndex ] );
+				mIndices.push_back( ( uint32_t ) hull.m_Indices[ indexIndex ] );
 			}
 
 			// Copy vertices
-			m_vertices.reserve( hull.mNumOutputVertices );
+			mVertices.reserve( hull.mNumOutputVertices );
 			for ( unsigned vertexIndex = 0; vertexIndex < hull.mNumOutputVertices; vertexIndex++ )
 			{
-				m_vertices.push_back( hull.m_OutputVertices[ vertexIndex ] );
+				mVertices.push_back( hull.m_OutputVertices[ vertexIndex ] );
 			}
 		}
 
 		lib.ReleaseResult( hull );
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void ConvexHull::ComputeQuickHull( const std::vector<btVector3>& _pointCloud )
 	{
 		Clear();
@@ -63,45 +63,47 @@ namespace fan
 
 		// Copy indices
 		const std::vector<size_t>& indexBuffer = hull.getIndexBuffer();
-		m_indices.reserve( indexBuffer.size() );
+		mIndices.reserve( indexBuffer.size() );
 		assert( indexBuffer.size() % 3 == 0 );
 		for ( int indexIndex = 0; indexIndex < (int)indexBuffer.size() / 3; indexIndex++ )
 		{
-			m_indices.push_back( ( uint32_t ) indexBuffer[ 3 * indexIndex + 0 ] );
-			m_indices.push_back( ( uint32_t ) indexBuffer[ 3 * indexIndex + 2 ] );
-			m_indices.push_back( ( uint32_t ) indexBuffer[ 3 * indexIndex + 1 ] );
+			mIndices.push_back( ( uint32_t ) indexBuffer[3 * indexIndex + 0 ] );
+			mIndices.push_back( ( uint32_t ) indexBuffer[3 * indexIndex + 2 ] );
+			mIndices.push_back( ( uint32_t ) indexBuffer[3 * indexIndex + 1 ] );
 		}
 
 		// Copy vertices
 		const quickhull::VertexDataSource<float>& vertexBuffer = hull.getVertexBuffer();
-		m_vertices.reserve( vertexBuffer.size() );
+		mVertices.reserve( vertexBuffer.size() );
 		for ( int vertexIndex = 0; vertexIndex < (int)vertexBuffer.size(); vertexIndex++ )
 		{
 			quickhull::Vector3<float> vertex = vertexBuffer[ vertexIndex ];
-			m_vertices.push_back( btVector3( vertex.x, vertex.y, vertex.z ) );
+			mVertices.push_back( btVector3( vertex.x, vertex.y, vertex.z ) );
 		}
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void ConvexHull::Clear()
 	{
-		m_vertices.clear();
-		m_indices.clear();
+		mVertices.clear();
+		mIndices.clear();
 	}
 
-	//================================================================================================================================
+	//========================================================================================================
 	// Raycast on all triangles of the convex hull
-	//================================================================================================================================
-	bool ConvexHull::RayCast( const btVector3 _origin, const btVector3 _direction, btVector3& _outIntersection ) const
-	{
+	//========================================================================================================
+    bool ConvexHull::RayCast( const btVector3 _origin,
+                              const btVector3 _direction,
+                              btVector3& _outIntersection ) const
+    {
 		btVector3 intersection;
 		float closestDistance = std::numeric_limits<float>::max();
-		for ( int triIndex = 0; triIndex < (int)m_indices.size() / 3; triIndex++ )
+		for ( int triIndex = 0; triIndex < (int)mIndices.size() / 3; triIndex++ )
 		{
-			const btVector3 v0 = m_vertices[ m_indices[ 3 * triIndex + 0 ] ];
-			const btVector3 v1 = m_vertices[ m_indices[ 3 * triIndex + 1 ] ];
-			const btVector3 v2 = m_vertices[ m_indices[ 3 * triIndex + 2 ] ];
+			const btVector3 v0 = mVertices[ mIndices[3 * triIndex + 0 ] ];
+			const btVector3 v1 = mVertices[ mIndices[3 * triIndex + 1 ] ];
+			const btVector3 v2 = mVertices[ mIndices[3 * triIndex + 2 ] ];
 			const Triangle triangle( v0, v1, v2 );
 
 			if ( triangle.RayCast( _origin, _direction, intersection ) )

@@ -105,7 +105,7 @@ namespace fan
             btTransform& local = followTransform.mLocalTransform;
             btTransform t = target * local;
 
-            _world.GetSingleton<RenderDebug>().DebugLine( target.getOrigin(), t.getOrigin(), Color::Red );
+            _world.GetSingleton<RenderDebug>().DebugLine( target.getOrigin(), t.getOrigin(), Color::sRed );
         }
     }
 }

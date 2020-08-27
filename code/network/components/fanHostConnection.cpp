@@ -188,11 +188,11 @@ namespace fan
 	{
 		switch( _clientState )
 		{
-		case HostConnection::Disconnected:		return  Color::Orange.ToImGui(); break;
-		case HostConnection::NeedingApprouval:	return  Color::Yellow.ToImGui(); break;
-		case HostConnection::PendingApprouval:	return  Color::Yellow.ToImGui(); break;
-		case HostConnection::Connected:			return  Color::Green.ToImGui(); break;
-		default:			assert( false );	return  Color::Purple.ToImGui(); break;
+		case HostConnection::Disconnected:		return  Color::sOrange.ToImGui(); break;
+		case HostConnection::NeedingApprouval:	return  Color::sYellow.ToImGui(); break;
+		case HostConnection::PendingApprouval:	return  Color::sYellow.ToImGui(); break;
+		case HostConnection::Connected:			return  Color::sGreen.ToImGui(); break;
+		default:			assert( false );	return  Color::sPurple.ToImGui(); break;
 		}
 	}
 

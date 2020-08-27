@@ -28,7 +28,7 @@ namespace fan
 		UIRenderer& uiRenderer = static_cast<UIRenderer&>( _component );
         uiRenderer.mMesh2D  = renderResources.mMesh2DManager->Get( RenderGlobal::sMesh2DQuad );
         uiRenderer.mVisible = true;
-        uiRenderer.mColor   = Color::White;
+        uiRenderer.mColor   = Color::sWhite;
         uiRenderer.mDepth   = 0;
         fanAssert( uiRenderer.mMesh2D );
 	}
@@ -75,7 +75,7 @@ namespace fan
 			// color
 			if( ImGui::Button( "##TransPos" ) )
 			{
-				ui.mColor = Color::White;
+				ui.mColor = Color::sWhite;
 			} ImGui::SameLine();
 			ImGui::ColorEdit4( "color", ui.mColor.Data(), ImGui::fanColorEditFlags );
 

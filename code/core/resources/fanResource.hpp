@@ -2,21 +2,18 @@
 
 namespace fan
 {
-	template< typename T > class ResourceList;
-	template< typename T > class ResourcePtr;
-
-	//================================================================================================================================
+	//========================================================================================================
 	// Base class for resources ( Mesh, textures etc.) 
-	//================================================================================================================================
+	//========================================================================================================
 	class Resource
 	{
 	public:
-		bool IsReferenced() const { return m_refCount > 0; }
-		int  GetRefCount() const { return m_refCount;  }
+		bool IsReferenced() const { return mRefCount > 0; }
+		int  GetRefCount() const { return mRefCount;  }
 
-		void IncreaseRefCount()  { m_refCount ++; }
-		void DecreaseRefCount()  { m_refCount --; }
+		void IncreaseRefCount()  { mRefCount ++; }
+		void DecreaseRefCount()  { mRefCount --; }
 	private:
-		int m_refCount = 0;
+		int mRefCount = 0;
 	};
 }

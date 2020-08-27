@@ -61,11 +61,11 @@ namespace fan
 			// Constants		
 			const float fontHeight = ImGui::GetFontSize();
 			const float fontWidth = 0.75f * fontHeight;
-			const float totalTime = Clock::SecondsBetween( m_intervalsCopy[ 0 ].time, m_intervalsCopy[ m_intervalsCopy.size() - 1 ].time );
-			const Clock::TimePoint  beginTime = m_intervalsCopy[ 0 ].time;
+			const float totalTime = Clock::SecondsBetween( m_intervalsCopy[ 0 ].mTime, m_intervalsCopy[m_intervalsCopy.size() - 1 ].mTime );
+			const Clock::TimePoint  beginTime = m_intervalsCopy[ 0 ].mTime;
 			const ImVec2 unsclaledTL = ImGui::GetCursorScreenPos();
 			const ImVec2 tl = { unsclaledTL.x, unsclaledTL.y };
-			const ImColor colorText = Color::Black.ToImGui();
+			const ImColor colorText = Color::sBlack.ToImGui();
 			ImDrawList* draw_list = ImGui::GetWindowDrawList();
 
 			const float sizeScrollBar = ( width - ImGui::GetScrollMaxX() ) / width;
@@ -108,10 +108,10 @@ namespace fan
 				}
 
 				// Find the corresponding opened interval
-				const size_t endId = m_intervalsCopy[ endIndex ].id;
+				const size_t endId = m_intervalsCopy[ endIndex ].mID;
 				int beginIndex = 0;
 				size_t depth = 0; // Stack depth of the scope
-				while ( m_intervalsCopy[ beginIndex ].id != endId )
+				while ( m_intervalsCopy[ beginIndex ].mID != endId )
 				{
 					if ( m_intervalsCopy[ beginIndex ].IsOpening() )
 					{
@@ -127,8 +127,8 @@ namespace fan
 				const Profiler::Interval& end = m_intervalsCopy[ endIndex ];
 
 				// Useful values
-				const float ratio = Clock::SecondsBetween( begin.time, end.time ) / totalTime;
-				const float offset = Clock::SecondsBetween( beginTime, begin.time ) / totalTime * width;
+				const float ratio = Clock::SecondsBetween( begin.mTime, end.mTime ) / totalTime;
+				const float offset = Clock::SecondsBetween( beginTime, begin.mTime ) / totalTime * width;
 				const float subWidth = ratio * width;
 				const ImVec2 tli = { tl.x + offset, tl.y + ( fontHeight + 1 ) * depth };
 				const ImVec2 bri = { tli.x + subWidth, tli.y + fontHeight };
@@ -146,8 +146,8 @@ namespace fan
 
 
 					std::stringstream ss;
-					ss << ( int ) 1000.f * Clock::SecondsBetween( begin.time, end.time ) << " ms.";
-					ImGui::TextUnformatted( begin.name );
+					ss << ( int ) 1000.f * Clock::SecondsBetween( begin.mTime, end.mTime ) << " ms.";
+					ImGui::TextUnformatted( begin.mName );
 					ImGui::TextUnformatted( ss.str().c_str() );
 
 					ImGui::EndTooltip();
@@ -157,11 +157,11 @@ namespace fan
 				draw_list->AddRectFilled( tli, bri, ImGui::GetColorU32( color.ToImGui() ), 0.0f, ImDrawCornerFlags_All );
 
 				// Draw text
-				const float textWidth = ImGui::CalcTextSize( begin.name ).x;
+				const float textWidth = ImGui::CalcTextSize( begin.mName ).x;
 				const float iWidth = bri.x - tli.x;
 				if ( iWidth > textWidth )
 				{
-					draw_list->AddText( { tli.x + 0.5f * ( iWidth - textWidth ) , tli.y }, colorText, begin.name, begin.name + std::strlen( begin.name ) );
+					draw_list->AddText( { tli.x + 0.5f * ( iWidth - textWidth ) , tli.y }, colorText, begin.mName, begin.mName + std::strlen( begin.mName ) );
 				}
 				++endIndex;
 			}

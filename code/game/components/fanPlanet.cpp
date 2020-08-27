@@ -61,6 +61,6 @@ namespace fan
             ImGui::DragFloat( "phase", &planet.mPhase, SIMD_PI / 3, 0.f, 2 * SIMD_PI );
         }
         RenderDebug& renderDebug = _world.GetSingleton<RenderDebug>();
-        renderDebug.DebugCircle( btVector3::Zero(), planet.mRadius, btVector3::Up(), 32, Color::Cyan );
+        renderDebug.DebugCircle( btVector3::Zero(), planet.mRadius, btVector3::Up(), 32, Color::sCyan );
     }
 }

@@ -23,9 +23,9 @@ namespace fan
 	void PointLight::Init( EcsWorld& /*_world*/, EcsEntity /*_entity*/, EcsComponent& _component )
 	{
 		PointLight& pointLight = static_cast<PointLight&>( _component );
-		pointLight.mAmbiant  = Color::White;
-		pointLight.mDiffuse  = Color::White;
-		pointLight.mSpecular = Color::White;
+		pointLight.mAmbiant  = Color::sWhite;
+		pointLight.mDiffuse  = Color::sWhite;
+		pointLight.mSpecular = Color::sWhite;
 		pointLight.mAttenuation[0] = 1.0f;
 		pointLight.mAttenuation[1] = 0.5f;
 		pointLight.mAttenuation[2] = 0.2f;
@@ -93,9 +93,9 @@ namespace fan
             // Filter color
             if( ImGui::Button( "##ambiantcpl2" ) ) { pointLight.mAmbiant = Color( 0.0f ); } ImGui::SameLine();
             ImGui::ColorEdit3( "ambiant##ambiantpl2", pointLight.mAmbiant.Data(), ImGui::fanColorEditFlags );
-            if( ImGui::Button( "##diffusecpl2" ) ) { pointLight.mDiffuse = Color::White; } ImGui::SameLine();
+            if( ImGui::Button( "##diffusecpl2" ) ) { pointLight.mDiffuse = Color::sWhite; } ImGui::SameLine();
             ImGui::ColorEdit3( "diffuse##diffusepl2", pointLight.mDiffuse.Data(), ImGui::fanColorEditFlags );
-            if( ImGui::Button( "##specularcpl2" ) ) { pointLight.mSpecular = Color::White ; } ImGui::SameLine();
+            if( ImGui::Button( "##specularcpl2" ) ) { pointLight.mSpecular = Color::sWhite ; } ImGui::SameLine();
             ImGui::ColorEdit3( "specular##specularpl2", pointLight.mSpecular.Data(), ImGui::fanColorEditFlags );
             // Attenuation
 

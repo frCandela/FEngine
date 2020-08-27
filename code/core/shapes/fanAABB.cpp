@@ -1,42 +1,50 @@
 #include "core/shapes/fanAABB.hpp"
-
 #include "core/math/fanMathUtils.hpp"
-#include "core/shapes/fanPlane.hpp"
 
 namespace fan
 {
-	AABB::AABB() : 
-		  m_low ( -0.5f * btVector3::One() )
-		, m_high(  0.5f * btVector3::One() ) 
+    //========================================================================================================
+    //========================================================================================================
+    AABB::AABB() :
+        mLow ( ),
+		mHigh( )
 	{}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	AABB::AABB( const btVector3 _low, const btVector3 _high ) :
-		m_low( _low ),
-		m_high( _high )
+            mLow( _low ),
+            mHigh( _high )
 	{
 		assert( _low[ 0 ] <= _high[ 0 ] && _low[ 1 ] <= _high[ 1 ] && _low[ 2 ] <= _high[ 2 ] );
 	}
 
-	//================================================================================================================================
+	//========================================================================================================
 	// Computes the AABB of a a transformed points cloud
-	//================================================================================================================================
+	//========================================================================================================
 	AABB::AABB( const std::vector<btVector3> _pointCloud, const glm::mat4 _modelMatrix )
 	{
 		if( _pointCloud.empty() )
 		{
-			m_low = -0.5f * btVector3::One();
-			m_high = 0.5f * btVector3::One();
+            mLow  = -0.5f * btVector3::One();
+            mHigh = 0.5f * btVector3::One();
 			return;
 		}
 
-		glm::vec3 high( std::numeric_limits<float>::lowest(), std::numeric_limits<float>::lowest(), std::numeric_limits<float>::lowest() );
-		glm::vec3 low( std::numeric_limits<float>::max(), std::numeric_limits<float>::max(), std::numeric_limits<float>::max() );
+        glm::vec3 high( std::numeric_limits<float>::lowest(),
+                        std::numeric_limits<float>::lowest(),
+                        std::numeric_limits<float>::lowest() );
+        glm::vec3 low( std::numeric_limits<float>::max(),
+                       std::numeric_limits<float>::max(),
+                       std::numeric_limits<float>::max() );
 
-		for ( int index = 0; index < (int)_pointCloud.size(); index++ )
-		{
-			const glm::vec4 vertex = _modelMatrix * glm::vec4( _pointCloud[ index ][ 0 ], _pointCloud[ index ][ 1 ], _pointCloud[ index ][ 2 ], 1.f );
+        for( int index = 0; index < (int)_pointCloud.size(); index++ )
+        {
+            const glm::vec4 vertex = _modelMatrix *
+                                     glm::vec4( _pointCloud[index][0],
+                                                _pointCloud[index][1],
+                                                _pointCloud[index][2],
+                                                1.f );
 			if ( vertex.x < low.x ) { low.x = vertex.x; }
 			if ( vertex.y < low.y ) { low.y = vertex.y; }
 			if ( vertex.z < low.z ) { low.z = vertex.z; }
@@ -44,36 +52,38 @@ namespace fan
 			if ( vertex.y > high.y ) { high.y = vertex.y; }
 			if ( vertex.z > high.z ) { high.z = vertex.z; }
 		}
-		m_low = ToBullet( low );
-		m_high = ToBullet( high );
-		assert( m_low[ 0 ] <= m_high[ 0 ] && m_low[ 1 ] <= m_high[ 1 ] && m_low[ 2 ] <= m_high[ 2 ] );
+        mLow  = ToBullet( low );
+        mHigh = ToBullet( high );
+		assert( mLow[ 0 ] <= mHigh[ 0 ] && mLow[ 1 ] <= mHigh[ 1 ] && mLow[ 2 ] <= mHigh[ 2 ] );
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	std::vector< btVector3 > AABB::GetCorners() const
 	{
 		return {
 			// Top face
-			m_high
-			,btVector3( m_low[ 0 ],m_high[ 1 ],m_high[ 2 ] )
-			,btVector3( m_low[ 0 ],m_high[ 1 ],m_low[ 2 ] )
-			,btVector3( m_high[ 0 ],m_high[ 1 ],m_low[ 2 ] )
+			mHigh
+			, btVector3( mLow[ 0 ], mHigh[ 1 ], mHigh[ 2 ] )
+			, btVector3( mLow[ 0 ], mHigh[ 1 ], mLow[ 2 ] )
+			, btVector3( mHigh[ 0 ], mHigh[ 1 ], mLow[ 2 ] )
 			//Bot face
-			,btVector3( m_high[ 0 ],m_low[ 1 ],m_high[ 2 ] )
-			,btVector3( m_low[ 0 ],m_low[ 1 ],m_high[ 2 ] )
-			,m_low
-			,btVector3( m_high[ 0 ],m_low[ 1 ],m_low[ 2 ] )
+			, btVector3( mHigh[ 0 ], mLow[ 1 ], mHigh[ 2 ] )
+			, btVector3( mLow[ 0 ], mLow[ 1 ], mHigh[ 2 ] )
+			, mLow
+			, btVector3( mHigh[ 0 ], mLow[ 1 ], mLow[ 2 ] )
 		};
 	}
 
-	//================================================================================================================================
+	//========================================================================================================
 	// Fast Ray - Box Intersection
 	// by Andrew Woo
 	// from "Graphics Gems", Academic Press, 1990
 	// Original code : https://github.com/erich666/GraphicsGems/blob/master/gems/RayBox.c
-	//================================================================================================================================
-	bool AABB::RayCast( const btVector3 _origin, const btVector3 _direction, btVector3& _outIntersection ) const
+	//========================================================================================================
+    bool AABB::RayCast( const btVector3 _origin,
+                        const btVector3 _direction,
+                        btVector3& _outIntersection ) const
 	{
 		const int RIGHT = 0;
 		const int LEFT = 1;
@@ -90,16 +100,16 @@ namespace fan
 		// rays cast all from the eye(assume perpsective view) 
 		for ( i = 0; i < 3; i++ )
 		{
-			if ( _origin[ i ] < m_low[ i ] )
+			if ( _origin[ i ] < mLow[ i ] )
 			{
 				quadrant[ i ] = LEFT;
-				candidatePlane[ i ] = m_low[ i ];
+				candidatePlane[ i ] = mLow[ i ];
 				inside = false;
 			}
-			else if ( _origin[ i ] > m_high[ i ] )
+			else if ( _origin[ i ] > mHigh[ i ] )
 			{
 				quadrant[ i ] = RIGHT;
-				candidatePlane[ i ] = m_high[ i ];
+				candidatePlane[ i ] = mHigh[ i ];
 				inside = false;
 			}
 			else
@@ -144,7 +154,7 @@ namespace fan
 			if ( whichPlane != i )
 			{
 				_outIntersection[ i ] = _origin[ i ] + maxT[ whichPlane ] * _direction[ i ];
-				if ( _outIntersection[ i ] < m_low[ i ] || _outIntersection[ i ] > m_high[ i ] )
+				if ( _outIntersection[ i ] < mLow[ i ] || _outIntersection[ i ] > mHigh[ i ] )
 					return false;
 			}
 			else

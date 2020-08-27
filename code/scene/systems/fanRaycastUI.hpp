@@ -66,7 +66,7 @@ namespace fan
                 UIRenderer& uiRenderer = *uiRendererIt;
                 if( button.mIsPressed )     { uiRenderer.mColor = button.mColorPressed; }
                 else if( button.mIsHovered ){ uiRenderer.mColor = button.mColorHovered; }
-                else                        { uiRenderer.mColor = Color::White; }
+                else                        { uiRenderer.mColor = Color::sWhite; }
             }
         }
     };

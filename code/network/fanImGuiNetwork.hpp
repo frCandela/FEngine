@@ -7,9 +7,9 @@ namespace fan
 	//================================================================================================================================
 	static ImVec4 GetRttColor( const float _rtt )
 	{
-		if( _rtt < 0.1 ) { return Color::Green.ToImGui(); }
-		if( _rtt < 0.15 ) { return Color::Yellow.ToImGui(); }
-		if( _rtt < 0.2 ) { return Color::Orange.ToImGui(); }
-		else { return Color::Red.ToImGui(); }
+		if( _rtt < 0.1 ) { return Color::sGreen.ToImGui(); }
+		if( _rtt < 0.15 ) { return Color::sYellow.ToImGui(); }
+		if( _rtt < 0.2 ) { return Color::sOrange.ToImGui(); }
+		else { return Color::sRed.ToImGui(); }
 	}
 }

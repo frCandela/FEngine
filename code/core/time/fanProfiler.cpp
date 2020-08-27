@@ -9,13 +9,13 @@ namespace fan
 	size_t Profiler::OpenTimeInterval( const char _name[ s_nameSize ] )
 	{
 		Interval interval;
-		interval.time = m_clock.Now();
-		interval.id = m_index++;
+		interval.mTime = mClock.Now();
+		interval.mID   = mIndex++;
 
-		strcpy_s( interval.name, _name ); // If you crash here, you probably entered a name that is more than 24 characters long
-		m_intervals.push_back( interval );
+		strcpy_s( interval.mName, _name ); // If you crash here, you probably entered a name that is more than 24 characters long
+		mIntervals.push_back( interval );
 
-		return interval.id;
+		return interval.mID;
 	}
 
 	//================================================================================================================================
@@ -24,10 +24,10 @@ namespace fan
 	void Profiler::CloseTimeInterval( const size_t _index )
 	{
 		Interval interval;
-		interval.time = m_clock.Now();
-		interval.id = _index;
-		interval.name[ 0 ] = '\0';
-		m_intervals.push_back( interval );
+		interval.mTime = mClock.Now();
+		interval.mID   = _index;
+		interval.mName[ 0 ] = '\0';
+		mIntervals.push_back( interval );
 	}
 
 	//================================================================================================================================
@@ -35,9 +35,9 @@ namespace fan
 	//================================================================================================================================
 	void Profiler::Begin()
 	{
-		m_intervals.clear();
-		m_index = 0;
-		m_clock.Reset();
+		mIntervals.clear();
+        mIndex = 0;
+		mClock.Reset();
 		const size_t index = OpenTimeInterval( "full_interval" );
 		assert( index == 0 );
 	}
@@ -55,14 +55,14 @@ namespace fan
 	//================================================================================================================================
 	ScopedProfile::ScopedProfile( const char  _name[ 24 ] )
 	{
-		m_index = Profiler::Get().OpenTimeInterval( _name );
+        mIndex = Profiler::Get().OpenTimeInterval( _name );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	ScopedProfile::~ScopedProfile()
 	{
-		Profiler::Get().CloseTimeInterval( m_index );
+		Profiler::Get().CloseTimeInterval( mIndex );
 	}
 
 }

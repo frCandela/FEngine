@@ -21,7 +21,7 @@ namespace fan
 	void UIButton::Init( EcsWorld& _world, EcsEntity /*_entity*/, EcsComponent& _component )
 	{
         UIButton& button = static_cast<UIButton&>( _component );
-        button.mColorHovered = Color::Grey;
+        button.mColorHovered = Color::sGrey;
         button.mColorPressed = Color::sDarkGrey;
         button.mIsHovered = false;
         button.mIsPressed = false;
@@ -57,7 +57,7 @@ namespace fan
         UIButton& button = static_cast<UIButton&>( _component );
 
         ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() );
-         if( ImGui::Button( "##color hovered reset" ) ){ button.mColorHovered = Color::Grey; }
+         if( ImGui::Button( "##color hovered reset" ) ){ button.mColorHovered = Color::sGrey; }
          ImGui::SameLine();
          ImGui::ColorEdit4( "color hovered", (float*)&button.mColorHovered[0], ImGui::fanColorEditFlags );
          if( ImGui::Button( "##color pressed reset" ) ){ button.mColorPressed = Color::sDarkGrey; }

@@ -28,7 +28,7 @@ namespace fan
 			for( ; boundsIt != _view.end<Bounds>(); ++boundsIt, ++sceneNodeIt )
 			{
 				const Bounds& bounds = *boundsIt;
-				_world.GetSingleton<RenderDebug>().DebugAABB( bounds.mAabb, Color::Red );
+				_world.GetSingleton<RenderDebug>().DebugAABB( bounds.mAabb, Color::sRed );
 			}
 		}
 	};
@@ -64,7 +64,7 @@ namespace fan
 						const btVector3 position = ToBullet( modelMat * glm::vec4( vertex.mPos, 1.f ) );
 						const btVector3 normal = ToBullet( normalMat * glm::vec4( vertex.mNormal, 1.f ) );
                         RenderDebug & renderDebug = _world.GetSingleton<RenderDebug>();
-                        renderDebug.DebugLine( position, position + 0.1f * normal, Color::Green );
+                        renderDebug.DebugLine( position, position + 0.1f * normal, Color::sGreen );
 					}
 				}
 			}
@@ -100,9 +100,9 @@ namespace fan
 						const btVector3 v0 = ToBullet( modelMat * glm::vec4( vertices[indices[3 * index + 0]].mPos, 1.f ) );
 						const btVector3 v1 = ToBullet( modelMat * glm::vec4( vertices[indices[3 * index + 1]].mPos, 1.f ) );
 						const btVector3 v2 = ToBullet( modelMat * glm::vec4( vertices[indices[3 * index + 2]].mPos, 1.f ) );
-						_world.GetSingleton<RenderDebug>().DebugLine( v0, v1, Color::Yellow );
-						_world.GetSingleton<RenderDebug>().DebugLine( v1, v2, Color::Yellow );
-						_world.GetSingleton<RenderDebug>().DebugLine( v2, v0, Color::Yellow );
+						_world.GetSingleton<RenderDebug>().DebugLine( v0, v1, Color::sYellow );
+						_world.GetSingleton<RenderDebug>().DebugLine( v1, v2, Color::sYellow );
+						_world.GetSingleton<RenderDebug>().DebugLine( v2, v0, Color::sYellow );
 					}
 				}
 			}
@@ -130,21 +130,19 @@ namespace fan
 				if( *meshRenderer.mMesh != nullptr )
 				{
 					const ConvexHull& hull = meshRenderer.mMesh->mConvexHull;
-					const std::vector<btVector3>& vertices = hull.GetVertices();
-					const std::vector<uint32_t>& indices = hull.GetIndices();
-					if( !vertices.empty() )
+					if( !hull.mVertices.empty() )
 					{
 						const glm::mat4  modelMat = transform.GetModelMatrix();
 
-						Color color = Color::Cyan;
-						for( unsigned polyIndex = 0; polyIndex < indices.size() / 3; polyIndex++ )
+						Color color = Color::sCyan;
+						for( unsigned polyIndex = 0; polyIndex < hull.mIndices.size() / 3; polyIndex++ )
 						{
-							const int index0 = indices[3 * polyIndex + 0];
-							const int index1 = indices[3 * polyIndex + 1];
-							const int index2 = indices[3 * polyIndex + 2];
-							const btVector3 vec0 = vertices[index0];
-							const btVector3 vec1 = vertices[index1];
-							const btVector3 vec2 = vertices[index2];
+							const int index0 = hull.mIndices[3 * polyIndex + 0];
+							const int index1 = hull.mIndices[3 * polyIndex + 1];
+							const int index2 = hull.mIndices[3 * polyIndex + 2];
+							const btVector3 vec0 = hull.mVertices[index0];
+							const btVector3 vec1 = hull.mVertices[index1];
+							const btVector3 vec2 = hull.mVertices[index2];
 							const btVector3 worldVec0 = ToBullet( modelMat * glm::vec4( vec0[0], vec0[1], vec0[2], 1.f ) );
 							const btVector3 worldVec1 = ToBullet( modelMat * glm::vec4( vec1[0], vec1[1], vec1[2], 1.f ) );
 							const btVector3 worldVec2 = ToBullet( modelMat * glm::vec4( vec2[0], vec2[1], vec2[2], 1.f ) );
@@ -228,7 +226,7 @@ namespace fan
 			const btVector3 left = _transform.Left();
 			const float length = 2.f;
 			const float radius = 0.5f;
-			const Color color = Color::Yellow;
+			const Color color = Color::sYellow;
 			btVector3 offsets[5] = { btVector3::Zero(), radius * up ,-radius * up, radius * left ,-radius * left };
 			for( int offsetIndex = 0; offsetIndex < 5; offsetIndex++ )
 			{
@@ -269,14 +267,14 @@ namespace fan
 			if( _world.HasComponent<BoxShape>( _entity ) )
 			{
 				const BoxShape& shape = _world.GetComponent<BoxShape>( _entity );
-				_world.GetSingleton<RenderDebug>().DebugCube( transform.mTransform, 0.5f * shape.GetScaling(), Color::Green, false );
+				_world.GetSingleton<RenderDebug>().DebugCube( transform.mTransform, 0.5f * shape.GetScaling(), Color::sGreen, false );
 			}
 
 			// sphere shape
 			if( _world.HasComponent<SphereShape>( _entity ) )
 			{
 				const SphereShape& shape = _world.GetComponent<SphereShape>( _entity );
-				_world.GetSingleton<RenderDebug>().DebugSphere( transform.mTransform, shape.GetRadius(), Color::Green, false );
+				_world.GetSingleton<RenderDebug>().DebugSphere( transform.mTransform, shape.GetRadius(), Color::sGreen, false );
 			}
 		}
 	};
@@ -306,10 +304,10 @@ namespace fan
                 const glm::ivec2 bl = p + glm::ivec2(0, s.y);
                 const glm::ivec2 br = p + s;
 
-                renderDebug.DebugLine2D( tl, tr , Color::Green );
-                renderDebug.DebugLine2D( tr, br , Color::Green );
-                renderDebug.DebugLine2D( br, bl , Color::Green );
-                renderDebug.DebugLine2D( bl, tl , Color::Green );
+                renderDebug.DebugLine2D( tl, tr , Color::sGreen );
+                renderDebug.DebugLine2D( tr, br , Color::sGreen );
+                renderDebug.DebugLine2D( br, bl , Color::sGreen );
+                renderDebug.DebugLine2D( bl, tl , Color::sGreen );
             }
         }
     };

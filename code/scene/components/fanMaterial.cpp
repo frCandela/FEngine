@@ -25,7 +25,7 @@ namespace fan
 
 		material.mTexture   = nullptr;
 		material.mShininess = 1;
-		material.mColor     = Color::White;
+		material.mColor     = Color::sWhite;
 	}
 
 	//========================================================================================================
@@ -59,7 +59,7 @@ namespace fan
         ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() - 16 );
         {
             // Filter color
-            if( ImGui::Button( "##color" ) ) { material.mColor = Color::White; } ImGui::SameLine();
+            if( ImGui::Button( "##color" ) ) { material.mColor = Color::sWhite; } ImGui::SameLine();
             ImGui::ColorEdit4( "color", material.mColor.Data(), ImGui::fanColorEditFlags );
 
             if( ImGui::Button( "##shininess" ) ) { material.mShininess = 1; } ImGui::SameLine();

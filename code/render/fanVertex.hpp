@@ -51,7 +51,7 @@ namespace fan
         glm::vec4 mColor;
 
         DebugVertex2D( const glm::vec2 _pos = glm::vec2( 0.f, 0.f ),
-                       const glm::vec4 _color = Color::White.ToGLM() );
+                       const glm::vec4 _color = Color::sWhite.ToGLM() );
         static std::vector<VkVertexInputBindingDescription>   GetBindingDescription();
         static std::vector<VkVertexInputAttributeDescription> GetAttributeDescriptions();
     };
@@ -66,7 +66,7 @@ namespace fan
 
         UIVertex( const glm::vec2 _pos = glm::vec2( 0.f, 0.f ),
                   const glm::vec2 _uv = glm::vec2( 0.f, 0.f ),
-                  const glm::vec4 _color = Color::White.ToGLM() );
+                  const glm::vec4 _color = Color::sWhite.ToGLM() );
         static std::vector<VkVertexInputBindingDescription> GetBindingDescription();
         static std::vector<VkVertexInputAttributeDescription> GetAttributeDescriptions();
 	};

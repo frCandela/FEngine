@@ -23,8 +23,8 @@ namespace fan
 	{
 		DirectionalLight& light = static_cast<DirectionalLight&>( _component );
 		light.mAmbiant  = Color( 0.1f, 0.1f, 0.1f );
-		light.mDiffuse  = Color::White;
-		light.mSpecular = Color::White;
+		light.mDiffuse  = Color::sWhite;
+		light.mSpecular = Color::sWhite;
 	}
 
 	//========================================================================================================
@@ -56,13 +56,13 @@ namespace fan
         ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() );
         {
             // Filter color
-            if( ImGui::Button( "##ambiant" ) ) { light.mAmbiant = Color::Black; } ImGui::SameLine();
+            if( ImGui::Button( "##ambiant" ) ) { light.mAmbiant = Color::sBlack; } ImGui::SameLine();
             ImGui::ColorEdit3( "ambiant", light.mAmbiant.Data(), ImGui::fanColorEditFlags );
 
-            if( ImGui::Button( "##diffuse" ) ) { light.mDiffuse = Color::Black; } ImGui::SameLine();
+            if( ImGui::Button( "##diffuse" ) ) { light.mDiffuse = Color::sBlack; } ImGui::SameLine();
             ImGui::ColorEdit3( "diffuse", light.mDiffuse.Data(), ImGui::fanColorEditFlags );
 
-            if( ImGui::Button( "##specular" ) ) { light.mSpecular = Color::Black; } ImGui::SameLine();
+            if( ImGui::Button( "##specular" ) ) { light.mSpecular = Color::sBlack; } ImGui::SameLine();
             ImGui::ColorEdit3( "specular", light.mSpecular.Data(), ImGui::fanColorEditFlags );
 
 

@@ -97,7 +97,7 @@ namespace fan
 					        glm::scale( glm::mat4( 1.f ), scale );
 
 					// Set the bounds
-					bounds.mAabb = AABB( renderer.mMesh->mConvexHull.GetVertices(), modelMatrix );
+					bounds.mAabb = AABB( renderer.mMesh->mConvexHull.mVertices, modelMatrix );
 
 					sceneNode.RemoveFlag( SceneNode::BoundsOutdated );
 				}

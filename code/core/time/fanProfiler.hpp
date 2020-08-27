@@ -6,10 +6,10 @@
 
 namespace fan
 {
-	//================================================================================================================================
+	//========================================================================================================
 	// Measures time intervals in scoped segments of code
 	// data is displayed in the profiler window of the editor
-	//================================================================================================================================
+	//========================================================================================================
 	class Profiler : public Singleton<Profiler>
 	{
 	public:
@@ -22,12 +22,12 @@ namespace fan
 		struct Interval
 		{
 
-			Clock::TimePoint time;
-			char	name[ s_nameSize ];
-			size_t  id;
+			Clock::TimePoint mTime;
+			char             mName[ s_nameSize ];
+			size_t           mID;
 
-			bool IsOpening() const { return name[ 0 ] != '\0'; }
-			bool IsClosing() const { return name[ 0 ] == '\0'; }
+			bool IsOpening() const { return mName[ 0 ] != '\0'; }
+			bool IsClosing() const { return mName[ 0 ] == '\0'; }
 		};
 
 		size_t	OpenTimeInterval( const char _name[ s_nameSize ] );
@@ -35,12 +35,12 @@ namespace fan
 
 		void Begin();
 		void End();
-		inline const std::vector<Interval>& GetIntervals() { return m_intervals; }
+		inline const std::vector<Interval>& GetIntervals() { return mIntervals; }
 
 	private:
-		Clock m_clock;
-		size_t m_index = 0;
-		std::vector<Profiler::Interval> m_intervals;
+		Clock                           mClock;
+		size_t                          mIndex = 0;
+		std::vector<Profiler::Interval> mIntervals;
 	};
 
 	//================================================================================================================================
@@ -52,8 +52,9 @@ namespace fan
 	public:
 		ScopedProfile( const char  _name[ Profiler::s_nameSize ] );
 		~ScopedProfile();
+
 	private:
-		size_t m_index;
+		size_t mIndex;
 	};
 #define SCOPED_PROFILE( _name ) ScopedProfile _name(#_name);
 }

@@ -19,9 +19,9 @@ namespace fan
 
 		enum Attenuation { Constant = 0, Linear = 1, Quadratic = 2 };
 
-		Color mAmbiant        = Color::White;
-		Color mDiffuse        = Color::White;
-		Color mSpecular       = Color::White;
+		Color mAmbiant        = Color::sWhite;
+		Color mDiffuse        = Color::sWhite;
+		Color mSpecular       = Color::sWhite;
 		float mAttenuation[3] = { 0.f, 0.f, 0.1f };
 
 		static float GetLightRange( const PointLight& _light );

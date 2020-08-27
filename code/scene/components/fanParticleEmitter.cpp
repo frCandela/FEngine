@@ -26,7 +26,7 @@ namespace fan
 		emitter.mParticlesPerSecond = 100.f;
 		emitter.mSpeed              = 1.f;
 		emitter.mDuration           = 2.f;
-		emitter.mColor              = Color::Magenta;
+		emitter.mColor              = Color::sMagenta;
 		emitter.mTimeAccumulator    = 0.f;
 		emitter.mTagsSignature      = 0;
 	}

@@ -158,11 +158,11 @@ namespace fan
 	{
 		switch( _clientState )
 		{
-		case fan::ClientConnection::ClientState::Disconnected:		return Color::Red.ToImGui();
-		case fan::ClientConnection::ClientState::Stopping:			return Color::Purple.ToImGui();
-		case fan::ClientConnection::ClientState::PendingConnection:	return Color::Yellow.ToImGui();
-		case fan::ClientConnection::ClientState::Connected:			return Color::Green.ToImGui();
-		default:			fanAssert( false );						return Color::Purple.ToImGui();
+		case fan::ClientConnection::ClientState::Disconnected:		return Color::sRed.ToImGui();
+		case fan::ClientConnection::ClientState::Stopping:			return Color::sPurple.ToImGui();
+		case fan::ClientConnection::ClientState::PendingConnection:	return Color::sYellow.ToImGui();
+		case fan::ClientConnection::ClientState::Connected:			return Color::sGreen.ToImGui();
+		default:			fanAssert( false );						return Color::sPurple.ToImGui();
 		}
 	}
 

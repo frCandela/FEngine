@@ -33,7 +33,7 @@ namespace fan
     //========================================================================================================
     void SceneResources::SetupResources( PrefabManager& _prefabManager )
     {
-        ResourcePtr< Prefab >::s_onResolve.Connect ( &PrefabManager::ResolvePtr, &_prefabManager );
+        ResourcePtr< Prefab >::sOnResolve.Connect ( &PrefabManager::ResolvePtr, &_prefabManager );
     }
 
     //========================================================================================================

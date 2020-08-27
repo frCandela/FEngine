@@ -55,9 +55,9 @@ namespace fan
 		SerializedValues();
 
 	private:
-		const char* m_jsonPath;
-		const char* m_valuesName;
-		const char* m_keysBindingsName;
-		Json m_json;
+		const char* mJsonPath;
+		const char* mValuesName;
+		const char* mKeysBindingsName;
+		Json mJson;
 	};
 }
