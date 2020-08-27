@@ -8,7 +8,7 @@ namespace fan
 	//========================================================================================================
 	void HostConnection::SetInfo( EcsComponentInfo& _info )
 	{
-		_info.mIcon  = ImGui::IconType::SOCKET16;
+		_info.mIcon  = ImGui::IconType::Socket16;
 		_info.mGroup = EngineGroups::Network;
 		_info.onGui  = &HostConnection::OnGui;
 		_info.mName  = "host connection";

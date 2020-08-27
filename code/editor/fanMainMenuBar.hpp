@@ -6,10 +6,8 @@
 
 namespace fan
 {
-	struct EditorGrid;
 	class EcsWorld;
 	class EditorWindow;
-	struct EditorSelection;
 
 	//========================================================================================================
 	// top main menu bar of the editor
@@ -17,12 +15,9 @@ namespace fan
 	class MainMenuBar
 	{
 	public:
-		Signal< std::string > onSaveScene;
-		Signal< std::string > onNewScene;
-		Signal< std::string > onOpenScene;
-		Signal<> onReloadShaders;
-		Signal<> onReloadIcons;
-		Signal<> onExit;
+		Signal<> mOnReloadShaders;
+		Signal<> mOnReloadIcons;
+		Signal<> mOnExit;
 
 		MainMenuBar();
 		~MainMenuBar();

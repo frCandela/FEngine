@@ -9,7 +9,7 @@ namespace fan
 	//========================================================================================================
 	void HostReplication::SetInfo( EcsComponentInfo& _info )
 	{
-		_info.mIcon  = ImGui::IconType::NETWORK16;
+		_info.mIcon  = ImGui::IconType::Network16;
 		_info.mGroup = EngineGroups::Network;
 		_info.onGui  = &HostReplication::OnGui;
 		_info.mName  = "host replication";

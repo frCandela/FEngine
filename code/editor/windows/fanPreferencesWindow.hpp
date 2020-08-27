@@ -8,10 +8,10 @@ namespace fan
 	class Renderer;
     class FullScreen;
 
-	//================================================================================================================================
+	//========================================================================================================
 	// shortcut & axis edition
 	// imgui colors
-	//================================================================================================================================
+	//========================================================================================================
 	class PreferencesWindow : public EditorWindow
 	{
 	public:
@@ -23,7 +23,7 @@ namespace fan
 		void OnGui( EcsWorld& _world ) override;
 
 	private:
-		Renderer& mRenderer;
+		Renderer&   mRenderer;
         FullScreen& mFullScreen;
 
 		void DrawJoysticks();

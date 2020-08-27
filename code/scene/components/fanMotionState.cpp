@@ -8,7 +8,7 @@ namespace fan
 	//========================================================================================================
 	void MotionState::SetInfo( EcsComponentInfo& _info )
 	{
-		_info.mIcon       = ImGui::IconType::RIGIDBODY16;
+		_info.mIcon       = ImGui::IconType::Rigidbody16;
 		_info.mGroup      = EngineGroups::ScenePhysics;
 		_info.destroy     = &MotionState::Destroy;
 		_info.save        = &MotionState::Save;

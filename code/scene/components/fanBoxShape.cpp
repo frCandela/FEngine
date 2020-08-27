@@ -7,7 +7,7 @@ namespace fan
 	//========================================================================================================
 	void BoxShape::SetInfo( EcsComponentInfo& _info )
 	{
-		_info.mIcon       = ImGui::IconType::CUBE_SHAPE16;
+		_info.mIcon       = ImGui::IconType::CubeShape16;
 		_info.mGroup      = EngineGroups::ScenePhysics;
 		_info.onGui       = &BoxShape::OnGui;
 		_info.destroy     = &BoxShape::Destroy;

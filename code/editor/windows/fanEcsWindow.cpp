@@ -13,10 +13,10 @@
 namespace fan
 {
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	EcsWindow::EcsWindow() :
-		EditorWindow( "ecs", ImGui::IconType::ECS16 )
+		EditorWindow( "ecs", ImGui::IconType::Ecs16 )
 	{
 	}
 
@@ -30,16 +30,17 @@ namespace fan
 		return ssStorage.str();
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void EcsWindow::OnGui( EcsWorld& _world )
 	{
 		// Global
 		if( ImGui::CollapsingHeader( "Global" ) )
 		{
 			ImGui::Text( "num chunks     : %d", EcsChunk::sAllocator.Size() );
-			ImGui::Text( "total size (Mo): %.1f", float( EcsChunk::sAllocator.Size() * EcsChunk::sAllocator.sChunkSize ) * 0.000001f );
-		}
+            ImGui::Text( "total size (Mo): %.1f",
+                         float( EcsChunk::sAllocator.Size() * EcsChunk::sAllocator.sChunkSize ) * 0.000001f );
+        }
 
 		// Archetypes
 		if( ImGui::CollapsingHeader( "Archetypes" ) )
@@ -61,7 +62,7 @@ namespace fan
 			{
 				std::stringstream ssSignature;
 				ssSignature << archetype->GetSignature();
-				ImGui::Text( ssSignature.str().c_str() );	ImGui::NextColumn();		// signature
+				ImGui::Text( ssSignature.str().c_str() );	ImGui::NextColumn();	// signature
 				ImGui::Text( "%d ", archetype->Size() );	ImGui::NextColumn();	// size
 				if( ImGui::IsItemHovered() )
 				{
@@ -94,9 +95,12 @@ namespace fan
 						}
 						ss << ": ";
 
-						for( int chunkIndex = 0; chunkIndex < archetype->GetChunkVector(componentIndex).NumChunk(); chunkIndex++ )
-						{
-							ss << archetype->GetChunkVector(componentIndex).GetChunk( chunkIndex ).Size() << " ";
+                        for( int chunkIndex = 0;
+                             chunkIndex < archetype->GetChunkVector( componentIndex ).NumChunk();
+                             chunkIndex++ )
+                        {
+							ss  << archetype->GetChunkVector(componentIndex).GetChunk( chunkIndex ).Size()
+							    << " ";
 						}
 						ImGui::Text( ss.str().c_str() );
 

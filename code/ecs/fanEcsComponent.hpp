@@ -50,7 +50,7 @@ namespace fan
 		};
 
 		std::string            mName;
-		ImGui::IconType        mIcon  = ImGui::IconType::NONE;	// editor icon
+		ImGui::IconType        mIcon  = ImGui::IconType::None16;	// editor icon
 		EngineGroups           mGroup = EngineGroups::None;	    // editor group
 		const char*		       mEditorPath = "";				// editor path for the addComponent menu
 		uint32_t               mType;

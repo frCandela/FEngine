@@ -8,7 +8,7 @@ namespace fan
 	//========================================================================================================
 	void Weapon::SetInfo( EcsComponentInfo& _info )
 	{
-		_info.mIcon       = ImGui::IconType::JOYSTICK16;
+		_info.mIcon       = ImGui::IconType::Joystick16;
 		_info.mGroup      = EngineGroups::Game;
 		_info.onGui       = &Weapon::OnGui;
 		_info.load        = &Weapon::Load;

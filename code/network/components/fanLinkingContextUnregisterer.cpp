@@ -7,7 +7,7 @@ namespace fan
 	//========================================================================================================
 	void LinkingContextUnregisterer::SetInfo( EcsComponentInfo& _info )
 	{
-		_info.mIcon   = ImGui::IconType::NETWORK16;
+		_info.mIcon   = ImGui::IconType::Network16;
 		_info.mGroup  = EngineGroups::Network;
 		_info.onGui   = &LinkingContextUnregisterer::OnGui;
 		_info.destroy = &LinkingContextUnregisterer::Destroy;

@@ -124,12 +124,12 @@ namespace fan
 
 				if ( ImGui::MenuItem( "Reload shaders", "F11" ) )
 				{
-					onReloadShaders.Emmit();
+					mOnReloadShaders.Emmit();
 				}
 
 				if ( ImGui::MenuItem( "Reload icons", "F12" ) )
 				{
-					onReloadIcons.Emmit();
+					mOnReloadIcons.Emmit();
 				}
 
                 if ( ImGui::MenuItem( "Reload ecs infos" ) )
@@ -141,7 +141,7 @@ namespace fan
 
 				if ( ImGui::MenuItem( "Exit" ) )
 				{
-					onExit.Emmit();
+					mOnExit.Emmit();
 				}
 
 				ImGui::EndMenu();
@@ -150,7 +150,7 @@ namespace fan
 			// View
 			if ( ImGui::BeginMenu( "Tools" ) )
 			{
-				ImGui::Icon( ImGui::IMGUI16, { 16,16 } ); ImGui::SameLine();
+				ImGui::Icon( ImGui::Imgui16, { 16, 16 } ); ImGui::SameLine();
 				ImGui::MenuItem( "Imgui demo", nullptr, &mShowImguiDemoWindow );
 
 				for ( size_t windowIndex = 0; windowIndex < m_editorWindows.size(); windowIndex++ )
@@ -338,7 +338,9 @@ namespace fan
 
 			// save old selection
 			SceneNode* prevSelectionNode = editorSelection.GetSelectedSceneNode();
-			const EcsHandle prevSelectionHandle= prevSelectionNode != nullptr ? prevSelectionNode->mHandle : 0;
+            const EcsHandle prevSelectionHandle = prevSelectionNode != nullptr ?
+                    prevSelectionNode->mHandle :
+                    0;
 
 			Debug::Get() << Debug::Severity::log << "loading scene: " << scene.mPath << Debug::Endl();
 			scene.LoadFrom( scene.mPath );

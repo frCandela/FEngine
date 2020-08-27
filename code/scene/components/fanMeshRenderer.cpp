@@ -9,7 +9,7 @@ namespace fan
 	//========================================================================================================
 	void MeshRenderer::SetInfo( EcsComponentInfo& _info )
 	{
-		_info.mIcon       = ImGui::IconType::MESH_RENDERER16;
+		_info.mIcon       = ImGui::IconType::MeshRenderer16;
 		_info.mGroup      = EngineGroups::SceneRender;
 		_info.onGui       = &MeshRenderer::OnGui;
 		_info.load        = &MeshRenderer::Load;

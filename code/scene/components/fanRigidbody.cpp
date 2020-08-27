@@ -9,7 +9,7 @@ namespace fan
 	//========================================================================================================
 	void Rigidbody::SetInfo( EcsComponentInfo& _info )
 	{
-		_info.mIcon   = ImGui::IconType::RIGIDBODY16;
+		_info.mIcon   = ImGui::IconType::Rigidbody16;
 		_info.mGroup  = EngineGroups::ScenePhysics;
 		_info.onGui   = &Rigidbody::OnGui;
 		_info.destroy = &Rigidbody::Destroy;

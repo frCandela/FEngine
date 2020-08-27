@@ -8,7 +8,7 @@ namespace fan
 	//========================================================================================================
 	void Battery::SetInfo( EcsComponentInfo& _info )
 	{
-		_info.mIcon       = ImGui::IconType::ENERGY16;
+		_info.mIcon       = ImGui::IconType::Energy16;
 		_info.mGroup      = EngineGroups::Game;
 		_info.onGui       = &Battery::OnGui;
 		_info.load        = &Battery::Load;

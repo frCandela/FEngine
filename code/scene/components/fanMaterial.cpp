@@ -8,7 +8,7 @@ namespace fan
 	//========================================================================================================
 	void Material::SetInfo( EcsComponentInfo& _info )
 	{
-		_info.mIcon       = ImGui::IconType::MATERIAL16;
+		_info.mIcon       = ImGui::IconType::Material16;
 		_info.mGroup      = EngineGroups::SceneRender;
 		_info.onGui       = &Material::OnGui;
 		_info.load        = &Material::Load;

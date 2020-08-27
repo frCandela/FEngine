@@ -10,7 +10,7 @@ namespace fan
 	//========================================================================================================
 	void UIRenderer::SetInfo( EcsComponentInfo& _info )
 	{
-		_info.mIcon       = ImGui::IconType::UI_MESH_RENDERER16;
+		_info.mIcon       = ImGui::IconType::UiMeshRenderer16;
 		_info.mGroup      = EngineGroups::SceneUI;
 		_info.onGui       = &UIRenderer::OnGui;
 		_info.load        = &UIRenderer::Load;

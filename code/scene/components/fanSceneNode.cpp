@@ -9,7 +9,7 @@ namespace fan
 	//========================================================================================================
 	void SceneNode::SetInfo( EcsComponentInfo& _info )
 	{
-		_info.mIcon       = ImGui::IconType::GAMEOBJECT16;
+		_info.mIcon       = ImGui::IconType::Gameobject16;
 		_info.mGroup      = EngineGroups::Scene;
 		_info.onGui       = &SceneNode::OnGui;
 		_info.destroy     = &SceneNode::Destroy;

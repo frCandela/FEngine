@@ -80,12 +80,12 @@ namespace fan
         ImGui::Text("transforms: ");
         ImGui::Indent();
         ImGui::SameLine();
-        if( ImGui::ButtonIcon(ImGui::IconType::PLUS8, {8,8} ) )
+        if( ImGui::ButtonIcon( ImGui::IconType::Plus8, { 8, 8} ) )
         {
             UILayout::CreateItem( _world, layout );
         }
         ImGui::SameLine();
-        if(ImGui::ButtonIcon(ImGui::IconType::MINUS8, {8,8} ) && ! layout.mTransforms.empty() )
+        if( ImGui::ButtonIcon( ImGui::IconType::Minus8, { 8, 8} ) && ! layout.mTransforms.empty() )
         {
             layout.mTransforms.pop_back();
         }

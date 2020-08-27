@@ -8,7 +8,7 @@ namespace fan
 	//========================================================================================================
 	void DirectionalLight::SetInfo( EcsComponentInfo& _info )
 	{
-		_info.mIcon       = ImGui::IconType::DIR_LIGHT16;
+		_info.mIcon       = ImGui::IconType::DirLight16;
 		_info.mGroup      = EngineGroups::SceneRender;
 		_info.onGui       = &DirectionalLight::OnGui;
 		_info.load        = &DirectionalLight::Load;

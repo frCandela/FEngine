@@ -5,56 +5,55 @@
 
 namespace fan
 {
-	//================================================================================================================================
+	//========================================================================================================
 	// ConsoleWindow::LogItem nested constructor
-	//================================================================================================================================
-	ConsoleWindow::LogItem::LogItem( const Debug::LogItem& _logItem )
+	//========================================================================================================
+	ConsoleWindow::LogItemCompiled::LogItemCompiled( const Debug::LogItem& _logItem )
 	{
-		severity = _logItem.severity;
-		logType = _logItem.type;
-		logMessage = Time::SecondsToString( _logItem.time ).c_str() + std::string( " " ) + _logItem.message;
-		color = GetSeverityColor( _logItem.severity );
+        mSeverity   = _logItem.severity;
+        mLogMessage = Time::SecondsToString( _logItem.time ).c_str() + std::string( " " ) + _logItem.message;
+        mColor      = GetSeverityColor( _logItem.severity );
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	ConsoleWindow::ConsoleWindow() :
-		EditorWindow( "console", ImGui::IconType::CONSOLE16 ),
-		m_maxSizeLogBuffers( 256 ),
-		m_firstLogIndex( 0 ),
-		m_grabFocus( false )
+            EditorWindow( "console", ImGui::IconType::Console16 ),
+            mMaxSizeLogBuffers( 256 ),
+            mFirstLogIndex( 0 ),
+            mGrabFocus( false )
 	{
-		m_inputBuffer[ 0 ] = '\0';
-		m_logBuffer.reserve( m_maxSizeLogBuffers );
+        mInputBuffer[ 0 ] = '\0';
+		mLogBuffer.reserve( mMaxSizeLogBuffers );
 		Debug::Get().onNewLog.Connect( &ConsoleWindow::OnNewLog, this );
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	ConsoleWindow::~ConsoleWindow()
 	{
 		Debug::Get().onNewLog.Clear();
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void ConsoleWindow::OnNewLog( Debug::LogItem _item )
 	{
-		m_scrollDown = true;
+        mScrollDown = true;
 
-		if ( (int)m_logBuffer.size() < m_maxSizeLogBuffers )
+		if ( (int)mLogBuffer.size() < mMaxSizeLogBuffers )
 		{
-			m_logBuffer.push_back( LogItem( _item ) );
+			mLogBuffer.push_back( LogItemCompiled( _item ) );
 		}
 		else
 		{
-			m_logBuffer[ m_firstLogIndex ] = LogItem( _item );
-			m_firstLogIndex = ( m_firstLogIndex + 1 ) % m_maxSizeLogBuffers;
+            mLogBuffer[ mFirstLogIndex ] = LogItemCompiled( _item );
+            mFirstLogIndex = ( mFirstLogIndex + 1 ) % mMaxSizeLogBuffers;
 		}
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void ConsoleWindow::OnGui( EcsWorld& /*_world*/ )
 	{
 		SCOPED_PROFILE(console)
@@ -63,26 +62,31 @@ namespace fan
 		const float height = ImGui::GetWindowHeight();
 		if ( height > 60 )
 		{
-			ImGui::BeginChild( "scrolling", ImVec2( 0, height - 65 ), true, ImGuiWindowFlags_AlwaysVerticalScrollbar );
-			for ( int logIndex = m_firstLogIndex; logIndex < m_firstLogIndex + (int)m_logBuffer.size(); logIndex++ )
-			{
-				const LogItem& item = m_logBuffer[ logIndex % m_maxSizeLogBuffers ];
-				ImGui::TextColored( item.color, item.logMessage.c_str() );	// Time			
+            ImGui::BeginChild( "scrolling",
+                               ImVec2( 0, height - 65 ),
+                               true,
+                               ImGuiWindowFlags_AlwaysVerticalScrollbar );
+            for( int logIndex = mFirstLogIndex;
+                 logIndex < mFirstLogIndex + (int)mLogBuffer.size();
+                 logIndex++ )
+            {
+				const LogItemCompiled& item = mLogBuffer[logIndex % mMaxSizeLogBuffers ];
+				ImGui::TextColored( item.mColor, item.mLogMessage.c_str() );	// Time
 			}
-			if ( m_scrollDown )
+			if ( mScrollDown )
 			{
 				ImGui::SetScrollHereY( 1.0f );
-				m_scrollDown = false;
+                mScrollDown = false;
 			}
 			ImGui::EndChild();
 		}
 
 		// Text input
 
-		if ( m_grabFocus )
+		if ( mGrabFocus )
 		{
 			ImGui::SetKeyboardFocusHere();
-			m_grabFocus = false;
+            mGrabFocus = false;
 		}
 
 		// Icon
@@ -90,8 +94,11 @@ namespace fan
 
 		// Input
 		bool pressed = false;
-		ImGui::PushItemWidth( ImGui::GetWindowWidth() - 90 );
-		if ( ImGui::InputText( "##input_console", m_inputBuffer, IM_ARRAYSIZE( m_inputBuffer ), ImGuiInputTextFlags_EnterReturnsTrue ) )
+        ImGui::PushItemWidth( ImGui::GetWindowWidth() - 90 );
+        if( ImGui::InputText( "##input_console",
+                              mInputBuffer,
+                              IM_ARRAYSIZE( mInputBuffer ),
+                              ImGuiInputTextFlags_EnterReturnsTrue ) )
 		{
 			pressed = true;
 		}
@@ -105,7 +112,7 @@ namespace fan
 		}
 		if ( pressed == true )
 		{
-			const std::string message = m_inputBuffer;
+			const std::string message = mInputBuffer;
 			if ( message.size() > 0 )
 			{
 				if ( message != "clear" )
@@ -116,15 +123,15 @@ namespace fan
 				{
 					Debug::Get().Clear();
 				}
-				m_inputBuffer[ 0 ] = '\0';
-				m_scrollDown = true;
-				m_grabFocus = true;
+                mInputBuffer[ 0 ] = '\0';
+                mScrollDown = true;
+                mGrabFocus  = true;
 			}
 		}
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	ImVec4 ConsoleWindow::GetSeverityColor( const Debug::Severity& _severity )
 	{
 		switch ( _severity )

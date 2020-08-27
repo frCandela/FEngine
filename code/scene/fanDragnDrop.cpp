@@ -22,7 +22,7 @@ namespace ImGui
 			if ( ImGui::BeginDragDropSource( _flags ) )
 			{
 				ImGui::SetDragDropPayload( "dragndrop_prefab", &_prefab, sizeof( fan::Prefab** ) );
-				ImGui::Icon( ImGui::IconType::PREFAB16, { 16,16 } ); ImGui::SameLine();
+				ImGui::Icon( ImGui::IconType::Prefab16, { 16, 16 } ); ImGui::SameLine();
 				ImGui::Text( ( _prefab->mPath ).c_str() );
 				ImGui::EndDragDropSource();
 			}

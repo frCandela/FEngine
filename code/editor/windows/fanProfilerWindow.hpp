@@ -6,9 +6,9 @@
 
 namespace fan
 {
-	//================================================================================================================================
+	//========================================================================================================
 	// Displays profiling data from the  profiler ( SCOPED_PROFILE macros )
-	//================================================================================================================================
+	//========================================================================================================
 	class ProfilerWindow : public EditorWindow
 	{
 	public:
@@ -18,17 +18,17 @@ namespace fan
 
 		void OnProfilerEnd();
 	private:
-		std::vector<Profiler::Interval> m_intervalsCopy;
-		bool	m_freezeCapture = false;
-		float	m_lastScrollPosition = 0.f;
-		float	m_scale = 1.f;
-		float	m_speed = 0.2f;
+		std::vector<Profiler::Interval> mIntervalsCopy;
+		bool                            mFreezeCapture      = false;
+		float                           mLastScrollPosition = 0.f;
+		float                           mScale              = 1.f;
+		float                           mSpeed              = 0.2f;
 
-		const Color m_color1;
-		const Color m_color2;
-		const Color m_colorHovered;
+		const Color mColor1;
+		const Color mColor2;
+		const Color mColorHovered;
 
-		void OnToogleFreezeCapture() { m_freezeCapture = !m_freezeCapture; }
+		void OnToogleFreezeCapture() { mFreezeCapture = !mFreezeCapture; }
 	};
 
 }

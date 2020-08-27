@@ -9,7 +9,7 @@ namespace fan
 	//========================================================================================================
 	void PointLight::SetInfo( EcsComponentInfo& _info )
 	{
-		_info.mIcon       = ImGui::IconType::POINT_LIGHT16;
+		_info.mIcon       = ImGui::IconType::PointLight16;
 		_info.mGroup      = EngineGroups::SceneRender;
 		_info.onGui       = &PointLight::OnGui;
 		_info.load        = &PointLight::Load;

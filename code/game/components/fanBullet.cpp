@@ -7,7 +7,7 @@ namespace fan
 	//========================================================================================================
 	void Bullet::SetInfo( EcsComponentInfo& _info )
 	{
-		_info.mIcon       = ImGui::IconType::JOYSTICK16;
+		_info.mIcon       = ImGui::IconType::Joystick16;
 		_info.mGroup      = EngineGroups::Game;
 		_info.onGui       = &Bullet::OnGui;
 		_info.load        = &Bullet::Load;

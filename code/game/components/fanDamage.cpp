@@ -8,7 +8,7 @@ namespace fan
 	//========================================================================================================
 	void Damage::SetInfo( EcsComponentInfo& _info )
 	{
-		_info.mIcon       = ImGui::IconType::JOYSTICK16;
+		_info.mIcon       = ImGui::IconType::Joystick16;
 		_info.mGroup      = EngineGroups::Game;
 		_info.onGui       = &Damage::OnGui;
 		_info.load        = &Damage::Load;

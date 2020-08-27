@@ -52,8 +52,8 @@ namespace fan
         bool                 mApplicationShouldExit;
         bool                 mShowUi = true;
 
-        MainMenuBar      *mMainMenuBar;
-        GameViewWindow   *mGameViewWindow;
+        MainMenuBar *        mMainMenuBar;
+        GameViewWindow *     mGameViewWindow;
 
 		IGame& GetCurrentGame() { return *mGames[ mCurrentGame ]; }
 		

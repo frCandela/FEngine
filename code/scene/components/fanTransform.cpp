@@ -10,7 +10,7 @@ namespace fan
 	//========================================================================================================
 	void Transform::SetInfo( EcsComponentInfo& _info )
 	{
-		_info.mIcon        = ImGui::IconType::TRANSFORM16;
+		_info.mIcon        = ImGui::IconType::Transform16;
 		_info.mGroup       = EngineGroups::Scene;
 		_info.onGui        = &Transform::OnGui;
 		_info.save         = &Transform::Save;

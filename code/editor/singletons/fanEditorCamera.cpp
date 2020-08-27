@@ -15,7 +15,7 @@ namespace fan
 	//========================================================================================================
 	void EditorCamera::SetInfo( EcsSingletonInfo& _info )
 	{
-		_info.mIcon  = ImGui::CAMERA16;
+		_info.mIcon  = ImGui::Camera16;
 		_info.mGroup = EngineGroups::Editor;
 		_info.onGui  = &EditorCamera::OnGui;
 		_info.mName  = "editor camera";

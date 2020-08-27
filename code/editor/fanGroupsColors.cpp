@@ -2,7 +2,7 @@
 
 namespace fan
 {
-	ImVec4 GroupsColors::s_colors[ GroupsColors::s_count ] = 
+	ImVec4 GroupsColors::sColors[ GroupsColors::sCount ] =
 	{
 		{ 1.000f, 1.000f, 1.000f, 1.000f }, // None
 		{ 0.969f, 0.904f, 0.291f, 1.000f }, // Network

@@ -7,7 +7,7 @@ namespace fan
 	//========================================================================================================
 	void SphereShape::SetInfo( EcsComponentInfo& _info )
 	{
-		_info.mIcon       = ImGui::IconType::SPHERE_SHAPE16;
+		_info.mIcon       = ImGui::IconType::SphereShape16;
 		_info.mGroup      = EngineGroups::ScenePhysics;
 		_info.onGui       = &SphereShape::OnGui;
 		_info.destroy     = &SphereShape::Destroy;

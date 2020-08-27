@@ -8,7 +8,7 @@ namespace fan
     //========================================================================================================
     void SceneResources::SetInfo( EcsSingletonInfo& _info )
     {
-        _info.mIcon  = ImGui::IconType::SCENE16;
+        _info.mIcon  = ImGui::IconType::Scene16;
         _info.mGroup = EngineGroups::SceneRender;
         _info.mName  = "scene resources";
         _info.onGui = &SceneResources::OnGui;

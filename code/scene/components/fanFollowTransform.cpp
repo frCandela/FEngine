@@ -9,7 +9,7 @@ namespace fan
 	//========================================================================================================
 	void FollowTransform::SetInfo( EcsComponentInfo& _info )
 	{
-		_info.mIcon       = ImGui::IconType::FOLLOW_TRANSFORM;
+		_info.mIcon       = ImGui::IconType::FollowTransform16;
 		_info.mGroup      = EngineGroups::Scene;
 		_info.onGui       = &FollowTransform::OnGui;
 		_info.save        = &FollowTransform::Save;
@@ -87,7 +87,7 @@ namespace fan
 
         ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() );
 
-        enum ImGui::IconType icon = followTransform.mLocked ? ImGui::LOCK_CLOSED16 : ImGui::LOCK_OPEN16;
+        enum ImGui::IconType icon = followTransform.mLocked ? ImGui::LockClosed16 : ImGui::LockOpen16;
         if( ImGui::ButtonIcon( icon, { 16,16 } ) )
         {
             followTransform.mLocked = !followTransform.mLocked;

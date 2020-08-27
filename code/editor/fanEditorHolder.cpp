@@ -106,9 +106,9 @@ namespace fan
         } );
 
         // Instance messages
-        mMainMenuBar->onReloadShaders.Connect( &Renderer::ReloadShaders, mRenderer );
-        mMainMenuBar->onReloadIcons.Connect( &Renderer::ReloadIcons, mRenderer );
-        mMainMenuBar->onExit.Connect( &EditorHolder::Exit, this );
+        mMainMenuBar->mOnReloadShaders.Connect( &Renderer::ReloadShaders, mRenderer );
+        mMainMenuBar->mOnReloadIcons.Connect( &Renderer::ReloadIcons, mRenderer );
+        mMainMenuBar->mOnExit.Connect( &EditorHolder::Exit, this );
 
         // Events linking
         InputManager& manager = Input::Get().Manager();
@@ -124,13 +124,13 @@ namespace fan
         manager.FindEvent( "toogle_world" )->Connect( &EditorHolder::OnCycleCurrentGame, this );
         manager.FindEvent( "reload_icons" )->Connect( &Renderer::ReloadIcons, mRenderer );
 
-        mGameViewWindow->onSizeChanged.Connect( &Renderer::ResizeGame, mRenderer );
-        mGameViewWindow->onPlay.Connect( &EditorHolder::OnCurrentGameStart, this );
-        mGameViewWindow->onPause.Connect( &EditorHolder::OnCurrentGamePause, this );
-        mGameViewWindow->onResume.Connect( &EditorHolder::OnCurrentGameResume, this );
-        mGameViewWindow->onStop.Connect( &EditorHolder::OnCurrentGameStop, this );
-        mGameViewWindow->onStep.Connect( &EditorHolder::OnCurrentGameStep, this );
-        mGameViewWindow->onSelectGame.Connect( &EditorHolder::OnCurrentGameSelect, this );
+        mGameViewWindow->mOnSizeChanged.Connect( &Renderer::ResizeGame, mRenderer );
+        mGameViewWindow->mOnPlay.Connect( &EditorHolder::OnCurrentGameStart, this );
+        mGameViewWindow->mOnPause.Connect( &EditorHolder::OnCurrentGamePause, this );
+        mGameViewWindow->mOnResume.Connect( &EditorHolder::OnCurrentGameResume, this );
+        mGameViewWindow->mOnStop.Connect( &EditorHolder::OnCurrentGameStop, this );
+        mGameViewWindow->mOnStep.Connect( &EditorHolder::OnCurrentGameStep, this );
+        mGameViewWindow->mOnSelectGame.Connect( &EditorHolder::OnCurrentGameSelect, this );
 
         // Loop over all worlds to initialize them
         for( int gameIndex = 0; gameIndex < (int)mGames.size(); gameIndex++ )
@@ -278,7 +278,8 @@ namespace fan
                                                        ( time.mLastLogicTime + time.mLogicDelta ) );
                 if( loopDelayMilliseconds > 30 )
                 {
-                    //Debug::Warning() << "logic is late of " << loopDelayMilliseconds << "ms" << Debug::Endl();
+                    //Debug::Warning() << "logic is late of " << loopDelayMilliseconds
+                    //                 << "ms" << Debug::Endl();
                     // if we are really really late, resets the timer
                     if( loopDelayMilliseconds > 100 )
                     {
@@ -376,15 +377,15 @@ namespace fan
         if( mLaunchSettings.mainLoopSleep )
         {
             // @todo repair this to work with multiple worlds running
-// 				const double minSleepTime = 1;
-// 				const double endFrameTime = Time::ElapsedSinceStartup();
-// 				const double timeBeforeNextLogic = lastLogicTime + time.logicDelta - endFrameTime;
-// 				const double timeBeforeNextRender = lastRenderTime + Time::s_renderDelta - endFrameTime;
-// 				const double sleepTimeMiliseconds = 1000. * std::min( timeBeforeNextLogic, timeBeforeNextRender );
-// 				if( sleepTimeMiliseconds > minSleepTime )
-// 				{
-// 					std::this_thread::sleep_for( std::chrono::milliseconds( int( sleepTimeMiliseconds / 2 ) ) );
-// 				}
+// 			const double minSleepTime = 1;
+// 			const double endFrameTime = Time::ElapsedSinceStartup();
+// 			const double timeBeforeNextLogic = lastLogicTime + time.logicDelta - endFrameTime;
+// 			const double timeBeforeNextRender = lastRenderTime + Time::s_renderDelta - endFrameTime;
+// 			const double sleepTimeMiliseconds = 1000. * std::min( timeBeforeNextLogic, timeBeforeNextRender );
+// 			if( sleepTimeMiliseconds > minSleepTime )
+// 			{
+// 				std::this_thread::sleep_for( std::chrono::milliseconds( int( sleepTimeMiliseconds / 2 ) ) );
+// 			}
         }
     }
 

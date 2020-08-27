@@ -12,7 +12,7 @@ namespace fan
     //========================================================================================================
     void RenderResources::SetInfo( EcsSingletonInfo& _info )
     {
-        _info.mIcon  = ImGui::RENDERER16;
+        _info.mIcon  = ImGui::Renderer16;
         _info.mGroup = EngineGroups::SceneRender;
         _info.mName  = "render resources";
         _info.onGui = &RenderResources::OnGui;

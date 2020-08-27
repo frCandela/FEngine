@@ -8,7 +8,7 @@ namespace fan
 	//========================================================================================================
 	void PlayerController::SetInfo( EcsComponentInfo& _info )
 	{
-		_info.mIcon       = ImGui::IconType::JOYSTICK16;
+		_info.mIcon       = ImGui::IconType::Joystick16;
 		_info.mGroup      = EngineGroups::Game;
 		_info.onGui       = &PlayerController::OnGui;
 		_info.load        = &PlayerController::Load;

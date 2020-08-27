@@ -123,7 +123,7 @@ namespace ImGui
         const std::string targetSlotName = _ptr.Data().mSlot == nullptr ?
                 "null :" :
                 _ptr.Data().mSlot->mName;
-        ImGui::Icon( ImGui::IconType::SIGNAL_SLOT16, { 16, 16 } );
+        ImGui::Icon( ImGui::IconType::SignalSlot16, { 16, 16 } );
         ImGui::SameLine();
         ImGui::Text( "target slot     : %s", targetSlotName.c_str() );
         ImGui::EndTooltip();
@@ -154,7 +154,7 @@ namespace ImGui
         const std::string targetSlotName = _ptr.Data().mSlot == nullptr ?
                 "null :" :
                 _ptr.Data().mSlot->mName;
-        ImGui::Icon( ImGui::IconType::SIGNAL_SLOT16, { 16, 16 } );
+        ImGui::Icon( ImGui::IconType::SignalSlot16, { 16, 16 } );
         ImGui::SameLine();
         ImGui::Text( "target slot     : %s", targetSlotName.c_str() );
         ImGui::EndTooltip();
@@ -164,7 +164,7 @@ namespace ImGui
     //========================================================================================================
     void FanSlotPtr( const char* _label, fan::EcsWorld& _world, fan::SlotPtr& _ptr )
     {
-        if( ImGui::ButtonIcon( ImGui::IconType::SIGNAL_SLOT16, { 16, 16 } ) )
+        if( ImGui::ButtonIcon( ImGui::IconType::SignalSlot16, { 16, 16 } ) )
         {
             _ptr.Clear();
         }

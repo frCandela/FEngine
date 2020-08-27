@@ -21,14 +21,14 @@
 
 namespace fan
 {
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	InspectorWindow::InspectorWindow() :
-		EditorWindow( "inspector", ImGui::IconType::INSPECTOR16 )
+		EditorWindow( "inspector", ImGui::IconType::Inspector16 )
 	{}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void InspectorWindow::OnGui( EcsWorld& _world )
 	{
 		SCOPED_PROFILE( inspector );
@@ -55,10 +55,17 @@ namespace fan
  				ImGui::Separator();
 				 
  				// Icon
-				ImGui::Icon( info.mIcon, { 16, 16 }, GroupsColors::GetColor( info.mGroup ) ); ImGui::SameLine();
-				ImGui::FanBeginDragDropSourceComponent( _world, node.mHandle, info.mType, ImGuiDragDropFlags_SourceAllowNullID );
-				ImGui::Text( "%s", info.mName.c_str() );
- 				ImGui::FanBeginDragDropSourceComponent( _world, node.mHandle, info.mType, ImGuiDragDropFlags_SourceAllowNullID );
+				ImGui::Icon( info.mIcon, { 16, 16 }, GroupsColors::GetColor( info.mGroup ) );
+				ImGui::SameLine();
+                ImGui::FanBeginDragDropSourceComponent( _world,
+                                                        node.mHandle,
+                                                        info.mType,
+                                                        ImGuiDragDropFlags_SourceAllowNullID );
+                ImGui::Text( "%s", info.mName.c_str() );
+                ImGui::FanBeginDragDropSourceComponent( _world,
+                                                        node.mHandle,
+                                                        info.mType,
+                                                        ImGuiDragDropFlags_SourceAllowNullID );
 
  				// Delete button	
 				std::stringstream ss;
@@ -83,9 +90,9 @@ namespace fan
 		}
 	}
 
-	//================================================================================================================================
+	//========================================================================================================
 	// menu item in the NewComponentPopup
-	//================================================================================================================================
+	//========================================================================================================
 	void InspectorWindow::NewComponentItem( EcsWorld& _world, const EcsComponentInfo& _info )
 	{
 		ImGui::Icon( _info.mIcon, { 16, 16 }, GroupsColors::GetColor( _info.mGroup ) ); ImGui::SameLine();
@@ -102,9 +109,9 @@ namespace fan
 		}
 	}
 
-	//================================================================================================================================
+	//========================================================================================================
 	// context menu when clicking "add component"
-	//================================================================================================================================
+	//========================================================================================================
 	void InspectorWindow::NewComponentPopup( EcsWorld& _world )
 	{
 		using Path = std::filesystem::path;
@@ -156,11 +163,15 @@ namespace fan
 		}
 	}
 
-	//================================================================================================================================
+	//========================================================================================================
 	// recursively draws all components available to add
 	// called from the NewComponentPopup
-	//================================================================================================================================
-	void InspectorWindow::R_NewComponentPopup( EcsWorld& _world, std::set< std::filesystem::path >& _componentsPathSet, std::set< std::filesystem::path >::iterator& _current, const std::vector< EcsComponentInfo >& _components, const std::vector<std::filesystem::path>& _componentsPath )
+	//========================================================================================================
+    void InspectorWindow::R_NewComponentPopup( EcsWorld& _world,
+                                               std::set<std::filesystem::path>& _componentsPathSet,
+                                               std::set<std::filesystem::path>::iterator& _current,
+                                               const std::vector<EcsComponentInfo>& _components,
+                                               const std::vector<std::filesystem::path>& _componentsPath )
 	{
 		std::filesystem::path rootPath = *_current;
 

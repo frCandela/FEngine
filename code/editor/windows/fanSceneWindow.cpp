@@ -27,9 +27,9 @@ namespace fan
 {
 	//========================================================================================================
 	//========================================================================================================
-	SceneWindow::SceneWindow() : EditorWindow( "scene", ImGui::IconType::SCENE16 )
+	SceneWindow::SceneWindow() : EditorWindow( "scene", ImGui::IconType::Scene16 )
 	{
-		m_textBuffer[0] = '\0';
+        mTextBuffer[0] = '\0';
 	}
 
 	//========================================================================================================
@@ -52,12 +52,12 @@ namespace fan
 		SceneNode* nodeRightClicked = nullptr;
 		R_DrawSceneTree( scene.GetRootNode(), nodeRightClicked );
 
- 		m_expandSceneHierarchy = false;
+		mExpandSceneHierarchy = false;
  
 		if( nodeRightClicked != nullptr )
 		{
 			ImGui::OpenPopup( "scene_window_node_rclicked" );
-			m_lastSceneNodeRightClicked = nodeRightClicked;
+			mLastSceneNodeRightClicked = nodeRightClicked;
  		}
  
 		PopupRightClick( _world );
@@ -79,11 +79,11 @@ namespace fan
 			bool itemClicked = false;
 			if( ImGui::BeginMenu( "New node" ) )
 			{
-				assert( m_lastSceneNodeRightClicked != nullptr );
-				Scene& scene = *m_lastSceneNodeRightClicked->mScene;
+				assert( mLastSceneNodeRightClicked != nullptr );
+				Scene& scene = *mLastSceneNodeRightClicked->mScene;
 				EcsWorld& world = *scene.mWorld;
 				btVector3 origin = btVector3::Zero();
-				const EcsEntity parentID = world.GetEntity( m_lastSceneNodeRightClicked->mHandle );
+				const EcsEntity parentID = world.GetEntity( mLastSceneNodeRightClicked->mHandle );
 				if( world.HasComponent<Transform>( parentID ) )
 				{
 					origin = world.GetComponent<Transform>( parentID ).GetPosition();
@@ -96,12 +96,12 @@ namespace fan
 				}
 
 				// Entities templates
-				ImGui::Icon( ImGui::CUBE_SHAPE16, { 16,16 } ); ImGui::SameLine();
+				ImGui::Icon( ImGui::CubeShape16, { 16, 16 } ); ImGui::SameLine();
 				
 				// model 
 				if( ImGui::MenuItem( "Model" ) )
 				{
-					SceneNode& node = scene.CreateSceneNode( "model", m_lastSceneNodeRightClicked );
+					SceneNode& node = scene.CreateSceneNode( "model", mLastSceneNodeRightClicked );
 					const EcsEntity entity = world.GetEntity( node.mHandle );
                     RenderResources& renderResources = _world.GetSingleton<RenderResources>();
 
@@ -118,10 +118,10 @@ namespace fan
 				}
 
 				// model with a rigidbody & shape
-				ImGui::Icon( ImGui::RIGIDBODY16, { 16,16 } ); ImGui::SameLine();
+				ImGui::Icon( ImGui::Rigidbody16, { 16, 16 } ); ImGui::SameLine();
 				if( ImGui::MenuItem( "Physics model" ) )
 				{
-					SceneNode& node = scene.CreateSceneNode( "physics_model", m_lastSceneNodeRightClicked );
+					SceneNode& node = scene.CreateSceneNode( "physics_model", mLastSceneNodeRightClicked );
 					const EcsEntity entity = world.GetEntity( node.mHandle );
                     RenderResources& renderResources = _world.GetSingleton<RenderResources>();
 
@@ -142,11 +142,11 @@ namespace fan
 				}
 
 				// point light
-				ImGui::Icon( ImGui::POINT_LIGHT16, { 16,16 } ); ImGui::SameLine();
+				ImGui::Icon( ImGui::PointLight16, { 16, 16 } ); ImGui::SameLine();
 				if( ImGui::MenuItem( "Point light" ) )
 
 				{
-					SceneNode& node = scene.CreateSceneNode( "point_light", m_lastSceneNodeRightClicked );
+					SceneNode& node = scene.CreateSceneNode( "point_light", mLastSceneNodeRightClicked );
 					const EcsEntity entity = world.GetEntity( node.mHandle );
 					
 					Transform& transform = world.AddComponent<Transform>( entity );
@@ -156,11 +156,11 @@ namespace fan
 				}
 
 				// directional light
-				ImGui::Icon( ImGui::DIR_LIGHT16, { 16,16 } ); ImGui::SameLine();
+				ImGui::Icon( ImGui::DirLight16, { 16, 16 } ); ImGui::SameLine();
 				if( ImGui::MenuItem( "Dir light" ) )
 				{
                     SceneNode& node = scene.CreateSceneNode( "directional_light",
-                                                             m_lastSceneNodeRightClicked );
+															 mLastSceneNodeRightClicked );
                     const EcsEntity entity = world.GetEntity( node.mHandle );
 					
 					Transform& transform = world.AddComponent<Transform>( entity );
@@ -172,10 +172,10 @@ namespace fan
 				}
 
 				// particle system
-				ImGui::Icon( ImGui::PARTICLES16, { 16,16 } ); ImGui::SameLine();
+				ImGui::Icon( ImGui::Particles16, { 16, 16 } ); ImGui::SameLine();
 				if( ImGui::MenuItem( "particle system" ) )
 				{
-					SceneNode& node = scene.CreateSceneNode( "particle_system", m_lastSceneNodeRightClicked );
+					SceneNode& node = scene.CreateSceneNode( "particle_system", mLastSceneNodeRightClicked );
 					const EcsEntity entity = world.GetEntity( node.mHandle );
 					
 					Transform& transform = world.AddComponent<Transform>( entity );
@@ -214,10 +214,10 @@ namespace fan
 
 			// delete
 			ImGui::Separator();
-			if( ImGui::Selectable( "Delete" ) && m_lastSceneNodeRightClicked != nullptr )
+			if( ImGui::Selectable( "Delete" ) && mLastSceneNodeRightClicked != nullptr )
 			{
-				EcsWorld& world = *m_lastSceneNodeRightClicked->mScene->mWorld;
-				world.Kill( world.GetEntity( m_lastSceneNodeRightClicked->mHandle ) );
+				EcsWorld& world = *mLastSceneNodeRightClicked->mScene->mWorld;
+				world.Kill( world.GetEntity( mLastSceneNodeRightClicked->mHandle ) );
 			}
 			ImGui::EndPopup();
 		}
@@ -239,7 +239,7 @@ namespace fan
 		// export to prefab modal
 		if( exportToPrefabPopup )
 		{
-			m_pathBuffer = "content/prefab";
+            mPathBuffer = "content/prefab";
 			ImGui::OpenPopup( "export_prefab" );
 		}
 		ExportPrefabModal( _world);
@@ -247,7 +247,7 @@ namespace fan
 		// load prefab popup
 		if( loadPrefabPopup )
 		{
-			m_pathBuffer = "content/prefab";
+            mPathBuffer = "content/prefab";
 			ImGui::OpenPopup( "import_prefab" );
 		}
 		ImportPrefabModal( _world );
@@ -264,7 +264,7 @@ namespace fan
 		ss << "##" << _node.mName;
 		ImGui::PushID( _node.mHandle );
 
-		if( ImGui::IsWindowAppearing() || m_expandSceneHierarchy == true )
+		if( ImGui::IsWindowAppearing() || mExpandSceneHierarchy == true )
 		{
 			ImGui::SetNextItemOpen( true );
 		}
@@ -337,28 +337,28 @@ namespace fan
 			}
 			bool enterPressed = false;
             if( ImGui::InputText( "Name ",
-                                  m_textBuffer,
-                                  IM_ARRAYSIZE( m_textBuffer ),
+                                  mTextBuffer,
+                                  IM_ARRAYSIZE( mTextBuffer ),
                                   ImGuiInputTextFlags_EnterReturnsTrue ) )
             {
 				enterPressed = true;
 			}
 			if( ImGui::Button( "Cancel" ) || ImGui::IsKeyPressed( GLFW_KEY_ESCAPE, false ) )
 			{
-				m_lastSceneNodeRightClicked = nullptr;
+				mLastSceneNodeRightClicked = nullptr;
 				ImGui::CloseCurrentPopup();
 			}
 			ImGui::SameLine();
 			if( ImGui::Button( "Ok" ) || enterPressed )
 			{
-				if( std::string( m_textBuffer ) != "" )
+				if( std::string( mTextBuffer ) != "" )
 				{
 					//Create new scene node 
 					Scene& scene = _world.GetSingleton<Scene>();
-					SceneNode& newNode = scene.CreateSceneNode( m_textBuffer, m_lastSceneNodeRightClicked );
+					SceneNode& newNode = scene.CreateSceneNode( mTextBuffer, mLastSceneNodeRightClicked );
 					onSelectSceneNode.Emmit( &newNode );
-					m_lastSceneNodeRightClicked = nullptr;
-					m_textBuffer[0] = '\0';
+					mLastSceneNodeRightClicked = nullptr;
+                    mTextBuffer[0] = '\0';
 					ImGui::CloseCurrentPopup();
 				}
 			}
@@ -375,29 +375,29 @@ namespace fan
 		{
 			if( ImGui::IsWindowAppearing() )
 			{
-				strcpy_s( m_textBuffer, 32, m_lastSceneNodeRightClicked->mName.c_str() );
+				strcpy_s( mTextBuffer, 32, mLastSceneNodeRightClicked->mName.c_str() );
 				ImGui::SetKeyboardFocusHere();
 			}
 			bool enterPressed = false;
             if( ImGui::InputText( "New Name ",
-                                  m_textBuffer,
-                                  IM_ARRAYSIZE( m_textBuffer ),
+                                  mTextBuffer,
+                                  IM_ARRAYSIZE( mTextBuffer ),
                                   ImGuiInputTextFlags_EnterReturnsTrue ) )
             {
 				enterPressed = true;
 			}
 			if( ImGui::Button( "Cancel" ) || ImGui::IsKeyPressed( GLFW_KEY_ESCAPE, false ) )
 			{
-				m_lastSceneNodeRightClicked = nullptr;
+				mLastSceneNodeRightClicked = nullptr;
 				ImGui::CloseCurrentPopup();
 			}
 			ImGui::SameLine();
 			if( ImGui::Button( "Ok" ) || ImGui::IsKeyPressed( GLFW_KEY_ENTER, false ) || enterPressed )
 			{
-				if( std::string( m_textBuffer ) != "" )
+				if( std::string( mTextBuffer ) != "" )
 				{
-					m_lastSceneNodeRightClicked->mName = m_textBuffer;
-					m_lastSceneNodeRightClicked = nullptr;
+					mLastSceneNodeRightClicked->mName = mTextBuffer;
+					mLastSceneNodeRightClicked = nullptr;
 					ImGui::CloseCurrentPopup();
 				}
 			}
@@ -409,13 +409,13 @@ namespace fan
 	//========================================================================================================
 	void SceneWindow::ImportPrefabModal( EcsWorld& _world )
 	{
-		if( ImGui::FanLoadFileModal( "import_prefab", RenderGlobal::sPrefabExtensions, m_pathBuffer ) )
+		if( ImGui::FanLoadFileModal( "import_prefab", RenderGlobal::sPrefabExtensions, mPathBuffer ) )
 		{
             SceneResources& sceneResources = _world.GetSingleton<SceneResources>();
-			Prefab* prefab = sceneResources.mPrefabManager->Load( m_pathBuffer.string() );
+			Prefab* prefab = sceneResources.mPrefabManager->Load( mPathBuffer.string() );
 			if( prefab != nullptr )
 			{
-                prefab->Instantiate( *m_lastSceneNodeRightClicked );
+                prefab->Instantiate( *mLastSceneNodeRightClicked );
 			}
 		}
 	}
@@ -424,30 +424,30 @@ namespace fan
 	//========================================================================================================
 	void SceneWindow::ExportPrefabModal( EcsWorld& _world )
 	{
-		if( m_lastSceneNodeRightClicked == nullptr )
+		if( mLastSceneNodeRightClicked == nullptr )
 		{
 			return;
 		}
 
-		if( ImGui::FanSaveFileModal( "export_prefab", RenderGlobal::sPrefabExtensions, m_pathBuffer ) )
+		if( ImGui::FanSaveFileModal( "export_prefab", RenderGlobal::sPrefabExtensions, mPathBuffer ) )
 		{
-			Debug::Log() << "Exporting prefab to " << m_pathBuffer.string() << Debug::Endl();
+			Debug::Log() << "Exporting prefab to " << mPathBuffer.string() << Debug::Endl();
 
-			std::ofstream outStream( m_pathBuffer.string() );
+			std::ofstream outStream( mPathBuffer.string() );
 			if( outStream.is_open() )
 			{
 				// Try to update the existing prefab if it exists
                 SceneResources& sceneResources = _world.GetSingleton<SceneResources>();
-				Prefab* prefab = sceneResources.mPrefabManager->Get( m_pathBuffer.string() );
+				Prefab* prefab = sceneResources.mPrefabManager->Get( mPathBuffer.string() );
 				if( prefab != nullptr )
 				{
-					prefab->CreateFromSceneNode( *m_lastSceneNodeRightClicked );
+					prefab->CreateFromSceneNode( *mLastSceneNodeRightClicked );
 					outStream << prefab->mJson;
 				}
 				else
 				{
 					Prefab newprefab;
-					newprefab.CreateFromSceneNode( *m_lastSceneNodeRightClicked );
+					newprefab.CreateFromSceneNode( *mLastSceneNodeRightClicked );
 					outStream << newprefab.mJson;
 				}
 
@@ -456,7 +456,7 @@ namespace fan
 			}
 			else
 			{
-				Debug::Warning() << "Prefab export failed : " << m_pathBuffer.string() << Debug::Endl();
+				Debug::Warning() << "Prefab export failed : " << mPathBuffer.string() << Debug::Endl();
 			}
 		}
 	}

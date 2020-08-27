@@ -6,7 +6,7 @@ namespace fan
 	//========================================================================================================
 	void HostGameData::SetInfo( EcsComponentInfo& _info )
 	{
-		_info.mIcon  = ImGui::GAME_DATA16;
+		_info.mIcon  = ImGui::GameData16;
 		_info.mGroup = EngineGroups::Network;
 		_info.onGui  = &HostGameData::OnGui;
 		_info.mName  = "host game data";

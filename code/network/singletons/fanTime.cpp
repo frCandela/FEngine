@@ -17,7 +17,7 @@ namespace fan
 	//========================================================================================================
 	void Time::SetInfo( EcsSingletonInfo& _info )
 	{ 
-		_info.mIcon  = ImGui::TIME16;
+		_info.mIcon  = ImGui::Time16;
 		_info.mGroup = EngineGroups::Network;
 		_info.onGui  = &Time::OnGui;
 		_info.mName  = "time";

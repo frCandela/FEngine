@@ -15,7 +15,7 @@ namespace fan
 	//========================================================================================================
     //========================================================================================================
     PreferencesWindow::PreferencesWindow( Renderer& _renderer, FullScreen& _fullScreen ) :
-            EditorWindow( "preferences", ImGui::IconType::PREFERENCES16 ),
+            EditorWindow( "preferences", ImGui::IconType::Preferences16 ),
             mRenderer( _renderer ),
             mFullScreen( _fullScreen )
     {
@@ -40,13 +40,13 @@ namespace fan
 		}
 
 		// loads groups colors
-		for( int i = 0; i < GroupsColors::s_count; i++ )
+		for( int i = 0; i < GroupsColors::sCount; i++ )
 		{
 			std::string name = "imgui_" + std::string( GetEngineGroupName( EngineGroups( i ) ) );
 			Color color;
 			if( SerializedValues::Get().GetColor( name.c_str(), color ) )
 			{
-				GroupsColors::s_colors[i] = color.ToImGui();
+				GroupsColors::sColors[i] = color.ToImGui();
 			}
 		}
 	}
@@ -66,10 +66,10 @@ namespace fan
 		}
 
 		// saves groups colors
-		for( int i = 0; i < GroupsColors::s_count; i++ )
+		for( int i = 0; i < GroupsColors::sCount; i++ )
 		{
 			std::string name = "imgui_" + std::string( GetEngineGroupName( EngineGroups( i ) ) );
-			SerializedValues::Get().SetColor( name.c_str(), GroupsColors::s_colors[i] );
+			SerializedValues::Get().SetColor( name.c_str(), GroupsColors::sColors[i] );
 		}
 	}
 
@@ -121,11 +121,11 @@ namespace fan
 		if( ImGui::CollapsingHeader( "Groups Colors" ) )
 		{
 			ImGui::Indent();
-			for (int i = 0; i < GroupsColors::s_count; i++)
+			for ( int i = 0; i < GroupsColors::sCount; i++)
 			{
 				const char* name = GetEngineGroupName( EngineGroups(i) );
 				ImGui::PushID( i );
-				ImGui::ColorEdit4( name, (float*)&GroupsColors::s_colors[i], ImGui::fanColorEditFlags );
+				ImGui::ColorEdit4( name, (float*)&GroupsColors::sColors[i], ImGui::fanColorEditFlags );
 				ImGui::PopID();
 			}
 			ImGui::Unindent();
@@ -148,7 +148,8 @@ namespace fan
 				std::map< std::string, Axis >& axisList = Input::Get().Manager().GetListAxis();
 
 				// Header
-				ImGui::Text( "Axis                         type        invert      (+)             (-)         " );
+				ImGui::Text( "Axis                         "
+                             "type        invert      (+)             (-)         " );
 
 				// Reset
 				ImGui::SameLine();
@@ -158,7 +159,8 @@ namespace fan
 				ImGui::SameLine();
 				if ( ImGui::Button( "Reset" ) ) { SerializedValues::Get().LoadKeyBindings(); }
 
-				ImGui::SameLine(); ImGui::FanShowHelpMarker( " for a reset to engine default, delete the file editor_data.json" );
+				ImGui::SameLine();
+				ImGui::FanShowHelpMarker(" for a reset to engine default, delete the file editor_data.json" );
 
 				ImGui::Indent();
 				ImGui::Columns( 2, "columns_axis" );
@@ -180,9 +182,11 @@ namespace fan
 
 			// Shortcut keys
 			{
-				std::map< std::string, InputManager::KeyboardEvent >& eventList = Input::Get().Manager().GetListKeyboardEvents();
+				std::map< std::string, InputManager::KeyboardEvent >& eventList =
+				        Input::Get().Manager().GetListKeyboardEvents();
 
-				ImGui::Text( "Shortcuts                    key         __________________ modifiers __________________" );
+				ImGui::Text( "Shortcuts                    "
+                             "key         __________________ modifiers __________________" );
 				ImGui::Indent();
 				ImGui::Columns( 2, "columns_keys" );
 				ImGui::SetColumnWidth( 0, column0_size );
@@ -202,8 +206,8 @@ namespace fan
 		}
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void PreferencesWindow::DrawJoysticks()
 	{
 		if ( ImGui::CollapsingHeader( "joysticks" ) )
@@ -218,52 +222,54 @@ namespace fan
 			// draw joysticks
 			for ( int joystickIndex = 0; joystickIndex < Joystick::NUM_JOYSTICK; joystickIndex++ )
 			{
-				if ( Joystick::Get().IsConnected( joystickIndex ) )
+				if ( ! Joystick::Get().IsConnected( joystickIndex ) ) { continue; }
+
+				ImGui::Text( Joystick::Get().GetName( joystickIndex ).c_str() );
+
+				// gamepad
+				if ( Joystick::Get().IsGamepad( joystickIndex ) )
 				{
-					ImGui::Text( Joystick::Get().GetName( joystickIndex ).c_str() );
+					ImGui::SameLine();
+					ImGui::Text( " -  %s", Joystick::Get().GetGamepadName( joystickIndex ).c_str() );
 
-					// gamepad
-					if ( Joystick::Get().IsGamepad( joystickIndex ) )
+					if ( numJoysticks > 1 ) { ImGui::SetColumnWidth( -1, 400.f ); }
+					else { ImGui::PushItemWidth( 400.f ); }
+
+					// axes
+					const std::vector< Joystick::Axis >& axes = Joystick::Get().GetGamepadAxisList();
+					for ( int axisIndex = 0; axisIndex < (int)axes.size(); axisIndex++ )
 					{
-						ImGui::SameLine();
-						ImGui::Text( " -  %s", Joystick::Get().GetGamepadName( joystickIndex ).c_str() );
-
-						if ( numJoysticks > 1 ) { ImGui::SetColumnWidth( -1, 400.f ); }
-						else { ImGui::PushItemWidth( 400.f ); }
-
-						// axes
-						const std::vector< Joystick::Axis >& axes = Joystick::Get().GetGamepadAxisList();
-						for ( int axisIndex = 0; axisIndex < (int)axes.size(); axisIndex++ )
-						{
-							float axisValue = Joystick::Get().GetAxis( joystickIndex, axes[ axisIndex ] );
-							ImGui::SliderFloat( Joystick::Get().s_axisNames[ axisIndex ], &axisValue, -1.f, 1.f );
-						}
-
-						// buttons
-						const std::vector< Joystick::Button >& buttons = Joystick::Get().GetGamepadButtonsList();
-						for ( int buttonindex = 0; buttonindex < (int)buttons.size(); buttonindex++ )
-						{
-							bool buttonValue = Joystick::Get().GetButton( joystickIndex, buttons[ buttonindex ] );
-							ImGui::Checkbox( Joystick::Get().s_buttonsNames[ buttonindex ], &buttonValue );
-						}
-
-						if ( numJoysticks > 1 ) { ImGui::NextColumn(); }
-						else { ImGui::PopItemWidth(); }
-
+						float axisValue = Joystick::Get().GetAxis( joystickIndex, axes[ axisIndex ] );
+                        ImGui::SliderFloat( Joystick::Get().s_axisNames[axisIndex],
+                                            &axisValue, -1.f, 1.f );
 					}
-					else
+
+					// buttons
+					const std::vector< Joystick::Button >& buttons =
+					        Joystick::Get().GetGamepadButtonsList();
+					for ( int buttonindex = 0; buttonindex < (int)buttons.size(); buttonindex++ )
 					{
-						ImGui::Text( "Unrecognized gamepad" );
+						bool buttonValue = Joystick::Get().GetButton( joystickIndex, buttons[ buttonindex ] );
+						ImGui::Checkbox( Joystick::Get().s_buttonsNames[ buttonindex ], &buttonValue );
 					}
+
+					if ( numJoysticks > 1 ) { ImGui::NextColumn(); }
+					else { ImGui::PopItemWidth(); }
+
 				}
+				else
+				{
+					ImGui::Text( "Unrecognized gamepad" );
+				}
+
 			}
 			ImGui::Columns( 1 );
 		}
 
 	}
 
-    //================================================================================================================================
-    //================================================================================================================================
+    //========================================================================================================
+    //========================================================================================================
     void PreferencesWindow::LogColorsCppInitCode()
     {
         ImGuiStyle& style = ImGui::GetStyle();
@@ -286,8 +292,8 @@ namespace fan
         }
     }
 
-    //================================================================================================================================
-    //================================================================================================================================
+    //========================================================================================================
+    //========================================================================================================
     void PreferencesWindow::SetDefaultColors()
     {
         ImGuiStyle& style = ImGui::GetStyle();

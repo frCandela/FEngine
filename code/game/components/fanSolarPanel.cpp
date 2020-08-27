@@ -9,7 +9,7 @@ namespace fan
 	//========================================================================================================
 	void SolarPanel::SetInfo( EcsComponentInfo& _info )
 	{
-		_info.mIcon       = ImGui::IconType::JOYSTICK16;
+		_info.mIcon       = ImGui::IconType::Joystick16;
 		_info.mGroup      = EngineGroups::Game;
 		_info.onGui       = &SolarPanel::OnGui;
 		_info.load        = &SolarPanel::Load;

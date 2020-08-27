@@ -137,7 +137,7 @@ namespace ImGui
 		bool openModal = false;
 		ImGui::PushID( _label );
 		{
-			if ( ImGui::ButtonIcon( ImGui::IconType::PREFAB16, { 16,16 } ) )
+			if ( ImGui::ButtonIcon( ImGui::IconType::Prefab16, { 16, 16 } ) )
 			{
 				openModal = true;
 			}

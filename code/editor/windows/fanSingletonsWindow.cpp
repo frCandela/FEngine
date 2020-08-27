@@ -2,7 +2,6 @@
 
 #include "core/fanDebug.hpp"
 #include "core/time/fanProfiler.hpp"
-#include "ecs/fanEcsWorld.hpp"
 #include "scene/fanDragnDrop.hpp"
 #include "editor/fanGroupsColors.hpp"
 
@@ -11,7 +10,7 @@ namespace fan
 	//========================================================================================================
 	//========================================================================================================
 	SingletonsWindow::SingletonsWindow() :
-		EditorWindow( "singletons", ImGui::IconType::SINGLETON16 )
+		EditorWindow( "singletons", ImGui::IconType::Singleton16 )
 	{}
 
 	//========================================================================================================
@@ -26,8 +25,9 @@ namespace fan
 		{
             if( info.onGui != nullptr )
             {
-                ImGui::SetCursorPosY( ImGui::GetCursorPosY() + 3);		// moves cursor lower to center the icon
-                ImGui::Icon( info.mIcon, { 16, 16 }, GroupsColors::GetColor( info.mGroup ) ); ImGui::SameLine();
+                ImGui::SetCursorPosY( ImGui::GetCursorPosY() + 3); // moves cursor lower to center the icon
+                ImGui::Icon( info.mIcon, { 16, 16 }, GroupsColors::GetColor( info.mGroup ) );
+                ImGui::SameLine();
                 ImGui::SetCursorPosY( ImGui::GetCursorPosY() - 3 );		// resets the cursor
                 if( ImGui::CollapsingHeader( info.mName.c_str() ) )
                 {

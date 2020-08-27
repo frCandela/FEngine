@@ -10,8 +10,8 @@ namespace fan
 	//========================================================================================================
 	//========================================================================================================
 	GameViewWindow::GameViewWindow( const LaunchSettings::Mode _launchMode )
-		: EditorWindow( "game view", ImGui::IconType::JOYSTICK16 )
-		, m_isHovered( false )
+		: EditorWindow( "game view", ImGui::IconType::Joystick16 )
+		, mIsHovered( false )
 	{
 		AddFlag( ImGuiWindowFlags_MenuBar );
 
@@ -19,13 +19,13 @@ namespace fan
 		switch( _launchMode )
 		{
             case LaunchSettings::Mode::EditorClient:
-                memcpy( m_gameWorldsStr, "client\0\0", 8 );
+                memcpy( mGameWorldsStr, "client\0\0", 8 );
                 break;
             case LaunchSettings::Mode::EditorServer:
-                memcpy( m_gameWorldsStr, "server\0\0", 8 );
+                memcpy( mGameWorldsStr, "server\0\0", 8 );
                 break;
             case LaunchSettings::Mode::EditorClientServer:
-                memcpy( m_gameWorldsStr, "client\0server\0\0,", 16 );
+                memcpy( mGameWorldsStr, "client\0server\0\0,", 16 );
                 break;
             default:
                 fanAssert( false );
@@ -40,10 +40,10 @@ namespace fan
 		// update window size
 		const ImVec2 imGuiSize = ImGui::GetContentRegionAvail();
 		btVector2 size = btVector2( imGuiSize.x, imGuiSize.y );
-		if ( m_size != size )
+		if ( mSize != size )
 		{
-			m_size = size;
-			onSizeChanged.Emmit( { (uint32_t)size[0], (uint32_t)size[1] } );
+            mSize = size;
+			mOnSizeChanged.Emmit( { (uint32_t)size[0], (uint32_t)size[1] } );
 		}
 
 		// draw menu bar
@@ -58,21 +58,21 @@ namespace fan
 			if ( playState.mState == EditorPlayState::STOPPED )
 			{
 				// Play
-                if( ImGui::ButtonIcon( ImGui::PLAY16,
+                if( ImGui::ButtonIcon( ImGui::Play16,
                                        { 16, 16 },
                                        -1,
                                        ImVec4( 0, 0, 0, 0 ),
                                        ImVec4( 1.f, 1.f, 1.f, 1.f ) ) )
                 {
-					onPlay.Emmit();
+					mOnPlay.Emmit();
 				}
 			}
 			else
 			{
 				// Stop
-				if ( ImGui::ButtonIcon( ImGui::STOP16, { 16,16 }, -1, ImVec4( 0, 0, 0, 0 ) ) )
+				if ( ImGui::ButtonIcon( ImGui::Stop16, { 16, 16 }, -1, ImVec4( 0, 0, 0, 0 ) ) )
 				{
-					onStop.Emmit();
+					mOnStop.Emmit();
 				}
 			}
 
@@ -82,28 +82,28 @@ namespace fan
 				: disabledColor;
 
 			// Pause
-			if ( ImGui::ButtonIcon( ImGui::PAUSE16, { 16,16 }, -1, ImVec4( 0, 0, 0, 0.f ), pauseTint ) )
+			if ( ImGui::ButtonIcon( ImGui::Pause16, { 16, 16 }, -1, ImVec4( 0, 0, 0, 0.f ), pauseTint ) )
 			{
-				if ( playState.mState == EditorPlayState::PLAYING ) { onPause.Emmit(); }
-				else if ( playState.mState == EditorPlayState::PAUSED ) { onResume.Emmit(); }
+				if ( playState.mState == EditorPlayState::PLAYING ) { mOnPause.Emmit(); }
+				else if ( playState.mState == EditorPlayState::PAUSED ) { mOnResume.Emmit(); }
 			}
 
             // Step
             const ImVec4 stepTint = playState.mState == EditorPlayState::PAUSED
                     ? ImVec4( 1.f, 1.f, 1.f, 1.f )
                     : disabledColor;
-            if( ImGui::ButtonIcon( ImGui::STEP16, { 16, 16 }, -1, ImVec4( 0, 0, 0, 0 ), stepTint ) &&
+            if( ImGui::ButtonIcon( ImGui::Step16, { 16, 16 }, -1, ImVec4( 0, 0, 0, 0 ), stepTint ) &&
                 playState.mState == EditorPlayState::PAUSED )
 			{
-				onStep.Emmit();
+				mOnStep.Emmit();
 			}
 
 			// combo current world			
 			ImGui::Spacing();
 			ImGui::SetNextItemWidth( 200.f );
-			if( ImGui::Combo( "##current game", &m_currentGameSelected, m_gameWorldsStr ) )
+			if( ImGui::Combo( "##current game", &mCurrentGameSelected, mGameWorldsStr ) )
 			{
-				onSelectGame.Emmit( m_currentGameSelected );
+				mOnSelectGame.Emmit( mCurrentGameSelected );
 			}
 
 			ImGui::EndMenuBar();
@@ -113,11 +113,11 @@ namespace fan
 		const ImVec2 cursorPos = ImGui::GetCursorPos();
 		const ImVec2 windowPos = ImGui::GetWindowPos();
 
-		m_position = btVector2( cursorPos.x + windowPos.x, cursorPos.y + windowPos.y );
+        mPosition = btVector2( cursorPos.x + windowPos.x, cursorPos.y + windowPos.y );
 
 		// Draw game
 		ImGui::Image( ( void* ) 12, imGuiSize );
 
-		m_isHovered = ImGui::IsItemHovered();
+        mIsHovered = ImGui::IsItemHovered();
 	}
 }

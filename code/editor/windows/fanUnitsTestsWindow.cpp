@@ -14,7 +14,7 @@ namespace fan
 {
     //========================================================================================================
     //========================================================================================================
-    UnitTestsWindow::UnitTestsWindow() : EditorWindow( "unit tests", ImGui::IconType::NONE ) {}
+    UnitTestsWindow::UnitTestsWindow() : EditorWindow( "unit tests", ImGui::IconType::None16 ) {}
 
     //========================================================================================================
     //========================================================================================================
@@ -120,13 +120,13 @@ namespace fan
         switch( _status )
         {
             case UnitTestResult::Status::Unknown :
-                ImGui::Icon(  ImGui::IconType::CHECK_NEUTRAL16, iconSize, ImVec4( 1, 1, 1, 1 ) );
+                ImGui::Icon( ImGui::IconType::CheckNeutral16, iconSize, ImVec4( 1, 1, 1, 1 ) );
                 break;
             case UnitTestResult::Status::Failed :
-                ImGui::Icon(  ImGui::IconType::CHECK_FAILED16, iconSize, ImVec4( 1, 0, 0, 1 ) );
+                ImGui::Icon( ImGui::IconType::CheckFailed16, iconSize, ImVec4( 1, 0, 0, 1 ) );
                 break;
             case UnitTestResult::Status::Success :
-                ImGui::Icon(  ImGui::IconType::CHECK_SUCCESS16, iconSize, ImVec4( 0, 1, 0, 1 ) );
+                ImGui::Icon( ImGui::IconType::CheckSuccess16, iconSize, ImVec4( 0, 1, 0, 1 ) );
                 break;
             default:
                fanAssert( false );

@@ -7,7 +7,7 @@ namespace fan
 	//========================================================================================================
 	void EntityReplication::SetInfo( EcsComponentInfo& _info )
 	{
-		_info.mIcon       = ImGui::NETWORK16;
+		_info.mIcon       = ImGui::Network16;
 		_info.mGroup      = EngineGroups::Network;
 		_info.onGui       = &EntityReplication::OnGui;
 		_info.mName       = "replication";

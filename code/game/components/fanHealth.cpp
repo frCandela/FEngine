@@ -8,7 +8,7 @@ namespace fan
 	//========================================================================================================
 	void Health::SetInfo( EcsComponentInfo& _info )
 	{
-		_info.mIcon       = ImGui::IconType::HEART16;
+		_info.mIcon       = ImGui::IconType::Heart16;
 		_info.mGroup      = EngineGroups::Game;
 		_info.onGui       = &Health::OnGui;
 		_info.load        = &Health::Load;

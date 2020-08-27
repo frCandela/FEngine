@@ -47,7 +47,7 @@ namespace fan
 	{
 		std::string            mName;
 		uint32_t               mType;
-		ImGui::IconType        mIcon  = ImGui::IconType::NONE;
+		ImGui::IconType        mIcon  = ImGui::IconType::None16;
 		EngineGroups           mGroup = EngineGroups::None;
         std::vector<SlotBase*> mSlots;                         // callable methods
 

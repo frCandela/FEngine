@@ -13,7 +13,7 @@ namespace fan
 	//========================================================================================================
 	void HostManager::SetInfo( EcsSingletonInfo& _info )
 	{
-		_info.mIcon  = ImGui::NETWORK16;
+		_info.mIcon  = ImGui::Network16;
 		_info.mGroup = EngineGroups::Network;
 		_info.onGui  = &HostManager::OnGui;
 		_info.mName  = "host manager";

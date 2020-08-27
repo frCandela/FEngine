@@ -14,7 +14,7 @@ namespace ImGui
 			if ( ImGui::BeginDragDropSource( _flags ) )
 			{
 				ImGui::SetDragDropPayload( "dragndrop_texture", &_texture, sizeof( fan::Texture** ) );
-				ImGui::Icon( ImGui::IconType::IMAGE16, { 16,16 } ); ImGui::SameLine();
+				ImGui::Icon( ImGui::IconType::Image16, { 16, 16 } ); ImGui::SameLine();
 				ImGui::Text( _texture->mPath.c_str() );
 				ImGui::EndDragDropSource();
 			}
@@ -47,7 +47,7 @@ namespace ImGui
 			if ( ImGui::BeginDragDropSource( _flags ) )
 			{
 				ImGui::SetDragDropPayload( "dragndrop_mesh", &_mesh, sizeof( fan::Mesh** ) );
-				ImGui::Icon( ImGui::IconType::MESH16, { 16,16 } ); ImGui::SameLine();
+				ImGui::Icon( ImGui::IconType::Mesh16, { 16, 16 } ); ImGui::SameLine();
 				ImGui::Text( _mesh->mPath.c_str() );
 				ImGui::EndDragDropSource();
 			}

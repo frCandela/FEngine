@@ -16,7 +16,7 @@ namespace fan
 		RenderWindow( Renderer& _renderer );
 
 	protected:
-		Renderer& m_renderer;
+		Renderer& mRenderer;
 
 		void OnGui( EcsWorld& _world ) override;
 	};

@@ -6,43 +6,44 @@
 
 namespace fan
 {
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	EditorWindow::EditorWindow( const std::string _name, const ImGui::IconType _iconType ) :
-		m_name( _name )
-		, m_isVisible( true )
-		, m_iconType( _iconType )
+	     mName( _name ),
+		 mIsVisible( true ),
+		 mIconType( _iconType )
 	{
 
 		std::stringstream ss;
 		ss << "show_window_" << _name;
-		m_jsonShowWindowKey = ss.str();
+        mJsonShowWindowKey = ss.str();
 
 		bool value = false;
-		if ( SerializedValues::Get().GetBool( m_jsonShowWindowKey.c_str(), value ) )
+		if ( SerializedValues::Get().GetBool( mJsonShowWindowKey.c_str(), value ) )
 		{
 			SetVisible( value );
 		}
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	EditorWindow::~EditorWindow()
 	{
-		SerializedValues::Get().SetBool( m_jsonShowWindowKey.c_str(), m_isVisible );
+		SerializedValues::Get().SetBool( mJsonShowWindowKey.c_str(), mIsVisible );
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void EditorWindow::Draw( EcsWorld& _world )
 	{
-		if ( m_isVisible == true )
+		if ( mIsVisible == true )
 		{
-			if ( ImGui::Begin( m_name.c_str(), &m_isVisible, m_flags ) )
+			if ( ImGui::Begin( mName.c_str(), &mIsVisible, mFlags ) )
 			{
 				OnGui( _world );
-			} ImGui::End();
-			SetVisible( m_isVisible );
+			}
+			ImGui::End();
+			SetVisible( mIsVisible );
 		}
 	}
 }

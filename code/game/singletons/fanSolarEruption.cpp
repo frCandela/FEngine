@@ -17,7 +17,7 @@ namespace fan
 	//========================================================================================================
 	void SolarEruption::SetInfo( EcsSingletonInfo& _info )
 	{
-		_info.mIcon  = ImGui::SUN_RED16;
+		_info.mIcon  = ImGui::SunEruption16;
 		_info.mGroup = EngineGroups::Game;
 		_info.onGui  = &SolarEruption::OnGui;
 		_info.save   = &SolarEruption::Save;

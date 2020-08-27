@@ -12,7 +12,7 @@ namespace fan
 	//========================================================================================================
 	void PlayerInput::SetInfo( EcsComponentInfo& _info )
 	{
-		_info.mIcon        = ImGui::IconType::INPUT16;
+		_info.mIcon        = ImGui::IconType::Input16;
 		_info.mGroup       = EngineGroups::Game;
 		_info.onGui        = &PlayerInput::OnGui;
 		_info.save         = &PlayerInput::Save;

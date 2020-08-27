@@ -6,7 +6,7 @@ namespace fan
 	//========================================================================================================
 	void Game::SetInfo( EcsSingletonInfo& _info )
 	{
-		_info.mIcon  = ImGui::JOYSTICK16;
+		_info.mIcon  = ImGui::Joystick16;
 		_info.mGroup = EngineGroups::Game;
 		_info.onGui  = &Game::OnGui;
 		_info.save   = &Game::Save;

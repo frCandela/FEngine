@@ -8,7 +8,7 @@ namespace fan
 	//========================================================================================================
 	void UITransform::SetInfo( EcsComponentInfo& _info )
 	{
-		_info.mIcon       = ImGui::IconType::UI_TRANSFORM16;
+		_info.mIcon       = ImGui::IconType::UiTransform16;
 		_info.mGroup      = EngineGroups::SceneUI;
 		_info.onGui       = &UITransform::OnGui;
 		_info.load        = &UITransform::Load;
