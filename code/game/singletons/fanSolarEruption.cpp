@@ -116,8 +116,8 @@ namespace fan
 
 		SpawnInfo spawnInfo = spawn::SpawnSolarEruption::GenerateInfo( mSpawnFrame );
 		spawnManager.spawns.push_back( spawnInfo );
-        _world.Run<S_ReplicateOnAllHosts>( ClientRPC::RPCSpawn( spawnInfo ),
-                                           HostReplication::ResendUntilReplicated );
+        _world.Run<SReplicateOnAllHosts>( ClientRPC::RPCSpawn( spawnInfo ),
+                                          HostReplication::ResendUntilReplicated );
 	}
 
 	//========================================================================================================

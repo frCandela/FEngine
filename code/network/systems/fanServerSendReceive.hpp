@@ -7,10 +7,10 @@
 
 namespace fan
 {
-	//==============================================================================================================================================================
+	//========================================================================================================
 	// Sends packets to all hosts
-	//==============================================================================================================================================================
-	struct S_ServerSend : EcsSystem
+	//========================================================================================================
+	struct SServerSend : EcsSystem
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world )
 		{
@@ -32,7 +32,8 @@ namespace fan
 			auto hostDataIt = _view.begin<HostGameData>();
 			auto hostReplicationIt = _view.begin<HostReplication>();
 			auto reliabilityLayerIt = _view.begin<ReliabilityLayer>();
-			for( ; hostConnectionIt != _view.end<HostConnection>(); ++hostConnectionIt, ++hostDataIt, ++hostReplicationIt, ++reliabilityLayerIt )
+            for( ; hostConnectionIt != _view.end<HostConnection>();
+                   ++hostConnectionIt, ++hostDataIt, ++hostReplicationIt, ++reliabilityLayerIt )
 			{
 				HostConnection& hostConnection = *hostConnectionIt;
 				const HostGameData& hostData = *hostDataIt;
@@ -45,7 +46,7 @@ namespace fan
 				// write game data
 				if( hostData.mSpaceshipID != 0 )
 				{
-					if( hostData.mNextPlayerState.frameIndex == time.mFrameIndex )
+					if( hostData.mNextPlayerState.mFrameIndex == time.mFrameIndex )
 					{
 						hostData.mNextPlayerState.Write( packet );
 					}
@@ -56,14 +57,17 @@ namespace fan
 				hostReplication.Write( _world, entity, packet );
 
 				// write ack
-				if( packet.GetSize() == sizeof( PacketTag ) ) { packet.onlyContainsAck = true; }
+				if( packet.GetSize() == sizeof( PacketTag ) ) { packet.mOnlyContainsAck = true; }
 				reliabilityLayer.Write( packet );
 
 				// send packet
 				if( packet.GetSize() > sizeof( PacketTag ) )// don't send empty packets
 				{
 					reliabilityLayer.RegisterPacket( packet );
-					hostConnection.mBandwidth = 1.f / time.mLogicDelta * float( packet.GetSize() ) / 1000.f; // in Ko/s
+                    hostConnection.mBandwidth = 1.f /
+                                                time.mLogicDelta *
+                                                float( packet.GetSize() ) /
+                                                1000.f; // in Ko/s
 					connection.mSocket.Send( packet, hostConnection.mIp, hostConnection.mPort );
 				}
 				else
@@ -74,10 +78,10 @@ namespace fan
 		}
 	};
 
-	//==============================================================================================================================================================
+	//========================================================================================================
 	// Receives packets from all hosts
-	//==============================================================================================================================================================
-	struct S_ServerReceive : EcsSystem
+	//========================================================================================================
+	struct SServerReceive : EcsSystem
 	{
 		static void Run( EcsWorld& _world, const float _delta )
 		{
@@ -122,12 +126,12 @@ namespace fan
 					PacketType packetType = packet.ReadType();
 					if( packetType == PacketType::Ack )
 					{
-						packet.onlyContainsAck = true;
+						packet.mOnlyContainsAck = true;
 					}
 					else if( packetType == PacketType::Hello )
 					{
 						// disconnections can cause the reliability layer tags to be off
-						reliabilityLayer.mExpectedPacketTag = packet.tag;
+						reliabilityLayer.mExpectedPacketTag = packet.mTag;
 					}
 
 
@@ -160,10 +164,13 @@ namespace fan
 							PacketDisconnect packetDisconnect;
 							packetDisconnect.Read( packet );
 							hostManager.DeleteHost( _world, clientHandle );
-							const HostGameData& hostGameData = _world.GetComponent< HostGameData>( _world.GetEntity( clientHandle ) );
+							EcsEntity clientEntity = _world.GetEntity( clientHandle );
+							const HostGameData& hostGameData = _world.GetComponent< HostGameData>( clientEntity );
 							if( hostGameData.mSpaceshipID != 0 )
 							{
-								_world.Run<S_ReplicateOnAllHosts>( ClientRPC::RPCDespawn( hostGameData.mSpaceshipID ), HostReplication::ResendUntilReplicated, clientHandle );
+                                _world.Run<SReplicateOnAllHosts>( ClientRPC::RPCDespawn( hostGameData.mSpaceshipID ),
+                                                                  HostReplication::ResendUntilReplicated,
+                                                                  clientHandle );
 							}
 						} break;
 						case PacketType::Ping:
@@ -182,7 +189,8 @@ namespace fan
 							}
 						} break;
 						default:
-							Debug::Warning() << "Invalid packet " << int( packetType ) << " received. Reading canceled." << Debug::Endl();
+							Debug::Warning() << "Invalid packet " << int( packetType )
+							                 << " received. Reading canceled." << Debug::Endl();
 							packetValid = false;
 							break;
 						}

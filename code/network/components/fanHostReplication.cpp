@@ -47,10 +47,10 @@ namespace fan
 		const EcsSingletonInfo& info = _world.GetSingletonInfo( _staticID );
 		const EcsSingleton& component = _world.GetSingleton( _staticID );
 		PacketReplication packet;
-		packet.replicationType = PacketReplication::ReplicationType::SingletonComponent;
-		packet.packetData.clear();
-		packet.packetData << sf::Uint32( info.mType);
-		info.netSave( component, packet.packetData );
+		packet.mReplicationType = PacketReplication::ReplicationType::SingletonComponent;
+		packet.mPacketData.clear();
+		packet.mPacketData << sf::Uint32( info.mType);
+		info.netSave( component, packet.mPacketData );
 
 		return packet;
 	}
@@ -66,24 +66,24 @@ namespace fan
 		const EcsEntity entity = _world.GetEntity( _handle );
 
 		PacketReplication packet;
-		packet.replicationType = PacketReplication::ReplicationType::Entity;
-		packet.packetData.clear();
+		packet.mReplicationType = PacketReplication::ReplicationType::Entity;
+		packet.mPacketData.clear();
 
 		// Serializes net id
 		 const auto it = linkingContext.mEcsHandleToNetID.find( _handle );
 		 if( it != linkingContext.mEcsHandleToNetID.end() )
 		 {
 			 const NetID netID = it->second;
-			 packet.packetData << netID;
-			 packet.packetData << sf::Uint8( _componentTypeInfo.size() );
+			 packet.mPacketData << netID;
+			 packet.mPacketData << sf::Uint8( _componentTypeInfo.size() );
 			 if( it != linkingContext.mEcsHandleToNetID.end() )
 			 {
 				 for( const uint32_t typeInfo : _componentTypeInfo )
 				 {
 					 const EcsComponentInfo& info = _world.GetComponentInfo( typeInfo );
 					 EcsComponent& component = _world.GetComponent( entity, typeInfo );
-					 packet.packetData << sf::Uint32( info.mType );
-					 info.netSave( component, packet.packetData );
+					 packet.mPacketData << sf::Uint32( info.mType );
+					 info.netSave( component, packet.mPacketData );
 				 }
 			 }
 		 }
@@ -96,9 +96,9 @@ namespace fan
 	PacketReplication HostReplication::BuildRPCPacket( sf::Packet& _dataRPC )
 	{
 		PacketReplication packet;
-		packet.replicationType = PacketReplication::ReplicationType::RPC;
-		packet.packetData.clear();
-		packet.packetData = _dataRPC;
+		packet.mReplicationType = PacketReplication::ReplicationType::RPC;
+		packet.mPacketData.clear();
+		packet.mPacketData = _dataRPC;
 
 		return packet;
 	}
@@ -113,10 +113,10 @@ namespace fan
 			data.mPacket.Write( _packet );
 			if( data.mFlags & ReplicationFlags::ResendUntilReplicated )
 			{
-				mPendingReplication.insert( { _packet.tag , data } );
+				mPendingReplication.insert( { _packet.mTag , data } );
 				const EcsHandle& handle = _world.GetHandle( _entity );
-				_packet.onSuccess.Connect( &HostReplication::OnReplicationSuccess, _world, handle );
-				_packet.onFail.Connect( &HostReplication::OnReplicationFail, _world, handle );
+				_packet.mOnSuccess.Connect( &HostReplication::OnReplicationSuccess, _world, handle );
+				_packet.mOnFail.Connect( &HostReplication::OnReplicationFail, _world, handle );
 			}
 		}
 		mNextReplication.clear();

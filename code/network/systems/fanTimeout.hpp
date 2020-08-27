@@ -44,7 +44,7 @@ namespace fan
 						const HostGameData& hostGameData = *hostGameDataIt;
 						if( hostGameData.mSpaceshipID != 0 )
 						{
-							_world.Run<S_ReplicateOnAllHosts>( ClientRPC::RPCDespawn( hostGameData.mSpaceshipID ), HostReplication::ResendUntilReplicated, sceneNode.mHandle );
+							_world.Run<SReplicateOnAllHosts>( ClientRPC::RPCDespawn( hostGameData.mSpaceshipID ), HostReplication::ResendUntilReplicated, sceneNode.mHandle );
 						}
 					}
 				}

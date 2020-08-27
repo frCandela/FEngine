@@ -55,9 +55,9 @@ namespace fan
 		case fan::ClientConnection::ClientState::Disconnected:
 		{
 			PacketHello hello;
-			hello.name = "toto";
+			hello.mName = "toto";
 			hello.Write( _packet );
-			_packet.onFail.Connect( &ClientConnection::OnLoginFail, _world, _world.GetHandle( _entity ) );
+			_packet.mOnFail.Connect( &ClientConnection::OnLoginFail, _world, _world.GetHandle( _entity ) );
             mState = ClientState::PendingConnection;
 			Debug::Log() << "logging in..." << Debug::Endl();
 		}
@@ -108,8 +108,8 @@ namespace fan
 		{
 			Debug::Log() << "login success" << Debug::Endl();
             mState = ClientState::Connected;
-			assert( _packetLogin.playerID != 0 );
-			mOnLoginSuccess.Emmit( _packetLogin.playerID );//playerID = _packetLogin.playerID;a
+			assert( _packetLogin.mPlayerId != 0 );
+			mOnLoginSuccess.Emmit( _packetLogin.mPlayerId );//playerID = _packetLogin.playerID;a
 		}
 	}
 
@@ -130,8 +130,8 @@ namespace fan
 		if( mState == ClientState::Connected )
 		{
             mLastPacketPing = _packetPing;
-            mLastPacketPing.clientFrame = _frameIndex,
-                    mRtt            = _packetPing.previousRtt;
+            mLastPacketPing.mClientFrame = _frameIndex,
+                    mRtt            = _packetPing.mPreviousRtt;
             mMustSendBackPacketPing = true;
 		}
 	}

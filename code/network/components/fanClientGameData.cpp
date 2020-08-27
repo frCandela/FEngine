@@ -36,13 +36,13 @@ namespace fan
         mLastServerState = _packet; // @todo store multiple server states to allow deeper rollback
 
 		// get the corresponding game state for the client
-		while( !mPreviousLocalStates.empty() && mPreviousLocalStates.front().frameIndex < _packet.frameIndex )
+		while( !mPreviousLocalStates.empty() && mPreviousLocalStates.front().mFrameIndex < _packet.mFrameIndex )
 		{
 			mPreviousLocalStates.pop();
 		}
 
 		// compares the server state & client state to verify we are synchronized				
-		if( !mPreviousLocalStates.empty() && mPreviousLocalStates.front().frameIndex == _packet.frameIndex )
+		if( !mPreviousLocalStates.empty() && mPreviousLocalStates.front().mFrameIndex == _packet.mFrameIndex )
 		{
 			const PacketPlayerGameState& packetState = mPreviousLocalStates.front();
 			mPreviousLocalStates.pop();
@@ -52,32 +52,32 @@ namespace fan
 				Debug::Warning() << "player is out of sync" << Debug::Endl();
                 mSpaceshipSynced = false;
 
-				if( packetState.frameIndex != _packet.frameIndex )
+				if( packetState.mFrameIndex != _packet.mFrameIndex )
 				{
-					Debug::Log() << "frame index difference: " << packetState.frameIndex
-					             << " " << _packet.frameIndex << Debug::Endl();
+					Debug::Log() << "frame index difference: " << packetState.mFrameIndex
+					             << " " << _packet.mFrameIndex << Debug::Endl();
 				}
-				if( !( packetState.position - _packet.position ).fuzzyZero() )
+				if( !( packetState.mPosition - _packet.mPosition ).fuzzyZero() )
 				{
-					const btVector3 diff = packetState.position - _packet.position;
+					const btVector3 diff = packetState.mPosition - _packet.mPosition;
 					Debug::Log() << "position difference: "
 					             << diff[0] << " " << diff[1] << " " << diff[2] << Debug::Endl();
 				}
-				if( !( packetState.orientation - _packet.orientation ).fuzzyZero() )
+				if( !( packetState.mOrientation - _packet.mOrientation ).fuzzyZero() )
 				{
-					const btVector3 diff = packetState.orientation - _packet.orientation;
+					const btVector3 diff = packetState.mOrientation - _packet.mOrientation;
 					Debug::Log() << "orientation difference: "
 					             << diff[0] << " " << diff[1] << " " << diff[2] << Debug::Endl();
 				}
-				if( !( packetState.velocity - _packet.velocity ).fuzzyZero() )
+				if( !( packetState.mVelocity - _packet.mVelocity ).fuzzyZero() )
 				{
-					const btVector3 diff = packetState.velocity - _packet.velocity;
+					const btVector3 diff = packetState.mVelocity - _packet.mVelocity;
 					Debug::Log() << "velocity difference: "
 					             << diff[0] << " " << diff[1] << " " << diff[2] << Debug::Endl();
 				}
-				if( !( packetState.angularVelocity - _packet.angularVelocity ).fuzzyZero() )
+				if( !( packetState.mAngularVelocity - _packet.mAngularVelocity ).fuzzyZero() )
 				{
-					const btVector3 diff = packetState.angularVelocity - _packet.angularVelocity;
+					const btVector3 diff = packetState.mAngularVelocity - _packet.mAngularVelocity;
 					Debug::Log() << "angular velocity difference: "
 					             << diff[0] << " " << diff[1] << " " << diff[2] << Debug::Endl();
 				}
@@ -100,15 +100,15 @@ namespace fan
 		if( numInputs > 0 )
 		{
 			// registers packet success
-			_packet.onSuccess.Connect( &ClientGameData::OnInputReceived, _world, _world.GetHandle(_entity) );
-			mInputsSent.push_front( { _packet.tag, mPreviousInputs.front().frameIndex } );
+			_packet.mOnSuccess.Connect( &ClientGameData::OnInputReceived, _world, _world.GetHandle( _entity) );
+			mInputsSent.push_front( { _packet.mTag, mPreviousInputs.front().mFrameIndex } );
 
 			// generate & send inputs
 			PacketInput packetInput;
-			packetInput.inputs.resize( numInputs );
+			packetInput.mInputs.resize( numInputs );
 			for( int i = 0; i < numInputs; i++ )
 			{
-				packetInput.inputs[numInputs - i - 1] = * ( mPreviousInputs.begin() + i) ;
+				packetInput.mInputs[numInputs - i - 1] = * ( mPreviousInputs.begin() + i) ;
 			}				
 			packetInput.Write( _packet );			
 		}
@@ -133,7 +133,7 @@ namespace fan
 				while( !mPreviousInputs.empty() )
 				{
 					const PacketInput::InputData packetInput = mPreviousInputs.back();
-					if( packetInput.frameIndex <= inputSent.mMostRecentFrame )
+					if( packetInput.mFrameIndex <= inputSent.mMostRecentFrame )
 					{
 						mPreviousInputs.pop_back();
 					}

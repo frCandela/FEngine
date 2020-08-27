@@ -192,8 +192,8 @@ namespace fan
 		{
 			Time& time = mWorld.GetSingleton<Time>();
 			const FrameIndex lastFrame = time.mFrameIndex;
-			const FrameIndex firstFrame = gameData.mLastServerState.frameIndex;
-            mWorld.Run<S_RollbackInit>();
+			const FrameIndex firstFrame = gameData.mLastServerState.mFrameIndex;
+            mWorld.Run<SRollbackInit>();
 			Debug::Highlight() << "rollback to frame " << firstFrame << Debug::Endl();
 
 			// Rollback at the frame we took the snapshot of the player game state
@@ -202,17 +202,17 @@ namespace fan
 			// reset world to first frame		
 			PhysicsWorld& physicsWorld = mWorld.GetSingleton<PhysicsWorld>();
 			physicsWorld.Reset();
-            mWorld.Run<S_RollbackRestoreState>( firstFrame );
+            mWorld.Run<SRollbackRestoreState>( firstFrame );
 			const EcsEntity spaceshipID = mWorld.GetEntity( gameData.sSpaceshipHandle );
 			Rigidbody& rigidbody = mWorld.GetComponent<Rigidbody>( spaceshipID );
 			physicsWorld.mDynamicsWorld->removeRigidBody( rigidbody.mRigidbody );
 			physicsWorld.mDynamicsWorld->addRigidBody( rigidbody.mRigidbody );
 			rigidbody.ClearForces();
 			Transform& transform = mWorld.GetComponent<Transform>( spaceshipID );
-			rigidbody.SetVelocity( gameData.mLastServerState.velocity );
-			rigidbody.SetAngularVelocity( gameData.mLastServerState.angularVelocity );
-			transform.SetPosition( gameData.mLastServerState.position );
-			transform.SetRotationEuler( gameData.mLastServerState.orientation );
+			rigidbody.SetVelocity( gameData.mLastServerState.mVelocity );
+			rigidbody.SetAngularVelocity( gameData.mLastServerState.mAngularVelocity );
+			transform.SetPosition( gameData.mLastServerState.mPosition );
+			transform.SetRotationEuler( gameData.mLastServerState.mOrientation );
 
 			// Clear previous states & saves the last correct server state
 			gameData.mPreviousLocalStates = std::queue<PacketPlayerGameState >();
@@ -224,7 +224,7 @@ namespace fan
 			{
 				time.mFrameIndex++;
 
-                mWorld.Run<S_RollbackRestoreState>( time.mFrameIndex );
+                mWorld.Run<SRollbackRestoreState>( time.mFrameIndex );
 
                 mWorld.Run<SMovePlanets>( delta );
                 mWorld.Run<SMoveSpaceships>( delta );
@@ -233,8 +233,8 @@ namespace fan
 				physicsWorld.mDynamicsWorld->stepSimulation( time.mLogicDelta, 10, Time::sPhysicsDelta );
                 mWorld.Run<S_SynchronizeTransformFromMotionState>();
 
-                mWorld.Run<S_ClientSaveState>( delta );
-                mWorld.Run<S_RollbackStateSave>( delta );
+                mWorld.Run<SClientSaveState>( delta );
+                mWorld.Run<SRollbackStateSave>( delta );
 			}
 
 			gameData.mSpaceshipSynced = true;
@@ -250,8 +250,8 @@ namespace fan
 
 		{
 			SCOPED_PROFILE( scene_update );
-            mWorld.Run<S_ClientReceive>( _delta );
-            mWorld.Run<S_RollbackRemoveOldStates>( _delta );
+            mWorld.Run<SClientReceive>( _delta );
+            mWorld.Run<SRollbackRemoveOldStates>( _delta );
 
 			RollbackResimulate( _delta );
 
@@ -261,13 +261,13 @@ namespace fan
 			}
 
             mWorld.Run<S_ProcessTimedOutPackets>();
-            mWorld.Run<S_ClientDetectServerTimeout>( _delta );
-            mWorld.Run<S_ClientRunReplication>(		_delta );
+            mWorld.Run<SClientDetectServerTimeout>( _delta );
+            mWorld.Run<SClientRunReplication>( _delta );
 			SpawnManager::Update( mWorld );
 
 			// update
             mWorld.Run<SRefreshPlayerInput>( _delta );
-            mWorld.Run<S_ClientSaveInput>( _delta );
+            mWorld.Run<SClientSaveInput>( _delta );
             mWorld.Run<SMovePlanets>( _delta );
             mWorld.Run<SMoveSpaceships>( _delta );
 
@@ -309,10 +309,10 @@ namespace fan
 				mWorld.Run<SUpdateGameCamera>( _delta );
 			}
 
-            mWorld.Run<S_ClientSaveState>(	_delta );
-            mWorld.Run<S_RollbackStateSave>( _delta );
+            mWorld.Run<SClientSaveState>( _delta );
+            mWorld.Run<SRollbackStateSave>( _delta );
 
-            mWorld.Run<S_ClientSend>(		_delta );
+            mWorld.Run<SClientSend>( _delta );
 		}
 	}
 

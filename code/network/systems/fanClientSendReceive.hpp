@@ -7,10 +7,10 @@
 
 namespace fan
 {
-	//==============================================================================================================================================================
+	//========================================================================================================
 	// Sends packet for each client connection
-	//==============================================================================================================================================================
-	struct S_ClientSend : EcsSystem
+	//========================================================================================================
+	struct SClientSend : EcsSystem
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world )
 		{
@@ -29,7 +29,8 @@ namespace fan
 			auto reliabilityLayerIt = _view.begin<ReliabilityLayer>();
 			auto connectionIt = _view.begin<ClientConnection>();
 			auto gameDataIt = _view.begin<ClientGameData>();
-			for( ; reliabilityLayerIt != _view.end<ReliabilityLayer>(); ++reliabilityLayerIt, ++connectionIt, ++gameDataIt )
+            for( ; reliabilityLayerIt != _view.end<ReliabilityLayer>();
+                   ++reliabilityLayerIt, ++connectionIt, ++gameDataIt )
 			{
 				ReliabilityLayer& reliabilityLayer = *reliabilityLayerIt;
 				ClientConnection& connection = *connectionIt;
@@ -43,7 +44,7 @@ namespace fan
 				connection.Write( _world, entity, packet );
 				gameData.Write( _world, entity, packet );
 
-				if( packet.GetSize() == sizeof( PacketTag ) ) { packet.onlyContainsAck = true; }
+				if( packet.GetSize() == sizeof( PacketTag ) ) { packet.mOnlyContainsAck = true; }
 
 				reliabilityLayer.Write( packet );
 
@@ -51,7 +52,10 @@ namespace fan
 				if( packet.GetSize() > sizeof( PacketTag ) )
 				{
 					reliabilityLayer.RegisterPacket( packet );
-					connection.mBandwidth = 1.f / time.mLogicDelta * float( packet.GetSize() ) / 1000.f; // in Ko/s
+                    connection.mBandwidth = 1.f /
+                                            time.mLogicDelta *
+                                            float( packet.GetSize() )
+                                            / 1000.f; // in Ko/s
 					connection.mSocket->Send( packet, connection.mServerIP, connection.mServerPort );
 				}
 				else
@@ -62,10 +66,10 @@ namespace fan
 		}
 	};
 
-	//==============================================================================================================================================================
+	//========================================================================================================
 	// Receives packets for each client connection
-	//==============================================================================================================================================================
-	struct S_ClientReceive : EcsSystem
+	//========================================================================================================
+	struct SClientReceive : EcsSystem
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world )
 		{
@@ -86,7 +90,8 @@ namespace fan
 			auto connectionIt = _view.begin<ClientConnection>();
 			auto replicationIt = _view.begin<ClientReplication>();
 			auto gameDataIt = _view.begin<ClientGameData>();
-			for( ; reliabilityLayerIt != _view.end<ReliabilityLayer>(); ++reliabilityLayerIt, ++connectionIt, ++replicationIt, ++gameDataIt )
+            for( ; reliabilityLayerIt != _view.end<ReliabilityLayer>();
+                   ++reliabilityLayerIt, ++connectionIt, ++replicationIt, ++gameDataIt )
 			{
 				ReliabilityLayer& reliabilityLayer = *reliabilityLayerIt;
 				ClientConnection& connection = *connectionIt;
@@ -120,12 +125,12 @@ namespace fan
 						PacketType packetType = packet.ReadType();
 						if( packetType == PacketType::Ack )
 						{
-							packet.onlyContainsAck = true;
+							packet.mOnlyContainsAck = true;
 						}
 						else if( packetType == PacketType::Disconnect )
 						{
 							// disconnection can cause the reliability layer tags to be off
-							reliabilityLayer.mExpectedPacketTag = packet.tag;
+							reliabilityLayer.mExpectedPacketTag = packet.mTag;
 						}
 
 						if( !reliabilityLayer.ValidatePacket( packet ) )
@@ -177,7 +182,8 @@ namespace fan
 								gameData.ProcessPacket( packetPlayerGameState );
 							} break;
 							default:
-								Debug::Warning() << "Invalid packet " << int( packetType ) << " received. Reading canceled." << Debug::Endl();
+								Debug::Warning() << "Invalid packet " << int( packetType )
+								                 << " received. Reading canceled." << Debug::Endl();
 								packetValid = false;
 								break;
 							}

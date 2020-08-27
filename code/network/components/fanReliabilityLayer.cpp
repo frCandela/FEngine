@@ -30,23 +30,23 @@ namespace fan
 	//========================================================================================================
 	bool ReliabilityLayer::ValidatePacket( Packet& _packet )
 	{
-		if( _packet.onlyContainsAck ) return true;
+		if( _packet.mOnlyContainsAck ) return true;
 
-		if( _packet.tag == mExpectedPacketTag )	// packet is perfect \o/
+		if( _packet.mTag == mExpectedPacketTag )	// packet is perfect \o/
 		{
 			mExpectedPacketTag++;
-			mPendingAck.push_back( _packet.tag );
+			mPendingAck.push_back( _packet.mTag );
 			return true;
 		}
-		else if( _packet.tag < mExpectedPacketTag ) // silently drop old packet.
+		else if( _packet.mTag < mExpectedPacketTag ) // silently drop old packet.
 		{
 			return false;
 		}
 		else //we missed some packets
 		{
-			assert( _packet.tag > mExpectedPacketTag );
-            mExpectedPacketTag = _packet.tag + 1;
-			mPendingAck.push_back( _packet.tag );
+			assert( _packet.mTag > mExpectedPacketTag );
+            mExpectedPacketTag = _packet.mTag + 1;
+			mPendingAck.push_back( _packet.mTag );
 			return true;
 		}
 	}
@@ -57,16 +57,16 @@ namespace fan
 	//========================================================================================================
 	void ReliabilityLayer::RegisterPacket( Packet& _packet )
 	{
-		if( _packet.onlyContainsAck )
+		if( _packet.mOnlyContainsAck )
 		{
 			mNextPacketTag--;
 			return;
 		}
 
 		InFlightPacket inFlightPacket;
-		inFlightPacket.mTag          = _packet.tag;
-		inFlightPacket.mOnFailure    = _packet.onFail;
-		inFlightPacket.mOnSuccess    = _packet.onSuccess;
+		inFlightPacket.mTag          = _packet.mTag;
+		inFlightPacket.mOnFailure    = _packet.mOnFail;
+		inFlightPacket.mOnSuccess    = _packet.mOnSuccess;
 		inFlightPacket.mTimeDispatch = Time::ElapsedSinceStartup();
 		mInFlightPackets.push( inFlightPacket );
 	}
@@ -77,9 +77,9 @@ namespace fan
 	void ReliabilityLayer::ProcessPacket( const PacketAck& _packetAck )
 	{
 		int ackIndex = 0;
-		while( ackIndex < (int)_packetAck.tags.size() && !mInFlightPackets.empty() )
+		while( ackIndex < (int)_packetAck.mTags.size() && !mInFlightPackets.empty() )
 		{
-			const PacketTag ackPacketTag = _packetAck.tags[ackIndex];
+			const PacketTag ackPacketTag = _packetAck.mTags[ackIndex];
 			/*const*/ InFlightPacket& inFlightPacket = mInFlightPackets.front();
 			if( inFlightPacket.mTag == ackPacketTag ) // packet was received ! \o/
 			{
@@ -108,7 +108,7 @@ namespace fan
 		if( !mPendingAck.empty() )
 		{
 			PacketAck packetAck;
-			packetAck.tags = mPendingAck;
+			packetAck.mTags = mPendingAck;
 			packetAck.Write( _packet );
 			mPendingAck.clear();
 		}

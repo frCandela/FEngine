@@ -63,11 +63,11 @@ namespace fan
 	PacketReplication ClientRPC::RPCShiftClientFrame( const int _framesDelta )
 	{
 		PacketReplication packet;
-		packet.replicationType = PacketReplication::ReplicationType::RPC;
+		packet.mReplicationType = PacketReplication::ReplicationType::RPC;
 
-		packet.packetData.clear();
-		packet.packetData << sRpcIdShiftFrame;
-		packet.packetData << sf::Int32(_framesDelta);
+		packet.mPacketData.clear();
+		packet.mPacketData << sRpcIdShiftFrame;
+		packet.mPacketData << sf::Int32( _framesDelta);
 
 		return packet;
 	}
@@ -90,19 +90,19 @@ namespace fan
 	PacketReplication ClientRPC::RPCSpawn( const SpawnInfo& _spawnInfo )
 	{
 		PacketReplication packet;
-		packet.replicationType = PacketReplication::ReplicationType::RPC;
+		packet.mReplicationType = PacketReplication::ReplicationType::RPC;
 
-		packet.packetData.clear();
-		packet.packetData << sRpcIdSpawn;
-		packet.packetData << _spawnInfo.spawnID;
-		packet.packetData << _spawnInfo.spawnFrameIndex;
+		packet.mPacketData.clear();
+		packet.mPacketData << sRpcIdSpawn;
+		packet.mPacketData << _spawnInfo.spawnID;
+		packet.mPacketData << _spawnInfo.spawnFrameIndex;
 
 		sf::Packet dataCpy = _spawnInfo.data;
 		while( !dataCpy.endOfPacket() )
 		{
 			uint8_t dataByte;
 			dataCpy >> dataByte;
-			packet.packetData << dataByte;
+			packet.mPacketData << dataByte;
 		}
 
 		return packet;
@@ -122,11 +122,11 @@ namespace fan
 	PacketReplication  ClientRPC::RPCDespawn( const NetID _netID )
 	{
 		PacketReplication packet;
-		packet.replicationType = PacketReplication::ReplicationType::RPC;
+		packet.mReplicationType = PacketReplication::ReplicationType::RPC;
 
-		packet.packetData.clear();
-		packet.packetData << sRpcIdDespawn;
-		packet.packetData << _netID;
+		packet.mPacketData.clear();
+		packet.mPacketData << sRpcIdDespawn;
+		packet.mPacketData << _netID;
 
 		return packet;
 	}

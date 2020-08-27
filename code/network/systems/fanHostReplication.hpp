@@ -7,11 +7,11 @@
 
 namespace fan
 {
-	//==============================================================================================================================================================
+	//========================================================================================================
 	// Sends a replication packet on all hosts,
 	// one host can be excluded using the _excludeHandle parameter. Pass it the handle of the 
-	//==============================================================================================================================================================
-	struct S_ReplicateOnAllHosts : EcsSystem
+	//========================================================================================================
+	struct SReplicateOnAllHosts : EcsSystem
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world )
 		{
@@ -19,7 +19,11 @@ namespace fan
 				_world.GetSignature<HostReplication>();
 		}
 
-		static void Run( EcsWorld& _world, const EcsView& _view, const PacketReplication& _packet, const HostReplication::ReplicationFlags _flags, const EcsHandle _excludeHandle = 0 )
+        static void Run( EcsWorld& _world,
+                         const EcsView& _view,
+                         const PacketReplication& _packet,
+                         const HostReplication::ReplicationFlags _flags,
+                         const EcsHandle _excludeHandle = 0 )
 		{
 			auto hostReplicationIt = _view.begin<HostReplication>();
 			for( ; hostReplicationIt != _view.end<HostReplication>(); ++hostReplicationIt )
@@ -34,10 +38,10 @@ namespace fan
 		}
 	};
 
-	//==============================================================================================================================================================
+	//========================================================================================================
 	// Replicates all entities that have an EntityReplication component on all hosts
-	//==============================================================================================================================================================
-	struct S_UpdateReplication : EcsSystem
+	//========================================================================================================
+	struct SUpdateReplication : EcsSystem
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world )
 		{
@@ -60,7 +64,8 @@ namespace fan
 			for( const std::pair<HostManager::IPPort, EcsHandle>& pair : hostManager.mHostHandles )
 			{
 				const EcsHandle handle = pair.second;
-				HostReplication& hostReplication = _world.GetComponent<HostReplication>( _world.GetEntity( handle ) );
+				EcsEntity entity = _world.GetEntity( handle );
+				HostReplication& hostReplication = _world.GetComponent<HostReplication>( entity );
 				hostReplications.push_back( { handle, hostReplication }  );
 			}
 
@@ -72,8 +77,10 @@ namespace fan
 				const EcsHandle handle = _world.GetHandle( entity );
 				const EntityReplication& entityReplication = *replicationIt;
 				assert( handle != 0 );
-				const PacketReplication packet = HostReplication::BuildEntityPacket( _world, handle, entityReplication.mComponentTypes );
-				if( packet.packetData.getDataSize() > 0 )
+                const PacketReplication packet = HostReplication::BuildEntityPacket( _world,
+                                                                                     handle,
+                                                                                     entityReplication.mComponentTypes );
+				if( packet.mPacketData.getDataSize() > 0 )
 				{
 					for( HostManagerHandlePair& pair : hostReplications )
 					{

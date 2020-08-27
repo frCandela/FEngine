@@ -76,9 +76,9 @@ namespace fan
                                                                                  ownerID,
                                                                                  bulletPosition,
                                                                                  bulletVelocity );
-                        _world.Run<S_ReplicateOnAllHosts>( ClientRPC::RPCSpawn( info ),
-                                                           HostReplication::ResendUntilReplicated,
-                                                           hostHandle );
+                        _world.Run<SReplicateOnAllHosts>( ClientRPC::RPCSpawn( info ),
+                                                          HostReplication::ResendUntilReplicated,
+                                                          hostHandle );
 					}
 				}
 			}

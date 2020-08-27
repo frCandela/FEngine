@@ -1,48 +1,47 @@
 #include "network/fanPacket.hpp"
 
-#include "ecs/fanEcsWorld.hpp"
-
 namespace fan
 {
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	Packet::Packet( const PacketTag _tag )
 	{
-		tag = _tag;
-		m_packet << _tag;
+        mTag = _tag;
+		mPacket << _tag;
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	PacketType Packet::ReadType()
 	{
 		PacketTypeInt intType;
-		m_packet >> intType;
+		mPacket >> intType;
 		return PacketType( intType );
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void Packet::Clear()
 	{
-		m_packet.clear();
-		tag = 0;
-		onlyContainsAck = false;
-		onFail.Clear();
-		onSuccess.Clear();
+		mPacket.clear();
+        mTag             = 0;
+        mOnlyContainsAck = false;
+		mOnFail.Clear();
+		mOnSuccess.Clear();
 	}
 
-	//================================================================================================================================
-	// we could make this more efficient with a custom packet/socket library that allows better access to packet data
-	//================================================================================================================================
+	//========================================================================================================
+	// we could make this more efficient with a custom packet/socket library
+	// that allows better access to packet data
+	//========================================================================================================
 	void PacketReplication::Read( Packet& _packet )
 	{
-		packetData.clear();
+		mPacketData.clear();
 
 		// get replication type
 		sf::Uint8 replicationTypeInt;
 		_packet >> replicationTypeInt;
-		replicationType = ReplicationType( replicationTypeInt );	
+        mReplicationType = ReplicationType( replicationTypeInt );
 
 		// get data size
 		sf::Uint8 dataSize;
@@ -53,23 +52,23 @@ namespace fan
 		{
 			sf::Uint8 data;
 			_packet >> data; 
-			packetData << data;
+			mPacketData << data;
 		}
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void PacketReplication::Write( Packet& _packet ) const
 	{
- 		assert( packetData.getDataSize() < std::numeric_limits<sf::Uint8>::max() );		
- 		assert( replicationType != ReplicationType::Count );
+ 		assert( mPacketData.getDataSize() < std::numeric_limits<sf::Uint8>::max() );
+ 		assert( mReplicationType != ReplicationType::Count );
  
  		_packet << PacketTypeInt( PacketType::Replication );
- 		_packet << sf::Uint8( replicationType );
- 		_packet << sf::Uint8( packetData.getDataSize() );
+ 		_packet << sf::Uint8( mReplicationType );
+ 		_packet << sf::Uint8( mPacketData.getDataSize() );
  		
-		sf::Packet packetCpy = packetData;
-		for( int i = 0; i < (int)packetData.getDataSize(); i++ )
+		sf::Packet packetCpy = mPacketData;
+		for( int i = 0; i < (int)mPacketData.getDataSize(); i++ )
 		{
 			sf::Uint8 data;
 			packetCpy >> data;

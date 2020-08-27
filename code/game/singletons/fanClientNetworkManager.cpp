@@ -82,7 +82,7 @@ namespace fan
 		const EcsEntity persistentID = _world.GetEntity( mPersistentHandle );
 		ClientConnection& connection = _world.GetComponent<ClientConnection>( persistentID );
 		connection.mState = ClientConnection::ClientState::Stopping;
-		_world.Run<S_ClientSend>( 0.42f );// send a last packet
+		_world.Run<SClientSend>( 0.42f );// send a last packet
 		connection.mSocket->Unbind();
 	}
 

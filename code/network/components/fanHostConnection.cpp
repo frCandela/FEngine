@@ -53,10 +53,10 @@ namespace fan
 			const EcsHandle handle = _world.GetHandle( _entity );
 
 			PacketLoginSuccess packetLogin;
-			packetLogin.playerID = handle;
+			packetLogin.mPlayerId = handle;
 			packetLogin.Write( _packet );			
-			_packet.onSuccess.Connect( &HostConnection::OnLoginSuccess, _world, handle );
-			_packet.onFail.Connect( &HostConnection::OnLoginFail, _world, handle );
+			_packet.mOnSuccess.Connect( &HostConnection::OnLoginSuccess, _world, handle );
+			_packet.mOnFail.Connect( &HostConnection::OnLoginFail, _world, handle );
             mState = HostConnection::PendingApprouval;
 		}
 		else if( mState == HostConnection::Connected )
@@ -68,8 +68,8 @@ namespace fan
                 mLastPingTime = currentTime;
 
 				PacketPing packetPing;
-				packetPing.previousRtt = mRtt;
-				packetPing.serverFrame = time.mFrameIndex;
+				packetPing.mPreviousRtt = mRtt;
+				packetPing.mServerFrame = time.mFrameIndex;
 				packetPing.Write( _packet );
 			}
 		}
@@ -94,7 +94,7 @@ namespace fan
 	{
 		if( mState == HostConnection::Disconnected )
 		{
-            mName  = _packetHello.name;
+            mName  = _packetHello.mName;
             mState = HostConnection::NeedingApprouval;
 		}
 		else if( mState == HostConnection::Connected )
@@ -111,8 +111,8 @@ namespace fan
                                         const float _logicDelta )
 	{
         // number of frames elapsed between sending & receiving
-		const FrameIndex delta = _frameIndex - _packetPing.serverFrame;
-		const FrameIndex clientCurrentFrameIndex = _packetPing.clientFrame + delta / 2;
+		const FrameIndex delta = _frameIndex - _packetPing.mServerFrame;
+		const FrameIndex clientCurrentFrameIndex = _packetPing.mClientFrame + delta / 2;
 
         mRtt = _logicDelta * delta;
         mFramesDelta[mNextDeltaIndex] = _frameIndex - clientCurrentFrameIndex;

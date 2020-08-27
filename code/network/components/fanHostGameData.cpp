@@ -30,18 +30,18 @@ namespace fan
 	{
 		if( mInputs.empty() )
 		{
-			for ( const PacketInput::InputData& inputData : _packet.inputs )
+			for ( const PacketInput::InputData& inputData : _packet.mInputs )
 			{
 				mInputs.push( inputData );
 			}			
 		}
 		else
 		{
-			for ( const PacketInput::InputData& inputData : _packet.inputs )
+			for ( const PacketInput::InputData& inputData : _packet.mInputs )
 			{
-				const FrameIndex mostRecentFrame = mInputs.back().frameIndex;
+				const FrameIndex mostRecentFrame = mInputs.back().mFrameIndex;
 				//assert( inputData.frameIndex <= mostRecentFrame + 1 );
-				if( inputData.frameIndex == mostRecentFrame + 1 )
+				if( inputData.mFrameIndex == mostRecentFrame + 1 )
 				{
 					mInputs.push( inputData );
 				} 				
@@ -65,7 +65,7 @@ namespace fan
 				std::queue< PacketInput::InputData > inputsCpy = hostGameData.mInputs;
 				while( !inputsCpy.empty() )
 				{
-					ImGui::Text( "%d", inputsCpy.front().frameIndex );
+					ImGui::Text( "%d", inputsCpy.front().mFrameIndex );
 					inputsCpy.pop();
 				}
 			}

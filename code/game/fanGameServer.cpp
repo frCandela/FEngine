@@ -186,15 +186,15 @@ namespace fan
 		{
 			SCOPED_PROFILE( scene_update );
 
-			S_ServerReceive::Run( mWorld, _delta );
+			SServerReceive::Run( mWorld, _delta );
             mWorld.Run<S_ProcessTimedOutPackets>	();
             mWorld.Run<S_DetectHostTimout>		();
-            mWorld.Run<S_HostSpawnShip>			( _delta );
-            mWorld.Run<S_HostSyncFrame>			( _delta );
+            mWorld.Run<SHostSpawnShip>			( _delta );
+            mWorld.Run<SHostSyncFrame>			( _delta );
 			SpawnManager			::Update( mWorld );
 
 			// update	
-			mWorld.Run<S_HostUpdateInput>( _delta );
+			mWorld.Run<SHostUpdateInput>( _delta );
 			mWorld.Run<SMovePlanets>	( _delta );
 			mWorld.Run<SMoveSpaceships> ( _delta );
 
@@ -231,9 +231,9 @@ namespace fan
 				mWorld.Run<SUpdateGameCamera>( _delta );
 			}
 
-			mWorld.Run<S_HostSaveState>( _delta );
-			mWorld.Run<S_UpdateReplication>();
-			mWorld.Run<S_ServerSend>( _delta );
+			mWorld.Run<SHostSaveState>( _delta );
+			mWorld.Run<SUpdateReplication>();
+			mWorld.Run<SServerSend>( _delta );
 		}
 	}
 

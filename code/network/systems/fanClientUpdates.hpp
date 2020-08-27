@@ -14,7 +14,7 @@ namespace fan
 	//========================================================================================================
 	// Save the player state ( transform & rigidbody ) for detecting desync with the server simulation
 	//========================================================================================================
-	struct S_ClientSaveState : EcsSystem
+	struct SClientSaveState : EcsSystem
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world )
 		{
@@ -27,7 +27,9 @@ namespace fan
 
 			const Time& time = _world.GetSingleton<Time>();
 
-			for( auto gameDataIt = _view.begin<ClientGameData>(); gameDataIt != _view.end<ClientGameData>(); ++gameDataIt )
+            for( auto gameDataIt = _view.begin<ClientGameData>();
+                 gameDataIt != _view.end<ClientGameData>();
+                 ++gameDataIt )
 			{
 				ClientGameData& gameData = *gameDataIt;
 
@@ -40,11 +42,11 @@ namespace fan
 					const Transform& transform = _world.GetComponent<Transform>( spaceshipID );
 					assert( rb.mRigidbody->getTotalForce().isZero() );
 					PacketPlayerGameState playerState;
-					playerState.frameIndex = time.mFrameIndex;
-					playerState.position = transform.GetPosition();
-					playerState.orientation = transform.GetRotationEuler();
-					playerState.velocity = rb.GetVelocity();
-					playerState.angularVelocity = rb.GetAngularVelocity();
+					playerState.mFrameIndex      = time.mFrameIndex;
+					playerState.mPosition        = transform.GetPosition();
+					playerState.mOrientation     = transform.GetRotationEuler();
+					playerState.mVelocity        = rb.GetVelocity();
+					playerState.mAngularVelocity = rb.GetAngularVelocity();
 					gameData.mPreviousLocalStates.push( playerState );
 				}
 			}
@@ -54,7 +56,7 @@ namespace fan
 	//========================================================================================================
 	// Save the player input for sending over the network and making rollbacks in case of desync
 	//========================================================================================================
-	struct S_ClientSaveInput : EcsSystem
+	struct SClientSaveInput : EcsSystem
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world )
 		{
@@ -78,14 +80,14 @@ namespace fan
 
 					// streams input to the server
 					PacketInput::InputData inputData;
-					inputData.frameIndex = time.mFrameIndex;
-					inputData.orientation = sf::Vector2f( input.mOrientation.x(), input.mOrientation.z() );
-					inputData.left = input.mLeft > 0;
-					inputData.right = input.mLeft < 0;
-					inputData.forward = input.mForward > 0;
-					inputData.backward = input.mForward < 0;
-					inputData.boost = input.mBoost > 0;
-					inputData.fire = input.mFire > 0;
+					inputData.mFrameIndex  = time.mFrameIndex;
+					inputData.mOrientation = sf::Vector2f( input.mOrientation.x(), input.mOrientation.z() );
+					inputData.mLeft        = input.mLeft > 0;
+					inputData.mRight       = input.mLeft < 0;
+					inputData.mForward     = input.mForward > 0;
+					inputData.mBackward    = input.mForward < 0;
+					inputData.mBoost       = input.mBoost > 0;
+					inputData.mFire        = input.mFire > 0;
 					gameData.mPreviousInputs.push_front( inputData );
 				}
 			}
@@ -95,7 +97,7 @@ namespace fan
 	//========================================================================================================
 	// Replicates components, singleton components & runs RPC
 	//========================================================================================================
-	struct S_ClientRunReplication : EcsSystem
+	struct SClientRunReplication : EcsSystem
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world )
 		{
@@ -118,11 +120,11 @@ namespace fan
 				for( PacketReplication packet : replication.mReplicationListSingletons )
 				{
 					sf::Uint32 staticIndex;
-					packet.packetData >> staticIndex;
+					packet.mPacketData >> staticIndex;
 					EcsSingleton& singleton = _world.GetSingleton( staticIndex );
 					const EcsSingletonInfo& info = _world.GetSingletonInfo( staticIndex );
-					info.netLoad( singleton, packet.packetData );
-					assert( packet.packetData.endOfPacket() );
+					info.netLoad( singleton, packet.mPacketData );
+					assert( packet.mPacketData.endOfPacket() );
 				}
 				replication.mReplicationListSingletons.clear();
 
@@ -132,8 +134,8 @@ namespace fan
 					NetID netID;
 					sf::Uint8 numComponents;
 
-					packet.packetData >> netID;
-					packet.packetData >> numComponents;
+					packet.mPacketData >> netID;
+					packet.mPacketData >> numComponents;
 
 					auto it = linkingContext.mNetIDToEcsHandle.find( netID );
 					if( it != linkingContext.mNetIDToEcsHandle.end() )
@@ -150,10 +152,10 @@ namespace fan
 						for( int i = 0; i < numComponents; i++ )
 						{
 							sf::Uint32 staticIndex;
-							packet.packetData >> staticIndex;
+							packet.mPacketData >> staticIndex;
 							const EcsComponentInfo& info = _world.GetComponentInfo( staticIndex );
 							EcsComponent& component = _world.GetComponent( replicatedID, staticIndex );
-							info.netLoad( component, packet.packetData );
+							info.netLoad( component, packet.mPacketData );
 						}
 					}
 				}
@@ -162,7 +164,7 @@ namespace fan
 				// replicate RPC
 				for( PacketReplication packet : replication.mReplicationListRPC )
 				{
-					rpc.TriggerRPC( packet.packetData );
+					rpc.TriggerRPC( packet.mPacketData );
 				}
 				replication.mReplicationListRPC.clear();
 			}
@@ -172,7 +174,7 @@ namespace fan
 	//========================================================================================================
 	// Detect server timeout on all clients connections
 	//========================================================================================================
-	struct S_ClientDetectServerTimeout : EcsSystem
+	struct SClientDetectServerTimeout : EcsSystem
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world )
 		{

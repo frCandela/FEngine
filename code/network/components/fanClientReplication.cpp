@@ -26,7 +26,7 @@ namespace fan
 	//========================================================================================================
 	void ClientReplication::ProcessPacket( PacketReplication& _packet )
 	{
-		switch( _packet.replicationType )
+		switch( _packet.mReplicationType )
 		{
 		case PacketReplication::ReplicationType::Entity:
 		    mReplicationListEntities.push_back( _packet );

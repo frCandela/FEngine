@@ -5,11 +5,12 @@
 
 namespace fan
 {
-	//==============================================================================================================================================================
+	//========================================================================================================
 	// iterates over all ClientRollback components to save the state of the entity for the current frame
-	// EcsComponentInfo can contain rollback load/save methods for serializing rollback state, we need to iterate over all components to call them
-	//==============================================================================================================================================================
-	struct S_RollbackStateSave : EcsSystem
+	// EcsComponentInfo can contain rollback load/save methods for serializing rollback state,
+	// we need to iterate over all components to call them
+	//========================================================================================================
+	struct SRollbackStateSave : EcsSystem
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world )
 		{
@@ -53,10 +54,11 @@ namespace fan
 		}
 	};
 
-	//==============================================================================================================================================================
-	// iterates over all ClientRollback components to remove rollback states older than the current server state frame index
-	//==============================================================================================================================================================
-	struct S_RollbackRemoveOldStates : EcsSystem
+	//========================================================================================================
+	// iterates over all ClientRollback components
+	// to remove rollback states older than the current server state frame index
+	//========================================================================================================
+	struct SRollbackRemoveOldStates : EcsSystem
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world )
 		{
@@ -72,7 +74,7 @@ namespace fan
 			if( netManager.mPersistentHandle == 0 ){ return; }
 			const EcsEntity entity = _world.GetEntity( netManager.mPersistentHandle );
 			const ClientGameData& clientData = _world.GetComponent<ClientGameData>( entity );
-			const FrameIndex lastFrameIndex = clientData.mLastServerState.frameIndex;
+			const FrameIndex lastFrameIndex = clientData.mLastServerState.mFrameIndex;
 
 			auto clientRollbackIt = _view.begin<ClientRollback>();
 			for( ; clientRollbackIt != _view.end<ClientRollback>(); ++clientRollbackIt )
@@ -80,8 +82,9 @@ namespace fan
 				ClientRollback& clientRollback = *clientRollbackIt;
 
 				// remove older game states in the rollback components 
-				while( !clientRollback.mRollbackDatas.empty()
-					&&  ( clientRollback.mRollbackDatas.front().mFrameIndex < lastFrameIndex || clientRollback.mRollbackDatas.size() > ClientRollback::sRollbackDatasMaxSize ))
+                while( !clientRollback.mRollbackDatas.empty() &&
+                       ( ( clientRollback.mRollbackDatas.front().mFrameIndex < lastFrameIndex ) ||
+                         ( clientRollback.mRollbackDatas.size() > ClientRollback::sRollbackDatasMaxSize ) ) )
 				{
 					clientRollback.mRollbackDatas.pop_front();
 				}
@@ -89,10 +92,10 @@ namespace fan
 		}
 	};
 
-	//==============================================================================================================================================================
+	//========================================================================================================
 	// iterates over all ClientRollback components to restore entity state at a specific frame index
-	//==============================================================================================================================================================
-	struct S_RollbackRestoreState : EcsSystem
+	//========================================================================================================
+	struct SRollbackRestoreState : EcsSystem
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world )
 		{
@@ -114,7 +117,7 @@ namespace fan
 					if( rollbackData.mFrameIndex == _frameIndex && signature[rollbackData.mComponentIndex] )
 					{
 						const EcsComponentInfo& componentInfo = _world.IndexedGetComponentInfo( rollbackData.mComponentIndex );
-						assert( componentInfo.rollbackLoad != nullptr );
+						fanAssert( componentInfo.rollbackLoad != nullptr );
 
 						EcsComponent& component = _world.IndexedGetComponent( entity, rollbackData.mComponentIndex );
 						sf::Packet dataCpy = rollbackData.mData;
@@ -125,13 +128,14 @@ namespace fan
 		}
 	};
 
-	//==============================================================================================================================================================
+	//========================================================================================================
 	// Initialize rollback data :
 	// only keep the first frame of all entity rollback data if the RollbackNoOverwrite is not set
 	// For now RollbackNoOverwrite is used only for player input,
-	// that way the player input is restored every frame and all other data (position, speed etc ) is overridden with new state except for the first one
-	//==============================================================================================================================================================
-	struct S_RollbackInit : EcsSystem
+	// that way the player input is restored every frame and all other data (position, speed etc )
+	// is overridden with new state except for the first one
+	//========================================================================================================
+	struct SRollbackInit : EcsSystem
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world )
 		{
@@ -148,7 +152,8 @@ namespace fan
 				ClientRollback& clientRollback = *clientRollbackIt;
 				std::fill( firstStateFound.begin(), firstStateFound.end(), false );
 
-				// iterate over all components and only keep the first rollback state when RollbackNoOverwrite is not set				
+				// iterate over all components and only keep the first rollback state
+				// when RollbackNoOverwrite is not set
 				for (int i = 0; i < (int)clientRollback.mRollbackDatas.size();)
 				{
 					const ClientRollback::RollbackData& rollbackData = clientRollback.mRollbackDatas[i];
@@ -158,7 +163,8 @@ namespace fan
 						if( firstStateFound[rollbackData.mComponentIndex] )
 						{
 							clientRollback.mRollbackDatas.erase( clientRollback.mRollbackDatas.begin() + i );
-							// do not increment i, we already advanced to the next element by erasing the current element.
+							// do not increment i,
+							// we already advanced to the next element by erasing the current element.
 						}
 						else
 						{
