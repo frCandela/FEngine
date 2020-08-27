@@ -4,10 +4,10 @@
 
 namespace fan
 {
-	//==============================================================================================================================================================
+	//========================================================================================================
 	// moves the planets in circles around their origin ( zero for now )
-	//==============================================================================================================================================================
-	struct S_MovePlanets : EcsSystem
+	//========================================================================================================
+	struct SMovePlanets : EcsSystem
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world )
 		{
@@ -34,7 +34,9 @@ namespace fan
 				const Planet& planet = *planetIt;
 
 				float const planetTime = -planet.mSpeed * currentTime;
-				btVector3 position( std::cosf( planetTime + planet.mPhase ), 0, std::sinf( planetTime + planet.mPhase ) );
+                btVector3 position( std::cosf( planetTime + planet.mPhase ),
+                                    0,
+                                    std::sinf( planetTime + planet.mPhase ) );
 				transform.SetPosition( /*parentTransform.getOrigin()*/ planet.mRadius * position );
 
 				sceneNode.AddFlag( SceneNode::BoundsOutdated );
@@ -42,10 +44,10 @@ namespace fan
 		}
 	};
 
-	//==============================================================================================================================================================
+	//========================================================================================================
 	// generates a light mesh from the planets positions & radius
-	//==============================================================================================================================================================
-	struct S_GenerateLightMesh : EcsSystem
+	//========================================================================================================
+	struct SGenerateLightMesh : EcsSystem
 	{
 		//================================================================
 		// helper struct for the S_GenerateLightMesh system
@@ -102,13 +104,17 @@ namespace fan
 			std::sort( std::begin( segments ), std::end( segments ),
 				[]( OrientedSegment& _s1, OrientedSegment& _s2 )
 			{
-				return SignedAngle( btVector3::Left(), _s1.direction, btVector3::Up() ) < SignedAngle( btVector3::Left(), _s2.direction, btVector3::Up() );
+                return SignedAngle( btVector3::Left(),
+                                    _s1.direction,
+                                    btVector3::Up() ) < SignedAngle( btVector3::Left(),
+                                                                     _s2.direction,
+                                                                     btVector3::Up() );
 			} );
 
 			// Finds the starting point of mesh generation loop
 			int startIndex = 0;
 			{
-				// Finds the index of a RIGHT axis that has a minimal number of nested levels of planets	(depth)	
+				// Finds the index of a RIGHT axis that has a minimal number of nested levels of planets
 				int startIndexDepth = 10000;
 				int depth = 0;	//			
 				for( int axisIndex = 0; axisIndex < (int)segments.size(); axisIndex++ )

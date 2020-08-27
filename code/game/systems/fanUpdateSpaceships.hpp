@@ -11,11 +11,11 @@
 
 namespace fan
 {
-	//==============================================================================================================================================================
+	//========================================================================================================
 	// moves the spaceships
 	// @todo split this in multiple sub systems for force application & energy management
-	//==============================================================================================================================================================
-	struct S_MoveSpaceships : EcsSystem
+	//========================================================================================================
+	struct SMoveSpaceships : EcsSystem
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world )
 		{
@@ -38,7 +38,8 @@ namespace fan
 			auto batteryIt = _view.begin<Battery>();
 			auto playerInputIt = _view.begin<PlayerInput>();
 			auto sceneNodeIt = _view.begin<SceneNode>();
-			for( ; rbIt != _view.end<Rigidbody>(); ++rbIt, ++transformIt, ++spaceshipIt, ++batteryIt, ++playerInputIt, ++sceneNodeIt )
+			for( ; rbIt != _view.end<Rigidbody>();
+                   ++rbIt, ++transformIt, ++spaceshipIt, ++batteryIt, ++playerInputIt, ++sceneNodeIt )
 			{
 				const SpaceShip& spaceship = *spaceshipIt;
 				const PlayerInput& playerInput = *playerInputIt;
@@ -47,7 +48,9 @@ namespace fan
 				Battery& battery = *batteryIt;
 
 				// get player input
-				const btVector3 orientation = btVector3( playerInput.mOrientation.x(), 0.f, playerInput.mOrientation.z() );
+                const btVector3 orientation = btVector3( playerInput.mOrientation.x(),
+                                                         0.f,
+                                                         playerInput.mOrientation.z() );
 				const float leftForce = _delta * spaceship.mLateralForce * playerInput.mLeft;
 				const float forwardAxis = _delta * playerInput.mForward;
 				const float boost = playerInput.mBoost;
@@ -70,7 +73,9 @@ namespace fan
 				else { speedMode = SpaceShip::NORMAL; }
 
 				// Consume energy
-				float totalConsumption = spaceship.mEnergyConsumedPerUnitOfForce * ( std::abs( leftForce ) + std::abs( spaceship.mForwardForces[speedMode] * forwardAxis ) );
+                float totalConsumption = spaceship.mEnergyConsumedPerUnitOfForce *
+                                         ( std::abs( leftForce ) +
+                                           std::abs( spaceship.mForwardForces[speedMode] * forwardAxis ) );
 				if( battery.mCurrentEnergy < totalConsumption )
 				{
 					battery.mCurrentEnergy = 0.f;
@@ -132,11 +137,15 @@ namespace fan
 
 				// Forces application		
 				rb.mRigidbody->applyCentralForce( leftForce * transform.Left() );
-				rb.mRigidbody->applyCentralForce( spaceship.mForwardForces[speedMode] * forwardAxis * transform.Forward() );
+                rb.mRigidbody->applyCentralForce( spaceship.mForwardForces[speedMode] *
+                                                  forwardAxis *
+                                                  transform.Forward() );
 				rb.mRigidbody->setAngularVelocity( btVector3::Zero() );
 
 				// Drag
-				btVector3 newVelocity = ( totalConsumption > 0.f ? spaceship.mActiveDrag : spaceship.mPassiveDrag ) * rb.GetVelocity();
+                btVector3 newVelocity = ( totalConsumption > 0.f ?
+                        spaceship.mActiveDrag :
+                        spaceship.mPassiveDrag ) * rb.GetVelocity();
 				newVelocity.setY( 0.f );
 				rb.SetVelocity( newVelocity );
 
@@ -146,10 +155,10 @@ namespace fan
 		}
 	};
 
-	//==============================================================================================================================================================
+	//========================================================================================================
 	// Deals damage to the health entities that are in the sunlight when the sun is bursting
-	//==============================================================================================================================================================
-	struct S_EruptionDamage : EcsSystem
+	//========================================================================================================
+	struct SEruptionDamage : EcsSystem
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world )
 		{
@@ -170,7 +179,9 @@ namespace fan
 			{
 				Health& health = *healthIt;
 				const SolarPanel& solarPanel = *solarPanelIt;
-				if( !health.mInvincible && solarPanel.mIsInSunlight && eruption.mState == SolarEruption::EXPODING )
+                if( !health.mInvincible &&
+                    solarPanel.mIsInSunlight &&
+                    eruption.mState == SolarEruption::EXPODING )
 				{
 					const float damage = _delta * eruption.mDamagePerSecond;
 					if( health.mCurrentHealth < damage )
@@ -186,10 +197,10 @@ namespace fan
 		}
 	};
 
-	//==============================================================================================================================================================
+	//========================================================================================================
 	// checks if any player is death and makes an explosion
-	//==============================================================================================================================================================
-	struct S_PlayerDeath : EcsSystem
+	//========================================================================================================
+	struct SPlayerDeath : EcsSystem
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world )
 		{
@@ -232,6 +243,5 @@ namespace fan
 				}
 			}
 		}
-
 	};
 }

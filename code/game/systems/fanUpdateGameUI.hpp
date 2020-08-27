@@ -7,10 +7,10 @@
 
 namespace fan
 {
-	//==============================================================================================================================================================
+	//========================================================================================================
 	// updates the ui sliders from the player/world variables ( health, energy, etc. )
-	//==============================================================================================================================================================
-	struct S_UpdateGameUiValues : EcsSystem
+	//========================================================================================================
+	struct SUpdateGameUiValues : EcsSystem
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world )
 		{
@@ -66,10 +66,10 @@ namespace fan
 		}
 	};
 
-	//==============================================================================================================================================================
+	//========================================================================================================
 	// moves the ui status bars above the player spaceship 
-	//==============================================================================================================================================================
-	struct S_UpdateGameUiPosition : EcsSystem
+	//========================================================================================================
+	struct SUpdateGameUiPosition : EcsSystem
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world )
 		{
@@ -98,8 +98,11 @@ namespace fan
 				if( ui.mUIRootTransform == nullptr ) { continue; }
 
 				// Set ui position
-				glm::vec2 screenPos = ToGLM( camera.WorldPosToScreen( cameraTransform, transform.GetPosition() ) );
-				glm::vec2 pixelPosition = renderWorld.mTargetSize * 0.5f * ( screenPos + glm::vec2( 1.f, 1.f ) );
+                glm::vec2 screenPos = ToGLM( camera.WorldPosToScreen( cameraTransform,
+                                                                      transform.GetPosition() ) );
+                glm::vec2 pixelPosition = renderWorld.mTargetSize *
+                                          0.5f *
+                                          ( screenPos + glm::vec2( 1.f, 1.f ) );
 				ui.mUIRootTransform->mPosition = pixelPosition + ui.mUIOffset;
 			}
 		}

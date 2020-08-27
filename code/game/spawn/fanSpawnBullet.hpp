@@ -17,16 +17,19 @@ namespace fan
 {
 	namespace spawn
 	{
-		//================================================================================================================================
-		//================================================================================================================================
+		//====================================================================================================
+		//====================================================================================================
 		struct SpawnBullet
 		{
 			static const SpawnID  s_id = SSID( "SpawnBullet" );
 
 			//================================================================
 			//================================================================
-			static SpawnInfo GenerateInfo( const FrameIndex _spawnFrameIndex, const NetID _owner, const  btVector3 _position, const btVector3 _velocity )
-			{
+            static SpawnInfo GenerateInfo( const FrameIndex _spawnFrameIndex,
+                                           const NetID _owner,
+                                           const btVector3 _position,
+                                           const btVector3 _velocity )
+            {
 				SpawnInfo info;
 				info.spawnFrameIndex = _spawnFrameIndex;
 				info.spawnID = s_id;
@@ -58,8 +61,11 @@ namespace fan
 
 			//================================================================
 			//================================================================
-			static void Instanciate( EcsWorld& _world, const NetID _owner, const btVector3& _position, const btVector3& _velocity )
-			{
+            static void Instanciate( EcsWorld& _world,
+                                     const NetID _owner,
+                                     const btVector3& _position,
+                                     const btVector3& _velocity )
+            {
 				Scene& scene = _world.GetSingleton<Scene>();
 				PhysicsWorld& physicsWorld = _world.GetSingleton<PhysicsWorld>();
 				CollisionManager& collisionManager = _world.GetSingleton<CollisionManager>();
@@ -81,7 +87,8 @@ namespace fan
 					bulletTransform.SetPosition( _position );
 
 					Rigidbody& bulletRigidbody = _world.GetComponent<Rigidbody>( bulletID );
-					bulletRigidbody.mOnContactStarted.Connect( &CollisionManager::OnBulletContact, &collisionManager );
+                    bulletRigidbody.mOnContactStarted.Connect( &CollisionManager::OnBulletContact,
+                                                               &collisionManager );
 					bulletRigidbody.SetIgnoreCollisionCheck( ownerRigidbody, true );
 					bulletRigidbody.SetVelocity( _velocity );
 					bulletRigidbody.SetMotionState( _world.GetComponent<MotionState>( bulletID ).mMotionState );

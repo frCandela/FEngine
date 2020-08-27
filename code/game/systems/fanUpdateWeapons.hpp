@@ -11,11 +11,11 @@
 
 namespace fan
 {
-	//==============================================================================================================================================================
+	//========================================================================================================
 	// fires the weapons :
 	// creates bullets at the proper position & speed depending on player input
-	//==============================================================================================================================================================
-	struct S_FireWeapons : EcsSystem
+	//========================================================================================================
+	struct SFireWeapons : EcsSystem
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world )
 		{
@@ -39,7 +39,8 @@ namespace fan
 			auto inputIt = _view.begin<PlayerInput>();
 			auto weaponIt = _view.begin<Weapon>();
 			auto batteryIt = _view.begin<Battery>();
-			for( ; transformIt != _view.end<Transform>(); ++transformIt, ++rigidbodyIt, ++inputIt, ++weaponIt, ++batteryIt )
+			for( ; transformIt != _view.end<Transform>();
+                   ++transformIt, ++rigidbodyIt, ++inputIt, ++weaponIt, ++batteryIt )
 			{
 				const Transform& transform = *transformIt;
 				const Rigidbody& rigidbody = *rigidbodyIt;
@@ -50,16 +51,20 @@ namespace fan
 				weapon.bBulletsTimeAccumulator += _delta * weapon.mBulletsPerSecond;
 				if( weapon.bBulletsTimeAccumulator > 1.f ) { weapon.bBulletsTimeAccumulator = 1.f; }
 
-				if( input.mFire > 0 && weapon.bBulletsTimeAccumulator >= 1.f && battery.mCurrentEnergy >= weapon.mBulletEnergyCost )
+                if( input.mFire > 0 &&
+                    weapon.bBulletsTimeAccumulator >= 1.f &&
+                    battery.mCurrentEnergy >= weapon.mBulletEnergyCost )
 				{
 					--weapon.bBulletsTimeAccumulator;
 					battery.mCurrentEnergy -= weapon.mBulletEnergyCost;
 
 					const EcsEntity spaceshipEntity = transformIt.GetEntity();
 					const EcsHandle ownerHandle = _world.GetHandle( spaceshipEntity );
-					const NetID ownerID = linkingContext.mEcsHandleToNetID.at( ownerHandle );
-					const btVector3 bulletPosition = transform.GetPosition() + transform.TransformDirection( weapon.mOriginOffset );
-					const btVector3 bulletVelocity = rigidbody.GetVelocity() + weapon.mBulletSpeed * transform.Forward();
+                    const NetID     ownerID        = linkingContext.mEcsHandleToNetID.at( ownerHandle );
+                    const btVector3 bulletPosition = transform.GetPosition() +
+                                                     transform.TransformDirection( weapon.mOriginOffset );
+                    const btVector3 bulletVelocity = rigidbody.GetVelocity() +
+                                                     weapon.mBulletSpeed * transform.Forward();
 					spawn::SpawnBullet::Instanciate( _world, ownerID, bulletPosition, bulletVelocity );
 
 					// Adds bullet to the spawn manager for spawning on hosts
@@ -67,8 +72,13 @@ namespace fan
 					{
 						// spawn on all hosts
 						const EcsHandle hostHandle = _world.GetComponent<HostPersistentHandle>( spaceshipEntity ).mHandle;
-						const SpawnInfo info = spawn::SpawnBullet::GenerateInfo( time.mFrameIndex, ownerID, bulletPosition, bulletVelocity );
-						_world.Run<S_ReplicateOnAllHosts>( ClientRPC::RPCSpawn( info ), HostReplication::ResendUntilReplicated, hostHandle );
+                        const SpawnInfo info = spawn::SpawnBullet::GenerateInfo( time.mFrameIndex,
+                                                                                 ownerID,
+                                                                                 bulletPosition,
+                                                                                 bulletVelocity );
+                        _world.Run<S_ReplicateOnAllHosts>( ClientRPC::RPCSpawn( info ),
+                                                           HostReplication::ResendUntilReplicated,
+                                                           hostHandle );
 					}
 				}
 			}

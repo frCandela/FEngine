@@ -5,10 +5,10 @@
 
 namespace fan
 {
-	//==============================================================================================================================================================
+	//========================================================================================================
 	// moves the camera above the players spaceships
-	//==============================================================================================================================================================
-	struct S_UpdateGameCamera : EcsSystem
+	//========================================================================================================
+	struct SUpdateGameCamera : EcsSystem
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world )
 		{
@@ -28,7 +28,9 @@ namespace fan
 			btVector3 center = btVector3::Zero();
 
 			// calculates players center and bounding box	
-			for( auto transformIt = _view.begin<Transform>(); transformIt != _view.end<Transform>(); ++transformIt )
+            for( auto transformIt = _view.begin<Transform>();
+                 transformIt != _view.end<Transform>();
+                 ++transformIt )
 			{
 				const Transform& transform = *transformIt;
 				const btVector3 position = transform.GetPosition();
@@ -61,10 +63,16 @@ namespace fan
 				}
 				else
 				{
-					const float requiredSizeX = 0.5f * ( 1.f + gameCamera.mMarginRatio[0] ) * ( high[0] - low[0] ) / camera.mAspectRatio;
-					const float requiredSizeZ = ( 1.f + gameCamera.mMarginRatio[1] ) * ( high[2] - low[2] ) / camera.mAspectRatio;
+                    const float requiredSizeX = 0.5f *
+                                                ( 1.f + gameCamera.mMarginRatio[0] ) *
+                                                ( high[0] - low[0] ) /
+                                                camera.mAspectRatio;
+                    const float requiredSizeZ = ( 1.f + gameCamera.mMarginRatio[1] ) *
+                                                ( high[2] - low[2] ) /
+                                                camera.mAspectRatio;
 
-					const float orthoSize = std::max( std::max( requiredSizeX, requiredSizeZ ), gameCamera.mMinOrthoSize );
+                    const float orthoSize = std::max( std::max( requiredSizeX, requiredSizeZ ),
+                                                      gameCamera.mMinOrthoSize );
 					camera.mOrthoSize = orthoSize;
 				}
 			}

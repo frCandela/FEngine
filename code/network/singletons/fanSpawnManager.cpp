@@ -42,8 +42,8 @@ namespace fan
 	{
 		spawnMethods.clear();		
 		RegisterSpawnMethod( spawn::SpawnBullet::s_id, &spawn::SpawnBullet::Spawn );
-		RegisterSpawnMethod( spawn::SpawnShip::s_id, &spawn::SpawnShip::Spawn );
-		RegisterSpawnMethod( spawn::SpawnSolarEruption::s_id, &spawn::SpawnSolarEruption::Spawn );
+		RegisterSpawnMethod( spawn::SpawnShip::sID, &spawn::SpawnShip::Spawn );
+		RegisterSpawnMethod( spawn::SpawnSolarEruption::sID, &spawn::SpawnSolarEruption::Spawn );
 	}
 
 	//========================================================================================================

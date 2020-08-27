@@ -5,10 +5,10 @@
 
 namespace fan
 {
-	//==============================================================================================================================================================
+	//========================================================================================================
 	// removes the particles that are not in the sunlight
-	//==============================================================================================================================================================
-	struct S_ParticlesOcclusion : EcsSystem
+	//========================================================================================================
+	struct SParticlesOcclusion : EcsSystem
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world )
 		{
@@ -23,8 +23,10 @@ namespace fan
 
 			SunLight& sunlight = _world.GetSingleton<SunLight>();
 
-			for( auto particleIt = _view.begin<Particle>(); particleIt != _view.end<Particle>(); ++particleIt )
-			{
+            for( auto particleIt = _view.begin<Particle>();
+                 particleIt != _view.end<Particle>();
+                 ++particleIt )
+            {
 				const EcsEntity entity = particleIt.GetEntity();
 				const Particle& particle = *particleIt;
 
@@ -33,7 +35,9 @@ namespace fan
 				// raycast on the light mesh
 				const btVector3 rayOrigin = btVector3( position[0], 1.f, position[2] );
 				btVector3 outIntersection;
-				bool isInsideSunlight = sunlight.mMesh->RayCast( rayOrigin, -btVector3::Up(), outIntersection );
+                bool isInsideSunlight = sunlight.mMesh->RayCast( rayOrigin,
+                                                                 -btVector3::Up(),
+                                                                 outIntersection );
 				if( !isInsideSunlight )
 				{
 					_world.Kill( entity );

@@ -226,8 +226,8 @@ namespace fan
 
                 mWorld.Run<S_RollbackRestoreState>( time.mFrameIndex );
 
-                mWorld.Run<S_MovePlanets>( delta );
-                mWorld.Run<S_MoveSpaceships>( delta );
+                mWorld.Run<SMovePlanets>( delta );
+                mWorld.Run<SMoveSpaceships>( delta );
 
                 mWorld.Run<S_SynchronizeMotionStateFromTransform>();
 				physicsWorld.mDynamicsWorld->stepSimulation( time.mLogicDelta, 10, Time::sPhysicsDelta );
@@ -266,10 +266,10 @@ namespace fan
 			SpawnManager::Update( mWorld );
 
 			// update
-            mWorld.Run<S_RefreshPlayerInput>( _delta );
+            mWorld.Run<SRefreshPlayerInput>( _delta );
             mWorld.Run<S_ClientSaveInput>( _delta );
-            mWorld.Run<S_MovePlanets>( _delta );
-            mWorld.Run<S_MoveSpaceships>( _delta );
+            mWorld.Run<SMovePlanets>( _delta );
+            mWorld.Run<SMoveSpaceships>( _delta );
 
 			// physics & transforms
 			PhysicsWorld& physicsWorld = mWorld.GetSingleton<PhysicsWorld>();
@@ -284,29 +284,29 @@ namespace fan
             mWorld.Run<SHighlightButtons>();
             mWorld.Run<SUpdateUIText>();
 
-			mWorld.Run<S_FireWeapons>(			 _delta );
-			mWorld.Run<S_GenerateLightMesh>(		 _delta );
-			mWorld.Run<S_UpdateSolarPannels>(	 _delta );
-			mWorld.Run<S_RechargeBatteries>(		 _delta );
+			mWorld.Run<SFireWeapons>( _delta );
+			mWorld.Run<SGenerateLightMesh>( _delta );
+			mWorld.Run<SUpdateSolarPanels>( _delta );
+			mWorld.Run<SRechargeBatteries>( _delta );
 			mWorld.Run<S_UpdateExpirationTimes>(	 _delta );
-			mWorld.Run<S_EruptionDamage>(		 _delta );
-			mWorld.Run<S_UpdateGameUiValues>(	 _delta );
-			mWorld.Run<S_UpdateGameUiPosition>(	 _delta );
+			mWorld.Run<SEruptionDamage>( _delta );
+			mWorld.Run<SUpdateGameUiValues>( _delta );
+			mWorld.Run<SUpdateGameUiPosition>( _delta );
 			SolarEruption::Step( mWorld,			 _delta );
-            mWorld.Run<S_PlayerDeath>(			 _delta );
+            mWorld.Run<SPlayerDeath>( _delta );
 
 			// late update
 			const RenderWorld& renderWorld = mWorld.GetSingleton<RenderWorld>();
 			if( !renderWorld.mIsHeadless )
 			{
-				mWorld.Run<S_ParticlesOcclusion>( _delta );
+				mWorld.Run<SParticlesOcclusion>( _delta );
 				mWorld.Run<S_UpdateParticles>( _delta );
 				mWorld.Run<S_EmitParticles>( _delta );
 				mWorld.Run<S_GenerateParticles>( _delta );
 				mWorld.Run<S_UpdateBoundsFromRigidbody>( _delta );
 				mWorld.Run<S_UpdateBoundsFromModel>();
 				mWorld.Run<S_UpdateBoundsFromTransform>();
-				mWorld.Run<S_UpdateGameCamera>( _delta );
+				mWorld.Run<SUpdateGameCamera>( _delta );
 			}
 
             mWorld.Run<S_ClientSaveState>(	_delta );

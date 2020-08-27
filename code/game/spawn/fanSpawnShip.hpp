@@ -21,21 +21,24 @@ namespace fan
 {
 	namespace spawn
 	{
-		//================================================================================================================================
-		//================================================================================================================================
+		//====================================================================================================
+		//====================================================================================================
 		struct SpawnShip
 		{
-			static const SpawnID  s_id = SSID( "SpawnShip" );
+			static const SpawnID sID = SSID( "SpawnShip" );
 
 			//================================================================
 			//================================================================
-			static SpawnInfo GenerateInfo( const PlayerID _owner, const FrameIndex _spawnFrameIndex, const NetID _spaceshipID, const  btVector3 _position )
+            static SpawnInfo GenerateInfo( const PlayerID _owner,
+                                           const FrameIndex _spawnFrameIndex,
+                                           const NetID _spaceshipID,
+                                           const btVector3 _position )
 			{
 				assert( _spaceshipID != 0 );
 
 				SpawnInfo info;
 				info.spawnFrameIndex = _spawnFrameIndex;
-				info.spawnID = s_id;
+				info.spawnID = sID;
 
 				// Write data to packet
 				info.data << _owner;
@@ -74,7 +77,7 @@ namespace fan
 					else
 					{
 						const ClientNetworkManager& netManager = _world.GetSingleton<ClientNetworkManager>();
-						const EcsEntity				persistentEntity = _world.GetEntity( netManager.mPersistentHandle );
+						const EcsEntity	persistentEntity = _world.GetEntity( netManager.mPersistentHandle );
 						ClientGameData& gameData = _world.GetComponent<ClientGameData>( persistentEntity );
 
 						if( gameData.mPlayerId == playerID )
@@ -99,12 +102,15 @@ namespace fan
 				}
 			}
 
-			//================================================================================================================================
+			//================================================================================================
 			// Generates the spaceship entity from the game prefab
-			// PlayerInput component causes the ship to be driven by inputs ( forward, left, right, boost etc. )
+			// PlayerInput component causes the ship to be driven by inputs ( forward, left, right etc. )
 			// PlayerController automatically updates the PlayerInput with local inputs from mouse & keyboard
-			//================================================================================================================================
-			static EcsHandle SpawnSpaceship( EcsWorld& _world, const bool _hasPlayerInput, const bool _hasPlayerController, const EcsHandle _persistentHandle = 0 )
+			//================================================================================================
+			static EcsHandle SpawnSpaceship( EcsWorld& _world,
+			        const bool _hasPlayerInput,
+			        const bool _hasPlayerController,
+			        const EcsHandle _persistentHandle = 0 )
 			{
 				// spawn the spaceship	
 				Game& game = _world.GetSingleton< Game >();
@@ -172,7 +178,8 @@ namespace fan
 
 						// registers physics callbacks
 						CollisionManager& collisionManager = _world.GetSingleton<CollisionManager>();
-						rigidbody.mOnContactStarted.Connect( &CollisionManager::OnSpaceShipContact, &collisionManager );
+                        rigidbody.mOnContactStarted.Connect( &CollisionManager::OnSpaceShipContact,
+                                                             &collisionManager );
 
 						return spaceshipNode.mHandle;
 					}

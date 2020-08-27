@@ -6,10 +6,10 @@
 
 namespace fan
 {
-	//==============================================================================================================================================================
+	//========================================================================================================
 	// updates solar panels charging rate depending on where they are in the sunlight
-	//==============================================================================================================================================================
-	struct S_UpdateSolarPannels : EcsSystem
+	//========================================================================================================
+	struct SUpdateSolarPanels : EcsSystem
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world )
 		{
@@ -33,16 +33,22 @@ namespace fan
 				// sunlight mesh raycast
 				const btVector3 rayOrigin = transform.GetPosition() + btVector3::Up();
 				btVector3 outIntersection;
-				solarPanel.mIsInSunlight = sunLight.mMesh->RayCast( rayOrigin, -btVector3::Up(), outIntersection );
+                solarPanel.mIsInSunlight = sunLight.mMesh->RayCast( rayOrigin,
+                                                                    -btVector3::Up(),
+                                                                    outIntersection );
 
 				// Charging rate
 				if( solarPanel.mIsInSunlight )
 				{
 					const btVector3 position = transform.GetPosition();
 					const float distance = position.norm();
-					const float slope = ( solarPanel.mMaxChargingRate - solarPanel.mMinChargingRate ) / ( solarPanel.mHighRange - solarPanel.mLowRange );
-					const float unclampedRate = solarPanel.mMaxChargingRate - slope * ( distance - solarPanel.mLowRange );
-					solarPanel.mCurrentChargingRate = std::clamp( unclampedRate, solarPanel.mMinChargingRate, solarPanel.mMaxChargingRate );
+                    const float slope = ( solarPanel.mMaxChargingRate - solarPanel.mMinChargingRate ) /
+                                        ( solarPanel.mHighRange - solarPanel.mLowRange );
+                    const float unclampedRate = solarPanel.mMaxChargingRate -
+                                                slope * ( distance - solarPanel.mLowRange );
+                    solarPanel.mCurrentChargingRate = std::clamp( unclampedRate,
+                                                                  solarPanel.mMinChargingRate,
+                                                                  solarPanel.mMaxChargingRate );
 				}
 				else
 				{
@@ -52,10 +58,10 @@ namespace fan
 		}
 	};
 
-	//==============================================================================================================================================================
+	//========================================================================================================
 	// recharges batteries from solar panels
-	//==============================================================================================================================================================
-	struct S_RechargeBatteries : EcsSystem
+	//========================================================================================================
+	struct SRechargeBatteries : EcsSystem
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world )
 		{
