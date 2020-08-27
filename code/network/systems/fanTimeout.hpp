@@ -34,17 +34,17 @@ namespace fan
 				const SceneNode& sceneNode = *sceneNodeIt;
 
 				// packets are sorted, so all timed out packets must be at front
-				if( connection.state == HostConnection::Connected )
+				if( connection.mState == HostConnection::Connected )
 				{
-					if( connection.lastResponseTime + connection.timeoutDelay < currentTime )
+					if( connection.mLastResponseTime + connection.mTimeoutDelay < currentTime )
 					{
 						Debug::Log() << "client timeout " << Debug::Endl();
 
-						hostManager.DeleteHost( _world, sceneNode.handle );
+						hostManager.DeleteHost( _world, sceneNode.mHandle );
 						const HostGameData& hostGameData = *hostGameDataIt;
-						if( hostGameData.spaceshipID != 0 )
+						if( hostGameData.mSpaceshipID != 0 )
 						{
-							_world.Run<S_ReplicateOnAllHosts>( ClientRPC::RPCDespawn( hostGameData.spaceshipID ), HostReplication::ResendUntilReplicated, sceneNode.handle );
+							_world.Run<S_ReplicateOnAllHosts>( ClientRPC::RPCDespawn( hostGameData.mSpaceshipID ), HostReplication::ResendUntilReplicated, sceneNode.mHandle );
 						}
 					}
 				}
@@ -66,16 +66,16 @@ namespace fan
 			{
 				ReliabilityLayer& reliabilityLayer = *reliabilityLayerIt;
 
-				const double timoutTime = Time::ElapsedSinceStartup() - reliabilityLayer.timeoutDuration;
+				const double timoutTime = Time::ElapsedSinceStartup() - reliabilityLayer.sTimeoutDuration;
 
 				//packets are sorted, so all timed out packets must be at front
-				while( !reliabilityLayer.inFlightPackets.empty() )
+				while( !reliabilityLayer.mInFlightPackets.empty() )
 				{
-					ReliabilityLayer::InFlightPacket& inFlightPacket = reliabilityLayer.inFlightPackets.front();
-					if( inFlightPacket.timeDispatch < timoutTime ) // packet timed out
+					ReliabilityLayer::InFlightPacket& inFlightPacket = reliabilityLayer.mInFlightPackets.front();
+					if( inFlightPacket.mTimeDispatch < timoutTime ) // packet timed out
 					{
-						inFlightPacket.onFailure.Emmit( inFlightPacket.tag );
-						reliabilityLayer.inFlightPackets.pop();
+						inFlightPacket.mOnFailure.Emmit( inFlightPacket.mTag );
+						reliabilityLayer.mInFlightPackets.pop();
 					}
 					else // no packets beyond could be timed out
 					{

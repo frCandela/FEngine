@@ -142,7 +142,7 @@ namespace ImGui
                      fan::GroupsColors::GetColor( sceneNodeInfo.group ) );
         const fan::SceneNode& sceneNode = _world.GetComponent<fan::SceneNode>( entity );
         ImGui::SameLine();
-        ImGui::Text( "scene node      : %s", sceneNode.name.c_str() );
+        ImGui::Text( "scene node      : %s", sceneNode.mName.c_str() );
 
         const fan::EcsComponentInfo& targetComponentInfo =
                                            _world.GetComponentInfo( _ptr.Data().mType );

@@ -28,7 +28,7 @@ namespace fan
 			for( ; boundsIt != _view.end<Bounds>(); ++boundsIt, ++sceneNodeIt )
 			{
 				const Bounds& bounds = *boundsIt;
-				_world.GetSingleton<RenderDebug>().DebugAABB( bounds.aabb, Color::Red );
+				_world.GetSingleton<RenderDebug>().DebugAABB( bounds.mAabb, Color::Red );
 			}
 		}
 	};
@@ -51,12 +51,12 @@ namespace fan
 				const MeshRenderer& meshRenderer = *meshRendererIt;
 				const Transform& transform = *transformIt;
 
-				if( *meshRenderer.mesh != nullptr )
+				if( *meshRenderer.mMesh != nullptr )
 				{
 					const glm::mat4  modelMat = transform.GetModelMatrix();
 					const glm::mat4  normalMat = transform.GetNormalMatrix();
-					const std::vector<uint32_t>& indices = meshRenderer.mesh->mIndices;
-					const std::vector<Vertex>& vertices = meshRenderer.mesh->mVertices;
+					const std::vector<uint32_t>& indices = meshRenderer.mMesh->mIndices;
+					const std::vector<Vertex>& vertices = meshRenderer.mMesh->mVertices;
 
 					for( int index = 0; index < (int)indices.size(); index++ )
 					{
@@ -89,11 +89,11 @@ namespace fan
 				const MeshRenderer& meshRenderer = *meshRendererIt;
 				const Transform& transform = *transformIt;
 
-				if( *meshRenderer.mesh != nullptr )
+				if( *meshRenderer.mMesh != nullptr )
 				{
 					const glm::mat4  modelMat = transform.GetModelMatrix();
-					const std::vector<uint32_t>& indices = meshRenderer.mesh->mIndices;
-					const std::vector<Vertex>& vertices = meshRenderer.mesh->mVertices;
+					const std::vector<uint32_t>& indices = meshRenderer.mMesh->mIndices;
+					const std::vector<Vertex>& vertices = meshRenderer.mMesh->mVertices;
 
 					for( int index = 0; index < (int)indices.size() / 3; index++ )
 					{
@@ -127,9 +127,9 @@ namespace fan
 				const MeshRenderer& meshRenderer = *meshRendererIt;
 				const Transform& transform = *transformIt;
 
-				if( *meshRenderer.mesh != nullptr )
+				if( *meshRenderer.mMesh != nullptr )
 				{
-					const ConvexHull& hull = meshRenderer.mesh->mConvexHull;
+					const ConvexHull& hull = meshRenderer.mMesh->mConvexHull;
 					const std::vector<btVector3>& vertices = hull.GetVertices();
 					const std::vector<uint32_t>& indices = hull.GetIndices();
 					if( !vertices.empty() )
@@ -190,7 +190,7 @@ namespace fan
 			const float lightRange = PointLight::GetLightRange( _light );
 			if( lightRange > 0 )
 			{
-				_renderDebug.DebugSphere( _transform.transform, lightRange, _light.diffuse );
+				_renderDebug.DebugSphere( _transform.mTransform, lightRange, _light.mDiffuse );
 			}
 		}
 	};
@@ -235,7 +235,7 @@ namespace fan
 				const btVector3 offset = offsets[offsetIndex];
 				_renderDebug.DebugLine( pos + offset, pos + offset + length * dir, color, false );
 			}
-			_renderDebug.DebugIcoSphere( _transform.transform, radius, 0, color, false );
+			_renderDebug.DebugIcoSphere( _transform.mTransform, radius, 0, color, false );
 		}
 	};
 
@@ -269,14 +269,14 @@ namespace fan
 			if( _world.HasComponent<BoxShape>( _entity ) )
 			{
 				const BoxShape& shape = _world.GetComponent<BoxShape>( _entity );
-				_world.GetSingleton<RenderDebug>().DebugCube( transform.transform, 0.5f * shape.GetScaling(), Color::Green, false );
+				_world.GetSingleton<RenderDebug>().DebugCube( transform.mTransform, 0.5f * shape.GetScaling(), Color::Green, false );
 			}
 
 			// sphere shape
 			if( _world.HasComponent<SphereShape>( _entity ) )
 			{
 				const SphereShape& shape = _world.GetComponent<SphereShape>( _entity );
-				_world.GetSingleton<RenderDebug>().DebugSphere( transform.transform, shape.GetRadius(), Color::Green, false );
+				_world.GetSingleton<RenderDebug>().DebugSphere( transform.mTransform, shape.GetRadius(), Color::Green, false );
 			}
 		}
 	};

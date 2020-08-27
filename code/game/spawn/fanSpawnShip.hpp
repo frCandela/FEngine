@@ -67,8 +67,8 @@ namespace fan
 					if( game.mIsServer )
 					{
 						HostGameData& hostData = _world.GetComponent<HostGameData>( _world.GetEntity( playerID ) );
-						hostData.spaceshipHandle = SpawnShip::SpawnSpaceship( _world, true, false, playerID );
-						linkingContext.AddEntity( hostData.spaceshipHandle, spaceshipID );
+						hostData.mSpaceshipHandle = SpawnShip::SpawnSpaceship( _world, true, false, playerID );
+						linkingContext.AddEntity( hostData.mSpaceshipHandle, spaceshipID );
 
 					}
 					else
@@ -77,15 +77,15 @@ namespace fan
 						const EcsEntity				persistentEntity = _world.GetEntity( netManager.mPersistentHandle );
 						ClientGameData& gameData = _world.GetComponent<ClientGameData>( persistentEntity );
 
-						if( gameData.playerID == playerID )
+						if( gameData.mPlayerId == playerID )
 						{
 							// spawn this client ship
-							if( gameData.spaceshipHandle == 0 )
+							if( gameData.sSpaceshipHandle == 0 )
 							{
-								gameData.spaceshipHandle = SpawnShip::SpawnSpaceship( _world, true, true );
-								if( gameData.spaceshipHandle != 0 )
+								gameData.sSpaceshipHandle = SpawnShip::SpawnSpaceship( _world, true, true );
+								if( gameData.sSpaceshipHandle != 0 )
                                 {
-                                    linkingContext.AddEntity( gameData.spaceshipHandle, spaceshipID );
+                                    linkingContext.AddEntity( gameData.sSpaceshipHandle, spaceshipID );
                                 }
 							}
 						}
@@ -112,26 +112,26 @@ namespace fan
 				{
 					Scene& scene = _world.GetSingleton<Scene>();
 					SceneNode& spaceshipNode = *game.mSpaceshipPrefab->Instantiate( scene.GetRootNode() );
-					EcsEntity spaceshipID = _world.GetEntity( spaceshipNode.handle );
+					EcsEntity spaceshipID = _world.GetEntity( spaceshipNode.mHandle );
 
 					_world.AddComponent<LinkingContextUnregisterer>( spaceshipID );
 
 					// set name
 					if( _hasPlayerController )
 					{
-						spaceshipNode.name = "spaceship_player";
+						spaceshipNode.mName = "spaceship_player";
 					}
 					else if( _persistentHandle )
 					{
-						spaceshipNode.name = "spaceship" + std::to_string( _persistentHandle );
+						spaceshipNode.mName = "spaceship" + std::to_string( _persistentHandle );
 					}
 
 					if( _persistentHandle != 0 ) // server only
 					{						
-						_world.AddComponent<HostPersistentHandle>( spaceshipID ).handle = _persistentHandle;
+						_world.AddComponent<HostPersistentHandle>( spaceshipID ).mHandle = _persistentHandle;
 						EntityReplication& entityReplication = _world.AddComponent<EntityReplication>( spaceshipID );
-						entityReplication.componentTypes = { Transform::Info::s_type, Rigidbody::Info::s_type };
-						entityReplication.exclude = _persistentHandle;
+						entityReplication.mComponentTypes = { Transform::Info::s_type, Rigidbody::Info::s_type };
+						entityReplication.mExclude        = _persistentHandle;
 					}
 
 					if( _hasPlayerInput )
@@ -165,16 +165,16 @@ namespace fan
 						Rigidbody& rigidbody = _world.GetComponent<Rigidbody>( spaceshipID );
 						MotionState& motionState = _world.GetComponent<MotionState>( spaceshipID );
 						BoxShape& boxShape = _world.GetComponent<BoxShape>( spaceshipID );
-						rigidbody.SetCollisionShape( boxShape.boxShape );
-						rigidbody.SetMotionState( motionState.motionState );
-						rigidbody.rigidbody->setWorldTransform( transform.transform );
-						physicsWorld.mDynamicsWorld->addRigidBody( rigidbody.rigidbody );
+						rigidbody.SetCollisionShape( boxShape.mBoxShape );
+						rigidbody.SetMotionState( motionState.mMotionState );
+						rigidbody.mRigidbody->setWorldTransform( transform.mTransform );
+						physicsWorld.mDynamicsWorld->addRigidBody( rigidbody.mRigidbody );
 
 						// registers physics callbacks
 						CollisionManager& collisionManager = _world.GetSingleton<CollisionManager>();
-						rigidbody.onContactStarted.Connect( &CollisionManager::OnSpaceShipContact, &collisionManager );
+						rigidbody.mOnContactStarted.Connect( &CollisionManager::OnSpaceShipContact, &collisionManager );
 
-						return spaceshipNode.handle;
+						return spaceshipNode.mHandle;
 					}
 					else
 					{

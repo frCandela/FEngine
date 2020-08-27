@@ -35,7 +35,7 @@ namespace fan
 		// create the network scene root for ordering net objects
 		HostManager& hostManager = _world.GetSingleton<HostManager>();
 		Scene& scene = _world.GetSingleton<Scene>();
-		hostManager.mNetRootNodeHandle = scene.CreateSceneNode( "net root", &scene.GetRootNode() ).handle;
+		hostManager.mNetRootNodeHandle = scene.CreateSceneNode( "net root", &scene.GetRootNode() ).mHandle;
 
 		// bind
 		ServerConnection& connection = _world.GetSingleton<ServerConnection>();	

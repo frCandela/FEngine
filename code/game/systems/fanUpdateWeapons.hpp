@@ -47,26 +47,26 @@ namespace fan
 				Weapon& weapon = *weaponIt;
 				Battery& battery = *batteryIt;
 
-				weapon.bulletsAccumulator += _delta * weapon.bulletsPerSecond;
-				if( weapon.bulletsAccumulator > 1.f ) { weapon.bulletsAccumulator = 1.f; }
+				weapon.bBulletsTimeAccumulator += _delta * weapon.mBulletsPerSecond;
+				if( weapon.bBulletsTimeAccumulator > 1.f ) { weapon.bBulletsTimeAccumulator = 1.f; }
 
-				if( input.fire > 0 && weapon.bulletsAccumulator >= 1.f && battery.currentEnergy >= weapon.bulletEnergyCost )
+				if( input.mFire > 0 && weapon.bBulletsTimeAccumulator >= 1.f && battery.mCurrentEnergy >= weapon.mBulletEnergyCost )
 				{
-					--weapon.bulletsAccumulator;
-					battery.currentEnergy -= weapon.bulletEnergyCost;
+					--weapon.bBulletsTimeAccumulator;
+					battery.mCurrentEnergy -= weapon.mBulletEnergyCost;
 
 					const EcsEntity spaceshipEntity = transformIt.GetEntity();
 					const EcsHandle ownerHandle = _world.GetHandle( spaceshipEntity );
 					const NetID ownerID = linkingContext.mEcsHandleToNetID.at( ownerHandle );
-					const btVector3 bulletPosition = transform.GetPosition() + transform.TransformDirection( weapon.originOffset );
-					const btVector3 bulletVelocity = rigidbody.GetVelocity() + weapon.bulletSpeed * transform.Forward();
+					const btVector3 bulletPosition = transform.GetPosition() + transform.TransformDirection( weapon.mOriginOffset );
+					const btVector3 bulletVelocity = rigidbody.GetVelocity() + weapon.mBulletSpeed * transform.Forward();
 					spawn::SpawnBullet::Instanciate( _world, ownerID, bulletPosition, bulletVelocity );
 
 					// Adds bullet to the spawn manager for spawning on hosts
 					if( game.mIsServer )
 					{
 						// spawn on all hosts
-						const EcsHandle hostHandle = _world.GetComponent<HostPersistentHandle>( spaceshipEntity ).handle;
+						const EcsHandle hostHandle = _world.GetComponent<HostPersistentHandle>( spaceshipEntity ).mHandle;
 						const SpawnInfo info = spawn::SpawnBullet::GenerateInfo( time.mFrameIndex, ownerID, bulletPosition, bulletVelocity );
 						_world.Run<S_ReplicateOnAllHosts>( ClientRPC::RPCSpawn( info ), HostReplication::ResendUntilReplicated, hostHandle );
 					}

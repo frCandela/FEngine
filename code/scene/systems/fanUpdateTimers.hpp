@@ -22,8 +22,8 @@ namespace fan
 				const EcsEntity entity = expirationeIt.GetEntity();
 				ExpirationTime& expiration = *expirationeIt;
 
-				expiration.duration -= _delta;
-				if( expiration.duration < 0.f )
+				expiration.mDuration -= _delta;
+				if( expiration.mDuration < 0.f )
 				{
 					_world.Kill( entity );
 				}

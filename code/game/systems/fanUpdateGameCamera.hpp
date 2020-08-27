@@ -57,15 +57,15 @@ namespace fan
 				Camera& camera = _world.GetComponent<Camera>( cameraID );
 				if( _view.Size() == 1 )
 				{
-					camera.orthoSize = 10.f;
+					camera.mOrthoSize = 10.f;
 				}
 				else
 				{
-					const float requiredSizeX = 0.5f * ( 1.f + gameCamera.mMarginRatio[0] ) * ( high[0] - low[0] ) / camera.aspectRatio;
-					const float requiredSizeZ = ( 1.f + gameCamera.mMarginRatio[1] ) * ( high[2] - low[2] ) / camera.aspectRatio;
+					const float requiredSizeX = 0.5f * ( 1.f + gameCamera.mMarginRatio[0] ) * ( high[0] - low[0] ) / camera.mAspectRatio;
+					const float requiredSizeZ = ( 1.f + gameCamera.mMarginRatio[1] ) * ( high[2] - low[2] ) / camera.mAspectRatio;
 
 					const float orthoSize = std::max( std::max( requiredSizeX, requiredSizeZ ), gameCamera.mMinOrthoSize );
-					camera.orthoSize = orthoSize;
+					camera.mOrthoSize = orthoSize;
 				}
 			}
 		}

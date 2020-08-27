@@ -1,11 +1,9 @@
 #include "network/components/fanClientRollback.hpp"
 
-#include "ecs/fanEcsWorld.hpp"
-
 namespace fan
 {
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void ClientRollback::SetInfo( EcsComponentInfo& _info )
 	{
 		_info.icon = ImGui::NETWORK16;
@@ -17,32 +15,37 @@ namespace fan
 		_info.editorPath = "network/";
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void ClientRollback::Init( EcsWorld& /*_world*/, EcsEntity /*_entity*/, EcsComponent& _component )
 	{
 		ClientRollback& clientRollback = static_cast<ClientRollback&>( _component );
-		clientRollback.rollbackDatas.clear();
+		clientRollback.mRollbackDatas.clear();
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void ClientRollback::Save( const EcsComponent& /*_component*/, Json& /*_json*/ ) {}
 	void ClientRollback::Load( EcsComponent& /*_component*/, const Json& /*_json*/ ) {}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void ClientRollback::OnGui( EcsWorld& /*_world*/, EcsEntity /*_entityID*/, EcsComponent& _component )
 	{
 		ImGui::Indent(); ImGui::Indent();
 		{
 			ClientRollback& clientRollback = static_cast<ClientRollback&>( _component );
 
-			const FrameIndex newestFrameIndex = clientRollback.rollbackDatas.empty() ? 0 : clientRollback.rollbackDatas.back().frameIndex;
-			const FrameIndex oldestFrameIndex = clientRollback.rollbackDatas.empty() ? 0 : clientRollback.rollbackDatas.front().frameIndex;
+            const FrameIndex newestFrameIndex = clientRollback.mRollbackDatas.empty()
+                                                ? 0
+                                                : clientRollback.mRollbackDatas.back().mFrameIndex;
+            const FrameIndex oldestFrameIndex = clientRollback.mRollbackDatas.empty()
+                                                ? 0
+                                                : clientRollback.mRollbackDatas.front().mFrameIndex;
 			
-			ImGui::Text( "Num saved states: %d", clientRollback.rollbackDatas.size() );
+			ImGui::Text( "Num saved states: %d", clientRollback.mRollbackDatas.size() );
 			ImGui::Text( "Range [%d,%d]", oldestFrameIndex, newestFrameIndex );
-		}ImGui::Unindent(); ImGui::Unindent();
+		}
+		ImGui::Unindent(); ImGui::Unindent();
 	}
 }

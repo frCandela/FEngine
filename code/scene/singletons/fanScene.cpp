@@ -109,10 +109,10 @@ namespace fan
 	//========================================================================================================
 	EcsHandle Scene::RFindMaximumHandle( SceneNode& _node )
 	{
-		EcsWorld& world = *_node.scene->mWorld;
+		EcsWorld& world = *_node.mScene->mWorld;
 
-		EcsHandle handle = _node.handle;
-		const std::vector<EcsHandle>& childs = _node.childs;
+		EcsHandle handle = _node.mHandle;
+		const std::vector<EcsHandle>& childs = _node.mChilds;
 		for ( int childIndex = 0; childIndex < (int)childs.size(); childIndex++ )
 		{
 		    SceneNode& node = world.GetComponent<SceneNode>( world.GetEntity( childs[childIndex] ) );
@@ -154,7 +154,7 @@ namespace fan
 	{
 		Clear( );
 		SceneNode& rootNode = CreateSceneNode( "root", nullptr );
-        mRootNodeHandle = rootNode.handle;
+        mRootNodeHandle = rootNode.mHandle;
 		mOnLoad.Emmit( *this );
 		mWorld->ApplyTransitions();
 	}
@@ -203,14 +203,14 @@ namespace fan
 	//========================================================================================================
 	void Scene::RSaveToJson( const SceneNode& _node, Json& _json )
 	{	
-		EcsWorld& world = *_node.scene->mWorld;
-		Serializable::SaveString( _json, "name", _node.name );
-		Serializable::SaveUInt( _json, "handle", _node.handle );
+		EcsWorld& world = *_node.mScene->mWorld;
+		Serializable::SaveString( _json, "name", _node.mName );
+		Serializable::SaveUInt( _json, "handle", _node.mHandle );
 
 		// save components
 		Json& jComponents = _json["components"];
 		{
-			EcsEntity entity = world.GetEntity( _node.handle );
+			EcsEntity entity = world.GetEntity( _node.mHandle );
 			unsigned nextIndex = 0;
 			for( const EcsComponentInfo& info : world.GetComponentInfos() )
 			{
@@ -231,9 +231,9 @@ namespace fan
 		// save childs
 		Json& jchilds = _json["childs"];
 		unsigned childIndex = 0;
-		for( int sceneNodeIndex = 0; sceneNodeIndex < (int)_node.childs.size(); sceneNodeIndex++ )
+		for( int sceneNodeIndex = 0; sceneNodeIndex < (int)_node.mChilds.size(); sceneNodeIndex++ )
 		{
-			const EcsHandle childHandle = _node.childs[sceneNodeIndex];
+			const EcsHandle childHandle = _node.mChilds[sceneNodeIndex];
 			SceneNode& childNode = world.GetComponent<SceneNode>( world.GetEntity(childHandle ));
 			if( ! childNode.HasFlag( SceneNode::NoSave ) )
 			{
@@ -363,7 +363,7 @@ namespace fan
 			const Json& jRoot = jScene["root"];
 			const EcsHandle handleOffset = 0; 
 			SceneNode&  rootNode = RLoadFromJson( jRoot, *this, nullptr, handleOffset );
-            mRootNodeHandle = rootNode.handle;
+            mRootNodeHandle = rootNode.mHandle;
 
 			mPath = _path;
 			inStream.close();
@@ -399,15 +399,15 @@ namespace fan
 		EcsHandle nodeHandle;
 		Serializable::LoadUInt( _json, "handle", nodeHandle );
 		SceneNode& node = _scene.CreateSceneNode( "tmp", _parent, nodeHandle + _handleOffset );
-		Serializable::LoadString( _json, "name", node.name );
+		Serializable::LoadString( _json, "name", node.mName );
 
 		// append id		
-		_scene.mNodes.insert( node.handle);
+		_scene.mNodes.insert( node.mHandle);
 
 		// components
 		const Json& jComponents = _json["components"];
 		{
-			const EcsEntity	entity = world.GetEntity( node.handle );
+			const EcsEntity	entity = world.GetEntity( node.mHandle );
 			for( int childIndex = 0; childIndex < (int)jComponents.size(); childIndex++ )
 			{
 				const Json& jComponent_i = jComponents[childIndex];				
@@ -449,7 +449,7 @@ namespace fan
             for( EcsHandle handle : scene.mNodes )
             {
                 SceneNode& sceneNode = _world.GetComponent<SceneNode>( _world.GetEntity( handle ) );
-                ImGui::Text( "%s : %d", sceneNode.name.c_str(), sceneNode.handle );
+                ImGui::Text( "%s : %d", sceneNode.mName.c_str(), sceneNode.mHandle );
             }
         }
     }

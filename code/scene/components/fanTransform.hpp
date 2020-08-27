@@ -11,9 +11,9 @@ WARNINGS_POP()
 
 namespace fan
 {
-	//================================================================================================================================
+	//========================================================================================================
 	// position, rotation and scale
-	//================================================================================================================================
+	//========================================================================================================
 	struct Transform : public EcsComponent
 	{
 		ECS_COMPONENT( Transform )
@@ -49,8 +49,7 @@ namespace fan
 		btVector3 InverseTransformPoint( const btVector3 _point ) const;
 		btVector3 InverseTransformDirection( const btVector3 _point ) const;
 
-		btTransform transform;
-		btVector3   scale;
+		btTransform mTransform;
+		btVector3   mScale;
 	};
-	static constexpr size_t sizeof_transform2 = sizeof( Transform );
 }

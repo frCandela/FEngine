@@ -6,15 +6,14 @@ namespace fan
 {
 	class EcsWorld;
 
-	//================================================================================================================================
+	//========================================================================================================
 	// PlayerController can be the mouse/keyboard or a game pad
 	// It is automatically placed on the spaceship in client mode to update the player input
 	// @wip gamepad is disabled for now
-	//================================================================================================================================
+	//========================================================================================================
 	struct PlayerController : public EcsComponent
 	{
 		ECS_COMPONENT( PlayerController )
-	public:
 		static void SetInfo( EcsComponentInfo& _info );
 		static void Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component );
 		static void OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component );

@@ -1,14 +1,12 @@
 #include "scene/components/fanRigidbody.hpp"
-
 #include "render/fanRenderSerializable.hpp"
 #include "scene/singletons/fanPhysicsWorld.hpp"
-#include "ecs/fanEcsWorld.hpp"
 #include "network/fanPacket.hpp"
 
 namespace fan
 {
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void Rigidbody::SetInfo( EcsComponentInfo& _info )
 	{
 		_info.icon = ImGui::IconType::RIGIDBODY16;
@@ -25,62 +23,33 @@ namespace fan
 		_info.name = "rigidbody";
 	}
 	   
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void Rigidbody::Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
 	{
 		// clear
 		Rigidbody& rb = static_cast<Rigidbody&>( _component );
-		rb.rigidbody = new btRigidBody( 1.f, nullptr, nullptr );
-		rb.rigidbody->setUserPointer( &_world );
-		rb.rigidbody->setUserIndex( _world.GetHandle( _entity ) );
+		rb.mRigidbody = new btRigidBody( 1.f, nullptr, nullptr );
+		rb.mRigidbody->setUserPointer( &_world );
+		rb.mRigidbody->setUserIndex( _world.GetHandle( _entity ) );
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void Rigidbody::Destroy( EcsWorld& _world, EcsEntity /*_entity*/, EcsComponent& _component )
 	{
 		PhysicsWorld& physicsWorld = _world.GetSingleton<PhysicsWorld>();
 		Rigidbody& rb = static_cast<Rigidbody&>( _component );
-		assert( rb.rigidbody != nullptr );
+		assert( rb.mRigidbody != nullptr );
 
-		physicsWorld.mDynamicsWorld->removeRigidBody( rb.rigidbody );
+		physicsWorld.mDynamicsWorld->removeRigidBody( rb.mRigidbody );
 
-		delete rb.rigidbody;
-		rb.rigidbody = nullptr;
+		delete rb.mRigidbody;
+		rb.mRigidbody = nullptr;
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
-	void Rigidbody::Save( const EcsComponent& _component, Json& _json )
-	{
-		const Rigidbody& rb = static_cast<const Rigidbody&>( _component );
-		Serializable::SaveFloat( _json, "mass", rb.GetMass() );
-		Serializable::SaveBool( _json, "enable_desactivation", rb.IsDeactivationEnabled() );
-		Serializable::SaveBool( _json, "is_kinematic", rb.IsKinematic() );
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void Rigidbody::Load( EcsComponent& _component, const Json& _json )
-	{
-		Rigidbody& rb = static_cast<Rigidbody&>( _component );
-
-		float tmpMass;
-		bool tmpEnableDesactivation;
-		bool tmpKinematic;
-
-		Serializable::LoadFloat( _json, "mass", tmpMass );
-		Serializable::LoadBool( _json, "enable_desactivation", tmpEnableDesactivation );
-		Serializable::LoadBool( _json, "is_kinematic", tmpKinematic );
-
-		rb.SetMass( tmpMass );
-		rb.EnableDeactivation( tmpEnableDesactivation );
-		if( tmpKinematic ) { rb.SetKinematic(); }
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================	
+	//========================================================================================================
+	//========================================================================================================
 	void Rigidbody::NetSave( const EcsComponent& _component, sf::Packet& _packet )
 	{
 		const Rigidbody& rb = static_cast<const Rigidbody&>( _component );
@@ -91,8 +60,8 @@ namespace fan
 		_packet << angularVelocity[1];
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================	
+	//========================================================================================================
+	//========================================================================================================
 	void Rigidbody::NetLoad( EcsComponent& _component, sf::Packet& _packet )
 	{
 		Rigidbody& rb = static_cast<Rigidbody&>( _component );
@@ -104,8 +73,8 @@ namespace fan
 		rb.SetAngularVelocity( angularVelocity );
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================	
+	//========================================================================================================
+	//========================================================================================================
 	void Rigidbody::RollbackSave( const EcsComponent& _component, sf::Packet& _packet )
 	{
 		const Rigidbody&	rb = static_cast<const Rigidbody&>( _component );
@@ -116,8 +85,8 @@ namespace fan
 		_packet << angularVelocity[1];
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================	
+	//========================================================================================================
+	//========================================================================================================
 	void Rigidbody::RollbackLoad( EcsComponent& _component, sf::Packet& _packet )
 	{
 		btVector3		velocity( 0, 0, 0 );
@@ -132,19 +101,19 @@ namespace fan
 		rb.SetAngularVelocity( angularVelocity );
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================	
+	//========================================================================================================
+	//========================================================================================================
 	float  Rigidbody::GetMass() const
 	{
-		const float invMass = rigidbody->getInvMass();
+		const float invMass = mRigidbody->getInvMass();
 		return ( invMass > 0.f ? 1.f / invMass : 0.f );
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================	
+	//========================================================================================================
+	//========================================================================================================
 	void  Rigidbody::SetMass( const float _mass )
 	{
-		btCollisionShape * collisionShape = rigidbody->getCollisionShape();
+		btCollisionShape * collisionShape = mRigidbody->getCollisionShape();
 
 
 		float mass = _mass >= 0.f ? _mass : 0.f;
@@ -153,103 +122,112 @@ namespace fan
 		{
 			collisionShape->calculateLocalInertia( mass, localInertia );
 		}
-		rigidbody->setMassProps( mass, localInertia );
+		mRigidbody->setMassProps( mass, localInertia );
 
 		if( mass > 0.f ) 
-		{ 
-			rigidbody->setCollisionFlags( rigidbody->getCollisionFlags() & ~btCollisionObject::CF_KINEMATIC_OBJECT );
+		{
+            mRigidbody->setCollisionFlags( mRigidbody->getCollisionFlags() &
+                                           ~btCollisionObject::CF_KINEMATIC_OBJECT );
 		}
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================	
+	//========================================================================================================
+	//========================================================================================================
 	void Rigidbody::SetStatic()
 	{
 		SetMass( 0.f );
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================	
+	//========================================================================================================
+	//========================================================================================================
 	void Rigidbody::SetKinematic()
 	{
 		SetMass( 0.f );
-		rigidbody->setCollisionFlags( rigidbody->getCollisionFlags() | btCollisionObject::CF_KINEMATIC_OBJECT );
-		rigidbody->setActivationState( DISABLE_DEACTIVATION );
+        mRigidbody->setCollisionFlags( mRigidbody->getCollisionFlags() |
+                                       btCollisionObject::CF_KINEMATIC_OBJECT );
+        mRigidbody->setActivationState( DISABLE_DEACTIVATION );
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================	
+	//========================================================================================================
+	//========================================================================================================
 	bool Rigidbody::IsStatic() const
 	{
-		return  !IsKinematic() && rigidbody->getInvMass() <= 0.f;
+		return !IsKinematic() && mRigidbody->getInvMass() <= 0.f;
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================	
+	//========================================================================================================
+	//========================================================================================================
 	bool Rigidbody::IsKinematic() const
 	{
-		return  rigidbody->getCollisionFlags() & btCollisionObject::CF_KINEMATIC_OBJECT;
+		return mRigidbody->getCollisionFlags() & btCollisionObject::CF_KINEMATIC_OBJECT;
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================	
+	//========================================================================================================
+	//========================================================================================================
 	void Rigidbody::Activate()
 	{
-		rigidbody->activate();
+		mRigidbody->activate();
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================	
+	//========================================================================================================
+	//========================================================================================================
 	bool Rigidbody::IsActive() const
 	{
-		return rigidbody->isActive();
+		return mRigidbody->isActive();
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================	
+	//========================================================================================================
+	//========================================================================================================
 	void Rigidbody::SetIgnoreCollisionCheck( const Rigidbody& _rb, const bool state )
 	{
-		rigidbody->setIgnoreCollisionCheck( _rb.rigidbody, state );
+		mRigidbody->setIgnoreCollisionCheck( _rb.mRigidbody, state );
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================	
+	//========================================================================================================
+	//========================================================================================================
 	bool Rigidbody::IsDeactivationEnabled() const
 	{
-		return  rigidbody->getActivationState() != DISABLE_DEACTIVATION;
+		return mRigidbody->getActivationState() != DISABLE_DEACTIVATION;
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================	
+	//========================================================================================================
+	//========================================================================================================
 	void Rigidbody::EnableDeactivation( const bool _enable )
 	{
-		rigidbody->forceActivationState( _enable ? ACTIVE_TAG : DISABLE_DEACTIVATION );
+		mRigidbody->forceActivationState( _enable ? ACTIVE_TAG : DISABLE_DEACTIVATION );
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================	
-	btVector3			Rigidbody::GetPosition() const { return rigidbody->getWorldTransform().getOrigin(); }
-	btQuaternion		Rigidbody::GetRotation() const { return rigidbody->getWorldTransform().getRotation(); }
-	const btVector3&	Rigidbody::GetVelocity() const { return rigidbody->getLinearVelocity(); }
-	const btVector3&	Rigidbody::GetAngularVelocity() const { return rigidbody->getAngularVelocity(); }
-	const btTransform&	Rigidbody::GetTransform() const { return rigidbody->getWorldTransform(); }
+	//========================================================================================================
+	//========================================================================================================
+    btVector3 Rigidbody::GetPosition() const { return mRigidbody->getWorldTransform().getOrigin(); }
+    btQuaternion Rigidbody::GetRotation() const { return mRigidbody->getWorldTransform().getRotation(); }
+    const btVector3& Rigidbody::GetVelocity() const { return mRigidbody->getLinearVelocity(); }
+    const btVector3& Rigidbody::GetAngularVelocity() const { return mRigidbody->getAngularVelocity(); }
+    const btTransform& Rigidbody::GetTransform() const { return mRigidbody->getWorldTransform(); }
 
-	//================================================================================================================================
-	//================================================================================================================================	
+	//========================================================================================================
+	//========================================================================================================
 	void Rigidbody::SetVelocity( const btVector3& _velocity )
 	{
-		rigidbody->setLinearVelocity( _velocity );
+		mRigidbody->setLinearVelocity( _velocity );
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================	
+    //========================================================================================================
+    //========================================================================================================
+    void Rigidbody::SetTransform( const btTransform& _transform )
+    {
+	    mRigidbody->setWorldTransform( _transform );
+    }
+
+	//========================================================================================================
+	//========================================================================================================
 	void Rigidbody::SetAngularVelocity( const btVector3& _velocity )
 	{
-		rigidbody->setAngularVelocity( _velocity );
+		mRigidbody->setAngularVelocity( _velocity );
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================	
+	//========================================================================================================
+	//========================================================================================================
 	void Rigidbody::SetCollisionShape( btCollisionShape* _collisionShape )
 	{
 		const float mass = GetMass();
@@ -257,25 +235,54 @@ namespace fan
 		if( mass != 0.f && _collisionShape != nullptr)
 		{
 			_collisionShape->calculateLocalInertia( mass, localInertia );
-			_collisionShape->setUserPointer( &rigidbody );
+			_collisionShape->setUserPointer( &mRigidbody );
 		}
-		rigidbody->setCollisionShape( _collisionShape );
-		rigidbody->setMassProps( mass, localInertia );
+		mRigidbody->setCollisionShape( _collisionShape );
+		mRigidbody->setMassProps( mass, localInertia );
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================	
+	//========================================================================================================
+	//========================================================================================================
 	void Rigidbody::SetMotionState( btDefaultMotionState* _motionState )
 	{		
-		rigidbody->setMotionState( _motionState );
+		mRigidbody->setMotionState( _motionState );
 		if( _motionState != nullptr )
 		{
 			_motionState->m_userPointer = this;
 		}
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+    //========================================================================================================
+    //========================================================================================================
+    void Rigidbody::Save( const EcsComponent& _component, Json& _json )
+    {
+        const Rigidbody& rb = static_cast<const Rigidbody&>( _component );
+        Serializable::SaveFloat( _json, "mass", rb.GetMass() );
+        Serializable::SaveBool( _json, "enable_desactivation", rb.IsDeactivationEnabled() );
+        Serializable::SaveBool( _json, "is_kinematic", rb.IsKinematic() );
+    }
+
+    //========================================================================================================
+    //========================================================================================================
+    void Rigidbody::Load( EcsComponent& _component, const Json& _json )
+    {
+        Rigidbody& rb = static_cast<Rigidbody&>( _component );
+
+        float tmpMass;
+        bool tmpEnableDesactivation;
+        bool tmpKinematic;
+
+        Serializable::LoadFloat( _json, "mass", tmpMass );
+        Serializable::LoadBool( _json, "enable_desactivation", tmpEnableDesactivation );
+        Serializable::LoadBool( _json, "is_kinematic", tmpKinematic );
+
+        rb.SetMass( tmpMass );
+        rb.EnableDeactivation( tmpEnableDesactivation );
+        if( tmpKinematic ) { rb.SetKinematic(); }
+    }
+
+	//========================================================================================================
+	//========================================================================================================
 	void Rigidbody::OnGui( EcsWorld& /*_world*/, EcsEntity /*_entityID*/, EcsComponent& _component )
 	{
 		Rigidbody& rb = static_cast<Rigidbody&>( _component );
@@ -320,7 +327,7 @@ namespace fan
 			{
 				rb.SetMass( 0.f );
 			} ImGui::SameLine();
-			float invMass = rb.rigidbody->getInvMass();
+			float invMass = rb.mRigidbody->getInvMass();
 			float mass = ( invMass > 0.f ? 1.f / invMass : 0.f );
 			if( ImGui::DragFloat( "mass", &mass, 1.f, 0.f, 1000.f ) )
 			{

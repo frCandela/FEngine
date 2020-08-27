@@ -334,18 +334,18 @@ namespace fan
 
 			// save old camera transform
 			const EcsEntity oldCameraID = _world.GetEntity( scene.mMainCameraHandle );
-			btTransform oldCameraTransform = _world.GetComponent<Transform>( oldCameraID ).transform;
+			btTransform oldCameraTransform = _world.GetComponent<Transform>( oldCameraID ).mTransform;
 
 			// save old selection
 			SceneNode* prevSelectionNode = editorSelection.GetSelectedSceneNode();
-			const EcsHandle prevSelectionHandle= prevSelectionNode != nullptr ? prevSelectionNode->handle : 0;
+			const EcsHandle prevSelectionHandle= prevSelectionNode != nullptr ? prevSelectionNode->mHandle : 0;
 
 			Debug::Get() << Debug::Severity::log << "loading scene: " << scene.mPath << Debug::Endl();
 			scene.LoadFrom( scene.mPath );
 
 			// restore camera
 			const EcsEntity newCameraID = _world.GetEntity( scene.mMainCameraHandle );
-			_world.GetComponent<Transform>( newCameraID ).transform = oldCameraTransform;
+			_world.GetComponent<Transform>( newCameraID ).mTransform = oldCameraTransform;
 
 			// restore selection
 			if( prevSelectionHandle != 0 && scene.mNodes.find( prevSelectionHandle) != scene.mNodes.end() )

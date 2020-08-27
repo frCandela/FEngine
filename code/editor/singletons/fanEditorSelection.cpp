@@ -76,8 +76,8 @@ namespace fan
 			}
 			else
 			{
-				EcsWorld& world = *selectedSceneNode->scene->mWorld;
-				world.Kill( world.GetEntity( selectedSceneNode->handle ) );
+				EcsWorld& world = *selectedSceneNode->mScene->mWorld;
+				world.Kill( world.GetEntity( selectedSceneNode->mHandle ) );
 				Deselect();
 			}
 		}
@@ -93,10 +93,10 @@ namespace fan
 
 		// translation gizmo on selected scene node
 		SceneNode* selectedSceneNode = GetSelectedSceneNode();
-		if ( selectedSceneNode != nullptr && selectedSceneNode->handle != mCurrentScene->mMainCameraHandle )
+		if ( selectedSceneNode != nullptr && selectedSceneNode->mHandle != mCurrentScene->mMainCameraHandle )
 		{
-			EcsWorld& world = *selectedSceneNode->scene->mWorld;
-			EcsEntity entity = world.GetEntity( selectedSceneNode->handle );
+			EcsWorld& world = *selectedSceneNode->mScene->mWorld;
+			EcsEntity entity = world.GetEntity( selectedSceneNode->mHandle );
 			if( world.HasComponent<Transform>( entity ) )
 			{
 				Transform& transform = world.GetComponent< Transform >( entity );
@@ -178,7 +178,7 @@ namespace fan
 	//========================================================================================================
 	void EditorSelection::SetSelectedSceneNode( SceneNode* _node )
 	{
-		mSelectedNodeHandle = _node != nullptr ? _node->handle : 0;
+		mSelectedNodeHandle = _node != nullptr ? _node->mHandle : 0;
 	}
 
 	//========================================================================================================
@@ -205,14 +205,14 @@ namespace fan
 		SceneNode* selectedSceneNode = GetSelectedSceneNode();
 		if( selectedSceneNode != nullptr )
 		{
-			EcsWorld& world = *selectedSceneNode->scene->mWorld;
-			EcsEntity entity = world.GetEntity( selectedSceneNode->handle );
+			EcsWorld& world = *selectedSceneNode->mScene->mWorld;
+			EcsEntity entity = world.GetEntity( selectedSceneNode->mHandle );
 
 			// FollowTransform
 			if( world.HasComponent<FollowTransform>( entity ) )
 			{
 				FollowTransform& follower = world.GetComponent<FollowTransform>( entity );
-				follower.locked = !follower.locked;
+				follower.mLocked = !follower.mLocked;
 				FollowTransform::UpdateLocalTransform( world, entity );
 			}
 		}

@@ -37,11 +37,11 @@ namespace fan
 		if( handleSelected != 0 )
 		{
 			SceneNode& node = _world.GetComponent<SceneNode>( _world.GetEntity( handleSelected ) );
-			const EcsEntity entity = _world.GetEntity( node.handle );
+			const EcsEntity entity = _world.GetEntity( node.mHandle );
 
 			// scene node gui
  			ImGui::Icon( GetIconType(), { 16,16 } ); ImGui::SameLine();
-			ImGui::Text( "Scene node : %s", node.name.c_str() );
+			ImGui::Text( "Scene node : %s", node.mName.c_str() );
 
 			
 			for( const EcsComponentInfo& info : _world.GetComponentInfos() )
@@ -56,9 +56,9 @@ namespace fan
 				 
  				// Icon
 				ImGui::Icon( info.icon, { 16,16 }, GroupsColors::GetColor( info.group ) ); ImGui::SameLine();
-				ImGui::FanBeginDragDropSourceComponent( _world, node.handle, info.type, ImGuiDragDropFlags_SourceAllowNullID );
+				ImGui::FanBeginDragDropSourceComponent( _world, node.mHandle, info.type, ImGuiDragDropFlags_SourceAllowNullID );
 				ImGui::Text( "%s", info.name.c_str() );
- 				ImGui::FanBeginDragDropSourceComponent( _world, node.handle, info.type, ImGuiDragDropFlags_SourceAllowNullID );
+ 				ImGui::FanBeginDragDropSourceComponent( _world, node.mHandle, info.type, ImGuiDragDropFlags_SourceAllowNullID );
 
  				// Delete button	
 				std::stringstream ss;

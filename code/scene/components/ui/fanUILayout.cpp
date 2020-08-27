@@ -74,7 +74,7 @@ namespace fan
 
     //========================================================================================================
     //========================================================================================================
-    void UILayout::OnGui( EcsWorld& _world, EcsEntity /*_entityID*/, EcsComponent& _component )
+    void UILayout::OnGui( EcsWorld& _world, EcsEntity /*_entity*/, EcsComponent& _component )
     {
         UILayout& layout = static_cast<UILayout&>( _component );
         ImGui::Text("transforms: ");

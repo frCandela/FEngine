@@ -77,13 +77,13 @@ namespace fan
 		if( eruption.mSunlightRenderer != nullptr )
 		{
 			SunLight& sunlight = _world.GetSingleton<SunLight>();
-			eruption.mSunlightRenderer->mesh = sunlight.mMesh;
+			eruption.mSunlightRenderer->mMesh = sunlight.mMesh;
 		}
 
 		// initialize the sun point light
 		if( eruption.mSunlightLight != nullptr )
 		{
-			eruption.mSunlightLight->attenuation[PointLight::LINEAR] = eruption.mStateLightAttenuation[WAITING];
+			eruption.mSunlightLight->mAttenuation[PointLight::Linear] = eruption.mStateLightAttenuation[WAITING];
 			eruption.mPreviousLightAttenuation = eruption.mStateLightAttenuation[WAITING];
 		}
 
@@ -91,7 +91,7 @@ namespace fan
 		if( eruption.mParticleEmitter != nullptr )
 		{
 			const int tagIndex = _world.GetIndex( tag_sunlight_occlusion::Info::s_type );
-			eruption.mParticleEmitter->tagsSignature[tagIndex] = 1;
+			eruption.mParticleEmitter->mTagsSignature[tagIndex] = 1;
 		}
 	}
 
@@ -138,11 +138,11 @@ namespace fan
 			eruption.mState = State( eruption.mState + 1 );
 			if( eruption.mState != State::SIZE )
 			{
-				eruption.mTimer                               = 0.f;
-				eruption.mParticleEmitter->particlesPerSecond = eruption.mStateParticlePerSecond[eruption.mState];
-				eruption.mParticleEmitter->speed              = eruption.mStateParticleSpeed[eruption.mState];
-				eruption.mParticleEmitter->duration           = eruption.mStateParticleDuration[eruption.mState];
-				eruption.mParticleEmitter->color              = eruption.mStateParticleColor[eruption.mState];
+				eruption.mTimer                                = 0.f;
+				eruption.mParticleEmitter->mParticlesPerSecond = eruption.mStateParticlePerSecond[eruption.mState];
+				eruption.mParticleEmitter->mSpeed              = eruption.mStateParticleSpeed[eruption.mState];
+				eruption.mParticleEmitter->mDuration           = eruption.mStateParticleDuration[eruption.mState];
+				eruption.mParticleEmitter->mColor              = eruption.mStateParticleColor[eruption.mState];
 			}
 			else
 			{
@@ -161,14 +161,14 @@ namespace fan
 		{
 			const float target = eruption.mStateLightAttenuation[eruption.mState];
 			float delta = eruption.mTimer / eruption.mStateDuration[eruption.mState]; // between 0-1
-			eruption.mSunlightLight->attenuation[PointLight::LINEAR] =
+			eruption.mSunlightLight->mAttenuation[PointLight::Linear] =
                     eruption.mPreviousLightAttenuation + delta * ( target - eruption.mPreviousLightAttenuation );
 		}break;
 		case EXPODING:
 		{
 			const float target = eruption.mStateLightAttenuation[eruption.mState];
 			float delta = eruption.mTimer / eruption.mStateDuration[eruption.mState]; // between 0-1
-			eruption.mSunlightLight->attenuation[PointLight::LINEAR] =
+			eruption.mSunlightLight->mAttenuation[PointLight::Linear] =
                     eruption.mPreviousLightAttenuation + delta * ( target - eruption.mPreviousLightAttenuation );
 		}break;
 		default:

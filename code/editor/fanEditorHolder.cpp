@@ -421,10 +421,10 @@ namespace fan
 
             // Saves the camera position for restoring it later
             const EcsEntity oldCameraID = world.GetEntity( mScene.mMainCameraHandle );
-            mPrevCameraTransform = world.GetComponent<Transform>( oldCameraID ).transform;
+            mPrevCameraTransform = world.GetComponent<Transform>( oldCameraID ).mTransform;
             // save old selection
             SceneNode* prevSelectionNode = world.GetSingleton<EditorSelection>().GetSelectedSceneNode();
-            mPrevSelectionHandle = prevSelectionNode != nullptr ? prevSelectionNode->handle : 0;
+            mPrevSelectionHandle = prevSelectionNode != nullptr ? prevSelectionNode->mHandle : 0;
         }
 
         void Restore() const
@@ -433,7 +433,7 @@ namespace fan
 
             // restore camera transform
             const EcsEntity newCameraID = world.GetEntity( mScene.mMainCameraHandle );
-            world.GetComponent<Transform>( newCameraID ).transform = mPrevCameraTransform;
+            world.GetComponent<Transform>( newCameraID ).mTransform = mPrevCameraTransform;
 
             // restore selection
             if( mPrevSelectionHandle != 0 && mScene.mNodes.find( mPrevSelectionHandle ) != mScene.mNodes.end() )
@@ -560,7 +560,7 @@ namespace fan
             Scene& scene = world.GetSingleton<Scene>();
             EcsEntity cameraID = world.GetEntity( scene.mMainCameraHandle );
             Camera& camera = world.GetComponent<Camera>( cameraID );
-            camera.aspectRatio = _size[0] / _size[1];
+            camera.mAspectRatio = _size[0] / _size[1];
             Transform& cameraTransform = world.GetComponent<Transform>( cameraID );
             _renderer.SetMainCamera(
                     camera.GetProjection(),

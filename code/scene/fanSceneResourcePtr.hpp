@@ -29,7 +29,6 @@ namespace fan
         const uint32_t type = 0;
         EcsHandle      handle = 0;
     };
-    static constexpr size_t sizeof_componentPtrBase = sizeof( ComponentPtrBase );
 
     //========================================================================================================
     // Same functionality than ComponentPtrBase but strongly typed

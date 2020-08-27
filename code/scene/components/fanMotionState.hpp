@@ -8,13 +8,12 @@ WARNINGS_POP()
 
 namespace fan
 {
-	//==============================================================================================================================================================
+	//========================================================================================================
 	// MotionState is used synchronizes physics transforms with graphics transforms
-	//==============================================================================================================================================================
+	//========================================================================================================
 	struct MotionState : public EcsComponent
 	{
 		ECS_COMPONENT( MotionState )
-	public:
 		static void SetInfo( EcsComponentInfo& _info );
 		static void Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component );
 		static void Destroy( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component );
@@ -22,7 +21,6 @@ namespace fan
 		static void Load( EcsComponent& /*_component*/, const Json& /*_json*/ ) {}
 		static void OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component );
 
-		btDefaultMotionState* motionState;
+		btDefaultMotionState* mMotionState;
 	};
-	static constexpr size_t sizeof_motionState = sizeof( MotionState );
 }

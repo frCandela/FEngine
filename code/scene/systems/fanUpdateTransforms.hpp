@@ -25,10 +25,10 @@ namespace fan
 				const Transform& follow = *transformIt;
 				FollowTransform& followTransform = *followTransformIt;
 
-				if( followTransform.targetTransform != nullptr )
+				if( followTransform.mTargetTransform != nullptr )
 				{
-					Transform& target = *followTransform.targetTransform;
-					followTransform.localTransform = SInitFollowTransforms::GetLocalTransform( target.transform, follow.transform );
+					Transform& target = *followTransform.mTargetTransform;
+					followTransform.mLocalTransform = SInitFollowTransforms::GetLocalTransform( target.mTransform, follow.mTransform );
 				}
 			}
 		}
@@ -58,10 +58,10 @@ namespace fan
 				Transform& follow = *transformIt;
 				const FollowTransform& followTransform = *followTransformIt;
 
-				if( followTransform.locked && followTransform.targetTransform != nullptr )
+				if( followTransform.mLocked && followTransform.mTargetTransform != nullptr )
 				{
-					Transform& target = *followTransform.targetTransform;
-					follow.transform = target.transform * followTransform.localTransform;
+					Transform& target = *followTransform.mTargetTransform;
+					follow.mTransform = target.mTransform * followTransform.mLocalTransform;
 				}
 			}
 		}

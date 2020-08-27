@@ -44,13 +44,13 @@ namespace fan
 				HostReplication& hostReplication = *hostReplicationIt;
 				HostGameData& hostData = *hostDataIt;
 				
-				if( hostConnection.state == HostConnection::Connected && hostConnection.synced  && hostData.spaceshipID == 0 )
+				if( hostConnection.mState == HostConnection::Connected && hostConnection.mSynced && hostData.mSpaceshipID == 0 )
 				{
 					// spawns new host spaceship
-					hostData.spaceshipID = linkingContext.mNextNetID++;	// assigns net id for the new ship
+					hostData.mSpaceshipID = linkingContext.mNextNetID++;	// assigns net id for the new ship
 					const FrameIndex spawnFrame = time.mFrameIndex + 60;
-					const SpawnInfo spawnInfo = spawn::SpawnShip::GenerateInfo( hostHandle, spawnFrame, hostData.spaceshipID, btVector3::Zero() );
-					hostData.nextPlayerStateFrame = spawnFrame + 60;	// set the timing of the first player state snapshot					
+					const SpawnInfo spawnInfo = spawn::SpawnShip::GenerateInfo( hostHandle, spawnFrame, hostData.mSpaceshipID, btVector3::Zero() );
+					hostData.mNextPlayerStateFrame = spawnFrame + 60;	// set the timing of the first player state snapshot
 					spawnManager.spawns.push_back( spawnInfo );			// triggers spaceship spawn on server
 					
 					// spawn new ship on all hosts
@@ -68,9 +68,9 @@ namespace fan
 
 						// replicate all other ships that are already spawned
 						HostGameData& otherHostData = _world.GetComponent< HostGameData >( _world.GetEntity( otherHostHandle ) );
-						if( otherHostData.spaceshipID != 0 )
+						if( otherHostData.mSpaceshipID != 0 )
 						{
-							const SpawnInfo otherHostspawnInfo = spawn::SpawnShip::GenerateInfo( otherHostHandle, spawnFrame, otherHostData.spaceshipID, btVector3::Zero() );
+							const SpawnInfo otherHostspawnInfo = spawn::SpawnShip::GenerateInfo( otherHostHandle, spawnFrame, otherHostData.mSpaceshipID, btVector3::Zero() );
 							hostReplication.Replicate(
 								ClientRPC::RPCSpawn( otherHostspawnInfo )
 								, HostReplication::ResendUntilReplicated
@@ -116,23 +116,23 @@ namespace fan
 
 				// sync the client frame index with the server
 				const double currentTime = Time::ElapsedSinceStartup();
-				if( currentTime - hostConnection.lastSync > 1.f )
+				if( currentTime - hostConnection.mLastSync > 1.f )
 				{
-					int max = hostConnection.framesDelta[0];
-					int min = hostConnection.framesDelta[0];
-					for( int i = 1; i < (int)hostConnection.framesDelta.size(); i++ )
+					int max = hostConnection.mFramesDelta[0];
+					int min = hostConnection.mFramesDelta[0];
+					for( int i = 1; i < (int)hostConnection.mFramesDelta.size(); i++ )
 					{
-						max = std::max( max, hostConnection.framesDelta[i] );
-						min = std::min( min, hostConnection.framesDelta[i] );
+						max = std::max( max, hostConnection.mFramesDelta[i] );
+						min = std::min( min, hostConnection.mFramesDelta[i] );
 					}
 
 					if( max - min <= 1 ) // we have consistent readings
 					{
 						// @todo calculate buffer size depending on jitter, not rtt
-						hostConnection.targetBufferSize = int( 1000.f * hostConnection.rtt * ( 5.f - 2.f ) / 100.f + 2.f ); // size 5 at 100 ms rtt
-						hostConnection.targetBufferSize = std::min( hostConnection.targetBufferSize, 15 );
+						hostConnection.mTargetBufferSize = int( 1000.f * hostConnection.mRtt * ( 5.f - 2.f ) / 100.f + 2.f ); // size 5 at 100 ms rtt
+						hostConnection.mTargetBufferSize = std::min( hostConnection.mTargetBufferSize, 15 );
 
-						const int targetFrameDifference = int( hostConnection.rtt / 2.f / time.mLogicDelta ) + hostConnection.targetBufferSize;
+						const int targetFrameDifference = int( hostConnection.mRtt / 2.f / time.mLogicDelta ) + hostConnection.mTargetBufferSize;
 						const int diff = std::abs( min + targetFrameDifference );
 						if( diff > 1 ) // only sync when we have a big enough frame index difference
 						{
@@ -140,12 +140,12 @@ namespace fan
 								ClientRPC::RPCShiftClientFrame( min + targetFrameDifference )
 								, HostReplication::ResendUntilReplicated
 							);
-							hostConnection.lastSync = currentTime;
+							hostConnection.mLastSync = currentTime;
 							success.Connect( &HostConnection::OnSyncSuccess, _world, _world.GetHandle( hostConnectionIt.GetEntity() ) );
 							if( diff > 10 )
 							{
 								Debug::Log() << "shifting host frame index : " << min + targetFrameDifference;
-								Debug::Get() << " " << hostConnection.ip.toString() << "::" << hostConnection.port << Debug::Endl();
+								Debug::Get() << " " << hostConnection.mIp.toString() << "::" << hostConnection.mPort << Debug::Endl();
 							}
 						}
 					}
@@ -174,18 +174,18 @@ namespace fan
 			{
 				HostGameData& hostData = *hostDataIt;
 
-				if( hostData.spaceshipHandle != 0 && time.mFrameIndex >= hostData.nextPlayerStateFrame )
+				if( hostData.mSpaceshipHandle != 0 && time.mFrameIndex >= hostData.mNextPlayerStateFrame )
 				{
-					const EcsEntity shipEntityID = _world.GetEntity( hostData.spaceshipHandle );
+					const EcsEntity shipEntityID = _world.GetEntity( hostData.mSpaceshipHandle );
 					const Rigidbody& rb = _world.GetComponent<Rigidbody>( shipEntityID );
 					const Transform& transform = _world.GetComponent<Transform>( shipEntityID );
-					hostData.nextPlayerState.frameIndex = time.mFrameIndex;
-					hostData.nextPlayerState.position = transform.GetPosition();
-					hostData.nextPlayerState.orientation = transform.GetRotationEuler();
-					hostData.nextPlayerState.velocity = rb.GetVelocity();
-					hostData.nextPlayerState.angularVelocity = rb.GetAngularVelocity();
+					hostData.mNextPlayerState.frameIndex      = time.mFrameIndex;
+					hostData.mNextPlayerState.position        = transform.GetPosition();
+					hostData.mNextPlayerState.orientation     = transform.GetRotationEuler();
+					hostData.mNextPlayerState.velocity        = rb.GetVelocity();
+					hostData.mNextPlayerState.angularVelocity = rb.GetAngularVelocity();
 
-					hostData.nextPlayerStateFrame = time.mFrameIndex + 7;
+					hostData.mNextPlayerStateFrame = time.mFrameIndex + 7;
 				}
 			}
 		}
@@ -210,15 +210,15 @@ namespace fan
 			{
 				HostGameData& hostData = *hostDataIt;
 
-				if( hostData.spaceshipID != 0 )
+				if( hostData.mSpaceshipID != 0 )
 				{
 					// Get the current input (current frame) for this client
-					while( !hostData.inputs.empty() )
+					while( !hostData.mInputs.empty() )
 					{
-						const PacketInput::InputData& inputData = hostData.inputs.front();
+						const PacketInput::InputData& inputData = hostData.mInputs.front();
 						if( inputData.frameIndex < time.mFrameIndex || inputData.frameIndex > time.mFrameIndex + 60 )
 						{
-							hostData.inputs.pop();
+							hostData.mInputs.pop();
 						}
 						else
 						{
@@ -226,21 +226,21 @@ namespace fan
 						}
 					}
 
-					if( hostData.spaceshipHandle != 0 )
+					if( hostData.mSpaceshipHandle != 0 )
 					{
 						// Updates spaceship input
-						if( !hostData.inputs.empty() && hostData.inputs.front().frameIndex == time.mFrameIndex )
+						if( !hostData.mInputs.empty() && hostData.mInputs.front().frameIndex == time.mFrameIndex )
 						{
-							const PacketInput::InputData& inputData = hostData.inputs.front();
-							hostData.inputs.pop();
+							const PacketInput::InputData& inputData = hostData.mInputs.front();
+							hostData.mInputs.pop();
 
-							const EcsEntity shipEntityID = _world.GetEntity( hostData.spaceshipHandle );
+							const EcsEntity shipEntityID = _world.GetEntity( hostData.mSpaceshipHandle );
 							PlayerInput& input = _world.GetComponent<PlayerInput>( shipEntityID );
-							input.orientation = btVector3( inputData.orientation.x, 0.f, inputData.orientation.y );
-							input.left = inputData.left ? 1.f : ( inputData.right ? -1.f : 0.f );
-							input.forward = inputData.forward ? 1.f : ( inputData.backward ? -1.f : 0.f );
-							input.boost = inputData.boost;
-							input.fire = inputData.fire;
+							input.mOrientation = btVector3( inputData.orientation.x, 0.f, inputData.orientation.y );
+							input.mLeft        = inputData.left ? 1.f : ( inputData.right ? -1.f : 0.f );
+							input.mForward     = inputData.forward ? 1.f : ( inputData.backward ? -1.f : 0.f );
+							input.mBoost       = inputData.boost;
+							input.mFire        = inputData.fire;
 						}
 						else
 						{

@@ -36,32 +36,32 @@ namespace fan
 				const SolarPanel& solarPanel = *solarPanelIt;
 				const Health& health = *healthIt;
 
-				if( ui.energyProgress == nullptr ||
-					ui.signalProgress == nullptr ||
-					ui.signalRenderer == nullptr ||
-					ui.healthProgress == nullptr )
+				if( ui.mEnergyProgress == nullptr ||
+                    ui.mSignalProgress == nullptr ||
+                    ui.mSignalRenderer == nullptr ||
+                    ui.mHealthProgress == nullptr )
 				{
 					continue;
 				}
 
 				// Update energy progress bar
-				ui.energyProgress->SetProgress( battery.currentEnergy / battery.maxEnergy );
+				ui.mEnergyProgress->SetProgress( battery.mCurrentEnergy / battery.mMaxEnergy );
 
 				// Update signal progress bar
-				const float signalRatio = solarPanel.currentChargingRate / solarPanel.maxChargingRate;
-				ui.signalProgress->SetProgress( signalRatio );
+				const float signalRatio = solarPanel.mCurrentChargingRate / solarPanel.mMaxChargingRate;
+				ui.mSignalProgress->SetProgress( signalRatio );
 
 				if( signalRatio < 0.5f )
 				{
-					ui.signalRenderer->mColor = Color( 1.f, 2.f * signalRatio, 0.f, 1.f ); // red to orange
+					ui.mSignalRenderer->mColor = Color( 1.f, 2.f * signalRatio, 0.f, 1.f ); // red to orange
 				}
 				else
 				{
-					ui.signalRenderer->mColor = Color( 1.f - signalRatio, 1.f, 0.f, 1.f ); // orange to green
+					ui.mSignalRenderer->mColor = Color( 1.f - signalRatio, 1.f, 0.f, 1.f ); // orange to green
 				}
 
 				// Update health progress bar
-				ui.healthProgress->SetProgress( health.currentHealth / health.maxHealth );
+				ui.mHealthProgress->SetProgress( health.mCurrentHealth / health.mMaxHealth );
 			}
 		}
 	};
@@ -95,12 +95,12 @@ namespace fan
 				const SpaceshipUI& ui = *uiIt;
 				const Transform& transform = *transformIt;
 
-				if( ui.uiRootTransform == nullptr ) { continue; }
+				if( ui.mUIRootTransform == nullptr ) { continue; }
 
 				// Set ui position
 				glm::vec2 screenPos = ToGLM( camera.WorldPosToScreen( cameraTransform, transform.GetPosition() ) );
 				glm::vec2 pixelPosition = renderWorld.mTargetSize * 0.5f * ( screenPos + glm::vec2( 1.f, 1.f ) );
-				ui.uiRootTransform->mPosition = pixelPosition + ui.uiOffset;
+				ui.mUIRootTransform->mPosition = pixelPosition + ui.mUIOffset;
 			}
 		}
 	};

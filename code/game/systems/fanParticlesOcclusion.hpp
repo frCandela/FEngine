@@ -28,7 +28,7 @@ namespace fan
 				const EcsEntity entity = particleIt.GetEntity();
 				const Particle& particle = *particleIt;
 
-				const btVector3& position = ToBullet( particle.position );
+				const btVector3& position = ToBullet( particle.mPosition );
 
 				// raycast on the light mesh
 				const btVector3 rayOrigin = btVector3( position[0], 1.f, position[2] );

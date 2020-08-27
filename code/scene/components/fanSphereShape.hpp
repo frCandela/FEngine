@@ -8,13 +8,12 @@ WARNINGS_POP()
 
 namespace fan
 {
-	//==============================================================================================================================================================
+	//========================================================================================================
 	// sphere physics shape
-	//==============================================================================================================================================================
+	//========================================================================================================
 	struct SphereShape : public EcsComponent
 	{
 		ECS_COMPONENT( SphereShape )
-	public:
 		static void SetInfo( EcsComponentInfo& _info );
 		static void Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component );
 		static void Destroy( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component );
@@ -25,7 +24,6 @@ namespace fan
 		void  SetRadius( const float _radius );
 		float GetRadius() const;
 
-		btSphereShape* sphereShape;
+		btSphereShape* mSphereShape;
 	};
-	static constexpr size_t sizeof_sphereShape = sizeof( SphereShape );
 }

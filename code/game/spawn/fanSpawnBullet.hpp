@@ -72,22 +72,22 @@ namespace fan
 				const Rigidbody& ownerRigidbody = _world.GetComponent<Rigidbody>( ownerEntity );
 
 				// creates the bullet
-				if( *ownerWeapon.bulletPrefab != nullptr )
+				if( *ownerWeapon.mBulletPrefab != nullptr )
 				{
-					SceneNode& node = *ownerWeapon.bulletPrefab->Instantiate( scene.GetRootNode() );
-					EcsEntity bulletID = _world.GetEntity( node.handle );
+					SceneNode& node = *ownerWeapon.mBulletPrefab->Instantiate( scene.GetRootNode() );
+					EcsEntity bulletID = _world.GetEntity( node.mHandle );
 
 					Transform& bulletTransform = _world.GetComponent<Transform>( bulletID );
 					bulletTransform.SetPosition( _position );
 
 					Rigidbody& bulletRigidbody = _world.GetComponent<Rigidbody>( bulletID );
-					bulletRigidbody.onContactStarted.Connect( &CollisionManager::OnBulletContact, &collisionManager );
+					bulletRigidbody.mOnContactStarted.Connect( &CollisionManager::OnBulletContact, &collisionManager );
 					bulletRigidbody.SetIgnoreCollisionCheck( ownerRigidbody, true );
 					bulletRigidbody.SetVelocity( _velocity );
-					bulletRigidbody.SetMotionState( _world.GetComponent<MotionState>( bulletID ).motionState );
-					bulletRigidbody.SetCollisionShape( _world.GetComponent<SphereShape>( bulletID ).sphereShape );
-					bulletRigidbody.SetTransform( bulletTransform.transform );
-					physicsWorld.mDynamicsWorld->addRigidBody( bulletRigidbody.rigidbody );
+					bulletRigidbody.SetMotionState( _world.GetComponent<MotionState>( bulletID ).mMotionState );
+					bulletRigidbody.SetCollisionShape( _world.GetComponent<SphereShape>( bulletID ).mSphereShape );
+					bulletRigidbody.SetTransform( bulletTransform.mTransform );
+					physicsWorld.mDynamicsWorld->addRigidBody( bulletRigidbody.mRigidbody );
 				}
 			}
 		};

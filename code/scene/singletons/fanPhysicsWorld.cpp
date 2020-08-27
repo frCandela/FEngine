@@ -150,8 +150,8 @@ namespace fan
 			const EcsHandle rb1Handle = static_cast<EcsHandle> ( _manifold->getBody1()->getUserIndex() );
 			Rigidbody& rb0 = world.GetComponent< Rigidbody >( world.GetEntity( rb0Handle ) );
 			Rigidbody& rb1 = world.GetComponent< Rigidbody >( world.GetEntity( rb1Handle ) );
-			rb0.onContactStarted.Emmit( rb0, rb1, _manifold );
-			rb1.onContactStarted.Emmit( rb1, rb0, _manifold );
+			rb0.mOnContactStarted.Emmit( rb0, rb1, _manifold );
+			rb1.mOnContactStarted.Emmit( rb1, rb0, _manifold );
 		}
 	}
 
@@ -167,8 +167,8 @@ namespace fan
 			const EcsHandle rb1Handle = static_cast<EcsHandle> ( _manifold->getBody1()->getUserIndex() );
 			Rigidbody& rb0 = world.GetComponent< Rigidbody >( world.GetEntity( rb0Handle ) );
 			Rigidbody& rb1 = world.GetComponent< Rigidbody >( world.GetEntity( rb1Handle ) );
-			rb0.onContactEnded.Emmit( rb0, rb1, _manifold );
-			rb1.onContactEnded.Emmit( rb1, rb0, _manifold );
+			rb0.mOnContactEnded.Emmit( rb0, rb1, _manifold );
+			rb1.mOnContactEnded.Emmit( rb1, rb0, _manifold );
 		}
 	}
 

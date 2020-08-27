@@ -58,14 +58,14 @@ namespace fan
 
 				// raycast on bounds
 				btVector3 intersection;
-				if( bounds.aabb.RayCast( _ray.origin, _ray.direction, intersection ) == true )
+				if( bounds.mAabb.RayCast( _ray.origin, _ray.direction, intersection ) == true )
 				{
 					// raycast on mesh renderer
 					if( _world.HasComponent<MeshRenderer>( entity ) )
 					{
 						const MeshRenderer& meshRenderer = _world.GetComponent<MeshRenderer>( entity );
 						const Ray transformedRay( transform.InverseTransformPoint( _ray.origin ), transform.InverseTransformDirection( _ray.direction ) );
-						if( meshRenderer.mesh != nullptr && meshRenderer.mesh->mConvexHull.RayCast( transformedRay.origin, transformedRay.direction, intersection ) )
+						if( meshRenderer.mMesh != nullptr && meshRenderer.mMesh->mConvexHull.RayCast( transformedRay.origin, transformedRay.direction, intersection ) )
 						{
 							results.push_back( { entity , intersection.distance2( _ray.origin ) } );
 						}

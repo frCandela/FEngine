@@ -6,16 +6,15 @@
 
 namespace fan
 {
-	//==============================================================================================================================================================
+	//========================================================================================================
 	// [Server] Uniquely identify and tag each packet send out
 	// Send out an acknowledgment for each validated packet 
-	// Process incoming acknowledgments and notify connected modules about which packets were received or dropped
+	// Process incoming acknowledgments and notify modules about which packets were received or dropped
 	// Ensure packets are never processed out of order. Old packets arriving after newer packets are dropped.
-	//==============================================================================================================================================================
+	//========================================================================================================
 	struct ReliabilityLayer: public EcsComponent
 	{
 		ECS_COMPONENT( ReliabilityLayer )
-	public:
 		static void SetInfo( EcsComponentInfo& _info );
 		static void Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component );
 		static void OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component );
@@ -25,23 +24,22 @@ namespace fan
 		//================================================================
 		struct InFlightPacket
 		{
-			PacketTag			tag;
-			double				timeDispatch;
-			Signal< PacketTag >	onFailure;
-			Signal< PacketTag >	onSuccess;
+			PacketTag           mTag;
+			double              mTimeDispatch;
+			Signal< PacketTag > mOnFailure;
+			Signal< PacketTag > mOnSuccess;
 		};
 
-		static const float			 timeoutDuration;		// time after which a packet is considered dropped
-		PacketTag					 nextPacketTag;			// the tag of the next packet being send
-		PacketTag					 expectedPacketTag;		// the expected tag of the next received packet 
-		std::vector<PacketTag>		 pendingAck;			// validated packets waiting for ack dispatch @todo change into a range to gain space
-		std::queue< InFlightPacket > inFlightPackets;		// list of packets pending success/drop status
+		static const float           sTimeoutDuration;		// time after which a packet is considered dropped
+		PacketTag                    mNextPacketTag;		// the tag of the next packet being send
+		PacketTag                    mExpectedPacketTag;	// the expected tag of the next received packet
+		std::vector<PacketTag>       mPendingAck;			// validated packets waiting for ack dispatch @todo change into a range to gain space
+		std::queue< InFlightPacket > mInFlightPackets;		// list of packets pending success/drop status
 
 		void		RegisterPacket( Packet& _packet );
 		bool		ValidatePacket( Packet& _packet );
-		PacketTag	GetNextPacketTag() { return nextPacketTag++; }
+		PacketTag	GetNextPacketTag() { return mNextPacketTag++; }
 		void		ProcessPacket( const PacketAck& _packetAck );
 		void		Write( Packet& _packet );
 	};
-	static constexpr size_t sizeof_reliabilityLayer = sizeof( ReliabilityLayer );
 }

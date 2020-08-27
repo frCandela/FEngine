@@ -51,12 +51,12 @@ namespace fan
 				if( packet.GetSize() > sizeof( PacketTag ) )
 				{
 					reliabilityLayer.RegisterPacket( packet );
-					connection.bandwidth = 1.f / time.mLogicDelta * float( packet.GetSize() ) / 1000.f; // in Ko/s
-					connection.socket->Send( packet, connection.serverIP, connection.serverPort );
+					connection.mBandwidth = 1.f / time.mLogicDelta * float( packet.GetSize() ) / 1000.f; // in Ko/s
+					connection.mSocket->Send( packet, connection.mServerIP, connection.mServerPort );
 				}
 				else
 				{
-					reliabilityLayer.nextPacketTag--;
+					reliabilityLayer.mNextPacketTag--;
 				}
 			}
 		}
@@ -102,10 +102,10 @@ namespace fan
 				do
 				{
 					packet.Clear();
-					socketStatus = connection.socket->Receive( packet, receiveIP, receivePort );
+					socketStatus = connection.mSocket->Receive( packet, receiveIP, receivePort );
 
 					// only receive from the server
-					if( receiveIP != connection.serverIP || receivePort != connection.serverPort )
+					if( receiveIP != connection.mServerIP || receivePort != connection.mServerPort )
 					{
 						continue;
 					}
@@ -114,7 +114,7 @@ namespace fan
 					{
 					case sf::UdpSocket::Done:
 					{
-						connection.serverLastResponse = Time::ElapsedSinceStartup();
+						connection.mServerLastResponse = Time::ElapsedSinceStartup();
 
 						// read the first packet type separately
 						PacketType packetType = packet.ReadType();
@@ -125,7 +125,7 @@ namespace fan
 						else if( packetType == PacketType::Disconnect )
 						{
 							// disconnection can cause the reliability layer tags to be off
-							reliabilityLayer.expectedPacketTag = packet.tag;
+							reliabilityLayer.mExpectedPacketTag = packet.tag;
 						}
 
 						if( !reliabilityLayer.ValidatePacket( packet ) )

@@ -1,14 +1,11 @@
 #include "network/components/fanClientConnection.hpp"
-
-#include "core/fanDebug.hpp"
-#include "ecs/fanEcsWorld.hpp"
 #include "network/singletons/fanTime.hpp"
 #include "network/fanImGuiNetwork.hpp"
 
 namespace fan
 {
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void ClientConnection::SetInfo( EcsComponentInfo& _info )
 	{
 		_info.icon = ImGui::SOCKET16;
@@ -18,41 +15,41 @@ namespace fan
 		_info.name = "client connection";
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void ClientConnection::Init( EcsWorld& /*_world*/, EcsEntity /*_entity*/, EcsComponent& _component )
 	{
 		ClientConnection& connection = static_cast<ClientConnection&>( _component );
-		assert( connection.socket == nullptr );
-		connection.socket = new UdpSocket();
-		connection.clientPort = 53010;
-		connection.serverIP = "127.0.0.1";
-		connection.serverPort = 53000;
-		connection.state = ClientState::Disconnected;
-		connection.rtt = 0.f;
-		connection.timeoutDelay = 5.f;
-		connection.bandwidth = 0.f;
-		connection.serverLastResponse = 0.f;
-		connection.lastPacketPing = PacketPing();
-		connection.mustSendBackPacketPing = false;	
-		connection.onLoginSuccess.Clear();
+		assert( connection.mSocket == nullptr );
+		connection.mSocket                 = new UdpSocket();
+		connection.mClientPort             = 53010;
+		connection.mServerIP               = "127.0.0.1";
+		connection.mServerPort             = 53000;
+		connection.mState                  = ClientState::Disconnected;
+		connection.mRtt                    = 0.f;
+		connection.mTimeoutDelay           = 5.f;
+		connection.mBandwidth              = 0.f;
+		connection.mServerLastResponse     = 0.f;
+		connection.mLastPacketPing         = PacketPing();
+		connection.mMustSendBackPacketPing = false;
+		connection.mOnLoginSuccess.Clear();
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void ClientConnection::Destroy( EcsWorld& /*_world*/, EcsEntity /*_entity*/, EcsComponent& _component )
 	{
 		ClientConnection& connection = static_cast<ClientConnection&>( _component );
-		delete connection.socket;
-		connection.socket = nullptr;
+		delete connection.mSocket;
+		connection.mSocket = nullptr;
 	}
 
-	//================================================================================================================================
+	//========================================================================================================
 	// Write into the _packet to communicate with the server
-	//================================================================================================================================
+	//========================================================================================================
 	void ClientConnection::Write( EcsWorld& _world, EcsEntity _entity, Packet& _packet )
 	{
-		switch( state )
+		switch( mState )
 		{
 
 		case fan::ClientConnection::ClientState::Disconnected:
@@ -61,7 +58,7 @@ namespace fan
 			hello.name = "toto";
 			hello.Write( _packet );
 			_packet.onFail.Connect( &ClientConnection::OnLoginFail, _world, _world.GetHandle( _entity ) );
-			state = ClientState::PendingConnection;
+            mState = ClientState::PendingConnection;
 			Debug::Log() << "logging in..." << Debug::Endl();
 		}
 		break;
@@ -70,10 +67,10 @@ namespace fan
 			break;
 
 		case fan::ClientConnection::ClientState::Connected:
-			if( mustSendBackPacketPing )
+			if( mMustSendBackPacketPing )
 			{
-				lastPacketPing.Write( _packet );
-				mustSendBackPacketPing = false;
+				mLastPacketPing.Write( _packet );
+                mMustSendBackPacketPing = false;
 			}
 			break;
 
@@ -82,7 +79,7 @@ namespace fan
 			{
 				PacketDisconnect disconnect;
 				disconnect.Write( _packet );
-				state = ClientState::Disconnected;
+                mState = ClientState::Disconnected;
 			}
 		}break;
 
@@ -92,56 +89,56 @@ namespace fan
 		}
 	}
 
-	//================================================================================================================================
+	//========================================================================================================
 	// login packet dropped our timed out. Resend a new one.
-	//================================================================================================================================
+	//========================================================================================================
 	void ClientConnection::OnLoginFail( const PacketTag /*_packetTag*/ )
 	{
-		if( state == ClientState::PendingConnection )
+		if( mState == ClientState::PendingConnection )
 		{
-			state = ClientState::Disconnected;
+            mState = ClientState::Disconnected;
 		}
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void ClientConnection::ProcessPacket( const PacketLoginSuccess& _packetLogin )
 	{
-		if( state == ClientState::PendingConnection )
+		if( mState == ClientState::PendingConnection )
 		{
 			Debug::Log() << "login success" << Debug::Endl();
-			state = ClientState::Connected;
+            mState = ClientState::Connected;
 			assert( _packetLogin.playerID != 0 );
-			onLoginSuccess.Emmit( _packetLogin.playerID );//playerID = _packetLogin.playerID;a
+			mOnLoginSuccess.Emmit( _packetLogin.playerID );//playerID = _packetLogin.playerID;a
 		}
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void ClientConnection::ProcessPacket( const PacketDisconnect& /*_packetDisconnect*/ )
 	{
-		state = ClientState::Disconnected;
+        mState = ClientState::Disconnected;
 		Debug::Log() << "disconnected from server" << Debug::Endl();		
 	}
 
-	//================================================================================================================================
+	//========================================================================================================
 	// received ping packet from the server.
 	// updates the rtt & sends back the packet later while adding the current client frame index
-	//================================================================================================================================
+	//========================================================================================================
 	void ClientConnection::ProcessPacket( const PacketPing& _packetPing, const FrameIndex _frameIndex )
 	{
-		if( state == ClientState::Connected )
+		if( mState == ClientState::Connected )
 		{
-			lastPacketPing = _packetPing;
-			lastPacketPing.clientFrame = _frameIndex,
-			rtt = _packetPing.previousRtt;
-			mustSendBackPacketPing = true;
+            mLastPacketPing = _packetPing;
+            mLastPacketPing.clientFrame = _frameIndex,
+                    mRtt            = _packetPing.previousRtt;
+            mMustSendBackPacketPing = true;
 		}
 	}
 
-	//================================================================================================================================
+	//========================================================================================================
 	// Editor gui helper
-	//================================================================================================================================
+	//========================================================================================================
 	std::string GetStateName( const ClientConnection::ClientState _clientState )
 	{
 		switch( _clientState )
@@ -154,35 +151,41 @@ namespace fan
 		}
 	}
 
-	//================================================================================================================================
+	//========================================================================================================
 	// returns a color corresponding to a rtt time in seconds
-	//================================================================================================================================
+	//========================================================================================================
 	static ImVec4 GetStateColor( const ClientConnection::ClientState _clientState )
 	{
 		switch( _clientState )
 		{
-		case fan::ClientConnection::ClientState::Disconnected:		return Color::Red.ToImGui(); break;
-		case fan::ClientConnection::ClientState::Stopping:			return Color::Purple.ToImGui(); break;
-		case fan::ClientConnection::ClientState::PendingConnection:	return Color::Yellow.ToImGui(); break;
-		case fan::ClientConnection::ClientState::Connected:			return Color::Green.ToImGui(); break;
-		default:			assert( false );								return Color::Purple.ToImGui(); break;
+		case fan::ClientConnection::ClientState::Disconnected:		return Color::Red.ToImGui();
+		case fan::ClientConnection::ClientState::Stopping:			return Color::Purple.ToImGui();
+		case fan::ClientConnection::ClientState::PendingConnection:	return Color::Yellow.ToImGui();
+		case fan::ClientConnection::ClientState::Connected:			return Color::Green.ToImGui();
+		default:			fanAssert( false );						return Color::Purple.ToImGui();
 		}
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void ClientConnection::OnGui( EcsWorld& /*_world*/, EcsEntity /*_entityID*/, EcsComponent& _component )
 	{
-		ClientConnection& connection = static_cast<ClientConnection&>( _component );
+        ClientConnection& connection = static_cast<ClientConnection&>( _component );
 
-		ImGui::DragFloat( "timeout time", &connection.timeoutDelay, 0.1f, 0.f, 10.f );
-		ImGui::Text( "state:               " ); ImGui::SameLine();
-		ImGui::TextColored( GetStateColor( connection.state ), "%s", GetStateName( connection.state ).c_str() );
-		ImGui::Text( "client port           %u", connection.clientPort );
-		ImGui::Text( "server adress         %s::%u", connection.serverIP.toString().c_str(), connection.serverPort );
-		ImGui::Text( "rtt                  " ); ImGui::SameLine();
-		ImGui::TextColored( GetRttColor( connection.rtt ), "%.1f", 1000.f * connection.rtt );
-		ImGui::Text( "bandwidth:            %.1f Ko/s", connection.bandwidth );
-		ImGui::Text( "server last response: %.1f", Time::ElapsedSinceStartup() - connection.serverLastResponse );
+        ImGui::DragFloat( "timeout time", &connection.mTimeoutDelay, 0.1f, 0.f, 10.f );
+        ImGui::Text( "state:               " );
+        ImGui::SameLine();
+        ImGui::TextColored( GetStateColor( connection.mState ),
+                            "%s",
+                            GetStateName( connection.mState ).c_str() );
+        ImGui::Text( "client port           %u", connection.mClientPort );
+        ImGui::Text( "server adress         %s::%u", connection.mServerIP.toString().c_str(),
+                                                     connection.mServerPort );
+        ImGui::Text( "rtt                  " );
+        ImGui::SameLine();
+        ImGui::TextColored( GetRttColor( connection.mRtt ), "%.1f", 1000.f * connection.mRtt );
+        ImGui::Text( "bandwidth:            %.1f Ko/s", connection.mBandwidth );
+        ImGui::Text( "server last response: %.1f",
+                     Time::ElapsedSinceStartup() - connection.mServerLastResponse );
 	}
 }

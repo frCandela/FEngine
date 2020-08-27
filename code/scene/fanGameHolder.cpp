@@ -246,7 +246,7 @@ namespace fan
 		Scene& scene = _world.GetSingleton<Scene>();
 		EcsEntity cameraID = _world.GetEntity( scene.mMainCameraHandle );
 		Camera& camera = _world.GetComponent<Camera>( cameraID );
-		camera.aspectRatio = _size[0] / _size[1];
+		camera.mAspectRatio = _size[0] / _size[1];
 		Transform& cameraTransform = _world.GetComponent<Transform>( cameraID );
 		_renderer.SetMainCamera(
 			camera.GetProjection(),

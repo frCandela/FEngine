@@ -45,8 +45,8 @@ namespace fan
 		// create explosion
 		const Transform& bulletTransform = world.GetComponent< Transform >( bulletID );
 		const Scene& scene = world.GetSingleton<Scene>();
-		const SceneNode& explosionNode = *bullet.explosionPrefab->Instantiate( scene.GetRootNode() );
-		const EcsEntity explosionID = world.GetEntity( explosionNode.handle );
+		const SceneNode& explosionNode = *bullet.mExplosionPrefab->Instantiate( scene.GetRootNode() );
+		const EcsEntity explosionID = world.GetEntity( explosionNode.mHandle );
 		Transform& explosionTransform = world.GetComponent< Transform >( explosionID );
 		explosionTransform.SetPosition( bulletTransform.GetPosition() );
 	}
@@ -71,8 +71,8 @@ namespace fan
 		if( !dir.fuzzyZero() )
 		{
 			SpaceShip& spaceship = world.GetComponent<SpaceShip>( spaceshipID );
-            _spaceshipBody.rigidbody->applyCentralForce( spaceship.collisionRepulsionForce *
-                                                         dir.normalized() );
+            _spaceshipBody.mRigidbody->applyCentralForce( spaceship.mCollisionRepulsionForce *
+                                                          dir.normalized() );
 		}
 
 		// applies damage
@@ -81,13 +81,13 @@ namespace fan
 			if( world.HasComponent<Damage>( otherID ) )
 			{
 				Health& health = world.GetComponent<Health>( spaceshipID );
-				if( !health.invincible )
+				if( !health.mInvincible )
 				{
 					Damage& damage = world.GetComponent<Damage>( otherID );
-					health.currentHealth -= damage.damage;
-					if( health.currentHealth <= 0.f )
+					health.mCurrentHealth -= damage.mDamage;
+					if( health.mCurrentHealth <= 0.f )
 					{
-						health.currentHealth = 0;
+						health.mCurrentHealth = 0;
 					}
 				}
 			}

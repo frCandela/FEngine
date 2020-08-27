@@ -188,11 +188,11 @@ namespace fan
 		ClientNetworkManager& netManager = mWorld.GetSingleton<ClientNetworkManager>();
 		const EcsEntity persistentID = mWorld.GetEntity( netManager.mPersistentHandle );
 		ClientGameData& gameData = mWorld.GetComponent<ClientGameData>( persistentID );
-		if( !gameData.spaceshipSynced )
+		if( !gameData.mSpaceshipSynced )
 		{
 			Time& time = mWorld.GetSingleton<Time>();
 			const FrameIndex lastFrame = time.mFrameIndex;
-			const FrameIndex firstFrame = gameData.lastServerState.frameIndex;
+			const FrameIndex firstFrame = gameData.mLastServerState.frameIndex;
             mWorld.Run<S_RollbackInit>();
 			Debug::Highlight() << "rollback to frame " << firstFrame << Debug::Endl();
 
@@ -203,20 +203,20 @@ namespace fan
 			PhysicsWorld& physicsWorld = mWorld.GetSingleton<PhysicsWorld>();
 			physicsWorld.Reset();
             mWorld.Run<S_RollbackRestoreState>( firstFrame );
-			const EcsEntity spaceshipID = mWorld.GetEntity( gameData.spaceshipHandle );
+			const EcsEntity spaceshipID = mWorld.GetEntity( gameData.sSpaceshipHandle );
 			Rigidbody& rigidbody = mWorld.GetComponent<Rigidbody>( spaceshipID );
-			physicsWorld.mDynamicsWorld->removeRigidBody( rigidbody.rigidbody );
-			physicsWorld.mDynamicsWorld->addRigidBody( rigidbody.rigidbody );
+			physicsWorld.mDynamicsWorld->removeRigidBody( rigidbody.mRigidbody );
+			physicsWorld.mDynamicsWorld->addRigidBody( rigidbody.mRigidbody );
 			rigidbody.ClearForces();
 			Transform& transform = mWorld.GetComponent<Transform>( spaceshipID );
-			rigidbody.SetVelocity( gameData.lastServerState.velocity );
-			rigidbody.SetAngularVelocity( gameData.lastServerState.angularVelocity );
-			transform.SetPosition( gameData.lastServerState.position );
-			transform.SetRotationEuler( gameData.lastServerState.orientation );
+			rigidbody.SetVelocity( gameData.mLastServerState.velocity );
+			rigidbody.SetAngularVelocity( gameData.mLastServerState.angularVelocity );
+			transform.SetPosition( gameData.mLastServerState.position );
+			transform.SetRotationEuler( gameData.mLastServerState.orientation );
 
 			// Clear previous states & saves the last correct server state
-			gameData.previousLocalStates = std::queue< PacketPlayerGameState >();
-			gameData.previousLocalStates.push( gameData.lastServerState );
+			gameData.mPreviousLocalStates = std::queue<PacketPlayerGameState >();
+			gameData.mPreviousLocalStates.push( gameData.mLastServerState );
 
 			// resimulate the last frames of input of the player
 			const float delta = time.mLogicDelta;
@@ -237,7 +237,7 @@ namespace fan
                 mWorld.Run<S_RollbackStateSave>( delta );
 			}
 
-			gameData.spaceshipSynced = true;
+			gameData.mSpaceshipSynced = true;
 			assert( time.mFrameIndex == lastFrame );
 		}
 	}

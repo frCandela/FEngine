@@ -64,7 +64,7 @@ namespace ImGui
 		else
 		{
 			fan::SceneNode& node = world.GetComponent<fan::SceneNode>( world.GetEntity( _ptr.handle ) );
-			name = info.name + " : " + node.name;
+			name = info.name + " : " + node.mName;
 		}		
  		// icon
  		if (ImGui::ButtonIcon( info.icon, { 16,16 } ))
@@ -75,7 +75,7 @@ namespace ImGui
 		if( _ptr.handle != 0 )
 		{
 			fan::SceneNode& node = world.GetComponent<fan::SceneNode>( world.GetEntity( _ptr.handle ) );
-			ImGui::FanBeginDragDropSourceComponent( world, node.handle, _ptr.type );
+			ImGui::FanBeginDragDropSourceComponent( world, node.mHandle, _ptr.type );
 		}
 		// dragndrop target for icon
 		ImGui::ComponentPayload payloadIcon = ImGui::FanBeginDragDropTargetComponent( world, _ptr.type );

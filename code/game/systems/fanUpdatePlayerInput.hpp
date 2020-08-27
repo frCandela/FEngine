@@ -39,10 +39,10 @@ namespace fan
 				const Transform& transform = *transformIt;
 				PlayerInput& input = *inputIt;
 
-				input.left = Input::Get().Manager().GetAxis( "game_left" );
-				input.forward = Input::Get().Manager().GetAxis( "game_forward" );
-				input.boost = Input::Get().Manager().GetAxis( "game_boost" );
-				input.fire = Input::Get().Manager().GetAxis( "game_fire" );
+				input.mLeft    = Input::Get().Manager().GetAxis( "game_left" );
+				input.mForward = Input::Get().Manager().GetAxis( "game_forward" );
+				input.mBoost   = Input::Get().Manager().GetAxis( "game_boost" );
+				input.mFire    = Input::Get().Manager().GetAxis( "game_fire" );
 
                 btVector3 mouseWorldPos = camera.ScreenPosToRay(
                         cameraTransform,
@@ -50,7 +50,7 @@ namespace fan
                 mouseWorldPos.setY( 0 );
                 btVector3 mouseDir = mouseWorldPos - transform.GetPosition();// Get mouse direction
                 mouseDir.normalize();
-				input.orientation = mouseDir;
+				input.mOrientation = mouseDir;
 			}
 		}
 	};

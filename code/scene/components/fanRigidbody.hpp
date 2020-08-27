@@ -13,15 +13,14 @@ struct btDefaultMotionState;
 
 namespace fan
 {
-	//==============================================================================================================================================================
+	//========================================================================================================
 	// bullet physics rigidbody
 	// must be registered manually
 	// unregisters automagically
-	//==============================================================================================================================================================
+	//========================================================================================================
 	struct Rigidbody : public EcsComponent
 	{
 		ECS_COMPONENT( Rigidbody )
-	public:
 		static void SetInfo( EcsComponentInfo& _info );
 		static void Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component );
 		static void Destroy( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component );
@@ -33,8 +32,8 @@ namespace fan
 		static void RollbackSave( const EcsComponent& _component, sf::Packet& _packet );
 		static void RollbackLoad( EcsComponent& _component, sf::Packet& _packet );
 
-		EcsHandle	GetHandle(){ return static_cast<EcsHandle>( rigidbody->getUserIndex() ); }
-		EcsWorld&	GetWorld() { return *static_cast<EcsWorld*>( rigidbody->getUserPointer() ); }
+		EcsHandle	GetHandle(){ return static_cast<EcsHandle>( mRigidbody->getUserIndex() ); }
+		EcsWorld&	GetWorld() { return *static_cast<EcsWorld*>( mRigidbody->getUserPointer() ); }
 		float		GetMass() const;
 		void		SetMass( const float _mass );
 		void		SetStatic();
@@ -53,15 +52,14 @@ namespace fan
 		const btTransform&	GetTransform() const;
 		void		SetAngularVelocity( const btVector3& _velocity );
 		void		SetVelocity( const btVector3& _velocity );
-		void		SetTransform( const btTransform& _transform ) { rigidbody->setWorldTransform( _transform ); }
-		void		ClearForces() { rigidbody->clearForces();  }
+		void		SetTransform( const btTransform& _transform );
+		void		ClearForces() { mRigidbody->clearForces();  }
 
 		void SetCollisionShape( btCollisionShape* _collisionShape );
 		void SetMotionState( btDefaultMotionState* _motionState );
 
-		btRigidBody * rigidbody;
-		Signal<Rigidbody&, Rigidbody&, btPersistentManifold* const&> onContactStarted;
-		Signal<Rigidbody&, Rigidbody&, btPersistentManifold* const&> onContactEnded;
+		btRigidBody * mRigidbody;
+		Signal<Rigidbody&, Rigidbody&, btPersistentManifold* const&> mOnContactStarted;
+		Signal<Rigidbody&, Rigidbody&, btPersistentManifold* const&> mOnContactEnded;
 	};
-	static constexpr size_t sizeof_rigidbody = sizeof( Rigidbody );
 }

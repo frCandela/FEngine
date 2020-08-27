@@ -38,14 +38,14 @@ namespace fan
 						if( componentInfo.rollbackSave != nullptr )
 						{
 							ClientRollback::RollbackData rollbackData;
-							rollbackData.frameIndex = time.mFrameIndex;
-							rollbackData.componentIndex = i;
+							rollbackData.mFrameIndex     = time.mFrameIndex;
+							rollbackData.mComponentIndex = i;
 
 							// save rollback state
 							const EcsComponent&  component = _world.IndexedGetComponent( entity, i );
-							componentInfo.rollbackSave( component, rollbackData.data );
-							assert( rollbackData.data.getDataSize() > 0 );
-							clientRollback.rollbackDatas.push_back( rollbackData );							
+							componentInfo.rollbackSave( component, rollbackData.mData );
+							assert( rollbackData.mData.getDataSize() > 0 );
+							clientRollback.mRollbackDatas.push_back( rollbackData );
 						}
 					}
 				}
@@ -72,7 +72,7 @@ namespace fan
 			if( netManager.mPersistentHandle == 0 ){ return; }
 			const EcsEntity entity = _world.GetEntity( netManager.mPersistentHandle );
 			const ClientGameData& clientData = _world.GetComponent<ClientGameData>( entity );
-			const FrameIndex lastFrameIndex = clientData.lastServerState.frameIndex;
+			const FrameIndex lastFrameIndex = clientData.mLastServerState.frameIndex;
 
 			auto clientRollbackIt = _view.begin<ClientRollback>();
 			for( ; clientRollbackIt != _view.end<ClientRollback>(); ++clientRollbackIt )
@@ -80,10 +80,10 @@ namespace fan
 				ClientRollback& clientRollback = *clientRollbackIt;
 
 				// remove older game states in the rollback components 
-				while( !clientRollback.rollbackDatas.empty() 
-					&&  ( clientRollback.rollbackDatas.front().frameIndex < lastFrameIndex || clientRollback.rollbackDatas.size() > ClientRollback::s_rollbackDatasMaxSize ))
+				while( !clientRollback.mRollbackDatas.empty()
+					&&  ( clientRollback.mRollbackDatas.front().mFrameIndex < lastFrameIndex || clientRollback.mRollbackDatas.size() > ClientRollback::sRollbackDatasMaxSize ))
 				{
-					clientRollback.rollbackDatas.pop_front();
+					clientRollback.mRollbackDatas.pop_front();
 				}
 			}
 		}
@@ -109,15 +109,15 @@ namespace fan
 				const EcsSignature& signature = entity.archetype->GetSignature();
 
 				// Iterates over all rollback Datas and load the ones with the correct frame index
-				for ( const ClientRollback::RollbackData& rollbackData : clientRollback.rollbackDatas)
+				for ( const ClientRollback::RollbackData& rollbackData : clientRollback.mRollbackDatas)
 				{
-					if( rollbackData.frameIndex == _frameIndex && signature[rollbackData.componentIndex] )
+					if( rollbackData.mFrameIndex == _frameIndex && signature[rollbackData.mComponentIndex] )
 					{
-						const EcsComponentInfo& componentInfo = _world.IndexedGetComponentInfo( rollbackData.componentIndex );
+						const EcsComponentInfo& componentInfo = _world.IndexedGetComponentInfo( rollbackData.mComponentIndex );
 						assert( componentInfo.rollbackLoad != nullptr );
 
-						EcsComponent& component = _world.IndexedGetComponent( entity, rollbackData.componentIndex );
-						sf::Packet dataCpy = rollbackData.data;
+						EcsComponent& component = _world.IndexedGetComponent( entity, rollbackData.mComponentIndex );
+						sf::Packet dataCpy = rollbackData.mData;
 						componentInfo.rollbackLoad( component, dataCpy );												
 					}
 				}
@@ -149,20 +149,20 @@ namespace fan
 				std::fill( firstStateFound.begin(), firstStateFound.end(), false );
 
 				// iterate over all components and only keep the first rollback state when RollbackNoOverwrite is not set				
-				for (int i = 0; i < (int)clientRollback.rollbackDatas.size();)
+				for (int i = 0; i < (int)clientRollback.mRollbackDatas.size();)
 				{
-					const ClientRollback::RollbackData& rollbackData = clientRollback.rollbackDatas[i];
-					const EcsComponentInfo& componentInfo = _world.IndexedGetComponentInfo( rollbackData.componentIndex );
+					const ClientRollback::RollbackData& rollbackData = clientRollback.mRollbackDatas[i];
+					const EcsComponentInfo& componentInfo = _world.IndexedGetComponentInfo( rollbackData.mComponentIndex );
 					if( ( componentInfo.flags & EcsComponentInfo::RollbackNoOverwrite ) == 0 )
 					{
-						if( firstStateFound[rollbackData.componentIndex] )
+						if( firstStateFound[rollbackData.mComponentIndex] )
 						{
-							clientRollback.rollbackDatas.erase( clientRollback.rollbackDatas.begin() + i );
+							clientRollback.mRollbackDatas.erase( clientRollback.mRollbackDatas.begin() + i );
 							// do not increment i, we already advanced to the next element by erasing the current element.
 						}
 						else
 						{
-							firstStateFound[rollbackData.componentIndex] = true;
+							firstStateFound[rollbackData.mComponentIndex] = true;
 							++i;
 						}
 					}

@@ -30,28 +30,28 @@ namespace fan
 				const Transform& emitterTransform = *transformIt;
 				ParticleEmitter& emitter = *particleEmitterIt;
 
-				if( emitter.particlesPerSecond > 0.f && emitter.enabled )
+				if( emitter.mParticlesPerSecond > 0.f && emitter.mEnabled )
 				{
-					emitter.timeAccumulator += _delta;
-					float particleSpawnDelta = 1.f / emitter.particlesPerSecond;
+					emitter.mTimeAccumulator += _delta;
+					float particleSpawnDelta = 1.f / emitter.mParticlesPerSecond;
 
 					const glm::vec3 origin = ToGLM( emitterTransform.GetPosition() );
 
 					// Spawn particles
-					while( emitter.timeAccumulator > particleSpawnDelta )
+					while( emitter.mTimeAccumulator > particleSpawnDelta )
 					{
-						emitter.timeAccumulator -= particleSpawnDelta;
+						emitter.mTimeAccumulator -= particleSpawnDelta;
 
 						EcsEntity entity = _world.CreateEntity();
 						Particle& particle = _world.AddComponent<Particle>( entity );
 
-						particle.speed = glm::normalize( glm::vec3( Random::FloatClip(), Random::FloatClip(), Random::FloatClip() ) );
-						particle.speed *= emitter.speed;
-						particle.position = origin;
-						particle.durationLeft = emitter.duration;
-						particle.color = emitter.color;
+						particle.mSpeed        = glm::normalize( glm::vec3( Random::FloatClip(), Random::FloatClip(), Random::FloatClip() ) );
+						particle.mSpeed *= emitter.mSpeed;
+						particle.mPosition     = origin;
+						particle.mDurationLeft = emitter.mDuration;
+						particle.mColor        = emitter.mColor;
 
-						_world.AddTagsFromSignature( entity, emitter.tagsSignature );
+						_world.AddTagsFromSignature( entity, emitter.mTagsSignature );
 					}
 				}
 			}

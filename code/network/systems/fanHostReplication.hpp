@@ -72,12 +72,12 @@ namespace fan
 				const EcsHandle handle = _world.GetHandle( entity );
 				const EntityReplication& entityReplication = *replicationIt;
 				assert( handle != 0 );
-				const PacketReplication packet = HostReplication::BuildEntityPacket( _world, handle, entityReplication.componentTypes );
+				const PacketReplication packet = HostReplication::BuildEntityPacket( _world, handle, entityReplication.mComponentTypes );
 				if( packet.packetData.getDataSize() > 0 )
 				{
 					for( HostManagerHandlePair& pair : hostReplications )
 					{
-						if( pair.handle != entityReplication.exclude ) // do not replicate on this host
+						if( pair.handle != entityReplication.mExclude ) // do not replicate on this host
 						{
 							pair.hostReplication.Replicate( packet, HostReplication::None );
 						}

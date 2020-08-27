@@ -1,7 +1,5 @@
 #include "scene/components/ui/fanUIProgressBar.hpp"
 
-#include "scene/fanSceneSerializable.hpp"
-
 namespace fan
 {
 	//========================================================================================================

@@ -9,15 +9,14 @@ namespace fan
 {
 	struct SpawnInfo;
 
-	//================================================================================================================================
+	//========================================================================================================
 	// Manages remote procedure calls
-	// A remote procedure call is the act of one host causing a	procedure to execute on one or more remote hosts
+	// A RPC is the act of one host causing a	procedure execution one one or more remote hosts
 	// Can generate replication packets to send using the server replication
-	//================================================================================================================================	
+	//========================================================================================================
 	struct ClientRPC : public EcsComponent
 	{
 		ECS_COMPONENT( ClientRPC )
-	public:
 		static void SetInfo( EcsComponentInfo& _info );
 		static void Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component );
 		static void OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component );
@@ -29,23 +28,22 @@ namespace fan
 		void RegisterRPCs( );
 		void TriggerRPC( sf::Packet& _packet );
 
-		std::unordered_map<RpcID , RpcUnwrapMethod > nameToRPCTable;
+		std::unordered_map<RpcID , RpcUnwrapMethod > mNameToRPCTable;
 
 		// List of available rpc
-		Signal < int >			 onShiftFrameIndex;
-		static const RpcID		 s_rpcIdShiftFrame = SSID( "RPCShiftFrame" );
+		Signal < int >           mOnShiftFrameIndex;
+		static const RpcID       sRpcIdShiftFrame             = SSID( "RPCShiftFrame" );
 		void					 UnwrapShiftClientFrame( sf::Packet& _packet );
 		static PacketReplication RPCShiftClientFrame( const int _framesDelta );
 
-		Signal< SpawnID, FrameIndex, sf::Packet >	 onSpawn;
-		static const RpcID		 s_rpcIdSpawn = SSID( "RPCSpawn" );
+		Signal< SpawnID, FrameIndex, sf::Packet > mOnSpawn;
+		static const RpcID                        sRpcIdSpawn = SSID( "RPCSpawn" );
 		void					 UnwrapSpawn( sf::Packet& _packet );
 		static PacketReplication RPCSpawn( const SpawnInfo& _spawnInfo );
 
-		Signal< NetID >	 onDespawn;
-		static const RpcID		 s_rpcIdDespawn = SSID( "RPCDespawn" );
+		Signal< NetID >          mOnDespawn;
+		static const RpcID       sRpcIdDespawn                      = SSID( "RPCDespawn" );
 		void					 UnwrapDespawn( sf::Packet& _packet );
 		static PacketReplication RPCDespawn( const NetID _netID );
-
 	};
 }

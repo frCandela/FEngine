@@ -7,14 +7,13 @@ namespace fan
 {
 	class EcsWorld;
 
-	//================================================================================================================================
+	//========================================================================================================
 	// Stores the input of the player
 	// This input can be direct in case of a local player or replicated ( server or remote players )
-	//================================================================================================================================
+	//========================================================================================================
 	struct PlayerInput : public EcsComponent
 	{
 		ECS_COMPONENT( PlayerInput )
-	public:
 		static void SetInfo( EcsComponentInfo& _info );
 		static void Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component );
 		static void OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component );
@@ -23,11 +22,10 @@ namespace fan
 		static void RollbackSave( const EcsComponent& _component, sf::Packet& _packet );
 		static void RollbackLoad( EcsComponent& _component, sf::Packet& _packet );
 
-		btVector3	orientation; // orientation of the ship
-		float		left;		 // left/right key pressed ( strafing )
-		float		forward;	 // forward or backward
-		float		boost;		 // shift to go faster
-		float		fire;		 // firing in front of the ship
+		btVector3 mOrientation; // orientation of the ship
+		float     mLeft;		 // left/right key pressed ( strafing )
+		float     mForward;	 // forward or backward
+		float     mBoost;		 // shift to go faster
+		float     mFire;		 // firing in front of the ship
 	};
-	static constexpr size_t sizeof_playerInput = sizeof( PlayerInput );
 }

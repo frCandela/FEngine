@@ -32,25 +32,25 @@ namespace fan
 				btCollisionShape* shape = nullptr;
 				if( _world.HasComponent<SphereShape>( entity ) )
 				{
-					shape = _world.GetComponent<SphereShape>( entity ).sphereShape;
+					shape = _world.GetComponent<SphereShape>( entity ).mSphereShape;
 				}
 				else if( _world.HasComponent<BoxShape>( entity ) )
 				{
-					shape = _world.GetComponent<BoxShape>( entity ).boxShape;
+					shape = _world.GetComponent<BoxShape>( entity ).mBoxShape;
 				}
 
 				// find a motion state
 				btDefaultMotionState* motionState = nullptr;
 				if( _world.HasComponent<MotionState>( entity ) )
 				{
-					motionState = _world.GetComponent<MotionState>( entity ).motionState;
+					motionState = _world.GetComponent<MotionState>( entity ).mMotionState;
 				}
 
 				// reset the rigidbody				
 				rb.SetMotionState( motionState );
 				rb.SetCollisionShape( shape );
 
-				physicsWorld.mDynamicsWorld->addRigidBody( rb.rigidbody );
+				physicsWorld.mDynamicsWorld->addRigidBody( rb.mRigidbody );
 			}
 		}
 	};
@@ -71,7 +71,7 @@ namespace fan
 			for( auto rigidbodyIt = _view.begin<Rigidbody>(); rigidbodyIt != _view.end<Rigidbody>(); ++rigidbodyIt )
 			{
 				Rigidbody& rigidbody = *rigidbodyIt;
-				physicsWorld.mDynamicsWorld->removeRigidBody( rigidbody.rigidbody );
+				physicsWorld.mDynamicsWorld->removeRigidBody( rigidbody.mRigidbody );
 			}
 		}
 	};

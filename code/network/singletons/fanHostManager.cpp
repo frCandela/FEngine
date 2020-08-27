@@ -38,19 +38,19 @@ namespace fan
 		SceneNode& rootNode = _world.GetComponent<SceneNode>( _world.GetEntity( mNetRootNodeHandle ) );
 		Scene& scene = _world.GetSingleton<Scene>();
 		SceneNode& hostNode = scene.CreateSceneNode( "tmp", &rootNode );
-        mHostHandles[{ _ip, _port}] = hostNode.handle;
-		hostNode.name = std::string("host") + std::to_string( hostNode.handle );
-		const EcsEntity entity = _world.GetEntity( hostNode.handle );
+        mHostHandles[{ _ip, _port}] = hostNode.mHandle;
+		hostNode.mName = std::string( "host") + std::to_string( hostNode.mHandle );
+		const EcsEntity entity = _world.GetEntity( hostNode.mHandle );
 		_world.AddComponent< HostGameData >( entity );
 		_world.AddComponent< HostReplication >( entity );
 		_world.AddComponent< ReliabilityLayer >( entity );
 
 		// fills in the host connection data
 		HostConnection& hostConnection = _world.AddComponent< HostConnection >( entity );
-		hostConnection.ip				= _ip;
-		hostConnection.port				= _port;
+		hostConnection.mIp   = _ip;
+		hostConnection.mPort = _port;
 
-		return hostNode.handle;
+		return hostNode.mHandle;
 	}
 
 	//========================================================================================================
@@ -63,22 +63,22 @@ namespace fan
 
 		// Delete the host spaceship if spawned
 		HostGameData hostGameData = _world.GetComponent<HostGameData>( entity );
-		if( hostGameData.spaceshipHandle != 0 )
+		if( hostGameData.mSpaceshipHandle != 0 )
 		{
-			const EcsEntity spaceshipID = _world.GetEntity( hostGameData.spaceshipHandle );
+			const EcsEntity spaceshipID = _world.GetEntity( hostGameData.mSpaceshipHandle );
 			_world.Kill( spaceshipID );
 		}		
 
 		// delete the host ip/port entry
 		HostConnection& hostConnection = _world.GetComponent< HostConnection >( entity );
-		auto it = mHostHandles.find( { hostConnection.ip, hostConnection.port } );
+		auto it = mHostHandles.find( { hostConnection.mIp, hostConnection.mPort } );
 		assert( it != mHostHandles.end() );
 		mHostHandles.erase( it );
 
 		Debug::Log() << "host disconnected "
-		             << hostConnection.ip.toString()
+		             << hostConnection.mIp.toString()
 		             << "::"
-		             << hostConnection.port << Debug::Endl();
+		             << hostConnection.mPort << Debug::Endl();
 	}
 
 	//========================================================================================================

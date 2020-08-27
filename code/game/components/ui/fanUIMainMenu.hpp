@@ -6,8 +6,8 @@
 
 namespace fan
 {
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	struct UIMainMenu : public EcsComponent
 	{
 		ECS_COMPONENT( UIMainMenu )
@@ -23,7 +23,6 @@ namespace fan
         static void OnShowCredits( EcsComponent& _component );
         static void OnPlay( EcsComponent& _component );
         static void OnQuit( EcsComponent& _component );
-
 
         ComponentPtr<SceneNode> mPlayNode;
         ComponentPtr<SceneNode> mOptionsNode;

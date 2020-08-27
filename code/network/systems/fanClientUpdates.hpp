@@ -31,21 +31,21 @@ namespace fan
 			{
 				ClientGameData& gameData = *gameDataIt;
 
-				if( gameData.spaceshipHandle != 0 && gameData.frameSynced )
+				if( gameData.sSpaceshipHandle != 0 && gameData.mFrameSynced )
 				{
-					const EcsEntity spaceshipID = _world.GetEntity( gameData.spaceshipHandle );
+					const EcsEntity spaceshipID = _world.GetEntity( gameData.sSpaceshipHandle );
 
 					// saves previous player state
 					const Rigidbody& rb = _world.GetComponent<Rigidbody>( spaceshipID );
 					const Transform& transform = _world.GetComponent<Transform>( spaceshipID );
-					assert( rb.rigidbody->getTotalForce().isZero() );
+					assert( rb.mRigidbody->getTotalForce().isZero() );
 					PacketPlayerGameState playerState;
 					playerState.frameIndex = time.mFrameIndex;
 					playerState.position = transform.GetPosition();
 					playerState.orientation = transform.GetRotationEuler();
 					playerState.velocity = rb.GetVelocity();
 					playerState.angularVelocity = rb.GetAngularVelocity();
-					gameData.previousLocalStates.push( playerState );
+					gameData.mPreviousLocalStates.push( playerState );
 				}
 			}
 		}
@@ -71,22 +71,22 @@ namespace fan
 			{
 				ClientGameData& gameData = *dataIt;
 
-				if( gameData.spaceshipHandle != 0 && gameData.frameSynced )
+				if( gameData.sSpaceshipHandle != 0 && gameData.mFrameSynced )
 				{
-					const EcsEntity spaceshipID = _world.GetEntity( gameData.spaceshipHandle );
+					const EcsEntity spaceshipID = _world.GetEntity( gameData.sSpaceshipHandle );
 					const PlayerInput& input = _world.GetComponent<PlayerInput>( spaceshipID );
 
 					// streams input to the server
 					PacketInput::InputData inputData;
 					inputData.frameIndex = time.mFrameIndex;
-					inputData.orientation = sf::Vector2f( input.orientation.x(), input.orientation.z() );
-					inputData.left = input.left > 0;
-					inputData.right = input.left < 0;
-					inputData.forward = input.forward > 0;
-					inputData.backward = input.forward < 0;
-					inputData.boost = input.boost > 0;
-					inputData.fire = input.fire > 0;
-					gameData.previousInputs.push_front( inputData );
+					inputData.orientation = sf::Vector2f( input.mOrientation.x(), input.mOrientation.z() );
+					inputData.left = input.mLeft > 0;
+					inputData.right = input.mLeft < 0;
+					inputData.forward = input.mForward > 0;
+					inputData.backward = input.mForward < 0;
+					inputData.boost = input.mBoost > 0;
+					inputData.fire = input.mFire > 0;
+					gameData.mPreviousInputs.push_front( inputData );
 				}
 			}
 		}
@@ -115,7 +115,7 @@ namespace fan
 				ClientReplication& replication = *replicationIt;
 
 				// replicate singletons components
-				for( PacketReplication packet : replication.replicationListSingletons )
+				for( PacketReplication packet : replication.mReplicationListSingletons )
 				{
 					sf::Uint32 staticIndex;
 					packet.packetData >> staticIndex;
@@ -124,10 +124,10 @@ namespace fan
 					info.netLoad( singleton, packet.packetData );
 					assert( packet.packetData.endOfPacket() );
 				}
-				replication.replicationListSingletons.clear();
+				replication.mReplicationListSingletons.clear();
 
 				// replicate entities
-				for( PacketReplication packet : replication.replicationListEntities )
+				for( PacketReplication packet : replication.mReplicationListEntities )
 				{
 					NetID netID;
 					sf::Uint8 numComponents;
@@ -157,14 +157,14 @@ namespace fan
 						}
 					}
 				}
-				replication.replicationListEntities.clear();
+				replication.mReplicationListEntities.clear();
 
 				// replicate RPC
-				for( PacketReplication packet : replication.replicationListRPC )
+				for( PacketReplication packet : replication.mReplicationListRPC )
 				{
 					rpc.TriggerRPC( packet.packetData );
 				}
-				replication.replicationListRPC.clear();
+				replication.mReplicationListRPC.clear();
 			}
 		}
 	};
@@ -188,13 +188,13 @@ namespace fan
 			{
 				ClientConnection& connection = *connectionIt;
 
-				if( connection.state == ClientConnection::ClientState::Connected )
+				if( connection.mState == ClientConnection::ClientState::Connected )
 				{
 					const double currentTime = Time::ElapsedSinceStartup();
-					if( connection.serverLastResponse + connection.timeoutDelay < currentTime )
+					if( connection.mServerLastResponse + connection.mTimeoutDelay < currentTime )
 					{
 						Debug::Log() << "server timeout " << Debug::Endl();
-						connection.state = ClientConnection::ClientState::Disconnected;
+						connection.mState = ClientConnection::ClientState::Disconnected;
 					}
 				}
 			}

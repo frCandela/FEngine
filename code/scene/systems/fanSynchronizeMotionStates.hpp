@@ -30,8 +30,8 @@ namespace fan
 				const Rigidbody& rigidbody = *rigidbodyIt;
 				Transform& transform = *transformIt;
 
-				if( rigidbody.rigidbody->getInvMass() <= 0.f ) { continue; }
-				motionState.motionState->getWorldTransform( transform.transform );
+				if( rigidbody.mRigidbody->getInvMass() <= 0.f ) { continue; }
+				motionState.mMotionState->getWorldTransform( transform.mTransform );
 			}
 		}
 	};
@@ -61,8 +61,8 @@ namespace fan
 				Rigidbody& rigidbody = *rigidbodyIt;
 				const Transform& transform = *transformIt;
 
-				rigidbody.rigidbody->setWorldTransform( transform.transform );
-				motionState.motionState->setWorldTransform( transform.transform );
+				rigidbody.mRigidbody->setWorldTransform( transform.mTransform );
+				motionState.mMotionState->setWorldTransform( transform.mTransform );
 			}
 		}
 	};

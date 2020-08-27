@@ -33,9 +33,9 @@ namespace fan
 				Transform& transform = *transformIt;
 				const Planet& planet = *planetIt;
 
-				float const planetTime = -planet.speed * currentTime;
-				btVector3 position( std::cosf( planetTime + planet.phase ), 0, std::sinf( planetTime + planet.phase ) );
-				transform.SetPosition( /*parentTransform.getOrigin()*/ planet.radius * position );
+				float const planetTime = -planet.mSpeed * currentTime;
+				btVector3 position( std::cosf( planetTime + planet.mPhase ), 0, std::sinf( planetTime + planet.mPhase ) );
+				transform.SetPosition( /*parentTransform.getOrigin()*/ planet.mRadius * position );
 
 				sceneNode.AddFlag( SceneNode::BoundsOutdated );
 			}
@@ -83,7 +83,7 @@ namespace fan
 			{
 				Transform& transform = *transformIt;
 
-				btVector3& scale = transform.scale;
+				btVector3& scale = transform.mScale;
 
 				const btVector3 planetPos = transform.GetPosition();
 				const btVector3 direction = planetPos - btVector3::Zero();

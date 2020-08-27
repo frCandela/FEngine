@@ -41,16 +41,16 @@ namespace fan
 				Transform& transform = *transformIt;
 				Material& material = *materialIt;
 
-				if( meshRenderer.mesh.IsValid() )
+				if( meshRenderer.mMesh.IsValid() )
 				{
 					// drawMesh data;
 					RenderDataModel data;
-					data.mesh = *meshRenderer.mesh;
+					data.mesh = *meshRenderer.mMesh;
 					data.modelMatrix = transform.GetModelMatrix();
 					data.normalMatrix = transform.GetNormalMatrix();
-					data.textureIndex = material.texture.IsValid() ? material.texture->mIndex : 0;
-					data.color = material.color.ToGLM();
-					data.shininess = material.shininess;
+					data.textureIndex = material.mTexture.IsValid() ? material.mTexture->mIndex : 0;
+					data.color = material.mColor.ToGLM();
+					data.shininess = material.mShininess;
 
 					renderWorld.drawData.push_back( data );
 				}
@@ -134,12 +134,12 @@ namespace fan
 
 				RenderDataPointLight pointLight;
 				pointLight.position = glm::vec4( ToGLM( transform.GetPosition() ), 1.f );
-				pointLight.diffuse = light.diffuse.ToGLM();
-				pointLight.specular = light.specular.ToGLM();
-				pointLight.ambiant = light.ambiant.ToGLM();
-				pointLight.constant = light.attenuation[PointLight::CONSTANT];
-				pointLight.linear = light.attenuation[PointLight::LINEAR];
-				pointLight.quadratic = light.attenuation[PointLight::QUADRATIC];
+				pointLight.diffuse = light.mDiffuse.ToGLM();
+				pointLight.specular = light.mSpecular.ToGLM();
+				pointLight.ambiant = light.mAmbiant.ToGLM();
+				pointLight.constant = light.mAttenuation[PointLight::Constant];
+				pointLight.linear = light.mAttenuation[PointLight::Linear];
+				pointLight.quadratic = light.mAttenuation[PointLight::Quadratic];
 
 				renderWorld.pointLights.push_back( pointLight );
 			}
@@ -171,9 +171,9 @@ namespace fan
 
 				RenderDataDirectionalLight light;
 				light.direction = glm::vec4( ToGLM( transform.Forward() ), 1 );
-				light.ambiant = directionalLight.ambiant.ToGLM();
-				light.diffuse = directionalLight.diffuse.ToGLM();
-				light.specular = directionalLight.specular.ToGLM();
+				light.ambiant = directionalLight.mAmbiant.ToGLM();
+				light.diffuse = directionalLight.mDiffuse.ToGLM();
+				light.specular = directionalLight.mSpecular.ToGLM();
 
 				renderWorld.directionalLights.push_back( light );
 			}

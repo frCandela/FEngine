@@ -42,12 +42,12 @@ namespace fan
 				const Rigidbody& rb = *rigidbodyIt;
 				Bounds& bounds = *boundsIt;
 
-				if( !rb.rigidbody->isInWorld() ) { continue; }
+				if( !rb.mRigidbody->isInWorld() ) { continue; }
 
 				// gets bounds from rigidbody
 				btVector3 low, high;
-				rb.rigidbody->getAabb( low, high );
-				bounds.aabb = AABB( low, high );
+				rb.mRigidbody->getAabb( low, high );
+				bounds.mAabb = AABB( low, high );
 
 				sceneNode.RemoveFlag( SceneNode::BoundsOutdated );
 			}
@@ -85,11 +85,11 @@ namespace fan
 				const Transform& transform = *transformIt;
 				Bounds& bounds = *boundsIt;
 
-				if( *renderer.mesh != nullptr )
+				if( *renderer.mMesh != nullptr )
 				{
 					// Calculates model matrix
 					const glm::vec3 position = ToGLM( transform.GetPosition() );
-					const glm::vec3 scale = ToGLM( transform.scale );
+					const glm::vec3 scale = ToGLM( transform.mScale );
 					const glm::quat rotation = ToGLM( transform.GetRotationQuat() );
 					glm::mat4 modelMatrix =
 					        glm::translate( glm::mat4( 1.f ), position ) *
@@ -97,7 +97,7 @@ namespace fan
 					        glm::scale( glm::mat4( 1.f ), scale );
 
 					// Set the bounds
-					bounds.aabb = AABB( renderer.mesh->mConvexHull.GetVertices(), modelMatrix );
+					bounds.mAabb = AABB( renderer.mMesh->mConvexHull.GetVertices(), modelMatrix );
 
 					sceneNode.RemoveFlag( SceneNode::BoundsOutdated );
 				}
@@ -136,7 +136,7 @@ namespace fan
 
 				const btVector3 origin = transform.GetPosition();
 				const float sizeBounds = 0.2f;
-				bounds.aabb = AABB( origin - sizeBounds * btVector3::One(), origin + sizeBounds * btVector3::One() );
+				bounds.mAabb = AABB( origin - sizeBounds * btVector3::One(), origin + sizeBounds * btVector3::One() );
 				sceneNode.RemoveFlag( SceneNode::BoundsOutdated );
 			}
 		}

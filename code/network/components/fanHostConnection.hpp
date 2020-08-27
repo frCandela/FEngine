@@ -5,14 +5,13 @@
 
 namespace fan
 {
-	struct Time;
-	//==============================================================================================================================================================
+    struct Time;
+	//========================================================================================================
 	// [Server]
-	//==============================================================================================================================================================
+	//========================================================================================================
 	struct HostConnection: public EcsComponent
 	{
 		ECS_COMPONENT( HostConnection )
-	public:
 		static void SetInfo( EcsComponentInfo& _info );
 		static void Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component );
 		static void OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component );
@@ -26,25 +25,25 @@ namespace fan
 			Connected			// Login packet was received, client is connected
 		};
 
-		IpAddress	ip;
-		Port		port;
-		std::string	name;
-		State		state;
-		double		lastResponseTime;	// last time the client answered back
-		double		lastPingTime;		// last time the client was sent a ping
-		double		lastDisconnectTime;	// last time the client was sent a disconnect packet
-		float		rtt;
-		float		bandwidth;			// Ko/s send to the client
-		float		pingDelay;			// send a ping to clients every X seconds
-		float		disconnectDelay;	// send a disconnect packet to clients every X seconds
-		float		timeoutDelay;		// disconnects clients after X seconds without a response
+		IpAddress   mIp;
+		Port        mPort;
+		std::string mName;
+		State       mState;
+		double      mLastResponseTime;	// last time the client answered back
+		double      mLastPingTime;		// last time the client was sent a ping
+		double      mLastDisconnectTime;	// last time the client was sent a disconnect packet
+		float       mRtt;
+		float       mBandwidth;			// Ko/s send to the client
+		float       mPingDelay;			// send a ping to clients every X seconds
+		float       mDisconnectDelay;	// send a disconnect packet to clients every X seconds
+		float       mTimeoutDelay;		// disconnects clients after X seconds without a response
 
 		// client frame index synchronization
-		bool				synced;				// true if the client has been synced 
-		double				lastSync;			// client frame index value is correct
-		std::array<int, 3>  framesDelta;		// server-client frame index delta in the N previous frames
-		int					targetBufferSize;	// the size of the input buffer we target for the client specific rtt
-		int					nextDeltaIndex;		// next delta to update in the array
+		bool               mSynced;				// true if the client has been synced
+		double             mLastSync;			// client frame index value is correct
+		std::array<int, 3> mFramesDelta;		// server-client frame index delta in the N previous frames
+		int                mTargetBufferSize;	// the size of the input buffer we target for the client specific rtt
+		int                mNextDeltaIndex;		// next delta to update in the array
 
 		void Write( EcsWorld& _world, EcsEntity _entity, Packet& _packet );
 		void ProcessPacket	( const PacketHello& _packetHello );
@@ -53,5 +52,4 @@ namespace fan
 		void OnLoginFail	( const PacketTag );
 		void OnLoginSuccess	( const PacketTag );
 	};
-	static constexpr size_t sizeof_hostConnection = sizeof( HostConnection );
 }

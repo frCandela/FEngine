@@ -43,11 +43,11 @@ namespace fan
 				Packet packet( reliabilityLayer.GetNextPacketTag() );
 
 				// write game data
-				if( hostData.spaceshipID != 0 )
+				if( hostData.mSpaceshipID != 0 )
 				{
-					if( hostData.nextPlayerState.frameIndex == time.mFrameIndex )
+					if( hostData.mNextPlayerState.frameIndex == time.mFrameIndex )
 					{
-						hostData.nextPlayerState.Write( packet );
+						hostData.mNextPlayerState.Write( packet );
 					}
 				}
 
@@ -63,12 +63,12 @@ namespace fan
 				if( packet.GetSize() > sizeof( PacketTag ) )// don't send empty packets
 				{
 					reliabilityLayer.RegisterPacket( packet );
-					hostConnection.bandwidth = 1.f / time.mLogicDelta * float( packet.GetSize() ) / 1000.f; // in Ko/s
-					connection.mSocket.Send( packet, hostConnection.ip, hostConnection.port );
+					hostConnection.mBandwidth = 1.f / time.mLogicDelta * float( packet.GetSize() ) / 1000.f; // in Ko/s
+					connection.mSocket.Send( packet, hostConnection.mIp, hostConnection.mPort );
 				}
 				else
 				{
-					reliabilityLayer.nextPacketTag--;
+					reliabilityLayer.mNextPacketTag--;
 				}
 			}
 		}
@@ -116,7 +116,7 @@ namespace fan
 					HostGameData& hostData = _world.GetComponent< HostGameData >( entity );
 					ReliabilityLayer& reliabilityLayer = _world.GetComponent<ReliabilityLayer>( entity );
 					HostConnection& hostConnection = _world.GetComponent<HostConnection>( entity );
-					hostConnection.lastResponseTime = Time::ElapsedSinceStartup();
+					hostConnection.mLastResponseTime = Time::ElapsedSinceStartup();
 
 					// read the first packet type separately
 					PacketType packetType = packet.ReadType();
@@ -127,7 +127,7 @@ namespace fan
 					else if( packetType == PacketType::Hello )
 					{
 						// disconnections can cause the reliability layer tags to be off
-						reliabilityLayer.expectedPacketTag = packet.tag;
+						reliabilityLayer.mExpectedPacketTag = packet.tag;
 					}
 
 
@@ -161,9 +161,9 @@ namespace fan
 							packetDisconnect.Read( packet );
 							hostManager.DeleteHost( _world, clientHandle );
 							const HostGameData& hostGameData = _world.GetComponent< HostGameData>( _world.GetEntity( clientHandle ) );
-							if( hostGameData.spaceshipID != 0 )
+							if( hostGameData.mSpaceshipID != 0 )
 							{
-								_world.Run<S_ReplicateOnAllHosts>( ClientRPC::RPCDespawn( hostGameData.spaceshipID ), HostReplication::ResendUntilReplicated, clientHandle );
+								_world.Run<S_ReplicateOnAllHosts>( ClientRPC::RPCDespawn( hostGameData.mSpaceshipID ), HostReplication::ResendUntilReplicated, clientHandle );
 							}
 						} break;
 						case PacketType::Ping:
@@ -176,7 +176,7 @@ namespace fan
 						{
 							PacketInput packetInput;
 							packetInput.Read( packet );
-							if( hostConnection.state == HostConnection::Connected )
+							if( hostConnection.mState == HostConnection::Connected )
 							{
 								hostData.ProcessPacket( packetInput );
 							}

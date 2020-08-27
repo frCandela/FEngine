@@ -23,12 +23,12 @@ namespace fan
 				const EcsEntity entity = particleIt.GetEntity();
 				Particle& particle = *particleIt;
 
-				particle.durationLeft -= _delta;
-				if( particle.durationLeft < 0.f )
+				particle.mDurationLeft -= _delta;
+				if( particle.mDurationLeft < 0.f )
 				{
 					_world.Kill( entity );
 				}
-				particle.position += _delta * particle.speed;
+				particle.mPosition += _delta * particle.mSpeed;
 			}
 		}
 	};

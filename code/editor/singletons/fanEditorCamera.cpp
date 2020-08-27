@@ -108,18 +108,18 @@ namespace fan
 
 		// Editor Camera
 		SceneNode& cameraNode = scene.CreateSceneNode( "editor_camera", &scene.GetRootNode() );
-		EcsEntity cameraID = _world.GetEntity( cameraNode.handle );
+		EcsEntity cameraID = _world.GetEntity( cameraNode.mHandle );
 		cameraNode.AddFlag( SceneNode::NoSave | SceneNode::NoDelete | SceneNode::NoRaycast );
 
 		Transform& transform = _world.AddComponent< Transform >( cameraID );
 		_world.AddComponent< Camera >( cameraID );
 
 		transform.SetPosition( btVector3( 0, 0, -2 ) );
-		scene.mMainCameraHandle = cameraNode.handle;
+		scene.mMainCameraHandle = cameraNode.mHandle;
 
 		// set editor camera singleton
 		EditorCamera& editorCamera = _world.GetSingleton<EditorCamera>();
-		editorCamera.mCameraHandle = cameraNode.handle;
+		editorCamera.mCameraHandle = cameraNode.mHandle;
 	}
 
     //========================================================================================================

@@ -5,15 +5,15 @@
 WARNINGS_BULLET_PUSH()
 #include "bullet/btBulletDynamicsCommon.h"
 WARNINGS_POP()
+
 namespace fan
 {
-	//==============================================================================================================================================================
+	//========================================================================================================
 	// physics box collision shape
-	//==============================================================================================================================================================
+	//========================================================================================================
 	struct BoxShape : public EcsComponent
 	{
 		ECS_COMPONENT( BoxShape )
-	public:
 		static void SetInfo( EcsComponentInfo& _info );
 		static void Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component );
 		static void Destroy( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component );
@@ -24,7 +24,6 @@ namespace fan
 		void	  SetScaling( const btVector3 _scaling );
 		btVector3 GetScaling() const;
 
-		btBoxShape* boxShape;
+		btBoxShape* mBoxShape;
 	};
-	static constexpr size_t sizeof_boxShape = sizeof( BoxShape );
 }

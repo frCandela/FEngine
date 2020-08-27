@@ -33,20 +33,20 @@ namespace fan
 				// sunlight mesh raycast
 				const btVector3 rayOrigin = transform.GetPosition() + btVector3::Up();
 				btVector3 outIntersection;
-				solarPanel.isInSunlight = sunLight.mMesh->RayCast( rayOrigin, -btVector3::Up(), outIntersection );
+				solarPanel.mIsInSunlight = sunLight.mMesh->RayCast( rayOrigin, -btVector3::Up(), outIntersection );
 
 				// Charging rate
-				if( solarPanel.isInSunlight )
+				if( solarPanel.mIsInSunlight )
 				{
 					const btVector3 position = transform.GetPosition();
 					const float distance = position.norm();
-					const float slope = ( solarPanel.maxChargingRate - solarPanel.minChargingRate ) / ( solarPanel.highRange - solarPanel.lowRange );
-					const float unclampedRate = solarPanel.maxChargingRate - slope * ( distance - solarPanel.lowRange );
-					solarPanel.currentChargingRate = std::clamp( unclampedRate, solarPanel.minChargingRate, solarPanel.maxChargingRate );
+					const float slope = ( solarPanel.mMaxChargingRate - solarPanel.mMinChargingRate ) / ( solarPanel.mHighRange - solarPanel.mLowRange );
+					const float unclampedRate = solarPanel.mMaxChargingRate - slope * ( distance - solarPanel.mLowRange );
+					solarPanel.mCurrentChargingRate = std::clamp( unclampedRate, solarPanel.mMinChargingRate, solarPanel.mMaxChargingRate );
 				}
 				else
 				{
-					solarPanel.currentChargingRate = 0.f;
+					solarPanel.mCurrentChargingRate = 0.f;
 				}
 			}
 		}
@@ -75,8 +75,8 @@ namespace fan
 				Battery& battery = *batteryIt;
 				const SolarPanel& solarPanel = *solarPanelIt;
 
-				const float energyAdded = _delta * solarPanel.currentChargingRate;
-				battery.currentEnergy = std::min( battery.currentEnergy + energyAdded, battery.maxEnergy );
+				const float energyAdded = _delta * solarPanel.mCurrentChargingRate;
+				battery.mCurrentEnergy = std::min( battery.mCurrentEnergy + energyAdded, battery.mMaxEnergy );
 			}
 		}
 	};

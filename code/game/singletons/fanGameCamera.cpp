@@ -59,17 +59,17 @@ namespace fan
 		Scene& scene = _world.GetSingleton<Scene>();
 		SceneNode& cameraNode = scene.CreateSceneNode( "game_camera", &scene.GetRootNode() );
 		cameraNode.AddFlag( SceneNode::NoSave | SceneNode::NoDelete | SceneNode::NoRaycast );
-		const EcsEntity cameraID = _world.GetEntity( cameraNode.handle );
+		const EcsEntity cameraID = _world.GetEntity( cameraNode.mHandle );
 		
 		Camera& camera = _world.AddComponent<Camera>( cameraID );
-		camera.type = Camera::ORTHOGONAL;
+		camera.mType = Camera::Orthogonal;
 
 		Transform& transform = _world.AddComponent<Transform>( cameraID );
 		transform.SetRotationEuler( btVector3( 90.f, 0.f, 0.f ) );
 		transform.SetPosition( btVector3( 0, 5, 0 ) );
 
 		GameCamera& gameCamera = _world.GetSingleton<GameCamera>();
-		gameCamera.cmCameraHandle = cameraNode.handle;
+		gameCamera.cmCameraHandle = cameraNode.mHandle;
 
 		return gameCamera;
 	}
