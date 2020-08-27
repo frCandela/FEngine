@@ -6,12 +6,12 @@ namespace fan
 {
 	//========================================================================================================
 	//========================================================================================================
-	float		Time::s_renderDelta = 1.f / 60.f;
-	float		Time::s_logicDelta = 1.f / 60.f;
-	float		Time::s_physicsDelta = 1.f / 60.f;
-	uint32_t	Time::s_framesCounter = 0;
-	uint32_t	Time::s_realFramerateLastSecond = 0;
-	double		Time::s_lastLogFrameTime = 0.f;
+	float		Time::sRenderDelta            = 1.f / 60.f;
+	float		Time::sLogicDelta             = 1.f / 60.f;
+	float		Time::sPhysicsDelta           = 1.f / 60.f;
+	uint32_t	Time::sFramesCounter           = 0;
+	uint32_t	Time::sRealFramerateLastSecond = 0;
+	double		Time::sLastLogFrameTime      = 0.f;
 
 	//========================================================================================================
 	//========================================================================================================
@@ -27,13 +27,13 @@ namespace fan
 	//========================================================================================================
 	void Time::Init( EcsWorld& /*_world*/, EcsSingleton& _component ){
 		Time& gameTime = static_cast<Time&>( _component );
-		gameTime.frameIndex = 0;
-		gameTime.frameStart = 0;
-		gameTime.logicDelta = 1.f / 60.f;
-		gameTime.timeScaleDelta = 0.f;
+		gameTime.mFrameIndex         = 0;
+		gameTime.mFrameStart         = 0;
+		gameTime.mLogicDelta         = 1.f / 60.f;
+		gameTime.mTimeScaleDelta     = 0.f;
 		// timeScaleIncrement -> it takes 20 frames to time scale one frame ( 5% faster/slower )
-		gameTime.timeScaleIncrement = gameTime.logicDelta / 20.f;
-		gameTime.lastLogicTime = 0.;
+		gameTime.mTimeScaleIncrement = gameTime.mLogicDelta / 20.f;
+		gameTime.mLastLogicTime      = 0.;
 	}
 
 	//========================================================================================================
@@ -41,14 +41,14 @@ namespace fan
 	//========================================================================================================
 	void Time::RegisterFrameDrawn()
 	{
-		++s_framesCounter;
+		++sFramesCounter;
 
 		const double time = ElapsedSinceStartup();
-		if( time - s_lastLogFrameTime > 1.f )
+		if( time - sLastLogFrameTime > 1.f )
 		{
-			s_realFramerateLastSecond = s_framesCounter;
-			s_framesCounter = 0;
-			s_lastLogFrameTime = time;
+            sRealFramerateLastSecond = sFramesCounter;
+            sFramesCounter           = 0;
+            sLastLogFrameTime        = time;
 		}
 	}
 
@@ -93,13 +93,13 @@ namespace fan
 	//========================================================================================================
 	void Time::OnShiftFrameIndex( const int _framesDelta )
 	{
-		if( std::abs( _framesDelta ) > Time::s_maxFrameDeltaBeforeShift )
+		if( std::abs( _framesDelta ) > Time::sMaxFrameDeltaBeforeShift )
 		{
-			frameIndex += _framesDelta;
+            mFrameIndex += _framesDelta;
 		}
 		else
 		{
-			timeScaleDelta = _framesDelta * logicDelta;
+            mTimeScaleDelta = _framesDelta * mLogicDelta;
 		}
 	}
 
@@ -108,10 +108,10 @@ namespace fan
 	void Time::OnGui( EcsWorld&, EcsSingleton& _component )
 	{
 		Time& gameTime = static_cast<Time&>( _component );
-		ImGui::Text( "frame index:          %d", gameTime.frameIndex );
-		ImGui::Text( "frame start:          %d", gameTime.frameStart );
-		ImGui::Text( "logic delta:          %.3f", gameTime.logicDelta );
-		ImGui::Text( "time scale increment: %.3f", gameTime.timeScaleIncrement );
-		ImGui::DragFloat( "timescale", &gameTime.timeScaleDelta, 0.1f );
+		ImGui::Text( "frame index:          %d", gameTime.mFrameIndex );
+		ImGui::Text( "frame start:          %d", gameTime.mFrameStart );
+		ImGui::Text( "logic delta:          %.3f", gameTime.mLogicDelta );
+		ImGui::Text( "time scale increment: %.3f", gameTime.mTimeScaleIncrement );
+		ImGui::DragFloat( "timescale", &gameTime.mTimeScaleDelta, 0.1f );
 	}
 }

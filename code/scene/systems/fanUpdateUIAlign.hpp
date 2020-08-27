@@ -30,7 +30,7 @@ namespace fan
                 if( align.mParent == nullptr )
                 {
                     pPos = glm::ivec2(0,0);
-                    pSize = glm::ivec2( renderWorld.targetSize );
+                    pSize = glm::ivec2( renderWorld.mTargetSize );
                 }
                 else
                 {

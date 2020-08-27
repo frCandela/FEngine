@@ -40,7 +40,7 @@ namespace fan
 					const Transform& transform = _world.GetComponent<Transform>( spaceshipID );
 					assert( rb.rigidbody->getTotalForce().isZero() );
 					PacketPlayerGameState playerState;
-					playerState.frameIndex = time.frameIndex;
+					playerState.frameIndex = time.mFrameIndex;
 					playerState.position = transform.GetPosition();
 					playerState.orientation = transform.GetRotationEuler();
 					playerState.velocity = rb.GetVelocity();
@@ -78,7 +78,7 @@ namespace fan
 
 					// streams input to the server
 					PacketInput::InputData inputData;
-					inputData.frameIndex = time.frameIndex;
+					inputData.frameIndex = time.mFrameIndex;
 					inputData.orientation = sf::Vector2f( input.orientation.x(), input.orientation.z() );
 					inputData.left = input.left > 0;
 					inputData.right = input.left < 0;
@@ -135,8 +135,8 @@ namespace fan
 					packet.packetData >> netID;
 					packet.packetData >> numComponents;
 
-					auto it = linkingContext.netIDToEcsHandle.find( netID );
-					if( it != linkingContext.netIDToEcsHandle.end() )
+					auto it = linkingContext.mNetIDToEcsHandle.find( netID );
+					if( it != linkingContext.mNetIDToEcsHandle.end() )
 					{
 						const EcsHandle replicatedHandle = it->second;
 						const EcsEntity replicatedID = _world.GetEntity( replicatedHandle );

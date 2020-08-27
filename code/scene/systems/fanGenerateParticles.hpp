@@ -36,7 +36,7 @@ namespace fan
 				vertices.push_back( { particle.position + glm::vec3( 0, 0.0f, size ), glm::vec3( 0.f, 1.f, 0.f ), color, glm::vec2( -0.5f, -0.5f ) } );
 				vertices.push_back( { particle.position + glm::vec3( size, 0.0f, -size ), glm::vec3( 0.f, 1.f, 0.f ), color, glm::vec2( -0.5f, -0.5f ) } );
 			}
-			renderWorld.particlesMesh->LoadFromVertices( vertices );
+			renderWorld.mParticlesMesh->LoadFromVertices( vertices );
 		}
 	};
 }

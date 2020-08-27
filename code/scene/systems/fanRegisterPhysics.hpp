@@ -50,7 +50,7 @@ namespace fan
 				rb.SetMotionState( motionState );
 				rb.SetCollisionShape( shape );
 
-				physicsWorld.dynamicsWorld->addRigidBody( rb.rigidbody );
+				physicsWorld.mDynamicsWorld->addRigidBody( rb.rigidbody );
 			}
 		}
 	};
@@ -71,7 +71,7 @@ namespace fan
 			for( auto rigidbodyIt = _view.begin<Rigidbody>(); rigidbodyIt != _view.end<Rigidbody>(); ++rigidbodyIt )
 			{
 				Rigidbody& rigidbody = *rigidbodyIt;
-				physicsWorld.dynamicsWorld->removeRigidBody( rigidbody.rigidbody );
+				physicsWorld.mDynamicsWorld->removeRigidBody( rigidbody.rigidbody );
 			}
 		}
 	};

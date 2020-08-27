@@ -147,7 +147,7 @@ namespace fan
             world.AddTagType<tag_editorOnly>();
 
             RenderWorld& renderWorld = world.GetSingleton<RenderWorld>();
-            renderWorld.isHeadless = ( &game != &GetCurrentGame() );
+            renderWorld.mIsHeadless = ( &game != &GetCurrentGame() );
 
             RenderResources& renderResources = world.GetSingleton<RenderResources>();
             renderResources.SetPointers( &mRenderer->mMeshManager,
@@ -222,7 +222,7 @@ namespace fan
         for( IGame* game : mGames )
         {
             Time& time = game->mWorld.GetSingleton<Time>();
-            time.lastLogicTime = Time::ElapsedSinceStartup();
+            time.mLastLogicTime = Time::ElapsedSinceStartup();
         }
         Profiler::Get().Begin();
 
@@ -241,10 +241,10 @@ namespace fan
     void EditorHolder::Step()
     {
         const double currentTime       = Time::ElapsedSinceStartup();
-        const bool   renderIsThisFrame = currentTime > mLastRenderTime + Time::s_renderDelta;
+        const bool   renderIsThisFrame = currentTime > mLastRenderTime + Time::sRenderDelta;
         const Time& currentWorldTime = GetCurrentGame().mWorld.GetSingleton<Time>();
         const bool logicIsThisFrame = currentTime >
-                                      currentWorldTime.lastLogicTime + currentWorldTime.logicDelta;
+                                      currentWorldTime.mLastLogicTime + currentWorldTime.mLogicDelta;
 
         // Update all worlds
         for( int gameIndex = 0; gameIndex < (int)mGames.size(); gameIndex++ )
@@ -255,14 +255,14 @@ namespace fan
 
             // runs logic, renders ui
             Time& time = world.GetSingleton<Time>();
-            while( currentTime > time.lastLogicTime + time.logicDelta )
+            while( currentTime > time.mLastLogicTime + time.mLogicDelta )
             {
                 world.GetSingleton<RenderDebug>().Clear();
 
                 if( isCurrentWorld )
                 {
                     // Update input
-                    ImGui::GetIO().DeltaTime = time.logicDelta;
+                    ImGui::GetIO().DeltaTime = time.mLogicDelta;
                     const btVector2 gamePos  = mGameViewWindow->GetPosition();
                     const btVector2 gameSize = mGameViewWindow->GetSize();
                     //todo mGameViewWindow->IsHovered()
@@ -275,32 +275,32 @@ namespace fan
                 // checking the loop timing is not late
                 const double loopDelayMilliseconds = 1000. *
                                                      ( currentTime -
-                                                       ( time.lastLogicTime + time.logicDelta ) );
+                                                       ( time.mLastLogicTime + time.mLogicDelta ) );
                 if( loopDelayMilliseconds > 30 )
                 {
                     //Debug::Warning() << "logic is late of " << loopDelayMilliseconds << "ms" << Debug::Endl();
                     // if we are really really late, resets the timer
                     if( loopDelayMilliseconds > 100 )
                     {
-                        time.lastLogicTime = currentTime - time.logicDelta;
+                        time.mLastLogicTime = currentTime - time.mLogicDelta;
                         //Debug::Warning() << "reset logic timer " << Debug::Endl();
                     }
                 }
 
                 // increase the logic time of a timeScaleDelta with n timeScaleIncrements
-                if( std::abs( time.timeScaleDelta ) >= time.timeScaleIncrement )
+                if( std::abs( time.mTimeScaleDelta ) >= time.mTimeScaleIncrement )
                 {
-                    const float increment = time.timeScaleDelta > 0.f
-                            ? time.timeScaleIncrement
-                            : -time.timeScaleIncrement;
-                    time.lastLogicTime -= increment;
-                    time.timeScaleDelta -= increment;
+                    const float increment = time.mTimeScaleDelta > 0.f
+                            ? time.mTimeScaleIncrement
+                            : -time.mTimeScaleIncrement;
+                    time.mLastLogicTime -= increment;
+                    time.mTimeScaleDelta -= increment;
                 }
 
-                time.lastLogicTime += time.logicDelta;
+                time.mLastLogicTime += time.mLogicDelta;
 
                 const EditorPlayState& playState = world.GetSingleton<EditorPlayState>();
-                game.Step( playState.mState == EditorPlayState::PLAYING ? time.logicDelta : 0.f );
+                game.Step( playState.mState == EditorPlayState::PLAYING ? time.mLogicDelta : 0.f );
 
                 // ui & debug
                 if( mShowUi )
@@ -314,9 +314,9 @@ namespace fan
                     EditorCamera& editorCamera = world.GetSingleton<EditorCamera>();
                     Scene       & scene        = world.GetSingleton<Scene>();
                     // only update the editor camera when we are using it
-                    if( scene.mMainCameraHandle == editorCamera.cameraHandle )
+                    if( scene.mMainCameraHandle == editorCamera.mCameraHandle )
                     {
-                        EditorCamera::Update( world, time.logicDelta );
+                        EditorCamera::Update( world, time.mLogicDelta );
                     }
                     world.GetSingleton<EditorSelection>().Update( mGameViewWindow->IsHovered() );
 
@@ -521,7 +521,7 @@ namespace fan
         SCOPED_PROFILE( update_RW );
         RenderWorld      & renderWorld = world.GetSingleton<RenderWorld>();
         const RenderDebug& renderDebug = world.GetSingleton<RenderDebug>();
-        renderWorld.targetSize = _size;
+        renderWorld.mTargetSize = _size;
 
         // update render data
         {
@@ -534,7 +534,7 @@ namespace fan
 
         // particles mesh
         RenderDataModel particlesDrawData;
-        particlesDrawData.mesh         = renderWorld.particlesMesh;
+        particlesDrawData.mesh         = renderWorld.mParticlesMesh;
         particlesDrawData.modelMatrix  = glm::mat4( 1.f );
         particlesDrawData.normalMatrix = glm::mat4( 1.f );
         particlesDrawData.color        = glm::vec4( 1.f, 1.f, 1.f, 1.f );
@@ -607,7 +607,7 @@ namespace fan
     {
         Scene       & scene        = _world.GetSingleton<Scene>();
         EditorCamera& editorCamera = _world.GetSingleton<EditorCamera>();
-        scene.SetMainCamera( editorCamera.cameraHandle );
+        scene.SetMainCamera( editorCamera.mCameraHandle );
     }
 
     //========================================================================================================
@@ -638,7 +638,7 @@ namespace fan
         {
             IGame      & game        = *mGames[gameIndex];
             RenderWorld& renderWorld = game.mWorld.GetSingleton<RenderWorld>();
-            renderWorld.isHeadless = ( gameIndex != mCurrentGame );
+            renderWorld.mIsHeadless = ( gameIndex != mCurrentGame );
         }
 
         mGameViewWindow->SetCurrentGameSelected( mCurrentGame );
@@ -662,7 +662,7 @@ namespace fan
         Scene       & scene        = world.GetSingleton<Scene>();
         EditorCamera& editorCamera = world.GetSingleton<EditorCamera>();
 
-        if( scene.mMainCameraHandle == editorCamera.cameraHandle )
+        if( scene.mMainCameraHandle == editorCamera.mCameraHandle )
         {
             currentGame.mOnSwitchToGameCamera.Emmit();
         }
@@ -679,6 +679,6 @@ namespace fan
     {
         IGame& game = GetCurrentGame();
         Time & time = game.mWorld.GetSingleton<Time>();
-        game.Step( time.logicDelta );
+        game.Step( time.mLogicDelta );
     }
 }

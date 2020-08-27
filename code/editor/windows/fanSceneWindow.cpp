@@ -283,7 +283,7 @@ namespace fan
 		}
 
 		ImGui::SameLine();
-		const EcsHandle handleSelected = world.GetSingleton<EditorSelection>().m_selectedNodeHandle;
+		const EcsHandle handleSelected = world.GetSingleton<EditorSelection>().mSelectedNodeHandle;
 		bool selected = ( _node.handle == handleSelected );
 
 		// Draw scene node empty selectable to display a hierarchy

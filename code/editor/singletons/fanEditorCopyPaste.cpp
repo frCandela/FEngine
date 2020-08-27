@@ -23,17 +23,17 @@ namespace fan
 	{
 		EditorCopyPaste& editorCopyPaste = static_cast<EditorCopyPaste&>( _component );
 
-		editorCopyPaste.m_selection = &_world.GetSingleton<EditorSelection>();
+		editorCopyPaste.mSelection = &_world.GetSingleton<EditorSelection>();
 	}
 
 	//========================================================================================================
 	//========================================================================================================
 	void EditorCopyPaste::OnCopy()
 	{
-		if ( m_selection->GetSelectedSceneNode() != nullptr )
+		if ( mSelection->GetSelectedSceneNode() != nullptr )
 		{
 			Prefab prefab;
-			prefab.CreateFromSceneNode( *m_selection->GetSelectedSceneNode() );
+			prefab.CreateFromSceneNode( *mSelection->GetSelectedSceneNode() );
 
 			std::stringstream ss;
 			ss << prefab.mJson;
@@ -54,7 +54,7 @@ namespace fan
 		Prefab prefab;
 		if ( prefab.CreateFromJson( pastedJson ) )
 		{
-            prefab.Instantiate( *m_selection->GetSelectedSceneNode() );
+            prefab.Instantiate( *mSelection->GetSelectedSceneNode() );
 		}
 	}
 } 

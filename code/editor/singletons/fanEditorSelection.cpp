@@ -33,7 +33,7 @@ namespace fan
 	void EditorSelection::Init( EcsWorld& _world, EcsSingleton& _component )
 	{
 		EditorSelection& editorSelection = static_cast<EditorSelection&>( _component );
-		editorSelection.m_currentScene = &_world.GetSingleton<Scene>();
+		editorSelection.mCurrentScene = &_world.GetSingleton<Scene>();
 	}
 
 	//========================================================================================================
@@ -52,14 +52,14 @@ namespace fan
 	//========================================================================================================
 	SceneNode* EditorSelection::GetSelectedSceneNode() const 
 	{ 
-		if( m_selectedNodeHandle == 0 )
+		if( mSelectedNodeHandle == 0 )
 		{
 			return nullptr;
 		}
 		else
 		{
-			EcsWorld& world = *m_currentScene->mWorld;
-			return &world.GetComponent<SceneNode>( world.GetEntity( m_selectedNodeHandle ) );
+			EcsWorld& world = *mCurrentScene->mWorld;
+			return &world.GetComponent<SceneNode>( world.GetEntity( mSelectedNodeHandle ) );
 		}
 	}
 
@@ -93,7 +93,7 @@ namespace fan
 
 		// translation gizmo on selected scene node
 		SceneNode* selectedSceneNode = GetSelectedSceneNode();
-		if ( selectedSceneNode != nullptr && selectedSceneNode->handle != m_currentScene->mMainCameraHandle )
+		if ( selectedSceneNode != nullptr && selectedSceneNode->handle != mCurrentScene->mMainCameraHandle )
 		{
 			EcsWorld& world = *selectedSceneNode->scene->mWorld;
 			EcsEntity entity = world.GetEntity( selectedSceneNode->handle );
@@ -115,11 +115,11 @@ namespace fan
 		}
 
 		// mouse selection
-        EcsWorld& world = *m_currentScene->mWorld;
+        EcsWorld& world = *mCurrentScene->mWorld;
         Mouse   & mouse = world.GetSingleton<Mouse>();
         if( !mouseCaptured && _gameWindowHovered && mouse.mPressed[ Mouse::buttonLeft ] )
  		{
-			EcsEntity cameraID = world.GetEntity( m_currentScene->mMainCameraHandle );
+			EcsEntity cameraID = world.GetEntity( mCurrentScene->mMainCameraHandle );
 			const Transform& cameraTransform = world.GetComponent<Transform>( cameraID );
 			const Camera& camera = world.GetComponent<Camera>( cameraID );
 
@@ -148,9 +148,9 @@ namespace fan
  		}
 
 		// draw collision shapes, lights @migration
-		if( m_selectedNodeHandle != 0 )
+		if( mSelectedNodeHandle != 0 )
 		{
-			const EcsEntity selectedEntity = world.GetEntity( m_selectedNodeHandle );
+			const EcsEntity selectedEntity = world.GetEntity( mSelectedNodeHandle );
 			S_DrawDebugCollisionShapes::DrawCollisionShape( world, selectedEntity );
 
 			if( world.HasComponent<Transform>( selectedEntity ) ) 
@@ -178,14 +178,14 @@ namespace fan
 	//========================================================================================================
 	void EditorSelection::SetSelectedSceneNode( SceneNode* _node )
 	{
-		m_selectedNodeHandle = _node != nullptr ? _node->handle : 0;
+		mSelectedNodeHandle = _node != nullptr ? _node->handle : 0;
 	}
 
 	//========================================================================================================
 	//========================================================================================================
 	void EditorSelection::Deselect()
 	{
-		m_selectedNodeHandle = 0;
+		mSelectedNodeHandle = 0;
 	}
 
 	//========================================================================================================

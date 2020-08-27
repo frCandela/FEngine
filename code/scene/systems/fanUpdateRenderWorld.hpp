@@ -94,8 +94,8 @@ namespace fan
 
 				RenderDataMesh2D data;
 				data.mesh = renderer.mMesh2D;
-                data.position = pos / renderWorld.targetSize * 2.f - glm::vec2( 1.f, 1.f );
-                data.scale = size / renderWorld.targetSize;
+                data.position = pos / renderWorld.mTargetSize * 2.f - glm::vec2( 1.f, 1.f );
+                data.scale = size / renderWorld.mTargetSize;
 				data.color = renderer.mColor.ToGLM();
 				data.textureIndex = renderer.GetTexture() != nullptr ? renderer.GetTexture()->mIndex : 0;
 				data.mDepth = renderer.mDepth;

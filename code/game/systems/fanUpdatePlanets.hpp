@@ -22,7 +22,7 @@ namespace fan
 			if( _delta == 0.f ) { return; }
 
 			Time& time = _world.GetSingleton<Time>();
-			const float currentTime = time.frameIndex * time.logicDelta;
+			const float currentTime = time.mFrameIndex * time.mLogicDelta;
 
 			auto transformIt = _view.begin<Transform>();
 			auto planetIt = _view.begin<Planet>();
@@ -126,7 +126,7 @@ namespace fan
 			// generates the mesh
 			std::vector<Vertex>	vertices;
 			vertices.reserve( 3 * _view.Size() );
-			const float minGapRadians = btRadians( sunLight.subAngle );
+			const float minGapRadians = btRadians( sunLight.mSubAngle );
 			std::set<float> norms;	// Stores the nested opening segments norms
 			for( int axisIndex = 0; axisIndex < (int)segments.size(); axisIndex++ )
 			{
@@ -161,7 +161,7 @@ namespace fan
 								const int numSubdivistions = int( angle / minGapRadians ) + 1;
 								const float subdivisionAngle = angle / numSubdivistions;
 								btTransform rotate( btQuaternion( btVector3::Up(), subdivisionAngle ) );
-								btVector3 subAxisNext = sunLight.radius * axis.direction / axis.norm;
+								btVector3 subAxisNext = sunLight.mRadius * axis.direction / axis.norm;
 								for( int subAxisIndex = 0; subAxisIndex < numSubdivistions; subAxisIndex++ )
 								{
 									btVector3 subAxis = subAxisNext;
@@ -171,7 +171,7 @@ namespace fan
 							}
 							else // gap size is small enough
 							{
-								length = sunLight.radius;
+								length = sunLight.mRadius;
 							}
 						}
 						else
@@ -191,7 +191,7 @@ namespace fan
 			}
 
 			// Load mesh
-			sunLight.mesh->LoadFromVertices( vertices );
+			sunLight.mMesh->LoadFromVertices( vertices );
 		}
 	};
 }

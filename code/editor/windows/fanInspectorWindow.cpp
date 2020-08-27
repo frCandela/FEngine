@@ -33,7 +33,7 @@ namespace fan
 	{
 		SCOPED_PROFILE( inspector );
 
-		EcsHandle handleSelected = _world.GetSingleton<EditorSelection>().m_selectedNodeHandle;
+		EcsHandle handleSelected = _world.GetSingleton<EditorSelection>().mSelectedNodeHandle;
 		if( handleSelected != 0 )
 		{
 			SceneNode& node = _world.GetComponent<SceneNode>( _world.GetEntity( handleSelected ) );
@@ -92,7 +92,7 @@ namespace fan
 		if( ImGui::MenuItem( _info.name.c_str() ) )
 		{
 			// Create new EcsComponent 
-			EcsHandle handleSelected = _world.GetSingleton<EditorSelection>().m_selectedNodeHandle;
+			EcsHandle handleSelected = _world.GetSingleton<EditorSelection>().mSelectedNodeHandle;
 			EcsEntity entity = _world.GetEntity( handleSelected );
 			if( !_world.HasComponent( entity, _info.type ) )
 			{

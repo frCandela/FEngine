@@ -33,7 +33,7 @@ namespace fan
 				// raycast on the light mesh
 				const btVector3 rayOrigin = btVector3( position[0], 1.f, position[2] );
 				btVector3 outIntersection;
-				bool isInsideSunlight = sunlight.mesh->RayCast( rayOrigin, -btVector3::Up(), outIntersection );
+				bool isInsideSunlight = sunlight.mMesh->RayCast( rayOrigin, -btVector3::Up(), outIntersection );
 				if( !isInsideSunlight )
 				{
 					_world.Kill( entity );

@@ -11,7 +11,6 @@ namespace fan
 	struct ServerNetworkManager : public EcsSingleton
 	{
 		ECS_SINGLETON( ServerNetworkManager )
-	public:
 		static void SetInfo( EcsSingletonInfo& _info );
 		static void Init( EcsWorld& _world, EcsSingleton& _component );
 		static void OnGui( EcsWorld&, EcsSingleton& _component );

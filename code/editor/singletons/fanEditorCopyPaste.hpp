@@ -8,7 +8,6 @@ namespace fan
 
 	//========================================================================================================
 	// copy paste editor callbacks
-	// @todo make this a singleton component in the editor ecs world
 	//========================================================================================================
 	struct EditorCopyPaste : EcsSingleton
 	{
@@ -20,6 +19,6 @@ namespace fan
 		void OnCopy();
 		void OnPaste();
 
-		EditorSelection* m_selection;
+		EditorSelection* mSelection;
 	};
 }

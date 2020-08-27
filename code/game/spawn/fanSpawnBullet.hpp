@@ -66,7 +66,7 @@ namespace fan
 				const LinkingContext& linkingContext = _world.GetSingleton<LinkingContext>();
 
 				// spawn the bullet now
-				const EcsHandle ownerHandle = linkingContext.netIDToEcsHandle.at( _owner );
+				const EcsHandle ownerHandle = linkingContext.mNetIDToEcsHandle.at( _owner );
 				const EcsEntity ownerEntity = _world.GetEntity( ownerHandle );
 				const Weapon& ownerWeapon = _world.GetComponent<Weapon>( ownerEntity );
 				const Rigidbody& ownerRigidbody = _world.GetComponent<Rigidbody>( ownerEntity );
@@ -87,7 +87,7 @@ namespace fan
 					bulletRigidbody.SetMotionState( _world.GetComponent<MotionState>( bulletID ).motionState );
 					bulletRigidbody.SetCollisionShape( _world.GetComponent<SphereShape>( bulletID ).sphereShape );
 					bulletRigidbody.SetTransform( bulletTransform.transform );
-					physicsWorld.dynamicsWorld->addRigidBody( bulletRigidbody.rigidbody );
+					physicsWorld.mDynamicsWorld->addRigidBody( bulletRigidbody.rigidbody );
 				}
 			}
 		};

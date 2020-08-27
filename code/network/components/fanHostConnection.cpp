@@ -72,7 +72,7 @@ namespace fan
 
 				PacketPing packetPing;
 				packetPing.previousRtt = rtt;
-				packetPing.serverFrame = time.frameIndex;
+				packetPing.serverFrame = time.mFrameIndex;
 				packetPing.Write( _packet );
 			}
 		}
@@ -160,7 +160,7 @@ namespace fan
 		}
 		averageFrameDelta /= (int)_connection.framesDelta.size();
 
-		return FrameIndex( -averageFrameDelta ) + FrameIndex( _connection.rtt / _time.logicDelta ) + 3;
+		return FrameIndex( -averageFrameDelta ) + FrameIndex( _connection.rtt / _time.mLogicDelta ) + 3;
 	}
 
 	//================================================================================================================================

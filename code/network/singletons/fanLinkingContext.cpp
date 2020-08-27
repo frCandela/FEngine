@@ -17,9 +17,9 @@ namespace fan
 	void LinkingContext::Init( EcsWorld& /*_world*/, EcsSingleton& _component )
 	{
 		LinkingContext& linkingContext = static_cast<LinkingContext&>( _component );
-		linkingContext.netIDToEcsHandle.clear();
-		linkingContext.ecsHandleToNetID.clear();
-		linkingContext.nextNetID = 1;
+		linkingContext.mNetIDToEcsHandle.clear();
+		linkingContext.mEcsHandleToNetID.clear();
+		linkingContext.mNextNetID = 1;
 	}
 
 	//========================================================================================================
@@ -28,22 +28,22 @@ namespace fan
 	{
 		fanAssert( _handle != 0 );
 		fanAssert( _netID != 0 );
-		fanAssert( ecsHandleToNetID.find( _handle ) == ecsHandleToNetID.end() );
-		fanAssert( netIDToEcsHandle.find( _netID ) == netIDToEcsHandle.end() );
-		netIDToEcsHandle[_netID] = _handle;
-		ecsHandleToNetID[_handle] = _netID;
+		fanAssert( mEcsHandleToNetID.find( _handle ) == mEcsHandleToNetID.end() );
+		fanAssert( mNetIDToEcsHandle.find( _netID ) == mNetIDToEcsHandle.end() );
+        mNetIDToEcsHandle[_netID]  = _handle;
+        mEcsHandleToNetID[_handle] = _netID;
 	}
 
 	//========================================================================================================
 	//========================================================================================================
 	void LinkingContext::RemoveEntity( const EcsHandle _handle )
 	{
-		auto it = ecsHandleToNetID.find( _handle );
-		if( it != ecsHandleToNetID.end() )
+		auto it = mEcsHandleToNetID.find( _handle );
+		if( it != mEcsHandleToNetID.end() )
 		{
 			const NetID netID = it->second;
-			netIDToEcsHandle.erase( netID );
-			ecsHandleToNetID.erase( _handle );
+			mNetIDToEcsHandle.erase( netID );
+			mEcsHandleToNetID.erase( _handle );
 		}
 	}
 
@@ -56,7 +56,7 @@ namespace fan
 
 		ImGui::Text( "net ID" );		ImGui::NextColumn();
 		ImGui::Text( "entity handle" ); ImGui::NextColumn();
-		for( std::pair<NetID, EcsHandle> pair : linkingContext.netIDToEcsHandle )
+		for( std::pair<NetID, EcsHandle> pair : linkingContext.mNetIDToEcsHandle )
 		{
 			ImGui::Text( "%d", pair.first );
 			ImGui::NextColumn();

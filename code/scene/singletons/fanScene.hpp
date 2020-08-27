@@ -32,12 +32,12 @@ namespace fan
 		void Clear();
 		void SetMainCamera( const EcsHandle _cameraHandle );
 
-		static EcsHandle	R_FindMaximumHandle( SceneNode& _node );
-		static void			R_SaveToJson( const SceneNode& _node, Json& _json );
-        static SceneNode& R_LoadFromJson( const Json& _json,
-                                          Scene& _scene,
-                                          SceneNode* _parent,
-                                          const uint32_t _handleOffset );
+		static EcsHandle	RFindMaximumHandle( SceneNode& _node );
+		static void			RSaveToJson( const SceneNode& _node, Json& _json );
+        static SceneNode&   RLoadFromJson( const Json& _json,
+                                           Scene& _scene,
+                                           SceneNode* _parent,
+                                           const uint32_t _handleOffset );
 		static void			RemapSceneNodesIndices( Json& _json );
 
 		Signal< Scene& >     mOnClear;

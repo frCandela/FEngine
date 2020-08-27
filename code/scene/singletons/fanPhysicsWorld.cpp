@@ -24,12 +24,12 @@ namespace fan
 		PhysicsWorld& physicsWorld = static_cast<PhysicsWorld&>( _component );
 		
 		// remove all collision objects
-		for( int i = physicsWorld.dynamicsWorld->getNumCollisionObjects() - 1; i >= 0; i-- )
+		for( int i = physicsWorld.mDynamicsWorld->getNumCollisionObjects() - 1; i >= 0; i-- )
 		{
-			btCollisionObject* obj = physicsWorld.dynamicsWorld->getCollisionObjectArray()[i];
-			physicsWorld.dynamicsWorld->removeCollisionObject( obj );
+			btCollisionObject* obj = physicsWorld.mDynamicsWorld->getCollisionObjectArray()[i];
+			physicsWorld.mDynamicsWorld->removeCollisionObject( obj );
 		}
-		physicsWorld.dynamicsWorld->setGravity( btVector3::Zero() );
+		physicsWorld.mDynamicsWorld->setGravity( btVector3::Zero() );
 	}
 
 	//========================================================================================================
@@ -37,7 +37,7 @@ namespace fan
 	void PhysicsWorld::Save( const EcsSingleton& _component, Json& _json )
 	{
 		const PhysicsWorld& physicsWorld = static_cast<const PhysicsWorld&>( _component );
-		Serializable::SaveVec3( _json, "gravity", physicsWorld.dynamicsWorld->getGravity() );
+		Serializable::SaveVec3( _json, "gravity", physicsWorld.mDynamicsWorld->getGravity() );
 	}
 
 	//========================================================================================================
@@ -47,21 +47,21 @@ namespace fan
 		btVector3 gravity;
 		Serializable::LoadVec3(	 _json, "gravity", gravity );
 		PhysicsWorld& physicsWorld = static_cast<PhysicsWorld&>( _component );
-		physicsWorld.dynamicsWorld->setGravity( gravity );
+		physicsWorld.mDynamicsWorld->setGravity( gravity );
 	}
 
 	//========================================================================================================
 	//========================================================================================================
 	PhysicsWorld::PhysicsWorld()
 	{
-		collisionConfiguration = new btDefaultCollisionConfiguration();
-		dispatcher = new btCollisionDispatcher( collisionConfiguration );
-		overlappingPairCache = new btDbvtBroadphase();
-		solver = new btSequentialImpulseConstraintSolver();
-        dynamicsWorld = new btDiscreteDynamicsWorld( dispatcher,
-                                                     overlappingPairCache,
-                                                     solver,
-                                                     collisionConfiguration );
+        mCollisionConfiguration = new btDefaultCollisionConfiguration();
+        mDispatcher             = new btCollisionDispatcher( mCollisionConfiguration );
+        mOverlappingPairCache   = new btDbvtBroadphase();
+        mSolver                 = new btSequentialImpulseConstraintSolver();
+        mDynamicsWorld = new btDiscreteDynamicsWorld( mDispatcher,
+                                                      mOverlappingPairCache,
+                                                      mSolver,
+                                                      mCollisionConfiguration );
 
 		// deterministic configuration ( not sure if it helps -> please test as you need it )
 // 		btContactSolverInfo& info = dynamicsWorld->getSolverInfo();
@@ -70,11 +70,11 @@ namespace fan
 
 		gContactStartedCallback = ContactStartedCallback;
 		gContactEndedCallback = ContactEndedCallback;
-		dynamicsWorld->setGravity( btVector3::Zero() );
+		mDynamicsWorld->setGravity( btVector3::Zero() );
 
 		// Bullet physics is broken when its internal clock is zero,
 		// this prevents it from happening when the timestep is exactly equal to the fixed timestep
-		dynamicsWorld->stepSimulation( 0.015f, 1, Time::s_physicsDelta );
+		mDynamicsWorld->stepSimulation( 0.015f, 1, Time::sPhysicsDelta );
 	}
 
 	//========================================================================================================
@@ -83,8 +83,8 @@ namespace fan
 	void PhysicsWorld::Reset()
 	{
 		///create a copy of the array, not a reference!
-		const btCollisionObjectArray& collisionObjects = dynamicsWorld->getCollisionObjectArray();
-		for( int i = 0; i < dynamicsWorld->getNumCollisionObjects(); i++ )
+		const btCollisionObjectArray& collisionObjects = mDynamicsWorld->getCollisionObjectArray();
+		for( int i = 0; i < mDynamicsWorld->getNumCollisionObjects(); i++ )
 		{
 			btCollisionObject* colObj = collisionObjects[i];
 			btRigidBody* body = btRigidBody::upcast( colObj );
@@ -103,8 +103,8 @@ namespace fan
 // 				}
 				// removed cached contact points
 				// (this is not necessary if all objects have been removed from the dynamics world)
-                btOverlappingPairCache* pairCache = dynamicsWorld->getBroadphase()->getOverlappingPairCache();
-                pairCache->cleanProxyFromPairs(colObj->getBroadphaseHandle(), dynamicsWorld->getDispatcher());
+                btOverlappingPairCache* pairCache = mDynamicsWorld->getBroadphase()->getOverlappingPairCache();
+                pairCache->cleanProxyFromPairs( colObj->getBroadphaseHandle(), mDynamicsWorld->getDispatcher());
 // 
 // 				btRigidBody* body = btRigidBody::upcast( colObj );
 // 				if( body && !body->isStaticObject() )
@@ -117,25 +117,25 @@ namespace fan
 		}
 
 		// reset some internal cached data in the broad phase
-		dynamicsWorld->getBroadphase()->resetPool( dynamicsWorld->getDispatcher() );
-		dynamicsWorld->getConstraintSolver()->reset();
+		mDynamicsWorld->getBroadphase()->resetPool( mDynamicsWorld->getDispatcher() );
+		mDynamicsWorld->getConstraintSolver()->reset();
 	}
 
 	//========================================================================================================
 	//========================================================================================================
 	PhysicsWorld::~PhysicsWorld()
 	{
-		for( int i = dynamicsWorld->getNumCollisionObjects() - 1; i >= 0; i-- )
+		for( int i = mDynamicsWorld->getNumCollisionObjects() - 1; i >= 0; i-- )
 		{
-			btCollisionObject* obj = dynamicsWorld->getCollisionObjectArray()[i];
-			dynamicsWorld->removeCollisionObject( obj );
+			btCollisionObject* obj = mDynamicsWorld->getCollisionObjectArray()[i];
+			mDynamicsWorld->removeCollisionObject( obj );
 		}
 
-		delete solver;
-		delete overlappingPairCache;
-		delete dispatcher;
-		delete collisionConfiguration;
-		delete dynamicsWorld;
+		delete mSolver;
+		delete mOverlappingPairCache;
+		delete mDispatcher;
+		delete mCollisionConfiguration;
+		delete mDynamicsWorld;
 	}
 
 	//========================================================================================================
@@ -180,12 +180,12 @@ namespace fan
 
         ImGui::Indent(); ImGui::Indent();
         {
-            btVector3 gravity = physicsWorld.dynamicsWorld->getGravity();
+            btVector3 gravity = physicsWorld.mDynamicsWorld->getGravity();
             if( ImGui::DragFloat3( "gravity", &gravity[0], 0.1f, -20.f, 20.f ) )
             {
-                physicsWorld.dynamicsWorld->setGravity( gravity );
+                physicsWorld.mDynamicsWorld->setGravity( gravity );
             }
-            ImGui::Text( "num rigidbodies : %d", physicsWorld.dynamicsWorld->getNumCollisionObjects() );
+            ImGui::Text( "num rigidbodies : %d", physicsWorld.mDynamicsWorld->getNumCollisionObjects() );
         }
         ImGui::Unindent(); ImGui::Unindent();
     }

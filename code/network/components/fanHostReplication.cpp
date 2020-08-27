@@ -68,13 +68,13 @@ namespace fan
 		packet.packetData.clear();
 
 		// Serializes net id
-		 const auto it = linkingContext.ecsHandleToNetID.find( _handle );
-		 if( it != linkingContext.ecsHandleToNetID.end() )
+		 const auto it = linkingContext.mEcsHandleToNetID.find( _handle );
+		 if( it != linkingContext.mEcsHandleToNetID.end() )
 		 {
 			 const NetID netID = it->second;
 			 packet.packetData << netID;
 			 packet.packetData << sf::Uint8( _componentTypeInfo.size() );
-			 if( it != linkingContext.ecsHandleToNetID.end() )
+			 if( it != linkingContext.mEcsHandleToNetID.end() )
 			 {
 				 for( const uint32_t typeInfo : _componentTypeInfo )
 				 {

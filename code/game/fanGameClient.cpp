@@ -148,15 +148,15 @@ namespace fan
         mWorld.Run<S_RegisterAllRigidbodies>();
         GameCamera& gameCamera = GameCamera::CreateGameCamera( mWorld );
         Scene& scene = mWorld.GetSingleton<Scene>();
-        scene.SetMainCamera( gameCamera.cameraHandle );
+        scene.SetMainCamera( gameCamera.cmCameraHandle );
 
 		SolarEruption::Start( mWorld );
 
         MeshManager& meshManager = *mWorld.GetSingleton<RenderResources>().mMeshManager;
         SunLight& sunLight = mWorld.GetSingleton<SunLight>();
         RenderWorld& renderWorld = mWorld.GetSingleton<RenderWorld>();
-        meshManager.Add( sunLight.mesh, "sunlight_mesh_" + mName );
-        meshManager.Add( renderWorld.particlesMesh, "particles_mesh_" + mName );
+        meshManager.Add( sunLight.mMesh, "sunlight_mesh_" + mName );
+        meshManager.Add( renderWorld.mParticlesMesh, "particles_mesh_" + mName );
 	}
 
 	//========================================================================================================
@@ -170,8 +170,8 @@ namespace fan
 		RenderWorld& renderWorld = mWorld.GetSingleton<RenderWorld>();
         SunLight& sunLight = mWorld.GetSingleton<SunLight>();
         MeshManager& meshManager = *mWorld.GetSingleton<RenderResources>().mMeshManager;
-        meshManager.Remove( sunLight.mesh->mPath );
-        meshManager.Remove( renderWorld.particlesMesh->mPath );
+        meshManager.Remove( sunLight.mMesh->mPath );
+        meshManager.Remove( renderWorld.mParticlesMesh->mPath );
 
 		GameCamera::DeleteGameCamera( mWorld );
 
@@ -186,18 +186,18 @@ namespace fan
 	    if( _delta == 0.f ) { return; }
 
 		ClientNetworkManager& netManager = mWorld.GetSingleton<ClientNetworkManager>();
-		const EcsEntity persistentID = mWorld.GetEntity( netManager.persistentHandle );
+		const EcsEntity persistentID = mWorld.GetEntity( netManager.mPersistentHandle );
 		ClientGameData& gameData = mWorld.GetComponent<ClientGameData>( persistentID );
 		if( !gameData.spaceshipSynced )
 		{
 			Time& time = mWorld.GetSingleton<Time>();
-			const FrameIndex lastFrame = time.frameIndex;
+			const FrameIndex lastFrame = time.mFrameIndex;
 			const FrameIndex firstFrame = gameData.lastServerState.frameIndex;
             mWorld.Run<S_RollbackInit>();
 			Debug::Highlight() << "rollback to frame " << firstFrame << Debug::Endl();
 
 			// Rollback at the frame we took the snapshot of the player game state
-			time.frameIndex = firstFrame;
+			time.mFrameIndex = firstFrame;
 
 			// reset world to first frame		
 			PhysicsWorld& physicsWorld = mWorld.GetSingleton<PhysicsWorld>();
@@ -205,8 +205,8 @@ namespace fan
             mWorld.Run<S_RollbackRestoreState>( firstFrame );
 			const EcsEntity spaceshipID = mWorld.GetEntity( gameData.spaceshipHandle );
 			Rigidbody& rigidbody = mWorld.GetComponent<Rigidbody>( spaceshipID );
-			physicsWorld.dynamicsWorld->removeRigidBody( rigidbody.rigidbody );
-			physicsWorld.dynamicsWorld->addRigidBody( rigidbody.rigidbody );
+			physicsWorld.mDynamicsWorld->removeRigidBody( rigidbody.rigidbody );
+			physicsWorld.mDynamicsWorld->addRigidBody( rigidbody.rigidbody );
 			rigidbody.ClearForces();
 			Transform& transform = mWorld.GetComponent<Transform>( spaceshipID );
 			rigidbody.SetVelocity( gameData.lastServerState.velocity );
@@ -219,18 +219,18 @@ namespace fan
 			gameData.previousLocalStates.push( gameData.lastServerState );
 
 			// resimulate the last frames of input of the player
-			const float delta = time.logicDelta;
-			while( time.frameIndex < lastFrame )
+			const float delta = time.mLogicDelta;
+			while( time.mFrameIndex < lastFrame )
 			{
-				time.frameIndex++;
+				time.mFrameIndex++;
 
-                mWorld.Run<S_RollbackRestoreState>( time.frameIndex );
+                mWorld.Run<S_RollbackRestoreState>( time.mFrameIndex );
 
                 mWorld.Run<S_MovePlanets>( delta );
                 mWorld.Run<S_MoveSpaceships>( delta );
 
                 mWorld.Run<S_SynchronizeMotionStateFromTransform>();
-				physicsWorld.dynamicsWorld->stepSimulation( time.logicDelta, 10, Time::s_physicsDelta );
+				physicsWorld.mDynamicsWorld->stepSimulation( time.mLogicDelta, 10, Time::sPhysicsDelta );
                 mWorld.Run<S_SynchronizeTransformFromMotionState>();
 
                 mWorld.Run<S_ClientSaveState>( delta );
@@ -238,7 +238,7 @@ namespace fan
 			}
 
 			gameData.spaceshipSynced = true;
-			assert( time.frameIndex == lastFrame );
+			assert( time.mFrameIndex == lastFrame );
 		}
 	}
 
@@ -257,7 +257,7 @@ namespace fan
 
 			if( _delta > 0.f )
 			{
-				time.frameIndex++;
+				time.mFrameIndex++;
 			}
 
             mWorld.Run<S_ProcessTimedOutPackets>();
@@ -274,7 +274,7 @@ namespace fan
 			// physics & transforms
 			PhysicsWorld& physicsWorld = mWorld.GetSingleton<PhysicsWorld>();
             mWorld.Run<S_SynchronizeMotionStateFromTransform>();
-			physicsWorld.dynamicsWorld->stepSimulation( _delta, 10, Time::s_physicsDelta );
+			physicsWorld.mDynamicsWorld->stepSimulation( _delta, 10, Time::sPhysicsDelta );
             mWorld.Run<S_SynchronizeTransformFromMotionState>();
             mWorld.Run<SMoveFollowTransforms>();
 
@@ -297,7 +297,7 @@ namespace fan
 
 			// late update
 			const RenderWorld& renderWorld = mWorld.GetSingleton<RenderWorld>();
-			if( !renderWorld.isHeadless )
+			if( !renderWorld.mIsHeadless )
 			{
 				mWorld.Run<S_ParticlesOcclusion>( _delta );
 				mWorld.Run<S_UpdateParticles>( _delta );
@@ -341,6 +341,6 @@ namespace fan
 	{
         GameCamera& gameCamera = mWorld.GetSingleton<GameCamera>();
         Scene& scene = mWorld.GetSingleton<Scene>();
-        scene.SetMainCamera( gameCamera.cameraHandle );
+        scene.SetMainCamera( gameCamera.cmCameraHandle );
 	}
 }

@@ -58,12 +58,12 @@ namespace fan
 		for (int spawnIndex = int(spawnManager.spawns.size()) - 1; spawnIndex >= 0 ; spawnIndex--)
 		{
 			SpawnInfo& spawnInfo = spawnManager.spawns[spawnIndex];
-			if( time.frameIndex >= spawnInfo.spawnFrameIndex )
+			if( time.mFrameIndex >= spawnInfo.spawnFrameIndex )
 			{
-				if( time.frameIndex > spawnInfo.spawnFrameIndex )
+				if( time.mFrameIndex > spawnInfo.spawnFrameIndex )
 				{
 					Debug::Warning() << "missed spawning for frame" << spawnInfo.spawnFrameIndex
-					                 << " ,delta is " << time.frameIndex - spawnInfo.spawnFrameIndex
+					                 << " ,delta is " << time.mFrameIndex - spawnInfo.spawnFrameIndex
 					                 << Debug::Endl();
 				}
 
@@ -76,8 +76,8 @@ namespace fan
 		LinkingContext& linkingContext = _world.GetSingleton<LinkingContext>();
 		for ( const NetID netID : spawnManager.despawns )
 		{
-			auto it = linkingContext.netIDToEcsHandle.find( netID );
-			if( it != linkingContext.netIDToEcsHandle.end() )
+			auto it = linkingContext.mNetIDToEcsHandle.find( netID );
+			if( it != linkingContext.mNetIDToEcsHandle.end() )
 			{
 				const EcsHandle handle = it->second;
 				linkingContext.RemoveEntity( handle );

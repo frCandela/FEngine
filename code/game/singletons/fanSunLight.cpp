@@ -21,12 +21,12 @@ namespace fan
 	void SunLight::Init( EcsWorld& /*_world*/, EcsSingleton& _component )
 	{
 		SunLight& sunLight = static_cast<SunLight&>( _component );
-		sunLight.subAngle = 45.f;
-		sunLight.radius = 100.f;
-		sunLight.mesh = new Mesh();
-		sunLight.mesh->mHostVisible = true;
-		sunLight.mesh->mOptimizeVertices = false;
-		sunLight.mesh->mAutoUpdateHull = false;
+		sunLight.mSubAngle                = 45.f;
+		sunLight.mRadius                  = 100.f;
+		sunLight.mMesh                    = new Mesh();
+		sunLight.mMesh->mHostVisible      = true;
+		sunLight.mMesh->mOptimizeVertices = false;
+		sunLight.mMesh->mAutoUpdateHull   = false;
 	}
 	
 	//========================================================================================================
@@ -34,8 +34,8 @@ namespace fan
 	void SunLight::Save( const EcsSingleton& _component, Json& _json )
 	{
 		const SunLight& sunLight = static_cast<const SunLight&>( _component );
-		Serializable::SaveFloat( _json, "sub_angle", sunLight.subAngle );
-		Serializable::SaveFloat( _json, "radius", sunLight.radius );
+		Serializable::SaveFloat( _json, "sub_angle", sunLight.mSubAngle );
+		Serializable::SaveFloat( _json, "radius", sunLight.mRadius );
 	}
 
 	//========================================================================================================
@@ -43,8 +43,8 @@ namespace fan
 	void SunLight::Load( EcsSingleton& _component, const Json& _json )
 	{
 		SunLight& sunLight = static_cast<SunLight&>( _component );
-		Serializable::LoadFloat( _json, "sub_angle", sunLight.subAngle );
-		Serializable::LoadFloat( _json, "radius", sunLight.radius );
+		Serializable::LoadFloat( _json, "sub_angle", sunLight.mSubAngle );
+		Serializable::LoadFloat( _json, "radius", sunLight.mRadius );
 	}
 
 	//========================================================================================================
@@ -62,8 +62,8 @@ namespace fan
 		glm::vec2 uv1( _v0[0], _v0[2] );
 		glm::vec2 uv2( _v1[0], _v1[2] );
 
-		uv1 = 0.5f * uv1 / radius + glm::vec2( 0.5f, 0.5f );
-		uv2 = 0.5f * uv2 / radius + glm::vec2( 0.5f, 0.5f );
+		uv1 = 0.5f * uv1 / mRadius + glm::vec2( 0.5f, 0.5f );
+		uv2 = 0.5f * uv2 / mRadius + glm::vec2( 0.5f, 0.5f );
 
 		_vertices.push_back( { center,	normal, color,centerUV } );
 		_vertices.push_back( { p1,		normal, color, uv1 } );
@@ -75,7 +75,7 @@ namespace fan
     void SunLight::OnGui( EcsWorld&, EcsSingleton& _component )
     {
         SunLight& sunLight = static_cast<SunLight&>( _component );
-        ImGui::DragFloat( "sub angle", &sunLight.subAngle, 1.f, 0.f, 90.f );
-        ImGui::DragFloat( "radius", &sunLight.radius, 1.f, 1.f, 1000.f );
+        ImGui::DragFloat( "sub angle", &sunLight.mSubAngle, 1.f, 0.f, 90.f );
+        ImGui::DragFloat( "radius", &sunLight.mRadius, 1.f, 1.f, 1000.f );
     }
 }

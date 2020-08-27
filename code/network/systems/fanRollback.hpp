@@ -38,7 +38,7 @@ namespace fan
 						if( componentInfo.rollbackSave != nullptr )
 						{
 							ClientRollback::RollbackData rollbackData;
-							rollbackData.frameIndex = time.frameIndex;
+							rollbackData.frameIndex = time.mFrameIndex;
 							rollbackData.componentIndex = i;
 
 							// save rollback state
@@ -69,8 +69,8 @@ namespace fan
 
 			// get the last server state frame index
 			const ClientNetworkManager& netManager = _world.GetSingleton<ClientNetworkManager>();
-			if( netManager.persistentHandle == 0 ){ return; }
-			const EcsEntity entity = _world.GetEntity( netManager.persistentHandle );
+			if( netManager.mPersistentHandle == 0 ){ return; }
+			const EcsEntity entity = _world.GetEntity( netManager.mPersistentHandle );
 			const ClientGameData& clientData = _world.GetComponent<ClientGameData>( entity );
 			const FrameIndex lastFrameIndex = clientData.lastServerState.frameIndex;
 

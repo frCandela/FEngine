@@ -139,7 +139,7 @@ namespace fan
         mWorld.Run<S_RegisterAllRigidbodies>();
         GameCamera& gameCamera = GameCamera::CreateGameCamera( mWorld );
         Scene& scene = mWorld.GetSingleton<Scene>();
-        scene.SetMainCamera( gameCamera.cameraHandle );
+        scene.SetMainCamera( gameCamera.cmCameraHandle );
 
 		SolarEruption::Start( mWorld );
 
@@ -149,8 +149,8 @@ namespace fan
         MeshManager& meshManager = *mWorld.GetSingleton<RenderResources>().mMeshManager;
         SunLight& sunLight = mWorld.GetSingleton<SunLight>();
         RenderWorld& renderWorld = mWorld.GetSingleton<RenderWorld>();
-        meshManager.Add( sunLight.mesh, "sunlight_mesh_" + mName );
-        meshManager.Add( renderWorld.particlesMesh, "particles_mesh_" + mName );
+        meshManager.Add( sunLight.mMesh, "sunlight_mesh_" + mName );
+        meshManager.Add( renderWorld.mParticlesMesh, "particles_mesh_" + mName );
 	}
 
 	//========================================================================================================
@@ -164,8 +164,8 @@ namespace fan
 		RenderWorld& renderWorld = mWorld.GetSingleton<RenderWorld>();
         SunLight& sunLight = mWorld.GetSingleton<SunLight>();
         MeshManager& meshManager = *mWorld.GetSingleton<RenderResources>().mMeshManager;
-        meshManager.Remove( sunLight.mesh->mPath );
-        meshManager.Remove( renderWorld.particlesMesh->mPath );
+        meshManager.Remove( sunLight.mMesh->mPath );
+        meshManager.Remove( renderWorld.mParticlesMesh->mPath );
 
 		GameCamera::DeleteGameCamera( mWorld );
         ServerNetworkManager & netManager = mWorld.GetSingleton<ServerNetworkManager>();
@@ -180,7 +180,7 @@ namespace fan
 
 		if( _delta > 0.f )
 		{
-			time.frameIndex++;
+			time.mFrameIndex++;
 		}
 
 		{
@@ -201,7 +201,7 @@ namespace fan
 			// physics & transforms
 			PhysicsWorld& physicsWorld = mWorld.GetSingleton<PhysicsWorld>();
             mWorld.Run<S_SynchronizeMotionStateFromTransform>();
-			physicsWorld.dynamicsWorld->stepSimulation( _delta, 10, Time::s_physicsDelta );
+			physicsWorld.mDynamicsWorld->stepSimulation( _delta, 10, Time::sPhysicsDelta );
 			mWorld.Run<S_SynchronizeTransformFromMotionState>();
 			mWorld.Run<SMoveFollowTransforms>();
 
@@ -218,7 +218,7 @@ namespace fan
 
 			// late update
 			const RenderWorld& renderWorld = mWorld.GetSingleton<RenderWorld>();
-			if( ! renderWorld.isHeadless )
+			if( ! renderWorld.mIsHeadless )
 			{
 				SCOPED_PROFILE( game_late );
 				mWorld.Run<S_ParticlesOcclusion>(		_delta );
@@ -243,6 +243,6 @@ namespace fan
     {
         GameCamera& gameCamera = mWorld.GetSingleton<GameCamera>();
         Scene& scene = mWorld.GetSingleton<Scene>();
-        scene.SetMainCamera( gameCamera.cameraHandle );
+        scene.SetMainCamera( gameCamera.cmCameraHandle );
     }
 }

@@ -107,7 +107,7 @@ namespace fan
 
 	//========================================================================================================
 	//========================================================================================================
-	EcsHandle Scene::R_FindMaximumHandle( SceneNode& _node )
+	EcsHandle Scene::RFindMaximumHandle( SceneNode& _node )
 	{
 		EcsWorld& world = *_node.scene->mWorld;
 
@@ -116,7 +116,7 @@ namespace fan
 		for ( int childIndex = 0; childIndex < (int)childs.size(); childIndex++ )
 		{
 		    SceneNode& node = world.GetComponent<SceneNode>( world.GetEntity( childs[childIndex] ) );
-			EcsHandle childHandle = R_FindMaximumHandle( node );
+			EcsHandle childHandle = RFindMaximumHandle( node );
 			if ( childHandle > handle )
 			{
 				handle = childHandle;
@@ -192,7 +192,7 @@ namespace fan
 
 			// saves all scene nodes recursively
 			Json& jRoot = jScene["root"];
-			R_SaveToJson( GetRootNode(), jRoot );
+            RSaveToJson( GetRootNode(), jRoot );
 			RemapSceneNodesIndices( jRoot );
 			outStream << json; // write to disk			
 			outStream.close();
@@ -201,7 +201,7 @@ namespace fan
 
 	//========================================================================================================
 	//========================================================================================================
-	void Scene::R_SaveToJson( const SceneNode& _node, Json& _json )
+	void Scene::RSaveToJson( const SceneNode& _node, Json& _json )
 	{	
 		EcsWorld& world = *_node.scene->mWorld;
 		Serializable::SaveString( _json, "name", _node.name );
@@ -238,7 +238,7 @@ namespace fan
 			if( ! childNode.HasFlag( SceneNode::NoSave ) )
 			{
 				Json& jchild = jchilds[childIndex];
-				R_SaveToJson( childNode, jchild );
+                RSaveToJson( childNode, jchild );
 				++childIndex;
 			}
 		}		
@@ -362,12 +362,12 @@ namespace fan
 			// loads all nodes recursively
 			const Json& jRoot = jScene["root"];
 			const EcsHandle handleOffset = 0; 
-			SceneNode&  rootNode = R_LoadFromJson( jRoot, *this, nullptr, handleOffset );
+			SceneNode&  rootNode = RLoadFromJson( jRoot, *this, nullptr, handleOffset );
             mRootNodeHandle = rootNode.handle;
 
 			mPath = _path;
 			inStream.close();
-			const EcsHandle maxHandle = R_FindMaximumHandle( rootNode ) + 1;
+			const EcsHandle maxHandle = RFindMaximumHandle( rootNode ) + 1;
 			mWorld->SetNextHandle( maxHandle );
 
 			ScenePointers::ResolveComponentPointers( *mWorld, handleOffset );
@@ -388,10 +388,10 @@ namespace fan
 
 	//========================================================================================================
 	//========================================================================================================
-    SceneNode& Scene::R_LoadFromJson( const Json& _json,
-                                      Scene& _scene,
-                                      SceneNode* _parent,
-                                      const uint32_t _handleOffset )
+    SceneNode& Scene::RLoadFromJson( const Json& _json,
+                                     Scene& _scene,
+                                     SceneNode* _parent,
+                                     const uint32_t _handleOffset )
 	{
 		//ScopedTimer timer("load scene");
 		EcsWorld& world = *_scene.mWorld;
@@ -428,8 +428,8 @@ namespace fan
 			for( int childIndex = 0; childIndex < (int)jchilds.size(); childIndex++ )
 			{
 				const Json& jchild_i = jchilds[childIndex];
-				{					
-					R_LoadFromJson( jchild_i, _scene, &node, _handleOffset );
+				{
+                    RLoadFromJson( jchild_i, _scene, &node, _handleOffset );
 				}
 			}
 		}

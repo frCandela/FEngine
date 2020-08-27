@@ -57,7 +57,7 @@ namespace fan
 
 					const EcsEntity spaceshipEntity = transformIt.GetEntity();
 					const EcsHandle ownerHandle = _world.GetHandle( spaceshipEntity );
-					const NetID ownerID = linkingContext.ecsHandleToNetID.at( ownerHandle );
+					const NetID ownerID = linkingContext.mEcsHandleToNetID.at( ownerHandle );
 					const btVector3 bulletPosition = transform.GetPosition() + transform.TransformDirection( weapon.originOffset );
 					const btVector3 bulletVelocity = rigidbody.GetVelocity() + weapon.bulletSpeed * transform.Forward();
 					spawn::SpawnBullet::Instanciate( _world, ownerID, bulletPosition, bulletVelocity );
@@ -67,7 +67,7 @@ namespace fan
 					{
 						// spawn on all hosts
 						const EcsHandle hostHandle = _world.GetComponent<HostPersistentHandle>( spaceshipEntity ).handle;
-						const SpawnInfo info = spawn::SpawnBullet::GenerateInfo( time.frameIndex, ownerID, bulletPosition, bulletVelocity );
+						const SpawnInfo info = spawn::SpawnBullet::GenerateInfo( time.mFrameIndex, ownerID, bulletPosition, bulletVelocity );
 						_world.Run<S_ReplicateOnAllHosts>( ClientRPC::RPCSpawn( info ), HostReplication::ResendUntilReplicated, hostHandle );
 					}
 				}

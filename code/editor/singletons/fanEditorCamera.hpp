@@ -5,9 +5,6 @@
 
 namespace fan
 {
-	struct SceneNode;
-	struct Transform;
-	struct Camera;
 	class EcsWorld;
 
 	//========================================================================================================
@@ -16,16 +13,14 @@ namespace fan
 	struct EditorCamera : public EcsSingleton
 	{
 		ECS_SINGLETON( EditorCamera )
-	public:
 		static void SetInfo( EcsSingletonInfo& _info );
 		static void Init( EcsWorld& _world, EcsSingleton& _component );
 		static void OnGui( EcsWorld&, EcsSingleton& _component );
 
-		EcsHandle cameraHandle;
-
-		float	  speed = 10.f;
-		float	  speedMultiplier = 3.f;
-		btVector2 xySensitivity = btVector2( 0.005f, 0.005f );
+		EcsHandle mCameraHandle;
+		float     mSpeed           = 10.f;
+		float     mSpeedMultiplier = 3.f;
+		btVector2 mXYSensitivity   = btVector2( 0.005f, 0.005f );
 
 		static void Update( EcsWorld& _world, const float _delta );
 		static void CreateEditorCamera( EcsWorld& _world );

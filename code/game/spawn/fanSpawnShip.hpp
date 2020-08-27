@@ -62,7 +62,7 @@ namespace fan
 				const Game& game						= _world.GetSingleton<Game>();
 
 				// do not spawn twice
-				if( linkingContext.netIDToEcsHandle.find( spaceshipID ) == linkingContext.netIDToEcsHandle.end() )
+				if( linkingContext.mNetIDToEcsHandle.find( spaceshipID ) == linkingContext.mNetIDToEcsHandle.end() )
 				{
 					if( game.mIsServer )
 					{
@@ -74,7 +74,7 @@ namespace fan
 					else
 					{
 						const ClientNetworkManager& netManager = _world.GetSingleton<ClientNetworkManager>();
-						const EcsEntity				persistentEntity = _world.GetEntity( netManager.persistentHandle );
+						const EcsEntity				persistentEntity = _world.GetEntity( netManager.mPersistentHandle );
 						ClientGameData& gameData = _world.GetComponent<ClientGameData>( persistentEntity );
 
 						if( gameData.playerID == playerID )
@@ -168,7 +168,7 @@ namespace fan
 						rigidbody.SetCollisionShape( boxShape.boxShape );
 						rigidbody.SetMotionState( motionState.motionState );
 						rigidbody.rigidbody->setWorldTransform( transform.transform );
-						physicsWorld.dynamicsWorld->addRigidBody( rigidbody.rigidbody );
+						physicsWorld.mDynamicsWorld->addRigidBody( rigidbody.rigidbody );
 
 						// registers physics callbacks
 						CollisionManager& collisionManager = _world.GetSingleton<CollisionManager>();

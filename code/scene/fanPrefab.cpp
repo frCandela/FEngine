@@ -64,7 +64,7 @@ namespace fan
 		Clear();
 
 		Json& prefabJson = mJson[ "prefab" ];
-		Scene::R_SaveToJson( _node, prefabJson );
+        Scene::RSaveToJson( _node, prefabJson );
 		Scene::RemapSceneNodesIndices( prefabJson );
 	}
 
@@ -82,8 +82,8 @@ namespace fan
 			EcsWorld& world = *_parent.scene->mWorld;
 			Scene& scene = world.GetSingleton<Scene>();
 			const EcsHandle handleOffset = world.GetNextHandle() - 1;
-			SceneNode& newNode = Scene::R_LoadFromJson( mJson["prefab"], scene, &_parent, handleOffset );
-			const EcsHandle maxHandle = Scene::R_FindMaximumHandle( _parent );
+			SceneNode& newNode = Scene::RLoadFromJson( mJson["prefab"], scene, &_parent, handleOffset );
+			const EcsHandle maxHandle = Scene::RFindMaximumHandle( _parent );
 			world.SetNextHandle( maxHandle + 1);
 			ScenePointers::ResolveComponentPointers( world, handleOffset );
 			return &newNode;

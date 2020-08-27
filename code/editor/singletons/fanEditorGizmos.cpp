@@ -27,7 +27,7 @@ namespace fan
 	void EditorGizmos::Init( EcsWorld& _world, EcsSingleton& _component )
 	{
 		EditorGizmos& editorGizmos = static_cast<EditorGizmos&>( _component );
-		editorGizmos.m_world = &_world;
+		editorGizmos.mWorld = &_world;
 	}
 
 	//========================================================================================================
@@ -38,8 +38,8 @@ namespace fan
                                       const size_t _uniqueID,
                                       btVector3& _newPosition )
 	{
-		Scene& scene = m_world->GetSingleton<Scene>();
-        Mouse& mouse = m_world->GetSingleton<Mouse>();
+		Scene& scene = mWorld->GetSingleton<Scene>();
+        Mouse& mouse = mWorld->GetSingleton<Mouse>();
 
 		// Get main camera data
 		EcsWorld& world = *scene.mWorld;
@@ -47,7 +47,7 @@ namespace fan
 		const Transform & cameraTransform = world.GetComponent<Transform>( id );
 		const Camera& camera = world.GetComponent<Camera>( id );
 
-		GizmoCacheData& cacheData = m_gizmoCacheData[ _uniqueID ];
+		GizmoCacheData& cacheData = mGizmoCacheData[ _uniqueID ];
 		const btVector3 origin = _transform.getOrigin();
 		const btTransform rotation( _transform.getRotation() );
         const btVector3   axisDirection[3] = { btVector3( 1, 0, 0 ),

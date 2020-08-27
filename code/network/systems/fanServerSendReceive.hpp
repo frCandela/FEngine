@@ -45,7 +45,7 @@ namespace fan
 				// write game data
 				if( hostData.spaceshipID != 0 )
 				{
-					if( hostData.nextPlayerState.frameIndex == time.frameIndex )
+					if( hostData.nextPlayerState.frameIndex == time.mFrameIndex )
 					{
 						hostData.nextPlayerState.Write( packet );
 					}
@@ -63,8 +63,8 @@ namespace fan
 				if( packet.GetSize() > sizeof( PacketTag ) )// don't send empty packets
 				{
 					reliabilityLayer.RegisterPacket( packet );
-					hostConnection.bandwidth = 1.f / time.logicDelta * float( packet.GetSize() ) / 1000.f; // in Ko/s
-					connection.socket.Send( packet, hostConnection.ip, hostConnection.port );
+					hostConnection.bandwidth = 1.f / time.mLogicDelta * float( packet.GetSize() ) / 1000.f; // in Ko/s
+					connection.mSocket.Send( packet, hostConnection.ip, hostConnection.port );
 				}
 				else
 				{
@@ -96,10 +96,10 @@ namespace fan
 			do
 			{
 				packet.Clear();
-				socketStatus = connection.socket.Receive( packet, receiveIP, receivePort );
+				socketStatus = connection.mSocket.Receive( packet, receiveIP, receivePort );
 
 				// Don't receive from itself
-				if( receivePort == connection.serverPort ) { continue; }
+				if( receivePort == connection.mServerPort ) { continue; }
 
 				switch( socketStatus )
 				{
@@ -170,7 +170,7 @@ namespace fan
 						{
 							PacketPing packetPing;
 							packetPing.Read( packet );
-							hostConnection.ProcessPacket( packetPing, time.frameIndex, time.logicDelta );
+							hostConnection.ProcessPacket( packetPing, time.mFrameIndex, time.mLogicDelta );
 						} break;
 						case PacketType::PlayerInput:
 						{

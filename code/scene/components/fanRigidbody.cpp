@@ -44,7 +44,7 @@ namespace fan
 		Rigidbody& rb = static_cast<Rigidbody&>( _component );
 		assert( rb.rigidbody != nullptr );
 
-		physicsWorld.dynamicsWorld->removeRigidBody( rb.rigidbody );
+		physicsWorld.mDynamicsWorld->removeRigidBody( rb.rigidbody );
 
 		delete rb.rigidbody;
 		rb.rigidbody = nullptr;

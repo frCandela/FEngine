@@ -23,8 +23,8 @@ namespace fan
 		std::vector<RenderDataPointLight>       pointLights;
 		std::vector<RenderDataDirectionalLight> directionalLights;
 
-		Mesh*       particlesMesh = nullptr;
-		glm::vec2   targetSize; // render target size in pixels
-		bool        isHeadless;
+		Mesh*     mParticlesMesh = nullptr;
+		glm::vec2 mTargetSize; // render target size in pixels
+		bool      mIsHeadless;
 	};
 }

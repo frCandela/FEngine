@@ -17,6 +17,8 @@ namespace fan
 	struct EditorGizmos : EcsSingleton
 	{
 		ECS_SINGLETON( EditorGizmos );
+        static void SetInfo( EcsSingletonInfo& _info );
+        static void Init( EcsWorld& _world, EcsSingleton& _component );
 
 		//================================================================
 		//================================================================	
@@ -26,13 +28,9 @@ namespace fan
 			bool pressed = false;
 			btVector3 offset;
 		};
-
-		static void SetInfo( EcsSingletonInfo& _info );
-		static void Init( EcsWorld& _world, EcsSingleton& _component );
-
 		bool DrawMoveGizmo( const btTransform _transform, const size_t _uniqueID, btVector3& _newPosition );
 
-		std::map< size_t, GizmoCacheData > m_gizmoCacheData;
-		EcsWorld* m_world;
+		std::map< size_t, GizmoCacheData >  mGizmoCacheData;
+		EcsWorld*                           mWorld;
 	};
 }

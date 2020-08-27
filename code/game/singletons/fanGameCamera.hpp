@@ -19,10 +19,10 @@ namespace fan
 		static void Save( const EcsSingleton& _component, Json& _json );
 		static void Load( EcsSingleton& _component, const Json& _json );
 
-		EcsHandle   cameraHandle;
-		float		heightFromTarget;
-		btVector2	marginRatio;
-		float		minOrthoSize;
+		EcsHandle cmCameraHandle;
+		float     mHeightFromTarget;
+		btVector2 mMarginRatio;
+		float     mMinOrthoSize;
 
 		static GameCamera& CreateGameCamera( EcsWorld& _world );
 		static void        DeleteGameCamera( EcsWorld& _world );

@@ -170,9 +170,9 @@ namespace fan
 			{
 				Health& health = *healthIt;
 				const SolarPanel& solarPanel = *solarPanelIt;
-				if( !health.invincible && solarPanel.isInSunlight && eruption.state == SolarEruption::EXPODING )
+				if( !health.invincible && solarPanel.isInSunlight && eruption.mState == SolarEruption::EXPODING )
 				{
-					const float damage = _delta * eruption.damagePerSecond;
+					const float damage = _delta * eruption.mDamagePerSecond;
 					if( health.currentHealth < damage )
 					{
 						health.currentHealth = 0.f;

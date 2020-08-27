@@ -46,12 +46,12 @@ namespace fan
 
 			// set main camera
 			GameCamera& gameCamera = _world.GetSingleton<GameCamera>();
-			if( gameCamera.cameraHandle != 0 )
+			if( gameCamera.cmCameraHandle != 0 )
 			{
 				// set position
-				const EcsEntity cameraID = _world.GetEntity( gameCamera.cameraHandle );
+				const EcsEntity cameraID = _world.GetEntity( gameCamera.cmCameraHandle );
 				Transform& cameraTransform = _world.GetComponent<Transform>( cameraID );
-				cameraTransform.SetPosition( center + gameCamera.heightFromTarget * btVector3::Up() );
+				cameraTransform.SetPosition( center + gameCamera.mHeightFromTarget * btVector3::Up() );
 
 				// set size
 				Camera& camera = _world.GetComponent<Camera>( cameraID );
@@ -61,10 +61,10 @@ namespace fan
 				}
 				else
 				{
-					const float requiredSizeX = 0.5f * ( 1.f + gameCamera.marginRatio[0] ) * ( high[0] - low[0] ) / camera.aspectRatio;
-					const float requiredSizeZ = ( 1.f + gameCamera.marginRatio[1] ) * ( high[2] - low[2] ) / camera.aspectRatio;
+					const float requiredSizeX = 0.5f * ( 1.f + gameCamera.mMarginRatio[0] ) * ( high[0] - low[0] ) / camera.aspectRatio;
+					const float requiredSizeZ = ( 1.f + gameCamera.mMarginRatio[1] ) * ( high[2] - low[2] ) / camera.aspectRatio;
 
-					const float orthoSize = std::max( std::max( requiredSizeX, requiredSizeZ ), gameCamera.minOrthoSize );
+					const float orthoSize = std::max( std::max( requiredSizeX, requiredSizeZ ), gameCamera.mMinOrthoSize );
 					camera.orthoSize = orthoSize;
 				}
 			}

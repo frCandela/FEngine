@@ -6,7 +6,6 @@
 namespace fan
 {
 	class EcsWorld;
-	struct SceneNode;
 
 	//========================================================================================================
 	//========================================================================================================
@@ -20,6 +19,6 @@ namespace fan
 		void Start( EcsWorld& _world );
 		void Stop( EcsWorld& _world );			
 
-		EcsHandle persistentHandle;
+		EcsHandle mPersistentHandle;
 	};
 }

@@ -17,7 +17,7 @@ namespace fan
 	void ServerConnection::Init( EcsWorld& /*_world*/, EcsSingleton& _component )
 	{
 		ServerConnection& connection = static_cast<ServerConnection&>( _component );
-		connection.serverPort = 53000;
+		connection.mServerPort = 53000;
 	}
 
 	//========================================================================================================
@@ -27,6 +27,6 @@ namespace fan
 		ServerConnection& connection = static_cast<ServerConnection&>( _component );
 		ImGui::Text( "Server" );
 		ImGui::Spacing();
-		ImGui::Text( "port: %u", connection.serverPort );
+		ImGui::Text( "port: %u", connection.mServerPort );
 	}
 }

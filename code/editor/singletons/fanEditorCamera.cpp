@@ -27,10 +27,10 @@ namespace fan
 	{
 		EditorCamera& editorCamera = static_cast<EditorCamera&>( _component );
 
-		editorCamera.cameraHandle = 0;
-		editorCamera.speed = 10.f;
-		editorCamera.speedMultiplier = 3.f;
-		editorCamera.xySensitivity = btVector2( 0.005f, 0.005f );
+		editorCamera.mCameraHandle    = 0;
+		editorCamera.mSpeed           = 10.f;
+		editorCamera.mSpeedMultiplier = 3.f;
+		editorCamera.mXYSensitivity   = btVector2( 0.005f, 0.005f );
 	}
 
 	//========================================================================================================
@@ -45,7 +45,7 @@ namespace fan
         if( !mouse.sLocked )                    { return; }
 
         EditorCamera& editorCamera = _world.GetSingleton<EditorCamera>();
-		const EcsEntity cameraEntity = _world.GetEntity( editorCamera.cameraHandle );
+		const EcsEntity cameraEntity = _world.GetEntity( editorCamera.mCameraHandle );
 		Transform& cameraTransform = _world.GetComponent<Transform>( cameraEntity );
 		Camera&	cameraCamera = _world.GetComponent<Camera>( cameraEntity );
 
@@ -56,10 +56,10 @@ namespace fan
 		float boost			= Input::Get().Manager().GetAxis( "editor_boost" );
 
 		// Calculates speed
-		float realSpeed = editorCamera.speed;
+		float realSpeed = editorCamera.mSpeed;
 		if( boost > 0.f )
 		{
-			realSpeed *= editorCamera.speedMultiplier;
+			realSpeed *= editorCamera.mSpeedMultiplier;
 		}
 
 		position += _delta * realSpeed * leftAxis * cameraTransform.Left();		// Camera goes left		
@@ -73,9 +73,9 @@ namespace fan
 		{
 			// Rotation depending on mouse movement
 			const float invertAxis = -1;
-			const btQuaternion rotationY( btVector3::Up(), -editorCamera.xySensitivity.x() * mouseDelta.x );
+			const btQuaternion rotationY( btVector3::Up(), -editorCamera.mXYSensitivity.x() * mouseDelta.x );
             const btQuaternion rotationX( invertAxis * cameraTransform.Left(),
-                                          -editorCamera.xySensitivity.y() * mouseDelta.y );
+                                          -editorCamera.mXYSensitivity.y() * mouseDelta.y );
 			cameraTransform.SetRotationQuat( rotationX * rotationY * cameraTransform.GetRotationQuat() );
 
 			// Remove roll
@@ -119,7 +119,7 @@ namespace fan
 
 		// set editor camera singleton
 		EditorCamera& editorCamera = _world.GetSingleton<EditorCamera>();
-		editorCamera.cameraHandle = cameraNode.handle;
+		editorCamera.mCameraHandle = cameraNode.handle;
 	}
 
     //========================================================================================================
@@ -127,8 +127,8 @@ namespace fan
     void EditorCamera::OnGui( EcsWorld&, EcsSingleton& _component )
     {
         EditorCamera& editorCamera = static_cast<EditorCamera&>( _component );
-        ImGui::DragFloat( "speed", &editorCamera.speed, 1.f, 0.f, 10000.f );
-        ImGui::DragFloat( "speed multiplier", &editorCamera.speedMultiplier, 1.f, 0.f, 10000.f );
-        ImGui::DragFloat2( "xy sensitivity", &editorCamera.xySensitivity[0], 1.f, 0.f, 1.f );
+        ImGui::DragFloat( "speed", &editorCamera.mSpeed, 1.f, 0.f, 10000.f );
+        ImGui::DragFloat( "speed multiplier", &editorCamera.mSpeedMultiplier, 1.f, 0.f, 10000.f );
+        ImGui::DragFloat2( "xy sensitivity", &editorCamera.mXYSensitivity[0], 1.f, 0.f, 1.f );
     }
 }

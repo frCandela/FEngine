@@ -24,8 +24,8 @@ namespace fan
 	void HostManager::Init( EcsWorld& /*_world*/, EcsSingleton& _component )
 	{
 		HostManager& hostManager = static_cast<HostManager&>( _component );
-		hostManager.hostHandles.clear();
-		hostManager.netRootNodeHandle = 0;
+		hostManager.mHostHandles.clear();
+		hostManager.mNetRootNodeHandle = 0;
 	}
 
 	//========================================================================================================
@@ -35,10 +35,10 @@ namespace fan
 		assert( FindHost( _ip, _port ) == 0 );
 
 		// Create an ecs entity associated with the host
-		SceneNode& rootNode = _world.GetComponent<SceneNode>( _world.GetEntity( netRootNodeHandle ) );
+		SceneNode& rootNode = _world.GetComponent<SceneNode>( _world.GetEntity( mNetRootNodeHandle ) );
 		Scene& scene = _world.GetSingleton<Scene>();
 		SceneNode& hostNode = scene.CreateSceneNode( "tmp", &rootNode );
-		hostHandles[{_ip, _port}] = hostNode.handle;
+        mHostHandles[{ _ip, _port}] = hostNode.handle;
 		hostNode.name = std::string("host") + std::to_string( hostNode.handle );
 		const EcsEntity entity = _world.GetEntity( hostNode.handle );
 		_world.AddComponent< HostGameData >( entity );
@@ -71,9 +71,9 @@ namespace fan
 
 		// delete the host ip/port entry
 		HostConnection& hostConnection = _world.GetComponent< HostConnection >( entity );
-		auto it = hostHandles.find( { hostConnection.ip, hostConnection.port } );
-		assert( it != hostHandles.end() );
-		hostHandles.erase( it );
+		auto it = mHostHandles.find( { hostConnection.ip, hostConnection.port } );
+		assert( it != mHostHandles.end() );
+		mHostHandles.erase( it );
 
 		Debug::Log() << "host disconnected "
 		             << hostConnection.ip.toString()
@@ -86,8 +86,8 @@ namespace fan
 	//========================================================================================================
 	EcsHandle HostManager::FindHost( const sf::IpAddress _ip, const Port _port )
 	{
-		const auto& it = hostHandles.find({_ip, _port});
-		return it == hostHandles.end() ? 0 : it->second;
+		const auto& it = mHostHandles.find( { _ip, _port});
+		return it == mHostHandles.end() ? 0 : it->second;
 	}
 
 	//========================================================================================================
@@ -104,13 +104,13 @@ namespace fan
         ImGui::NextColumn();
         ImGui::Text( "port" );
         ImGui::NextColumn();
-        for( const std::pair<IPPort, EcsHandle>& pair : hostManager.hostHandles )
+        for( const std::pair<IPPort, EcsHandle>& pair : hostManager.mHostHandles )
         {
             ImGui::Text( "host%d", pair.second );
             ImGui::NextColumn();
-            ImGui::Text( "%s", pair.first.adress.toString().c_str() );
+            ImGui::Text( "%s", pair.first.mAdress.toString().c_str() );
             ImGui::NextColumn();
-            ImGui::Text( "%d", pair.first.port );
+            ImGui::Text( "%d", pair.first.mPort );
             ImGui::NextColumn();
         }
         ImGui::Columns( 1 );

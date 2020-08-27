@@ -18,7 +18,7 @@ namespace fan
 		static void Init( EcsWorld& _world, EcsSingleton& _component );
 		static void OnGui( EcsWorld&, EcsSingleton& _component );
 
-		UdpSocket socket;
-		Port	  serverPort;
+		UdpSocket mSocket;
+		Port      mServerPort;
 	};
 }

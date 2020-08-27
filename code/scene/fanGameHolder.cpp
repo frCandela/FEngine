@@ -86,7 +86,7 @@ namespace fan
 		// initializes timers
 		mLastRenderTime = Time::ElapsedSinceStartup();
 		Time& time = mGame.mWorld.GetSingleton<Time>();
-		time.lastLogicTime = Time::ElapsedSinceStartup();
+		time.mLastLogicTime = Time::ElapsedSinceStartup();
 		
 		Profiler::Get().Begin();
 
@@ -104,18 +104,18 @@ namespace fan
 	void GameHolder::Step()
 	{
 		const double currentTime = Time::ElapsedSinceStartup();
-		const bool renderIsThisFrame = currentTime > mLastRenderTime + Time::s_renderDelta;
+		const bool renderIsThisFrame = currentTime > mLastRenderTime + Time::sRenderDelta;
 		Time& time = mGame.mWorld.GetSingleton<Time>();
         const bool logicIsThisFrame = currentTime >
-                                      time.lastLogicTime + time.logicDelta;
+                                      time.mLastLogicTime + time.mLogicDelta;
 
 		// runs logic, renders ui
-		while( currentTime > time.lastLogicTime + time.logicDelta )
+		while( currentTime > time.mLastLogicTime + time.mLogicDelta )
 		{
             mGame.mWorld.GetSingleton<RenderDebug>().Clear();
 
 			// Update input
-			ImGui::GetIO().DeltaTime = time.logicDelta;
+			ImGui::GetIO().DeltaTime = time.mLogicDelta;
 
 
 			const glm::ivec2 iPos = mWindow.GetPosition();
@@ -131,31 +131,31 @@ namespace fan
 
 			// checking the loop timing is not late
             const double loopDelayMilliseconds = 1000. * ( currentTime
-                                                           - ( time.lastLogicTime + time.logicDelta ) );
+                                                           - ( time.mLastLogicTime + time.mLogicDelta ) );
 			if( loopDelayMilliseconds > 30 )
 			{
 				//Debug::Warning() << "logic is late of " << loopDelayMilliseconds << "ms" << Debug::Endl();
 				// if we are really really late, resets the timer
 				if( loopDelayMilliseconds > 100 )
 				{
-					time.lastLogicTime = currentTime - time.logicDelta;
+					time.mLastLogicTime = currentTime - time.mLogicDelta;
 					//Debug::Warning() << "reset logic timer " << Debug::Endl();
 				}
 			}
 
 			// increase the logic time of a timeScaleDelta with n timeScaleIncrements
-			if( std::abs( time.timeScaleDelta ) >= time.timeScaleIncrement )
+			if( std::abs( time.mTimeScaleDelta ) >= time.mTimeScaleIncrement )
 			{
-                const float increment = time.timeScaleDelta > 0.f
-                        ? time.timeScaleIncrement
-                        : -time.timeScaleIncrement;
-                time.lastLogicTime -= increment;
-				time.timeScaleDelta -= increment;
+                const float increment = time.mTimeScaleDelta > 0.f
+                        ? time.mTimeScaleIncrement
+                        : -time.mTimeScaleIncrement;
+                time.mLastLogicTime -= increment;
+				time.mTimeScaleDelta -= increment;
 			}
 
-			time.lastLogicTime += time.logicDelta;
+			time.mLastLogicTime += time.mLogicDelta;
 
-            mGame.Step( time.logicDelta );
+            mGame.Step( time.mLogicDelta );
 
             mGame.mWorld.Run<SMoveFollowTransforms>();
 
@@ -215,7 +215,7 @@ namespace fan
 	{
 		RenderWorld& renderWorld = _world.GetSingleton<RenderWorld>();
 		const RenderDebug& renderDebug = _world.GetSingleton<RenderDebug>();
-		renderWorld.targetSize = _size;
+		renderWorld.mTargetSize = _size;
 
 		// update render data
 		_world.Run<SUpdateRenderWorldModels>();
@@ -225,7 +225,7 @@ namespace fan
 
 		// particles mesh
 		RenderDataModel particlesDrawData;
-		particlesDrawData.mesh = renderWorld.particlesMesh;
+		particlesDrawData.mesh = renderWorld.mParticlesMesh;
 		particlesDrawData.modelMatrix = glm::mat4( 1.f );
 		particlesDrawData.normalMatrix = glm::mat4( 1.f );
 		particlesDrawData.color = glm::vec4( 1.f, 1.f, 1.f, 1.f );

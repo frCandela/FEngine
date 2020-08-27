@@ -56,8 +56,8 @@ namespace fan
 			// Get all HostManager/EcsHandle pairs
 			HostManager& hostManager = _world.GetSingleton<HostManager>();
 			std::vector< HostManagerHandlePair > hostReplications;
-			hostReplications.reserve( hostManager.hostHandles.size() );
-			for( const std::pair<HostManager::IPPort, EcsHandle>& pair : hostManager.hostHandles )
+			hostReplications.reserve( hostManager.mHostHandles.size() );
+			for( const std::pair<HostManager::IPPort, EcsHandle>& pair : hostManager.mHostHandles )
 			{
 				const EcsHandle handle = pair.second;
 				HostReplication& hostReplication = _world.GetComponent<HostReplication>( _world.GetEntity( handle ) );

@@ -35,17 +35,17 @@ namespace fan
 		// create the network scene root for ordering net objects
 		HostManager& hostManager = _world.GetSingleton<HostManager>();
 		Scene& scene = _world.GetSingleton<Scene>();
-		hostManager.netRootNodeHandle = scene.CreateSceneNode( "net root", &scene.GetRootNode() ).handle;
+		hostManager.mNetRootNodeHandle = scene.CreateSceneNode( "net root", &scene.GetRootNode() ).handle;
 
 		// bind
 		ServerConnection& connection = _world.GetSingleton<ServerConnection>();	
-		if( connection.socket.Bind( connection.serverPort ) != sf::Socket::Done )
+		if( connection.mSocket.Bind( connection.mServerPort ) != sf::Socket::Done )
 		{
-			Debug::Error() << "bind failed on port " << connection.serverPort << Debug::Endl();
+			Debug::Error() << "bind failed on port " << connection.mServerPort << Debug::Endl();
 		}
 		else
 		{
-			Debug::Log() << "bind on port " << connection.serverPort << Debug::Endl();
+			Debug::Log() << "bind on port " << connection.mServerPort << Debug::Endl();
 		}
 	}
 
@@ -54,8 +54,8 @@ namespace fan
 	void ServerNetworkManager::Stop( EcsWorld& _world )
 	{
 		ServerConnection& connection = _world.GetSingleton<ServerConnection>();
-		Debug::Log() << "unbind from port " << connection.socket.GetPort() << Debug::Endl();
-		connection.socket.Unbind();
+		Debug::Log() << "unbind from port " << connection.mSocket.GetPort() << Debug::Endl();
+		connection.mSocket.Unbind();
 	}
 
 	//========================================================================================================

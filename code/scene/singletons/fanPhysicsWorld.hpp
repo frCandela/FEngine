@@ -18,7 +18,6 @@ namespace fan
 	struct PhysicsWorld : public EcsSingleton
 	{
 		ECS_SINGLETON( PhysicsWorld )
-	public:
 		static void SetInfo( EcsSingletonInfo& _info );
 		static void Init( EcsWorld& _world, EcsSingleton& _component );
 		static void OnGui( EcsWorld&, EcsSingleton& _component );
@@ -28,14 +27,13 @@ namespace fan
 		PhysicsWorld();
 		~PhysicsWorld();
 
-		btDefaultCollisionConfiguration*	 collisionConfiguration;
-		btCollisionDispatcher*				 dispatcher;
-		btDbvtBroadphase*					 overlappingPairCache;
-		btSequentialImpulseConstraintSolver* solver;
-		btDiscreteDynamicsWorld*			 dynamicsWorld;
+		btDefaultCollisionConfiguration*	 mCollisionConfiguration;
+		btCollisionDispatcher*				 mDispatcher;
+		btDbvtBroadphase*					 mOverlappingPairCache;
+		btSequentialImpulseConstraintSolver* mSolver;
+		btDiscreteDynamicsWorld*			 mDynamicsWorld;
 
 		void Reset();
-
 		static void ContactStartedCallback( btPersistentManifold* const& _manifold );
 		static void ContactEndedCallback( btPersistentManifold* const& _manifold );
 	};

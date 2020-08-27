@@ -47,8 +47,8 @@ namespace fan
 				if( hostConnection.state == HostConnection::Connected && hostConnection.synced  && hostData.spaceshipID == 0 )
 				{
 					// spawns new host spaceship
-					hostData.spaceshipID = linkingContext.nextNetID++;	// assigns net id for the new ship
-					const FrameIndex spawnFrame = time.frameIndex + 60;
+					hostData.spaceshipID = linkingContext.mNextNetID++;	// assigns net id for the new ship
+					const FrameIndex spawnFrame = time.mFrameIndex + 60;
 					const SpawnInfo spawnInfo = spawn::SpawnShip::GenerateInfo( hostHandle, spawnFrame, hostData.spaceshipID, btVector3::Zero() );
 					hostData.nextPlayerStateFrame = spawnFrame + 60;	// set the timing of the first player state snapshot					
 					spawnManager.spawns.push_back( spawnInfo );			// triggers spaceship spawn on server
@@ -57,7 +57,7 @@ namespace fan
 					_world.Run<S_ReplicateOnAllHosts>( ClientRPC::RPCSpawn( spawnInfo ), HostReplication::ResendUntilReplicated );	
 
 					// replicate all other hosts on new host
-					for( const auto& pair : hostManager.hostHandles )
+					for( const auto& pair : hostManager.mHostHandles )
 					{
 						// do not replicate  itself
 						const EcsHandle otherHostHandle = pair.second;
@@ -80,7 +80,7 @@ namespace fan
 
 					// replicates solar eruption spawn
 					const SolarEruption& solarEruption = _world.GetSingleton<SolarEruption>();
-					const SpawnInfo eruptionSpawnInfo = spawn::SpawnSolarEruption::GenerateInfo( solarEruption.spawnFrame );
+					const SpawnInfo eruptionSpawnInfo = spawn::SpawnSolarEruption::GenerateInfo( solarEruption.mSpawnFrame );
 					hostReplication.Replicate(
 						ClientRPC::RPCSpawn( eruptionSpawnInfo )
 						, HostReplication::ResendUntilReplicated
@@ -132,7 +132,7 @@ namespace fan
 						hostConnection.targetBufferSize = int( 1000.f * hostConnection.rtt * ( 5.f - 2.f ) / 100.f + 2.f ); // size 5 at 100 ms rtt
 						hostConnection.targetBufferSize = std::min( hostConnection.targetBufferSize, 15 );
 
-						const int targetFrameDifference = int( hostConnection.rtt / 2.f / time.logicDelta ) + hostConnection.targetBufferSize;
+						const int targetFrameDifference = int( hostConnection.rtt / 2.f / time.mLogicDelta ) + hostConnection.targetBufferSize;
 						const int diff = std::abs( min + targetFrameDifference );
 						if( diff > 1 ) // only sync when we have a big enough frame index difference
 						{
@@ -174,18 +174,18 @@ namespace fan
 			{
 				HostGameData& hostData = *hostDataIt;
 
-				if( hostData.spaceshipHandle != 0 && time.frameIndex >= hostData.nextPlayerStateFrame )
+				if( hostData.spaceshipHandle != 0 && time.mFrameIndex >= hostData.nextPlayerStateFrame )
 				{
 					const EcsEntity shipEntityID = _world.GetEntity( hostData.spaceshipHandle );
 					const Rigidbody& rb = _world.GetComponent<Rigidbody>( shipEntityID );
 					const Transform& transform = _world.GetComponent<Transform>( shipEntityID );
-					hostData.nextPlayerState.frameIndex = time.frameIndex;
+					hostData.nextPlayerState.frameIndex = time.mFrameIndex;
 					hostData.nextPlayerState.position = transform.GetPosition();
 					hostData.nextPlayerState.orientation = transform.GetRotationEuler();
 					hostData.nextPlayerState.velocity = rb.GetVelocity();
 					hostData.nextPlayerState.angularVelocity = rb.GetAngularVelocity();
 
-					hostData.nextPlayerStateFrame = time.frameIndex + 7;
+					hostData.nextPlayerStateFrame = time.mFrameIndex + 7;
 				}
 			}
 		}
@@ -216,7 +216,7 @@ namespace fan
 					while( !hostData.inputs.empty() )
 					{
 						const PacketInput::InputData& inputData = hostData.inputs.front();
-						if( inputData.frameIndex < time.frameIndex || inputData.frameIndex > time.frameIndex + 60 )
+						if( inputData.frameIndex < time.mFrameIndex || inputData.frameIndex > time.mFrameIndex + 60 )
 						{
 							hostData.inputs.pop();
 						}
@@ -229,7 +229,7 @@ namespace fan
 					if( hostData.spaceshipHandle != 0 )
 					{
 						// Updates spaceship input
-						if( !hostData.inputs.empty() && hostData.inputs.front().frameIndex == time.frameIndex )
+						if( !hostData.inputs.empty() && hostData.inputs.front().frameIndex == time.mFrameIndex )
 						{
 							const PacketInput::InputData& inputData = hostData.inputs.front();
 							hostData.inputs.pop();

@@ -23,12 +23,12 @@ namespace fan
 		renderWorld.uiDrawData.clear();
 		renderWorld.pointLights.clear();
 		renderWorld.directionalLights.clear();
-		renderWorld.targetSize = {1920,1080};
-		renderWorld.particlesMesh = new Mesh();
-		renderWorld.particlesMesh->mHostVisible = true;
-		renderWorld.particlesMesh->mOptimizeVertices = false;
-		renderWorld.particlesMesh->mAutoUpdateHull = false;
-		renderWorld.isHeadless = false;
+		renderWorld.mTargetSize                       = { 1920, 1080};
+		renderWorld.mParticlesMesh                    = new Mesh();
+		renderWorld.mParticlesMesh->mHostVisible      = true;
+		renderWorld.mParticlesMesh->mOptimizeVertices = false;
+		renderWorld.mParticlesMesh->mAutoUpdateHull   = false;
+		renderWorld.mIsHeadless                       = false;
 	}
 
 	//========================================================================================================
@@ -40,13 +40,13 @@ namespace fan
         ImGui::Text( "ui mesh:            %d", renderWorld.uiDrawData.size() );
         ImGui::Text( "pointLights:        %d", renderWorld.pointLights.size() );
         ImGui::Text( "directionalLights:  %d", renderWorld.directionalLights.size() );
-        ImGui::Text( "particles vertices: %d", renderWorld.particlesMesh->mVertices.size() );
+        ImGui::Text( "particles vertices: %d", renderWorld.mParticlesMesh->mVertices.size() );
         ImGui::Text( "target size:        %d x %d",
-                     (int)renderWorld.targetSize.x,
-                     (int)renderWorld.targetSize.y );
+                     (int)renderWorld.mTargetSize.x,
+                     (int)renderWorld.mTargetSize.y );
 
         ImGui::PushReadOnly();
-        ImGui::Checkbox( "is headless", &renderWorld.isHeadless );
+        ImGui::Checkbox( "is headless", &renderWorld.mIsHeadless );
         ImGui::PopReadOnly();
     }
 }

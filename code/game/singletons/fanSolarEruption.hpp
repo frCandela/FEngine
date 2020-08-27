@@ -20,7 +20,6 @@ namespace fan
 	class SolarEruption : public EcsSingleton
 	{
 		ECS_SINGLETON( SolarEruption )
-	public:
 		static void SetInfo( EcsSingletonInfo& _info );
 		static void Init( EcsWorld& _world, EcsSingleton& _component );
 		static void OnGui( EcsWorld& _world, EcsSingleton& _component );
@@ -36,27 +35,27 @@ namespace fan
 		void		ScheduleNextEruption( EcsWorld& _world );
 
 
-		ComponentPtr<Material>			sunlightMaterial;
-		ComponentPtr<MeshRenderer>		sunlightRenderer;
-		ComponentPtr<ParticleEmitter>	particleEmitter;
-		ComponentPtr<PointLight>		sunlightLight;
+		ComponentPtr<Material>        mSunlightMaterial;
+		ComponentPtr<MeshRenderer>    mSunlightRenderer;
+		ComponentPtr<ParticleEmitter> mParticleEmitter;
+		ComponentPtr<PointLight>      mSunlightLight;
 		
-		float previousLightAttenuation;
+		float mPreviousLightAttenuation;
 
-		FrameIndex	spawnFrame; // the frame index at which the eruption is spawn
-		bool		enabled;
-		State		state;
-		float		timer;				// time accumulator
-		float		cooldown;			// time between eruption in seconds
-		float		randomCooldown;		// adds [0-randomCooldown] seconds to the eruption cooldown
-		float		damagePerSecond;	// damage taken if the player stays in the sunlight
+		FrameIndex mSpawnFrame; // the frame index at which the eruption is spawn
+		bool       mEnabled;
+		State      mState;
+		float      mTimer;				// time accumulator
+		float      mCooldown;			// time between eruption in seconds
+		float      mRandomCooldown;		// adds [0-randomCooldown] seconds to the eruption cooldown
+		float      mDamagePerSecond;	// damage taken if the player stays in the sunlight
 
-		float   stateDuration[SIZE];
-		float	stateLightAttenuation[SIZE];
-		float   stateParticlePerSecond[SIZE];
-		float	stateParticleSpeed[SIZE];
-		float	stateParticleDuration[SIZE];
-		Color	stateParticleColor[SIZE];
+		float mStateDuration[SIZE];
+		float mStateLightAttenuation[SIZE];
+		float mStateParticlePerSecond[SIZE];
+		float mStateParticleSpeed[SIZE];
+		float mStateParticleDuration[SIZE];
+		Color mStateParticleColor[SIZE];
 
 	};
 }

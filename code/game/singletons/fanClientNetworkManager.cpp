@@ -29,7 +29,7 @@ namespace fan
 	void ClientNetworkManager::Init( EcsWorld& /*_world*/, EcsSingleton& _component )
 	{
 		ClientNetworkManager& netManager = static_cast<ClientNetworkManager&>( _component );
-		netManager.persistentHandle = 0;
+		netManager.mPersistentHandle = 0;
 	}
 
 	//========================================================================================================
@@ -39,8 +39,8 @@ namespace fan
 		// Create player persistent scene node
 		Scene& scene			= _world.GetSingleton<Scene>();
 		SceneNode& persistentNode =  scene.CreateSceneNode( "persistent", &scene.GetRootNode() );
-		persistentHandle = persistentNode.handle;
-		EcsEntity persistentID	= _world.GetEntity( persistentHandle );
+        mPersistentHandle = persistentNode.handle;
+		EcsEntity persistentID	= _world.GetEntity( mPersistentHandle );
 		_world.AddComponent<ReliabilityLayer>( persistentID );
 		_world.AddComponent<ClientConnection>( persistentID );
 		_world.AddComponent<ClientReplication>( persistentID );
@@ -53,11 +53,11 @@ namespace fan
 		// connect rpc
 		Time& time = _world.GetSingleton<Time>();
 		SpawnManager& spawnManager = _world.GetSingleton<SpawnManager>();
-		rpcManager.onShiftFrameIndex.Connect( &ClientGameData::OnShiftFrameIndex, _world, persistentHandle );
+		rpcManager.onShiftFrameIndex.Connect( &ClientGameData::OnShiftFrameIndex, _world, mPersistentHandle );
 		rpcManager.onShiftFrameIndex.Connect( &Time::OnShiftFrameIndex, &time );
 		rpcManager.onSpawn.Connect( &SpawnManager::OnSpawn, &spawnManager );
 		rpcManager.onDespawn.Connect( &SpawnManager::OnDespawn, &spawnManager );
-		connection.onLoginSuccess.Connect( &ClientGameData::OnLoginSuccess, _world, persistentHandle );
+		connection.onLoginSuccess.Connect( &ClientGameData::OnLoginSuccess, _world, mPersistentHandle );
 
 
 		// Bind socket
@@ -79,7 +79,7 @@ namespace fan
 	//========================================================================================================
 	void ClientNetworkManager::Stop( EcsWorld& _world )
 	{
-		const EcsEntity persistentID = _world.GetEntity( persistentHandle );
+		const EcsEntity persistentID = _world.GetEntity( mPersistentHandle );
 		ClientConnection& connection = _world.GetComponent<ClientConnection>( persistentID );
 		connection.state = ClientConnection::ClientState::Stopping;
 		_world.Run<S_ClientSend>( 0.42f );// send a last packet
@@ -91,6 +91,6 @@ namespace fan
 	void ClientNetworkManager::OnGui( EcsWorld& /*_world*/, EcsSingleton& _component )
 	{
 		ClientNetworkManager& netManager = static_cast<ClientNetworkManager&>( _component );
-		ImGui::Text( "persistent handle : %d", netManager.persistentHandle );
+		ImGui::Text( "persistent handle : %d", netManager.mPersistentHandle );
 	}
 }

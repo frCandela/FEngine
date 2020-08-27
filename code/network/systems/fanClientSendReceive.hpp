@@ -51,7 +51,7 @@ namespace fan
 				if( packet.GetSize() > sizeof( PacketTag ) )
 				{
 					reliabilityLayer.RegisterPacket( packet );
-					connection.bandwidth = 1.f / time.logicDelta * float( packet.GetSize() ) / 1000.f; // in Ko/s
+					connection.bandwidth = 1.f / time.mLogicDelta * float( packet.GetSize() ) / 1000.f; // in Ko/s
 					connection.socket->Send( packet, connection.serverIP, connection.serverPort );
 				}
 				else
@@ -149,7 +149,7 @@ namespace fan
 							{
 								PacketPing packetPing;
 								packetPing.Read( packet );
-								connection.ProcessPacket( packetPing, time.frameIndex );
+								connection.ProcessPacket( packetPing, time.mFrameIndex );
 							} break;
 							case PacketType::LoggedIn:
 							{

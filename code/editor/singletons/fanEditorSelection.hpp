@@ -14,7 +14,6 @@ namespace fan
 	struct EditorSelection : EcsSingleton
 	{
 		ECS_SINGLETON( EditorSelection );
-
 		static void SetInfo( EcsSingletonInfo& _info );
 		static void Init( EcsWorld& _world, EcsSingleton& _component );
 
@@ -26,8 +25,8 @@ namespace fan
 
 		SceneNode* GetSelectedSceneNode() const;
 
-		EcsHandle			m_selectedNodeHandle = 0;
-		Scene*				m_currentScene = nullptr;
+		EcsHandle mSelectedNodeHandle = 0;
+		Scene*	  mCurrentScene = nullptr;
 
 		void OnSceneNodeDeleted( SceneNode* _node );
 		void OnToogleTransformLock();

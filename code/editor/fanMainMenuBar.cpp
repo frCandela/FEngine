@@ -192,7 +192,7 @@ namespace fan
 
 			// Framerate
 			ImGui::SameLine( ImGui::GetWindowWidth() - 60 );
-			if ( ImGui::BeginMenu( std::to_string( Time::s_realFramerateLastSecond ).c_str(), false ) )
+			if ( ImGui::BeginMenu( std::to_string( Time::sRealFramerateLastSecond ).c_str(), false ) )
 			{
 			    ImGui::EndMenu();
 			}
@@ -209,20 +209,20 @@ namespace fan
 				Time& time = _world.GetSingleton<Time>();
 
 				ImGui::PushItemWidth( 80.f );
-				float maxFps = 1.f / Time::s_renderDelta;
+				float maxFps = 1.f / Time::sRenderDelta;
 				if ( ImGui::DragFloat( "fps", &maxFps, 1.f, 1.f, 3000.f, "%.f" ) )
 				{
-					Time::s_renderDelta = maxFps < 1.f ? 1.f : 1.f / maxFps ;
+					Time::sRenderDelta = maxFps < 1.f ? 1.f : 1.f / maxFps ;
 				}
-				float maxLogicFrequency = 1.f / time.logicDelta;
+				float maxLogicFrequency = 1.f / time.mLogicDelta;
 				if ( ImGui::DragFloat( "logic frequency", &maxLogicFrequency, 1.f, 1.f, 3000.f, "%.f" ) )
 				{
-					time.logicDelta = maxLogicFrequency < 1.f ? 1.f : 1.f / maxLogicFrequency;
+					time.mLogicDelta = maxLogicFrequency < 1.f ? 1.f : 1.f / maxLogicFrequency;
 				}
-				float maxPhysicsFrequency = 1.f / Time::s_physicsDelta;
+				float maxPhysicsFrequency = 1.f / Time::sPhysicsDelta;
 				if ( ImGui::DragFloat( "physics frequency", &maxPhysicsFrequency, 1.f, 1.f, 3000.f, "%.f" ) )
 				{
-					Time::s_physicsDelta = maxPhysicsFrequency < 1.f ? 1.f : 1.f / maxPhysicsFrequency;
+					Time::sPhysicsDelta = maxPhysicsFrequency < 1.f ? 1.f : 1.f / maxPhysicsFrequency;
 				}
 				ImGui::PopItemWidth();
 				ImGui::EndPopup();
