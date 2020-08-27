@@ -1,6 +1,5 @@
 #include "network/singletons/fanHostManager.hpp"
 
-#include "ecs/fanEcsWorld.hpp"
 #include "scene/singletons/fanScene.hpp"
 #include "scene/components/fanSceneNode.hpp"
 #include "network/components/fanHostGameData.hpp"
@@ -10,8 +9,8 @@
 
 namespace fan
 {
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void HostManager::SetInfo( EcsSingletonInfo& _info )
 	{
 		_info.icon = ImGui::NETWORK16;
@@ -20,8 +19,8 @@ namespace fan
 		_info.name = "host manager";
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void HostManager::Init( EcsWorld& /*_world*/, EcsSingleton& _component )
 	{
 		HostManager& hostManager = static_cast<HostManager&>( _component );
@@ -29,8 +28,8 @@ namespace fan
 		hostManager.netRootNodeHandle = 0;
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	EcsHandle HostManager::CreateHost( EcsWorld& _world, IpAddress _ip, const Port _port )
 	{
 		assert( FindHost( _ip, _port ) == 0 );
@@ -54,8 +53,8 @@ namespace fan
 		return hostNode.handle;
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void HostManager::DeleteHost( EcsWorld& _world, const EcsHandle _hostHandle )
 	{
 		// Deletes the ecs entity associated with the host
@@ -76,39 +75,44 @@ namespace fan
 		assert( it != hostHandles.end() );
 		hostHandles.erase( it );
 
-		Debug::Log() << "host disconnected " << hostConnection.ip.toString() << "::" << hostConnection.port << Debug::Endl();
+		Debug::Log() << "host disconnected "
+		             << hostConnection.ip.toString()
+		             << "::"
+		             << hostConnection.port << Debug::Endl();
 	}
 
-	//================================================================================================================================
+	//========================================================================================================
 	// returns the client handle associated with an ip/port, returns 0 if it doesn't exists
-	//================================================================================================================================
+	//========================================================================================================
 	EcsHandle HostManager::FindHost( const sf::IpAddress _ip, const Port _port )
 	{
 		const auto& it = hostHandles.find({_ip, _port});
 		return it == hostHandles.end() ? 0 : it->second;
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void HostManager::OnGui( EcsWorld&, EcsSingleton& _component )
 	{
-		HostManager& hostManager = static_cast<HostManager&>( _component );
+        HostManager& hostManager = static_cast<HostManager&>( _component );
 
-		ImGui::Indent(); ImGui::Indent();
-		{
-			ImGui::Columns( 3 );
+        ImGui::Columns( 3 );
 
-			ImGui::Text( "name" );	ImGui::NextColumn();
-			ImGui::Text( "ip" );		ImGui::NextColumn();
-			ImGui::Text( "port" );		ImGui::NextColumn();
-			for( const std::pair<IPPort, EcsHandle>& pair : hostManager.hostHandles )
-			{
-				ImGui::Text( "host%d", pair.second );						ImGui::NextColumn();
-				ImGui::Text( "%s", pair.first.adress.toString().c_str() );	ImGui::NextColumn();
-				ImGui::Text( "%d", pair.first.port );						ImGui::NextColumn();
-			}
-			ImGui::Columns( 1 );
-
-		}ImGui::Unindent(); ImGui::Unindent();
+        ImGui::Text( "name" );
+        ImGui::NextColumn();
+        ImGui::Text( "ip" );
+        ImGui::NextColumn();
+        ImGui::Text( "port" );
+        ImGui::NextColumn();
+        for( const std::pair<IPPort, EcsHandle>& pair : hostManager.hostHandles )
+        {
+            ImGui::Text( "host%d", pair.second );
+            ImGui::NextColumn();
+            ImGui::Text( "%s", pair.first.adress.toString().c_str() );
+            ImGui::NextColumn();
+            ImGui::Text( "%d", pair.first.port );
+            ImGui::NextColumn();
+        }
+        ImGui::Columns( 1 );
 	}
 }

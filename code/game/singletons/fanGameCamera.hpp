@@ -7,13 +7,12 @@ namespace fan
 {
 	class EcsWorld;
 
-	//================================================================================================================================
+	//========================================================================================================
 	// Contains the data of the game camera ( what entity it is and how it should be placed )
-	//================================================================================================================================	
+	//========================================================================================================
 	struct GameCamera : public EcsSingleton
 	{
 		ECS_SINGLETON( GameCamera )
-	public:
 		static void SetInfo( EcsSingletonInfo& _info );
 		static void Init( EcsWorld& _world, EcsSingleton& _component );
 		static void OnGui( EcsWorld&, EcsSingleton& _component );

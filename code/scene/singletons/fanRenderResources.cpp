@@ -82,38 +82,31 @@ namespace fan
     void RenderResources::OnGui( EcsWorld& /*_world*/, EcsSingleton& _singleton )
     {
         RenderResources& renderResources = static_cast<RenderResources&>( _singleton );
-
-        ImGui::Indent();
-        ImGui::Indent();
+        if( ImGui::CollapsingHeader( "meshes" ) )
         {
-            if( ImGui::CollapsingHeader( "meshes" ) )
+            const std::vector<Mesh*>& meshes = renderResources.mMeshManager->GetMeshes();
+            for( const Mesh         * mesh : meshes )
             {
-                const std::vector<Mesh*>& meshes = renderResources.mMeshManager->GetMeshes();
-                for( const Mesh         * mesh : meshes )
-                {
-                    ImGui::Text( mesh->mPath.c_str() );
-                }
-            }
-
-            if( ImGui::CollapsingHeader( "meshes2D" ) )
-            {
-                const std::vector<Mesh2D*>& meshes = renderResources.mMesh2DManager->GetMeshes();
-                for( const Mesh2D         * mesh : meshes )
-                {
-                    ImGui::Text( mesh->mPath.c_str() );
-                }
-            }
-
-            if( ImGui::CollapsingHeader( "textures" ) )
-            {
-                const std::vector<Texture*>& textures = renderResources.mTextureManager->GetTextures();
-                for( const Texture         *  texture : textures )
-                {
-                    ImGui::Text( texture->mPath.c_str() );
-                }
+                ImGui::Text( mesh->mPath.c_str() );
             }
         }
-        ImGui::Unindent();
-        ImGui::Unindent();
+
+        if( ImGui::CollapsingHeader( "meshes2D" ) )
+        {
+            const std::vector<Mesh2D*>& meshes = renderResources.mMesh2DManager->GetMeshes();
+            for( const Mesh2D         * mesh : meshes )
+            {
+                ImGui::Text( mesh->mPath.c_str() );
+            }
+        }
+
+        if( ImGui::CollapsingHeader( "textures" ) )
+        {
+            const std::vector<Texture*>& textures = renderResources.mTextureManager->GetTextures();
+            for( const Texture         * texture : textures )
+            {
+                ImGui::Text( texture->mPath.c_str() );
+            }
+        }
     }
 }

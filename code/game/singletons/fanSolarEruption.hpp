@@ -13,10 +13,10 @@ namespace fan
 {
 	struct Time;
 
-	//================================================================================================================================
+	//========================================================================================================
 	// SolarEruption is the fx of the sun exploding out and projecting matter all around it
 	// The sun periodically erupts, forcing the player to hide behind planets or take damage
-	//================================================================================================================================
+	//========================================================================================================
 	class SolarEruption : public EcsSingleton
 	{
 		ECS_SINGLETON( SolarEruption )

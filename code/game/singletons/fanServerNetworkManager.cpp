@@ -2,24 +2,17 @@
 
 #include "core/fanDebug.hpp"
 #include "network/singletons/fanTime.hpp"
-#include "ecs/fanEcsWorld.hpp"
-#include "game/singletons/fanGame.hpp"
-#include "scene/fanSceneSerializable.hpp"
 #include "scene/singletons/fanScene.hpp"
 #include "scene/components/fanSceneNode.hpp"
 #include "network/components/fanHostGameData.hpp"
-#include "network/components/fanHostConnection.hpp"
-#include "network/components/fanHostReplication.hpp"
-#include "network/components/fanReliabilityLayer.hpp"
 #include "network/singletons/fanServerConnection.hpp"
-#include "network/singletons/fanLinkingContext.hpp"
 #include "network/singletons/fanHostManager.hpp"
 #include "network/systems/fanTimeout.hpp"
 
 namespace fan
 {
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void ServerNetworkManager::SetInfo( EcsSingletonInfo& _info )
 	{
 		_info.icon = ImGui::NETWORK16;
@@ -28,15 +21,15 @@ namespace fan
 		_info.name = "server network manager";
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void ServerNetworkManager::Init( EcsWorld& /*_world*/, EcsSingleton& /*_component*/ )
 	{
 		//ServerNetworkManager& netManager = static_cast<ServerNetworkManager&>( _component );
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void ServerNetworkManager::Start( EcsWorld& _world )
 	{
 		// create the network scene root for ordering net objects
@@ -56,8 +49,8 @@ namespace fan
 		}
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void ServerNetworkManager::Stop( EcsWorld& _world )
 	{
 		ServerConnection& connection = _world.GetSingleton<ServerConnection>();
@@ -65,16 +58,11 @@ namespace fan
 		connection.socket.Unbind();
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void ServerNetworkManager::OnGui( EcsWorld& /*_world*/, EcsSingleton& /*_component*/ )
 	{
 		//ServerNetworkManager& netManager = static_cast<ServerNetworkManager&>( _component );
-
-		ImGui::Indent(); ImGui::Indent();
-		{
-			ImGui::Text( "Stop looking at me plz" );
-		}
-		ImGui::Unindent(); ImGui::Unindent();
+		ImGui::Text( "Stop looking at me plz" );
 	}
 }

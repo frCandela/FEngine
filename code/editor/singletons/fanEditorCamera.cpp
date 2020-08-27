@@ -34,22 +34,6 @@ namespace fan
 	}
 
 	//========================================================================================================
-	//========================================================================================================
-	void EditorCamera::OnGui( EcsWorld&, EcsSingleton& _component )
-	{
-		EditorCamera& editorCamera = static_cast<EditorCamera&>( _component );
-
-		ImGui::Indent(); ImGui::Indent();
-		{
-			ImGui::DragFloat( "speed", &editorCamera.speed, 1.f, 0.f, 10000.f );
-			ImGui::DragFloat( "speed multiplier", &editorCamera.speedMultiplier, 1.f, 0.f, 10000.f );
-			ImGui::DragFloat2( "xy sensitivity", &editorCamera.xySensitivity[0], 1.f, 0.f, 1.f );
-		}
-		ImGui::Unindent(); ImGui::Unindent();
-	}
-
-
-	//========================================================================================================
 	// updates the editor camera position & rotation
 	//========================================================================================================
 	void EditorCamera::Update( EcsWorld& _world, const float _delta )
@@ -137,4 +121,14 @@ namespace fan
 		EditorCamera& editorCamera = _world.GetSingleton<EditorCamera>();
 		editorCamera.cameraHandle = cameraNode.handle;
 	}
+
+    //========================================================================================================
+    //========================================================================================================
+    void EditorCamera::OnGui( EcsWorld&, EcsSingleton& _component )
+    {
+        EditorCamera& editorCamera = static_cast<EditorCamera&>( _component );
+        ImGui::DragFloat( "speed", &editorCamera.speed, 1.f, 0.f, 10000.f );
+        ImGui::DragFloat( "speed multiplier", &editorCamera.speedMultiplier, 1.f, 0.f, 10000.f );
+        ImGui::DragFloat2( "xy sensitivity", &editorCamera.xySensitivity[0], 1.f, 0.f, 1.f );
+    }
 }

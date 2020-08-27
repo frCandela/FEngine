@@ -40,20 +40,14 @@ namespace fan
     //========================================================================================================
     void SceneResources::OnGui( EcsWorld& /*_world*/, EcsSingleton& _singleton )
     {
-        ImGui::Indent();
-        ImGui::Indent();
+        if( ImGui::CollapsingHeader( "prefabs" ) )
         {
-            if( ImGui::CollapsingHeader( "prefabs" ) )
+            SceneResources& sceneResources = static_cast<SceneResources&>( _singleton );
+            const std::map<std::string, Prefab*>& prefabs = sceneResources.mPrefabManager->GetPrefabs();
+            for( auto pair : prefabs )
             {
-                SceneResources& sceneResources = static_cast<SceneResources&>( _singleton );
-                const std::map<std::string, Prefab*>& prefabs = sceneResources.mPrefabManager->GetPrefabs();
-                for( auto pair : prefabs )
-                {
-                    ImGui::Text( pair.second->mPath.c_str() );
-                }
+                ImGui::Text( pair.second->mPath.c_str() );
             }
         }
-        ImGui::Unindent();
-        ImGui::Unindent();
     }
 }

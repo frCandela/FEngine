@@ -1,7 +1,6 @@
 #include "game/singletons/fanGameCamera.hpp"
 
 #include "network/singletons/fanTime.hpp"
-#include "ecs/fanEcsWorld.hpp"
 #include "scene/singletons/fanScene.hpp"
 #include "scene/components/fanSceneNode.hpp"
 #include "scene/components/fanTransform.hpp"
@@ -9,8 +8,8 @@
 
 namespace fan
 {
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void GameCamera::SetInfo( EcsSingletonInfo& _info )
 	{
 		_info.icon = ImGui::CAMERA16;
@@ -21,8 +20,8 @@ namespace fan
 		_info.name = "game camera";
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void GameCamera::Init( EcsWorld& /*_world*/, EcsSingleton& _component )
 	{
 		GameCamera& gameCamera = static_cast<GameCamera&>( _component );
@@ -31,23 +30,8 @@ namespace fan
 		gameCamera.minOrthoSize = 15.f;
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
-	void GameCamera::OnGui( EcsWorld&, EcsSingleton& _component )
-	{
-		GameCamera& gameCamera = static_cast<GameCamera&>( _component );
-
-		ImGui::Indent(); ImGui::Indent();
-		{
-			ImGui::DragFloat( "height from target", &gameCamera.heightFromTarget, 0.25f, 0.5f, 30.f );
-			ImGui::DragFloat2( "margin ratio", &gameCamera.marginRatio[0], 0.1f, 0.f, 10.f );
-			ImGui::DragFloat( "minSize", &gameCamera.minOrthoSize, 0.1f, 0.f, 100.f );
-		}
-		ImGui::Unindent(); ImGui::Unindent();
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void GameCamera::Save( const EcsSingleton& _component, Json& _json )
 	{
 		const GameCamera& gameCamera = static_cast<const GameCamera&>( _component );
@@ -56,8 +40,8 @@ namespace fan
  		Serializable::SaveFloat( _json, "height_from_target", gameCamera.heightFromTarget );
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void GameCamera::Load( EcsSingleton& _component, const Json& _json )
 	{
 		GameCamera& gameCamera = static_cast<GameCamera&>( _component );
@@ -66,10 +50,10 @@ namespace fan
 		Serializable::LoadFloat( _json, "height_from_target", gameCamera.heightFromTarget );
 	}
 
-	//================================================================================================================================
+	//========================================================================================================
 	// creates the game camera entity & components
 	// setups the GameCamera singleton
-	//================================================================================================================================
+	//========================================================================================================
     GameCamera& GameCamera::CreateGameCamera( EcsWorld & _world )
 	{
 		Scene& scene = _world.GetSingleton<Scene>();
@@ -90,14 +74,25 @@ namespace fan
 		return gameCamera;
 	}
 
-	//================================================================================================================================
+	//========================================================================================================
 	// deletes the games camera entity & components
 	// unregisters is from the GameCamera singleton
-	//================================================================================================================================
+	//========================================================================================================
 	void GameCamera::DeleteGameCamera( EcsWorld& _world )
 	{
 		GameCamera& gameCamera = _world.GetSingleton<GameCamera>();
 		_world.Kill( _world.GetEntity( gameCamera.cameraHandle ) );
 		gameCamera.cameraHandle = 0;
 	}
+
+    //========================================================================================================
+    //========================================================================================================
+    void GameCamera::OnGui( EcsWorld&, EcsSingleton& _component )
+    {
+        GameCamera& gameCamera = static_cast<GameCamera&>( _component );
+        ImGui::DragFloat( "height from target", &gameCamera.heightFromTarget, 0.25f, 0.5f, 30.f );
+        ImGui::DragFloat2( "margin ratio", &gameCamera.marginRatio[0], 0.1f, 0.f, 10.f );
+        ImGui::DragFloat( "minSize", &gameCamera.minOrthoSize, 0.1f, 0.f, 100.f );
+    }
+
 }

@@ -7,13 +7,12 @@ namespace fan
 {
 	struct SceneNode;
 
-	//================================================================================================================================
+	//========================================================================================================
 	// [SERVER] Manages host creation/destruction & holds references to the hosts data
-	//================================================================================================================================	
+	//========================================================================================================
 	struct HostManager : public EcsSingleton
 	{
 		ECS_SINGLETON( HostManager )
-	public:
 		static void SetInfo( EcsSingletonInfo& _info );
 		static void Init( EcsWorld& _world, EcsSingleton& _component );
 		static void OnGui( EcsWorld&, EcsSingleton& _component );

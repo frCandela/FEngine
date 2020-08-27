@@ -10,7 +10,7 @@ namespace fan
     //========================================================================================================
     struct SceneResources : public EcsSingleton
     {
-    ECS_SINGLETON( SceneResources )
+        ECS_SINGLETON( SceneResources )
         static void SetInfo( EcsSingletonInfo& _info );
         static void Init( EcsWorld& _world, EcsSingleton& _singleton );
         static void OnGui( EcsWorld& _world, EcsSingleton& _singleton );

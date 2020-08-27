@@ -42,11 +42,6 @@ namespace fan
 	void Game::OnGui( EcsWorld&, EcsSingleton& _component )
 	{
 		Game& gameData = static_cast<Game&>( _component );
-
-		ImGui::Indent(); ImGui::Indent();
-		{
-			ImGui::FanPrefab( "spaceship", gameData.mSpaceshipPrefab );
-		}
-		ImGui::Unindent(); ImGui::Unindent();
+		ImGui::FanPrefab( "spaceship", gameData.mSpaceshipPrefab );
 	}
 }

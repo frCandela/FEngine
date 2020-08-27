@@ -8,12 +8,11 @@ namespace fan
 	class EcsWorld;
 	struct SceneNode;
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	struct ClientNetworkManager : public EcsSingleton
 	{
 		ECS_SINGLETON( ClientNetworkManager )
-	public:
 		static void SetInfo( EcsSingletonInfo& _info );
 		static void Init( EcsWorld& _world, EcsSingleton& _component );
 		static void OnGui( EcsWorld&, EcsSingleton& _component );

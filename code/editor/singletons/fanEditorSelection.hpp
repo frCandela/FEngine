@@ -5,7 +5,6 @@
 
 namespace fan
 {
-	class GameViewWindow;
 	struct Scene;
 	struct SceneNode;
 
@@ -26,7 +25,6 @@ namespace fan
 		void Update( const bool _gameWindowHovered );
 
 		SceneNode* GetSelectedSceneNode() const;
-		Scene&	   GetSelectedScene() const { return *m_currentScene; }
 
 		EcsHandle			m_selectedNodeHandle = 0;
 		Scene*				m_currentScene = nullptr;

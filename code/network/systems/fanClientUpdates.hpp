@@ -5,12 +5,15 @@
 #include "network/components/fanClientRPC.hpp"
 #include "network/singletons/fanTime.hpp"
 #include "game/components/fanPlayerInput.hpp"
+#include "scene/components/fanTransform.hpp"
+#include "scene/components/fanRigidbody.hpp"
+#include "network/singletons/fanLinkingContext.hpp"
 
 namespace fan
 {
-	//==============================================================================================================================================================
+	//========================================================================================================
 	// Save the player state ( transform & rigidbody ) for detecting desync with the server simulation
-	//==============================================================================================================================================================
+	//========================================================================================================
 	struct S_ClientSaveState : EcsSystem
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world )
@@ -48,9 +51,9 @@ namespace fan
 		}
 	};
 
-	//==============================================================================================================================================================
+	//========================================================================================================
 	// Save the player input for sending over the network and making rollbacks in case of desync
-	//==============================================================================================================================================================
+	//========================================================================================================
 	struct S_ClientSaveInput : EcsSystem
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world )
@@ -64,9 +67,9 @@ namespace fan
 
 			const Time& time = _world.GetSingleton<Time>();
 
-			for( auto gameDataIt = _view.begin<ClientGameData>(); gameDataIt != _view.end<ClientGameData>(); ++gameDataIt )
+			for( auto dataIt = _view.begin<ClientGameData>(); dataIt != _view.end<ClientGameData>(); ++dataIt)
 			{
-				ClientGameData& gameData = *gameDataIt;
+				ClientGameData& gameData = *dataIt;
 
 				if( gameData.spaceshipHandle != 0 && gameData.frameSynced )
 				{
@@ -89,9 +92,9 @@ namespace fan
 		}
 	};
 
-	//==============================================================================================================================================================
+	//========================================================================================================
 	// Replicates components, singleton components & runs RPC
-	//==============================================================================================================================================================
+	//========================================================================================================
 	struct S_ClientRunReplication : EcsSystem
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world )
@@ -139,7 +142,8 @@ namespace fan
 						const EcsEntity replicatedID = _world.GetEntity( replicatedHandle );
 						if( _world.HasComponent<SceneNode>( replicatedID ) )
 						{
-							_world.GetComponent<SceneNode>( replicatedID ).AddFlag( SceneNode::Flags::BoundsOutdated );
+                            SceneNode& node = _world.GetComponent<SceneNode>( replicatedID );
+                            node.AddFlag( SceneNode::Flags::BoundsOutdated );
 						}
 
 
@@ -165,9 +169,9 @@ namespace fan
 		}
 	};
 
-	//==============================================================================================================================================================
+	//========================================================================================================
 	// Detect server timeout on all clients connections
-	//==============================================================================================================================================================
+	//========================================================================================================
 	struct S_ClientDetectServerTimeout : EcsSystem
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world )
@@ -178,7 +182,9 @@ namespace fan
 		{
 			if( _delta == 0.f ) { return; }
 
-			for( auto connectionIt = _view.begin<ClientConnection>(); connectionIt != _view.end<ClientConnection>(); ++connectionIt )
+            for( auto connectionIt = _view.begin<ClientConnection>();
+                 connectionIt != _view.end<ClientConnection>();
+                 ++connectionIt )
 			{
 				ClientConnection& connection = *connectionIt;
 

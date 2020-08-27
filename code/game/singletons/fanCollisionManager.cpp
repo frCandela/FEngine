@@ -1,7 +1,6 @@
 #include "game/singletons/fanCollisionManager.hpp"
 
 #include "core/fanDebug.hpp"
-#include "ecs/fanEcsWorld.hpp"
 #include "scene/components/fanRigidbody.hpp"
 #include "scene/components/fanTransform.hpp"
 #include "scene/components/fanSceneNode.hpp"
@@ -10,12 +9,11 @@
 #include "game/components/fanHealth.hpp"
 #include "game/components/fanDamage.hpp"
 #include "game/components/fanSpaceShip.hpp"
-#include "scene/singletons/fanPhysicsWorld.hpp"
 
 namespace fan
 {
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void CollisionManager::SetInfo( EcsSingletonInfo& _info )
 	{
 		_info.icon = ImGui::RIGIDBODY16;
@@ -23,17 +21,19 @@ namespace fan
 		_info.name = "collision manager";
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void CollisionManager::Init( EcsWorld& /*_world*/, EcsSingleton& /*_component*/ )
 	{
 		//CollisionManager& collisionManager = static_cast<CollisionManager&>( _component );
 
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
-	void CollisionManager::OnBulletContact( Rigidbody& _bulletBody, Rigidbody& /*_otherBody*/, btPersistentManifold* const& /*_manifold*/ )
+	//========================================================================================================
+	//========================================================================================================
+    void CollisionManager::OnBulletContact( Rigidbody& _bulletBody,
+                                            Rigidbody& /*_otherBody*/,
+                                            btPersistentManifold* const& /*_manifold*/ )
 	{
 		EcsWorld& world =  _bulletBody.GetWorld();
 		const EcsHandle bulletHandle = _bulletBody.GetHandle();
@@ -51,9 +51,11 @@ namespace fan
 		explosionTransform.SetPosition( bulletTransform.GetPosition() );
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
-	void CollisionManager::OnSpaceShipContact( Rigidbody& _spaceshipBody, Rigidbody& _otherBody, btPersistentManifold* const& /*_manifold*/ )
+	//========================================================================================================
+	//========================================================================================================
+    void CollisionManager::OnSpaceShipContact( Rigidbody& _spaceshipBody,
+                                               Rigidbody& _otherBody,
+                                               btPersistentManifold* const& /*_manifold*/ )
 	{
 		// get ids
 		EcsWorld& world = _spaceshipBody.GetWorld();
@@ -69,7 +71,8 @@ namespace fan
 		if( !dir.fuzzyZero() )
 		{
 			SpaceShip& spaceship = world.GetComponent<SpaceShip>( spaceshipID );
-			_spaceshipBody.rigidbody->applyCentralForce( spaceship.collisionRepulsionForce * dir.normalized() );
+            _spaceshipBody.rigidbody->applyCentralForce( spaceship.collisionRepulsionForce *
+                                                         dir.normalized() );
 		}
 
 		// applies damage
@@ -91,7 +94,7 @@ namespace fan
 		}
 		else
 		{
-			Debug::Error() << "CollisionManager: spaceship has no health !" << Debug::Endl();
+			Debug::Error( "CollisionManager: spaceship has no health !" );
 		}
 	}
 }

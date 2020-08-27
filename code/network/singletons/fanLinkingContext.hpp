@@ -7,13 +7,12 @@
 
 namespace fan
 {
-	//================================================================================================================================
+	//========================================================================================================
 	// Links net ID's to entities handles
-	//================================================================================================================================	
+	//========================================================================================================
 	struct LinkingContext : public EcsSingleton
 	{
 		ECS_SINGLETON( LinkingContext )
-	public:
 		static void SetInfo( EcsSingletonInfo& _info );
 		static void Init( EcsWorld& _world, EcsSingleton& _component );
 		static void OnGui( EcsWorld&, EcsSingleton& _component );

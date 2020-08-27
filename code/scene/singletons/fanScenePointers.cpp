@@ -24,18 +24,6 @@ namespace fan
 		scenePointers.mUnresolvedComponentPtr.clear();
 	}
 
-	//========================================================================================================
-	//========================================================================================================
-	void ScenePointers::OnGui( EcsWorld&, EcsSingleton& _component )
-	{
-		ScenePointers& scenePointers = static_cast<ScenePointers&>( _component );
-		ImGui::Indent(); ImGui::Indent();
-		{
-			ImGui::Text( "unresolved component pointers: %d", scenePointers.mUnresolvedComponentPtr.size() );
-		}
-		ImGui::Unindent(); ImGui::Unindent();
-	}
-
     //========================================================================================================
     //========================================================================================================
     void ScenePointers::Clear( ScenePointers& _scenePointers )
@@ -65,4 +53,12 @@ namespace fan
         }
         scenePointers.mUnresolvedSlotPtr.clear();
 	}
+
+    //========================================================================================================
+    //========================================================================================================
+    void ScenePointers::OnGui( EcsWorld&, EcsSingleton& _component )
+    {
+        ScenePointers& scenePointers = static_cast<ScenePointers&>( _component );
+        ImGui::Text( "unresolved component pointers: %d", scenePointers.mUnresolvedComponentPtr.size() );
+    }
 }

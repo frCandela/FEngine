@@ -1,19 +1,11 @@
 #include "game/singletons/fanClientNetworkManager.hpp"
 
-#include "core/fanDebug.hpp"
 #include "network/singletons/fanTime.hpp"
-#include "game/singletons/fanGame.hpp"
-#include "ecs/fanEcsWorld.hpp"
-#include "scene/fanSceneSerializable.hpp"
-#include "scene/components/fanTransform.hpp"
-#include "scene/components/fanRigidbody.hpp"
 #include "scene/components/fanSceneNode.hpp"
 #include "scene/singletons/fanScene.hpp"
 #include "network/components/fanClientReplication.hpp"
 #include "network/components/fanClientConnection.hpp"
-#include "network/singletons/fanLinkingContext.hpp"
 #include "network/singletons/fanSpawnManager.hpp"
-#include "network/components/fanClientRPC.hpp"
 #include "network/components/fanClientGameData.hpp"
 #include "network/components/fanReliabilityLayer.hpp"
 #include "network/systems/fanTimeout.hpp"
@@ -22,8 +14,8 @@
 
 namespace fan
 {
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void ClientNetworkManager::SetInfo( EcsSingletonInfo& _info )
 	{
 		_info.icon = ImGui::CLIENT_NET16;
@@ -32,16 +24,16 @@ namespace fan
 		_info.name = "client network manager";
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void ClientNetworkManager::Init( EcsWorld& /*_world*/, EcsSingleton& _component )
 	{
 		ClientNetworkManager& netManager = static_cast<ClientNetworkManager&>( _component );
 		netManager.persistentHandle = 0;
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void ClientNetworkManager::Start( EcsWorld& _world )
 	{
 		// Create player persistent scene node
@@ -83,8 +75,8 @@ namespace fan
 		}
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void ClientNetworkManager::Stop( EcsWorld& _world )
 	{
 		const EcsEntity persistentID = _world.GetEntity( persistentHandle );
@@ -94,16 +86,11 @@ namespace fan
 		connection.socket->Unbind();
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void ClientNetworkManager::OnGui( EcsWorld& /*_world*/, EcsSingleton& _component )
 	{
 		ClientNetworkManager& netManager = static_cast<ClientNetworkManager&>( _component );
-
-		ImGui::Indent(); ImGui::Indent();
-		{
-			ImGui::Text( "persistent handle : %d", netManager.persistentHandle );
-		}
-		ImGui::Unindent(); ImGui::Unindent();
+		ImGui::Text( "persistent handle : %d", netManager.persistentHandle );
 	}
 }
