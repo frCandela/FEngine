@@ -5,11 +5,11 @@
 
 namespace fan
 {
-	//==============================================================================================================================================================
+	//========================================================================================================
 	// Updates the entity transform using the transform of the motion state of its rigidbody
 	// Called after the physics update
-	//==============================================================================================================================================================
-	struct S_SynchronizeTransformFromMotionState : EcsSystem
+	//========================================================================================================
+	struct SSynchronizeTransformFromMotionState : EcsSystem
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world )
 		{
@@ -36,11 +36,11 @@ namespace fan
 		}
 	};
 
-	//==============================================================================================================================================================
+	//========================================================================================================
 	// Updates rigidbody and motion state using the transform of the entity
 	// Called before the physics update
-	//==============================================================================================================================================================
-	struct S_SynchronizeMotionStateFromTransform : EcsSystem
+	//========================================================================================================
+	struct SSynchronizeMotionStateFromTransform : EcsSystem
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world )
 		{

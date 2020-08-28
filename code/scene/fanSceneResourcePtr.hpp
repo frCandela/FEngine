@@ -16,18 +16,18 @@ namespace fan
     //========================================================================================================
     struct ComponentPtrBase
     {
-        ComponentPtrBase( uint32_t _type ) : type( _type ) {}
-        void Init( EcsWorld& _world ) { world = &_world; }
+        ComponentPtrBase( uint32_t _type ) : mType( _type ) {}
+        void Init( EcsWorld& _world ) { mWorld = &_world; }
         void Create( EcsHandle _handle );
         void CreateUnresolved( EcsHandle _handle );
         void Clear();
-        bool IsValid() const{ return type != 0 && handle != 0; }
-        EcsComponent& operator*() const { return world->GetComponent( world->GetEntity( handle ), type ); }
+        bool IsValid() const{ return mType != 0 && mHandle != 0; }
+        EcsComponent& operator*() const { return mWorld->GetComponent( mWorld->GetEntity( mHandle ), mType ); }
         EcsComponent* operator->() const { return &( **this ); /* use operator* */ }
 
-        EcsWorld* world;
-        const uint32_t type = 0;
-        EcsHandle      handle = 0;
+        EcsWorld*      mWorld;
+        const uint32_t mType   = 0;
+        EcsHandle      mHandle = 0;
     };
 
     //========================================================================================================
@@ -40,21 +40,21 @@ namespace fan
         ComponentPtr() : ComponentPtrBase( _componentType::Info::sType ) {}
         _componentType& operator*() const
         {
-            return static_cast<_componentType&>( world->GetComponent( world->GetEntity( handle ), type ));
+            return static_cast<_componentType&>( mWorld->GetComponent( mWorld->GetEntity( mHandle ), mType ));
         }
         _componentType* operator->() const { return &( **this ); /* use operator* */ }
         bool operator!=( const ComponentPtr<_componentType>& _other ) const { return !( *this == _other ); }
         bool operator==( const ComponentPtr<_componentType>& _other ) const
         {
-            return _other.handle == handle;
+            return _other.mHandle == mHandle;
         }
         bool operator!=( _componentType* _component ) const
         {
             if( _component == nullptr )
             {
-                return handle != 0;
+                return mHandle != 0;
             }
-            else if( handle == 0 )
+            else if( mHandle == 0 )
             {
                 return true;
             }
@@ -64,9 +64,9 @@ namespace fan
         {
             if( _component == nullptr )
             {
-                return handle == 0;
+                return mHandle == 0;
             }
-            else if( handle == 0 )
+            else if( mHandle == 0 )
             {
                 return false;
             }
@@ -82,8 +82,8 @@ namespace fan
     {
     public:
         PrefabPtr( Prefab* _prefab = nullptr ) : ResourcePtr<Prefab>( _prefab ) {}
-        void Init( const std::string _path ) { m_path = _path; }
-        const std::string& GetPath() const { return m_path; }
+        void Init( const std::string _path ) { mPath = _path; }
+        const std::string& GetPath() const { return mPath; }
 
         ResourcePtr& Set( Prefab* _resource )
         {
@@ -91,7 +91,7 @@ namespace fan
             return *this;
         }
     private:
-        std::string m_path;
+        std::string mPath;
     };
 }
 

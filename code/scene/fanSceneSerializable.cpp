@@ -9,8 +9,8 @@ namespace fan
 	//========================================================================================================
 	void Serializable::SaveComponentPtr(Json& _json, const char* _name, const ComponentPtrBase& _ptr)
 	{
-		_json[_name]["handle"] = _ptr.handle;
-		_json[_name]["component_type"] = _ptr.type;
+		_json[_name]["handle"] = _ptr.mHandle;
+		_json[_name]["component_type"] = _ptr.mType;
 	}
 
 	//========================================================================================================
@@ -28,7 +28,7 @@ namespace fan
 		if (token == nullptr ) { return false; }
 
         uint32_t    componentType = ( *token )["component_type"];
-		if(_outPtr.type != componentType ) { return false; }
+		if( _outPtr.mType != componentType ) { return false; }
 
 		_outPtr.CreateUnresolved( (*token)["handle"] );
 		return true;

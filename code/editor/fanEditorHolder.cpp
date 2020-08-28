@@ -325,15 +325,15 @@ namespace fan
                     {
                         SCOPED_PROFILE( debug_draw );
                         // Debug Draw
-                        if( mMainMenuBar->ShowWireframe() ){ world.Run<S_DrawDebugWireframe>(); }
-                        if( mMainMenuBar->ShowNormals() ){ world.Run<S_DrawDebugNormals>(); }
-                        if( mMainMenuBar->ShowAABB() ){ world.Run<S_DrawDebugBounds>(); }
-                        if( mMainMenuBar->ShowHull() ){ world.Run<S_DrawDebugHull>(); }
-                        if( mMainMenuBar->ShowUiBounds() ){ world.Run<S_DrawDebugUiBounds>(); }
+                        if( mMainMenuBar->ShowWireframe() ){ world.Run<SDrawDebugWireframe>(); }
+                        if( mMainMenuBar->ShowNormals() ){ world.Run<SDrawDebugNormals>(); }
+                        if( mMainMenuBar->ShowAABB() ){ world.Run<SDrawDebugBounds>(); }
+                        if( mMainMenuBar->ShowHull() ){ world.Run<SDrawDebugHull>(); }
+                        if( mMainMenuBar->ShowUiBounds() ){ world.Run<SDrawDebugUiBounds>(); }
                         if( mMainMenuBar->ShowLights() )
                         {
-                            world.Run<S_DrawDebugPointLights>();
-                            world.Run<S_DrawDebugDirectionalLights>();
+                            world.Run<SDrawDebugPointLights>();
+                            world.Run<SDrawDebugDirectionalLights>();
                         }
                         EditorGrid::Draw( GetCurrentGame().mWorld );
 
@@ -529,8 +529,8 @@ namespace fan
             SCOPED_PROFILE( update_render_data );
             world.Run<SUpdateRenderWorldModels>();
             world.Run<SUpdateRenderWorldUI>();
-            world.Run<S_UpdateRenderWorldPointLights>();
-            world.Run<S_UpdateRenderWorldDirectionalLights>();
+            world.Run<SUpdateRenderWorldPointLights>();
+            world.Run<SUpdateRenderWorldDirectionalLights>();
         }
 
         // particles mesh

@@ -17,12 +17,12 @@ namespace fan
 	//========================================================================================================
 	void ComponentPtrBase::CreateUnresolved( EcsHandle _handle )
 	{
-		handle = _handle;
+		mHandle = _handle;
 		
 		// adds to the unresolved pointers list
 		if( _handle != 0 )
 		{
-			ScenePointers& scenePointers = world->GetSingleton<ScenePointers>();
+			ScenePointers& scenePointers = mWorld->GetSingleton<ScenePointers>();
 			scenePointers.mUnresolvedComponentPtr.push_back( this );
 		}
 	}
@@ -31,15 +31,15 @@ namespace fan
 	//========================================================================================================
 	void ComponentPtrBase::Create( EcsHandle _handle )
 	{
-		handle = _handle;
-		fanAssert( world->HasComponent( world->GetEntity( _handle ), type ) );
+		mHandle = _handle;
+		fanAssert( mWorld->HasComponent( mWorld->GetEntity( _handle ), mType ) );
 	}
 
 	//========================================================================================================
 	//========================================================================================================
 	void ComponentPtrBase::Clear()
 	{
-		handle = 0;
+		mHandle = 0;
 	}
 }
 
@@ -50,20 +50,20 @@ namespace ImGui
 	//========================================================================================================
  	bool FanComponentBase( const char* _label, fan::ComponentPtrBase& _ptr )
  	{
-		fan::EcsWorld& world = *_ptr.world;
+		fan::EcsWorld& world = *_ptr.mWorld;
  		bool returnValue = false;
  
-		const fan::EcsComponentInfo& info = world.GetComponentInfo( _ptr.type );
+		const fan::EcsComponentInfo& info = world.GetComponentInfo( _ptr.mType );
 
 		// create button title
 		std::string name;
-		if( _ptr.handle == 0 )
+		if( _ptr.mHandle == 0 )
 		{
 			name = info.mName + " : NULL";
 		}
 		else
 		{
-			fan::SceneNode& node = world.GetComponent<fan::SceneNode>( world.GetEntity( _ptr.handle ) );
+			fan::SceneNode& node = world.GetComponent<fan::SceneNode>( world.GetEntity( _ptr.mHandle ) );
 			name = info.mName + " : " + node.mName;
 		}		
  		// icon
@@ -72,13 +72,13 @@ namespace ImGui
  			returnValue = true;
  		}
 		// dragndrop source for icon
-		if( _ptr.handle != 0 )
+		if( _ptr.mHandle != 0 )
 		{
-			fan::SceneNode& node = world.GetComponent<fan::SceneNode>( world.GetEntity( _ptr.handle ) );
-			ImGui::FanBeginDragDropSourceComponent( world, node.mHandle, _ptr.type );
+			fan::SceneNode& node = world.GetComponent<fan::SceneNode>( world.GetEntity( _ptr.mHandle ) );
+			ImGui::FanBeginDragDropSourceComponent( world, node.mHandle, _ptr.mType );
 		}
 		// dragndrop target for icon
-		ImGui::ComponentPayload payloadIcon = ImGui::FanBeginDragDropTargetComponent( world, _ptr.type );
+		ImGui::ComponentPayload payloadIcon = ImGui::FanBeginDragDropTargetComponent( world, _ptr.mType );
  		
 		ImGui::SameLine();
  
@@ -91,13 +91,13 @@ namespace ImGui
  		ImGui::SameLine();
  
  		// dragndrop source for button
-		if( _ptr.handle != 0 )
+		if( _ptr.mHandle != 0 )
 		{
-			ImGui::FanBeginDragDropSourceComponent( world, _ptr.handle, _ptr.type );
+			ImGui::FanBeginDragDropSourceComponent( world, _ptr.mHandle, _ptr.mType );
 		}
 
 		// dragndrop target for button
-  		ImGui::ComponentPayload payloadButton = ImGui::FanBeginDragDropTargetComponent( world, _ptr.type );
+  		ImGui::ComponentPayload payloadButton = ImGui::FanBeginDragDropTargetComponent( world, _ptr.mType );
 		if( payloadButton.mHandle != 0 || payloadIcon.mHandle != 0 )
 		{
             ImGui::ComponentPayload& payload = ( payloadButton.mHandle != 0

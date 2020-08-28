@@ -39,8 +39,6 @@ namespace fan
                     pSize  = parentTransform.mSize;
                 }
 
-
-
                 const glm::ivec2& cSize = childTransform.mSize;
                 glm::ivec2& cPos = childTransform.mPosition;
 

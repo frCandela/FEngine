@@ -128,7 +128,7 @@ namespace fan
 
 			// raycast on bounds
 			std::vector<EcsEntity> results;
-			world.Run<S_RaycastAll>( ray, results );
+			world.Run<SRaycastAll>( ray, results );
 			if( !results.empty() )
 			{
 				// cycle selection
@@ -151,7 +151,7 @@ namespace fan
 		if( mSelectedNodeHandle != 0 )
 		{
 			const EcsEntity selectedEntity = world.GetEntity( mSelectedNodeHandle );
-			S_DrawDebugCollisionShapes::DrawCollisionShape( world, selectedEntity );
+			SDrawDebugCollisionShapes::DrawCollisionShape( world, selectedEntity );
 
 			if( world.HasComponent<Transform>( selectedEntity ) ) 
 			{
@@ -161,14 +161,14 @@ namespace fan
                 {
                     const DirectionalLight& directionalLight = world.GetComponent<DirectionalLight>(
                             selectedEntity );
-                    S_DrawDebugDirectionalLights::DrawDirectionalLight( renderDebug,
-                                                                        transform,
-                                                                        directionalLight );
+                    SDrawDebugDirectionalLights::DrawDirectionalLight( renderDebug,
+                                                                       transform,
+                                                                       directionalLight );
 				} 
 				if( world.HasComponent<PointLight>( selectedEntity ) )
 				{
 					const PointLight& pointLight = world.GetComponent<PointLight>( selectedEntity );
-					S_DrawDebugPointLights::DrawPointLight( renderDebug, transform, pointLight );
+					SDrawDebugPointLights::DrawPointLight( renderDebug, transform, pointLight );
 				}
 			}
 		}	

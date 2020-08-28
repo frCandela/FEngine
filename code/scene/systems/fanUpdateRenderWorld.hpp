@@ -112,7 +112,7 @@ namespace fan
 	//========================================================================================================
 	// Update the render world point lights
 	//========================================================================================================
-	struct S_UpdateRenderWorldPointLights : EcsSystem
+	struct SUpdateRenderWorldPointLights : EcsSystem
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world )
 		{
@@ -149,7 +149,7 @@ namespace fan
 	//========================================================================================================
 	// Update the render world directional lights
 	//========================================================================================================
-	struct S_UpdateRenderWorldDirectionalLights : EcsSystem
+	struct SUpdateRenderWorldDirectionalLights : EcsSystem
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world )
 		{

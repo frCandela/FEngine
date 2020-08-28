@@ -7,13 +7,13 @@
 
 namespace fan
 {
-	//==============================================================================================================================================================
+	//========================================================================================================
 	// enumerates over all rigidbody in the world, find the ones that have a collision shape and 
 	// optionally a motion state and adds them to the physics world.
 	// this can be called post scene load to register all new scene nodes that need it
 	// @todo split this in two systems for SphereShape & BoxShape
-	//==============================================================================================================================================================
-	struct S_RegisterAllRigidbodies : EcsSystem
+	//========================================================================================================
+	struct SRegisterAllRigidbodies : EcsSystem
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world )
 		{
@@ -23,7 +23,9 @@ namespace fan
 		static void Run( EcsWorld& _world, const EcsView& _view )
 		{
 			PhysicsWorld& physicsWorld = _world.GetSingleton<PhysicsWorld>();
-			for( auto rigidbodyIt = _view.begin<Rigidbody>(); rigidbodyIt != _view.end<Rigidbody>(); ++rigidbodyIt )
+            for( auto rigidbodyIt = _view.begin<Rigidbody>();
+                 rigidbodyIt != _view.end<Rigidbody>();
+                 ++rigidbodyIt )
 			{
 				const EcsEntity entity = rigidbodyIt.GetEntity();
 				Rigidbody& rb = *rigidbodyIt;
@@ -55,10 +57,10 @@ namespace fan
 		}
 	};
 
-	//==============================================================================================================================================================
+	//========================================================================================================
 	// enumerates over all rigidbody in the world, and removes them from the physics world
-	//==============================================================================================================================================================
-	struct S_UnregisterAllRigidbodies : EcsSystem
+	//========================================================================================================
+	struct SUnregisterAllRigidbodies : EcsSystem
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world )
 		{
@@ -68,7 +70,9 @@ namespace fan
 		static void Run( EcsWorld& _world, const EcsView& _view )
 		{
 			PhysicsWorld& physicsWorld = _world.GetSingleton<PhysicsWorld>();
-			for( auto rigidbodyIt = _view.begin<Rigidbody>(); rigidbodyIt != _view.end<Rigidbody>(); ++rigidbodyIt )
+            for( auto rigidbodyIt = _view.begin<Rigidbody>();
+                 rigidbodyIt != _view.end<Rigidbody>();
+                 ++rigidbodyIt )
 			{
 				Rigidbody& rigidbody = *rigidbodyIt;
 				physicsWorld.mDynamicsWorld->removeRigidBody( rigidbody.mRigidbody );

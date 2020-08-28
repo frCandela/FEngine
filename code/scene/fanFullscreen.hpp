@@ -18,6 +18,7 @@ namespace fan
         void SavePreviousPositionAndSize( const Window& _window );
         void SetFullScreen( Window& _window );
         void SetWindowed( Window& _window );
+
     private:
         glm::ivec2 mPrevWindowedSize;
         glm::ivec2 mPrevWindowedPosition;

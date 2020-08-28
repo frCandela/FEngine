@@ -220,8 +220,8 @@ namespace fan
 		// update render data
 		_world.Run<SUpdateRenderWorldModels>();
 		_world.Run<SUpdateRenderWorldUI>();
-		_world.Run<S_UpdateRenderWorldPointLights>();
-		_world.Run<S_UpdateRenderWorldDirectionalLights>();
+		_world.Run<SUpdateRenderWorldPointLights>();
+		_world.Run<SUpdateRenderWorldDirectionalLights>();
 
 		// particles mesh
 		RenderDataModel particlesDrawData;

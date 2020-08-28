@@ -145,7 +145,7 @@ namespace fan
 		netManager.Start( mWorld );
 
 		// Init game
-        mWorld.Run<S_RegisterAllRigidbodies>();
+        mWorld.Run<SRegisterAllRigidbodies>();
         GameCamera& gameCamera = GameCamera::CreateGameCamera( mWorld );
         Scene& scene = mWorld.GetSingleton<Scene>();
         scene.SetMainCamera( gameCamera.cmCameraHandle );
@@ -164,7 +164,7 @@ namespace fan
 	void  GameClient::Stop()
 	{
 		// clears the physics world
-        mWorld.Run<S_UnregisterAllRigidbodies>();
+        mWorld.Run<SUnregisterAllRigidbodies>();
 
 		// clears the particles mesh
 		RenderWorld& renderWorld = mWorld.GetSingleton<RenderWorld>();
@@ -229,9 +229,9 @@ namespace fan
                 mWorld.Run<SMovePlanets>( delta );
                 mWorld.Run<SMoveSpaceships>( delta );
 
-                mWorld.Run<S_SynchronizeMotionStateFromTransform>();
+                mWorld.Run<SSynchronizeMotionStateFromTransform>();
 				physicsWorld.mDynamicsWorld->stepSimulation( time.mLogicDelta, 10, Time::sPhysicsDelta );
-                mWorld.Run<S_SynchronizeTransformFromMotionState>();
+                mWorld.Run<SSynchronizeTransformFromMotionState>();
 
                 mWorld.Run<SClientSaveState>( delta );
                 mWorld.Run<SRollbackStateSave>( delta );
@@ -273,9 +273,9 @@ namespace fan
 
 			// physics & transforms
 			PhysicsWorld& physicsWorld = mWorld.GetSingleton<PhysicsWorld>();
-            mWorld.Run<S_SynchronizeMotionStateFromTransform>();
+            mWorld.Run<SSynchronizeMotionStateFromTransform>();
 			physicsWorld.mDynamicsWorld->stepSimulation( _delta, 10, Time::sPhysicsDelta );
-            mWorld.Run<S_SynchronizeTransformFromMotionState>();
+            mWorld.Run<SSynchronizeTransformFromMotionState>();
             mWorld.Run<SMoveFollowTransforms>();
 
             mWorld.Run<SAlignUI>();
@@ -288,7 +288,7 @@ namespace fan
 			mWorld.Run<SGenerateLightMesh>( _delta );
 			mWorld.Run<SUpdateSolarPanels>( _delta );
 			mWorld.Run<SRechargeBatteries>( _delta );
-			mWorld.Run<S_UpdateExpirationTimes>(	 _delta );
+			mWorld.Run<SUpdateExpirationTimes>( _delta );
 			mWorld.Run<SEruptionDamage>( _delta );
 			mWorld.Run<SUpdateGameUiValues>( _delta );
 			mWorld.Run<SUpdateGameUiPosition>( _delta );
@@ -300,12 +300,12 @@ namespace fan
 			if( !renderWorld.mIsHeadless )
 			{
 				mWorld.Run<SParticlesOcclusion>( _delta );
-				mWorld.Run<S_UpdateParticles>( _delta );
-				mWorld.Run<S_EmitParticles>( _delta );
-				mWorld.Run<S_GenerateParticles>( _delta );
-				mWorld.Run<S_UpdateBoundsFromRigidbody>( _delta );
-				mWorld.Run<S_UpdateBoundsFromModel>();
-				mWorld.Run<S_UpdateBoundsFromTransform>();
+				mWorld.Run<SUpdateParticles>( _delta );
+				mWorld.Run<SEmitParticles>( _delta );
+				mWorld.Run<SGenerateParticles>( _delta );
+				mWorld.Run<SUpdateBoundsFromRigidbody>( _delta );
+				mWorld.Run<SUpdateBoundsFromModel>();
+				mWorld.Run<SUpdateBoundsFromTransform>();
 				mWorld.Run<SUpdateGameCamera>( _delta );
 			}
 

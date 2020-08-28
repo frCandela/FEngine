@@ -9,10 +9,10 @@
 
 namespace fan
 {
-	//==============================================================================================================================================================
+	//========================================================================================================
 	// Uses the rigidbody bounds to set the entity bounds
-	//==============================================================================================================================================================
-	struct S_UpdateBoundsFromRigidbody : EcsSystem
+	//========================================================================================================
+	struct SUpdateBoundsFromRigidbody : EcsSystem
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world )
 		{
@@ -54,10 +54,10 @@ namespace fan
 		}
 	};
 
-	//==============================================================================================================================================================
+	//========================================================================================================
 	// Uses the convex hull in the mesh renderer mesh to generate new bounds
-	//==============================================================================================================================================================
-	struct S_UpdateBoundsFromModel : EcsSystem
+	//========================================================================================================
+	struct SUpdateBoundsFromModel : EcsSystem
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world )
 		{
@@ -74,7 +74,8 @@ namespace fan
 			auto transformIt = _view.begin<Transform>();
 			auto boundsIt = _view.begin<Bounds>();
 			auto sceneNodeIt = _view.begin<SceneNode>();
-			for( ; meshRendererIt != _view.end<MeshRenderer>(); ++meshRendererIt, ++transformIt, ++boundsIt, ++sceneNodeIt )
+            for( ; meshRendererIt != _view.end<MeshRenderer>();
+                   ++meshRendererIt, ++transformIt, ++boundsIt, ++sceneNodeIt )
 			{
 				SceneNode& sceneNode = *sceneNodeIt;
 				if( !sceneNode.HasFlag( SceneNode::BoundsOutdated ) )
@@ -105,10 +106,10 @@ namespace fan
 		}
 	};
 
-	//==============================================================================================================================================================
+	//========================================================================================================
 	// Uses a transform bounds to set the entity bounds
-	//==============================================================================================================================================================
-	struct S_UpdateBoundsFromTransform : EcsSystem
+	//========================================================================================================
+	struct SUpdateBoundsFromTransform : EcsSystem
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world )
 		{
@@ -136,7 +137,8 @@ namespace fan
 
 				const btVector3 origin = transform.GetPosition();
 				const float sizeBounds = 0.2f;
-				bounds.mAabb = AABB( origin - sizeBounds * btVector3::One(), origin + sizeBounds * btVector3::One() );
+                bounds.mAabb = AABB( origin - sizeBounds * btVector3::One(),
+                                     origin + sizeBounds * btVector3::One() );
 				sceneNode.RemoveFlag( SceneNode::BoundsOutdated );
 			}
 		}

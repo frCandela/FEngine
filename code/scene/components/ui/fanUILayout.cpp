@@ -58,7 +58,7 @@ namespace fan
 	{
         UILayout& layout = static_cast<UILayout&>( _component );
         fanAssert( ! layout.mTransforms.empty() );
-        EcsWorld& world = *layout.mTransforms[0].world;
+        EcsWorld& world = *layout.mTransforms[0].mWorld;
         layout.mTransforms.clear();
 
         int count = 0;

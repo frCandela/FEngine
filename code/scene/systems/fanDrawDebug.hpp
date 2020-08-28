@@ -11,11 +11,12 @@
 namespace fan
 {
 	class EcsWorld;
+    struct DirectionalLight;
 
 	//========================================================================================================
 	// Draw the bounds of all scene nodes 
 	//========================================================================================================
-	struct S_DrawDebugBounds : EcsSystem
+	struct SDrawDebugBounds : EcsSystem
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world )
 		{
@@ -36,7 +37,7 @@ namespace fan
 	//========================================================================================================
 	// Draw the normals of all models 
 	//========================================================================================================
-	struct S_DrawDebugNormals : EcsSystem
+	struct SDrawDebugNormals : EcsSystem
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world )
 		{
@@ -74,7 +75,7 @@ namespace fan
 	//========================================================================================================
 	// Draw all the models in wireframe
 	//========================================================================================================
-	struct S_DrawDebugWireframe : EcsSystem
+	struct SDrawDebugWireframe : EcsSystem
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world )
 		{
@@ -88,23 +89,22 @@ namespace fan
 			{
 				const MeshRenderer& meshRenderer = *meshRendererIt;
 				const Transform& transform = *transformIt;
+				if( *meshRenderer.mMesh == nullptr ) { continue; }
 
-				if( *meshRenderer.mMesh != nullptr )
-				{
-					const glm::mat4  modelMat = transform.GetModelMatrix();
-					const std::vector<uint32_t>& indices = meshRenderer.mMesh->mIndices;
-					const std::vector<Vertex>& vertices = meshRenderer.mMesh->mVertices;
+				const glm::mat4  modelMat = transform.GetModelMatrix();
+				const std::vector<uint32_t>& indices = meshRenderer.mMesh->mIndices;
+				const std::vector<Vertex>& vertices = meshRenderer.mMesh->mVertices;
 
-					for( int index = 0; index < (int)indices.size() / 3; index++ )
-					{
-						const btVector3 v0 = ToBullet( modelMat * glm::vec4( vertices[indices[3 * index + 0]].mPos, 1.f ) );
-						const btVector3 v1 = ToBullet( modelMat * glm::vec4( vertices[indices[3 * index + 1]].mPos, 1.f ) );
-						const btVector3 v2 = ToBullet( modelMat * glm::vec4( vertices[indices[3 * index + 2]].mPos, 1.f ) );
-						_world.GetSingleton<RenderDebug>().DebugLine( v0, v1, Color::sYellow );
-						_world.GetSingleton<RenderDebug>().DebugLine( v1, v2, Color::sYellow );
-						_world.GetSingleton<RenderDebug>().DebugLine( v2, v0, Color::sYellow );
-					}
+				for( int index = 0; index < (int)indices.size() / 3; index++ )
+                {
+                    const btVector3 v0 = ToBullet(modelMat * glm::vec4( vertices[indices[3 * index + 0]].mPos, 1.f ) );
+                    const btVector3 v1 = ToBullet(modelMat * glm::vec4( vertices[indices[3 * index + 1]].mPos, 1.f ) );
+                    const btVector3 v2 = ToBullet(modelMat * glm::vec4( vertices[indices[3 * index + 2]].mPos, 1.f ) );
+					_world.GetSingleton<RenderDebug>().DebugLine( v0, v1, Color::sYellow );
+					_world.GetSingleton<RenderDebug>().DebugLine( v1, v2, Color::sYellow );
+					_world.GetSingleton<RenderDebug>().DebugLine( v2, v0, Color::sYellow );
 				}
+
 			}
 		}
 	};
@@ -112,12 +112,13 @@ namespace fan
 	//========================================================================================================
 	// Draw all the models convex hull in wireframe
 	//========================================================================================================
-	struct S_DrawDebugHull : EcsSystem
+	struct SDrawDebugHull : EcsSystem
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world )
 		{
 			return _world.GetSignature<MeshRenderer>() | _world.GetSignature<Transform>();
 		}
+
 		static void Run( EcsWorld& _world, const EcsView& _view )
 		{
 			auto meshRendererIt = _view.begin<MeshRenderer>();
@@ -127,44 +128,38 @@ namespace fan
 				const MeshRenderer& meshRenderer = *meshRendererIt;
 				const Transform& transform = *transformIt;
 
-				if( *meshRenderer.mMesh != nullptr )
+				if( *meshRenderer.mMesh == nullptr ){ continue; }
+
+				const ConvexHull& hull = meshRenderer.mMesh->mConvexHull;
+				if( hull.mVertices.empty() ){ continue; }
+
+				const glm::mat4  modelMat = transform.GetModelMatrix();
+
+				Color color = Color::sCyan;
+				for( unsigned polyIndex = 0; polyIndex < hull.mIndices.size() / 3; polyIndex++ )
 				{
-					const ConvexHull& hull = meshRenderer.mMesh->mConvexHull;
-					if( !hull.mVertices.empty() )
-					{
-						const glm::mat4  modelMat = transform.GetModelMatrix();
+					const int index0 = hull.mIndices[3 * polyIndex + 0];
+					const int index1 = hull.mIndices[3 * polyIndex + 1];
+					const int index2 = hull.mIndices[3 * polyIndex + 2];
+					const btVector3 vec0 = hull.mVertices[index0];
+					const btVector3 vec1 = hull.mVertices[index1];
+					const btVector3 vec2 = hull.mVertices[index2];
+					const btVector3 worldVec0 = ToBullet( modelMat * glm::vec4( vec0[0], vec0[1], vec0[2], 1.f ) );
+					const btVector3 worldVec1 = ToBullet( modelMat * glm::vec4( vec1[0], vec1[1], vec1[2], 1.f ) );
+					const btVector3 worldVec2 = ToBullet( modelMat * glm::vec4( vec2[0], vec2[1], vec2[2], 1.f ) );
 
-						Color color = Color::sCyan;
-						for( unsigned polyIndex = 0; polyIndex < hull.mIndices.size() / 3; polyIndex++ )
-						{
-							const int index0 = hull.mIndices[3 * polyIndex + 0];
-							const int index1 = hull.mIndices[3 * polyIndex + 1];
-							const int index2 = hull.mIndices[3 * polyIndex + 2];
-							const btVector3 vec0 = hull.mVertices[index0];
-							const btVector3 vec1 = hull.mVertices[index1];
-							const btVector3 vec2 = hull.mVertices[index2];
-							const btVector3 worldVec0 = ToBullet( modelMat * glm::vec4( vec0[0], vec0[1], vec0[2], 1.f ) );
-							const btVector3 worldVec1 = ToBullet( modelMat * glm::vec4( vec1[0], vec1[1], vec1[2], 1.f ) );
-							const btVector3 worldVec2 = ToBullet( modelMat * glm::vec4( vec2[0], vec2[1], vec2[2], 1.f ) );
-
-							_world.GetSingleton<RenderDebug>().DebugLine( worldVec0, worldVec1, color );
-							_world.GetSingleton<RenderDebug>().DebugLine( worldVec1, worldVec2, color );
-							_world.GetSingleton<RenderDebug>().DebugLine( worldVec2, worldVec0, color );
-						}
-					}
-
+					_world.GetSingleton<RenderDebug>().DebugLine( worldVec0, worldVec1, color );
+					_world.GetSingleton<RenderDebug>().DebugLine( worldVec1, worldVec2, color );
+					_world.GetSingleton<RenderDebug>().DebugLine( worldVec2, worldVec0, color );
 				}
 			}
 		}
 	};
 
-
-	struct Transform;
-	struct PointLight;
-	//==============================================================================================================================================================
+	//========================================================================================================
 	// Draw all the point lights gizmos
-	//==============================================================================================================================================================
-	struct S_DrawDebugPointLights : EcsSystem
+	//========================================================================================================
+	struct SDrawDebugPointLights : EcsSystem
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world )
 		{
@@ -183,7 +178,9 @@ namespace fan
 			}
 		}
 
-		static void DrawPointLight( RenderDebug& _renderDebug, const Transform& _transform, const PointLight& _light )
+        static void DrawPointLight( RenderDebug& _renderDebug,
+                                    const Transform& _transform,
+                                    const PointLight& _light )
 		{
 			const float lightRange = PointLight::GetLightRange( _light );
 			if( lightRange > 0 )
@@ -193,12 +190,10 @@ namespace fan
 		}
 	};
 
-
-	struct DirectionalLight;
-	//==============================================================================================================================================================
+	//========================================================================================================
 	// Draw all the directional lights gizmos
-	//==============================================================================================================================================================
-	struct S_DrawDebugDirectionalLights : EcsSystem
+	//========================================================================================================
+	struct SDrawDebugDirectionalLights : EcsSystem
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world )
 		{
@@ -218,7 +213,9 @@ namespace fan
 			}
 		}
 
-		static void DrawDirectionalLight( RenderDebug& _renderDebug, const Transform& _transform, const DirectionalLight& /*_light*/ )
+        static void DrawDirectionalLight( RenderDebug& _renderDebug,
+                                          const Transform& _transform,
+                                          const DirectionalLight& /*_light*/ )
 		{
 			const btVector3 pos = _transform.GetPosition();
 			const btVector3 dir = _transform.Forward();
@@ -227,7 +224,11 @@ namespace fan
 			const float length = 2.f;
 			const float radius = 0.5f;
 			const Color color = Color::sYellow;
-			btVector3 offsets[5] = { btVector3::Zero(), radius * up ,-radius * up, radius * left ,-radius * left };
+            btVector3 offsets[5] = { btVector3::Zero(),
+                                     radius * up,
+                                     -radius * up,
+                                     radius * left,
+                                     -radius * left };
 			for( int offsetIndex = 0; offsetIndex < 5; offsetIndex++ )
 			{
 				const btVector3 offset = offsets[offsetIndex];
@@ -237,16 +238,17 @@ namespace fan
 		}
 	};
 
-	//==============================================================================================================================================================
+	//========================================================================================================
 	// @todo split this in two systems for BoxShape & SphereShape
 	// Draw physics shapes in wireframe (box, sphere, etc )
-	//==============================================================================================================================================================
-	struct S_DrawDebugCollisionShapes : EcsSystem
+	//========================================================================================================
+	struct SDrawDebugCollisionShapes : EcsSystem
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world )
 		{
 			return _world.GetSignature<Transform>();
 		}
+
 		static void Run( EcsWorld& _world, const EcsView& _view )
 		{
 			auto transformIt = _view.begin<Transform>();
@@ -267,22 +269,26 @@ namespace fan
 			if( _world.HasComponent<BoxShape>( _entity ) )
 			{
 				const BoxShape& shape = _world.GetComponent<BoxShape>( _entity );
-				_world.GetSingleton<RenderDebug>().DebugCube( transform.mTransform, 0.5f * shape.GetScaling(), Color::sGreen, false );
+                _world.GetSingleton<RenderDebug>().DebugCube( transform.mTransform,
+                                                              0.5f * shape.GetScaling(),
+                                                              Color::sGreen, false );
 			}
 
 			// sphere shape
 			if( _world.HasComponent<SphereShape>( _entity ) )
 			{
 				const SphereShape& shape = _world.GetComponent<SphereShape>( _entity );
-				_world.GetSingleton<RenderDebug>().DebugSphere( transform.mTransform, shape.GetRadius(), Color::sGreen, false );
-			}
+                _world.GetSingleton<RenderDebug>().DebugSphere( transform.mTransform,
+                                                                shape.GetRadius(),
+                                                                Color::sGreen, false );
+            }
 		}
 	};
 
 
-    //==============================================================================================================================================================
-    //==============================================================================================================================================================
-    struct S_DrawDebugUiBounds : EcsSystem
+    //========================================================================================================
+    //========================================================================================================
+    struct SDrawDebugUiBounds : EcsSystem
     {
         static EcsSignature GetSignature( const EcsWorld& _world )
         {

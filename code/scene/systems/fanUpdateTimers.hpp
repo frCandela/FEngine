@@ -3,10 +3,10 @@
 
 namespace fan
 {
-	//==============================================================================================================================================================
+	//========================================================================================================
 	// Kills the entities that expired
-	//==============================================================================================================================================================
-	struct S_UpdateExpirationTimes : EcsSystem
+	//========================================================================================================
+	struct SUpdateExpirationTimes : EcsSystem
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world )
 		{
@@ -17,10 +17,12 @@ namespace fan
 		{
 			if( _delta == 0.f ) { return; }
 
-			for( auto expirationeIt = _view.begin<ExpirationTime>(); expirationeIt != _view.end<ExpirationTime>(); ++expirationeIt )
+            for( auto expirationIt = _view.begin<ExpirationTime>();
+                 expirationIt != _view.end<ExpirationTime>();
+                 ++expirationIt )
 			{
-				const EcsEntity entity = expirationeIt.GetEntity();
-				ExpirationTime& expiration = *expirationeIt;
+				const EcsEntity entity = expirationIt.GetEntity();
+				ExpirationTime& expiration = *expirationIt;
 
 				expiration.mDuration -= _delta;
 				if( expiration.mDuration < 0.f )

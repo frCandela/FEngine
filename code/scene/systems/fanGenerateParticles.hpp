@@ -6,10 +6,10 @@
 
 namespace fan
 {
-	//==============================================================================================================================================================
+	//========================================================================================================
 	// Generate a mesh for all particles in the world
-	//==============================================================================================================================================================
-	struct S_GenerateParticles : EcsSystem
+	//========================================================================================================
+	struct SGenerateParticles : EcsSystem
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world )
 		{
@@ -32,9 +32,18 @@ namespace fan
 
 				glm::vec3 color = particle.mColor.ToGLM3();
 				// pos, normal, color, uv;
-				vertices.push_back( { particle.mPosition + glm::vec3( -size, 0.0f, -size ), glm::vec3( 0.f, 1.f, 0.f ), color, glm::vec2( -0.5f, -0.5f ) } );
-				vertices.push_back( { particle.mPosition + glm::vec3( 0, 0.0f, size ), glm::vec3( 0.f, 1.f, 0.f ), color, glm::vec2( -0.5f, -0.5f ) } );
-				vertices.push_back( { particle.mPosition + glm::vec3( size, 0.0f, -size ), glm::vec3( 0.f, 1.f, 0.f ), color, glm::vec2( -0.5f, -0.5f ) } );
+                vertices.push_back( { particle.mPosition + glm::vec3( -size, 0.0f, -size ),
+                                      glm::vec3( 0.f, 1.f, 0.f ),
+                                      color,
+                                      glm::vec2( -0.5f, -0.5f ) } );
+                vertices.push_back( { particle.mPosition + glm::vec3( 0, 0.0f, size ),
+                                      glm::vec3( 0.f, 1.f, 0.f ),
+                                      color,
+                                      glm::vec2( -0.5f, -0.5f ) } );
+                vertices.push_back( { particle.mPosition + glm::vec3( size, 0.0f, -size ),
+                                      glm::vec3( 0.f, 1.f, 0.f ),
+                                      color,
+                                      glm::vec2( -0.5f, -0.5f ) } );
 			}
 			renderWorld.mParticlesMesh->LoadFromVertices( vertices );
 		}

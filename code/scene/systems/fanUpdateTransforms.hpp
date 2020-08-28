@@ -6,9 +6,9 @@ namespace fan
 {
 	class EcsWorld;
 
-	//==============================================================================================================================================================
+	//========================================================================================================
 	// setups the FollowTransforms offsets @todo remove this ( useless ? )
-	//==============================================================================================================================================================
+	//========================================================================================================
 	struct SInitFollowTransforms : EcsSystem
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world )
@@ -28,7 +28,8 @@ namespace fan
 				if( followTransform.mTargetTransform != nullptr )
 				{
 					Transform& target = *followTransform.mTargetTransform;
-					followTransform.mLocalTransform = SInitFollowTransforms::GetLocalTransform( target.mTransform, follow.mTransform );
+					followTransform.mLocalTransform =
+					        SInitFollowTransforms::GetLocalTransform( target.mTransform, follow.mTransform );
 				}
 			}
 		}
@@ -39,9 +40,9 @@ namespace fan
 		}
 	};
 
-	//==============================================================================================================================================================
+	//========================================================================================================
 	// moves the 3D FollowTransforms after their targets
-	//==============================================================================================================================================================
+	//========================================================================================================
 	struct SMoveFollowTransforms : EcsSystem
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world )

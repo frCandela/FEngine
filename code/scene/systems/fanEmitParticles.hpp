@@ -7,10 +7,10 @@
 
 namespace fan
 {
-	//==============================================================================================================================================================
+	//========================================================================================================
 	// Spawns particles for all particle emitters in the scene
-	//==============================================================================================================================================================
-	struct S_EmitParticles : EcsSystem
+	//========================================================================================================
+	struct SEmitParticles : EcsSystem
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world )
 		{
@@ -45,7 +45,9 @@ namespace fan
 						EcsEntity entity = _world.CreateEntity();
 						Particle& particle = _world.AddComponent<Particle>( entity );
 
-						particle.mSpeed        = glm::normalize( glm::vec3( Random::FloatClip(), Random::FloatClip(), Random::FloatClip() ) );
+                        particle.mSpeed = glm::normalize( glm::vec3( Random::FloatClip(),
+                                                                     Random::FloatClip(),
+                                                                     Random::FloatClip() ) );
 						particle.mSpeed *= emitter.mSpeed;
 						particle.mPosition     = origin;
 						particle.mDurationLeft = emitter.mDuration;
