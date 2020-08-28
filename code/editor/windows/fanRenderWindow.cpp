@@ -76,9 +76,9 @@ namespace fan
 			for ( uint32_t meshIndex = 0; meshIndex < meshArray.size(); meshIndex++ )
 			{
 				const DrawData& drawData = meshArray[ meshIndex ];
-				if ( drawData.mesh != nullptr )
+				if ( drawData.mMesh != nullptr )
 				{
-					ImGui::Text( drawData.mesh->mPath.c_str() );
+					ImGui::Text( drawData.mMesh->mPath.c_str() );
 				}
 				else
 				{
@@ -91,24 +91,24 @@ namespace fan
 		if ( ImGui::CollapsingHeader( "Directional lights : " ) )
 		{
 			ImGui::PushItemWidth( 150 );
-			for ( size_t lightIndex = 0; lightIndex < lights.dirLightsNum; lightIndex++ )
+			for ( size_t lightIndex = 0; lightIndex < lights.mDirLightsNum; lightIndex++ )
 			{
-				UniformDirectionalLight light = lights.dirLights[ lightIndex ];
-				ImGui::DragFloat3( "dir ", &light.direction[ 0 ] );
+				UniformDirectionalLight light = lights.mDirLights[ lightIndex ];
+				ImGui::DragFloat3( "dir ", &light.mDirection[ 0 ] );
 				ImGui::SameLine();
-				ImGui::ColorEdit3( "diffuse", &light.diffuse[ 0 ], ImGui::fanColorEditFlags );
+				ImGui::ColorEdit3( "diffuse", &light.mDiffuse[ 0 ], ImGui::fanColorEditFlags );
 			}
 			ImGui::PopItemWidth();
 		}
 		if ( ImGui::CollapsingHeader( "Point lights : " ) )
 		{
 			ImGui::PushItemWidth( 150 );
-			for ( size_t lightIndex = 0; lightIndex < lights.pointLightNum; lightIndex++ )
+			for ( size_t lightIndex = 0; lightIndex < lights.mPointLightNum; lightIndex++ )
 			{
-				UniformPointLight& light = lights.pointlights[ lightIndex ];
-				ImGui::DragFloat3( "pos ##pos", &light.position[ 0 ] );
+				UniformPointLight& light = lights.mPointlights[ lightIndex ];
+				ImGui::DragFloat3( "pos ##pos", &light.mPosition[ 0 ] );
 				ImGui::SameLine();
-				ImGui::ColorEdit3( "diffuse", &light.diffuse[ 0 ], ImGui::fanColorEditFlags );
+				ImGui::ColorEdit3( "diffuse", &light.mDiffuse[ 0 ], ImGui::fanColorEditFlags );
 			}
 			ImGui::PopItemWidth();
 		}

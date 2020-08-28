@@ -16,29 +16,29 @@ namespace fan
 {
 	struct Mesh2D;
 
-	//================================================================
-	//================================================================
+	//========================================================================================================
+    //========================================================================================================
 	struct RenderDataMesh2D
 	{
-		Mesh2D* mesh;
-		glm::vec2 position;
-		glm::vec2 scale;
-		glm::vec4 color;
-		uint32_t textureIndex;
-		int      mDepth = 0;
+		Mesh2D* mMesh;
+		glm::vec2 mPosition;
+		glm::vec2 mScale;
+		glm::vec4 mColor;
+		uint32_t  mTextureIndex;
+		int       mDepth = 0;
 	};
 
-	//================================================================
-	//================================================================
+    //========================================================================================================
+    //========================================================================================================
 	struct DynamicUniformUIVert
 	{
-		glm::vec2 position;
-		glm::vec2 scale;
-		glm::vec4 color;
+		glm::vec2 mPosition;
+		glm::vec2 mScale;
+		glm::vec4 mColor;
 	};
 
-	//================================================================
-	//================================================================
+    //========================================================================================================
+    //========================================================================================================
 	struct UniformsUI
 	{
 		void Create( const VkDeviceSize _minUniformBufferOffsetAlignment );
@@ -46,19 +46,19 @@ namespace fan
 		AlignedMemory<DynamicUniformUIVert>	mDynamicUniforms;
 	};
 
-	//================================================================
-	//================================================================
+    //========================================================================================================
+    //========================================================================================================
 	struct UIDrawData
 	{
-		Mesh2D* mesh;
-		uint32_t textureIndex;
+		Mesh2D* mMesh;
+		uint32_t mTextureIndex;
 	};
 
 	struct FrameBuffer;
 	struct RenderPass;
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	struct DrawUI
 	{
 		Pipeline					mPipeline;
@@ -73,10 +73,20 @@ namespace fan
 
 		void Create( Device& _device, uint32_t _imagesCount );
 		void Destroy( Device& _device );
-		void BindDescriptors( VkCommandBuffer _commandBuffer, const size_t _indexFrame, const uint32_t _indexOffset );
+        void BindDescriptors( VkCommandBuffer _commandBuffer,
+                              const size_t _indexFrame,
+                              const uint32_t _indexOffset );
 		void UpdateUniformBuffers( Device& _device, const size_t _index );
-		void RecordCommandBuffer( const size_t _index, RenderPass& _renderPass, FrameBuffer& _framebuffer, VkExtent2D _extent, DescriptorImages& _descriptorTextures );
-		void BindTexture( VkCommandBuffer _commandBuffer, const uint32_t _textureIndex, DescriptorSampler& _descriptorSampler, DescriptorImages& _descriptorTextures, VkPipelineLayout _pipelineLayout );
+        void RecordCommandBuffer( const size_t _index,
+                                  RenderPass& _renderPass,
+                                  FrameBuffer& _framebuffer,
+                                  VkExtent2D _extent,
+                                  DescriptorImages& _descriptorTextures );
+        void BindTexture( VkCommandBuffer _commandBuffer,
+                          const uint32_t _textureIndex,
+                          DescriptorSampler& _descriptorSampler,
+                          DescriptorImages& _descriptorTextures,
+                          VkPipelineLayout _pipelineLayout );
 		void SetUIDrawData( const std::vector<RenderDataMesh2D>& _drawData );
 		PipelineConfig	GetPipelineConfig( DescriptorImages& _descriptorImages ) const;
 	};

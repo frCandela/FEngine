@@ -45,12 +45,12 @@ namespace fan
 				{
 					// drawMesh data;
 					RenderDataModel data;
-					data.mesh = *meshRenderer.mMesh;
-					data.modelMatrix = transform.GetModelMatrix();
-					data.normalMatrix = transform.GetNormalMatrix();
-					data.textureIndex = material.mTexture.IsValid() ? material.mTexture->mIndex : 0;
-					data.color = material.mColor.ToGLM();
-					data.shininess = material.mShininess;
+					data.mMesh         = *meshRenderer.mMesh;
+					data.mModelMatrix  = transform.GetModelMatrix();
+					data.mNormalMatrix = transform.GetNormalMatrix();
+					data.mTextureIndex = material.mTexture.IsValid() ? material.mTexture->mIndex : 0;
+					data.mColor        = material.mColor.ToGLM();
+					data.mShininess    = material.mShininess;
 
 					renderWorld.drawData.push_back( data );
 				}
@@ -93,12 +93,12 @@ namespace fan
                 const glm::vec2 pos = glm::vec2( transform.mPosition.x, transform.mPosition.y );
 
 				RenderDataMesh2D data;
-				data.mesh = renderer.mMesh2D;
-                data.position = pos / renderWorld.mTargetSize * 2.f - glm::vec2( 1.f, 1.f );
-                data.scale = size / renderWorld.mTargetSize;
-				data.color = renderer.mColor.ToGLM();
-				data.textureIndex = renderer.GetTexture() != nullptr ? renderer.GetTexture()->mIndex : 0;
-				data.mDepth = renderer.mDepth;
+				data.mMesh         = renderer.mMesh2D;
+                data.mPosition     = pos / renderWorld.mTargetSize * 2.f - glm::vec2( 1.f, 1.f );
+                data.mScale        = size / renderWorld.mTargetSize;
+				data.mColor        = renderer.mColor.ToGLM();
+				data.mTextureIndex = renderer.GetTexture() != nullptr ? renderer.GetTexture()->mIndex : 0;
+				data.mDepth        = renderer.mDepth;
 				renderWorld.uiDrawData.push_back( data );
 			}
 
@@ -133,13 +133,13 @@ namespace fan
 				PointLight& light = *lightIt;
 
 				RenderDataPointLight pointLight;
-				pointLight.position = glm::vec4( ToGLM( transform.GetPosition() ), 1.f );
-				pointLight.diffuse = light.mDiffuse.ToGLM();
-				pointLight.specular = light.mSpecular.ToGLM();
-				pointLight.ambiant = light.mAmbiant.ToGLM();
-				pointLight.constant = light.mAttenuation[PointLight::Constant];
-				pointLight.linear = light.mAttenuation[PointLight::Linear];
-				pointLight.quadratic = light.mAttenuation[PointLight::Quadratic];
+				pointLight.mPosition  = glm::vec4( ToGLM( transform.GetPosition() ), 1.f );
+				pointLight.mDiffuse   = light.mDiffuse.ToGLM();
+				pointLight.mSpecular  = light.mSpecular.ToGLM();
+				pointLight.mAmbiant   = light.mAmbiant.ToGLM();
+				pointLight.mConstant  = light.mAttenuation[PointLight::Constant];
+				pointLight.mLinear    = light.mAttenuation[PointLight::Linear];
+				pointLight.mQuadratic = light.mAttenuation[PointLight::Quadratic];
 
 				renderWorld.pointLights.push_back( pointLight );
 			}
@@ -170,10 +170,10 @@ namespace fan
 				DirectionalLight& directionalLight = *lightIt;
 
 				RenderDataDirectionalLight light;
-				light.direction = glm::vec4( ToGLM( transform.Forward() ), 1 );
-				light.ambiant = directionalLight.mAmbiant.ToGLM();
-				light.diffuse = directionalLight.mDiffuse.ToGLM();
-				light.specular = directionalLight.mSpecular.ToGLM();
+				light.mDirection = glm::vec4( ToGLM( transform.Forward() ), 1 );
+				light.mAmbiant   = directionalLight.mAmbiant.ToGLM();
+				light.mDiffuse   = directionalLight.mDiffuse.ToGLM();
+				light.mSpecular  = directionalLight.mSpecular.ToGLM();
 
 				renderWorld.directionalLights.push_back( light );
 			}

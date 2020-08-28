@@ -9,16 +9,18 @@
 namespace ImGui
 {
 
-	//================================================================================================================================
+	//========================================================================================================
 	// Draws a ImGui widget for displaying a TexturePtr
 	// Returns true if the value (TexturePtr) was edited
-	//================================================================================================================================
+	//========================================================================================================
 	bool FanTexturePtr( const char* _label, fan::TexturePtr& _ptr )
 	{
 		bool returnValue = false;
 
 		fan::Texture* texture = *_ptr;
-		const std::string name = texture == nullptr ? "null" : std::filesystem::path( texture->mPath ).filename().string();
+        const std::string name = texture == nullptr ?
+                                 "null" :
+                                 std::filesystem::path( texture->mPath ).filename().string();
 
 		// Set button icon & modal
 		const std::string modalName = std::string( "Find texture (" ) + _label + ")";
@@ -55,7 +57,8 @@ namespace ImGui
 
 				// size
 				std::stringstream ss;
-				ss << texture->mExtent.width << " x " << texture->mExtent.height << " x " << texture->mLayerCount;
+				ss << texture->mExtent.width << " x " << texture->mExtent.height
+				   << " x " << texture->mLayerCount;
 				ImGui::Text( ss.str().c_str() );
 
 				ImGui::EndTooltip();
@@ -78,8 +81,9 @@ namespace ImGui
 		}
 
 		// Modal set value
-		if ( ImGui::FanLoadFileModal( modalName.c_str(), fan::RenderGlobal::sImagesExtensions, m_pathBuffer ) )
-		{
+        if( ImGui::FanLoadFileModal( modalName.c_str(),
+                                     fan::RenderGlobal::sImagesExtensions, m_pathBuffer ) )
+        {
 			_ptr.Init( m_pathBuffer.string() );
 			_ptr.Resolve();
 			returnValue = true;
@@ -91,10 +95,10 @@ namespace ImGui
 		return returnValue;
 	}
 
-	//================================================================================================================================
+	//========================================================================================================
 	// Draws a ImGui widget for displaying a MeshPtr
 	// Returns true if the value (MeshPtr) was edited
-	//================================================================================================================================
+	//========================================================================================================
 	bool FanMeshPtr( const char* _label, fan::MeshPtr& _ptr )
 	{
 		bool returnValue = false;

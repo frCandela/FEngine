@@ -9,9 +9,9 @@ namespace fan
 {
 	struct Instance;
 
-	//================================================================================================================================
+	//========================================================================================================
 	// Vulkan device
-	//================================================================================================================================
+	//========================================================================================================
 	struct Device
 	{
 		Device(){}
@@ -37,12 +37,20 @@ namespace fan
 		const std::string	GetDebugName( const uint64_t _object ) const;
 	private:
 		Device( Device const& ) = delete;
-		Device& operator=( Device const& ) = delete;	
-		
-		bool						SelectPhysicalDevice( Instance& _instance, VkPhysicalDeviceFeatures& _outAvailableFeatures, std::vector<VkExtensionProperties>& _outAvailableExtensions );
-		std::vector < const char*>	GetDesiredExtensions( const std::vector<VkExtensionProperties>& _availableExtensions, const std::vector < const char*> _desiredExtensions );
-		static bool					IsExtensionAvailable( const std::vector<VkExtensionProperties>& _availableExtensions, std::string _requiredExtension );
-		void						GetQueueFamiliesIndices( VkSurfaceKHR _surface, uint32_t& _outGraphics, uint32_t& _outCompute, uint32_t& _outPresent );
-		bool						ResetCommandPool();
+		Device& operator=( Device const& ) = delete;
+
+        bool SelectPhysicalDevice( Instance& _instance,
+                                   VkPhysicalDeviceFeatures& _outAvailableFeatures,
+                                   std::vector<VkExtensionProperties>& _outAvailableExtensions );
+        std::vector<const char*>
+        GetDesiredExtensions( const std::vector<VkExtensionProperties>& _availableExtensions,
+                              const std::vector<const char*> _desiredExtensions );
+        static bool IsExtensionAvailable( const std::vector<VkExtensionProperties>& _availableExtensions,
+                                          std::string _requiredExtension );
+        void GetQueueFamiliesIndices( VkSurfaceKHR _surface,
+                                      uint32_t& _outGraphics,
+                                      uint32_t& _outCompute,
+                                      uint32_t& _outPresent );
+        bool ResetCommandPool();
 	};
 }

@@ -19,8 +19,8 @@ namespace fan
 	struct Device;
 	struct ImageView;
 
-	//================================================================
-	//================================================================
+    //========================================================================================================
+    //========================================================================================================
 	struct PushConstBlock
 	{
 		glm::vec2 scale;
@@ -30,9 +30,9 @@ namespace fan
 	struct RenderPass;
 	struct FrameBuffer;
 
-	//================================================================================================================================
+	//========================================================================================================
 	// imgui backend
-	//================================================================================================================================
+	//========================================================================================================
 	struct DrawImgui
 	{
 		Pipeline			mPipeline;
@@ -51,17 +51,24 @@ namespace fan
 		std::vector < int32_t>	mVertexCount;
 		std::vector < int32_t>	mIndexCount;
 
-		void Create( Device& _device, const int _swapchainImagesCount, VkRenderPass _renderPass, GLFWwindow* _window, VkExtent2D _extent, ImageView& _gameImageView );
+        void Create( Device& _device, const int _swapchainImagesCount,
+                     VkRenderPass _renderPass,
+                     GLFWwindow* _window,
+                     VkExtent2D _extent,
+                     ImageView& _gameImageView );
 		void Destroy( Device& _device );
 		
 		void UpdateBuffer( Device& _device, const size_t _index );
 		void DrawFrame( VkCommandBuffer commandBuffer, const size_t _index );
 		void ReloadIcons( Device& _device );
 		void UpdateGameImageDescriptor( Device& _device, ImageView& _gameImageView );
-		void RecordCommandBuffer( const size_t _index, Device& _device, RenderPass& _renderPass, FrameBuffer& _framebuffer );
+        void RecordCommandBuffer( const size_t _index,
+                                  Device& _device,
+                                  RenderPass& _renderPass,
+                                  FrameBuffer& _framebuffer );
 
-		static void			SetClipboardText( void* _userData, const char* _text ) { glfwSetClipboardString( (GLFWwindow*)_userData, _text ); }
-		static const char*	GetClipboardText( void* _userData ) { return glfwGetClipboardString( (GLFWwindow*)_userData ); }
+		static void			SetClipboardText( void* _userData, const char* _text );
+		static const char*	GetClipboardText( void* _userData );
 		
 	private:
 		void InitImgui( Device& _device, GLFWwindow* _window, VkExtent2D _extent );

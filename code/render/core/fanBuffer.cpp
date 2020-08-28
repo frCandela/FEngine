@@ -5,8 +5,8 @@
 
 namespace fan
 {
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void Buffer::Destroy( Device& _device )
 	{
 		if ( mMemory != VK_NULL_HANDLE )
@@ -24,9 +24,13 @@ namespace fan
 		}
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
-	bool Buffer::Create( Device& _device, VkDeviceSize _size, VkBufferUsageFlags _usage, VkMemoryPropertyFlags _memoryProperties, VkDeviceSize  _alignement )
+	//========================================================================================================
+	//========================================================================================================
+    bool Buffer::Create( Device& _device,
+                         VkDeviceSize _size,
+                         VkBufferUsageFlags _usage,
+                         VkMemoryPropertyFlags _memoryProperties,
+                         VkDeviceSize _alignement )
 	{
 		assert( mBuffer == VK_NULL_HANDLE );
 		assert( mMemory == VK_NULL_HANDLE );
@@ -49,7 +53,7 @@ namespace fan
 			Debug::Error( "Could not create buffer" );
 			return false;
 		}
-		//Debug::Get() << Debug::Severity::log << std::hex << "VkBuffer              " << mBuffer << std::dec << Debug::Endl();
+		//Debug::Log() << std::hex << "VkBuffer              " << mBuffer << std::dec << Debug::Endl();
 
 		VkMemoryRequirements memoryRequirements;
 		vkGetBufferMemoryRequirements( _device.mDevice, mBuffer, &memoryRequirements );
@@ -58,14 +62,15 @@ namespace fan
 		bufferMemoryAllocateInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
 		bufferMemoryAllocateInfo.pNext = nullptr;
 		bufferMemoryAllocateInfo.allocationSize = memoryRequirements.size;
-		bufferMemoryAllocateInfo.memoryTypeIndex = _device.FindMemoryType( memoryRequirements.memoryTypeBits, _memoryProperties );
+        bufferMemoryAllocateInfo.memoryTypeIndex = _device.FindMemoryType( memoryRequirements.memoryTypeBits,
+                                                                           _memoryProperties );
 
 		if ( vkAllocateMemory( _device.mDevice, &bufferMemoryAllocateInfo, nullptr, &mMemory ) != VK_SUCCESS )
 		{
 			Debug::Error( "Could not allocate buffer" );
 			return false;
 		}
-		//Debug::Get() << Debug::Severity::log << std::hex << "VkDeviceMemory        " << mMemory << std::dec << Debug::Endl();
+		//Debug::Log() << std::hex << "VkDeviceMemory        " << mMemory << std::dec << Debug::Endl();
 
 		Bind( _device );
 
@@ -75,18 +80,18 @@ namespace fan
 		return true;
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void Buffer::SetData( Device& _device, const void* _data, VkDeviceSize _size, VkDeviceSize _offset )
 	{
 		assert( _size <= mSize );
-		vkMapMemory( _device.mDevice, mMemory, _offset, _size, 0, &mappedData );
-		memcpy( mappedData, _data, (size_t)_size );
+		vkMapMemory( _device.mDevice, mMemory, _offset, _size, 0, &mMappedData );
+		memcpy( mMappedData, _data, (size_t)_size );
 		vkUnmapMemory( _device.mDevice, mMemory );
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	VkResult Buffer::Bind( Device& _device, VkDeviceSize _offset )
 	{
 		VkResult result = vkBindBufferMemory( _device.mDevice, mBuffer, mMemory, _offset );
@@ -97,26 +102,26 @@ namespace fan
 		return result;
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	VkResult Buffer::Map( Device& _device, VkDeviceSize _size, VkDeviceSize _offset )
 	{
-		return vkMapMemory( _device.mDevice, mMemory, _offset, _size, 0, &mappedData );
+		return vkMapMemory( _device.mDevice, mMemory, _offset, _size, 0, &mMappedData );
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void Buffer::Unmap( Device& _device )
 	{
-		if ( mappedData && mMemory )
+		if ( mMappedData && mMemory )
 		{
 			vkUnmapMemory( _device.mDevice, mMemory );
-			mappedData = nullptr;
+            mMappedData = nullptr;
 		}
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	VkResult Buffer::Flush( Device& _device, VkDeviceSize _size, VkDeviceSize _offset )
 	{
 		VkMappedMemoryRange mappedRange = {};
@@ -127,8 +132,8 @@ namespace fan
 		return vkFlushMappedMemoryRanges( _device.mDevice, 1, &mappedRange );
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void Buffer::CopyBufferTo( VkCommandBuffer _commandBuffer, VkBuffer _dstBuffer, VkDeviceSize _size )
 	{
 		VkBufferCopy copyRegion = {};

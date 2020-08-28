@@ -9,8 +9,8 @@
 
 namespace fan
 {
-    //================================================================================================================================
-    //================================================================================================================================
+    //========================================================================================================
+    //========================================================================================================
     void DrawModels::Create( Device& _device, uint32_t _imagesCount )
     {
         mSamplerTextures.Create( _device, 0, 8, VK_FILTER_LINEAR );
@@ -165,8 +165,8 @@ namespace fan
 
         for( int uniformIndex = 0; uniformIndex < (int)mDynamicUniformsMaterial.Size(); uniformIndex++ )
         {
-            mDynamicUniformsMaterial[uniformIndex].color     = glm::vec4( 1 );
-            mDynamicUniformsMaterial[uniformIndex].shininess = 1;
+            mDynamicUniformsMaterial[uniformIndex].mColor     = glm::vec4( 1 );
+            mDynamicUniformsMaterial[uniformIndex].mShininess = 1;
         }
     }
 
@@ -193,10 +193,10 @@ namespace fan
             for( uint32_t meshIndex = 0; meshIndex < mDrawData.size(); meshIndex++ )
             {
                 DrawData& drawData = mDrawData[meshIndex];
-                Mesh    & mesh     = *drawData.mesh;
+                Mesh    & mesh     = *drawData.mMesh;
 
                 BindTexture( commandBuffer,
-                             drawData.textureIndex,
+                             drawData.mTextureIndex,
                              mDescriptorSampler,
                              _descriptorTextures,
                              mPipeline.mPipelineLayout );
@@ -264,18 +264,18 @@ namespace fan
         {
             const RenderDataModel& data = _drawData[dataIndex];
 
-            if( data.mesh != nullptr && !data.mesh->mIndices.empty() )
+            if( data.mMesh != nullptr && !data.mMesh->mIndices.empty() )
             {
                 // Transform
-                mUniforms.mDynamicUniformsMatrices[dataIndex].modelMat  = data.modelMatrix;
-                mUniforms.mDynamicUniformsMatrices[dataIndex].normalMat = data.normalMatrix;
+                mUniforms.mDynamicUniformsMatrices[dataIndex].mModelMat  = data.mModelMatrix;
+                mUniforms.mDynamicUniformsMatrices[dataIndex].mNormalMat = data.mNormalMatrix;
 
                 // material
-                mUniforms.mDynamicUniformsMaterial[dataIndex].color     = data.color;
-                mUniforms.mDynamicUniformsMaterial[dataIndex].shininess = data.shininess;
+                mUniforms.mDynamicUniformsMaterial[dataIndex].mColor     = data.mColor;
+                mUniforms.mDynamicUniformsMaterial[dataIndex].mShininess = data.mShininess;
 
                 // Mesh
-                mDrawData.push_back( { data.mesh, data.textureIndex } );
+                mDrawData.push_back( { data.mMesh, data.mTextureIndex } );
             }
         }
     }
@@ -285,17 +285,17 @@ namespace fan
     void DrawModels::SetPointLights( const std::vector<RenderDataPointLight>& _lightData )
     {
        fanAssert( _lightData.size() < RenderGlobal::sMaximumNumPointLights );
-        mUniforms.mUniformsLights.pointLightNum = (uint32_t)_lightData.size();
+        mUniforms.mUniformsLights.mPointLightNum = (uint32_t)_lightData.size();
         for( int i = 0; i < (int)_lightData.size(); ++i )
         {
             const RenderDataPointLight& light                  = _lightData[i];
-            mUniforms.mUniformsLights.pointlights[i].position  = light.position;
-            mUniforms.mUniformsLights.pointlights[i].diffuse   = light.diffuse;
-            mUniforms.mUniformsLights.pointlights[i].specular  = light.specular;
-            mUniforms.mUniformsLights.pointlights[i].ambiant   = light.ambiant;
-            mUniforms.mUniformsLights.pointlights[i].constant  = light.constant;
-            mUniforms.mUniformsLights.pointlights[i].linear    = light.linear;
-            mUniforms.mUniformsLights.pointlights[i].quadratic = light.quadratic;
+            mUniforms.mUniformsLights.mPointlights[i].mPosition  = light.mPosition;
+            mUniforms.mUniformsLights.mPointlights[i].mDiffuse   = light.mDiffuse;
+            mUniforms.mUniformsLights.mPointlights[i].mSpecular  = light.mSpecular;
+            mUniforms.mUniformsLights.mPointlights[i].mAmbiant   = light.mAmbiant;
+            mUniforms.mUniformsLights.mPointlights[i].mConstant  = light.mConstant;
+            mUniforms.mUniformsLights.mPointlights[i].mLinear    = light.mLinear;
+            mUniforms.mUniformsLights.mPointlights[i].mQuadratic = light.mQuadratic;
         }
     }
 
@@ -304,14 +304,14 @@ namespace fan
     void DrawModels::SetDirectionalLights( const std::vector<RenderDataDirectionalLight>& _lightData )
     {
        fanAssert( _lightData.size() < RenderGlobal::sMaximumNumDirectionalLight );
-        mUniforms.mUniformsLights.dirLightsNum = (uint32_t)_lightData.size();
+        mUniforms.mUniformsLights.mDirLightsNum = (uint32_t)_lightData.size();
         for( int i = 0; i < (int)_lightData.size(); ++i )
         {
             const RenderDataDirectionalLight& light          = _lightData[i];
-            mUniforms.mUniformsLights.dirLights[i].direction = light.direction;
-            mUniforms.mUniformsLights.dirLights[i].ambiant   = light.ambiant;
-            mUniforms.mUniformsLights.dirLights[i].diffuse   = light.diffuse;
-            mUniforms.mUniformsLights.dirLights[i].specular  = light.specular;
+            mUniforms.mUniformsLights.mDirLights[i].mDirection = light.mDirection;
+            mUniforms.mUniformsLights.mDirLights[i].mAmbiant   = light.mAmbiant;
+            mUniforms.mUniformsLights.mDirLights[i].mDiffuse   = light.mDiffuse;
+            mUniforms.mUniformsLights.mDirLights[i].mSpecular  = light.mSpecular;
         }
     }
 

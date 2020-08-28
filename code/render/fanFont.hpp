@@ -40,8 +40,8 @@ namespace fan
     private:
         static FT_Library   sFreetypeLib;
 
-        int mAtlasSize = 0; // number of glyph per row/col
-        int mGlyphSize = 0; // max size of the side of a glyph in pixels
+        int     mAtlasSize = 0; // number of glyph per row/col
+        int     mGlyphSize = 0; // max size of the side of a glyph in pixels
         FT_Face mFace;
         std::map< uint32_t, Glyph>  mGlyphs;
     };

@@ -2,29 +2,29 @@
 
 namespace fan
 {
-	//================================================================================================================================
-	//================================================================================================================================
+	//=======================================================================================================
+	//=======================================================================================================
 	std::vector <VkVertexInputBindingDescription> Vertex::GetBindingDescription()
 	{
 		std::vector <VkVertexInputBindingDescription> bindingDescription( 1 );
 
-		bindingDescription[ 0 ].binding = 0;								// Index of the binding in the array of bindings
-		bindingDescription[ 0 ].stride = sizeof( Vertex );					// Number of bytes from one entry to the next
+		bindingDescription[ 0 ].binding = 0; // Index of the binding in the array
+		bindingDescription[ 0 ].stride = sizeof( Vertex );// Number of bytes from one entry to the next
 		bindingDescription[ 0 ].inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
 
 		return bindingDescription;
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	std::vector<VkVertexInputAttributeDescription> Vertex::GetAttributeDescriptions()
 	{
 		std::vector<VkVertexInputAttributeDescription> attributeDescriptions( 4 );
 
 		// Position
-		attributeDescriptions[ 0 ].binding = 0;							// Tells Vulkan from which binding the per-vertex data comes
-		attributeDescriptions[ 0 ].location = 0;							// References the location directive of the input in the vertex shader
-		attributeDescriptions[ 0 ].format = VK_FORMAT_R32G32B32_SFLOAT;	// Describes the type of data for the attribute
+		attributeDescriptions[ 0 ].binding = 0;  // Tells Vulkan from which binding the per-vertex data comes
+		attributeDescriptions[ 0 ].location = 0; // References the location of the input in the vertex shader
+		attributeDescriptions[ 0 ].format = VK_FORMAT_R32G32B32_SFLOAT;	// type of data for the attribute
 		attributeDescriptions[ 0 ].offset = offsetof( Vertex, mPos );
 
 		// Normal
@@ -48,40 +48,38 @@ namespace fan
 		return attributeDescriptions;
 	}
 
-	//================================================================================================================================
+	//========================================================================================================
 	// DebugVertex
-	//================================================================================================================================
+	//========================================================================================================
 	DebugVertex::DebugVertex( const glm::vec3 _pos, const glm::vec3 _normal, const glm::vec4 _color ) :
-			mPos( _pos )
-		, mNormal( _normal )
-		, mColor( _color )
-	{
+            mPos( _pos ),
+            mNormal( _normal ),
+            mColor( _color )
+	{}
 
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	std::vector <VkVertexInputBindingDescription> DebugVertex::GetBindingDescription()
 	{
 		std::vector <VkVertexInputBindingDescription> bindingDescription( 1 );
 
-		bindingDescription[ 0 ].binding = 0;								// Index of the binding in the array of bindings
-		bindingDescription[ 0 ].stride = sizeof( DebugVertex );					// Number of bytes from one entry to the next
+		bindingDescription[ 0 ].binding = 0;
+		bindingDescription[ 0 ].stride = sizeof( DebugVertex );
 		bindingDescription[ 0 ].inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
 
 		return bindingDescription;
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	std::vector<VkVertexInputAttributeDescription> DebugVertex::GetAttributeDescriptions()
 	{
 		std::vector<VkVertexInputAttributeDescription> attributeDescriptions( 3 );
 
 		// Position
-		attributeDescriptions[ 0 ].binding = 0;							// Tells Vulkan from which binding the per-vertex data comes
-		attributeDescriptions[ 0 ].location = 0;							// References the location directive of the input in the vertex shader
-		attributeDescriptions[ 0 ].format = VK_FORMAT_R32G32B32_SFLOAT;	// Describes the type of data for the attribute
+		attributeDescriptions[ 0 ].binding = 0;
+		attributeDescriptions[ 0 ].location = 0;
+		attributeDescriptions[ 0 ].format = VK_FORMAT_R32G32B32_SFLOAT;
 		attributeDescriptions[ 0 ].offset = offsetof( DebugVertex, mPos );
 
 		// Normal
@@ -102,9 +100,9 @@ namespace fan
     //========================================================================================================
     // DebugVertex2D
     //========================================================================================================
-    DebugVertex2D::DebugVertex2D( const glm::vec2 _pos , const glm::vec4 _color  )
-            : mPos( _pos )
-            , mColor( _color )
+    DebugVertex2D::DebugVertex2D( const glm::vec2 _pos, const glm::vec4 _color ) :
+            mPos( _pos ),
+            mColor( _color )
     {}
 
     //========================================================================================================
@@ -142,10 +140,10 @@ namespace fan
 	//========================================================================================================
 	// UIVertex
 	//========================================================================================================
-	UIVertex::UIVertex( const glm::vec2 _pos, const glm::vec2 _uv, const glm::vec4 _color )
-		: mPos( _pos )
-		, mUv( _uv )
-		, mColor( _color )
+	UIVertex::UIVertex( const glm::vec2 _pos, const glm::vec2 _uv, const glm::vec4 _color ) :
+            mPos( _pos ),
+            mUv( _uv ),
+            mColor( _color )
 	{}
 
 	//========================================================================================================

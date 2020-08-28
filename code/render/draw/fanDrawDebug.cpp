@@ -146,7 +146,8 @@ namespace fan
             VkCommandBufferInheritanceInfo commandBufferInheritanceInfo = CommandBuffer::GetInheritanceInfo(
                     _renderPass.mRenderPass,
                     _framebuffer.mFrameBuffers[_index] );
-            VkCommandBufferBeginInfo       commandBufferBeginInfo       = CommandBuffer::GetBeginInfo( &commandBufferInheritanceInfo );
+            VkCommandBufferBeginInfo  commandBufferBeginInfo = CommandBuffer::GetBeginInfo(
+                    &commandBufferInheritanceInfo );
 
 			if( vkBeginCommandBuffer( commandBuffer, &commandBufferBeginInfo ) == VK_SUCCESS )
 			{
@@ -201,7 +202,8 @@ namespace fan
             VkCommandBufferInheritanceInfo commandBufferInheritanceInfo = CommandBuffer::GetInheritanceInfo(
                     _renderPass.mRenderPass,
                     _framebuffer.mFrameBuffers[_index] );
-            VkCommandBufferBeginInfo       commandBufferBeginInfo = CommandBuffer::GetBeginInfo( &commandBufferInheritanceInfo );
+            VkCommandBufferBeginInfo commandBufferBeginInfo = CommandBuffer::GetBeginInfo(
+                    &commandBufferInheritanceInfo );
 
             if( vkBeginCommandBuffer( commandBuffer, &commandBufferBeginInfo ) == VK_SUCCESS )
             {

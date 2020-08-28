@@ -26,7 +26,9 @@ namespace fan
 
 		bool operator==( const Vertex& _other ) const
 		{
-			return mPos == _other.mPos && mNormal == _other.mNormal && mColor == _other.mColor && mUv == _other.mUv;
+            return mPos == _other.mPos &&
+                   mNormal == _other.mNormal &&
+                   mColor == _other.mColor && mUv == _other.mUv;
 		}
 	};
 
@@ -79,7 +81,7 @@ namespace std
 		size_t operator()( fan::Vertex const& vertex ) const
 		{
 			return ( ( hash<glm::vec3>()( vertex.mPos ) ^
-                       ( hash<glm::vec3>()( vertex.mNormal ) << 1 ) ) >> 1 ) ^
+			        ( hash<glm::vec3>()( vertex.mNormal ) << 1 ) ) >> 1 ) ^
                    ( hash<glm::vec2>()( vertex.mColor ) << 1 ) ^
                    ( hash<glm::vec2>()( vertex.mUv ) << 1 );
 		}

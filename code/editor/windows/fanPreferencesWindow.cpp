@@ -88,7 +88,7 @@ namespace fan
 			ImGui::Indent();
 		    mFullScreen.OnGui( mRenderer.mWindow );
 			// Filter color
-			glm::vec4& color = mRenderer.mDrawPostprocess.mUniforms.color;
+			glm::vec4& color = mRenderer.mDrawPostprocess.mUniforms.mColor;
 			ImGui::ColorEdit3( "Filter##1", &color[ 0 ], ImGui::fanColorEditFlags );
 
 			// Clear color

@@ -6,8 +6,8 @@
 
 namespace fan
 {
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void Instance::Create( void* _debugCallbackUserData )
 	{
 		assert( mInstance == VK_NULL_HANDLE );
@@ -44,21 +44,26 @@ namespace fan
 		instanceCreateInfo.enabledLayerCount = static_cast< uint32_t >( mEnabledValidationLayers.size() );
 		instanceCreateInfo.ppEnabledLayerNames = mEnabledValidationLayers.data();
 		instanceCreateInfo.enabledExtensionCount = static_cast< uint32_t >( mEnabledExtensions.size() );
-		instanceCreateInfo.ppEnabledExtensionNames = mEnabledExtensions.size() > 0 ? mEnabledExtensions.data() : nullptr;
+        instanceCreateInfo.ppEnabledExtensionNames = mEnabledExtensions.size() > 0 ?
+                                                     mEnabledExtensions.data() :
+                                                     nullptr;
 
-		if ( vkCreateInstance( &instanceCreateInfo, nullptr, &mInstance ) != VK_SUCCESS || mInstance == VK_NULL_HANDLE )
-		{
+        if( vkCreateInstance( &instanceCreateInfo, nullptr, &mInstance ) != VK_SUCCESS ||
+            mInstance == VK_NULL_HANDLE )
+        {
 			Debug::Error( "ouch, this is going to be messy" );
 		}
 		SetupDebugCallback( _debugCallbackUserData );
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void Instance::Destroy()
 	{
 		// destroy debug report callback
-		PFN_vkDestroyDebugReportCallbackEXT func = (PFN_vkDestroyDebugReportCallbackEXT)vkGetInstanceProcAddr( mInstance, "vkDestroyDebugReportCallbackEXT" );
+		PFN_vkDestroyDebugReportCallbackEXT func = (PFN_vkDestroyDebugReportCallbackEXT)vkGetInstanceProcAddr(
+                                                            mInstance,
+                                                            "vkDestroyDebugReportCallbackEXT" );
 		if( func != nullptr )
 		{
 			func( mInstance, mDebugReportCallback, nullptr );
@@ -68,13 +73,14 @@ namespace fan
 		mInstance = VK_NULL_HANDLE;
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
-	bool Instance::IsExtensionAvailable( const std::vector< VkExtensionProperties >& _availableExtensions, const std::string _requiredExtension )
-	{
-		for ( int availableExtensionIndex = 0; availableExtensionIndex < (int)_availableExtensions.size(); availableExtensionIndex++ )
+	//========================================================================================================
+	//========================================================================================================
+    bool Instance::IsExtensionAvailable( const std::vector<VkExtensionProperties>& _availableExtensions,
+                                         const std::string _requiredExtension )
+    {
+		for ( int i = 0; i < (int)_availableExtensions.size(); i++ )
 		{
-			if ( _requiredExtension.compare( _availableExtensions[ availableExtensionIndex ].extensionName ) == 0 )
+			if ( _requiredExtension.compare( _availableExtensions[ i ].extensionName ) == 0 )
 			{
 				return true;
 			}
@@ -82,13 +88,14 @@ namespace fan
 		return false;
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
-	bool Instance::IsLayerAvailable( const std::vector<VkLayerProperties>& _availableLayers, const std::string _requiredLayer )
+	//========================================================================================================
+    //========================================================================================================
+    bool Instance::IsLayerAvailable( const std::vector<VkLayerProperties>& _availableLayers,
+                                     const std::string _requiredLayer )
 	{
-		for ( int availableLayerIndex = 0; availableLayerIndex < (int)_availableLayers.size(); availableLayerIndex++ )
+		for ( int i = 0; i < (int)_availableLayers.size(); i++ )
 		{
-			if ( _requiredLayer.compare( _availableLayers[ availableLayerIndex ].layerName ) == 0 )
+			if ( _requiredLayer.compare( _availableLayers[ i ].layerName ) == 0 )
 			{
 				return true;
 			}
@@ -96,8 +103,8 @@ namespace fan
 		return false;
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void Instance::FindDesiredValidationLayers( const std::vector < const char*> _desiredLayers )
 	{
 		if( _desiredLayers.empty() ) { return; }
@@ -119,8 +126,8 @@ namespace fan
 		}
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void Instance::FindDesiredExtensions( const std::vector < const char*> _desiredExtensions )
 	{
 		// Get available extensions
@@ -140,8 +147,8 @@ namespace fan
 		}
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	bool Instance::SetupDebugCallback( void * _userData )
 	{
 		VkDebugReportCallbackCreateInfoEXT createInfo = {};
@@ -150,25 +157,35 @@ namespace fan
 		createInfo.pfnCallback = DebugCallback;
 		createInfo.pUserData = _userData;
 
-		auto func = ( PFN_vkCreateDebugReportCallbackEXT ) vkGetInstanceProcAddr( mInstance, "vkCreateDebugReportCallbackEXT" );
+        auto func = (PFN_vkCreateDebugReportCallbackEXT)
+                vkGetInstanceProcAddr( mInstance, "vkCreateDebugReportCallbackEXT" );
 		if ( func != nullptr && func( mInstance, &createInfo, nullptr, &mDebugReportCallback ) == VK_SUCCESS )
 		{
-			Debug::Get() << Debug::Severity::log << std::hex << "VkDebugCallback       " << mDebugReportCallback << std::dec << Debug::Endl();
+			Debug::Log() << std::hex << "VkDebugCallback       " << mDebugReportCallback
+			             << std::dec << Debug::Endl();
 			return true;
 		}
 
 		return false;
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
-	VKAPI_ATTR VkBool32 VKAPI_CALL Instance::DebugCallback( VkDebugReportFlagsEXT /*_flags*/, VkDebugReportObjectTypeEXT /*_objType*/, uint64_t _obj, size_t /*_location*/, int32_t /*_code*/, const char* /*_layerPrefix*/, const char* _msg, void* _userData )
-	{
+	//========================================================================================================
+    //========================================================================================================
+    VKAPI_ATTR VkBool32 VKAPI_CALL Instance::DebugCallback( VkDebugReportFlagsEXT /*_flags*/,
+                                                            VkDebugReportObjectTypeEXT /*_objType*/,
+                                                            uint64_t _obj,
+                                                            size_t /*_location*/,
+                                                            int32_t /*_code*/,
+                                                            const char* /*_layerPrefix*/,
+                                                            const char* _msg,
+                                                            void* _userData )
+    {
 		//Debug::Get() << Debug::Severity::error << "Vulkan  Error:  " << _msg << Debug::Endl();
 		std::stringstream ss;
 		ss << "######## VkError";
 
-		std::map< uint64_t, std::string >& debugNames = *static_cast<std::map< uint64_t, std::string >*>( _userData );
+        std::map<uint64_t, std::string>& debugNames = *static_cast<std::map<uint64_t,
+                                                                            std::string>*>( _userData );
 		auto it = debugNames.find( _obj );
 		if( it != debugNames.end() )
 		{

@@ -35,9 +35,9 @@ namespace fan
 {
 	class Window;
 
-	//================================================================================================================================
+	//========================================================================================================
 	// Contains all the rendering data
-	//================================================================================================================================
+	//========================================================================================================
 	class Renderer
 	{
 	public:
@@ -68,8 +68,8 @@ namespace fan
         Mesh2DManager   mMesh2DManager;
         TextureManager  mTextureManager;
         Font            mDefaultFont;
-		Window& mWindow;
-		Device& mDevice;
+		Window&         mWindow;
+		Device&         mDevice;
 
 		const ViewType  mViewType;
 		VkExtent2D		mGameExtent = { 1,1 };

@@ -5,11 +5,15 @@
 
 namespace fan
 {
-	//================================================================================================================================
-	//================================================================================================================================
-	bool RenderPass::Create( Device& _device,	VkAttachmentDescription* _attachmentdescriptions,	uint32_t _countAttachments,
-												VkSubpassDescription* _subpassDescriptions,			uint32_t _countSubpasses,
-												VkSubpassDependency* _dependencies,					uint32_t _countDependencies ) 
+	//========================================================================================================
+	//========================================================================================================
+    bool RenderPass::Create( Device& _device,
+                             VkAttachmentDescription* _attachmentdescriptions,
+                             uint32_t _countAttachments,
+                             VkSubpassDescription* _subpassDescriptions,
+                             uint32_t _countSubpasses,
+                             VkSubpassDependency* _dependencies,
+                             uint32_t _countDependencies )
 	{
 		assert( mRenderPass == VK_NULL_HANDLE );
 
@@ -24,20 +28,20 @@ namespace fan
 		renderPassCreateInfo.dependencyCount	= _countDependencies;
 		renderPassCreateInfo.pDependencies		= _dependencies;
 
-		if( vkCreateRenderPass( _device.mDevice, &renderPassCreateInfo, nullptr, &mRenderPass ) != VK_SUCCESS )
+		if( vkCreateRenderPass( _device.mDevice, &renderPassCreateInfo, nullptr, &mRenderPass ) != VK_SUCCESS)
 		{
 			Debug::Error( "Could not create render pass" );
 			return false;
 		}
-		Debug::Get() << Debug::Severity::log << std::hex << "VkRenderPass          " << mRenderPass << std::dec << Debug::Endl();
+		Debug::Log() << std::hex << "VkRenderPass          " << mRenderPass << std::dec << Debug::Endl();
 
 		_device.AddDebugName( (uint64_t)mRenderPass, "RenderPass" );
 
 		return true;
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void RenderPass::Destroy( Device& _device )
 	{
 		if( mRenderPass != VK_NULL_HANDLE )
@@ -48,8 +52,8 @@ namespace fan
 		}
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	VkAttachmentReference RenderPass::GetColorAttachmentReference( const uint32_t _index )
 	{
 		VkAttachmentReference colorAttachmentRef;
@@ -59,9 +63,10 @@ namespace fan
 		return colorAttachmentRef;
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
-	VkAttachmentDescription RenderPass::GetColorAttachment( const VkFormat _format, const VkImageLayout _finalLayout )
+	//========================================================================================================
+	//========================================================================================================
+    VkAttachmentDescription RenderPass::GetColorAttachment( const VkFormat _format,
+                                                            const VkImageLayout _finalLayout )
 	{
 		VkAttachmentDescription colorAttachment;
 		colorAttachment.flags			= 0;
@@ -77,8 +82,8 @@ namespace fan
 		return colorAttachment;
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	VkAttachmentReference RenderPass::GetDepthAttachmentReference( const uint32_t _index )
 	{
 		VkAttachmentReference depthAttachmentRef;
@@ -88,8 +93,8 @@ namespace fan
 		return depthAttachmentRef;
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	VkAttachmentDescription RenderPass::GetDepthAttachment( const VkFormat _format )
 	{
 		VkAttachmentDescription depthAttachment;
@@ -106,8 +111,8 @@ namespace fan
 		return depthAttachment;
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	VkSubpassDependency RenderPass::GetDependency()
 	{
 		VkSubpassDependency dependency;
@@ -122,9 +127,11 @@ namespace fan
 		return dependency;
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
-	VkSubpassDescription RenderPass::GetSubpassDescription( VkAttachmentReference* _colorReferences, uint32_t _count , VkAttachmentReference* _depthReference )
+	//========================================================================================================
+	//========================================================================================================
+    VkSubpassDescription RenderPass::GetSubpassDescription( VkAttachmentReference* _colorReferences,
+                                                            uint32_t _count,
+                                                            VkAttachmentReference* _depthReference )
 	{
 		VkSubpassDescription subpassDescription;
 		subpassDescription.flags					= 0;
@@ -141,9 +148,13 @@ namespace fan
 		return subpassDescription;
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
-	VkRenderPassBeginInfo RenderPass::GetBeginInfo( VkRenderPass _renderPass, VkFramebuffer _frameBuffer, VkExtent2D _extent, const VkClearValue* _clearValue, uint32_t _clearCount )
+	//========================================================================================================
+	//========================================================================================================
+    VkRenderPassBeginInfo RenderPass::GetBeginInfo( VkRenderPass _renderPass,
+                                                    VkFramebuffer _frameBuffer,
+                                                    VkExtent2D _extent,
+                                                    const VkClearValue* _clearValue,
+                                                    uint32_t _clearCount )
 	{
 		VkRenderPassBeginInfo beginInfo		= {};
 		beginInfo.sType						= VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;

@@ -356,16 +356,16 @@ namespace fan
                                   const glm::vec3 _position )
     {
         SCOPED_PROFILE( set_main_camera );
-        mDrawModels.mUniforms.mUniformsProjView.view = _view;
-        mDrawModels.mUniforms.mUniformsProjView.proj = _projection;
-        mDrawModels.mUniforms.mUniformsProjView.proj[1][1] *= -1;
+        mDrawModels.mUniforms.mUniformsProjView.mView = _view;
+        mDrawModels.mUniforms.mUniformsProjView.mProj = _projection;
+        mDrawModels.mUniforms.mUniformsProjView.mProj[1][1] *= -1;
 
-        mDrawModels.mUniforms.mUniformsCameraPosition.cameraPosition = _position;
+        mDrawModels.mUniforms.mUniformsCameraPosition.mCameraPosition = _position;
 
-		mDrawDebug.mUniformsMVPColor.model = glm::mat4( 1.0 );
-		mDrawDebug.mUniformsMVPColor.view = _view;
-		mDrawDebug.mUniformsMVPColor.proj = mDrawModels.mUniforms.mUniformsProjView.proj;
-		mDrawDebug.mUniformsMVPColor.color = glm::vec4( 1, 1, 1, 1 );
+		mDrawDebug.mUniformsMVPColor.mModel = glm::mat4( 1.0 );
+		mDrawDebug.mUniformsMVPColor.mView  = _view;
+		mDrawDebug.mUniformsMVPColor.mProj  = mDrawModels.mUniforms.mUniformsProjView.mProj;
+		mDrawDebug.mUniformsMVPColor.mColor = glm::vec4( 1, 1, 1, 1 );
 	}
 
 	//========================================================================================================
@@ -617,11 +617,12 @@ namespace fan
     {
         // game
         {
-            VkAttachmentDescription colorAtt           = RenderPass::GetColorAttachment( mWindow.mSwapchain.mSurfaceFormat.format,
-                                                                                         VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL );
-            VkAttachmentReference   colorAttRef        = RenderPass::GetColorAttachmentReference( 0 );
-            VkAttachmentDescription depthAtt           = RenderPass::GetDepthAttachment( mDevice.FindDepthFormat() );
-            VkAttachmentReference   depthAttRef        = RenderPass::GetDepthAttachmentReference( 1 );
+            VkAttachmentDescription colorAtt = RenderPass::GetColorAttachment(
+                    mWindow.mSwapchain.mSurfaceFormat.format,
+                    VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL );
+            VkAttachmentReference   colorAttRef = RenderPass::GetColorAttachmentReference( 0 );
+            VkAttachmentDescription depthAtt    = RenderPass::GetDepthAttachment( mDevice.FindDepthFormat() );
+            VkAttachmentReference   depthAttRef = RenderPass::GetDepthAttachmentReference( 1 );
             VkSubpassDescription    subpassDescription = RenderPass::GetSubpassDescription( &colorAttRef,
                                                                                             1,
                                                                                             &depthAttRef );

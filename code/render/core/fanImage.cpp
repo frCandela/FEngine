@@ -5,8 +5,8 @@
 
 namespace fan
 {
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void Image::Destroy( Device& _device )
 	{
 		if ( mImage != VK_NULL_HANDLE )
@@ -24,9 +24,13 @@ namespace fan
 		}
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
-	bool Image::Create( Device& _device, const VkFormat _format, const VkExtent2D _size, const VkImageUsageFlags _usage, const VkMemoryPropertyFlags _memoryProperties )
+	//========================================================================================================
+	//========================================================================================================
+    bool Image::Create( Device& _device,
+                        const VkFormat _format,
+                        const VkExtent2D _size,
+                        const VkImageUsageFlags _usage,
+                        const VkMemoryPropertyFlags _memoryProperties )
 	{
 		assert( mImage == VK_NULL_HANDLE );
 		assert( mMemory == VK_NULL_HANDLE );		
@@ -62,7 +66,8 @@ namespace fan
 		bufferMemoryAllocateInfo.sType				= VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
 		bufferMemoryAllocateInfo.pNext				= nullptr;
 		bufferMemoryAllocateInfo.allocationSize		= memoryRequirements.size;
-		bufferMemoryAllocateInfo.memoryTypeIndex	= _device.FindMemoryType( memoryRequirements.memoryTypeBits, _memoryProperties );
+		bufferMemoryAllocateInfo.memoryTypeIndex	= _device.FindMemoryType( memoryRequirements.memoryTypeBits,
+                                                                              _memoryProperties );
 
 		if ( vkAllocateMemory( _device.mDevice, &bufferMemoryAllocateInfo, nullptr, &mMemory ) != VK_SUCCESS )
 		{
@@ -75,8 +80,8 @@ namespace fan
 			Debug::Error( "Could not bind memory to image" );
 			return false;
 		}
-		Debug::Get() << Debug::Severity::log << std::hex << "VkImage               " << mImage << std::dec << Debug::Endl();
-		Debug::Get() << Debug::Severity::log << "VkDeviceMemory        " << mMemory << std::dec << Debug::Endl();
+		Debug::Log() << std::hex << "VkImage               " << mImage << std::dec << Debug::Endl();
+		Debug::Log() << "VkDeviceMemory        " << mMemory << std::dec << Debug::Endl();
 
 		_device.AddDebugName( (uint64_t)mImage, "Image" );
 		_device.AddDebugName( (uint64_t)mMemory, "Image" );
@@ -84,9 +89,13 @@ namespace fan
 		return true;
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
-	void Image::TransitionImageLayout( VkCommandBuffer _commandBuffer, VkFormat _format, VkImageLayout _oldLayout, VkImageLayout _newLayout, uint32_t _mipLevels )
+	//========================================================================================================
+	//========================================================================================================
+    void Image::TransitionImageLayout( VkCommandBuffer _commandBuffer,
+                                       VkFormat _format,
+                                       VkImageLayout _oldLayout,
+                                       VkImageLayout _newLayout,
+                                       uint32_t _mipLevels )
 	{
 		// Synchronize access to resources
 		VkImageMemoryBarrier barrier = {};
@@ -101,7 +110,8 @@ namespace fan
 		if ( _newLayout == VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL )
 		{
 			barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
-			const bool hasStencilComponent = _format == VK_FORMAT_D32_SFLOAT_S8_UINT || _format == VK_FORMAT_D24_UNORM_S8_UINT;
+			const bool hasStencilComponent = _format == VK_FORMAT_D32_SFLOAT_S8_UINT ||
+			                                 _format == VK_FORMAT_D24_UNORM_S8_UINT;
 			if( hasStencilComponent )
 			{
 				barrier.subresourceRange.aspectMask |= VK_IMAGE_ASPECT_STENCIL_BIT;
@@ -127,7 +137,8 @@ namespace fan
 			sourceStage		 = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
 			destinationStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
 		}
-		else if ( _oldLayout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL && _newLayout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL )
+        else if( _oldLayout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL &&
+                 _newLayout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL )
 		{
 			barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
 			barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
@@ -135,10 +146,12 @@ namespace fan
 			sourceStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
 			destinationStage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
 		}
-		else if ( _oldLayout == VK_IMAGE_LAYOUT_UNDEFINED && _newLayout == VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL )
+        else if( _oldLayout == VK_IMAGE_LAYOUT_UNDEFINED &&
+                 _newLayout == VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL )
 		{
 			barrier.srcAccessMask = 0;
-			barrier.dstAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+            barrier.dstAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT |
+                                    VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
 
 			sourceStage = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
 			destinationStage = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;

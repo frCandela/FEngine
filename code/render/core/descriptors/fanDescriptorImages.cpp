@@ -2,20 +2,24 @@
 
 #include "core/fanDebug.hpp"
 #include "render/core/fanDevice.hpp"
-#include "render/resources/fanTexture.hpp"
 
 namespace fan
 {
-	//================================================================================================================================
-	//================================================================================================================================
-	void DescriptorImages::Create( Device& _device, VkImageView* _pViews, const uint32_t _count, VkSampler* _pSamplers )
+	//========================================================================================================
+    //========================================================================================================
+    void DescriptorImages::Create( Device& _device,
+                                   VkImageView* _pViews,
+                                   const uint32_t _count,
+                                   VkSampler* _pSamplers )
 	{
 	    if(  _count == 0) { return; }
 
 		assert( mDescriptorPool == VK_NULL_HANDLE );
 		assert( mDescriptorSetLayout == VK_NULL_HANDLE );
 
-		VkDescriptorType descriptorType = ( _pSamplers == nullptr ? VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE : VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER );
+        VkDescriptorType descriptorType = ( _pSamplers == nullptr ?
+                VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE :
+                VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER );
 
 		// Descriptor pool
 		{
@@ -48,7 +52,10 @@ namespace fan
 			descriptorSetLayoutCreateInfo.pBindings = setLayoutBindings.data();
 			descriptorSetLayoutCreateInfo.bindingCount = static_cast< uint32_t >( setLayoutBindings.size() );
 
-			vkCreateDescriptorSetLayout( _device.mDevice, &descriptorSetLayoutCreateInfo, nullptr, &mDescriptorSetLayout );
+            vkCreateDescriptorSetLayout( _device.mDevice,
+                                         &descriptorSetLayoutCreateInfo,
+                                         nullptr,
+                                         &mDescriptorSetLayout );
 
 			Debug::Log() << "VkDescriptorSetAllocateInfo: " << _count << Debug::Endl();
 			// Descriptor set
@@ -80,12 +87,16 @@ namespace fan
 				writeDescriptorSets[i].pImageInfo = &imageInfo[i];
 				writeDescriptorSets[i].descriptorCount = 1;
 			}
-			vkUpdateDescriptorSets( _device.mDevice, static_cast<uint32_t>( writeDescriptorSets.size() ), writeDescriptorSets.data(), 0, nullptr );
+            vkUpdateDescriptorSets( _device.mDevice,
+                                    static_cast<uint32_t>( writeDescriptorSets.size() ),
+                                    writeDescriptorSets.data(),
+                                    0,
+                                    nullptr );
 		}
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void DescriptorImages::Destroy( Device& _device )
 	{
 		if ( mDescriptorPool != VK_NULL_HANDLE )
@@ -103,10 +114,13 @@ namespace fan
 		mDescriptorSets.clear();
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
-	void DescriptorImages::UpdateDescriptorSet( Device& _device, const uint32_t _index, VkImageView _imageView, VkSampler _sampler )
-	{
+	//========================================================================================================
+	//========================================================================================================
+    void DescriptorImages::UpdateDescriptorSet( Device& _device,
+                                                const uint32_t _index,
+                                                VkImageView _imageView,
+                                                VkSampler _sampler )
+    {
 		VkDescriptorImageInfo iconsDescriptorImageInfo{};
 		iconsDescriptorImageInfo.sampler = _sampler;
 		iconsDescriptorImageInfo.imageView = _imageView;
@@ -115,7 +129,9 @@ namespace fan
 		VkWriteDescriptorSet writeDescriptorSetIcons{};
 		writeDescriptorSetIcons.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
 		writeDescriptorSetIcons.dstSet = mDescriptorSets[_index];
-		writeDescriptorSetIcons.descriptorType = _sampler == VK_NULL_HANDLE ? VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE : VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+        writeDescriptorSetIcons.descriptorType = _sampler == VK_NULL_HANDLE ?
+                VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE :
+                VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
 		writeDescriptorSetIcons.dstBinding = 0;
 		writeDescriptorSetIcons.pImageInfo = &iconsDescriptorImageInfo;
 		writeDescriptorSetIcons.descriptorCount = 1;

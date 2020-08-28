@@ -17,14 +17,14 @@ namespace fan
 		void Destroy( Device& _device );
 		void Resize( Device& _device, VkSurfaceKHR _surface, VkExtent2D _desiredSize );
 
-		void			StartNextFrame() { mCurrentFrame = ( mCurrentFrame + 1 ) % s_maxFramesInFlight; }
-		VkResult		AcquireNextImage( Device& _device );
-		bool			PresentImage( Device& _device );
-		VkSemaphore*	GetCurrentImageAvailableSemaphore() { return &mImagesAvailableSemaphores[ mCurrentFrame ]; }
-		VkSemaphore*	GetCurrentRenderFinishedSemaphore() { return &mRenderFinishedSemaphores[ mCurrentFrame ]; }
-		VkFence*		GetCurrentInFlightFence()			{ return &mInFlightFences[ mCurrentFrame ]; }
+		void		 StartNextFrame() { mCurrentFrame = ( mCurrentFrame + 1 ) % sMaxFramesInFlight; }
+		VkResult	 AcquireNextImage( Device& _device );
+		bool		 PresentImage( Device& _device );
+		VkSemaphore* GetCurrentImageAvailableSemaphore(){return &mImagesAvailableSemaphores[ mCurrentFrame ];}
+		VkSemaphore* GetCurrentRenderFinishedSemaphore(){return &mRenderFinishedSemaphores[ mCurrentFrame ]; }
+		VkFence*	 GetCurrentInFlightFence()			{return &mInFlightFences[ mCurrentFrame ]; }
 
-		static const uint32_t s_maxFramesInFlight = 3;
+		static const uint32_t sMaxFramesInFlight = 3;
 
 		VkSwapchainKHR		mSwapchain = VK_NULL_HANDLE;
 		uint32_t			mCurrentImageIndex;
@@ -33,21 +33,21 @@ namespace fan
 		VkSurfaceFormatKHR	mSurfaceFormat;
 		VkExtent2D			mExtent;
 
-		VkImage     mImages[s_maxFramesInFlight]                    = { VK_NULL_HANDLE,
-																		VK_NULL_HANDLE,
-																		VK_NULL_HANDLE };
-		ImageView   mImageViews[s_maxFramesInFlight]                = { VK_NULL_HANDLE,
-																		VK_NULL_HANDLE,
-																		VK_NULL_HANDLE };
-		VkSemaphore mImagesAvailableSemaphores[s_maxFramesInFlight] = { VK_NULL_HANDLE,
-																		VK_NULL_HANDLE,
-																		VK_NULL_HANDLE };
-		VkSemaphore mRenderFinishedSemaphores[s_maxFramesInFlight]  = { VK_NULL_HANDLE,
-																		VK_NULL_HANDLE,
-																		VK_NULL_HANDLE };
-		VkFence     mInFlightFences[s_maxFramesInFlight]            = { VK_NULL_HANDLE,
-																		VK_NULL_HANDLE,
-																		VK_NULL_HANDLE };
+		VkImage     mImages[sMaxFramesInFlight]                    = { VK_NULL_HANDLE,
+                                                                       VK_NULL_HANDLE,
+                                                                       VK_NULL_HANDLE };
+		ImageView   mImageViews[sMaxFramesInFlight]                = { VK_NULL_HANDLE,
+                                                                       VK_NULL_HANDLE,
+                                                                       VK_NULL_HANDLE };
+		VkSemaphore mImagesAvailableSemaphores[sMaxFramesInFlight] = { VK_NULL_HANDLE,
+                                                                       VK_NULL_HANDLE,
+                                                                       VK_NULL_HANDLE };
+		VkSemaphore mRenderFinishedSemaphores[sMaxFramesInFlight]  = { VK_NULL_HANDLE,
+                                                                       VK_NULL_HANDLE,
+                                                                       VK_NULL_HANDLE };
+		VkFence     mInFlightFences[sMaxFramesInFlight]            = { VK_NULL_HANDLE,
+                                                                       VK_NULL_HANDLE,
+                                                                       VK_NULL_HANDLE };
 
 	private:
 		VkPresentModeKHR FindDesiredPresentMode( Device& _device,

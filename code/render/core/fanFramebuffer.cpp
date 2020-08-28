@@ -6,10 +6,14 @@
 
 namespace fan
 {
-	//================================================================================================================================
+	//========================================================================================================
 	// Creates _framesCount framebuffers with one different swapchain image view each
-	//================================================================================================================================
-	void FrameBuffer::CreateForSwapchain( Device& _device, const size_t _framesCount, const VkExtent2D _extent, RenderPass& _renderPass, ImageView* _swapchainImageViews )
+	//========================================================================================================
+    void FrameBuffer::CreateForSwapchain( Device& _device,
+                                          const size_t _framesCount,
+                                          const VkExtent2D _extent,
+                                          RenderPass& _renderPass,
+                                          ImageView* _swapchainImageViews )
 	{		
 		for( int i = 0; i < (int)_framesCount; i++ )
 		{
@@ -25,21 +29,30 @@ namespace fan
 			framebufferCreateInfo.width = _extent.width;
 			framebufferCreateInfo.height = _extent.height;
 			framebufferCreateInfo.layers = 1;
-		
-			if( vkCreateFramebuffer( _device.mDevice, &framebufferCreateInfo, nullptr, &mFrameBuffers[i] ) != VK_SUCCESS )
+
+            if( vkCreateFramebuffer( _device.mDevice,
+                                     &framebufferCreateInfo,
+                                     nullptr,
+                                     &mFrameBuffers[i] ) != VK_SUCCESS )
 			{
 				Debug::Error( "Could not create swapchain framebuffer" );
 			} 
-			Debug::Get() << Debug::Severity::log << std::hex << "VkFramebuffer         " << mFrameBuffers[i]  << " swapchain" << std::dec << Debug::Endl();
+			Debug::Log()  << std::hex << "VkFramebuffer         " << mFrameBuffers[i]  << " swapchain"
+			              << std::dec << Debug::Endl();
 		
 			_device.AddDebugName( (uint64_t)mFrameBuffers[i], "Framebuffer" );
 		}
 	}
 	
-	//================================================================================================================================
+	//========================================================================================================
 	// Create _framesCount framebuffers with the same attachments
-	//================================================================================================================================
-	void FrameBuffer::Create( Device& _device, const size_t _framesCount, const VkExtent2D _extent, RenderPass& _renderPass, const VkImageView* _attachments, uint32_t _attCount )
+	//========================================================================================================
+    void FrameBuffer::Create( Device& _device,
+                              const size_t _framesCount,
+                              const VkExtent2D _extent,
+                              RenderPass& _renderPass,
+                              const VkImageView* _attachments,
+                              uint32_t _attCount )
 	{
 		for( int i = 0; i < (int)_framesCount; i++ )
 		{
@@ -56,18 +69,23 @@ namespace fan
 			framebufferCreateInfo.height = _extent.height;
 			framebufferCreateInfo.layers = 1;
 
-			if( vkCreateFramebuffer( _device.mDevice, &framebufferCreateInfo, nullptr, &mFrameBuffers[i] ) != VK_SUCCESS )
+            if( vkCreateFramebuffer( _device.mDevice,
+                                     &framebufferCreateInfo,
+                                     nullptr,
+                                     &mFrameBuffers[i] ) != VK_SUCCESS )
 			{
 				Debug::Error( "Could not create framebuffer" );
-			} Debug::Get() << Debug::Severity::log << std::hex << "VkFramebuffer         " << mFrameBuffers[i] << std::dec << Debug::Endl();
+			}
+			Debug::Log()  << std::hex << "VkFramebuffer         " << mFrameBuffers[i]
+			              << std::dec << Debug::Endl();
 		}
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void FrameBuffer::Destroy( Device& _device )
 	{
-		for( int framebufferIndex = 0; framebufferIndex < SwapChain::s_maxFramesInFlight; framebufferIndex++ )
+		for( int framebufferIndex = 0; framebufferIndex < SwapChain::sMaxFramesInFlight; framebufferIndex++ )
 		{
 			if( mFrameBuffers[framebufferIndex] != VK_NULL_HANDLE )
 			{

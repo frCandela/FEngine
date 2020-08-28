@@ -27,10 +27,11 @@ namespace fan
 		std::ifstream file( _filename );
 		if ( !file.is_open() )
 		{
-			Debug::Get() << Debug::Severity::error << "SpirvCompiler: Failed to load shader: " << _filename << Debug::Endl();
+			Debug::Error() << "SpirvCompiler: Failed to load shader: " << _filename << Debug::Endl();
 			return {};
 		}
-		std::string		inputGLSL( ( std::istreambuf_iterator< char >( file ) ), std::istreambuf_iterator< char >() );
+        std::string inputGLSL( ( std::istreambuf_iterator<char>( file ) ),
+                               std::istreambuf_iterator<char>() );
 
 		shaderc::Compiler compiler;
 		shaderc::CompileOptions options;

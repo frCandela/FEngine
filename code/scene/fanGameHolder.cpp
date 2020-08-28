@@ -225,12 +225,12 @@ namespace fan
 
 		// particles mesh
 		RenderDataModel particlesDrawData;
-		particlesDrawData.mesh = renderWorld.mParticlesMesh;
-		particlesDrawData.modelMatrix = glm::mat4( 1.f );
-		particlesDrawData.normalMatrix = glm::mat4( 1.f );
-		particlesDrawData.color = glm::vec4( 1.f, 1.f, 1.f, 1.f );
-		particlesDrawData.shininess = 1;
-		particlesDrawData.textureIndex = 1;
+		particlesDrawData.mMesh         = renderWorld.mParticlesMesh;
+		particlesDrawData.mModelMatrix  = glm::mat4( 1.f );
+		particlesDrawData.mNormalMatrix = glm::mat4( 1.f );
+		particlesDrawData.mColor        = glm::vec4( 1.f, 1.f, 1.f, 1.f );
+		particlesDrawData.mShininess    = 1;
+		particlesDrawData.mTextureIndex = 1;
 		renderWorld.drawData.push_back( particlesDrawData );
 
 		_renderer.SetDrawData( renderWorld.drawData );

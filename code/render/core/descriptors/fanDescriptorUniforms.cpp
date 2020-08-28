@@ -2,12 +2,11 @@
 
 #include "core/fanDebug.hpp"
 #include "render/core/fanDevice.hpp"
-#include "render/core/fanBuffer.hpp"
 
 namespace fan
 {
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void DescriptorUniforms::Destroy( Device& _device )
 	{
 		if ( mDescriptorPool != VK_NULL_HANDLE )
@@ -24,77 +23,101 @@ namespace fan
 
 		for ( int bindingIndex = 0; bindingIndex < (int)mBindingData.size(); bindingIndex++ )
 		{
-			for ( int bufferIndex = 0; bufferIndex < SwapChain::s_maxFramesInFlight; bufferIndex++ )
+			for ( int bufferIndex = 0; bufferIndex < SwapChain::sMaxFramesInFlight; bufferIndex++ )
 			{
-				mBindingData[ bindingIndex ].buffers[ bufferIndex ].Destroy( _device );
+				mBindingData[ bindingIndex ].mBuffers[ bufferIndex ].Destroy( _device );
 			}
 		}
 	}
 
-	//================================================================================================================================
+	//========================================================================================================
 	// Adds a dynamic uniform buffer binding
-	//================================================================================================================================
-	void DescriptorUniforms::AddUniformBinding( Device& _device, const size_t _count, const VkShaderStageFlags  _stage, const VkDeviceSize _bufferSize )
+	//========================================================================================================
+    void DescriptorUniforms::AddUniformBinding( Device& _device,
+                                                const size_t _count,
+                                                const VkShaderStageFlags _stage,
+                                                const VkDeviceSize _bufferSize )
 	{
 		BindingData bindingData;
 		bindingData.CreateBuffers( _device, _count, _bufferSize );
 
-		bindingData.layoutBinding.binding = static_cast<uint32_t>( mBindingData.size() );
-		bindingData.layoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-		bindingData.layoutBinding.descriptorCount = static_cast<uint32_t>( 1 );
-		bindingData.layoutBinding.stageFlags = _stage;
-		bindingData.layoutBinding.pImmutableSamplers = nullptr;
+		bindingData.mLayoutBinding.binding            = static_cast<uint32_t>( mBindingData.size() );
+		bindingData.mLayoutBinding.descriptorType     = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+		bindingData.mLayoutBinding.descriptorCount    = static_cast<uint32_t>( 1 );
+		bindingData.mLayoutBinding.stageFlags         = _stage;
+		bindingData.mLayoutBinding.pImmutableSamplers = nullptr;
 
 		mBindingData.push_back( bindingData );
 	}
 
-	//================================================================================================================================
+	//========================================================================================================
 	// Adds a uniform buffer binding
-	//================================================================================================================================
-	void DescriptorUniforms::AddDynamicUniformBinding( Device& _device, const size_t _count, VkShaderStageFlags  _stage, VkDeviceSize _bufferSize, VkDeviceSize _alignment )
+	//========================================================================================================
+    void DescriptorUniforms::AddDynamicUniformBinding( Device& _device,
+                                                       const size_t _count,
+                                                       VkShaderStageFlags _stage,
+                                                       VkDeviceSize _bufferSize,
+                                                       VkDeviceSize _alignment )
 	{
 		BindingData bindingData;
 		bindingData.CreateBuffers( _device, _count, _bufferSize * _alignment, _alignment );
 
-		bindingData.layoutBinding.binding = static_cast<uint32_t>( mBindingData.size() );
-		bindingData.layoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
-		bindingData.layoutBinding.descriptorCount = static_cast<uint32_t>( 1 );
-		bindingData.layoutBinding.stageFlags = _stage;
-		bindingData.layoutBinding.pImmutableSamplers = nullptr;
+		bindingData.mLayoutBinding.binding            = static_cast<uint32_t>( mBindingData.size() );
+		bindingData.mLayoutBinding.descriptorType     = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
+		bindingData.mLayoutBinding.descriptorCount    = static_cast<uint32_t>( 1 );
+		bindingData.mLayoutBinding.stageFlags         = _stage;
+		bindingData.mLayoutBinding.pImmutableSamplers = nullptr;
 
 		mBindingData.push_back( bindingData );
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
-	void DescriptorUniforms::ResizeDynamicUniformBinding( Device& _device, const size_t _count, VkDeviceSize _bufferSize, VkDeviceSize _alignment, const int _index )
+	//========================================================================================================
+    //========================================================================================================
+    void DescriptorUniforms::ResizeDynamicUniformBinding( Device& _device,
+                                                          const size_t _count,
+                                                          VkDeviceSize _bufferSize,
+                                                          VkDeviceSize _alignment,
+                                                          const int _index )
 	{
 		assert( _index < (int)mBindingData.size() );
 		for ( int bufferIndex = 0; bufferIndex < (int)_count; bufferIndex++ )
 		{
-			mBindingData[ _index ].buffers[ bufferIndex ].Destroy( _device );
+			mBindingData[ _index ].mBuffers[ bufferIndex ].Destroy( _device );
 		}
 		mBindingData[ _index ].CreateBuffers( _device, _count, _bufferSize * _alignment, _alignment );
 	}
 
-	//================================================================================================================================
+	//========================================================================================================
 	// For uniform buffers only, update buffer data of the binding at _index
-	//================================================================================================================================
-	void DescriptorUniforms::SetData( Device& _device, const size_t _indexBinding, const size_t _indexBuffer, const void* _data, VkDeviceSize _size, VkDeviceSize _offset )
+	//========================================================================================================
+    void DescriptorUniforms::SetData( Device& _device,
+                                      const size_t _indexBinding,
+                                      const size_t _indexBuffer,
+                                      const void* _data,
+                                      VkDeviceSize _size, VkDeviceSize _offset )
 	{
 		assert( _indexBinding >= 0 && _indexBinding < mBindingData.size() );
-		mBindingData[ _indexBinding ].buffers[ _indexBuffer ].SetData( _device, _data, _size, _offset );
+		mBindingData[ _indexBinding ].mBuffers[ _indexBuffer ].SetData( _device, _data, _size, _offset );
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
-	void DescriptorUniforms::Bind( VkCommandBuffer _commandBuffer, VkPipelineLayout _pipelineLayout, const size_t _index )
+	//========================================================================================================
+	//========================================================================================================
+    void DescriptorUniforms::Bind( VkCommandBuffer _commandBuffer,
+                                   VkPipelineLayout _pipelineLayout,
+                                   const size_t _index )
 	{
-		vkCmdBindDescriptorSets( _commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipelineLayout, 0, 1, &mDescriptorSets[ _index ], 0, nullptr );
+        vkCmdBindDescriptorSets( _commandBuffer,
+                                 VK_PIPELINE_BIND_POINT_GRAPHICS,
+                                 _pipelineLayout,
+                                 0,
+                                 1,
+                                 &mDescriptorSets[_index],
+                                 0,
+                                 nullptr );
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	bool DescriptorUniforms::Create( Device& _device, const uint32_t _count )
 	{
 		// Create DescriptorSetLayout
@@ -103,7 +126,7 @@ namespace fan
 			bindingsArray.reserve( mBindingData.size() );
 			for( int bindingIndex = 0; bindingIndex < (int)mBindingData.size(); bindingIndex++ )
 			{
-				bindingsArray.push_back( mBindingData[bindingIndex].layoutBinding );
+				bindingsArray.push_back( mBindingData[bindingIndex].mLayoutBinding );
 			}
 
 			VkDescriptorSetLayoutCreateInfo descriptorSetLayoutCreateInfo = {};
@@ -113,33 +136,41 @@ namespace fan
 			descriptorSetLayoutCreateInfo.bindingCount = static_cast< uint32_t >( mBindingData.size() );
 			descriptorSetLayoutCreateInfo.pBindings = bindingsArray.data();
 
-			if ( vkCreateDescriptorSetLayout( _device.mDevice, &descriptorSetLayoutCreateInfo, nullptr, &mDescriptorSetLayout ) != VK_SUCCESS )
+            if( vkCreateDescriptorSetLayout( _device.mDevice,
+                                             &descriptorSetLayoutCreateInfo,
+                                             nullptr,
+                                             &mDescriptorSetLayout ) != VK_SUCCESS )
 			{
 				Debug::Error( "Could not allocate descriptor set layout." );
 				return false;
-			} Debug::Get() << Debug::Severity::log << std::hex << "VkDescriptorSetLayout " << mDescriptorSetLayout << std::dec << Debug::Endl();
+			} Debug::Log() << std::hex << "VkDescriptorSetLayout " << mDescriptorSetLayout
+			               << std::dec << Debug::Endl();
 		}
 
 		// Create DescriptorPool
 		{
 			std::vector< VkDescriptorPoolSize > poolSizes( mBindingData.size() );
-			for ( int layoutIndex = 0; layoutIndex < (int)mBindingData.size(); layoutIndex++ )
-			{
-				poolSizes[ layoutIndex ].type = mBindingData[ layoutIndex ].layoutBinding.descriptorType;
-				poolSizes[ layoutIndex ].descriptorCount = mBindingData[ layoutIndex ].layoutBinding.descriptorCount;
-			}
-			VkDescriptorPoolCreateInfo descriptorPoolCreateInfo = {};
+            for( int i = 0; i < (int)mBindingData.size(); i++ )
+            {
+                poolSizes[i].type            = mBindingData[i].mLayoutBinding.descriptorType;
+                poolSizes[i].descriptorCount = mBindingData[i].mLayoutBinding.descriptorCount;
+            }
+			VkDescriptorPoolCreateInfo          descriptorPoolCreateInfo = {};
 			descriptorPoolCreateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
 			descriptorPoolCreateInfo.pNext = nullptr;
 			descriptorPoolCreateInfo.flags = 0;
 			descriptorPoolCreateInfo.maxSets = _count;
 			descriptorPoolCreateInfo.poolSizeCount = static_cast< uint32_t >( poolSizes.size() );
 			descriptorPoolCreateInfo.pPoolSizes = poolSizes.data();
-			if ( vkCreateDescriptorPool( _device.mDevice, &descriptorPoolCreateInfo, nullptr, &mDescriptorPool ) != VK_SUCCESS )
+            if( vkCreateDescriptorPool( _device.mDevice,
+                                        &descriptorPoolCreateInfo,
+                                        nullptr,
+                                        &mDescriptorPool ) != VK_SUCCESS )
 			{
 				Debug::Error( "Could not allocate descriptor pool." );
 				return false;
-			} Debug::Get() << Debug::Severity::log << std::hex << "VkDescriptorPool      " << mDescriptorPool << std::dec << Debug::Endl();
+			} Debug::Log() << std::hex << "VkDescriptorPool      " << mDescriptorPool
+			               << std::dec << Debug::Endl();
 		}
 
 		// Create descriptor set
@@ -156,14 +187,17 @@ namespace fan
 			descriptorSetAllocateInfo.descriptorSetCount = _count;
 			descriptorSetAllocateInfo.pSetLayouts = descriptorSetLayouts.data();
 
-			if ( vkAllocateDescriptorSets( _device.mDevice, &descriptorSetAllocateInfo, mDescriptorSets ) != VK_SUCCESS )
+            if( vkAllocateDescriptorSets( _device.mDevice,
+                                          &descriptorSetAllocateInfo,
+                                          mDescriptorSets ) != VK_SUCCESS )
 			{
 				Debug::Error( "Could not allocate descriptor set." );
 				return false;
 			}
 			for ( uint32_t setIndex = 0; setIndex < _count; setIndex++ )
 			{
-				Debug::Get() << Debug::Severity::log << std::hex << "VkDescriptorSet       " << mDescriptorSets[ setIndex ] << std::dec << Debug::Endl();
+				Debug::Log() << std::hex << "VkDescriptorSet       " << mDescriptorSets[ setIndex ]
+				             << std::dec << Debug::Endl();
 			}
 		}
 
@@ -172,9 +206,9 @@ namespace fan
 		return true;
 	}
 
-	//================================================================================================================================
+	//========================================================================================================
 	// Update the descriptors sets using the old WriteDescriptor sets
-	//================================================================================================================================
+	//========================================================================================================
 	void DescriptorUniforms::UpdateDescriptorSets( Device& _device, const uint32_t _count )
 	{
 		std::vector<VkWriteDescriptorSet>	writeDescriptors;
@@ -192,17 +226,19 @@ namespace fan
 			
 			for( uint32_t i = 0; i < _count; i++ )
 			{
-				descriptorBufferInfo[i].buffer = bindingData.buffers[i].mBuffer;
+				descriptorBufferInfo[i].buffer = bindingData.mBuffers[i].mBuffer;
 				descriptorBufferInfo[i].offset = 0;
-				descriptorBufferInfo[i].range = bindingData.buffers[i].mAlignment > 1 ? bindingData.buffers[i].mAlignment : bindingData.buffers[i].mSize;
+                descriptorBufferInfo[i].range = bindingData.mBuffers[i].mAlignment > 1 ?
+                        bindingData.mBuffers[i].mAlignment :
+                        bindingData.mBuffers[i].mSize;
 			
 				writeDescriptorSet[i].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
 				writeDescriptorSet[i].pNext = nullptr;
 				writeDescriptorSet[i].dstSet = mDescriptorSets[i];
 				writeDescriptorSet[i].dstBinding = static_cast<uint32_t>( bindingIndex );
 				writeDescriptorSet[i].dstArrayElement = 0;
-				writeDescriptorSet[i].descriptorCount = bindingData.layoutBinding.descriptorCount;
-				writeDescriptorSet[i].descriptorType = bindingData.layoutBinding.descriptorType;
+				writeDescriptorSet[i].descriptorCount = bindingData.mLayoutBinding.descriptorCount;
+				writeDescriptorSet[i].descriptorType = bindingData.mLayoutBinding.descriptorType;
 				writeDescriptorSet[i].pImageInfo = nullptr;
 				writeDescriptorSet[i].pBufferInfo = &descriptorBufferInfo[i];
 				//uboWriteDescriptorSet.pTexelBufferView = nullptr;		
@@ -220,14 +256,22 @@ namespace fan
 		);
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
-	void DescriptorUniforms::BindingData::CreateBuffers( Device& _device, const size_t _count, VkDeviceSize _sizeBuffer, VkDeviceSize _alignment )
+	//========================================================================================================
+	//========================================================================================================
+    void DescriptorUniforms::BindingData::CreateBuffers( Device& _device,
+                                                         const size_t _count,
+                                                         VkDeviceSize _sizeBuffer,
+                                                         VkDeviceSize _alignment )
 	{		
-		assert( _count <= SwapChain::s_maxFramesInFlight );
+		assert( _count <= SwapChain::sMaxFramesInFlight );
 		for ( int bufferIndex = 0; bufferIndex < (int)_count; bufferIndex++ )
 		{
-			buffers[ bufferIndex ].Create(_device,_sizeBuffer,VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,VK_MEMORY_PROPERTY_HOST_COHERENT_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, _alignment );
+            mBuffers[bufferIndex].Create( _device,
+                                          _sizeBuffer,
+                                          VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+                                          VK_MEMORY_PROPERTY_HOST_COHERENT_BIT |
+                                          VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT,
+                                          _alignment );
 		}		
 	}
 }

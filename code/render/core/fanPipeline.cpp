@@ -29,13 +29,13 @@ namespace fan
         bindingDescription.clear();
         attributeDescriptions.clear();
 
-        inputAssemblyStateInfo.sType                  = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
+        inputAssemblyStateInfo.sType           = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
         inputAssemblyStateInfo.pNext                  = nullptr;
         inputAssemblyStateInfo.flags                  = 0;
         inputAssemblyStateInfo.topology               = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
         inputAssemblyStateInfo.primitiveRestartEnable = VK_FALSE;
 
-        rasterizationStateInfo.sType                   = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
+        rasterizationStateInfo.sType             = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
         rasterizationStateInfo.pNext                   = nullptr;
         rasterizationStateInfo.flags                   = 0;
         rasterizationStateInfo.depthClampEnable        = VK_FALSE;
@@ -59,7 +59,7 @@ namespace fan
         //multisampleStateCreateInfo.alphaToCoverageEnable=;
         //multisampleStateCreateInfo.alphaToOneEnable=;
 
-        depthStencilStateInfo.sType                 = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
+        depthStencilStateInfo.sType              = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
         depthStencilStateInfo.pNext                 = nullptr;
         depthStencilStateInfo.flags                 = 0;
         depthStencilStateInfo.depthTestEnable       = VK_TRUE;
@@ -137,13 +137,15 @@ namespace fan
        fanAssert( _pipelineConfig.attributeDescriptions.size() > 0 );
 
         VkPipelineVertexInputStateCreateInfo vertexInputStateCreateInfo = {};
-        vertexInputStateCreateInfo.sType                           = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+        vertexInputStateCreateInfo.sType        = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
         vertexInputStateCreateInfo.pNext                           = nullptr;
         vertexInputStateCreateInfo.flags                           = 0;
-        vertexInputStateCreateInfo.vertexBindingDescriptionCount   = static_cast< uint32_t >( _pipelineConfig.bindingDescription.size() );
+        vertexInputStateCreateInfo.vertexBindingDescriptionCount   = static_cast< uint32_t >(
+                _pipelineConfig.bindingDescription.size() );
         vertexInputStateCreateInfo.pVertexBindingDescriptions      = _pipelineConfig.bindingDescription.data();
-        vertexInputStateCreateInfo.vertexAttributeDescriptionCount = static_cast< uint32_t >( _pipelineConfig.attributeDescriptions.size() );
-        vertexInputStateCreateInfo.pVertexAttributeDescriptions    = _pipelineConfig.attributeDescriptions.data();
+        vertexInputStateCreateInfo.vertexAttributeDescriptionCount = static_cast< uint32_t >(
+                _pipelineConfig.attributeDescriptions.size() );
+        vertexInputStateCreateInfo.pVertexAttributeDescriptions= _pipelineConfig.attributeDescriptions.data();
 
         VkPipelineViewportStateCreateInfo viewportStateCreateInfo = {};
         viewportStateCreateInfo.sType         = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
@@ -154,7 +156,8 @@ namespace fan
         viewportStateCreateInfo.scissorCount  = 1;
         viewportStateCreateInfo.pScissors     = &scissor;
 
-        _pipelineConfig.colorBlendStateInfo.attachmentCount = static_cast< uint32_t >( _pipelineConfig.attachmentBlendStates.size() );
+        _pipelineConfig.colorBlendStateInfo.attachmentCount = static_cast< uint32_t >(
+                _pipelineConfig.attachmentBlendStates.size() );
         _pipelineConfig.colorBlendStateInfo.pAttachments    = _pipelineConfig.attachmentBlendStates.data();
 
         VkPipelineDynamicStateCreateInfo dynamicStateCreateInfo = {};
@@ -168,9 +171,11 @@ namespace fan
         pipelineLayoutCreateInfo.sType                  = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
         pipelineLayoutCreateInfo.pNext                  = nullptr;
         pipelineLayoutCreateInfo.flags                  = 0;
-        pipelineLayoutCreateInfo.setLayoutCount         = static_cast< uint32_t >( _pipelineConfig.descriptorSetLayouts.size() );
+        pipelineLayoutCreateInfo.setLayoutCount         = static_cast< uint32_t >(
+                _pipelineConfig.descriptorSetLayouts.size() );
         pipelineLayoutCreateInfo.pSetLayouts            = _pipelineConfig.descriptorSetLayouts.data();
-        pipelineLayoutCreateInfo.pushConstantRangeCount = static_cast< uint32_t >( _pipelineConfig.pushConstantRanges.size() );
+        pipelineLayoutCreateInfo.pushConstantRangeCount = static_cast< uint32_t >(
+                _pipelineConfig.pushConstantRanges.size() );
         pipelineLayoutCreateInfo.pPushConstantRanges    = _pipelineConfig.pushConstantRanges.data();
 
         if( vkCreatePipelineLayout( _device.mDevice, &pipelineLayoutCreateInfo, nullptr, &mPipelineLayout ) !=
@@ -237,8 +242,8 @@ namespace fan
         return true;
     }
 
-    //================================================================================================================================
-    //================================================================================================================================
+    //========================================================================================================
+    //========================================================================================================
     void Pipeline::Bind( VkCommandBuffer _commandBuffer, VkExtent2D _extent )
     {
         VkViewport viewport;
@@ -259,8 +264,8 @@ namespace fan
         vkCmdBindPipeline( _commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mPipeline );
     }
 
-    //================================================================================================================================
-    //================================================================================================================================
+    //========================================================================================================
+    //========================================================================================================
     void Pipeline::Destroy( Device& _device )
     {
         if( mPipelineCache != VK_NULL_HANDLE )

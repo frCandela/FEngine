@@ -1,5 +1,4 @@
 #include "render/draw/fanDrawPostprocess.hpp"
-
 #include "core/fanDebug.hpp"
 #include "render/fanVertex.hpp"
 #include "render/core/fanRenderPass.hpp"
@@ -7,8 +6,10 @@
 
 namespace fan
 {
- 	//================================================================================================================================
-	//================================================================================================================================
+ 	//========================================================================================================
+
+	//========================================================================================================
+
 	void DrawPostprocess::Create( Device& _device, uint32_t _imagesCount, ImageView& _inputImageView )
 	{
 		CreateQuadVertexBuffer( _device );
@@ -16,15 +17,18 @@ namespace fan
 		mSampler.Create( _device, 0, 0.f, VK_FILTER_NEAREST );
 		
 		mDescriptorUniform.Destroy( _device );
-		mDescriptorUniform.AddUniformBinding( _device, _imagesCount, VK_SHADER_STAGE_FRAGMENT_BIT, sizeof( UniformsPostprocess ) );
+        mDescriptorUniform.AddUniformBinding( _device,
+                                              _imagesCount,
+                                              VK_SHADER_STAGE_FRAGMENT_BIT,
+                                              sizeof( UniformsPostprocess ) );
 		mDescriptorUniform.Create( _device, _imagesCount );
 		mDescriptorUniform.SetData( _device, 0, 0, &mUniforms, sizeof( UniformsPostprocess ), 0 );
 		
 		mDescriptorImage.Create( _device, &_inputImageView.mImageView, 1, &mSampler.mSampler );
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void DrawPostprocess::Destroy( Device& _device )
 	{
         mPipeline.Destroy( _device );
@@ -34,8 +38,8 @@ namespace fan
 		mVertexBufferQuad.Destroy( _device );
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void DrawPostprocess::BindDescriptors( VkCommandBuffer _commandBuffer, const size_t _index )
 	{
 		std::vector<VkDescriptorSet> descriptors = {
@@ -54,8 +58,8 @@ namespace fan
 		);
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	PipelineConfig DrawPostprocess::GetPipelineConfig() const
 	{
 		PipelineConfig config( mVertexShader, mFragmentShader );
@@ -74,20 +78,21 @@ namespace fan
 		config.rasterizationStateInfo.cullMode              = VK_CULL_MODE_NONE;
 		config.attachmentBlendStates[0].srcColorBlendFactor = VK_BLEND_FACTOR_ONE;
 		config.attachmentBlendStates[0].dstColorBlendFactor = VK_BLEND_FACTOR_ZERO;
-		config.descriptorSetLayouts                         = { mDescriptorImage.mDescriptorSetLayout, mDescriptorUniform.mDescriptorSetLayout };
+        config.descriptorSetLayouts = { mDescriptorImage.mDescriptorSetLayout,
+                                        mDescriptorUniform.mDescriptorSetLayout };
 
 		return config;
 	}
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void DrawPostprocess::UpdateUniformBuffers( Device& _device, const size_t _index )
 	{
 		mDescriptorUniform.SetData( _device, 0, _index, &mUniforms, sizeof( UniformsPostprocess ), 0 );
 	}
 
-	//================================================================================================================================
+	//========================================================================================================
 	// Used for postprocess
-	//================================================================================================================================
+	//========================================================================================================
 	void DrawPostprocess::CreateQuadVertexBuffer( Device& _device )
 	{
 		// Vertex quad
@@ -121,13 +126,19 @@ namespace fan
 		stagingBuffer.Destroy( _device );
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
-	void DrawPostprocess::RecordCommandBuffer( const size_t _index, RenderPass& _renderPass, FrameBuffer& _framebuffer, VkExtent2D _extent )
+	//========================================================================================================
+	//========================================================================================================
+    void DrawPostprocess::RecordCommandBuffer( const size_t _index,
+                                               RenderPass& _renderPass,
+                                               FrameBuffer& _framebuffer,
+                                               VkExtent2D _extent )
 	{
 		VkCommandBuffer commandBuffer = mCommandBuffers.mBuffers[_index];
-		VkCommandBufferInheritanceInfo commandBufferInheritanceInfo = CommandBuffer::GetInheritanceInfo( _renderPass.mRenderPass, _framebuffer.mFrameBuffers[_index] );
-		VkCommandBufferBeginInfo commandBufferBeginInfo = CommandBuffer::GetBeginInfo( &commandBufferInheritanceInfo );
+        VkCommandBufferInheritanceInfo commandBufferInheritanceInfo = CommandBuffer::GetInheritanceInfo(
+                _renderPass.mRenderPass,
+                _framebuffer.mFrameBuffers[_index] );
+		VkCommandBufferBeginInfo commandBufferBeginInfo =
+		        CommandBuffer::GetBeginInfo( &commandBufferInheritanceInfo );
 
 		if( vkBeginCommandBuffer( commandBuffer, &commandBufferBeginInfo ) == VK_SUCCESS )
 		{
@@ -139,12 +150,12 @@ namespace fan
 			vkCmdDraw( commandBuffer, static_cast<uint32_t>( 4 ), 1, 0, 0 );
 			if( vkEndCommandBuffer( commandBuffer ) != VK_SUCCESS )
 			{
-				Debug::Get() << Debug::Severity::error << "Could not record command buffer " << commandBuffer << "." << Debug::Endl();
+				Debug::Error() << "Could not record command buffer " << commandBuffer << "." << Debug::Endl();
 			}
 		}
 		else
 		{
-			Debug::Get() << Debug::Severity::error << "Could not record command buffer " << commandBuffer << "." << Debug::Endl();
+			Debug::Error() << "Could not record command buffer " << commandBuffer << "." << Debug::Endl();
 		}
 	}
 }

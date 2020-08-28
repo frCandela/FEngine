@@ -116,12 +116,12 @@ namespace fan
             for( uint32_t meshIndex = 0; meshIndex < mDrawData.size(); meshIndex++ )
             {
                 UIDrawData drawData = mDrawData[meshIndex];
-                Mesh2D* mesh = drawData.mesh;
+                Mesh2D* mesh = drawData.mMesh;
                 VkBuffer vertexBuffers[] = { mesh->mVertexBuffer.mBuffer };
                 BindDescriptors( commandBuffer, _index, meshIndex );
                 vkCmdBindVertexBuffers( commandBuffer, 0, 1, vertexBuffers, offsets );
                 BindTexture( commandBuffer,
-                             drawData.textureIndex,
+                             drawData.mTextureIndex,
                              mDescriptorSampler,
                              _descriptorTextures,
                              mPipeline.mPipelineLayout );
@@ -184,11 +184,11 @@ namespace fan
         {
             const RenderDataMesh2D& uiData = _drawData[meshIndex];
 
-            mDrawData[meshIndex].mesh                      = uiData.mesh;
-            mDrawData[meshIndex].textureIndex              = uiData.textureIndex;
-            mUniforms.mDynamicUniforms[meshIndex].position = uiData.position;
-            mUniforms.mDynamicUniforms[meshIndex].scale    = uiData.scale;
-            mUniforms.mDynamicUniforms[meshIndex].color    = uiData.color;
+            mDrawData[meshIndex].mMesh                      = uiData.mMesh;
+            mDrawData[meshIndex].mTextureIndex              = uiData.mTextureIndex;
+            mUniforms.mDynamicUniforms[meshIndex].mPosition = uiData.mPosition;
+            mUniforms.mDynamicUniforms[meshIndex].mScale = uiData.mScale;
+            mUniforms.mDynamicUniforms[meshIndex].mColor = uiData.mColor;
         }
     }
 
