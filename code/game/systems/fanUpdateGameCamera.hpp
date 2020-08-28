@@ -44,7 +44,7 @@ namespace fan
 			}
 
 			center /= (float)_view.Size();
-			assert( low[0] <= high[0] && low[2] <= high[2] );
+            fanAssert( low[0] <= high[0] && low[2] <= high[2] );
 
 			// set main camera
 			GameCamera& gameCamera = _world.GetSingleton<GameCamera>();

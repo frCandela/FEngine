@@ -187,8 +187,8 @@ namespace fan
 			SCOPED_PROFILE( scene_update );
 
 			SServerReceive::Run( mWorld, _delta );
-            mWorld.Run<S_ProcessTimedOutPackets>	();
-            mWorld.Run<S_DetectHostTimout>		();
+            mWorld.Run<SProcessTimedOutPackets>	();
+            mWorld.Run<SDetectHostTimout>		();
             mWorld.Run<SHostSpawnShip>			( _delta );
             mWorld.Run<SHostSyncFrame>			( _delta );
 			SpawnManager			::Update( mWorld );

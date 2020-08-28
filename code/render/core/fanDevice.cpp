@@ -11,7 +11,7 @@ namespace fan
 	//========================================================================================================
 	void Device::Create( Instance& _instance, VkSurfaceKHR _surface )
 	{
-		assert( mDevice == VK_NULL_HANDLE );
+        fanAssert( mDevice == VK_NULL_HANDLE );
 
 		VkPhysicalDeviceFeatures availableFeatures;
 		std::vector<VkExtensionProperties>	availableExtensions;
@@ -73,7 +73,7 @@ namespace fan
 		vkGetPhysicalDeviceMemoryProperties( mPhysicalDevice, &mMemoryProperties );
 
 		// Creates command pool 
-		assert( mCommandPool == VK_NULL_HANDLE );
+        fanAssert( mCommandPool == VK_NULL_HANDLE );
 		VkCommandPoolCreateInfo commandPoolCreateInfo;
 		commandPoolCreateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
 		commandPoolCreateInfo.pNext = nullptr;

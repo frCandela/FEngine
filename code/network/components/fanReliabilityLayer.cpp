@@ -44,7 +44,7 @@ namespace fan
 		}
 		else //we missed some packets
 		{
-			assert( _packet.mTag > mExpectedPacketTag );
+            fanAssert( _packet.mTag > mExpectedPacketTag );
             mExpectedPacketTag = _packet.mTag + 1;
 			mPendingAck.push_back( _packet.mTag );
 			return true;
@@ -94,7 +94,7 @@ namespace fan
 			}
 			else // inFlightPacket was already removed (maybe from timeout)	
 			{
-				assert( inFlightPacket.mTag > ackPacketTag );
+                fanAssert( inFlightPacket.mTag > ackPacketTag );
 				ackIndex++;
 			}
 		}

@@ -40,7 +40,7 @@ namespace fan
 	{
 		PhysicsWorld& physicsWorld = _world.GetSingleton<PhysicsWorld>();
 		Rigidbody& rb = static_cast<Rigidbody&>( _component );
-		assert( rb.mRigidbody != nullptr );
+        fanAssert( rb.mRigidbody != nullptr );
 
 		physicsWorld.mDynamicsWorld->removeRigidBody( rb.mRigidbody );
 
@@ -298,7 +298,7 @@ namespace fan
 			case KINEMATIC: rb.SetKinematic(); break;
 			case STATIC: 	rb.SetStatic(); break;
 			default:
-				assert( false );
+                fanAssert( false );
 				break;
 			}
 		}

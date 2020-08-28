@@ -45,7 +45,7 @@ namespace fan
 							// save rollback state
 							const EcsComponent&  component = _world.IndexedGetComponent( entity, i );
 							componentInfo.rollbackSave( component, rollbackData.mData );
-							assert( rollbackData.mData.getDataSize() > 0 );
+                            fanAssert( rollbackData.mData.getDataSize() > 0 );
 							clientRollback.mRollbackDatas.push_back( rollbackData );
 						}
 					}

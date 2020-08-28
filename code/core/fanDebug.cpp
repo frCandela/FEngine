@@ -46,7 +46,7 @@ namespace fan
 			std::cout << "[HIGH]";
 		} break;
 		default:
-			assert( false );
+            fanAssert( false );
 			break;
 		}
 		std::cout << " " << mStringstream.str().c_str() << std::endl;

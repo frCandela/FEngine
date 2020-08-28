@@ -34,7 +34,7 @@ namespace fan
                                            const NetID _spaceshipID,
                                            const btVector3 _position )
 			{
-				assert( _spaceshipID != 0 );
+                fanAssert( _spaceshipID != 0 );
 
 				SpawnInfo info;
 				info.spawnFrameIndex = _spawnFrameIndex;

@@ -20,7 +20,7 @@ namespace fan
 	void ClientConnection::Init( EcsWorld& /*_world*/, EcsEntity /*_entity*/, EcsComponent& _component )
 	{
 		ClientConnection& connection = static_cast<ClientConnection&>( _component );
-		assert( connection.mSocket == nullptr );
+        fanAssert( connection.mSocket == nullptr );
 		connection.mSocket                 = new UdpSocket();
 		connection.mClientPort             = 53010;
 		connection.mServerIP               = "127.0.0.1";
@@ -84,7 +84,7 @@ namespace fan
 		}break;
 
 		default:
-			assert( false );
+            fanAssert( false );
 			break;
 		}
 	}
@@ -108,7 +108,7 @@ namespace fan
 		{
 			Debug::Log() << "login success" << Debug::Endl();
             mState = ClientState::Connected;
-			assert( _packetLogin.mPlayerId != 0 );
+            fanAssert( _packetLogin.mPlayerId != 0 );
 			mOnLoginSuccess.Emmit( _packetLogin.mPlayerId );//playerID = _packetLogin.playerID;a
 		}
 	}
@@ -147,7 +147,7 @@ namespace fan
 		case fan::ClientConnection::ClientState::Stopping:			return "Stopping";			break;
 		case fan::ClientConnection::ClientState::PendingConnection:	return "PendingConnection";	break;
 		case fan::ClientConnection::ClientState::Connected:			return "Connected";			break;
-		default:			assert( false );						return "Error";				break;
+		default:			fanAssert( false );						return "Error";				break;
 		}
 	}
 

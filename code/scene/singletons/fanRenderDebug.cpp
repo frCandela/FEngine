@@ -75,8 +75,8 @@ namespace fan
     void
     RenderDebug::DebugTriangles( const std::vector<btVector3>& _triangles, const std::vector<Color>& _colors )
     {
-        assert( _triangles.size() % 3 == 0 );
-        assert( _colors.size() == _triangles.size() / 3 );
+        fanAssert( _triangles.size() % 3 == 0 );
+        fanAssert( _colors.size() == _triangles.size() / 3 );
 
         mDebugTriangles.resize( mDebugTriangles.size() + _triangles.size() );
         for( int triangleIndex = 0; triangleIndex < (int)_triangles.size() / 3; triangleIndex++ )
@@ -107,7 +107,7 @@ namespace fan
                                    const Color _color,
                                    const bool _depthTestEnable )
 	{
-		assert( _nbSegments > 2 && _radius >= 0.f );
+        fanAssert( _nbSegments > 2 && _radius >= 0.f );
 
 		const btVector3 other = btVector3( -_axis[1], -_axis[2], _axis[0] );
 		btVector3 orthogonal = _radius * _axis.cross( other ).normalized();

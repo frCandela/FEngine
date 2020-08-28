@@ -15,59 +15,59 @@ namespace fan
 	struct btVector2
 	{
 	public:
-		btVector2( const btVector3 _vec3 ) { m_vector = _vec3; }
-		btVector2() : m_vector( 0, 0, 0 ) {}
-		btVector2( const btScalar _x, const btScalar _y ) : m_vector( _x, _y, 0 ) {}
+		btVector2( const btVector3 _vec3 ) { mVector = _vec3; }
+		btVector2() : mVector( 0, 0, 0 ) {}
+		btVector2( const btScalar _x, const btScalar _y ) : mVector( _x, _y, 0 ) {}
 
 		static btVector2 Zero() { return btVector2( 0.f, 0.f ); }
-		btScalar x() const { return m_vector.x(); }
-		btScalar y() const { return m_vector.y(); }
-		void setX( const btScalar _x ) { m_vector.setX( _x ); }
-		void setY( const btScalar _y ) { m_vector.setY( _y ); }
+		btScalar x() const { return mVector.x(); }
+		btScalar y() const { return mVector.y(); }
+		void setX( const btScalar _x ) { mVector.setX( _x ); }
+		void setY( const btScalar _y ) { mVector.setY( _y ); }
 
-		btScalar& operator[] ( int _index ) { return m_vector[ _index ]; }
-		btScalar operator[] ( int _index ) const { return m_vector[ _index ]; }
+		btScalar& operator[] ( int _index ) { return mVector[ _index ]; }
+		btScalar operator[] ( int _index ) const { return mVector[ _index ]; }
 		btVector2& operator+=( const btVector2& _v )
 		{
-			m_vector += _v.m_vector;
+            mVector += _v.mVector;
 			return *this;
 		}
 		btVector2& operator-=( const btVector2& _v )
 		{
-			m_vector -= _v.m_vector;
+            mVector -= _v.mVector;
 			return *this;
 		}
 		btVector2& operator*=( const btScalar& _value )
 		{
-			m_vector *= _value;
+            mVector *= _value;
 			return *this;
 		}
 		btVector2& operator/=( const btScalar& _value )
 		{
-			m_vector /= _value;
+            mVector /= _value;
 			return *this;
 		}
 		btVector2& operator*=( const btVector2& _value )
 		{
-			m_vector *= _value.m_vector;
+            mVector *= _value.mVector;
 			return *this;
 		}
 		btVector2& operator/=( const btVector2& _value )
 		{
-			m_vector = m_vector / _value.m_vector;
+            mVector = mVector / _value.mVector;
 			return *this;
 		}
 		bool operator!=( const btVector2& _value ) const
 		{
-			return m_vector[ 0 ] != _value.m_vector[ 0 ] || m_vector[ 1 ] != _value.m_vector[ 1 ];
+			return mVector[ 0 ] != _value.mVector[ 0 ] || mVector[ 1 ] != _value.mVector[ 1 ];
 		}
 		bool operator==( const btVector2& _value ) const
 		{
-			return m_vector[ 0 ] == _value.m_vector[ 0 ] && m_vector[ 1 ] == _value.m_vector[ 1 ];
+			return mVector[ 0 ] == _value.mVector[ 0 ] && mVector[ 1 ] == _value.mVector[ 1 ];
 		}
 
 	private:
-		btVector3 m_vector;
+		btVector3 mVector;
 	};
 
 	//========================================================================================================

@@ -10,7 +10,7 @@ namespace fan
 	//========================================================================================================
 	void Instance::Create( void* _debugCallbackUserData )
 	{
-		assert( mInstance == VK_NULL_HANDLE );
+        fanAssert( mInstance == VK_NULL_HANDLE );
 
 		// Get desired extensions
 		uint32_t glfwExtensionCount = 0;

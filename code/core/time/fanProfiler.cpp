@@ -6,7 +6,7 @@ namespace fan
 	//================================================================================================================================
 	// Beginning of an interval, saves the times, a name and return the interval unique id
 	//================================================================================================================================
-	size_t Profiler::OpenTimeInterval( const char _name[ s_nameSize ] )
+	size_t Profiler::OpenTimeInterval( const char _name[ sNameSize ] )
 	{
 		Interval interval;
 		interval.mTime = mClock.Now();
@@ -39,7 +39,7 @@ namespace fan
         mIndex = 0;
 		mClock.Reset();
 		const size_t index = OpenTimeInterval( "full_interval" );
-		assert( index == 0 );
+        fanAssert( index == 0 );
 	}
 
 	//================================================================================================================================
@@ -48,7 +48,7 @@ namespace fan
 	{
 
 		CloseTimeInterval( 0 );
-		onProfilingEnd.Emmit();
+		mOnProfilingEnd.Emmit();
 	}
 
 	//================================================================================================================================

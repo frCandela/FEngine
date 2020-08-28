@@ -212,7 +212,7 @@ namespace fan
 						// disconnect
 					} break;
 					default:
-						assert( false );
+                        fanAssert( false );
 						break;
 					}
 				} while( socketStatus == sf::UdpSocket::Done );

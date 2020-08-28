@@ -20,7 +20,7 @@ namespace fan
 		}
 		else
 		{
-			assert( extension == ".vert" );
+            fanAssert( extension == ".vert" );
 			shaderKind = shaderc_shader_kind::shaderc_vertex_shader;
 		}
 

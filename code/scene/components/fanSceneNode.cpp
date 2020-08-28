@@ -183,7 +183,7 @@ namespace fan
 	//========================================================================================================
 	SceneNode& SceneNode::GetParent() const
 	{
-		assert( mParentHandle != 0 );
+        fanAssert( mParentHandle != 0 );
 		return mScene->mWorld->GetComponent<SceneNode>( mScene->mWorld->GetEntity( mParentHandle ) );
 	}
 

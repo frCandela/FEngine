@@ -14,8 +14,8 @@ namespace fan
 	{
 	    if(  _count == 0) { return; }
 
-		assert( mDescriptorPool == VK_NULL_HANDLE );
-		assert( mDescriptorSetLayout == VK_NULL_HANDLE );
+        fanAssert( mDescriptorPool == VK_NULL_HANDLE );
+        fanAssert( mDescriptorSetLayout == VK_NULL_HANDLE );
 
         VkDescriptorType descriptorType = ( _pSamplers == nullptr ?
                 VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE :

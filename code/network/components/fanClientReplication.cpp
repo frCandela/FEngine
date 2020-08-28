@@ -38,7 +38,7 @@ namespace fan
 		    mReplicationListRPC.push_back( _packet );
 		    break;
 		default:
-		    assert( false );
+            fanAssert( false );
 		    break;
 		}
 	}

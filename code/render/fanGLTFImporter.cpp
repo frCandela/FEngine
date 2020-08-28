@@ -33,7 +33,7 @@ namespace fan
 	//========================================================================================================
 	GLTFImporter::GLTFBufferView::GLTFBufferView( const Json& _jView )
 	{
-		assert( _jView.find( "byteStride" ) == _jView.end() ); // buffers using stride are not supported
+        fanAssert( _jView.find( "byteStride" ) == _jView.end() ); // buffers using stride are not supported
 		mBuffer     = _jView[ "buffer" ];
         mByteLength = _jView[ "byteLength" ];
         mByteOffset = _jView[ "byteOffset" ];
@@ -140,7 +140,7 @@ namespace fan
 			GLTFAccessor accessorIndices( jAccessors[ mesh.primitive0.mIndices ] );
 			GLTFBufferView viewIndices( jBufferViews[ accessorIndices.mView ] );
 			GLTFBuffer bufferIndices( jBuffers[ viewIndices.mBuffer ] );
-			assert( accessorIndices.mType == Scalar );
+            fanAssert( accessorIndices.mType == Scalar );
 			if ( m_loadedBuffers[ viewIndices.mBuffer ].empty() )
 			{ // Load the buffer if it's not loaded already
 				m_loadedBuffers[ viewIndices.mBuffer ] = DecodeBuffer( jBuffers[ viewIndices.mBuffer ][ "uri" ] );
@@ -156,7 +156,7 @@ namespace fan
 			GLTFAccessor accessorPositions( jAccessors[ mesh.primitive0.mPositions ] );
 			GLTFBufferView viewPositions( jBufferViews[ accessorPositions.mView ] );
 			GLTFBuffer bufferPositions( jBuffers[ viewPositions.mBuffer ] );
-			assert( accessorPositions.mType == Float );
+            fanAssert( accessorPositions.mType == Float );
 			if ( m_loadedBuffers[ viewPositions.mBuffer ].empty() )
 			{ // Load the buffer if it's not loaded already
 				m_loadedBuffers[ viewPositions.mBuffer ] = DecodeBuffer( jBuffers[ viewPositions.mBuffer ][ "uri" ] );
@@ -173,14 +173,14 @@ namespace fan
 			GLTFAccessor accessorNormals( jAccessors[ mesh.primitive0.mNormal ] );
 			GLTFBufferView viewNormals( jBufferViews[ accessorNormals.mView ] );
 			GLTFBuffer bufferNormals( jBuffers[ viewNormals.mBuffer ] );
-			assert( accessorNormals.mType == Float );
+            fanAssert( accessorNormals.mType == Float );
 			if ( m_loadedBuffers[ viewNormals.mBuffer ].empty() )
 			{ // Load the buffer if it's not loaded already
 				m_loadedBuffers[ viewNormals.mBuffer ] = DecodeBuffer( jBuffers[ viewNormals.mBuffer ][ "uri" ] );
 			}
 			const std::string buffer = bufferNormals.GetBuffer( viewNormals, m_loadedBuffers[ viewNormals.mBuffer ] );
 			const glm::vec3* normalsArray = ( const glm::vec3* )buffer.data();
-			assert( (int)meshVertices.size() == accessorNormals.mCount );
+            fanAssert( (int)meshVertices.size() == accessorNormals.mCount );
 			for ( int i = 0; i < (int)meshVertices.size(); i++ ) { meshVertices[ i ].mNormal = normalsArray[ i ]; }
 		}
 		else
@@ -194,14 +194,14 @@ namespace fan
 			GLTFAccessor accessorTexcoords0( jAccessors[ mesh.primitive0.mTexcoord0 ] );
 			GLTFBufferView viewTexcoords0( jBufferViews[ accessorTexcoords0.mView ] );
 			GLTFBuffer bufferTexcoord0( jBuffers[ viewTexcoords0.mBuffer ] );
-			assert( accessorTexcoords0.mType == Float );
+            fanAssert( accessorTexcoords0.mType == Float );
 			if ( m_loadedBuffers[ viewTexcoords0.mBuffer ].empty() )
 			{ // Load the buffer if it's not loaded already
 				m_loadedBuffers[ viewTexcoords0.mBuffer ] = DecodeBuffer( jBuffers[ viewTexcoords0.mBuffer ][ "uri" ] );
 			}
 			const std::string buffer = bufferTexcoord0.GetBuffer( viewTexcoords0, m_loadedBuffers[ viewTexcoords0.mBuffer ] );
 			const glm::vec2* texcoords0Array = ( const glm::vec2* )buffer.data();
-			assert( (int)meshVertices.size() == accessorTexcoords0.mCount );
+            fanAssert( (int)meshVertices.size() == accessorTexcoords0.mCount );
 			for ( int i = 0; i < (int)meshVertices.size(); i++ ) { meshVertices[ i ].mUv = texcoords0Array[ i ]; }
 		}
 		else

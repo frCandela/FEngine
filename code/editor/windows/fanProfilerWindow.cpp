@@ -14,7 +14,7 @@ namespace fan
 		, mColor2( 0.29f, 0.8f, 1.f )
 		, mColorHovered( 0.64f, 0.96f, 0.99f )
 	{
-		Profiler::Get().onProfilingEnd.Connect( &ProfilerWindow::OnProfilerEnd, this );
+		Profiler::Get().mOnProfilingEnd.Connect( &ProfilerWindow::OnProfilerEnd, this );
 
         Signal<>& freezeCaptureSignal = * Input::Get().Manager().FindEvent( "freeze_capture" );
         freezeCaptureSignal.Connect( &ProfilerWindow::OnToogleFreezeCapture, this );
@@ -139,7 +139,7 @@ namespace fan
 				const ImVec2 bri = { tli.x + subWidth, tli.y + fontHeight };
 
 				// Alternates colors on elements at the same depth
-				assert( depth < lastColorStateAtDepth.size() );
+                fanAssert( depth < lastColorStateAtDepth.size() );
 				lastColorStateAtDepth[ depth ] = !lastColorStateAtDepth[ depth ];
 				Color color = lastColorStateAtDepth[ depth ] ? mColor1 : mColor2;
 

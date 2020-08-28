@@ -2,7 +2,6 @@
 
 #include <iostream>
 #include <limits>
-#include <assert.h>
 #include <type_traits>
 
 #include "bullet/LinearMath/btVector3.h"

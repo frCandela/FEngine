@@ -31,7 +31,7 @@ namespace fan
 	//========================================================================================================
 	void SpawnManager::RegisterSpawnMethod( const SpawnID _spawnID, const SpawnMethod _spawnMethod )
 	{
-		assert( spawnMethods.find( _spawnID ) == spawnMethods.end() );
+        fanAssert( spawnMethods.find( _spawnID ) == spawnMethods.end() );
 		spawnMethods[_spawnID] = _spawnMethod;
 	}
 
@@ -41,7 +41,7 @@ namespace fan
 	void SpawnManager::RegisterSpawnMethods()
 	{
 		spawnMethods.clear();		
-		RegisterSpawnMethod( spawn::SpawnBullet::s_id, &spawn::SpawnBullet::Spawn );
+		RegisterSpawnMethod( spawn::SpawnBullet::sID, &spawn::SpawnBullet::Spawn );
 		RegisterSpawnMethod( spawn::SpawnShip::sID, &spawn::SpawnShip::Spawn );
 		RegisterSpawnMethod( spawn::SpawnSolarEruption::sID, &spawn::SpawnSolarEruption::Spawn );
 	}

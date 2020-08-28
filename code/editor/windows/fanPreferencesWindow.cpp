@@ -240,7 +240,7 @@ namespace fan
 					for ( int axisIndex = 0; axisIndex < (int)axes.size(); axisIndex++ )
 					{
 						float axisValue = Joystick::Get().GetAxis( joystickIndex, axes[ axisIndex ] );
-                        ImGui::SliderFloat( Joystick::Get().s_axisNames[axisIndex],
+                        ImGui::SliderFloat( Joystick::Get().sAxisNames[axisIndex],
                                             &axisValue, -1.f, 1.f );
 					}
 
@@ -250,7 +250,7 @@ namespace fan
 					for ( int buttonindex = 0; buttonindex < (int)buttons.size(); buttonindex++ )
 					{
 						bool buttonValue = Joystick::Get().GetButton( joystickIndex, buttons[ buttonindex ] );
-						ImGui::Checkbox( Joystick::Get().s_buttonsNames[ buttonindex ], &buttonValue );
+						ImGui::Checkbox( Joystick::Get().sButtonsNames[ buttonindex ], &buttonValue );
 					}
 
 					if ( numJoysticks > 1 ) { ImGui::NextColumn(); }

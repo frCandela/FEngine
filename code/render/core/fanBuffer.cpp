@@ -32,9 +32,9 @@ namespace fan
                          VkMemoryPropertyFlags _memoryProperties,
                          VkDeviceSize _alignement )
 	{
-		assert( mBuffer == VK_NULL_HANDLE );
-		assert( mMemory == VK_NULL_HANDLE );
-		assert( _alignement > 0 );
+        fanAssert( mBuffer == VK_NULL_HANDLE );
+        fanAssert( mMemory == VK_NULL_HANDLE );
+        fanAssert( _alignement > 0 );
 
 		mSize = _size;
 		mAlignment = _alignement;
@@ -84,7 +84,7 @@ namespace fan
 	//========================================================================================================
 	void Buffer::SetData( Device& _device, const void* _data, VkDeviceSize _size, VkDeviceSize _offset )
 	{
-		assert( _size <= mSize );
+        fanAssert( _size <= mSize );
 		vkMapMemory( _device.mDevice, mMemory, _offset, _size, 0, &mMappedData );
 		memcpy( mMappedData, _data, (size_t)_size );
 		vkUnmapMemory( _device.mDevice, mMemory );

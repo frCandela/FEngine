@@ -256,7 +256,7 @@ namespace fan
 
 		uint32_t count;
 		vkGetSwapchainImagesKHR( _device.mDevice, mSwapchain, &count, nullptr );
-		assert( count == mImagesCount );
+        fanAssert( count == mImagesCount );
 		if( vkGetSwapchainImagesKHR( _device.mDevice, mSwapchain, &count, mImages ) == VK_INCOMPLETE )
 		{
 			Debug::Error() << "vkGetSwapchainImagesKHR failed." << Debug::Endl();
@@ -306,7 +306,7 @@ namespace fan
 	{
 		for ( uint32_t imageIndex = 0; imageIndex < mImagesCount; imageIndex++ )
 		{
-			assert( mImageViews[imageIndex].mImageView == VK_NULL_HANDLE );
+            fanAssert( mImageViews[imageIndex].mImageView == VK_NULL_HANDLE );
             mImageViews[imageIndex].Create( _device,
                                             mImages[imageIndex],
                                             mSurfaceFormat.format,

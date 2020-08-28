@@ -24,7 +24,7 @@ namespace fan
                             const VkImageAspectFlags _aspectFlags,
                             const VkImageViewType _viewType )
 	{
-		assert( mImageView == VK_NULL_HANDLE );
+        fanAssert( mImageView == VK_NULL_HANDLE );
 
 		VkImageViewCreateInfo imageViewCreateInfo;
 		imageViewCreateInfo.sType							= VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;

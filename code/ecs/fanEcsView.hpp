@@ -27,7 +27,7 @@ namespace fan
 				}
 				else
 				{
-					assert( _view.mSignature[_componentIndex] );
+                    fanAssert( _view.mSignature[_componentIndex] );
                     mArchetypesList = _view.mArchetypes;
                     mComponentIndex = _componentIndex;
                     mChunkIndex     = 0;

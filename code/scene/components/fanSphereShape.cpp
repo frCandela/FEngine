@@ -31,7 +31,7 @@ namespace fan
 	void SphereShape::Destroy( EcsWorld& /*_world*/, EcsEntity /*_entity*/, EcsComponent& _component )
 	{
 		SphereShape& sphereShape = static_cast<SphereShape&>( _component );
-		assert( sphereShape.mSphereShape != nullptr );
+        fanAssert( sphereShape.mSphereShape != nullptr );
 		delete sphereShape.mSphereShape;
 		sphereShape.mSphereShape = nullptr;
 	}

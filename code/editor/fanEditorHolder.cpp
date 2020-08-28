@@ -144,7 +144,7 @@ namespace fan
             world.AddSingletonType<EditorSelection>();
             world.AddSingletonType<EditorCopyPaste>();
             world.AddSingletonType<EditorGizmos>();
-            world.AddTagType<tag_editorOnly>();
+            world.AddTagType<TagEditorOnly>();
 
             RenderWorld& renderWorld = world.GetSingleton<RenderWorld>();
             renderWorld.mIsHeadless = ( &game != &GetCurrentGame() );
@@ -311,7 +311,7 @@ namespace fan
 
                 if( isCurrentWorld )
                 {
-                    assert( logicIsThisFrame );
+                    fanAssert( logicIsThisFrame );
                     EditorCamera& editorCamera = world.GetSingleton<EditorCamera>();
                     Scene       & scene        = world.GetSingleton<Scene>();
                     // only update the editor camera when we are using it
@@ -630,7 +630,7 @@ namespace fan
     //========================================================================================================
     void EditorHolder::OnCurrentGameSelect( const int _index )
     {
-        assert( _index < (int)mGames.size() );
+        fanAssert( _index < (int)mGames.size() );
 
         mCurrentGame = _index;
 

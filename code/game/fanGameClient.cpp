@@ -238,7 +238,7 @@ namespace fan
 			}
 
 			gameData.mSpaceshipSynced = true;
-			assert( time.mFrameIndex == lastFrame );
+            fanAssert( time.mFrameIndex == lastFrame );
 		}
 	}
 
@@ -260,7 +260,7 @@ namespace fan
 				time.mFrameIndex++;
 			}
 
-            mWorld.Run<S_ProcessTimedOutPackets>();
+            mWorld.Run<SProcessTimedOutPackets>();
             mWorld.Run<SClientDetectServerTimeout>( _delta );
             mWorld.Run<SClientRunReplication>( _delta );
 			SpawnManager::Update( mWorld );

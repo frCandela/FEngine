@@ -3,6 +3,7 @@
 #include <cctype>	
 #include "imgui/imgui.h"
 #include "core/input/fanInput.hpp"
+#include "core/fanAssert.hpp"
 
 namespace fan
 {
@@ -10,7 +11,7 @@ namespace fan
 	//========================================================================================================
 	Keyboard::Keyboard()
 	{
-		assert( mKeysPressed.size() == mKeysReleased.size() );
+		fanAssert( mKeysPressed.size() == mKeysReleased.size() );
 		const uint64_t max = std::numeric_limits<uint64_t>::max();
 		for ( int buttonIndex = 0; buttonIndex < (int) mKeysPressed.size(); buttonIndex++ )
 		{

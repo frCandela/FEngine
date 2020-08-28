@@ -211,7 +211,7 @@ namespace fan
 		static_assert( std::is_base_of< EcsComponent, _ComponentType>::value );
 
 		const int nextTypeIndex = NumComponents();
-		assert( mNextTagIndex >= nextTypeIndex );
+        fanAssert( mNextTagIndex >= nextTypeIndex );
 
 		// Set component info
 		EcsComponentInfo info;

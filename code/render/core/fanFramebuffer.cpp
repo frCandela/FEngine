@@ -17,7 +17,7 @@ namespace fan
 	{		
 		for( int i = 0; i < (int)_framesCount; i++ )
 		{
-			assert( mFrameBuffers[i] == VK_NULL_HANDLE );
+            fanAssert( mFrameBuffers[i] == VK_NULL_HANDLE );
 		
 			VkFramebufferCreateInfo framebufferCreateInfo;
 			framebufferCreateInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
@@ -56,7 +56,7 @@ namespace fan
 	{
 		for( int i = 0; i < (int)_framesCount; i++ )
 		{
-			assert( mFrameBuffers[i] == VK_NULL_HANDLE );
+            fanAssert( mFrameBuffers[i] == VK_NULL_HANDLE );
 
 			VkFramebufferCreateInfo framebufferCreateInfo;
 			framebufferCreateInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;

@@ -154,7 +154,7 @@ namespace fan
                        ( ( Joystick::Get().GetButton( joystickID, mButtonPositive ) ? 1.f : 0.f ) +
                          ( Joystick::Get().GetButton( joystickID, mButtonNegative ) ? -1.f : 0.f ) );
             default:
-                assert( false );
+                fanAssert( false );
                 return 0.f;
         }
 	}
@@ -291,7 +291,7 @@ namespace ImGui
 
 			} break;
 			default:
-				assert( false );
+                fanAssert( false );
 				break;
 			}
 

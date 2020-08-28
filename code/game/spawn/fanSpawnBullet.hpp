@@ -21,7 +21,7 @@ namespace fan
 		//====================================================================================================
 		struct SpawnBullet
 		{
-			static const SpawnID  s_id = SSID( "SpawnBullet" );
+			static const SpawnID sID = SSID( "SpawnBullet" );
 
 			//================================================================
 			//================================================================
@@ -32,7 +32,7 @@ namespace fan
             {
 				SpawnInfo info;
 				info.spawnFrameIndex = _spawnFrameIndex;
-				info.spawnID = s_id;
+				info.spawnID = sID;
 
 				// Write data to packet
 				info.data << _position[0] << _position[2];

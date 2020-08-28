@@ -79,7 +79,7 @@ namespace fan
                                                           VkDeviceSize _alignment,
                                                           const int _index )
 	{
-		assert( _index < (int)mBindingData.size() );
+        fanAssert( _index < (int)mBindingData.size() );
 		for ( int bufferIndex = 0; bufferIndex < (int)_count; bufferIndex++ )
 		{
 			mBindingData[ _index ].mBuffers[ bufferIndex ].Destroy( _device );
@@ -96,7 +96,7 @@ namespace fan
                                       const void* _data,
                                       VkDeviceSize _size, VkDeviceSize _offset )
 	{
-		assert( _indexBinding >= 0 && _indexBinding < mBindingData.size() );
+        fanAssert( _indexBinding >= 0 && _indexBinding < mBindingData.size() );
 		mBindingData[ _indexBinding ].mBuffers[ _indexBuffer ].SetData( _device, _data, _size, _offset );
 	}
 
@@ -262,8 +262,8 @@ namespace fan
                                                          const size_t _count,
                                                          VkDeviceSize _sizeBuffer,
                                                          VkDeviceSize _alignment )
-	{		
-		assert( _count <= SwapChain::sMaxFramesInFlight );
+	{
+        fanAssert( _count <= SwapChain::sMaxFramesInFlight );
 		for ( int bufferIndex = 0; bufferIndex < (int)_count; bufferIndex++ )
 		{
             mBuffers[bufferIndex].Create( _device,

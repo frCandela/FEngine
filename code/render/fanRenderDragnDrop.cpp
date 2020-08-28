@@ -29,7 +29,7 @@ namespace ImGui
 		{
 			if ( const ImGuiPayload* payload = ImGui::AcceptDragDropPayload( "dragndrop_texture" ) )
 			{
-				assert( payload->DataSize == sizeof( fan::Texture** ) );
+                fanAssert( payload->DataSize == sizeof( fan::Texture** ) );
 				_texture = *( fan::Texture** )payload->Data;
 			}
 			ImGui::EndDragDropTarget();
@@ -62,7 +62,7 @@ namespace ImGui
 		{
 			if ( const ImGuiPayload* payload = ImGui::AcceptDragDropPayload( "dragndrop_mesh" ) )
 			{
-				assert( payload->DataSize == sizeof( fan::Mesh** ) );
+                fanAssert( payload->DataSize == sizeof( fan::Mesh** ) );
 				_mesh = *( fan::Mesh** )payload->Data;
 			}
 			ImGui::EndDragDropTarget();

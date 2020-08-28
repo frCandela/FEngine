@@ -229,7 +229,7 @@ namespace fan
 
 					if( spaceShip.mDeathFx == nullptr )
 					{
-						Debug::Error() << "S_PlayerDeath: SpaceShip has no death fx" << Debug::Endl();
+						Debug::Error() << "SPlayerDeath: SpaceShip has no death fx" << Debug::Endl();
 					}
 					else
 					{

@@ -79,7 +79,7 @@ namespace fan
 			bool itemClicked = false;
 			if( ImGui::BeginMenu( "New node" ) )
 			{
-				assert( mLastSceneNodeRightClicked != nullptr );
+                fanAssert( mLastSceneNodeRightClicked != nullptr );
 				Scene& scene = *mLastSceneNodeRightClicked->mScene;
 				EcsWorld& world = *scene.mWorld;
 				btVector3 origin = btVector3::Zero();
@@ -274,7 +274,7 @@ namespace fan
 		ImGui::ComponentPayload payload = ImGui::FanBeginDragDropTargetComponent<SceneNode>( world );
 		if( payload.IsValid() )
 		{
-			assert( payload.mComponentType == SceneNode::Info::sType );
+            fanAssert( payload.mComponentType == SceneNode::Info::sType );
 			SceneNode& nodeDrop1 = scene.mWorld->GetComponent<SceneNode>( scene.mWorld->GetEntity( payload.mHandle) );
 			if( &nodeDrop1 != &_node )
 			{
@@ -305,7 +305,7 @@ namespace fan
 		ImGui::ComponentPayload payload2 = ImGui::FanBeginDragDropTargetComponent<SceneNode>( world );
 		if( payload2.IsValid() )
 		{
-			assert( payload2.mComponentType == SceneNode::Info::sType );
+            fanAssert( payload2.mComponentType == SceneNode::Info::sType );
 			SceneNode& nodeDrop2 = world.GetComponent<SceneNode>( world.GetEntity( payload2.mHandle ) );
 			nodeDrop2.SetParent( &_node );
 		}

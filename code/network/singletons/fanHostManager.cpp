@@ -32,7 +32,7 @@ namespace fan
 	//========================================================================================================
 	EcsHandle HostManager::CreateHost( EcsWorld& _world, IpAddress _ip, const Port _port )
 	{
-		assert( FindHost( _ip, _port ) == 0 );
+        fanAssert( FindHost( _ip, _port ) == 0 );
 
 		// Create an ecs entity associated with the host
 		SceneNode& rootNode = _world.GetComponent<SceneNode>( _world.GetEntity( mNetRootNodeHandle ) );
@@ -72,7 +72,7 @@ namespace fan
 		// delete the host ip/port entry
 		HostConnection& hostConnection = _world.GetComponent< HostConnection >( entity );
 		auto it = mHostHandles.find( { hostConnection.mIp, hostConnection.mPort } );
-		assert( it != mHostHandles.end() );
+        fanAssert( it != mHostHandles.end() );
 		mHostHandles.erase( it );
 
 		Debug::Log() << "host disconnected "

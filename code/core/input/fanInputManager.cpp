@@ -92,7 +92,7 @@ namespace fan
 	//========================================================================================================
 	float InputManager::GetAxis( const std::string& _name, const int _joystickIDOverride )
 	{
-		assert( mAxis.find( _name ) != mAxis.end() );
+        fanAssert( mAxis.find( _name ) != mAxis.end() );
 		Axis& axis = mAxis[ _name ];
 		return  axis.GetValue( _joystickIDOverride );
 	}

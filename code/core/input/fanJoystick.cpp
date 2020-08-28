@@ -14,7 +14,7 @@ namespace fan
 	//========================================================================================================
 	bool Joystick::IsConnected( const JoystickID _GLFW_JOYSTICK ) const
 	{
-		assert( _GLFW_JOYSTICK <= NUM_JOYSTICK );
+        fanAssert( _GLFW_JOYSTICK <= NUM_JOYSTICK );
 		return glfwJoystickPresent( _GLFW_JOYSTICK ) == GLFW_TRUE;
 	}
 
@@ -120,7 +120,7 @@ namespace fan
 				hatAxisY = -1.f;
 				break;
 			default:
-				assert( false );
+                fanAssert( false );
 				break;
 			}
 
@@ -182,7 +182,7 @@ namespace fan
 	//========================================================================================================
 	std::string  Joystick::GetAxisName( const Joystick::Axis _key )
 	{
-		if ( _key >= 0 ) { return s_axisNames[ _key ]; }
+		if ( _key >= 0 ) { return sAxisNames[ _key ]; }
 		else { return "               "; }
 	}
 
@@ -190,7 +190,7 @@ namespace fan
 	//========================================================================================================
 	std::string  Joystick::GetButtonName( const Button _button )
 	{
-		if ( _button >= 0 ) { return s_buttonsNames[ _button ]; }
+		if ( _button >= 0 ) { return sButtonsNames[ _button ]; }
 		else { return "               "; }
 	}
 
@@ -205,7 +205,7 @@ namespace fan
 
     //========================================================================================================
     //========================================================================================================
-    const char* Joystick::s_axisNames[GLFW_GAMEPAD_AXIS_LAST + 1] =
+    const char* Joystick::sAxisNames[GLFW_GAMEPAD_AXIS_LAST + 1] =
     {
         "LEFT_X         ",
         "LEFT_Y         ",
@@ -215,7 +215,7 @@ namespace fan
         "RIGHT_TRIGGER  ",
     };
 
-	const char* Joystick::s_buttonsNames[ GLFW_GAMEPAD_BUTTON_LAST + 1 ] =
+	const char* Joystick::sButtonsNames[GLFW_GAMEPAD_BUTTON_LAST + 1 ] =
 	{
         "A              ",
         "B              ",
@@ -234,7 +234,7 @@ namespace fan
         "DPAD_LEFT      ",
 	};
 
-    const std::vector<Joystick::Axis> Joystick::s_axesList =
+    const std::vector<Joystick::Axis> Joystick::sAxesList =
     {
         Joystick::LEFT_X,
         Joystick::LEFT_Y,
@@ -244,7 +244,7 @@ namespace fan
         Joystick::RIGHT_TRIGGER,
     };
 
-	const std::vector< Joystick::Button > Joystick::s_buttonsList =
+	const std::vector< Joystick::Button > Joystick::sButtonsList =
 	{
 	    Joystick::A,
 		Joystick::B,

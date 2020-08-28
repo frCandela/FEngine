@@ -172,7 +172,7 @@ namespace fan
                     eruption.mPreviousLightAttenuation + delta * ( target - eruption.mPreviousLightAttenuation );
 		}break;
 		default:
-			assert( false );
+            fanAssert( false );
 			break;
 		}
 	}

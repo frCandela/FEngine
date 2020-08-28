@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdlib.h>
+#include "core/fanAssert.hpp"
 
 namespace fan
 {
@@ -25,8 +26,8 @@ namespace fan
 		size_t	Alignment() const { return mAlignment; }
 		void	SetAlignement( const size_t _alignment )
 		{
-			assert( std::_Is_pow_2( _alignment ) );
-			assert( _alignment > sizeof( T ) && mAlignment >> 1 < sizeof( T ) );
+            fanAssert( std::_Is_pow_2( _alignment ) );
+            fanAssert( _alignment > sizeof( T ) && mAlignment >> 1 < sizeof( T ) );
 
             mAlignment = _alignment;
 		}
@@ -34,7 +35,7 @@ namespace fan
 		size_t	Size() const { return mSize; }
 		void Resize( size_t _size )
 		{
-			assert( mAlignment > 0 );
+            fanAssert( mAlignment > 0 );
 
 			void* oldData = mData;
 
@@ -52,7 +53,7 @@ namespace fan
 
 		T& operator[]( const int& _pos )
 		{
-			assert( mData != nullptr );
+            fanAssert( mData != nullptr );
 			void* adress = static_cast< char* >( mData ) + mAlignment * _pos;
 			return *static_cast< T* >( adress );
 		}

@@ -153,7 +153,7 @@ namespace fan
 			return { 1,0,0,1 };		// Red
 		} break;
 		default:
-			assert( false );
+            fanAssert( false );
 			break;
 		}
 		return { 0,0,0,1 };		// Black

@@ -37,7 +37,7 @@ namespace fan
 		void Reload( EcsWorld& _world );
 		void Save( EcsWorld& _world );
 	private:
-		std::vector< EditorWindow* > m_editorWindows;
+		std::vector< EditorWindow* > mEditorWindows;
 
 		bool mShowImguiDemoWindow = true;
 		bool mShowHull            = false;

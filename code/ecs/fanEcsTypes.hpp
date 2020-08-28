@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <bitset>
+#include "core/fanAssert.hpp"
 
 namespace fan
 {

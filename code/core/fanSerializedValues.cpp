@@ -35,7 +35,7 @@ namespace fan
 		Debug::Log( "Saving value to disk" );
 		Input::Get().Manager().Save( mJson[ mKeysBindingsName ] );
 		std::ofstream outFile( mJsonPath );
-		assert( outFile.is_open() );
+        fanAssert( outFile.is_open() );
 		outFile << mJson;
 		outFile.close();
 	}

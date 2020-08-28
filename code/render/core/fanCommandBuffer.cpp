@@ -7,7 +7,7 @@ namespace fan
 	//========================================================================================================
 	bool CommandBuffer::Create( Device& _device, const int _size, const VkCommandBufferLevel _level )
 	{
-		assert( mBuffers[0] == VK_NULL_HANDLE && mBuffers[1] == VK_NULL_HANDLE&& mBuffers[2] == VK_NULL_HANDLE );
+        fanAssert( mBuffers[0] == VK_NULL_HANDLE && mBuffers[1] == VK_NULL_HANDLE&& mBuffers[2] == VK_NULL_HANDLE );
 
 		VkCommandBufferAllocateInfo commandBufferAllocateInfo;
 		commandBufferAllocateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;

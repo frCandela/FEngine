@@ -40,7 +40,7 @@ namespace fan
 			for ( const PacketInput::InputData& inputData : _packet.mInputs )
 			{
 				const FrameIndex mostRecentFrame = mInputs.back().mFrameIndex;
-				//assert( inputData.frameIndex <= mostRecentFrame + 1 );
+				//fanAssert( inputData.frameIndex <= mostRecentFrame + 1 );
 				if( inputData.mFrameIndex == mostRecentFrame + 1 )
 				{
 					mInputs.push( inputData );

@@ -96,7 +96,7 @@ namespace fan
                     gameHolder.Run();
                 } break;
                 default:
-                    assert( false );
+                    fanAssert( false );
                     break;
             }
 

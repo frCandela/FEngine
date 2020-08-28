@@ -28,7 +28,7 @@ namespace fan
 		const Json* token = FindToken( _json, _name );
 		if ( token != nullptr )
 		{
-			assert( !_outPtr.IsValid() );
+            fanAssert( !_outPtr.IsValid() );
 			_outPtr.Init( *token );
 			_outPtr.Resolve();
 			return true;
@@ -43,7 +43,7 @@ namespace fan
 		const Json* token = FindToken( _json, _name );
 		if ( token != nullptr )
 		{
-			assert( !_outPtr.IsValid() );
+            fanAssert( !_outPtr.IsValid() );
 			_outPtr.Init( *token );
 			_outPtr.Resolve();
 			return true;

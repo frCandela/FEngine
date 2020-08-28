@@ -76,7 +76,7 @@ namespace fan
 				const EcsEntity entity = replicationIt.GetEntity();
 				const EcsHandle handle = _world.GetHandle( entity );
 				const EntityReplication& entityReplication = *replicationIt;
-				assert( handle != 0 );
+                fanAssert( handle != 0 );
                 const PacketReplication packet = HostReplication::BuildEntityPacket( _world,
                                                                                      handle,
                                                                                      entityReplication.mComponentTypes );

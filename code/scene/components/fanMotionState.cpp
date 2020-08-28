@@ -32,7 +32,7 @@ namespace fan
 	void MotionState::Destroy( EcsWorld& /*_world*/, EcsEntity /*_entity*/, EcsComponent& _component )
 	{
 		MotionState& motionState = static_cast<MotionState&>( _component );
-		assert( motionState.mMotionState != nullptr );
+        fanAssert( motionState.mMotionState != nullptr );
 		delete motionState.mMotionState;
 		motionState.mMotionState = nullptr;
 	}

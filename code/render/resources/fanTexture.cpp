@@ -204,8 +204,7 @@ namespace fan
 		if ( vkCreateImage( _device.mDevice, &imageInfo, nullptr, &mImage ) != VK_SUCCESS )
 			throw std::runtime_error( "failed to create image!" );
 
-		Debug::Get() << Debug::Severity::log << std::hex << "VkImage               ";
-        Debug::Get() << mImage << std::dec << Debug::Endl();
+		Debug::Log() << std::hex << "VkImage               " << mImage << std::dec << Debug::Endl();
 
 		// Allocate memory for the image
 		VkMemoryRequirements memRequirements;
@@ -363,10 +362,10 @@ namespace fan
 
 	    if( mPixels == nullptr ) { return; }
 
-		assert( mMemory == VK_NULL_HANDLE );
-		assert( mImageView == VK_NULL_HANDLE );
-		assert( mImage == VK_NULL_HANDLE );
-		assert( mPixels != nullptr );
+        fanAssert( mMemory == VK_NULL_HANDLE );
+        fanAssert( mImageView == VK_NULL_HANDLE );
+        fanAssert( mImage == VK_NULL_HANDLE );
+        fanAssert( mPixels != nullptr );
 
 		VkDeviceSize imageSize = mExtent.width * mExtent.height * 4 * sizeof( unsigned char );
 

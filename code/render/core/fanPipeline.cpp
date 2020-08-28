@@ -184,8 +184,7 @@ namespace fan
             Debug::Error( "Could not allocate command pool." );
             return false;
         }
-        Debug::Get()
-                << Debug::Severity::log
+        Debug::Log()
                 << std::hex
                 << "VkPipelineLayout      "
                 << mPipelineLayout
@@ -232,8 +231,7 @@ namespace fan
         _device.AddDebugName( (uint64_t)mPipelineLayout, "Pipeline" );
         _device.AddDebugName( (uint64_t)mPipeline, "Pipeline" );
 
-        Debug::Get()
-                << Debug::Severity::log
+        Debug::Log()
                 << std::hex
                 << "VkPipeline            "
                 << mPipeline

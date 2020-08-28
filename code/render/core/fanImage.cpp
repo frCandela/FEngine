@@ -32,8 +32,8 @@ namespace fan
                         const VkImageUsageFlags _usage,
                         const VkMemoryPropertyFlags _memoryProperties )
 	{
-		assert( mImage == VK_NULL_HANDLE );
-		assert( mMemory == VK_NULL_HANDLE );		
+        fanAssert( mImage == VK_NULL_HANDLE );
+        fanAssert( mMemory == VK_NULL_HANDLE );
 
 		VkImageCreateInfo imageCreateInfo;
 		imageCreateInfo.sType					= VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;

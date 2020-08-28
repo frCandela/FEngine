@@ -41,8 +41,8 @@ namespace fan
 	template< typename _ResourceType >
 	ResourcePtr<_ResourceType>::ResourcePtr( Resource* _resource ) :
 		mResource( _resource )
-	{		
-		assert( mResource == nullptr );
+	{
+        fanAssert( mResource == nullptr );
 		SetResource( _resource );
 	}
 

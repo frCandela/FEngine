@@ -8,7 +8,7 @@ namespace fan
 	//========================================================================================================
 	void DescriptorSampler::Create( Device& _device, VkSampler _sampler ) 
 	{
-		assert( _sampler != VK_NULL_HANDLE );
+        fanAssert( _sampler != VK_NULL_HANDLE );
 
 		// Descriptor pool
 		{

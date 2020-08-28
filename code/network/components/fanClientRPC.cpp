@@ -29,7 +29,7 @@ namespace fan
 	//========================================================================================================
 	void ClientRPC::RegisterUnwrapMethod( const RpcID _rpcID, const RpcUnwrapMethod _unwrapMethod )
 	{
-		assert( mNameToRPCTable.find( _rpcID ) == mNameToRPCTable.end() );
+        fanAssert( mNameToRPCTable.find( _rpcID ) == mNameToRPCTable.end() );
         mNameToRPCTable[_rpcID] = _unwrapMethod;
 	}
 

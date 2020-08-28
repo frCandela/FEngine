@@ -74,8 +74,8 @@ namespace fan
 	// if _handle=0 (by default), generate a new handle
 	//========================================================================================================
 	SceneNode& Scene::CreateSceneNode( const std::string _name, SceneNode* const _parentNode, EcsHandle _handle )
-	{		
-		assert( _parentNode != nullptr || mRootNodeHandle == 0 ); // we can have only one root node
+	{
+        fanAssert( _parentNode != nullptr || mRootNodeHandle == 0 ); // we can have only one root node
 
 		EcsEntity entity = mWorld->CreateEntity();
 
@@ -90,7 +90,7 @@ namespace fan
 			mWorld->SetHandle( entity, _handle );
 			handle = _handle;
 		}
-		assert( mNodes.find( handle ) == mNodes.end() );
+        fanAssert( mNodes.find( handle ) == mNodes.end() );
 		mNodes.insert( handle );
 
 		SceneNode& sceneNode = mWorld->AddComponent<SceneNode>( entity );

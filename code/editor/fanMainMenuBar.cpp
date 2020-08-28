@@ -31,9 +31,9 @@ namespace fan
 	{
 		SerializedValues::Get().SetBool( "show_imguidemo", mShowImguiDemoWindow );
 
-		for ( int windowIndex = 0; windowIndex < (int)m_editorWindows.size(); windowIndex++ )
+		for ( int windowIndex = 0; windowIndex < (int)mEditorWindows.size(); windowIndex++ )
 		{
-			delete m_editorWindows[ windowIndex ];
+			delete mEditorWindows[ windowIndex ];
 		}
 	}
 
@@ -42,7 +42,7 @@ namespace fan
 	//========================================================================================================
 	void MainMenuBar::SetWindows( std::vector< EditorWindow* > _editorWindows )
 	{
-		m_editorWindows = _editorWindows;
+        mEditorWindows = _editorWindows;
 	}
 
 	//========================================================================================================
@@ -82,9 +82,9 @@ namespace fan
 		ImGui::End();
 
 		// Draw editor windows
-		for ( int windowIndex = 0; windowIndex < (int)m_editorWindows.size(); windowIndex++ )
+		for ( int windowIndex = 0; windowIndex < (int)mEditorWindows.size(); windowIndex++ )
 		{
-			m_editorWindows[ windowIndex ]->Draw( _world );
+			mEditorWindows[ windowIndex ]->Draw( _world );
 		}
 
 		// Draw imgui demo
@@ -153,9 +153,9 @@ namespace fan
 				ImGui::Icon( ImGui::Imgui16, { 16, 16 } ); ImGui::SameLine();
 				ImGui::MenuItem( "Imgui demo", nullptr, &mShowImguiDemoWindow );
 
-				for ( size_t windowIndex = 0; windowIndex < m_editorWindows.size(); windowIndex++ )
+				for ( size_t windowIndex = 0; windowIndex < mEditorWindows.size(); windowIndex++ )
 				{
-					EditorWindow* window = m_editorWindows[ windowIndex ];
+					EditorWindow* window = mEditorWindows[ windowIndex ];
 					ImGui::Icon( window->GetIconType(), { 16,16 } ); ImGui::SameLine();
 					bool showWindow = window->IsVisible();
 					if ( ImGui::MenuItem( window->GetName().c_str(), nullptr, &showWindow ) )

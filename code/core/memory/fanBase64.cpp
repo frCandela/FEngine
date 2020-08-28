@@ -4,7 +4,7 @@ namespace fan
 {
 	//========================================================================================================
 	//========================================================================================================
-	static const std::string s_base64Chars =
+	static const std::string sBase64Chars =
 		"ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 		"abcdefghijklmnopqrstuvwxyz"
 		"0123456789+/";
@@ -39,7 +39,7 @@ namespace fan
 
 				for ( i = 0; i < 4; i++ )
 				{
-					encodedString += s_base64Chars[ charArray4[ i ] ];
+					encodedString += sBase64Chars[ charArray4[ i ] ];
 				}
 				i = 0;
 			}
@@ -58,7 +58,7 @@ namespace fan
 
 			for ( j = 0; ( j < i + 1 ); j++ )
 			{
-				encodedString += s_base64Chars[ charArray4[ j ] ];
+				encodedString += sBase64Chars[ charArray4[ j ] ];
 			}
 
 			while ( ( i++ < 3 ) )
@@ -90,7 +90,7 @@ namespace fan
 			{
 				for ( i = 0; i < 4; i++ )
 				{
-					charArray4[ i ] = s_base64Chars.find( charArray4[ i ] ) & 0xff;
+					charArray4[ i ] = sBase64Chars.find( charArray4[ i ] ) & 0xff;
 				}
 
 				charArray3[ 0 ] = ( charArray4[ 0 ] << 2 ) + ( ( charArray4[ 1 ] & 0x30 ) >> 4 );
@@ -109,7 +109,7 @@ namespace fan
 		{
 			for ( j = 0; j < i; j++ )
 			{
-				charArray4[ j ] = s_base64Chars.find( charArray4[ j ] ) & 0xff;
+				charArray4[ j ] = sBase64Chars.find( charArray4[ j ] ) & 0xff;
 			}
 
 			charArray3[ 0 ] = ( charArray4[ 0 ] << 2 ) + ( ( charArray4[ 1 ] & 0x30 ) >> 4 );

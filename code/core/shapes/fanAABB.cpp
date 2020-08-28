@@ -1,5 +1,6 @@
 #include "core/shapes/fanAABB.hpp"
 #include "core/math/fanMathUtils.hpp"
+#include "core/fanAssert.hpp"
 
 namespace fan
 {
@@ -16,7 +17,7 @@ namespace fan
             mLow( _low ),
             mHigh( _high )
 	{
-		assert( _low[ 0 ] <= _high[ 0 ] && _low[ 1 ] <= _high[ 1 ] && _low[ 2 ] <= _high[ 2 ] );
+        fanAssert( _low[ 0 ] <= _high[ 0 ] && _low[ 1 ] <= _high[ 1 ] && _low[ 2 ] <= _high[ 2 ] );
 	}
 
 	//========================================================================================================
@@ -54,7 +55,7 @@ namespace fan
 		}
         mLow  = ToBullet( low );
         mHigh = ToBullet( high );
-		assert( mLow[ 0 ] <= mHigh[ 0 ] && mLow[ 1 ] <= mHigh[ 1 ] && mLow[ 2 ] <= mHigh[ 2 ] );
+        fanAssert( mLow[ 0 ] <= mHigh[ 0 ] && mLow[ 1 ] <= mHigh[ 1 ] && mLow[ 2 ] <= mHigh[ 2 ] );
 	}
 
 	//========================================================================================================

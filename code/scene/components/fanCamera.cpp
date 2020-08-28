@@ -101,8 +101,8 @@ namespace fan
 	Ray Camera::ScreenPosToRay( const Transform& _cameraTransform,
 	                            const btVector2& _screenSpacePosition ) const
 	{
-		assert( _screenSpacePosition.x() >= -1.f && _screenSpacePosition.x() <= 1.f );
-		assert( _screenSpacePosition.y() >= -1.f && _screenSpacePosition.y() <= 1.f );
+        fanAssert( _screenSpacePosition.x() >= -1.f && _screenSpacePosition.x() <= 1.f );
+        fanAssert( _screenSpacePosition.y() >= -1.f && _screenSpacePosition.y() <= 1.f );
 
 		if( mType == Type::Perspective )
 		{

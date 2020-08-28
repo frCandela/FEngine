@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include <map>
+#include "core/fanAssert.hpp"
 
 namespace fan
 {
@@ -20,7 +21,7 @@ namespace fan
 
 		VkPhysicalDevice	mPhysicalDevice	= VK_NULL_HANDLE;
 		VkDevice			mDevice			= VK_NULL_HANDLE;
-		VkCommandPool		mCommandPool		= VK_NULL_HANDLE;
+		VkCommandPool		mCommandPool	= VK_NULL_HANDLE;
 		VkQueue				mGraphicsQueue	= VK_NULL_HANDLE;
 
 		VkPhysicalDeviceProperties			mDeviceProperties;

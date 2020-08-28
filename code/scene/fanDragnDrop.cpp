@@ -38,7 +38,7 @@ namespace ImGui
 		{
 			if ( const ImGuiPayload* payload = ImGui::AcceptDragDropPayload( "dragndrop_prefab" ) )
 			{
-				assert( payload->DataSize == sizeof( fan::Prefab** ) );
+                fanAssert( payload->DataSize == sizeof( fan::Prefab** ) );
 				_prefab = *( fan::Prefab** )payload->Data;
 			}
 			ImGui::EndDragDropTarget();

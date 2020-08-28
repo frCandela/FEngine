@@ -53,7 +53,7 @@ namespace fan
 	//================================================================================================================================
 	void PrefabManager::ResolvePtr( ResourcePtr<Prefab>& _resourcePtr )
 	{
-		assert( !_resourcePtr.IsValid() );
+        fanAssert( !_resourcePtr.IsValid() );
 
 		PrefabPtr& prefabPtr = static_cast< PrefabPtr& >( _resourcePtr );
 		Prefab * prefab = Load( prefabPtr.GetPath() );

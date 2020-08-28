@@ -14,23 +14,22 @@ namespace fan
 	{
 	public:
 
-		static const size_t s_nameSize = 32;
-		Signal<> onProfilingEnd;
+		static const size_t sNameSize          = 32;
+		Signal<>            mOnProfilingEnd;
 
 		//================================================================
 		//================================================================
 		struct Interval
 		{
-
 			Clock::TimePoint mTime;
-			char             mName[ s_nameSize ];
+			char             mName[ sNameSize ];
 			size_t           mID;
 
 			bool IsOpening() const { return mName[ 0 ] != '\0'; }
 			bool IsClosing() const { return mName[ 0 ] == '\0'; }
 		};
 
-		size_t	OpenTimeInterval( const char _name[ s_nameSize ] );
+		size_t	OpenTimeInterval( const char _name[ sNameSize ] );
 		void	CloseTimeInterval( const size_t _index );
 
 		void Begin();
@@ -50,7 +49,7 @@ namespace fan
 	class ScopedProfile
 	{
 	public:
-		ScopedProfile( const char  _name[ Profiler::s_nameSize ] );
+		ScopedProfile( const char  _name[ Profiler::sNameSize ] );
 		~ScopedProfile();
 
 	private:

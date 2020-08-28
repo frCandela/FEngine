@@ -23,7 +23,7 @@ namespace fan
                           const float _maxAnisotropy,
                           const VkFilter _filter )
 	{
-		assert( mSampler == VK_NULL_HANDLE );
+        fanAssert( mSampler == VK_NULL_HANDLE );
 
 		VkSamplerCreateInfo samplerInfo = {};
 		samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;

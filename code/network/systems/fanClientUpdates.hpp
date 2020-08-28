@@ -40,7 +40,7 @@ namespace fan
 					// saves previous player state
 					const Rigidbody& rb = _world.GetComponent<Rigidbody>( spaceshipID );
 					const Transform& transform = _world.GetComponent<Transform>( spaceshipID );
-					assert( rb.mRigidbody->getTotalForce().isZero() );
+                    fanAssert( rb.mRigidbody->getTotalForce().isZero() );
 					PacketPlayerGameState playerState;
 					playerState.mFrameIndex      = time.mFrameIndex;
 					playerState.mPosition        = transform.GetPosition();
@@ -124,7 +124,7 @@ namespace fan
 					EcsSingleton& singleton = _world.GetSingleton( staticIndex );
 					const EcsSingletonInfo& info = _world.GetSingletonInfo( staticIndex );
 					info.netLoad( singleton, packet.mPacketData );
-					assert( packet.mPacketData.endOfPacket() );
+                    fanAssert( packet.mPacketData.endOfPacket() );
 				}
 				replication.mReplicationListSingletons.clear();
 

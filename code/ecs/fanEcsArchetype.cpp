@@ -21,7 +21,7 @@ namespace fan
 		{
 			if( _signature[i] )
 			{
-				assert( _componentsInfo[i].mIndex == i );
+                fanAssert( _componentsInfo[i].mIndex == i );
 				AddComponentType( _componentsInfo[i] );
 			}
 		}

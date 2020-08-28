@@ -64,7 +64,7 @@ namespace fan
 		// Copy indices
 		const std::vector<size_t>& indexBuffer = hull.getIndexBuffer();
 		mIndices.reserve( indexBuffer.size() );
-		assert( indexBuffer.size() % 3 == 0 );
+        fanAssert( indexBuffer.size() % 3 == 0 );
 		for ( int indexIndex = 0; indexIndex < (int)indexBuffer.size() / 3; indexIndex++ )
 		{
 			mIndices.push_back( ( uint32_t ) indexBuffer[3 * indexIndex + 0 ] );

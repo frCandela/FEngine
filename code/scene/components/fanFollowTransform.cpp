@@ -34,7 +34,7 @@ namespace fan
 	//========================================================================================================
 	void FollowTransform::UpdateLocalTransform( EcsWorld& _world, EcsEntity _entityID )
 	{
-		assert( _world.HasComponent<FollowTransform>( _entityID ) );
+        fanAssert( _world.HasComponent<FollowTransform>( _entityID ) );
 
 		FollowTransform& follower = _world.GetComponent<FollowTransform>( _entityID );
 

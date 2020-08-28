@@ -130,8 +130,7 @@ namespace fan
 
             if( vkEndCommandBuffer( commandBuffer ) != VK_SUCCESS )
             {
-                Debug::Get()
-                        << Debug::Severity::error
+                Debug::Error()
                         << "Could not record command buffer "
                         << _index
                         << "."
@@ -140,8 +139,7 @@ namespace fan
         }
         else
         {
-            Debug::Get()
-                    << Debug::Severity::error
+            Debug::Error()
                     << "Could not record command buffer "
                     << _index
                     << "."

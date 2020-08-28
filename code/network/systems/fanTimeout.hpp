@@ -9,9 +9,9 @@
 
 namespace fan
 {
-	//==============================================================================================================================================================
-	//==============================================================================================================================================================
-	struct S_DetectHostTimout : EcsSystem
+	//========================================================================================================
+	//========================================================================================================
+	struct SDetectHostTimout : EcsSystem
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world )
 		{
@@ -28,7 +28,8 @@ namespace fan
 			auto sceneNodeIt = _view.begin<SceneNode>();
 			auto hostConnectionit = _view.begin<HostConnection>();
 			auto hostGameDataIt = _view.begin<HostGameData>();
-			for( ; hostConnectionit != _view.end<HostConnection>(); ++hostConnectionit, ++sceneNodeIt, ++hostGameDataIt )
+            for( ; hostConnectionit != _view.end<HostConnection>();
+                   ++hostConnectionit, ++sceneNodeIt, ++hostGameDataIt )
 			{
 				const HostConnection& connection = *hostConnectionit;
 				const SceneNode& sceneNode = *sceneNodeIt;
@@ -44,7 +45,10 @@ namespace fan
 						const HostGameData& hostGameData = *hostGameDataIt;
 						if( hostGameData.mSpaceshipID != 0 )
 						{
-							_world.Run<SReplicateOnAllHosts>( ClientRPC::RPCDespawn( hostGameData.mSpaceshipID ), HostReplication::ResendUntilReplicated, sceneNode.mHandle );
+                            _world.Run<SReplicateOnAllHosts>(
+                                    ClientRPC::RPCDespawn( hostGameData.mSpaceshipID ),
+                                    HostReplication::ResendUntilReplicated,
+                                    sceneNode.mHandle );
 						}
 					}
 				}
@@ -52,17 +56,19 @@ namespace fan
 		}
 	};
 
-	//==============================================================================================================================================================
-	//==============================================================================================================================================================
-	struct S_ProcessTimedOutPackets : EcsSystem
+	//========================================================================================================
+	//========================================================================================================
+	struct SProcessTimedOutPackets : EcsSystem
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world )
 		{
 			return _world.GetSignature<ReliabilityLayer>();
 		}
 		static void Run( EcsWorld& /*_world*/, const EcsView& _view )
-		{
-			for( auto reliabilityLayerIt = _view.begin<ReliabilityLayer>(); reliabilityLayerIt != _view.end<ReliabilityLayer>(); ++reliabilityLayerIt )
+        {
+            for( auto reliabilityLayerIt = _view.begin<ReliabilityLayer>();
+                 reliabilityLayerIt != _view.end<ReliabilityLayer>();
+                 ++reliabilityLayerIt )
 			{
 				ReliabilityLayer& reliabilityLayer = *reliabilityLayerIt;
 

@@ -31,7 +31,7 @@ namespace fan
 	void BoxShape::Destroy( EcsWorld& /*_world*/, EcsEntity /*_entity*/, EcsComponent& _component )
 	{
 		BoxShape& boxShape = static_cast<BoxShape&>( _component );
-		assert( boxShape.mBoxShape != nullptr );
+        fanAssert( boxShape.mBoxShape != nullptr );
 		delete boxShape.mBoxShape;
 		boxShape.mBoxShape = nullptr;
 	}

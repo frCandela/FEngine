@@ -177,7 +177,7 @@ namespace fan
 		case HostConnection::NeedingApprouval:	return "NeedingApprouval";	break;
 		case HostConnection::PendingApprouval:	return "PendingApprouval";	break;
 		case HostConnection::Connected:			return "Connected";			break;
-		default:			assert( false );		return "error";				break;
+		default:		fanAssert( false );		return "error";				break;
 		}
 	}
 
@@ -192,7 +192,7 @@ namespace fan
 		case HostConnection::NeedingApprouval:	return  Color::sYellow.ToImGui(); break;
 		case HostConnection::PendingApprouval:	return  Color::sYellow.ToImGui(); break;
 		case HostConnection::Connected:			return  Color::sGreen.ToImGui(); break;
-		default:			assert( false );	return  Color::sPurple.ToImGui(); break;
+		default:			fanAssert( false );	return  Color::sPurple.ToImGui(); break;
 		}
 	}
 

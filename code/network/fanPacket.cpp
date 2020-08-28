@@ -60,8 +60,8 @@ namespace fan
 	//========================================================================================================
 	void PacketReplication::Write( Packet& _packet ) const
 	{
- 		assert( mPacketData.getDataSize() < std::numeric_limits<sf::Uint8>::max() );
- 		assert( mReplicationType != ReplicationType::Count );
+        fanAssert( mPacketData.getDataSize() < std::numeric_limits<sf::Uint8>::max() );
+        fanAssert( mReplicationType != ReplicationType::Count );
  
  		_packet << PacketTypeInt( PacketType::Replication );
  		_packet << sf::Uint8( mReplicationType );
