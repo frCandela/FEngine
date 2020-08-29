@@ -2,8 +2,6 @@
 
 #include <sstream>
 #include "render/fanRenderDragnDrop.hpp"
-#include "render/fanRenderGlobal.hpp"
-#include "editor/fanImguiIcons.hpp"
 #include "editor/fanModals.hpp"
 
 namespace ImGui
@@ -36,7 +34,10 @@ namespace ImGui
 		if ( openModal )
 		{
 			ImGui::OpenPopup( modalName.c_str() );
-			m_pathBuffer = "content/models";
+			if( m_pathBuffer.empty() )
+            {
+                m_pathBuffer = fan::RenderGlobal::sContentPath;
+            }
 		}
 		ImGui::SameLine();
 
@@ -123,7 +124,10 @@ namespace ImGui
 		if ( openModal )
 		{
 			ImGui::OpenPopup( modalName.c_str() );
-			m_pathBuffer = "content/models";
+			if( m_pathBuffer.empty() )
+            {
+                m_pathBuffer = fan::RenderGlobal::sContentPath;
+            }
 		}
 		ImGui::SameLine();
 

@@ -76,7 +76,7 @@ namespace  fan
     //========================================================================================================
     void SlotPtr::SetSingletonSlot( uint32_t _singletonType, SlotBase* _slot )
     {
-        fanAssert( mWorld->SafeGetSingletonInfo( _singletonType ) != nullptr );
+        fanAssert( _singletonType == 0 || mWorld->SafeGetSingletonInfo( _singletonType ) != nullptr );
         mCallData->mHandle = 0;
         mCallData->mType = _singletonType;
         mCallData->mSlot = _slot;

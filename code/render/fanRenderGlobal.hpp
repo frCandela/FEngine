@@ -17,6 +17,8 @@ namespace fan
 		static const std::set<std::string> sSceneExtensions;
 		static const std::set<std::string> sPrefabExtensions;
 
+        static const char* sContentPath;
+
 		static const char* sDefaultMesh;
 		static const char* sDefaultTexture;
 		static const char* sWhiteTexture;
