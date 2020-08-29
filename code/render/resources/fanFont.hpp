@@ -34,34 +34,21 @@ namespace fan
             std::map<uint32_t, Glyph> mGlyphs;
             Texture*                  mTexture;
 
-            int GetPixelSize() const { return mGlyphSize * mSize ; }
-            const Glyph& GetGlyph( const uint32_t _codepoint ) const
-            {
-                auto it = mGlyphs.find( _codepoint );
-                if( it == mGlyphs.end() )
-                {
-                    std::vector<uint32_t> defaultUnicode;
-                    Font::ToUTF8( "?", defaultUnicode );
-                    it = mGlyphs.find( defaultUnicode[0] );
-                }
-                //fanAssert( it != mGlyphs.end() );
-                return it->second;
-            }
+            int          GetPixelSize() const { return mGlyphSize * mSize ; }
+            const Glyph& GetGlyph( const uint32_t _codePoint ) const;
         };
 
-        Font(){}
-        ~Font(){ FT_Done_Face( mFace ); }
-        bool LoadFont( const std::string _path );
+        Font( FT_Library _ftLib, const std::string _path );
+        ~Font(){ if( IsValid() ) { FT_Done_Face( mFace ); } }
         const Atlas* GenerateAtlas( TextureManager& _textureManager,  int _height );
         const Atlas* FindAtlas( const int _height );
+        const std::string& GetPath() const { return mPath; }
+        bool IsValid() const { return ! mPath.empty(); }
 
         static void ToUTF8( const std::string& _str, std::vector<uint32_t >& _outUnicode );
-        static bool InitFreetype();
-        static void ClearFreetype();
-
     private:
-        static FT_Library   sFreetypeLib;
         FT_Face             mFace;
         std::vector<Atlas>  mAtlases;
+        std::string         mPath;
     };
 }

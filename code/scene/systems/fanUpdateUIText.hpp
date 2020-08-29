@@ -22,7 +22,7 @@ namespace fan
         static void Run( EcsWorld& _world, const EcsView& _view )
         {
             RenderResources& resources = _world.GetSingleton<RenderResources>();
-            Font& font = *resources.mFont;
+            Font& font = *resources.mFontManager->Load( RenderGlobal::sDefaultGameFont );
 
             auto textIt = _view.begin<UIText>();
             auto rendererIt = _view.begin<UIRenderer>();

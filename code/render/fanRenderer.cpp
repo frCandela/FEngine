@@ -17,9 +17,11 @@
 namespace fan
 {
 	//========================================================================================================
-	//========================================================================================================
-    Renderer::Renderer( Window& _window, const ViewType _viewType )
-            : mWindow( _window ), mDevice( _window.mDevice ), mViewType( _viewType )
+    //========================================================================================================
+    Renderer::Renderer( Window& _window, const ViewType _viewType ) :
+            mWindow( _window ),
+            mDevice( _window.mDevice ),
+            mViewType( _viewType )
     {
 		const uint32_t imagesCount = mWindow.mSwapchain.mImagesCount;
 		mGameExtent = mWindow.mSwapchain.mExtent;

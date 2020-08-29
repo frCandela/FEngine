@@ -12,7 +12,8 @@ WARNINGS_POP()
 #include "render/resources/fanMeshManager.hpp"
 #include "render/resources/fanMesh2DManager.hpp"
 #include "render/resources/fanTextureManager.hpp"
-#include "render/fanFont.hpp"
+#include "render/resources/fanFontManager.hpp"
+#include "render/resources/fanFont.hpp"
 #include "render/core/fanCommandBuffer.hpp"
 #include "render/core/fanRenderPass.hpp"
 #include "render/core/fanSampler.hpp"
@@ -67,7 +68,7 @@ namespace fan
 		MeshManager     mMeshManager;
         Mesh2DManager   mMesh2DManager;
         TextureManager  mTextureManager;
-        Font            mDefaultFont;
+        FontManager     mFontManager;
 		Window&         mWindow;
 		Device&         mDevice;
 

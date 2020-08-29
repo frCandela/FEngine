@@ -8,7 +8,7 @@ namespace fan
     class MeshManager;
     class Mesh2DManager;
     class TextureManager;
-    class Font;
+    class FontManager;
 
     //========================================================================================================
     //========================================================================================================
@@ -24,17 +24,17 @@ namespace fan
         static void SetupResources( MeshManager& _meshManager,
                                     Mesh2DManager& _mesh2DManager,
                                     TextureManager& _textureManager,
-                                    Font& _font );
+                                    FontManager& _font );
 
         void SetPointers( MeshManager* _meshManager,
                           Mesh2DManager* _mesh2DManager,
                           TextureManager* _textureManager,
-                          Font* _font );
+                          FontManager* _font );
 
         MeshManager   * mMeshManager    = nullptr;
         Mesh2DManager * mMesh2DManager  = nullptr;
         TextureManager* mTextureManager = nullptr;
-        Font *          mFont           = nullptr;
+        FontManager *   mFontManager           = nullptr;
 
     };
 }

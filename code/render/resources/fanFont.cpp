@@ -1,47 +1,27 @@
-#include "render/fanFont.hpp"
+#include "fanFont.hpp"
 #include "SFML/System/Utf.hpp"
 #include "core/fanDebug.hpp"
 #include "render/resources/fanTextureManager.hpp"
 
 namespace fan
 {
-    FT_Library Font::sFreetypeLib = nullptr;
     //========================================================================================================
     //========================================================================================================
-    bool Font::InitFreetype()
+    Font::Font( FT_Library _ftLib, const std::string _path )
     {
-        if (FT_Init_FreeType( &sFreetypeLib ) )
+        if( FT_New_Face( _ftLib, _path.c_str(), 0, &mFace ) )
         {
-            Debug::Log( "ERROR::FREETYPE: Could not init FreeType Library" );
-            return false;
-        }
-        return true;
-    }
-
-    //========================================================================================================
-    //========================================================================================================
-    void Font::ClearFreetype()
-    {
-        FT_Done_FreeType( sFreetypeLib );
-    }
-
-    //========================================================================================================
-    //========================================================================================================
-    bool Font::LoadFont( const std::string _path )
-    {
-        if( FT_New_Face( sFreetypeLib, _path.c_str(), 0, &mFace ) )
-        {
-            Debug::Error( "Freetype: Failed to load font" );
-            return false;
+            Debug::Error() << "Freetype: Failed to load font " << _path << Debug::Endl();
+            return;
         }
 
         if( FT_Select_Charmap( mFace, FT_ENCODING_UNICODE ) )
         {
-            Debug::Error( "Freetype: font has no unicode charmap" );
-            return false;
+            Debug::Error() <<  "Freetype: font " << _path << " has no unicode charmap" << Debug::Endl();
+            return;
         }
 
-        return true;
+        mPath = _path;
     }
 
     //========================================================================================================
@@ -56,6 +36,21 @@ namespace fan
             it = sf::Utf8::decode(it, _str.end(), codepoint );
             _outUnicode.push_back(codepoint);
         }
+    }
+
+    //========================================================================================================
+    //========================================================================================================
+    const Font::Glyph& Font::Atlas::GetGlyph( const uint32_t _codePoint ) const
+    {
+        auto it = mGlyphs.find( _codePoint );
+        if( it == mGlyphs.end() )
+        {
+            std::vector<uint32_t> defaultUnicode;
+            Font::ToUTF8( "?", defaultUnicode );
+            it = mGlyphs.find( defaultUnicode[0] );
+        }
+        fanAssert( it != mGlyphs.end() );
+        return it->second;
     }
 
     //========================================================================================================

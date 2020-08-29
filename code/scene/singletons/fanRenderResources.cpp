@@ -4,7 +4,8 @@
 #include "render/resources/fanMesh2D.hpp"
 #include "render/resources/fanTextureManager.hpp"
 #include "render/resources/fanMesh2DManager.hpp"
-#include "render/fanFont.hpp"
+#include "render/resources/fanFontManager.hpp"
+#include "render/resources/fanFont.hpp"
 
 namespace fan
 {
@@ -31,12 +32,12 @@ namespace fan
     void RenderResources::SetPointers( MeshManager* _meshManager,
                                        Mesh2DManager* _mesh2DManager,
                                        TextureManager* _textureManager,
-                                       Font* _font  )
+                                       FontManager* _fontManager  )
     {
         mMeshManager   = _meshManager;
         mMesh2DManager = _mesh2DManager;
         mTextureManager = _textureManager;
-        mFont = _font;
+        mFontManager = _fontManager;
     }
 
     //========================================================================================================
@@ -44,18 +45,17 @@ namespace fan
     void RenderResources::SetupResources( MeshManager& _meshManager,
                                           Mesh2DManager& _mesh2DManager,
                                           TextureManager& _textureManager,
-                                          Font& _font )
+                                          FontManager& _fontManager )
     {
         ResourcePtr<Mesh>::sOnResolve.Connect( &MeshManager::ResolvePtr, &_meshManager );
         ResourcePtr< Texture >::sOnResolve.Connect( &TextureManager::ResolvePtr, &_textureManager );
+
+        _fontManager.Load( RenderGlobal::sDefaultGameFont );
 
         _meshManager.Load( RenderGlobal::sDefaultMesh );
         Mesh2D* quad2D = RenderResources::CreateMesh2DQuad();
         _mesh2DManager.Add( quad2D, RenderGlobal::sMesh2DQuad );
         _textureManager.Load( RenderGlobal::sWhiteTexture );
-
-        Font::InitFreetype();
-        _font.LoadFont( RenderGlobal::sDefaultGameFont );
     }
 
     //========================================================================================================

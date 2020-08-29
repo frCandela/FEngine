@@ -7,7 +7,7 @@
 #include "core/input/fanInput.hpp"
 #include "network/singletons/fanTime.hpp"
 #include "render/fanRenderer.hpp"
-#include "render/fanFont.hpp"
+#include "render/resources/fanFont.hpp"
 #include "editor/windows/fanPreferencesWindow.hpp"	
 #include "editor/windows/fanSingletonsWindow.hpp"
 #include "editor/windows/fanInspectorWindow.hpp"	
@@ -84,7 +84,7 @@ namespace fan
         RenderResources::SetupResources( mRenderer->mMeshManager,
                                          mRenderer->mMesh2DManager,
                                          mRenderer->mTextureManager,
-                                         mRenderer->mDefaultFont );
+                                         mRenderer->mFontManager );
         SceneResources::SetupResources( mPrefabManager );
 
 
@@ -153,7 +153,7 @@ namespace fan
             renderResources.SetPointers( &mRenderer->mMeshManager,
                                          &mRenderer->mMesh2DManager,
                                          &mRenderer->mTextureManager,
-                                         &mRenderer->mDefaultFont);
+                                         &mRenderer->mFontManager);
 
             SceneResources& sceneResources = world.GetSingleton<SceneResources>();
             sceneResources.SetPointers( &mPrefabManager );
