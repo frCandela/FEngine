@@ -1,6 +1,7 @@
 #include "ecs/fanEcsWorld.hpp"
 #include "core/time/fanProfiler.hpp"
 #include "core/fanAssert.hpp"
+#include "core/fanDebug.hpp"
 
 namespace fan
 {
@@ -545,6 +546,21 @@ namespace fan
 			}
 		}
 	}
+
+    //========================================================================================================
+    //========================================================================================================
+    EcsView EcsWorld::Match( const EcsSignature& _signature ) const
+    {
+        EcsView view( mTypeToIndex, _signature );
+        for( auto it = mArchetypes.begin(); it != mArchetypes.end(); ++it )
+        {
+            if( ( it->first & _signature ) == _signature && !it->second->Empty() )
+            {
+                view.mArchetypes.push_back( it->second );
+            }
+        }
+        return view;
+    }
 
 	//========================================================================================================
 	//========================================================================================================

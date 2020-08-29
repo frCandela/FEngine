@@ -14,7 +14,7 @@ namespace fan
     void EcsArchetype::Create( const std::vector<EcsComponentInfo>& _componentsInfo,
                                const EcsSignature& _signature )
 	{
-        mSignature = EcsSignature( 0);
+        mSignature = _signature;
 
 		const int numComponents = int( _componentsInfo.size() );
 		for( int i = 0; i < numComponents; i++ )
@@ -32,7 +32,6 @@ namespace fan
 	//========================================================================================================
 	void EcsArchetype::AddComponentType( const EcsComponentInfo& _componentsInfo )
 	{
-        mSignature[ _componentsInfo.mIndex ] = 1;
         mChunkVectors[_componentsInfo.mIndex].Create( _componentsInfo.copy,
                                                       _componentsInfo.mSize,
                                                       _componentsInfo.mAlignment );
