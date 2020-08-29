@@ -26,7 +26,7 @@ namespace fan
 	{
 		EditorGrid& editorGrid = static_cast<EditorGrid&>( _component );
 		editorGrid.mOffset     = btVector3::Zero();
-		editorGrid.mColor      = Color( 0.161f, 0.290f, 0.8f, 0.478f );
+		editorGrid.mColor      = Color( 0.164f, 0.287f, 0.331f, 1.f );
 		editorGrid.mSpacing    = 1.f;
 		editorGrid.mLinesCount = 10;
 		editorGrid.mIsVisible  = true;
@@ -91,7 +91,7 @@ namespace fan
         ImGui::MenuItem( "visible", nullptr, &grid.mIsVisible );
         ImGui::DragFloat( "spacing", &grid.mSpacing, 0.25f, 0.f, 100.f );
         ImGui::DragInt( "lines count", &grid.mLinesCount, 1.f, 0, 1000 );
-        ImGui::ColorEdit3( "color", &grid.mColor[0], ImGui::fanColorEditFlags );
+        ImGui::ColorEdit4( "color", &grid.mColor[0], ImGui::fanColorEditFlags );
         ImGui::DragFloat3( "offset", &grid.mOffset[0] );
     }
 }

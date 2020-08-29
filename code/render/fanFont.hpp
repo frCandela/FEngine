@@ -20,7 +20,7 @@ namespace fan
     public:
         struct Glyph {
             glm::ivec2 mUVPos;   // pixels
-            glm::ivec2 mUVSize;  // pixels
+            glm::ivec2 mSize;  // pixels
             glm::ivec2 mBearing; // pixels
             long       mAdvance; // 1/64th pixels
         };

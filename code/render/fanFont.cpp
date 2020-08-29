@@ -151,11 +151,11 @@ namespace fan
             };
             mGlyphs[charcode] = glyph;
 
-            for( int x = 0; x < glyph.mUVSize.x; x++ )
+            for( int x = 0; x < glyph.mSize.x; x++ )
             {
-                for( int y = 0; y < glyph.mUVSize.y; y++ )
+                for( int y = 0; y < glyph.mSize.y; y++ )
                 {
-                    const size_t glyphLocalOffset = y * glyph.mUVSize.x + x;
+                    const size_t glyphLocalOffset = y * glyph.mSize.x + x;
                     const char greyLevel = mFace->glyph->bitmap.buffer[ glyphLocalOffset ];
 
                     glm::ivec2   pixel = glyphOrigin + glm::ivec2( x, y );
