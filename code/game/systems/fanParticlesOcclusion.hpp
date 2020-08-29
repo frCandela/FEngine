@@ -14,7 +14,7 @@ namespace fan
 		{
 			return
 				_world.GetSignature< Particle >() |
-				_world.GetSignature< tag_sunlight_occlusion>();
+				_world.GetSignature<TagSunlightOcclusion>();
 		}
 
 		static void Run( EcsWorld& _world, const EcsView& _view, const float _delta )

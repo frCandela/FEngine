@@ -123,7 +123,7 @@ namespace fan
 		mWorld.AddSingletonType<HostManager>();
 		mWorld.AddSingletonType<Time>();
 
-        mWorld.AddTagType<tag_sunlight_occlusion>();
+        mWorld.AddTagType<TagSunlightOcclusion>();
 
         Game& game = mWorld.GetSingleton<Game>();
         game.mIsServer = true;

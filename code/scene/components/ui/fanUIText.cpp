@@ -4,6 +4,7 @@
 #include "scene/components/ui/fanUIText.hpp"
 #include "scene/fanSceneSerializable.hpp"
 #include "scene/singletons/fanRenderResources.hpp"
+#include "scene/fanSceneTags.hpp"
 
 namespace fan
 {
@@ -22,13 +23,14 @@ namespace fan
 
 	//========================================================================================================
 	//========================================================================================================
-	void UIText::Init( EcsWorld& _world, EcsEntity /*_entity*/, EcsComponent& _component )
+	void UIText::Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
 	{
         UIText& uiText = static_cast<UIText&>( _component );
         uiText.mText  = "";
-        uiText.mModified = true; 
         uiText.mMesh2D = new Mesh2D();
         _world.GetSingleton<RenderResources>().mMesh2DManager->Add( uiText.mMesh2D, "text_mesh" );
+
+        _world.AddTag<TagUIModified>( _entity );
 	}
 
     //========================================================================================================
@@ -49,7 +51,7 @@ namespace fan
 
     //========================================================================================================
 	//========================================================================================================
-	void UIText::OnGui( EcsWorld& /*_world*/, EcsEntity /*_entityID*/, EcsComponent& _component )
+	void UIText::OnGui( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
 	{
         UIText& uiText = static_cast<UIText&>( _component );
 
@@ -59,7 +61,7 @@ namespace fan
 			if( ImGui::Button( "##clear_text" ) )
 			{
                 uiText.mText.clear();
-                uiText.mModified = true;
+                _world.AddTag<TagUIModified>( _entity );
 			}
 			ImGui::SameLine();
 			static const size_t maxSize = 64;
@@ -68,9 +70,8 @@ namespace fan
 			if( ImGui::InputText("text", mTextBuffer, 64 ) )
             {
                 uiText.mText = mTextBuffer;
-                uiText.mModified = true;
+                _world.AddTag<TagUIModified>( _entity );
             }
-            ImGui::Checkbox("modified", &uiText.mModified );
 		} ImGui::PopItemWidth();
 	}
 }

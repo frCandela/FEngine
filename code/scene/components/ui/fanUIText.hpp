@@ -18,7 +18,6 @@ namespace fan
 		static void Load( EcsComponent& _component, const Json& _json );
 
 		std::string mText;
-		bool        mModified;
 		Mesh2D *    mMesh2D;
 	};
 }

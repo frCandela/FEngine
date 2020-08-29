@@ -13,9 +13,10 @@ namespace fan
     {
         static EcsSignature GetSignature( const EcsWorld& _world )
         {
-            return _world.GetSignature<UITransform>() |
+            return  _world.GetSignature<UITransform>() |
                     _world.GetSignature<UIRenderer>() |
-                    _world.GetSignature<UIText>();
+                    _world.GetSignature<UIText>() |
+                    _world.GetSignature<TagUIModified>();
         }
 
         static void Run( EcsWorld& _world, const EcsView& _view )
@@ -28,6 +29,8 @@ namespace fan
             auto transformIt = _view.begin<UITransform>();
             for( ; transformIt != _view.end<UITransform>(); ++transformIt, ++rendererIt, ++textIt )
             {
+                _world.RemoveTag<TagUIModified>( textIt.GetEntity() );
+
                 UITransform& transform = *transformIt;
                 UIRenderer&  renderer = *rendererIt;
                 UIText&      text = *textIt;
@@ -38,9 +41,6 @@ namespace fan
                     renderer.mTexture = nullptr;
                     continue;
                 }
-
-                if( !text.mModified ){ continue; }
-                text.mModified = false;
 
                 std::vector<uint32_t> unicode;
                 Font::ToUTF8( text.mText, unicode );

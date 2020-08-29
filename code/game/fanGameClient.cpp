@@ -134,7 +134,9 @@ namespace fan
 		mWorld.AddSingletonType<LinkingContext>();
 		mWorld.AddSingletonType<Time>();
 
-		mWorld.AddTagType<tag_sunlight_occlusion>();
+		mWorld.AddTagType<TagSunlightOcclusion>();
+		mWorld.AddTagType<TagUIModified>();
+
 	}
 
 	//========================================================================================================
