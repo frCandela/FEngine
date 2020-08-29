@@ -34,7 +34,7 @@ namespace fan
         MeshManager   * mMeshManager    = nullptr;
         Mesh2DManager * mMesh2DManager  = nullptr;
         TextureManager* mTextureManager = nullptr;
-        FontManager *   mFontManager           = nullptr;
+        FontManager *   mFontManager    = nullptr;
 
     };
 }

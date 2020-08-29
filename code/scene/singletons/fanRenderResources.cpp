@@ -1,5 +1,4 @@
-#include "fanRenderResources.hpp"
-
+#include "scene/singletons/fanRenderResources.hpp"
 #include "render/resources/fanMesh.hpp"
 #include "render/resources/fanMesh2D.hpp"
 #include "render/resources/fanTextureManager.hpp"
@@ -49,6 +48,7 @@ namespace fan
     {
         ResourcePtr<Mesh>::sOnResolve.Connect( &MeshManager::ResolvePtr, &_meshManager );
         ResourcePtr< Texture >::sOnResolve.Connect( &TextureManager::ResolvePtr, &_textureManager );
+        ResourcePtr< Font >::sOnResolve.Connect( &FontManager::ResolvePtr, &_fontManager );
 
         _fontManager.Load( RenderGlobal::sDefaultGameFont );
 

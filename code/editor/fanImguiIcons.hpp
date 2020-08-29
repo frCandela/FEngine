@@ -29,6 +29,7 @@ namespace ImGui
         LockOpen16,
         LockClosed16,
         Network16,
+        Font16,
 
 		// special
 		Play16,

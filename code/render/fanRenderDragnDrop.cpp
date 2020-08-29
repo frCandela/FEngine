@@ -1,6 +1,7 @@
 #include "render/fanRenderDragnDrop.hpp"
 #include "render/resources/fanTexture.hpp"
 #include "render/resources/fanMesh.hpp"
+#include "render/resources/fanFont.hpp"
 
 namespace ImGui
 {
@@ -24,17 +25,17 @@ namespace ImGui
 	//========================================================================================================
 	fan::Texture* FanBeginDragDropTargetTexture()
 	{
-		fan::Texture* _texture = nullptr;
+		fan::Texture* texture = nullptr;
 		if ( ImGui::BeginDragDropTarget() )
 		{
 			if ( const ImGuiPayload* payload = ImGui::AcceptDragDropPayload( "dragndrop_texture" ) )
 			{
                 fanAssert( payload->DataSize == sizeof( fan::Texture** ) );
-				_texture = *( fan::Texture** )payload->Data;
+                texture = *( fan::Texture** )payload->Data;
 			}
 			ImGui::EndDragDropTarget();
 		}
-		return _texture;
+		return texture;
 	}
 
 	//========================================================================================================
@@ -57,16 +58,49 @@ namespace ImGui
 	//========================================================================================================
 	fan::Mesh* FanBeginDragDropTargetMesh()
 	{
-		fan::Mesh* _mesh = nullptr;
+		fan::Mesh* mesh = nullptr;
 		if ( ImGui::BeginDragDropTarget() )
 		{
 			if ( const ImGuiPayload* payload = ImGui::AcceptDragDropPayload( "dragndrop_mesh" ) )
 			{
                 fanAssert( payload->DataSize == sizeof( fan::Mesh** ) );
-				_mesh = *( fan::Mesh** )payload->Data;
+                mesh = *( fan::Mesh** )payload->Data;
 			}
 			ImGui::EndDragDropTarget();
 		}
-		return _mesh;
+		return mesh;
 	}
+
+    //========================================================================================================
+    //========================================================================================================
+    void FanBeginDragDropSourceFont( fan::Font* _font, ImGuiDragDropFlags _flags )
+    {
+        if ( _font != nullptr )
+        {
+            if ( ImGui::BeginDragDropSource( _flags ) )
+            {
+                ImGui::SetDragDropPayload( "dragndrop_font", &_font, sizeof( fan::Font** ) );
+                ImGui::Icon( ImGui::IconType::Font16, { 16, 16 } ); ImGui::SameLine();
+                ImGui::Text( _font->GetPath().c_str() );
+                ImGui::EndDragDropSource();
+            }
+        }
+    }
+
+    //========================================================================================================
+    //========================================================================================================
+    fan::Font* FanBeginDragDropTargetFont()
+    {
+        fan::Font* font = nullptr;
+        if ( ImGui::BeginDragDropTarget() )
+        {
+            if ( const ImGuiPayload* payload = ImGui::AcceptDragDropPayload( "dragndrop_font" ) )
+            {
+                fanAssert( payload->DataSize == sizeof( fan::Font** ) );
+                font = *( fan::Font** )payload->Data;
+            }
+            ImGui::EndDragDropTarget();
+        }
+        return font;
+    }
 }

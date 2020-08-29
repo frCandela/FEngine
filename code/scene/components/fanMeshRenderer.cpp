@@ -48,12 +48,5 @@ namespace fan
     {
         MeshRenderer& meshRenderer = static_cast<MeshRenderer&>( _component );
         ImGui::FanMeshPtr( "mesh", meshRenderer.mMesh );
-
-        // num triangles
-        std::stringstream ss;
-        ss << "triangles: ";
-        ss << ( *meshRenderer.mMesh != nullptr ? meshRenderer.mMesh->mIndices.size() / 3 : 0 );
-        ImGui::Text( ss.str().c_str() );
-
     }
 }

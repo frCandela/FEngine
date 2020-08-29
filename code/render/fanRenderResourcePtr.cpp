@@ -21,29 +21,29 @@ namespace ImGui
                                  std::filesystem::path( texture->mPath ).filename().string();
 
 		// Set button icon & modal
-		const std::string modalName = std::string( "Find texture (" ) + _label + ")";
-		static std::filesystem::path m_pathBuffer;
-		bool openModal = false;
+		const std::string            modalName = std::string( "Find texture (" ) + _label + ")";
+		static std::filesystem::path sPathBuffer;
 		ImGui::PushID( _label );
 		{
 			if ( ImGui::ButtonIcon( ImGui::IconType::Image16, { 16, 16 } ) )
 			{
-				openModal = true;
+                _ptr = nullptr;
+                returnValue = true;
 			}
-		} ImGui::PopID();
-		if ( openModal )
-		{
-			ImGui::OpenPopup( modalName.c_str() );
-			if( m_pathBuffer.empty() )
-            {
-                m_pathBuffer = fan::RenderGlobal::sContentPath;
-            }
 		}
+		ImGui::PopID();
 		ImGui::SameLine();
-
 		// name button 
 		const float width = 0.6f * ImGui::GetWindowWidth() - ImGui::GetCursorPosX() + 23;
-		ImGui::Button( name.c_str(), ImVec2( width, 0.f ) ); ImGui::SameLine();
+		if( ImGui::Button( name.c_str(), ImVec2( width, 0.f ) ) )
+        {
+            ImGui::OpenPopup( modalName.c_str() );
+            if( sPathBuffer.empty() )
+            {
+                sPathBuffer = fan::RenderGlobal::sContentPath;
+            }
+        }
+		ImGui::SameLine();
 		ImGui::FanBeginDragDropSourceTexture( texture );
 
 		// tooltip
@@ -83,9 +83,9 @@ namespace ImGui
 
 		// Modal set value
         if( ImGui::FanLoadFileModal( modalName.c_str(),
-                                     fan::RenderGlobal::sImagesExtensions, m_pathBuffer ) )
+                                     fan::RenderGlobal::sImagesExtensions, sPathBuffer ) )
         {
-			_ptr.Init( m_pathBuffer.string() );
+			_ptr.Init( sPathBuffer.string() );
 			_ptr.Resolve();
 			returnValue = true;
 		}
@@ -110,36 +110,39 @@ namespace ImGui
                 std::filesystem::path( mesh->mPath ).filename().string();
 
 		// Set button icon & modal
-		const std::string modalName = std::string( "Find mesh (" ) + _label + ")";
-		static std::filesystem::path m_pathBuffer;
-		bool openModal = false;
+		const std::string            modalName = std::string( "Find mesh (" ) + _label + ")";
+		static std::filesystem::path sPathBuffer;
 		ImGui::PushID( _label );
 		{
 			if ( ImGui::ButtonIcon( ImGui::IconType::Mesh16, { 16, 16 } ) )
 			{
-				openModal = true;
+                _ptr = nullptr;
+                returnValue = true;
 			}
 		}
 		ImGui::PopID();
-		if ( openModal )
-		{
-			ImGui::OpenPopup( modalName.c_str() );
-			if( m_pathBuffer.empty() )
-            {
-                m_pathBuffer = fan::RenderGlobal::sContentPath;
-            }
-		}
 		ImGui::SameLine();
 
 		// name button 
 		const float width = 0.6f * ImGui::GetWindowWidth() - ImGui::GetCursorPosX() + 8;
-		ImGui::Button( name.c_str(), ImVec2( width, 0.f ) ); ImGui::SameLine();
+		if( ImGui::Button( name.c_str(), ImVec2( width, 0.f ) ) )
+        {
+            ImGui::OpenPopup( modalName.c_str() );
+            if( sPathBuffer.empty() )
+            {
+                sPathBuffer = fan::RenderGlobal::sModelsPath;
+            }
+        }
+		ImGui::SameLine();
 		ImGui::FanBeginDragDropSourceMesh( mesh );
 
 		// tooltip
-		if ( mesh != nullptr )
+		if ( mesh != nullptr && ImGui::IsItemHovered() )
 		{
-			ImGui::FanToolTip( mesh->mPath.c_str() );
+		    ImGui::BeginTooltip();
+		    ImGui::Text( mesh->mPath.c_str() );
+            ImGui::Text( "%d triangles", (int)mesh->mIndices.size() / 3 );
+		    ImGui::EndTooltip();
 		}
 
 		// dragndrop		
@@ -150,16 +153,16 @@ namespace ImGui
 			returnValue = true;
 		}
 
-		// Right click = clear
-		if ( ImGui::IsItemClicked( 1 ) )
-		{
-			_ptr = nullptr;
-			returnValue = true;
-		}
+        // Right click = clear
+        if ( ImGui::IsItemClicked( 1 ) )
+        {
+            _ptr = nullptr;
+            returnValue = true;
+        }
 
-		if ( ImGui::FanLoadFileModal( modalName.c_str(), fan::RenderGlobal::sMeshExtensions, m_pathBuffer ) )
+		if ( ImGui::FanLoadFileModal( modalName.c_str(), fan::RenderGlobal::sMeshExtensions, sPathBuffer ) )
 		{
-			_ptr.Init( m_pathBuffer.string() );
+			_ptr.Init( sPathBuffer.string() );
 			_ptr.Resolve();
 			returnValue = true;
 		}
@@ -169,4 +172,76 @@ namespace ImGui
 
 		return returnValue;
 	}
+
+    //========================================================================================================
+    //========================================================================================================
+    bool FanFontPtr( const char* _label, fan::FontPtr& _ptr )
+    {
+        bool returnValue = false;
+
+        fan::Font* font = *_ptr;
+        const std::string name = ( font == nullptr ) ?
+                "null" :
+                std::filesystem::path( font->GetPath() ).filename().string();
+
+        // Set button icon & modal
+        const std::string            modalName = std::string( "Find font (" ) + _label + ")";
+        static std::filesystem::path sPathBuffer;
+        ImGui::PushID( _label );
+        {
+            if ( ImGui::ButtonIcon( ImGui::IconType::Font16, { 16, 16 } ) )
+            {
+                _ptr = nullptr;
+                returnValue = true;
+            }
+        }
+        ImGui::PopID();
+        ImGui::SameLine();
+
+        // name button
+        const float width = 0.6f * ImGui::GetWindowWidth() - ImGui::GetCursorPosX() + 23;
+        if( ImGui::Button( name.c_str(), ImVec2( width, 0.f ) ) )
+        {
+            ImGui::OpenPopup( modalName.c_str() );
+            if( sPathBuffer.empty() )
+            {
+                sPathBuffer = fan::RenderGlobal::sFontsPath;
+            }
+        }
+        ImGui::SameLine();
+        ImGui::FanBeginDragDropSourceFont( font );
+
+        // tooltip
+        if ( font != nullptr )
+        {
+            ImGui::FanToolTip( font->GetPath().c_str() );
+        }
+
+        // dragndrop
+        fan::Font* fontDrop = ImGui::FanBeginDragDropTargetFont();
+        if ( fontDrop )
+        {
+            _ptr = fontDrop;
+            returnValue = true;
+        }
+
+        // Right click = clear
+        if ( ImGui::IsItemClicked( 1 ) )
+        {
+            _ptr = nullptr;
+            returnValue = true;
+        }
+
+        if ( ImGui::FanLoadFileModal( modalName.c_str(), fan::RenderGlobal::sFontsExtensions, sPathBuffer ) )
+        {
+            _ptr.Init( sPathBuffer.string() );
+            _ptr.Resolve();
+            returnValue = true;
+        }
+
+        ImGui::SameLine();
+        ImGui::Text( _label );
+
+        return returnValue;
+    }
 }

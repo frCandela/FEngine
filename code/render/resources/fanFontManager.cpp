@@ -1,7 +1,8 @@
 #include "render/resources/fanFont.hpp"
+#include "core/fanDebug.hpp"
 #include "core/fanAssert.hpp"
 #include "render/resources/fanFontManager.hpp"
-#include "core/fanDebug.hpp"
+#include "render/fanRenderResourcePtr.hpp"
 
 namespace fan
 {
@@ -82,5 +83,19 @@ namespace fan
             delete font;
         }
         mFonts.clear();
+    }
+
+    //========================================================================================================
+    //========================================================================================================
+    void FontManager::ResolvePtr( ResourcePtr<Font>& _resourcePtr )
+    {
+        fanAssert( ! _resourcePtr.IsValid() );
+        FontPtr& fontPtr = static_cast< FontPtr& >( _resourcePtr );
+        if( fontPtr.GetPath().empty() ){ return; }
+        Font    * font    = Load( fontPtr.GetPath() );
+        if ( font != nullptr )
+        {
+            fontPtr = font;
+        }
     }
 }

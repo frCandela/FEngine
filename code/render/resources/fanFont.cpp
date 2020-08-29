@@ -81,7 +81,7 @@ namespace fan
 
     //========================================================================================================
     //========================================================================================================
-    const Font::Atlas* Font::GenerateAtlas( TextureManager& _textureManager,const int _height )
+    const Font::Atlas* Font::GenerateAtlas( TextureManager& _textureManager, const int _height )
     {
         fanAssert( FindAtlas( _height) == nullptr );
         fanAssert( _height > 0 );
@@ -166,7 +166,7 @@ namespace fan
         }
 
         atlas.mTexture->LoadFromPixels( buffer, { bufferPixelSize,bufferPixelSize  }, 1 );
-        _textureManager.Add( atlas.mTexture, "font" + std::to_string(_height) ) ;
+        _textureManager.Add( atlas.mTexture, mPath + "size_" + std::to_string(_height) ) ;
         mAtlases.push_back( atlas );
         return & *mAtlases.rbegin();
     }

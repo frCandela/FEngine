@@ -6,6 +6,7 @@ namespace fan
 {
 	struct Texture;
 	struct Mesh;
+    class Font;
 }
 
 //===========================================================================================================
@@ -20,4 +21,8 @@ namespace ImGui
     void FanBeginDragDropSourceMesh( fan::Mesh* _mesh,
                                      ImGuiDragDropFlags _flags = ImGuiDragDropFlags_None );
 	fan::Mesh*		FanBeginDragDropTargetMesh();
+
+    void FanBeginDragDropSourceFont( fan::Font* _font,
+                                     ImGuiDragDropFlags _flags = ImGuiDragDropFlags_None );
+    fan::Font*		FanBeginDragDropTargetFont();
 }

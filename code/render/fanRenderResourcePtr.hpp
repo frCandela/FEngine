@@ -3,11 +3,11 @@
 #include "core/resources/fanResourcePtr.hpp"
 #include "render/resources/fanTexture.hpp"
 #include "render/resources/fanMesh.hpp"
+#include "render/resources/fanFont.hpp"
 
 namespace fan
 {
 	//========================================================================================================
-	// Resource pointer for textures
 	//========================================================================================================
 	class TexturePtr : public ResourcePtr<Texture>
 	{
@@ -23,7 +23,6 @@ namespace fan
 	};
 
 	//========================================================================================================
-	// Resource pointer for meshes
 	//========================================================================================================
 	class MeshPtr : public ResourcePtr<Mesh>
 	{
@@ -37,6 +36,21 @@ namespace fan
 	private:
 		std::string mPath;
 	};
+
+    //========================================================================================================
+    //========================================================================================================
+    class FontPtr : public ResourcePtr<Font>
+    {
+    public:
+        FontPtr( Font* _font = nullptr ) : ResourcePtr<Font>( _font ) {}
+
+        void Init( const std::string _path ) { mPath = _path; }
+        const std::string& GetPath() const { return mPath; }
+
+        ResourcePtr& operator=( Font* _resource ) { SetResource( _resource ); return *this; }
+    private:
+        std::string mPath;
+    };
 }
 
 //============================================================================================================
@@ -46,4 +60,5 @@ namespace ImGui
 {
 	bool FanTexturePtr( const char* _label, fan::TexturePtr& _ptr );
 	bool FanMeshPtr( const char* _label, fan::MeshPtr& _ptr );
+    bool FanFontPtr( const char* _label, fan::FontPtr& _ptr );
 }

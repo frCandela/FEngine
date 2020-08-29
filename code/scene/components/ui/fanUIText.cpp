@@ -5,6 +5,8 @@
 #include "scene/fanSceneSerializable.hpp"
 #include "scene/singletons/fanRenderResources.hpp"
 #include "scene/fanSceneTags.hpp"
+#include "render/resources/fanFont.hpp"
+#include "render/fanRenderSerializable.hpp"
 
 namespace fan
 {
@@ -25,12 +27,13 @@ namespace fan
 	//========================================================================================================
 	void UIText::Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
 	{
-        UIText& uiText = static_cast<UIText&>( _component );
-        uiText.mText  = "";
-        uiText.mMesh2D = new Mesh2D();
-        uiText.mSize = 18;
+        UIText& text = static_cast<UIText&>( _component );
+        text.mText   = "";
+        text.mMesh2D = new Mesh2D();
+        text.mSize   = 18;
+        text.mFontPtr = nullptr;
 
-        _world.GetSingleton<RenderResources>().mMesh2DManager->Add( uiText.mMesh2D, "text_mesh" );
+        _world.GetSingleton<RenderResources>().mMesh2DManager->Add( text.mMesh2D, "text_mesh" );
         _world.AddTag<TagUIModified>( _entity );
 	}
 
@@ -38,35 +41,42 @@ namespace fan
     //========================================================================================================
     void UIText::Save( const EcsComponent& _component, Json& _json )
     {
-        const UIText& uiText = static_cast<const UIText&>( _component );
-        Serializable::SaveString( _json, "text", uiText.mText );
-        Serializable::SaveInt( _json, "size", uiText.mSize );
+        const UIText& text = static_cast<const UIText&>( _component );
+        Serializable::SaveString( _json, "text", text.mText );
+        Serializable::SaveInt( _json, "size", text.mSize );
+        Serializable::SaveFontPtr( _json, "font", text.mFontPtr );
     }
 
     //========================================================================================================
     //========================================================================================================
     void UIText::Load( EcsComponent& _component, const Json& _json )
     {
-        UIText& uiText = static_cast<UIText&>( _component );
-        Serializable::LoadString( _json, "text", uiText.mText );
-        Serializable::LoadInt( _json, "size", uiText.mSize );
+        UIText& text = static_cast<UIText&>( _component );
+        Serializable::LoadString( _json, "text", text.mText );
+        Serializable::LoadInt( _json, "size", text.mSize );
+        Serializable::LoadFontPtr( _json, "font", text.mFontPtr );
     }
 
     //========================================================================================================
 	//========================================================================================================
 	void UIText::OnGui( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
 	{
-        UIText& uiText = static_cast<UIText&>( _component );
+        UIText& text = static_cast<UIText&>( _component );
 
 		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() );
 		{
+            if( ImGui::FanFontPtr("font", text.mFontPtr ) )
+            {
+                _world.AddTag<TagUIModified>( _entity );
+            }
+
             if( ImGui::Button( "##clear_font_size" ) )
             {
-                uiText.mSize = 18;
+                text.mSize = 18;
                 _world.AddTag<TagUIModified>( _entity );
             }
             ImGui::SameLine();
-            ImGui::DragInt("size", &uiText.mSize, 1, 8, 300 );
+            ImGui::DragInt( "size", &text.mSize, 1, 8, 300 );
             if( ImGui::IsItemDeactivatedAfterEdit() )
             {
                 _world.AddTag<TagUIModified>( _entity );
@@ -75,16 +85,16 @@ namespace fan
 			// color
 			if( ImGui::Button( "##clear_text" ) )
 			{
-                uiText.mText.clear();
+                text.mText.clear();
                 _world.AddTag<TagUIModified>( _entity );
 			}
 			ImGui::SameLine();
 			static const size_t maxSize = 64;
 			char mTextBuffer[maxSize];
-			memcpy( mTextBuffer, uiText.mText.c_str(), std::min( maxSize, uiText.mText.size() + 1 ) );
+			memcpy( mTextBuffer, text.mText.c_str(), std::min( maxSize, text.mText.size() + 1 ) );
 			if( ImGui::InputText("text", mTextBuffer, 64 ) )
             {
-                uiText.mText = mTextBuffer;
+                text.mText = mTextBuffer;
                 _world.AddTag<TagUIModified>( _entity );
             }
 		} ImGui::PopItemWidth();

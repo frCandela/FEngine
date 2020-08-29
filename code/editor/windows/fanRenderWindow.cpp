@@ -8,6 +8,7 @@
 #include "render/fanRenderer.hpp"
 #include "render/resources/fanMesh.hpp"
 #include "render/resources/fanMesh2D.hpp"
+#include "render/fanRenderDragnDrop.hpp"
 #include "scene/singletons/fanSceneResources.hpp"
 #include "scene/singletons/fanRenderResources.hpp"
 #include "scene/fanPrefabManager.hpp"
@@ -37,6 +38,7 @@ namespace fan
 			for ( Mesh * mesh : renderResources.mMeshManager->GetMeshes() )
 			{
 				ImGui::Text("ref: %d name: %s", mesh->GetRefCount(), mesh->mPath.c_str() );
+                ImGui::FanBeginDragDropSourceMesh( mesh, ImGuiDragDropFlags_SourceAllowNullID );
 			}
 		}
 
@@ -57,8 +59,18 @@ namespace fan
                              tex->mExtent.width,
                              tex->mExtent.height,
                              tex->mPath.c_str() );
+                ImGui::FanBeginDragDropSourceTexture( tex, ImGuiDragDropFlags_SourceAllowNullID );
             }
 		}
+
+        if ( ImGui::CollapsingHeader( "Loaded fonts : " ) )
+        {
+            for ( Font * font : renderResources.mFontManager->GetFonts() )
+            {
+                ImGui::Text( font->GetPath().c_str() );
+                ImGui::FanBeginDragDropSourceFont( font, ImGuiDragDropFlags_SourceAllowNullID );
+            }
+        }
 
 		// Display mesh list
 		if ( ImGui::CollapsingHeader( "Loaded prefabs : " ) )
