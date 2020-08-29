@@ -13,6 +13,8 @@ WARNINGS_POP()
 
 namespace fan
 {
+    class TextureManager;
+
     //========================================================================================================
     //========================================================================================================
     class Font
@@ -25,13 +27,33 @@ namespace fan
             long       mAdvance; // 1/64th pixels
         };
 
+        struct Atlas
+        {
+            int                       mGlyphSize = 0;   // max size of the side of a glyph in pixels
+            int                       mSize = 0;        // number of glyph per row/col
+            std::map<uint32_t, Glyph> mGlyphs;
+            Texture*                  mTexture;
+
+            int GetPixelSize() const { return mGlyphSize * mSize ; }
+            const Glyph& GetGlyph( const uint32_t _codepoint ) const
+            {
+                auto it = mGlyphs.find( _codepoint );
+                if( it == mGlyphs.end() )
+                {
+                    std::vector<uint32_t> defaultUnicode;
+                    Font::ToUTF8( "?", defaultUnicode );
+                    it = mGlyphs.find( defaultUnicode[0] );
+                }
+                //fanAssert( it != mGlyphs.end() );
+                return it->second;
+            }
+        };
+
         Font(){}
         ~Font(){ FT_Done_Face( mFace ); }
         bool LoadFont( const std::string _path );
-        bool SetHeight( const int _pixelHeight );
-        Texture* GenerateAtlas();
-        int GetAtlasSize() const { return mGlyphSize * mAtlasSize ; }
-        const Glyph& GetGlyph( const uint32_t _codepoint ) const;
+        const Atlas* GenerateAtlas( TextureManager& _textureManager,  int _height );
+        const Atlas* FindAtlas( const int _height );
 
         static void ToUTF8( const std::string& _str, std::vector<uint32_t >& _outUnicode );
         static bool InitFreetype();
@@ -39,10 +61,7 @@ namespace fan
 
     private:
         static FT_Library   sFreetypeLib;
-
-        int     mAtlasSize = 0; // number of glyph per row/col
-        int     mGlyphSize = 0; // max size of the side of a glyph in pixels
-        FT_Face mFace;
-        std::map< uint32_t, Glyph>  mGlyphs;
+        FT_Face             mFace;
+        std::vector<Atlas>  mAtlases;
     };
 }

@@ -42,17 +42,24 @@ namespace fan
                     continue;
                 }
 
+                const Font::Atlas * atlas = font.FindAtlas( text.mSize );
+                if( atlas == nullptr )
+                {
+                    atlas = font.GenerateAtlas( *resources.mTextureManager, text.mSize );
+                    fanAssert( atlas != nullptr );
+                }
+
                 std::vector<uint32_t> unicode;
                 Font::ToUTF8( text.mText, unicode );
 
                 std::vector<const Font::Glyph*> glyphs;
-                for( uint32_t codePoint : unicode ) { glyphs.push_back( &font.GetGlyph( codePoint ) ); }
+                for( uint32_t codePoint : unicode ) { glyphs.push_back( &atlas->GetGlyph( codePoint ) ); }
 
                 glm::ivec2 textOffset;
                 CalculateTextOffsetAndSize( glyphs, textOffset, transform.mSize );
 
                 std::vector<UIVertex> vertices;
-                const float           atlasPixelSize = (float)font.GetAtlasSize();
+                const float           atlasPixelSize = (float)atlas->GetPixelSize();
                 const glm::vec2       scale          = glm::vec2( atlasPixelSize ) /
                                                        glm::vec2( transform.mSize );
                 long          x = 0;
@@ -83,6 +90,7 @@ namespace fan
 
                 text.mMesh2D->LoadFromVertices( vertices );
                 renderer.mMesh2D = text.mMesh2D;
+                renderer.mTexture = atlas->mTexture;
             }
         }
 

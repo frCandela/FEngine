@@ -280,11 +280,11 @@ namespace fan
             mWorld.Run<SSynchronizeTransformFromMotionState>();
             mWorld.Run<SMoveFollowTransforms>();
 
+            mWorld.Run<SUpdateUIText>();
             mWorld.Run<SAlignUI>();
             mWorld.Run<SUpdateUILayouts>();
             mWorld.Run<SHoverButtons>();
             mWorld.Run<SHighlightButtons>();
-            mWorld.Run<SUpdateUIText>();
 
 			mWorld.Run<SFireWeapons>( _delta );
 			mWorld.Run<SGenerateLightMesh>( _delta );

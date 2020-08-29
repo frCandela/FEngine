@@ -109,7 +109,7 @@ namespace fan
 		bool		IsAlive	( const EcsEntity _entity ) const;
 
 		template< typename _tagOrComponentType >			EcsSignature	GetSignature() const;
-		template< typename _SystemType, typename... _Args > void			            Run( _Args&&... _args );
+		template< typename _SystemType, typename... _Args > void Run( _Args&&... _args );
 		template< typename _SystemType > EcsView Match() const;
         EcsView Match( const EcsSignature& _signature ) const;
 
@@ -272,7 +272,11 @@ namespace fan
 	template< typename _SystemType, typename... _Args > void EcsWorld::Run( _Args&&... _args )
 	{
 		static_assert( std::is_base_of< EcsSystem, _SystemType >::value );
-		_SystemType::Run( *this, Match<_SystemType>(), _args... );
+		EcsView view = Match<_SystemType>();
+		if( ! view.Empty() )
+		{
+		    _SystemType::Run( *this, view, _args... );
+		}
 	}
 
 	//========================================================================================================

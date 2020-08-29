@@ -1,6 +1,7 @@
 #include "render/fanFont.hpp"
 #include "SFML/System/Utf.hpp"
 #include "core/fanDebug.hpp"
+#include "render/resources/fanTextureManager.hpp"
 
 namespace fan
 {
@@ -45,20 +46,6 @@ namespace fan
 
     //========================================================================================================
     //========================================================================================================
-    bool Font::SetHeight( const int _pixelHeight )
-    {
-        if(  FT_Set_Pixel_Sizes( mFace, 0, _pixelHeight ) != 0 )
-        {
-            Debug::Error() << "Font::SetHeight " << _pixelHeight << " failed" << Debug::Endl();
-            return false;
-        }
-        mGlyphSize = _pixelHeight;
-        return true;
-    }
-
-
-    //========================================================================================================
-    //========================================================================================================
     void Font::ToUTF8( const std::string& _str, std::vector<uint32_t >& _outUnicode )
     {
         _outUnicode.clear();
@@ -69,21 +56,6 @@ namespace fan
             it = sf::Utf8::decode(it, _str.end(), codepoint );
             _outUnicode.push_back(codepoint);
         }
-    }
-
-    //========================================================================================================
-    //========================================================================================================
-    const Font::Glyph& Font::GetGlyph( const uint32_t _codepoint ) const
-    {
-        auto it = mGlyphs.find( _codepoint );
-        if( it == mGlyphs.end() )
-        {
-            std::vector<uint32_t> defaultUnicode;
-            Font::ToUTF8( "?", defaultUnicode );
-            it = mGlyphs.find( defaultUnicode[0] );
-        }
-        fanAssert( it != mGlyphs.end() );
-        return it->second;
     }
 
     //========================================================================================================
@@ -100,9 +72,29 @@ namespace fan
 
     //========================================================================================================
     //========================================================================================================
-    Texture* Font::GenerateAtlas()
+    const Font::Atlas* Font::FindAtlas( const int _height )
     {
-        fanAssert( mGlyphSize != 0 );
+        for( Atlas& atlas : mAtlases )
+        {
+            if( atlas.mGlyphSize == _height )
+            {
+                return &atlas;
+            }
+        }
+        return nullptr;
+    }
+
+    //========================================================================================================
+    //========================================================================================================
+    const Font::Atlas* Font::GenerateAtlas( TextureManager& _textureManager,const int _height )
+    {
+        fanAssert( FindAtlas( _height) == nullptr );
+        fanAssert( _height > 0 );
+        if( FT_Set_Pixel_Sizes( mFace, 0, _height ) != 0 )
+        {
+            Debug::Error() << "Font::GenerateAtlas invalid pixel height" << _height << Debug::Endl();
+            return nullptr;
+        }
         fanAssert( mFace->charmap != nullptr );
 
         std::vector< FT_ULong > unicodeCharacters;
@@ -115,10 +107,13 @@ namespace fan
             if (!index) break;
         }
 
-        mAtlasSize = FindAtlasSize( unicodeCharacters.size() );
-        const size_t bufferPixelSize = mGlyphSize * mAtlasSize;
+        Atlas atlas;
+        atlas.mSize = FindAtlasSize( unicodeCharacters.size() );
+        atlas.mGlyphSize = _height;
+
+        const size_t bufferPixelSize = atlas.mGlyphSize * atlas.mSize;
         uint8_t * buffer = new uint8_t[ bufferPixelSize * bufferPixelSize * 4 ];
-        Texture * texture = new Texture();
+        atlas.mTexture = new Texture();
 
         glm::ivec2 glyphCoord(0,0);
         for ( int  i = 0; i < unicodeCharacters.size(); i++)
@@ -139,9 +134,9 @@ namespace fan
             }
 
             const glm::ivec2 glyphSize   = glm::ivec2( mFace->glyph->bitmap.width, mFace->glyph->bitmap.rows);
-            if( glyphSize.x > mGlyphSize || glyphSize.y > mGlyphSize ){ continue; }
+            if( glyphSize.x > atlas.mGlyphSize || glyphSize.y > atlas.mGlyphSize ){ continue; }
 
-            const glm::ivec2 glyphOrigin = mGlyphSize * glyphCoord;
+            const glm::ivec2 glyphOrigin = atlas.mGlyphSize * glyphCoord;
             const glm::ivec2 glyphBearing = glm::ivec2(mFace->glyph->bitmap_left, mFace->glyph->bitmap_top);
             Glyph glyph = {
                     glyphOrigin,
@@ -149,7 +144,7 @@ namespace fan
                     glyphBearing,
                     mFace->glyph->advance.x
             };
-            mGlyphs[charcode] = glyph;
+            atlas.mGlyphs[charcode] = glyph;
 
             for( int x = 0; x < glyph.mSize.x; x++ )
             {
@@ -168,14 +163,16 @@ namespace fan
             }
 
             glyphCoord.x++;
-            if( glyphCoord.x >= mAtlasSize )
+            if( glyphCoord.x >= atlas.mSize )
             {
                 glyphCoord.x = 0;
                 glyphCoord.y++;
             }
         }
 
-        texture->LoadFromPixels( buffer, { bufferPixelSize,bufferPixelSize  }, 1 );
-        return texture;
+        atlas.mTexture->LoadFromPixels( buffer, { bufferPixelSize,bufferPixelSize  }, 1 );
+        _textureManager.Add( atlas.mTexture, "font" + std::to_string(_height) ) ;
+        mAtlases.push_back( atlas );
+        return & *mAtlases.rbegin();
     }
 }

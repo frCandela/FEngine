@@ -56,8 +56,6 @@ namespace fan
 
         Font::InitFreetype();
         _font.LoadFont( RenderGlobal::sDefaultGameFont );
-        _font.SetHeight( 34 );
-        _textureManager.Add( _font.GenerateAtlas(), "font48" ) ;
     }
 
     //========================================================================================================

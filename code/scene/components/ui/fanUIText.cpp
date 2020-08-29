@@ -28,8 +28,9 @@ namespace fan
         UIText& uiText = static_cast<UIText&>( _component );
         uiText.mText  = "";
         uiText.mMesh2D = new Mesh2D();
-        _world.GetSingleton<RenderResources>().mMesh2DManager->Add( uiText.mMesh2D, "text_mesh" );
+        uiText.mSize = 18;
 
+        _world.GetSingleton<RenderResources>().mMesh2DManager->Add( uiText.mMesh2D, "text_mesh" );
         _world.AddTag<TagUIModified>( _entity );
 	}
 
@@ -39,6 +40,7 @@ namespace fan
     {
         const UIText& uiText = static_cast<const UIText&>( _component );
         Serializable::SaveString( _json, "text", uiText.mText );
+        Serializable::SaveInt( _json, "size", uiText.mSize );
     }
 
     //========================================================================================================
@@ -47,6 +49,7 @@ namespace fan
     {
         UIText& uiText = static_cast<UIText&>( _component );
         Serializable::LoadString( _json, "text", uiText.mText );
+        Serializable::LoadInt( _json, "size", uiText.mSize );
     }
 
     //========================================================================================================
@@ -57,6 +60,18 @@ namespace fan
 
 		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() );
 		{
+            if( ImGui::Button( "##clear_font_size" ) )
+            {
+                uiText.mSize = 18;
+                _world.AddTag<TagUIModified>( _entity );
+            }
+            ImGui::SameLine();
+            ImGui::DragInt("size", &uiText.mSize, 1, 8, 300 );
+            if( ImGui::IsItemDeactivatedAfterEdit() )
+            {
+                _world.AddTag<TagUIModified>( _entity );
+            }
+
 			// color
 			if( ImGui::Button( "##clear_text" ) )
 			{

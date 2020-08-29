@@ -19,5 +19,6 @@ namespace fan
 
 		std::string mText;
 		Mesh2D *    mMesh2D;
+		int         mSize;
 	};
 }
