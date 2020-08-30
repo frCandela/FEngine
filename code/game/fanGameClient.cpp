@@ -25,6 +25,7 @@
 #include "scene/singletons/fanSceneResources.hpp"
 #include "scene/singletons/fanScenePointers.hpp"
 #include "scene/singletons/fanRenderDebug.hpp"
+#include "scene/singletons/fanApplication.hpp"
 
 #include "network/fanPacket.hpp"
 #include "network/singletons/fanLinkingContext.hpp"
@@ -56,7 +57,7 @@
 #include "game/systems/fanParticlesOcclusion.hpp"
 #include "game/components/fanBullet.hpp"
 #include "game/components/fanDamage.hpp"
-#include "game/components/ui/fanUIMainMenu.hpp"
+#include "game/singletons/ui/fanUIMainMenu.hpp"
 
 namespace fan
 {
@@ -103,7 +104,6 @@ namespace fan
 		mWorld.AddComponentType<SpaceshipUI>();
 		mWorld.AddComponentType<Damage>();
 		mWorld.AddComponentType<PlayerController>();
-        mWorld.AddComponentType<UIMainMenu>();
 		// network components
 		mWorld.AddComponentType<ReliabilityLayer>();
 		mWorld.AddComponentType<ClientConnection>();
@@ -122,6 +122,7 @@ namespace fan
 		mWorld.AddSingletonType<ScenePointers>();
 		mWorld.AddSingletonType<RenderDebug>();
 		mWorld.AddSingletonType<Mouse>();
+        mWorld.AddSingletonType<Application>();
 		// game singleton components
 		mWorld.AddSingletonType<SunLight>();
 		mWorld.AddSingletonType<GameCamera>();
@@ -130,6 +131,7 @@ namespace fan
 		mWorld.AddSingletonType<SolarEruption>();
 		mWorld.AddSingletonType<SpawnManager>();
 		mWorld.AddSingletonType<ClientNetworkManager>();
+        mWorld.AddSingletonType<UIMainMenu>();
 		// network singleton components
 		mWorld.AddSingletonType<LinkingContext>();
 		mWorld.AddSingletonType<Time>();

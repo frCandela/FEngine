@@ -15,6 +15,7 @@
 #include "scene/singletons/fanScene.hpp"
 #include "scene/singletons/fanRenderDebug.hpp"
 #include "scene/singletons/fanRenderResources.hpp"
+#include "scene/singletons/fanApplication.hpp"
 
 namespace fan
 {
@@ -48,6 +49,9 @@ namespace fan
                                     &mRenderer->mMesh2DManager,
                                     &mRenderer->mTextureManager,
                                     &mRenderer->mFontManager );
+
+        Application& app = mGame.mWorld.GetSingleton<Application>();
+        app.mOnQuit.Connect( &GameHolder::Exit, this );
 
         SceneResources::SetupResources( mPrefabManager );
         SceneResources& sceneResources = mGame.mWorld.GetSingleton<SceneResources>();

@@ -20,6 +20,7 @@ namespace fan
     //========================================================================================================
     FontManager::~FontManager()
     {
+        Clear();
         FT_Done_FreeType( mFreetypeLib );
     }
 

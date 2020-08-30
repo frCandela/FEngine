@@ -42,6 +42,7 @@ namespace fan
 		Serializable::SaveColor( _json, "color_hovered", button.mColorHovered );
         Serializable::SaveTexturePtr( _json, "image_normal", button.mImageNormal );
         Serializable::SaveTexturePtr( _json, "image_pressed", button.mImagePressed );
+        Serializable::SaveSlotPtr( _json, "pressed_slot_ptr", button.mSlotPtr );
 	}
 
 	//========================================================================================================
@@ -53,6 +54,7 @@ namespace fan
         Serializable::LoadColor( _json, "color_hovered", button.mColorHovered );
         Serializable::LoadTexturePtr( _json, "image_normal", button.mImageNormal );
         Serializable::LoadTexturePtr( _json, "image_pressed", button.mImagePressed );
+        Serializable::LoadSlotPtr( _json, "pressed_slot_ptr", button.mSlotPtr );
 	}
 
     //========================================================================================================

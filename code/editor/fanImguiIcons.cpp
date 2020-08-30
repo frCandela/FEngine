@@ -42,7 +42,7 @@ namespace ImGui
 		,DECL_ICON( 16.f, 4, 6 )  // LOCK_CLOSED16,
 		,DECL_ICON( 16.f, 5, 6 )  // NETWORK16,
 		,DECL_ICON( 16.f, 6, 6 )  // Font16,
-
+		,DECL_ICON( 16.f, 7, 6 )  // Application16,
 
 		,DECL_ICON( 16.f, 1, 0 )  // PLAY16
 		,DECL_ICON( 16.f, 2, 0 )  // PAUSE16

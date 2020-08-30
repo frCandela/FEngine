@@ -7,7 +7,6 @@
 #include "core/input/fanInput.hpp"
 #include "network/singletons/fanTime.hpp"
 #include "render/fanRenderer.hpp"
-#include "render/resources/fanFont.hpp"
 #include "editor/windows/fanPreferencesWindow.hpp"	
 #include "editor/windows/fanSingletonsWindow.hpp"
 #include "editor/windows/fanInspectorWindow.hpp"	
@@ -24,13 +23,12 @@
 #include "editor/singletons/fanEditorCamera.hpp"
 #include "editor/singletons/fanEditorGrid.hpp"
 #include "scene/singletons/fanRenderWorld.hpp"
-#include "scene/fanFullscreen.hpp"
 #include "scene/components/fanPointLight.hpp"
 #include "scene/components/fanCamera.hpp"
 #include "scene/systems/fanUpdateTransforms.hpp"
 #include "scene/systems/fanDrawDebug.hpp"
 #include "scene/systems/fanUpdateRenderWorld.hpp"
-#include "scene/singletons/fanScene.hpp"
+#include "scene/singletons/fanApplication.hpp"
 #include "scene/fanSceneTags.hpp"
 
 namespace fan
@@ -154,6 +152,9 @@ namespace fan
                                          &mRenderer->mMesh2DManager,
                                          &mRenderer->mTextureManager,
                                          &mRenderer->mFontManager);
+
+            Application& app = world.GetSingleton<Application>();
+            app.mOnQuit.Connect( &EditorHolder::Exit, this );
 
             SceneResources& sceneResources = world.GetSingleton<SceneResources>();
             sceneResources.SetPointers( &mPrefabManager );

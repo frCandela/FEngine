@@ -20,6 +20,7 @@
 #include "scene/singletons/fanSceneResources.hpp"
 #include "scene/singletons/fanScenePointers.hpp"
 #include "scene/singletons/fanRenderDebug.hpp"
+#include "scene/singletons/fanApplication.hpp"
 
 #include "network/singletons/fanServerConnection.hpp"
 #include "network/singletons/fanLinkingContext.hpp"
@@ -109,6 +110,7 @@ namespace fan
 		mWorld.AddSingletonType<ScenePointers>();
 		mWorld.AddSingletonType<RenderDebug>();
         mWorld.AddSingletonType<Mouse>();
+        mWorld.AddSingletonType<Application>();
 		// game singleton components
 		mWorld.AddSingletonType<SunLight>();
 		mWorld.AddSingletonType<GameCamera>();
