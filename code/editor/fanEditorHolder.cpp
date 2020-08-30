@@ -153,9 +153,6 @@ namespace fan
                                          &mRenderer->mTextureManager,
                                          &mRenderer->mFontManager);
 
-            Application& app = world.GetSingleton<Application>();
-            app.mOnQuit.Connect( &EditorHolder::Exit, this );
-
             SceneResources& sceneResources = world.GetSingleton<SceneResources>();
             sceneResources.SetPointers( &mPrefabManager );
 

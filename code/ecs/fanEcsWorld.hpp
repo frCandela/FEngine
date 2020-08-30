@@ -63,7 +63,7 @@ namespace fan
 		void		RemoveHandle	( const EcsEntity _entity );
 		EcsHandle	GetNextHandle() const { return mNextHandle; }
 		void		SetNextHandle( const EcsHandle  _handle ) { mNextHandle = _handle; }
-        bool HandleExists( const EcsHandle _handle ) { return mHandles.find( _handle ) != mHandles.end(); }
+        bool        HandleExists( const EcsHandle _handle ) { return mHandles.find( _handle ) != mHandles.end(); }
 
 		// Singletons
 		template <typename _SingletonType >	void		AddSingletonType();

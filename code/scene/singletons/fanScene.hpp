@@ -51,10 +51,5 @@ namespace fan
 		std::set<EcsHandle> mNodes;
 
 		SceneNode& GetRootNode() const;
-
-		// slots
-		static void Test1( EcsSingleton& _singleton );
-        static void Test2( EcsSingleton& _singleton );
-		static void Test3( EcsSingleton& _singleton, int _test  );
 	};
 }

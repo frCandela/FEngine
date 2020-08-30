@@ -5,6 +5,7 @@
 #include "scene/components/fanBoxShape.hpp"
 #include "scene/components/fanSphereShape.hpp"
 #include "scene/components/ui/fanUITransform.hpp"
+#include "scene/components/ui/fanUIRenderer.hpp"
 #include "scene/singletons/fanRenderDebug.hpp"
 #include "scene/singletons/fanScene.hpp"
 
@@ -301,6 +302,14 @@ namespace fan
             auto transformIt = _view.begin<UITransform>();
             for( ; transformIt != _view.end<UITransform>(); ++transformIt )
             {
+                EcsEntity entity = transformIt.GetEntity();
+                if( _world.HasComponent<UIRenderer>( entity ))
+                {
+                    UIRenderer& renderer = _world.GetComponent<UIRenderer>( entity );
+                    if( renderer.mVisible == false ){ continue; }
+                }
+
+
                 UITransform transform = *transformIt;
                 const glm::ivec2& p = transform.mPosition;
                 const glm::ivec2& s = transform.mSize;

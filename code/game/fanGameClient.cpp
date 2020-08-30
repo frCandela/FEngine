@@ -161,6 +161,9 @@ namespace fan
         RenderWorld& renderWorld = mWorld.GetSingleton<RenderWorld>();
         meshManager.Add( sunLight.mMesh, "sunlight_mesh_" + mName );
         meshManager.Add( renderWorld.mParticlesMesh, "particles_mesh_" + mName );
+
+        UIMainMenu& mainMenu = mWorld.GetSingleton<UIMainMenu>();
+        UIMainMenu::ShowMainMenu( mainMenu );
 	}
 
 	//========================================================================================================

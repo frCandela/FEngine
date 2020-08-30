@@ -43,7 +43,7 @@ namespace fan
 		void AddFlag( uint32_t _flag ) { mFlags |= _flag; }
 		void RemoveFlag( Flags _flag ) { mFlags &= ~_flag; }
 
-		static void GetDescendantsOf( SceneNode& _root, std::vector<SceneNode*>& _outList );
+		static void GetDescendantsOf( const SceneNode& _root, std::vector<SceneNode*>& _outList );
 
 		EcsHandle               mHandle;
 		EcsHandle               mParentHandle;

@@ -217,7 +217,7 @@ namespace fan
 	//========================================================================================================
 	// fills the _list with _root and all its descendants  
 	//========================================================================================================
-	void SceneNode::GetDescendantsOf( SceneNode& _root, std::vector<SceneNode*>& _outList )
+	void SceneNode::GetDescendantsOf( const SceneNode& _root, std::vector<SceneNode*>& _outList )
 	{
 		EcsWorld& world = *_root.mScene->mWorld;
 
