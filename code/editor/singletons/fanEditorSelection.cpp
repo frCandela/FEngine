@@ -206,9 +206,15 @@ namespace fan
 			// FollowTransform
 			if( world.HasComponent<FollowTransform>( entity ) )
 			{
-				FollowTransform& follower = world.GetComponent<FollowTransform>( entity );
-				follower.mLocked = !follower.mLocked;
-				FollowTransform::UpdateLocalTransform( world, entity );
+				FollowTransform& followTransform = world.GetComponent<FollowTransform>( entity );
+                followTransform.mLocked = !followTransform.mLocked;
+
+                Transform * transform = world.SafeGetComponent<Transform>( entity );
+                SceneNode * sceneNode = world.SafeGetComponent<SceneNode>( entity );
+                if( transform != nullptr && sceneNode != nullptr )
+                {
+                    FollowTransform::UpdateLocalTransform( followTransform , *transform, *sceneNode );
+                }
 			}
 		}
 	}

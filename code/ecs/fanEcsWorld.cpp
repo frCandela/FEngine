@@ -439,6 +439,18 @@ namespace fan
 		return IndexedGetComponent( _entity, GetIndex( _type ) );
 	}
 
+    //========================================================================================================
+    //========================================================================================================
+    EcsComponent* EcsWorld::SafeGetComponent( const EcsEntity _entity, const uint32_t _type )
+    {
+        const int componentIndex = GetIndex( _type );
+	    if( IndexedHasComponent( _entity, componentIndex ) )
+        {
+	        return &IndexedGetComponent( _entity, componentIndex );
+        }
+        return nullptr;
+    }
+
 	//========================================================================================================
 	//========================================================================================================
 	EcsComponent& EcsWorld::IndexedGetComponent( const EcsEntity _entity, const int _componentIndex ) {

@@ -17,7 +17,7 @@ namespace fan
     struct ComponentPtrBase
     {
         ComponentPtrBase( uint32_t _type ) : mType( _type ) {}
-        void Init( EcsWorld& _world ) { mWorld = &_world; }
+        void Init( EcsWorld& _world ) { mWorld = &_world; mHandle = 0; }
         void Create( EcsHandle _handle );
         void CreateUnresolved( EcsHandle _handle );
         void Clear();

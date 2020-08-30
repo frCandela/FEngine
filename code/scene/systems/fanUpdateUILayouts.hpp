@@ -11,32 +11,37 @@ namespace fan
     {
         static EcsSignature GetSignature( const EcsWorld& _world )
         {
-            return _world.GetSignature<UITransform>() | _world.GetSignature<UILayout>();
+            return _world.GetSignature<UITransform>() |
+                   _world.GetSignature<SceneNode>() |
+                   _world.GetSignature<UILayout>();
         }
 
-        static void Run( EcsWorld& /*_world*/, const EcsView& _view )
+        static void Run( EcsWorld& _world, const EcsView& _view )
         {
             auto layoutIt = _view.begin<UILayout>();
             auto transformUIIt = _view.begin<UITransform>();
+            auto sceneNodeIt = _view.begin<SceneNode>();
 
             std::vector<UITransform*> transforms;
-
-            for( ; layoutIt != _view.end<UILayout>(); ++layoutIt, ++transformUIIt )
+            for( ; layoutIt != _view.end<UILayout>(); ++layoutIt, ++transformUIIt, ++sceneNodeIt )
             {
 
                 UILayout   & layout        = *layoutIt;
                 UITransform& parentTransform = *transformUIIt;
+                SceneNode& sceneNode = *sceneNodeIt;
 
                 // collects child transforms
+                fanAssert( sceneNode.mParentHandle != 0 );
                 glm::ivec2 totalSize(0,0);
                 transforms.clear();
-                for( ComponentPtr<UITransform> transformPtr : layout.mTransforms )
+                for( EcsHandle child : sceneNode.mChilds )
                 {
-                    if( transformPtr.IsValid() )
+                    EcsEntity childEntity = _world.GetEntity( child );
+                    UITransform* childTransform = _world.SafeGetComponent<UITransform>( childEntity );
+                    if( childTransform != nullptr )
                     {
-                        UITransform * transform = &( *transformPtr );
-                        totalSize += transform->mSize;
-                        transforms.push_back( transform );
+                        totalSize += childTransform->mSize;
+                        transforms.push_back( childTransform );
                     }
                 }
                 if( transforms.empty() ){ continue; }

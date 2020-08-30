@@ -92,11 +92,13 @@ namespace fan
 		template <typename _ComponentType > void			    RemoveComponent		( const EcsEntity _entity );
 		template <typename _ComponentType > bool			    HasComponent		( const EcsEntity _entity );
 		template< typename _ComponentType >	_ComponentType& GetComponent		( const EcsEntity _entity );
+        template< typename _ComponentType >	_ComponentType* SafeGetComponent	( const EcsEntity _entity );
 		EcsComponent&			AddComponent		( const EcsEntity _entity, const uint32_t _type );
 		void					RemoveComponent		( const EcsEntity _entity, const uint32_t _type );
 		bool					HasComponent		( const EcsEntity _entity, const uint32_t _type );
         bool					IndexedHasComponent	( const EcsEntity _entity, const int _componentindex );
 		EcsComponent&			GetComponent		( const EcsEntity _entity, const uint32_t _type );
+        EcsComponent*			SafeGetComponent	( const EcsEntity _entity, const uint32_t _type );
 		EcsComponent&			IndexedGetComponent ( const EcsEntity _entity, const int _componentIndex );
 		const EcsComponentInfo&	IndexedGetComponentInfo( const int _componentIndex ) const;
 		const EcsComponentInfo&	GetComponentInfo( const uint32_t _type ) const;
@@ -266,6 +268,14 @@ namespace fan
 		static_assert( std::is_base_of< EcsComponent, _ComponentType>::value );
 		return static_cast<_ComponentType&> ( GetComponent( _entity, _ComponentType::Info::sType ) );
 	}
+
+    //========================================================================================================
+    //========================================================================================================
+    template< typename _ComponentType >	_ComponentType* EcsWorld::SafeGetComponent( const EcsEntity _entity )
+    {
+        static_assert( std::is_base_of< EcsComponent, _ComponentType>::value );
+        return static_cast<_ComponentType*> ( SafeGetComponent( _entity, _ComponentType::Info::sType ) );
+    }
 
 	//========================================================================================================
 	//========================================================================================================

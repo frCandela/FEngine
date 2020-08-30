@@ -1,13 +1,19 @@
 #pragma once
 
 #include "ecs/fanEcsComponent.hpp"
-#include "scene/fanSceneResourcePtr.hpp"
+#include "fanDisableWarnings.hpp"
+WARNINGS_GLM_PUSH()
+#include "glm/glm.hpp"
+WARNINGS_POP()
+
 
 namespace fan
 {
     struct UITransform;
 
 	//========================================================================================================
+	// aligns the ui transform of this entity with the one on the parent entity
+	// see SAlignUI
 	//========================================================================================================
 	struct UIAlign : public EcsComponent
 	{
@@ -22,7 +28,6 @@ namespace fan
         enum AlignDirection : int { Horizontal, Vertical, HorizontalVertical   };
         enum UnitType       : int { Ratio, Pixels   };
 
-        ComponentPtr<UITransform>   mParent;
         AlignCorner                 mCorner;
         AlignDirection              mDirection;
         UnitType                    mUnitType;

@@ -1,10 +1,11 @@
+#include "ecs/fanEcsWorld.hpp"
 #include "ecs/fanEcsSystem.hpp"
 #include "scene/components/fanTransform.hpp"
 #include "scene/components/fanFollowTransform.hpp"
+#include "scene/components/fanSceneNode.hpp"
 
 namespace fan
 {
-	class EcsWorld;
 
 	//========================================================================================================
 	// setups the FollowTransforms offsets @todo remove this ( useless ? )
@@ -13,23 +14,30 @@ namespace fan
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world )
 		{
-			return	_world.GetSignature<Transform>() | _world.GetSignature<FollowTransform>();
+			return	_world.GetSignature<Transform>() |
+                    _world.GetSignature<SceneNode>() |
+                    _world.GetSignature<FollowTransform>();
 		}
 
-		static void Run( EcsWorld& /*_world*/, const EcsView& _view )
+		static void Run( EcsWorld& _world, const EcsView& _view )
 		{
+            auto sceneNodeIt = _view.begin<SceneNode>();
 			auto transformIt = _view.begin<Transform>();
 			auto followTransformIt = _view.begin<FollowTransform>();
-			for( ; transformIt != _view.end<Transform>(); ++transformIt, ++followTransformIt )
+			for( ; transformIt != _view.end<Transform>(); ++transformIt, ++followTransformIt, ++sceneNodeIt )
 			{
 				const Transform& follow = *transformIt;
 				FollowTransform& followTransform = *followTransformIt;
+                SceneNode& sceneNode = *sceneNodeIt;
 
-				if( followTransform.mTargetTransform != nullptr )
-				{
-					Transform& target = *followTransform.mTargetTransform;
-					followTransform.mLocalTransform =
-					        SInitFollowTransforms::GetLocalTransform( target.mTransform, follow.mTransform );
+                fanAssert( sceneNode.mParentHandle != 0 );
+                EcsEntity parentEntity = _world.GetEntity( sceneNode.mParentHandle );
+                Transform * parentTransform = _world.SafeGetComponent<Transform>( parentEntity );
+				if( parentTransform != nullptr )
+                {
+                    followTransform.mLocalTransform = SInitFollowTransforms::GetLocalTransform(
+                            parentTransform->mTransform,
+                            follow.mTransform );
 				}
 			}
 		}
@@ -47,22 +55,28 @@ namespace fan
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world )
 		{
-			return	_world.GetSignature<Transform>() | _world.GetSignature<FollowTransform>();
+			return	_world.GetSignature<Transform>() |
+			        _world.GetSignature<SceneNode>() |
+			        _world.GetSignature<FollowTransform>();
 		}
 
-		static void Run( EcsWorld& /*_world*/, const EcsView& _view )
+		static void Run( EcsWorld& _world, const EcsView& _view )
 		{
+            auto sceneNodeIt = _view.begin<SceneNode>();
 			auto transformIt = _view.begin<Transform>();
 			auto followTransformIt = _view.begin<FollowTransform>();
-			for( ; transformIt != _view.end<Transform>(); ++transformIt, ++followTransformIt )
+			for( ; transformIt != _view.end<Transform>(); ++transformIt, ++followTransformIt, ++sceneNodeIt )
 			{
 				Transform& follow = *transformIt;
 				const FollowTransform& followTransform = *followTransformIt;
+                SceneNode& sceneNode = *sceneNodeIt;
 
-				if( followTransform.mLocked && followTransform.mTargetTransform != nullptr )
+                fanAssert( sceneNode.mParentHandle != 0 );
+                EcsEntity parentEntity = _world.GetEntity( sceneNode.mParentHandle );
+                Transform * parentTransform = _world.SafeGetComponent<Transform>( parentEntity );
+				if( followTransform.mLocked && parentTransform != nullptr )
 				{
-					Transform& target = *followTransform.mTargetTransform;
-					follow.mTransform = target.mTransform * followTransform.mLocalTransform;
+					follow.mTransform = parentTransform->mTransform * followTransform.mLocalTransform;
 				}
 			}
 		}

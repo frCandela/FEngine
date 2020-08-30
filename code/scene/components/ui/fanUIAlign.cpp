@@ -1,5 +1,6 @@
 #include "scene/components/ui/fanUIAlign.hpp"
 #include "scene/components/ui/fanUITransform.hpp"
+#include "scene/fanSceneSerializable.hpp"
 
 namespace fan
 {
@@ -18,14 +19,13 @@ namespace fan
 
 	//========================================================================================================
 	//========================================================================================================
-	void UIAlign::Init( EcsWorld& _world, EcsEntity /*_entity*/, EcsComponent& _component )
+	void UIAlign::Init( EcsWorld& /*_world*/, EcsEntity /*_entity*/, EcsComponent& _component )
 	{
         UIAlign& align = static_cast<UIAlign&>( _component );
         align.mCorner = AlignCorner::TopLeft;
         align.mDirection = AlignDirection::Vertical;
         align.mUnitType = UnitType::Ratio;
         align.mOffset = glm::vec2( 0.f, 0.f );
-        align.mParent.Init( _world );
 	}
 
 	//========================================================================================================
@@ -33,7 +33,6 @@ namespace fan
 	void UIAlign::Save( const EcsComponent& _component, Json& _json )
 	{
         const UIAlign& align = static_cast<const UIAlign&>( _component );
-        Serializable::SaveComponentPtr( _json, "parent", align.mParent );
         Serializable::SaveInt( _json, "corner", align.mCorner );
         Serializable::SaveInt( _json, "direction", align.mDirection );
         Serializable::SaveInt( _json, "unitType", align.mUnitType );
@@ -45,7 +44,6 @@ namespace fan
 	void UIAlign::Load( EcsComponent& _component, const Json& _json )
 	{
         UIAlign& align = static_cast<UIAlign&>( _component );
-        Serializable::LoadComponentPtr( _json, "parent", align.mParent );
         Serializable::LoadInt( _json, "corner", (int&)align.mCorner );
         Serializable::LoadInt( _json, "direction", (int&)align.mDirection );
         Serializable::LoadInt( _json, "unitType", (int&)align.mUnitType );
@@ -60,7 +58,6 @@ namespace fan
 
         ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() + 16 );
 
-        ImGui::FanComponent("parent", align.mParent );
         ImGui::Combo("corner", (int*)&align.mCorner, "TopLeft\0TopRight\0BottomLeft\0BottomRight\0\0" );
         ImGui::Combo("direction", (int*)&align.mDirection, "Horizontal\0Vertical\0HorizontalVertical\0\0" );
         ImGui::Combo("unit type", (int*)&align.mUnitType, "Ratio\0Pixels\0\0" );

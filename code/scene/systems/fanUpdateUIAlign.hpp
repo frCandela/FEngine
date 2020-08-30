@@ -11,32 +11,39 @@ namespace fan
     {
         static EcsSignature GetSignature( const EcsWorld& _world )
         {
-            return _world.GetSignature<UITransform>() | _world.GetSignature<UIAlign>();
+            return _world.GetSignature<UITransform>() |
+                   _world.GetSignature<UIAlign>() |
+                   _world.GetSignature<SceneNode>();
         }
 
         static void Run( EcsWorld& _world, const EcsView& _view )
         {
             RenderWorld& renderWorld = _world.GetSingleton<RenderWorld>();
 
+            auto sceneNodeIt = _view.begin<SceneNode>();
             auto alignIt = _view.begin<UIAlign>();
             auto transformUIIt = _view.begin<UITransform>();
-            for( ; alignIt != _view.end<UIAlign>(); ++alignIt, ++transformUIIt )
+            for( ; alignIt != _view.end<UIAlign>(); ++alignIt, ++transformUIIt, ++sceneNodeIt )
             {
                 UIAlign   &  align          = *alignIt;
                 UITransform& childTransform = *transformUIIt;
+                SceneNode& sceneNode = *sceneNodeIt;
+
+                fanAssert( sceneNode.mParentHandle != 0 );
+                EcsEntity parentEntity = _world.GetEntity(sceneNode.mParentHandle);
+                UITransform* parentTransform = _world.SafeGetComponent<UITransform>( parentEntity );
 
                 glm::ivec2 pPos;
                 glm::ivec2 pSize;
-                if( align.mParent == nullptr )
+                if( parentTransform == nullptr )
                 {
                     pPos = glm::ivec2(0,0);
                     pSize = glm::ivec2( renderWorld.mTargetSize );
                 }
                 else
                 {
-                    const UITransform& parentTransform = *align.mParent;
-                    pPos = parentTransform.mPosition;
-                    pSize  = parentTransform.mSize;
+                    pPos = parentTransform->mPosition;
+                    pSize  = parentTransform->mSize;
                 }
 
                 const glm::ivec2& cSize = childTransform.mSize;

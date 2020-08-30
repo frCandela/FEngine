@@ -1,13 +1,14 @@
 #pragma once
 
 #include "ecs/fanEcsComponent.hpp"
-#include "scene/fanSceneResourcePtr.hpp"
 
 namespace fan
 {
     struct UITransform;
 
 	//========================================================================================================
+	// aligns all child ui transforms with their brothers and with this entity ui transform
+	// see SUpdateUILayouts
 	//========================================================================================================
 	struct UILayout : public EcsComponent
 	{
@@ -22,8 +23,5 @@ namespace fan
 
         Type mType;
         int  mGap;
-		std::vector< ComponentPtr<UITransform> > mTransforms;
-
-		static ComponentPtr<UITransform>& CreateItem( EcsWorld& _world, UILayout& _layout );
 	};
 }
