@@ -121,6 +121,8 @@ namespace fan
         manager.FindEvent( "reload_scene" )->Connect( &EditorHolder::OnCurrentGameReload, this );
         manager.FindEvent( "toogle_world" )->Connect( &EditorHolder::OnCycleCurrentGame, this );
         manager.FindEvent( "reload_icons" )->Connect( &Renderer::ReloadIcons, mRenderer );
+        manager.FindEvent( "delete" )->Connect( &EditorHolder::OnCurrentGameDeleteSelection, this );
+        manager.FindEvent( "toogle_follow_transform_lock" )->Connect( &EditorHolder::OnCurrentGameToogleTransformLock, this );
 
         mGameViewWindow->mOnSizeChanged.Connect( &Renderer::ResizeGame, mRenderer );
         mGameViewWindow->mOnPlay.Connect( &EditorHolder::OnCurrentGameStart, this );
@@ -129,6 +131,7 @@ namespace fan
         mGameViewWindow->mOnStop.Connect( &EditorHolder::OnCurrentGameStop, this );
         mGameViewWindow->mOnStep.Connect( &EditorHolder::OnCurrentGameStep, this );
         mGameViewWindow->mOnSelectGame.Connect( &EditorHolder::OnCurrentGameSelect, this );
+
 
         // Loop over all worlds to initialize them
         for( int gameIndex = 0; gameIndex < (int)mGames.size(); gameIndex++ )
@@ -621,6 +624,14 @@ namespace fan
     void EditorHolder::OnCurrentGamePaste()
     {
         GetCurrentGame().mWorld.GetSingleton<EditorCopyPaste>().OnPaste();
+    }
+    void EditorHolder::OnCurrentGameDeleteSelection()
+    {
+        GetCurrentGame().mWorld.GetSingleton<EditorSelection>().DeleteSelection();
+    }
+    void EditorHolder::OnCurrentGameToogleTransformLock()
+    {
+        GetCurrentGame().mWorld.GetSingleton<EditorSelection>().OnToogleTransformLock();
     }
 
     //========================================================================================================

@@ -40,11 +40,6 @@ namespace fan
 	//========================================================================================================
 	void EditorSelection::ConnectCallbacks( Scene& _scene )
 	{
-		Input::Get().Manager().FindEvent( "delete" )->Connect( &EditorSelection::DeleteSelection, this );
-
-        Signal<>& toogleLockEvent = * Input::Get().Manager().FindEvent( "toogle_follow_transform_lock" );
-        toogleLockEvent.Connect( &EditorSelection::OnToogleTransformLock, this );
-
  		_scene.mOnDeleteSceneNode.Connect( &EditorSelection::OnSceneNodeDeleted, this );
 	}
 

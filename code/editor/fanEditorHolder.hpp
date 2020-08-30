@@ -72,6 +72,8 @@ namespace fan
 		void OnCurrentGameSave();
 		void OnCurrentGameCopy();
 		void OnCurrentGamePaste();
+        void OnCurrentGameDeleteSelection();
+        void OnCurrentGameToogleTransformLock();
 		void OnCurrentGameSelect( const int _index );
 
 		static void GameStart( IGame& _game );
