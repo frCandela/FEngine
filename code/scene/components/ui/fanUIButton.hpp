@@ -5,6 +5,7 @@
 #include "scene/components/ui/fanUITransform.hpp"
 #include "scene/fanSceneResourcePtr.hpp"
 #include "core/fanColor.hpp"
+#include "render/fanRenderResourcePtr.hpp"
 
 namespace fan
 {
@@ -19,10 +20,12 @@ namespace fan
 		static void Save( const EcsComponent& _component, Json& _json );
 		static void Load( EcsComponent& _component, const Json& _json );
 
-		Color   mColorHovered;
-        Color   mColorPressed;
-		bool    mIsHovered;
-        bool    mIsPressed;
+		bool        mIsHovered;
+        bool        mIsPressed;
+        Color       mColorNormal;
+        Color       mColorHovered;
+        TexturePtr  mImageNormal;
+        TexturePtr  mImagePressed;
 
         Signal<> mPressed;
         SlotPtr  mSlotPtr;

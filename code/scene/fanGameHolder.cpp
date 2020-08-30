@@ -168,6 +168,9 @@ namespace fan
 
                 ImGui::Begin( "test" );
                 mFullScreen.OnGui( mWindow );
+
+                ImGui::Text("%f %f", mouse.mLocalPosition.x, mouse.mLocalPosition.y );
+
                 ImGui::End();
 
 				ImGui::Render();

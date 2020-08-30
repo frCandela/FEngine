@@ -1,6 +1,5 @@
 #include "render/resources/fanFont.hpp"
 #include "core/fanDebug.hpp"
-#include "core/fanAssert.hpp"
 #include "render/resources/fanFontManager.hpp"
 #include "render/fanRenderResourcePtr.hpp"
 

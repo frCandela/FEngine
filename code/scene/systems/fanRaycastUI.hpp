@@ -64,9 +64,21 @@ namespace fan
             {
                 UIButton  & button     = *buttonIt;
                 UIRenderer& uiRenderer = *uiRendererIt;
-                if( button.mIsPressed )     { uiRenderer.mColor = button.mColorPressed; }
-                else if( button.mIsHovered ){ uiRenderer.mColor = button.mColorHovered; }
-                else                        { uiRenderer.mColor = Color::sWhite; }
+                if( button.mIsPressed )
+                {
+                    uiRenderer.mColor = button.mColorHovered;
+                    uiRenderer.mTexture = button.mImagePressed;
+                }
+                else if( button.mIsHovered )
+                {
+                    uiRenderer.mColor = button.mColorHovered;
+                    uiRenderer.mTexture = button.mImageNormal;
+                }
+                else
+                {
+                    uiRenderer.mColor = button.mColorNormal;
+                    uiRenderer.mTexture = button.mImageNormal;
+                }
             }
         }
     };
