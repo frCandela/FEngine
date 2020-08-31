@@ -193,11 +193,6 @@ namespace fan
 				newNodePopup = true;
 			}
 
-			if( ImGui::MenuItem( "Import prefab" ) )
-			{
-				loadPrefabPopup = true;
-			}
-
 			ImGui::Separator();
 
 			// rename
@@ -206,19 +201,26 @@ namespace fan
 				renameNodePopup = true;
 			}
 
-			// export to prefab
-			if( ImGui::Selectable( "Export to prefab" ) )
-			{
-				exportToPrefabPopup = true;
-			}
-
 			// delete
-			ImGui::Separator();
 			if( ImGui::Selectable( "Delete" ) && mLastSceneNodeRightClicked != nullptr )
 			{
 				EcsWorld& world = *mLastSceneNodeRightClicked->mScene->mWorld;
 				world.Kill( world.GetEntity( mLastSceneNodeRightClicked->mHandle ) );
 			}
+
+			ImGui::Separator();
+
+            if( ImGui::MenuItem( "Import prefab" ) )
+            {
+                loadPrefabPopup = true;
+            }
+
+            // export to prefab
+            if( ImGui::Selectable( "Export to prefab" ) )
+            {
+                exportToPrefabPopup = true;
+            }
+
 			ImGui::EndPopup();
 		}
 
