@@ -63,6 +63,7 @@ namespace fan
                         const Color _color );
 		void DebugAABB( const AABB& _aabb, const Color _color );
         void DebugLine2D( const glm::ivec2 _start, const glm::ivec2 _end, const Color _color );
+        void DebugQuad2D( const glm::ivec2 _pos, const glm::ivec2 _size, const Color _color );
 
 	};
 }

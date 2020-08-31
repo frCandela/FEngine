@@ -284,6 +284,21 @@ namespace fan
         mDebugLines2D.push_back( DebugVertex2D( _end, _color.ToGLM() ) );
     }
 
+    //========================================================================================================
+    //========================================================================================================
+    void RenderDebug::DebugQuad2D(  const glm::ivec2 _pos, const glm::ivec2 _size, const Color _color )
+    {
+        const glm::ivec2 tl = _pos;
+        const glm::ivec2 tr = _pos + glm::ivec2(_size.x, 0);
+        const glm::ivec2 bl = _pos + glm::ivec2(0, _size.y);
+        const glm::ivec2 br = _pos + _size;
+
+        DebugLine2D( tl, tr , _color );
+        DebugLine2D( tr, br , _color );
+        DebugLine2D( br, bl , _color );
+        DebugLine2D( bl, tl , _color );
+    }
+
 	//========================================================================================================
     //========================================================================================================
     void RenderDebug::OnGui( EcsWorld&, EcsSingleton& _component )

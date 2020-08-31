@@ -23,9 +23,9 @@ namespace fan
 	{
         UIAlign& align = static_cast<UIAlign&>( _component );
         align.mCorner = AlignCorner::TopLeft;
-        align.mDirection = AlignDirection::Vertical;
+        align.mDirection = AlignDirection::HorizontalVertical;
         align.mUnitType = UnitType::Ratio;
-        align.mOffset = glm::vec2( 0.f, 0.f );
+        align.mOffset = glm::vec2( 0.5f, 0.5f );
 	}
 
 	//========================================================================================================

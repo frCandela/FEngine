@@ -6,6 +6,7 @@
 #include "scene/components/fanSphereShape.hpp"
 #include "scene/components/ui/fanUITransform.hpp"
 #include "scene/components/ui/fanUIRenderer.hpp"
+#include "scene/components/ui/fanUILayout.hpp"
 #include "scene/singletons/fanRenderDebug.hpp"
 #include "scene/singletons/fanScene.hpp"
 
@@ -309,20 +310,10 @@ namespace fan
                     if( renderer.mVisible == false ){ continue; }
                 }
 
-
                 UITransform transform = *transformIt;
-                const glm::ivec2& p = transform.mPosition;
-                const glm::ivec2& s = transform.mSize;
-
-                const glm::ivec2 tl = p;
-                const glm::ivec2 tr = p + glm::ivec2(s.x, 0);
-                const glm::ivec2 bl = p + glm::ivec2(0, s.y);
-                const glm::ivec2 br = p + s;
-
-                renderDebug.DebugLine2D( tl, tr , Color::sGreen );
-                renderDebug.DebugLine2D( tr, br , Color::sGreen );
-                renderDebug.DebugLine2D( br, bl , Color::sGreen );
-                renderDebug.DebugLine2D( bl, tl , Color::sGreen );
+                const glm::ivec2& pos = transform.mPosition;
+                const glm::ivec2& size = transform.mSize;
+                renderDebug.DebugQuad2D( pos, size, Color::sGreen );
             }
         }
     };

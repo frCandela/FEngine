@@ -36,6 +36,7 @@ namespace fan
 
         Signal<>& toogleMainMenuSignal = *Input::Get().Manager().CreateKeyboardEvent( "toogle_main_menu",
                                                                                       Keyboard::ESCAPE );
+        toogleMainMenuSignal.Clear();
         toogleMainMenuSignal.Connect( &UIMainMenu::ToogleMainMenu, &menu );
     }
 
@@ -43,11 +44,12 @@ namespace fan
     //========================================================================================================
     void UIMainMenu::ToogleMainMenu()
     {
-        mVisible = ! mVisible;
+        bool visible = ! mVisible;
         HideAll( *this );
-        if( mVisible )
+        if( visible )
         {
             ShowMainMenu( *this );
+            mVisible = visible;
         }
     }
 
@@ -58,7 +60,6 @@ namespace fan
         EcsWorld& world = * _root.mScene->mWorld;
         std::vector<SceneNode*> descendants;
         SceneNode::GetDescendantsOf( _root, descendants );
-        descendants.push_back( &_root );
         for( SceneNode * node : descendants )
         {
             fanAssert( node != nullptr );
@@ -75,10 +76,11 @@ namespace fan
     //========================================================================================================
     void UIMainMenu::HideAll( EcsSingleton& _this )
     {
-        const UIMainMenu& menu = static_cast<const UIMainMenu&>( _this );
+        UIMainMenu& menu = static_cast<UIMainMenu&>( _this );
         if( menu.mMainMenuNode.IsValid() ){ ShowNodeAndChildren( *menu.mMainMenuNode, false ); }
         if( menu.mOptionsNode.IsValid() ) { ShowNodeAndChildren( *menu.mOptionsNode, false );  }
         if( menu.mCreditsNode.IsValid() ) { ShowNodeAndChildren( *menu.mCreditsNode, false );  }
+        menu.mVisible = false;
     }
 
     //========================================================================================================

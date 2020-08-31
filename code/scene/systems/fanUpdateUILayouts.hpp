@@ -33,6 +33,7 @@ namespace fan
                 // collects child transforms
                 fanAssert( sceneNode.mParentHandle != 0 );
                 glm::ivec2 totalSize(0,0);
+                glm::ivec2 maxSize(0,0);
                 transforms.clear();
                 for( EcsHandle child : sceneNode.mChilds )
                 {
@@ -41,14 +42,17 @@ namespace fan
                     if( childTransform != nullptr )
                     {
                         totalSize += childTransform->mSize;
+                        maxSize.x = std::max( childTransform->mSize.x, maxSize.x );
+                        maxSize.y = std::max( childTransform->mSize.y, maxSize.y );
                         transforms.push_back( childTransform );
                     }
                 }
                 if( transforms.empty() ){ continue; }
 
                 // calculates gap size
+                const bool isAutoGap = (layout.mGap < 0);
                 glm::ivec2 gap;
-                if( layout.mGap < 0 ) // auto gap
+                if( isAutoGap ) // auto gap
                 {
                     gap = ( parentTransform.mSize - totalSize );
                     gap /= ( transforms.size() + 1 );
@@ -59,35 +63,62 @@ namespace fan
                     gap = glm::ivec2( layout.mGap, layout.mGap );
                 }
 
-                glm::ivec2 externalGap = parentTransform.mSize - totalSize;
-                externalGap -= ( int( transforms.size()) - 1 ) * gap;
-                externalGap /= 2;
+                const glm::ivec2 totalInternalGapSize = ( int( transforms.size()) - 1 ) * gap;
+                const glm::ivec2       externalGapSize = ( ( parentTransform.mSize - totalSize ) -
+                                                            totalInternalGapSize ) / 2;
 
-                // aligns all transforms in the layout
-                glm::ivec2 position = parentTransform.mPosition;
+                // calculate the position of the first child in the layout
+                glm::ivec2 origin = parentTransform.mPosition;
                 switch(  layout.mType )
                 {
-                    case UILayout::Horizontal:  position.x += externalGap.x;   break;
-                    case UILayout::Vertical:    position.y += externalGap.y;   break;
-                    default:                    fanAssert( false );  break;
+                    case UILayout::Horizontal: origin.x += externalGapSize.x;   break;
+                    case UILayout::Vertical:   origin.y += externalGapSize.y;   break;
+                    default:                   fanAssert( false );  break;
                 }
 
+                // aligns all transforms on the other axis
                 for( UITransform * transform : transforms)
                 {
-                    transform->mPosition = position;
+                    transform->mPosition = origin;
                     switch(  layout.mType )
                     {
                         case UILayout::Horizontal:
-                            position.x += transform->mSize.x + gap.x;
+                            origin.x += transform->mSize.x + gap.x;
                             transform->mPosition.y += (parentTransform.mSize.y - transform->mSize.y) / 2;
                             break;
                         case UILayout::Vertical:
-                            position.y += transform->mSize.y + gap.y;
+                            origin.y += transform->mSize.y + gap.y;
                             transform->mPosition.x += (parentTransform.mSize.x - transform->mSize.x) / 2;
                             break;
                         default: fanAssert( false ); break;
                     }
                 }
+
+
+                if( ! isAutoGap )
+                {
+                    // calculates the origin & bounds of the layout
+                    const glm::ivec2 maxExternalGap = (parentTransform.mSize - maxSize) / 2;
+                    glm::ivec2 layoutPosition;
+                    glm::ivec2 layoutSize;
+                    switch(  layout.mType )
+                    {
+                        case UILayout::Horizontal:
+                            layoutPosition = parentTransform.mPosition + glm::ivec2( externalGapSize.x, maxExternalGap.y );
+                            layoutSize     =  glm::ivec2( totalSize.x + totalInternalGapSize.x, maxSize.y );
+                            break;
+                        case UILayout::Vertical:
+                            layoutPosition = parentTransform.mPosition + glm::ivec2( maxExternalGap.x, externalGapSize.y );
+                            layoutSize     = glm::ivec2( maxSize.x, totalSize.y + totalInternalGapSize.y );
+                            break;
+                        default: layoutPosition = { 0, 0}; layoutSize = { 0, 0}; fanAssert( false ); break;
+                    }
+
+                    // set the size & position of the parent to fit the layout bounds
+                    parentTransform.mPosition = layoutPosition;
+                    parentTransform.mSize = layoutSize;
+                }
+
             }
         }
     };

@@ -22,8 +22,8 @@ namespace fan
 	void UILayout::Init( EcsWorld& /*_world*/, EcsEntity /*_entity*/, EcsComponent& _component )
 	{
         UILayout& layout = static_cast<UILayout&>( _component );
-        layout.mType = Type::Horizontal;
-        layout.mGap = -1;
+        layout.mType = Type::Vertical;
+        layout.mGap = 10;
 	}
 
 	//========================================================================================================
