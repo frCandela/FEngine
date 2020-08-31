@@ -139,7 +139,7 @@ namespace fan
 		mWorld.AddTagType<TagUIVisible>();
 
         mName = "client";
-        mOnSwitchToGameCamera.Connect( &GameClient::SwitchToGameCamera, this );
+        mWorld.GetSingleton<Scene>().mOnEditorUseGameCamera.Connect( &GameClient::UseGameCamera, this );
         mWorld.GetSingleton<Scene>().mOnLoad.Connect( &GameClient::OnLoadScene, this );
 	}
 
@@ -346,7 +346,7 @@ namespace fan
 
     //========================================================================================================
     //========================================================================================================
-    void GameClient::SwitchToGameCamera()
+    void GameClient::UseGameCamera()
 	{
         GameCamera& gameCamera = mWorld.GetSingleton<GameCamera>();
         Scene& scene = mWorld.GetSingleton<Scene>();

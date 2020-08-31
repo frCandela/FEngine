@@ -58,9 +58,6 @@ namespace fan
 	//========================================================================================================
 	void GameServer::Init()
 	{
-        mName = "server";
-        mOnSwitchToGameCamera.Connect( &GameServer::SwitchToGameCamera, this );
-
 		// base components
 		mWorld.AddComponentType<SceneNode>();
 		mWorld.AddComponentType<Transform>();
@@ -125,8 +122,11 @@ namespace fan
 
         mWorld.AddTagType<TagSunlightOcclusion>();
 
+
+        mName = "server";
         Game& game = mWorld.GetSingleton<Game>();
         game.mIsServer = true;
+        mWorld.GetSingleton<Scene>().mOnEditorUseGameCamera.Connect( &GameServer::UseGameCamera, this );
 	}
 
 	//========================================================================================================
@@ -239,7 +239,7 @@ namespace fan
 
     //========================================================================================================
     //========================================================================================================
-    void GameServer::SwitchToGameCamera()
+    void GameServer::UseGameCamera()
     {
         GameCamera& gameCamera = mWorld.GetSingleton<GameCamera>();
         Scene& scene = mWorld.GetSingleton<Scene>();

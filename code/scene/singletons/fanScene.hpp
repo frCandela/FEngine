@@ -47,6 +47,7 @@ namespace fan
 		Signal< Scene& >     mOnClear;
 		Signal< Scene& >     mOnLoad;
 		Signal< SceneNode* > mOnDeleteSceneNode;
+        Signal<>             mOnEditorUseGameCamera;
 
 		EcsWorld* const		mWorld = nullptr;
 		std::string         mPath;

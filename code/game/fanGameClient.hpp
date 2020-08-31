@@ -20,7 +20,7 @@ namespace fan
 
 	private:
 		void RollbackResimulate( const float _delta );
-        void SwitchToGameCamera();
+        void UseGameCamera();
         void OnLoadScene( Scene& _scene );
 	};
 }

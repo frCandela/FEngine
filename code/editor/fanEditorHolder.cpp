@@ -368,6 +368,7 @@ namespace fan
 
             Time::RegisterFrameDrawn();    // used for stats
 
+
             UpdateRenderWorld( *mRenderer, GetCurrentGame(), ToGLM( mGameViewWindow->GetSize() ) );
 
             mRenderer->DrawFrame();
@@ -675,7 +676,7 @@ namespace fan
 
         if( scene.mMainCameraHandle == editorCamera.mCameraHandle )
         {
-            currentGame.mOnSwitchToGameCamera.Emmit();
+            world.GetSingleton<Scene>().mOnEditorUseGameCamera.Emmit();
         }
         else
         {

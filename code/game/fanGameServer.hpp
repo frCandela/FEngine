@@ -15,6 +15,6 @@ namespace fan
         void Step( const float _delta ) override;
 
 	private:
-        void SwitchToGameCamera();
+        void UseGameCamera();
 	};					  
 }
