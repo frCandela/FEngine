@@ -3,6 +3,7 @@
 #include "scene/components/ui/fanUITransform.hpp"
 #include "scene/components/ui/fanUIRenderer.hpp"
 #include "scene/singletons/fanMouse.hpp"
+#include "scene/fanSceneTags.hpp"
 #include "core/fanDebug.hpp"
 
 namespace fan
@@ -13,7 +14,9 @@ namespace fan
     {
         static EcsSignature GetSignature( const EcsWorld& _world )
         {
-            return _world.GetSignature<UIButton>() | _world.GetSignature<UITransform>();
+            return _world.GetSignature<UIButton>() |
+                    _world.GetSignature<UITransform>() |
+                    _world.GetSignature<TagUIEnabled>();
         }
 
         static void Run( EcsWorld& _world, const EcsView& _view )

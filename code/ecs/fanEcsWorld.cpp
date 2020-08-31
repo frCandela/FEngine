@@ -68,6 +68,13 @@ namespace fan
 			targetSignature |= transition.mSignatureAdd;
 			targetSignature &= ~transition.mSignatureRemove;
 
+			// if we didn't change anything, continue after erasing the transition
+            if( ! transition.mIsDead && targetSignature == srcArchetype.GetSignature() )
+            {
+                srcArchetype.GetEntityData(srcIndex).mTransitionIndex = -1;
+                continue;
+            }
+
             // entity is dead, no need to consider a target archetype
 			if( transition.mIsDead || targetSignature == EcsSignature( 0 ) )
 			{
@@ -333,20 +340,39 @@ namespace fan
 	bool EcsWorld::HasTag( const EcsEntity _entity, const uint32_t _type ) const
 	{
         const int tagIndex = GetIndex( _type );
+        return IndexedHasTag( _entity, tagIndex );
+    }
+
+    //========================================================================================================
+    //========================================================================================================
+    bool EcsWorld::IndexedHasTag( const EcsEntity _entity, const int _tagIndex ) const
+    {
+	    fanAssert( _tagIndex < ecsSignatureLength  );
+        fanAssert( _tagIndex >= GetFistTagIndex() );
         const EcsEntityData& entityData = _entity.mArchetype->GetEntityData( _entity.mIndex );
-	    if( entityData.mTransitionIndex != -1 )
+        if( entityData.mTransitionIndex != -1 )
         {
             const EcsTransition& transition = mTransitions[entityData.mTransitionIndex];
-            if( transition.mSignatureAdd[tagIndex] )
+            if( transition.mSignatureAdd[_tagIndex] )
             {
                 return true;
             }
-            else if( transition.mSignatureRemove[tagIndex])
+            else if( transition.mSignatureRemove[_tagIndex])
             {
                 return false;
             }
         }
-        return _entity.mArchetype->GetSignature()[tagIndex];
+        return _entity.mArchetype->GetSignature()[_tagIndex];
+    }
+
+    //========================================================================================================
+    //========================================================================================================
+    const EcsTagInfo& EcsWorld::IndexedGetTagInfo( const int _tagIndex ) const
+    {
+        fanAssert( _tagIndex < ecsSignatureLength );
+        fanAssert( _tagIndex >= GetFistTagIndex() );
+	    int reverseIndex = int(ecsSignatureLength) - 1 - _tagIndex;
+	    return mTagsInfo[ reverseIndex ];
     }
 
 	//========================================================================================================

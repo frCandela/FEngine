@@ -238,7 +238,7 @@ namespace fan
 
     //========================================================================================================
     //========================================================================================================
-    void SceneNode::OnGui( EcsWorld& /*_world*/, EcsEntity /*_entityID*/, EcsComponent& _component )
+    void SceneNode::OnGui( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
     {
         SceneNode& node = static_cast<SceneNode&>( _component );
         EcsWorld& world = * node.mScene->mWorld;
@@ -248,5 +248,15 @@ namespace fan
         ImGui::Text( "scene     : %s", node.mScene->mPath.empty() ? "<no path>" : node.mScene->mPath.c_str());
         ImGui::Text( "handle    : %u", node.mHandle );
         ImGui::Text( "entity id : %u", entity );
+
+        ImGui::Text( "tags: ");
+        for( int tagIndex = _world.GetFistTagIndex(); tagIndex < ecsSignatureLength; tagIndex++ )
+        {
+            if( _world.IndexedHasTag( _entity, tagIndex ) )
+            {
+                ImGui::SameLine();
+                ImGui::Text( "%s ", _world.IndexedGetTagInfo( tagIndex ).mName.c_str() );
+            }
+        }
     }
 }

@@ -225,10 +225,10 @@ namespace fan
 		renderWorld.mTargetSize = _size;
 
 		// update render data
-		_world.Run<SUpdateRenderWorldModels>();
-		_world.Run<SUpdateRenderWorldUI>();
-		_world.Run<SUpdateRenderWorldPointLights>();
-		_world.Run<SUpdateRenderWorldDirectionalLights>();
+        _world.ForceRun<SUpdateRenderWorldModels>();
+        _world.ForceRun<SUpdateRenderWorldUI>();
+        _world.ForceRun<SUpdateRenderWorldPointLights>();
+        _world.ForceRun<SUpdateRenderWorldDirectionalLights>();
 
 		// particles mesh
 		RenderDataModel particlesDrawData;

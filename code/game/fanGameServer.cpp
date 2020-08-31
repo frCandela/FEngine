@@ -75,8 +75,6 @@ namespace fan
 		mWorld.AddComponentType<MotionState>();
 		mWorld.AddComponentType<BoxShape>();
 		mWorld.AddComponentType<SphereShape>();
-		mWorld.AddComponentType<UITransform>();
-		mWorld.AddComponentType<UIRenderer>();
 		mWorld.AddComponentType<Bounds>();
 		mWorld.AddComponentType<ExpirationTime>();
 		mWorld.AddComponentType<FollowTransform>();

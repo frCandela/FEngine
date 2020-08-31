@@ -17,7 +17,7 @@ namespace fan
         static void Save( const EcsSingleton& _this, Json& _json );
         static void Load( EcsSingleton& _this, const Json& _json );
 
-        static void ShowNodeAndChildren( SceneNode& _root, const bool _visible );
+        static void EnableNodeAndChildren( SceneNode& _root, const bool _enable );
 
         // signal targets
         void ToogleMainMenu();

@@ -52,6 +52,9 @@ namespace fan
 		void ApplyTransitions();
 		void Clear();
 		int  NumComponents() const	{ return int( mComponentsInfo.size() ); }
+        int  NumTags() const	    { return ecsSignatureLength - mNextTagIndex - 1; }
+        int  GetFistTagIndex() const{ return mNextTagIndex + 1; }
+
 		int  GetIndex( const uint32_t  _type ) const;
 		void ReloadInfos();
 
@@ -85,7 +88,9 @@ namespace fan
 		void AddTag		( const EcsEntity _entity, const uint32_t _type );
 		void RemoveTag	( const EcsEntity _entity, const uint32_t _type );
 		bool HasTag		( const EcsEntity _entity, const uint32_t _type ) const;
+        bool IndexedHasTag( const EcsEntity _entity, const int _tagIndex ) const;
 		void AddTagsFromSignature( const EcsEntity _entity, const EcsSignature& _signature );
+        const EcsTagInfo&	IndexedGetTagInfo( const int _tagIndex ) const;
 
 		// Components
 		template <typename _ComponentType >	void			AddComponentType	();
@@ -113,6 +118,7 @@ namespace fan
 
 		template< typename _tagOrComponentType >			EcsSignature	GetSignature() const;
 		template< typename _SystemType, typename... _Args > void Run( _Args&&... _args );
+        template< typename _SystemType, typename... _Args > void ForceRun( _Args&&... _args );
 		template< typename _SystemType > EcsView Match() const;
         EcsView Match( const EcsSignature& _signature ) const;
 
@@ -145,6 +151,7 @@ namespace fan
 		std::unordered_map< uint32_t, EcsSingleton* >     mSingletons;
 		std::unordered_map< uint32_t, EcsSingletonInfo >  mSingletonInfos;
 		std::vector< EcsComponentInfo >                   mComponentsInfo;
+        std::vector< EcsTagInfo >                         mTagsInfo;
 		std::vector< EcsTransition >                      mTransitions;
 		std::vector< DestroyedComponent >                 mDestroyedComponents;
 	};
@@ -190,6 +197,7 @@ namespace fan
         mTypeToIndex[_TagType::Info::sType] = newTagIndex;
 
         mTagsMask[newTagIndex] = 1;
+        mTagsInfo.push_back({ _TagType::Info::sName } );
 	}
 
 	//========================================================================================================
@@ -297,6 +305,16 @@ namespace fan
 		    _SystemType::Run( *this, view, _args... );
 		}
 	}
+
+    //========================================================================================================
+    // runs even if the view is empty
+    //========================================================================================================
+    template< typename _SystemType, typename... _Args > void EcsWorld::ForceRun( _Args&&... _args )
+    {
+        static_assert( std::is_base_of< EcsSystem, _SystemType >::value );
+        EcsView view = Match<_SystemType>();
+        _SystemType::Run( *this, view, _args... );
+    }
 
 	//========================================================================================================
 	//========================================================================================================

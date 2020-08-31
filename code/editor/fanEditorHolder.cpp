@@ -529,10 +529,10 @@ namespace fan
         // update render data
         {
             SCOPED_PROFILE( update_render_data );
-            world.Run<SUpdateRenderWorldModels>();
-            world.Run<SUpdateRenderWorldUI>();
-            world.Run<SUpdateRenderWorldPointLights>();
-            world.Run<SUpdateRenderWorldDirectionalLights>();
+            world.ForceRun<SUpdateRenderWorldModels>();
+            world.ForceRun<SUpdateRenderWorldUI>();
+            world.ForceRun<SUpdateRenderWorldPointLights>();
+            world.ForceRun<SUpdateRenderWorldDirectionalLights>();
         }
 
         // particles mesh

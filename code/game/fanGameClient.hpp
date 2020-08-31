@@ -4,6 +4,8 @@
 
 namespace fan
 {
+    struct Scene;
+
 	//========================================================================================================
 	//========================================================================================================
 	class GameClient : public IGame
@@ -19,5 +21,6 @@ namespace fan
 	private:
 		void RollbackResimulate( const float _delta );
         void SwitchToGameCamera();
+        void OnLoadScene( Scene& _scene );
 	};
 }

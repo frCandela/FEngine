@@ -2,6 +2,7 @@
 #include "render/fanRenderSerializable.hpp"
 #include "render/resources/fanMesh2DManager.hpp"
 #include "scene/singletons/fanRenderResources.hpp"
+#include "scene/fanSceneTags.hpp"
 #include "editor/fanModals.hpp"
 
 namespace fan
@@ -21,16 +22,17 @@ namespace fan
 
 	//========================================================================================================
 	//========================================================================================================
-	void UIRenderer::Init( EcsWorld& _world, EcsEntity /*_entity*/, EcsComponent& _component )
+	void UIRenderer::Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
 	{
         RenderResources& renderResources = _world.GetSingleton<RenderResources>();
 
 		UIRenderer& uiRenderer = static_cast<UIRenderer&>( _component );
         uiRenderer.mMesh2D  = renderResources.mMesh2DManager->Get( RenderGlobal::sMesh2DQuad );
-        uiRenderer.mVisible = true;
         uiRenderer.mColor   = Color::sWhite;
         uiRenderer.mDepth   = 0;
         fanAssert( uiRenderer.mMesh2D );
+
+        _world.AddTag< TagUIVisible >( _entity );
 	}
 
     //========================================================================================================
@@ -40,7 +42,6 @@ namespace fan
         const UIRenderer& ui = static_cast<const UIRenderer&>( _component );
         Serializable::SaveColor( _json, "color", ui.mColor );
         Serializable::SaveTexturePtr( _json, "texture_path", ui.mTexture );
-        Serializable::SaveBool( _json, "visible", ui.mVisible );
         Serializable::SaveInt( _json, "depth", ui.mDepth );
     }
 
@@ -51,7 +52,6 @@ namespace fan
         UIRenderer& ui = static_cast<UIRenderer&>( _component );
         Serializable::LoadColor( _json, "color", ui.mColor );
         Serializable::LoadTexturePtr( _json, "texture_path", ui.mTexture );
-        Serializable::LoadBool( _json, "visible", ui.mVisible );
         Serializable::LoadInt( _json, "depth", ui.mDepth );
     }
 
@@ -66,7 +66,7 @@ namespace fan
 
     //========================================================================================================
 	//========================================================================================================
-	void UIRenderer::OnGui( EcsWorld& /*_world*/, EcsEntity /*_entityID*/, EcsComponent& _component )
+	void UIRenderer::OnGui( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
 	{
 		UIRenderer& ui = static_cast<UIRenderer&>( _component );
 
@@ -81,7 +81,15 @@ namespace fan
 
 			// texture
 			ImGui::FanTexturePtr( "ui texture", ui.mTexture );
-			ImGui::Checkbox("visible", &ui.mVisible );
+
+			// enabled
+            bool isEnabled = _world.HasTag<TagUIVisible>( _entity );
+            if( ImGui::Checkbox("visible", &isEnabled ) )
+            {
+                if( isEnabled ) { _world.AddTag<TagUIVisible>(_entity);     }
+                else            { _world.RemoveTag<TagUIVisible>(_entity);  }
+            }
+
             if( ImGui::Button( "##depth ui" ) ){	ui.mDepth = 0 ; }
             ImGui::SameLine();
 			ImGui::DragInt("depth", &ui.mDepth, 1, 0, 1024 );

@@ -20,7 +20,6 @@ namespace fan
 		Mesh2D*    mMesh2D;
 		Color      mColor;
 		TexturePtr mTexture;
-		bool       mVisible;
 		int        mDepth;
 
 		glm::ivec2	GetTextureSize() const;

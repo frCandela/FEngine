@@ -9,6 +9,7 @@
 #include "scene/components/ui/fanUILayout.hpp"
 #include "scene/singletons/fanRenderDebug.hpp"
 #include "scene/singletons/fanScene.hpp"
+#include "scene/fanSceneTags.hpp"
 
 namespace fan
 {
@@ -294,7 +295,7 @@ namespace fan
     {
         static EcsSignature GetSignature( const EcsWorld& _world )
         {
-            return _world.GetSignature<UITransform>();
+            return _world.GetSignature<UITransform>() | _world.GetSignature<TagUIVisible>();
         }
         static void Run( EcsWorld& _world, const EcsView& _view )
         {
@@ -303,13 +304,6 @@ namespace fan
             auto transformIt = _view.begin<UITransform>();
             for( ; transformIt != _view.end<UITransform>(); ++transformIt )
             {
-                EcsEntity entity = transformIt.GetEntity();
-                if( _world.HasComponent<UIRenderer>( entity ))
-                {
-                    UIRenderer& renderer = _world.GetComponent<UIRenderer>( entity );
-                    if( renderer.mVisible == false ){ continue; }
-                }
-
                 UITransform transform = *transformIt;
                 const glm::ivec2& pos = transform.mPosition;
                 const glm::ivec2& size = transform.mSize;

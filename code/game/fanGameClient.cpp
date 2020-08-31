@@ -65,9 +65,6 @@ namespace fan
 	//========================================================================================================
 	void GameClient::Init()
 	{
-        mName = "client";
-        mOnSwitchToGameCamera.Connect( &GameClient::SwitchToGameCamera, this );
-
 		// base components
 		mWorld.AddComponentType<SceneNode>();
 		mWorld.AddComponentType<Transform>();
@@ -138,7 +135,12 @@ namespace fan
 
 		mWorld.AddTagType<TagSunlightOcclusion>();
 		mWorld.AddTagType<TagUIModified>();
+		mWorld.AddTagType<TagUIEnabled>();
+		mWorld.AddTagType<TagUIVisible>();
 
+        mName = "client";
+        mOnSwitchToGameCamera.Connect( &GameClient::SwitchToGameCamera, this );
+        mWorld.GetSingleton<Scene>().mOnLoad.Connect( &GameClient::OnLoadScene, this );
 	}
 
 	//========================================================================================================
@@ -349,5 +351,15 @@ namespace fan
         GameCamera& gameCamera = mWorld.GetSingleton<GameCamera>();
         Scene& scene = mWorld.GetSingleton<Scene>();
         scene.SetMainCamera( gameCamera.cmCameraHandle );
+	}
+
+    //========================================================================================================
+    //========================================================================================================
+    void GameClient::OnLoadScene( Scene& _scene )
+	{
+        (void) _scene;
+
+        UIMainMenu& mainMenu = mWorld.GetSingleton<UIMainMenu>();
+        UIMainMenu::ShowMainMenu( mainMenu );
 	}
 }

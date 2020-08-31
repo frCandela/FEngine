@@ -48,6 +48,7 @@ namespace fan
     };
 
     struct TagTest  : EcsTag  { ECS_TAG( TagTest )  };
+    struct TagTest2  : EcsTag  { ECS_TAG( TagTest2 )  };
 
     //========================================================================================================
     //========================================================================================================
@@ -56,9 +57,9 @@ namespace fan
     public:
         static std::vector<TestMethod> GetTests()
         {
-            return { { &UnitTestEcs::TestAddRemoveTags,          "test add remove tags " },
-                     { &UnitTestEcs::TestFaultyAddRemoveTags,    "test faulty add remove tags " },
-                     { &UnitTestEcs::TestDuplicateAddRemoveTags, "test duplicate add remove tags " },
+            return { { &UnitTestEcs::TestAddTagType,             "tag add types " },
+                     { &UnitTestEcs::TestAddRemoveTags,          "tag add/remove " },
+                     { &UnitTestEcs::TestFaultyAddRemoveTags,    "tag multiple add/remove" },
             };
         }
         void Create() override
@@ -66,10 +67,26 @@ namespace fan
             mWorld.AddComponentType<TestEcsComponent>();
             mWorld.AddSingletonType<TestEcsSingleton>();
             mWorld.AddTagType<TagTest>();
+
         }
         void Destroy() override {}
 
         EcsWorld mWorld;
+
+        void TestAddTagType()
+        {
+            EcsWorld world;
+            TEST_ASSERT( world.NumTags() == 0 );
+            TEST_ASSERT( world.GetFistTagIndex() == ecsSignatureLength );
+            world.AddTagType<TagTest>();
+            TEST_ASSERT( world.NumTags() == 1 );
+            TEST_ASSERT( world.GetFistTagIndex() == ecsSignatureLength - 1 );
+            TEST_ASSERT( world.IndexedGetTagInfo(world.GetFistTagIndex() ).mName == "TagTest" );
+            world.AddTagType<TagTest2>();
+            TEST_ASSERT( world.NumTags() == 2 );
+            TEST_ASSERT( world.GetFistTagIndex() == ecsSignatureLength - 2 );
+            TEST_ASSERT( world.IndexedGetTagInfo(world.GetFistTagIndex() ).mName == "TagTest2" );
+        }
 
         void TestAddRemoveTags()
         {
@@ -143,36 +160,5 @@ namespace fan
 
             TEST_ASSERT( mWorld.HasTag<TagTest>( entity ) );
         }
-
-        void TestDuplicateAddRemoveTags()
-        {
-            EcsEntity entity = mWorld.CreateEntity();
-            EcsHandle handle = mWorld.AddHandle( entity );
-            mWorld.AddComponent<TestEcsComponent>( entity );
-            TEST_ASSERT( !mWorld.HasTag<TagTest>( entity ) );
-
-
-            mWorld.ApplyTransitions();
-            entity = mWorld.GetEntity( handle );
-        }
-            /*
-            mWorld.AddTag<TagTest>( entity );
-            mWorld.RemoveTag<TagTest>( entity );
-            TEST_ASSERT( ! mWorld.HasTag<TagTest>( entity ) );
-
-            mWorld.ApplyTransitions();
-            entity = mWorld.GetEntity( handle );
-
-            TEST_ASSERT( ! mWorld.HasTag<TagTest>( entity ) );
-            mWorld.AddTag<TagTest>( entity );
-            mWorld.RemoveTag<TagTest>( entity );
-            mWorld.AddTag<TagTest>( entity );
-            TEST_ASSERT( mWorld.HasTag<TagTest>( entity ) );
-
-            mWorld.ApplyTransitions();
-            entity = mWorld.GetEntity( handle );
-
-            TEST_ASSERT( mWorld.HasTag<TagTest>( entity ) );
-        }*/
     };
 }

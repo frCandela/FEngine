@@ -9,6 +9,7 @@
 #include "scene/components/ui/fanUIRenderer.hpp"
 #include "scene/components/fanPointLight.hpp"
 #include "scene/components/fanDirectionalLight.hpp"
+#include "scene/fanSceneTags.hpp"
 
 namespace fan
 {
@@ -66,7 +67,8 @@ namespace fan
 		static EcsSignature GetSignature( const EcsWorld& _world )
 		{
 			return _world.GetSignature<UIRenderer>()
-				| _world.GetSignature<UITransform>();
+				| _world.GetSignature<UITransform>()
+				| _world.GetSignature<TagUIVisible>();
 		}
 
 		static void Run( EcsWorld& _world, const EcsView& _view )
@@ -82,9 +84,7 @@ namespace fan
 				UIRenderer       & renderer  = *rendererIt;
 				const UITransform& transform = *transformIt;
 
-                if( renderer.GetTexture() == nullptr ||
-                    !renderer.mVisible ||
-                    renderer.mMesh2D == nullptr )
+                if( renderer.GetTexture() == nullptr || renderer.mMesh2D == nullptr )
 				{
 				    continue;
 				}

@@ -22,6 +22,7 @@ namespace fan
         EcsWorld    mWorld;
         std::string mName;
 
-        Signal<> mOnSwitchToGameCamera; // called by the editor
+        // called by the editor
+        Signal<> mOnSwitchToGameCamera;
     };
 }

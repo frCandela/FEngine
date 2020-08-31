@@ -2,6 +2,8 @@
 #include "game/singletons/ui/fanUIMainMenu.hpp"
 #include "scene/singletons/fanScene.hpp"
 #include "scene/components/ui/fanUIRenderer.hpp"
+#include "scene/components/ui/fanUIButton.hpp"
+#include "scene/fanSceneTags.hpp"
 #include "core/input/fanInput.hpp"
 #include "core/input/fanInputManager.hpp"
 
@@ -49,13 +51,12 @@ namespace fan
         if( visible )
         {
             ShowMainMenu( *this );
-            mVisible = visible;
         }
     }
 
     //========================================================================================================
     //========================================================================================================
-    void UIMainMenu::ShowNodeAndChildren( SceneNode& _root, const bool _visible )
+    void UIMainMenu::EnableNodeAndChildren( SceneNode& _root, const bool _enable )
     {
         EcsWorld& world = * _root.mScene->mWorld;
         std::vector<SceneNode*> descendants;
@@ -64,10 +65,15 @@ namespace fan
         {
             fanAssert( node != nullptr );
             EcsEntity entity = world.GetEntity( node->mHandle );
-            if( world.HasComponent<UIRenderer>( entity ) )
+            if( _enable )
             {
-                UIRenderer& renderer = world.GetComponent<UIRenderer>( entity );
-                renderer.mVisible = _visible;
+                world.AddTag<TagUIEnabled>( entity );
+                world.AddTag<TagUIVisible>( entity );
+            }
+            else
+            {
+                world.RemoveTag<TagUIEnabled>( entity );
+                world.RemoveTag<TagUIVisible>( entity );
             }
         }
     }
@@ -77,9 +83,9 @@ namespace fan
     void UIMainMenu::HideAll( EcsSingleton& _this )
     {
         UIMainMenu& menu = static_cast<UIMainMenu&>( _this );
-        if( menu.mMainMenuNode.IsValid() ){ ShowNodeAndChildren( *menu.mMainMenuNode, false ); }
-        if( menu.mOptionsNode.IsValid() ) { ShowNodeAndChildren( *menu.mOptionsNode, false );  }
-        if( menu.mCreditsNode.IsValid() ) { ShowNodeAndChildren( *menu.mCreditsNode, false );  }
+        if( menu.mMainMenuNode.IsValid() ){ EnableNodeAndChildren( *menu.mMainMenuNode, false ); }
+        if( menu.mOptionsNode.IsValid() ) { EnableNodeAndChildren( *menu.mOptionsNode, false );  }
+        if( menu.mCreditsNode.IsValid() ) { EnableNodeAndChildren( *menu.mCreditsNode, false );  }
         menu.mVisible = false;
     }
 
@@ -89,7 +95,7 @@ namespace fan
     {
         UIMainMenu& menu = static_cast<UIMainMenu&>( _this );
         HideAll( menu );
-        if( menu.mMainMenuNode.IsValid() ){ ShowNodeAndChildren( *menu.mMainMenuNode, true ); }
+        if( menu.mMainMenuNode.IsValid() ){ EnableNodeAndChildren( *menu.mMainMenuNode, true ); }
         menu.mVisible = true;
     }
 
@@ -99,7 +105,7 @@ namespace fan
     {
         UIMainMenu& menu = static_cast<UIMainMenu&>( _this );
         HideAll( menu );
-        if( menu.mOptionsNode.IsValid() ){ ShowNodeAndChildren( *menu.mOptionsNode, true ); }
+        if( menu.mOptionsNode.IsValid() ){ EnableNodeAndChildren( *menu.mOptionsNode, true ); }
     }
 
     //========================================================================================================
@@ -108,7 +114,7 @@ namespace fan
     {
         UIMainMenu& menu = static_cast<UIMainMenu&>( _this );
         HideAll( menu );
-        if( menu.mCreditsNode.IsValid() ){ ShowNodeAndChildren( *menu.mCreditsNode, true ); }
+        if( menu.mCreditsNode.IsValid() ){ EnableNodeAndChildren( *menu.mCreditsNode, true ); }
     }
 
     //========================================================================================================

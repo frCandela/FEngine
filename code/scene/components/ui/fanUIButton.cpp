@@ -1,6 +1,7 @@
 #include "scene/components/ui/fanUIButton.hpp"
 #include "editor/fanModals.hpp"
 #include "render/fanRenderSerializable.hpp"
+#include "scene/fanSceneTags.hpp"
 
 namespace fan
 {
@@ -19,7 +20,7 @@ namespace fan
 
 	//========================================================================================================
 	//========================================================================================================
-	void UIButton::Init( EcsWorld& _world, EcsEntity /*_entity*/, EcsComponent& _component )
+	void UIButton::Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
 	{
         UIButton& button = static_cast<UIButton&>( _component );
         button.mIsHovered = false;
@@ -31,6 +32,8 @@ namespace fan
         button.mSlotPtr.Init( _world, button.mPressed.GetType() );
         button.mPressed.Clear();
         button.mPressed.Connect( _world, button.mSlotPtr );
+
+        _world.AddTag<TagUIEnabled>( _entity );
 	}
 
 	//========================================================================================================
@@ -38,6 +41,7 @@ namespace fan
 	void UIButton::Save( const EcsComponent& _component, Json& _json )
 	{
 		const UIButton& button = static_cast<const UIButton&>( _component );
+
         Serializable::SaveColor( _json, "color_normal", button.mColorNormal );
 		Serializable::SaveColor( _json, "color_hovered", button.mColorHovered );
         Serializable::SaveTexturePtr( _json, "image_normal", button.mImageNormal );
@@ -59,12 +63,19 @@ namespace fan
 
     //========================================================================================================
     //========================================================================================================
-    void UIButton::OnGui( EcsWorld& _world, EcsEntity /*_entityID*/, EcsComponent& _component )
+    void UIButton::OnGui( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
     {
         UIButton& button = static_cast<UIButton&>( _component );
-        ImGui::PushID("uibutton");
 
+        ImGui::PushID("uibutton");
         ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() );
+
+        bool isEnabled = _world.HasTag<TagUIEnabled>( _entity);
+        if( ImGui::Checkbox("enabled", &isEnabled ) )
+        {
+            if( isEnabled ) { _world.AddTag<TagUIEnabled>(_entity);     }
+            else            { _world.RemoveTag<TagUIEnabled>(_entity);  }
+        }
 
         if( ImGui::Button( "##color normal reset" ) ){ button.mColorNormal = Color::sDarkGrey; }
         ImGui::SameLine();
@@ -74,8 +85,9 @@ namespace fan
         ImGui::SameLine();
         ImGui::ColorEdit4( "color hovered", (float*)&button.mColorHovered[0], ImGui::fanColorEditFlags );
 
-        ImGui::FanTexturePtr( "normal", button.mImageNormal );
+        ImGui::FanTexturePtr( "idle", button.mImageNormal );
         ImGui::FanTexturePtr( "pressed", button.mImagePressed );
+        ImGui::FanSlotPtr("on pressed", _world, button.mSlotPtr );
 
         ImGui::PopItemWidth();
 
@@ -85,7 +97,6 @@ namespace fan
          ImGui::Checkbox("is pressed", &button.mIsPressed );
          ImGui::PopReadOnly();
 
-         ImGui::FanSlotPtr("pressed", _world, button.mSlotPtr );
 
          ImGui::PopID();
     }
