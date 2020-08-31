@@ -224,11 +224,7 @@ namespace fan
 		const RenderDebug& renderDebug = _world.GetSingleton<RenderDebug>();
 		renderWorld.mTargetSize = _size;
 
-		// update render data
-        _world.ForceRun<SUpdateRenderWorldModels>();
-        _world.ForceRun<SUpdateRenderWorldUI>();
-        _world.ForceRun<SUpdateRenderWorldPointLights>();
-        _world.ForceRun<SUpdateRenderWorldDirectionalLights>();
+        mGame.UpdateRenderWorld();
 
 		// particles mesh
 		RenderDataModel particlesDrawData;
@@ -248,7 +244,6 @@ namespace fan
                                     renderDebug.mDebugLinesNoDepthTest,
                                     renderDebug.mDebugTriangles,
                                     renderDebug.mDebugLines2D);
-
 		// Camera
 		Scene& scene = _world.GetSingleton<Scene>();
 		EcsEntity cameraID = _world.GetEntity( scene.mMainCameraHandle );

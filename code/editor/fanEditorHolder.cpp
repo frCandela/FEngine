@@ -24,12 +24,10 @@
 #include "editor/singletons/fanEditorGrid.hpp"
 #include "scene/singletons/fanRenderWorld.hpp"
 #include "scene/components/fanPointLight.hpp"
+#include "scene/components/fanDirectionalLight.hpp"
 #include "scene/components/fanCamera.hpp"
 #include "scene/systems/fanUpdateTransforms.hpp"
 #include "scene/systems/fanDrawDebug.hpp"
-#include "scene/systems/fanUpdateRenderWorld.hpp"
-#include "scene/singletons/fanApplication.hpp"
-#include "scene/fanSceneTags.hpp"
 
 namespace fan
 {
@@ -527,14 +525,7 @@ namespace fan
         const RenderDebug& renderDebug = world.GetSingleton<RenderDebug>();
         renderWorld.mTargetSize = _size;
 
-        // update render data
-        {
-            SCOPED_PROFILE( update_render_data );
-            world.ForceRun<SUpdateRenderWorldModels>();
-            world.ForceRun<SUpdateRenderWorldUI>();
-            world.ForceRun<SUpdateRenderWorldPointLights>();
-            world.ForceRun<SUpdateRenderWorldDirectionalLights>();
-        }
+        _game.UpdateRenderWorld();
 
         // particles mesh
         RenderDataModel particlesDrawData;

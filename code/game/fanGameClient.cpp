@@ -5,6 +5,7 @@
 #include "core/input/fanInput.hpp"
 #include "core/input/fanInputManager.hpp"
 
+#include "scene/systems/fanUpdateRenderWorld.hpp"
 #include "scene/systems/fanSynchronizeMotionStates.hpp"
 #include "scene/systems/fanRegisterPhysics.hpp"
 #include "scene/systems/fanUpdateParticles.hpp"
@@ -18,10 +19,7 @@
 #include "scene/systems/fanUpdateUILayouts.hpp"
 #include "scene/systems/fanUpdateUIText.hpp"
 #include "scene/components/fanCamera.hpp"
-#include "scene/components/fanDirectionalLight.hpp"
-#include "scene/components/fanPointLight.hpp"
 #include "scene/singletons/fanScene.hpp"
-#include "scene/singletons/fanRenderResources.hpp"
 #include "scene/singletons/fanSceneResources.hpp"
 #include "scene/singletons/fanScenePointers.hpp"
 #include "scene/singletons/fanRenderDebug.hpp"
@@ -324,6 +322,17 @@ namespace fan
             mWorld.Run<SClientSend>( _delta );
 		}
 	}
+
+    //========================================================================================================
+    //========================================================================================================
+    void GameClient::UpdateRenderWorld()
+    {
+        SCOPED_PROFILE( update_render_world );
+        mWorld.ForceRun<SUpdateRenderWorldModels>();
+        mWorld.ForceRun<SUpdateRenderWorldUI>();
+        mWorld.ForceRun<SUpdateRenderWorldPointLights>();
+        mWorld.ForceRun<SUpdateRenderWorldDirectionalLights>();
+    }
 
 	//========================================================================================================
 	// Creates the joystick/keyboard axes in the input manager

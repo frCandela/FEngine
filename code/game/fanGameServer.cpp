@@ -3,6 +3,7 @@
 #include "core/time/fanProfiler.hpp"
 #include "network/singletons/fanTime.hpp"
 
+#include "scene/systems/fanUpdateRenderWorld.hpp"
 #include "scene/systems/fanSynchronizeMotionStates.hpp"
 #include "scene/systems/fanRegisterPhysics.hpp"
 #include "scene/systems/fanUpdateParticles.hpp"
@@ -12,8 +13,6 @@
 #include "scene/systems/fanUpdateTimers.hpp"
 #include "scene/systems/fanUpdateTransforms.hpp"
 #include "scene/components/fanCamera.hpp"
-#include "scene/components/fanDirectionalLight.hpp"
-#include "scene/components/fanPointLight.hpp"
 #include "scene/singletons/fanScene.hpp"
 #include "scene/singletons/fanMouse.hpp"
 #include "scene/singletons/fanRenderResources.hpp"
@@ -211,9 +210,7 @@ namespace fan
 			mWorld.Run<SRechargeBatteries>( _delta );
 			mWorld.Run<SUpdateExpirationTimes>( _delta );
 			mWorld.Run<SEruptionDamage>( _delta );
-			mWorld.Run<SUpdateGameUiValues>( _delta );
-			mWorld.Run<SUpdateGameUiPosition>( _delta );
-			SolarEruption::Step( mWorld,			_delta );
+			SolarEruption::Step( mWorld, _delta );
             mWorld.Run<SPlayerDeath>( _delta );
 
 			// late update
@@ -236,6 +233,15 @@ namespace fan
 			mWorld.Run<SServerSend>( _delta );
 		}
 	}
+
+    //========================================================================================================
+    //========================================================================================================
+    void GameServer::UpdateRenderWorld()
+    {
+        mWorld.ForceRun<SUpdateRenderWorldModels>();
+        mWorld.ForceRun<SUpdateRenderWorldPointLights>();
+        mWorld.ForceRun<SUpdateRenderWorldDirectionalLights>();
+    }
 
     //========================================================================================================
     //========================================================================================================

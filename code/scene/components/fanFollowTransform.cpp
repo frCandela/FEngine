@@ -63,6 +63,7 @@ namespace fan
 		const FollowTransform& followTransform = static_cast<const FollowTransform&>( _component );
 		Serializable::SaveVec3( _json, "local_position", followTransform.mLocalTransform.getOrigin() );
 		Serializable::SaveQuat( _json, "local_rotation", followTransform.mLocalTransform.getRotation() );
+		Serializable::SaveBool( _json, "locked", followTransform.mLocked );
 	}
 
 	//========================================================================================================
@@ -76,6 +77,7 @@ namespace fan
 		Serializable::LoadQuat( _json, "local_rotation", tmpQuat );
 		followTransform.mLocalTransform.setOrigin( tmpVec );
 		followTransform.mLocalTransform.setRotation( tmpQuat );
+		Serializable::LoadBool( _json, "locked", followTransform.mLocked );
 	}
 
     //========================================================================================================
