@@ -170,7 +170,12 @@ namespace fan
 			// saves all scene nodes recursively
 			Json& jRoot = jScene["root"];
             RSaveToJson( GetRootNode(), jRoot );
-			RemapSceneNodesIndices( jRoot );
+
+
+            Scene::RemapTable remapTable;
+            GenerateRemapTable( jRoot, remapTable );
+            RemapHandlesRecursively( jScene, remapTable );
+
 			outStream << json; // write to disk			
 			outStream.close();
 		}
@@ -221,79 +226,76 @@ namespace fan
 		}		
 	}
 
+    //========================================================================================================
+    // parse all the json, get all the scene nodes handles & generates a remap table on a range close to zero
+    // ex: 400, 401, 1051 will be remapped to 1,2,3
+    //========================================================================================================
+    void Scene::GenerateRemapTable( Json& _jsonRootSceneNode, RemapTable& _outRemapTable )
+    {
+        int                     nextRemapIndex = 1;
+        std::stack<const Json*> stack;
+        stack.push( &_jsonRootSceneNode );
+        while( !stack.empty() )
+        {
+            const Json& jNode = *stack.top();
+            stack.pop();
+
+            uint32_t id = jNode["handle"];
+            _outRemapTable[id] = nextRemapIndex++;
+
+            // push all childs
+            const Json& jchilds = jNode["childs"];
+            {
+                for( int childIndex = 0; childIndex < (int)jchilds.size(); childIndex++ )
+                {
+                    const Json& jChild = jchilds[childIndex];
+                    stack.push( &jChild );
+                }
+            }
+        }
+    }
+
+
 	//========================================================================================================
-	// Find all the gameobjects handles in the json and remap them on a range close to zero
-	// ex: 400, 401, 1051 will be remapped to 1,2,3
+	// remaps scene nodes handles & component pointers  according to a remap table
 	//========================================================================================================
-	void Scene::RemapSceneNodesIndices( Json& _json )
-	{
-		std::vector< Json* > jsonIndices;
-		std::set< uint32_t > uniqueIndices;
+	void Scene::RemapHandlesRecursively( Json& _json, const RemapTable& _remapTable )
+    {
+        std::stack<Json*> stack;
+        stack.push( &_json );
+        while( !stack.empty() )
+        {
+            Json& js = *stack.top();
+            stack.pop();
 
-		// parse all the json, get all the scene nodes IDs & generates a remap table
-		std::map< uint32_t, uint32_t > remapTable;
-		{
-			int nextRemapIndex = 1;
-			std::stack< const Json* > stack;
-			stack.push( &_json );
-			while( !stack.empty() )
-			{
-				const Json& jNode = *stack.top();
-				stack.pop();
+            // remap
+            Json::iterator jNodeId = js.find( "handle" );
+            if( jNodeId != js.end() )
+            {
+                const uint32_t nodeId = *jNodeId;
+                auto           it     = _remapTable.find( nodeId );
+                if( nodeId == 0 ){}
+                else if( it != _remapTable.end() )
+                {
+                    const uint32_t remapId = it->second;
+                    *jNodeId = remapId;
+                }
+                else
+                {
+                    *jNodeId = 0;// pointer target is outside of the json nodes
+                }
+            }
 
-				uint32_t id = jNode["handle"];
-				remapTable[id] = nextRemapIndex++;
-
-				// push all childs
-				const Json& jchilds = jNode["childs"];
-				{
-					for( int childIndex = 0; childIndex < (int)jchilds.size(); childIndex++ )
-					{
-						const Json& jChild = jchilds[childIndex];
-						stack.push( &jChild );
-					}
-				}
-			}
-		}
-
-		// remap all indices ( scene nodes & component pointers )
-		{
-			std::stack< Json* > stack;
-			stack.push( &_json );
-			while( !stack.empty() )
-			{
-				Json& js = *stack.top();
-				stack.pop();
-
-				// remap
-				Json::iterator jNodeId = js.find( "handle" );
-				if( jNodeId != js.end() )
-				{
- 					const uint32_t nodeId = *jNodeId;
-					auto it = remapTable.find( nodeId );
-					if( nodeId == 0 ) {}
- 					else if( it != remapTable.end() )
-					{
-						const uint32_t remapId = it->second;
-						*jNodeId = remapId;
-					}
-					else
-					{						
-						*jNodeId = 0;// pointer target is outside of the json nodes
-					}
-				}
-
-				// push all childs
-				if( js.is_structured() )
-				{
-					for( auto& element : js )
-					{
-						stack.push( &element );
-					}
-				}
-			}
-		}
-	}
+            // push all childs
+            if( js.is_structured() )
+            {
+                for( auto& element : js )
+                {
+                    stack.push( &element );
+                }
+            }
+        }
+    }
 
 	//========================================================================================================
 	//========================================================================================================

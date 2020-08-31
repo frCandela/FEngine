@@ -38,7 +38,11 @@ namespace fan
                                            Scene& _scene,
                                            SceneNode* _parent,
                                            const uint32_t _handleOffset );
-		static void			RemapSceneNodesIndices( Json& _json );
+
+
+        using RemapTable = std::map< EcsHandle , EcsHandle >;
+        static void GenerateRemapTable( Json& _jsonRootSceneNode, RemapTable& _outRemapTable );
+		static void	RemapHandlesRecursively( Json& _json, const RemapTable& _remapTable );
 
 		Signal< Scene& >     mOnClear;
 		Signal< Scene& >     mOnLoad;

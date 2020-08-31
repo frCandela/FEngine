@@ -65,7 +65,9 @@ namespace fan
 
 		Json& prefabJson = mJson[ "prefab" ];
         Scene::RSaveToJson( _node, prefabJson );
-		Scene::RemapSceneNodesIndices( prefabJson );
+        Scene::RemapTable remapTable;
+        Scene::GenerateRemapTable( prefabJson, remapTable );
+        Scene::RemapHandlesRecursively( prefabJson, remapTable );
 	}
 
 	//========================================================================================================
