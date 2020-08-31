@@ -13,6 +13,7 @@ namespace fan
     const char* RenderGlobal::sFontsPath = "content/fonts/";
     const char* RenderGlobal::sModelsPath = "content/models/";
 
+    const char* RenderGlobal::sEditorIcon     = "content/_default/editorIcon.png";
 	const char* RenderGlobal::sDefaultIcons     = "content/_default/texture/icons.png";
 	const char* RenderGlobal::sDefaultImguiFont = "content/_default/imgui_font.ttf";
     const char* RenderGlobal::sDefaultGameFont = "content/fonts/Vera.ttf";

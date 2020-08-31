@@ -74,6 +74,7 @@ namespace fan
         if( windowSize == glm::ivec2(-1,-1) ){ SerializedValues::LoadWindowSize( windowSize ); }
         mWindow.Create( _settings.windowName.c_str(), windowPosition, windowSize );
         mFullScreen.SavePreviousPositionAndSize( mWindow );
+        mWindow.SetIcon( RenderGlobal::sEditorIcon );
 
         Mouse::SetCallbacks( mWindow.mWindow );
 

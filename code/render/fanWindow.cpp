@@ -1,7 +1,9 @@
 #include "render/fanWindow.hpp"
-
 #include "core/fanDebug.hpp"
 #include "core/input/fanInput.hpp"
+#include "render/resources/fanTexture.hpp"
+#include "render/fanRenderGlobal.hpp"
+
 
 namespace fan
 {
@@ -35,6 +37,23 @@ namespace fan
         glfwSetWindowUserPointer( mWindow, &mInputData );
         mInputData.mWindow = mWindow;
         fanAssert(glfwGetWindowUserPointer( mWindow ) == &mInputData) ;
+    }
+
+    //========================================================================================================
+    //========================================================================================================
+    bool Window::SetIcon(const std::string &_path)
+    {
+        Texture iconTexture;
+        if( iconTexture.LoadFromFile( _path ) )
+        {
+            GLFWimage image = { (int)iconTexture.mExtent.width,
+                                (int)iconTexture.mExtent.height,
+                                iconTexture.mPixels };
+            glfwSetWindowIcon( mWindow, 1, &image );
+            iconTexture.FreePixels();
+            return true;
+        }
+        return false;
     }
 
     //========================================================================================================

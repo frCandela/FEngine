@@ -30,6 +30,7 @@ namespace fan
         void PostCreateWindow(const glm::ivec2 _size);
         void SetFullscreen();
         void SetWindowed(  const glm::ivec2 _position, const glm::ivec2 _size );
+        bool SetIcon( const std::string& _path );
 
 		void Destroy();
         void DestroyWindow();
