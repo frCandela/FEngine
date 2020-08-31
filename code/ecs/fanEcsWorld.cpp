@@ -68,8 +68,6 @@ namespace fan
 			targetSignature |= transition.mSignatureAdd;
 			targetSignature &= ~transition.mSignatureRemove;
 
-            fanAssert( transition.mIsDead || targetSignature != srcArchetype.GetSignature() );
-
             // entity is dead, no need to consider a target archetype
 			if( transition.mIsDead || targetSignature == EcsSignature( 0 ) )
 			{
@@ -300,10 +298,12 @@ namespace fan
 	void EcsWorld::AddTag( const EcsEntity _entity, const uint32_t _type )
 	{
 		const int tagIndex = GetIndex( _type );
-		if( _entity.mArchetype == &mTransitionArchetype || !_entity.mArchetype->GetSignature()[tagIndex] )
+        const EcsEntityData& entityData = _entity.mArchetype->GetEntityData( _entity.mIndex );
+		if( entityData.mTransitionIndex != -1 || !_entity.mArchetype->GetSignature()[tagIndex] )
 		{			
 			EcsTransition& transition = FindOrCreateTransition( _entity );
 			transition.mSignatureAdd[tagIndex] = 1;
+            transition.mSignatureRemove[tagIndex] = 0;
 		}	
 	}
 
@@ -311,13 +311,20 @@ namespace fan
 	//========================================================================================================
 	void EcsWorld::RemoveTag( const EcsEntity _entity, const uint32_t _type )
 	{
-        fanAssert( _entity.mArchetype != &mTransitionArchetype );
-
-		const int tagIndex = GetIndex( _type );
-		if( _entity.mArchetype->GetSignature()[tagIndex] )
+        const int tagIndex = GetIndex( _type );
+        const EcsEntityData& entityData = _entity.mArchetype->GetEntityData( _entity.mIndex );
+        if( _entity.mArchetype == &mTransitionArchetype )
+        {
+            fanAssert( entityData.mTransitionIndex != -1 );
+            EcsTransition& transition = FindOrCreateTransition( _entity );
+            fanAssert( transition.mSignatureRemove[tagIndex] == 0 );
+            transition.mSignatureAdd[tagIndex] = 0;
+        }
+		else if (  entityData.mTransitionIndex != -1 || _entity.mArchetype->GetSignature()[tagIndex] )
 		{
 			EcsTransition& transition = FindOrCreateTransition( _entity );
 			transition.mSignatureRemove[tagIndex] = 1;
+            transition.mSignatureAdd[tagIndex] = 0;
 		}
 	}
 
@@ -325,9 +332,22 @@ namespace fan
 	//========================================================================================================
 	bool EcsWorld::HasTag( const EcsEntity _entity, const uint32_t _type ) const
 	{
-		const int tagIndex = GetIndex( _type );
-		return _entity.mArchetype->GetSignature()[tagIndex];
-	}
+        const int tagIndex = GetIndex( _type );
+        const EcsEntityData& entityData = _entity.mArchetype->GetEntityData( _entity.mIndex );
+	    if( entityData.mTransitionIndex != -1 )
+        {
+            const EcsTransition& transition = mTransitions[entityData.mTransitionIndex];
+            if( transition.mSignatureAdd[tagIndex] )
+            {
+                return true;
+            }
+            else if( transition.mSignatureRemove[tagIndex])
+            {
+                return false;
+            }
+        }
+        return _entity.mArchetype->GetSignature()[tagIndex];
+    }
 
 	//========================================================================================================
 	//========================================================================================================

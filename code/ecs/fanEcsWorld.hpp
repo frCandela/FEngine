@@ -81,6 +81,7 @@ namespace fan
 		template <typename _TagType > void AddTagType();
 		template <typename _TagType > void AddTag	( const EcsEntity _entity );
 		template <typename _TagType > void RemoveTag( const EcsEntity _entity );
+        template <typename _TagType > bool HasTag( const EcsEntity _entity );
 		void AddTag		( const EcsEntity _entity, const uint32_t _type );
 		void RemoveTag	( const EcsEntity _entity, const uint32_t _type );
 		bool HasTag		( const EcsEntity _entity, const uint32_t _type ) const;
@@ -205,6 +206,14 @@ namespace fan
 	{
 		static_assert( std::is_base_of< EcsTag, _TagType>::value );
 		RemoveTag( _entity, _TagType::Info::sType );
+	}
+
+	//========================================================================================================
+	//========================================================================================================
+	template <typename _TagType > bool EcsWorld::HasTag( const EcsEntity _entity )
+	{
+		static_assert( std::is_base_of< EcsTag, _TagType>::value );
+		return HasTag( _entity, _TagType::Info::sType );
 	}
 
 	//========================================================================================================
