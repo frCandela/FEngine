@@ -28,22 +28,17 @@ ELSEIF(${CMAKE_BUILD_TYPE} MATCHES Release)
     set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/release )
 ENDIF()
 
-#Removes default warning setting
-if(MSVC)
-  if(CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
-    string(REGEX REPLACE "/W[0-4]" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
-  endif()
-endif()
+if (MSVC)
+    #Removes default warning setting
+    if (CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
+        string(REGEX REPLACE "/W[0-4]" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+    endif ()
+    set( COMPILATION_FLAGS /W4 /WX  )
+    set( MIDDLEWARE_COMPILATION_FLAGS /W0 )
+    add_compile_options( /FUNCTIONPADMIN )
+endif ()
 
 set( CMAKE_PDB_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin )
-set( COMPILATION_FLAGS /W4 /WX  )
-set( MIDDLEWARE_COMPILATION_FLAGS /W0 )
-add_compile_options( /FUNCTIONPADMIN )
-
-if( WIN32 )
-    add_compile_definitions( FAN_WIN32 )
-endif()
-
 add_compile_definitions(SFML_STATIC)
 add_compile_definitions(GLFW_INCLUDE_VULKAN)
 add_compile_definitions(GLM_FORCE_RADIANS)
@@ -77,6 +72,12 @@ set(APP_LIBRARIES
     fanEditor
 )
 
-add_executable(${APP_NAME} ${APP_SOURCES} )
+if ( ${CMAKE_BUILD_TYPE} MATCHES Release AND MSVC  )
+    add_executable(${APP_NAME} WIN32 ${APP_SOURCES} )
+else()
+    add_executable(${APP_NAME} ${APP_SOURCES} )
+endif ()
+
+
 target_link_libraries(${APP_NAME} ${APP_LIBRARIES})
-target_compile_options(${APP_NAME}  PRIVATE ${COMPILATION_FLAGS} )
+target_compile_options(${APP_NAME} PRIVATE ${COMPILATION_FLAGS} )

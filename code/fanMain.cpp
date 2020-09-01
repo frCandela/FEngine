@@ -12,10 +12,10 @@ int main( int _argc, char* _argv[] )
 // 	args.push_back( "0" );
 //	args.push_back( "-autoplay" );
 //	args.push_back( "1" );
- 	args.push_back( "-scene" );
-    args.push_back( "content/scenes/test.scene" );
-	args.push_back( "-editor_client_server" );
-	args.push_back( "-client" );
+// 	args.push_back( "-scene" );
+//    args.push_back( "content/scenes/test.scene" );
+//	args.push_back( "-editor_client_server" );
+//	args.push_back( "-client" );
 
 	// generates a list of strings from the command line arguments
 	for( int i = 1; i < _argc; i++ ){	args.push_back( _argv[i] );	}
@@ -26,4 +26,14 @@ int main( int _argc, char* _argv[] )
 	fan::LPPMain main( settings ); 
 
 	return 0;
+}
+
+int WinMain( HINSTANCE _hInstance, HINSTANCE _hPrevInstance, LPSTR _lpCmdLine, int _nShowCmd )
+{
+    (void)_hInstance;
+    (void)_hPrevInstance;
+    (void)_lpCmdLine;
+    (void)_nShowCmd;
+
+    main( __argc, __argv );
 }
