@@ -6,13 +6,13 @@ WARNINGS_GLM_PUSH()
 WARNINGS_POP()
 #include "ecs/fanSignal.hpp"
 #include "render/fanWindow.hpp"
+#include "render/fanRenderer.hpp"
 #include "scene/fanPrefabManager.hpp"
 #include "scene/fanFullscreen.hpp"
 #include "game/fanLaunchSettings.hpp"
 
 namespace fan
 {
-    class Renderer;
     class IGame;
 
     //========================================================================================================
@@ -20,9 +20,8 @@ namespace fan
     class IHolder
     {
     public:
-        IHolder( const LaunchSettings& _settings ) :
-                mLaunchSettings( _settings ), mApplicationShouldExit( false ) {}
-        virtual ~IHolder();
+        IHolder( const LaunchSettings& _settings );
+        virtual ~IHolder() = default;
 
         void Exit();
 
@@ -32,12 +31,13 @@ namespace fan
         const LaunchSettings mLaunchSettings;
         bool                 mApplicationShouldExit;
 
-        Renderer*            mRenderer;
         Window               mWindow;
+        Renderer             mRenderer;
         PrefabManager        mPrefabManager;
         FullScreen           mFullScreen;
         double               mLastRenderTime = 0.;
 
+        void InitWorld( EcsWorld& _world );
         static void UpdateRenderWorld( Renderer& _renderer, IGame& _game, const glm::vec2 _size );
     };
 }

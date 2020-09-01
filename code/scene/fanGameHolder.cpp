@@ -7,7 +7,6 @@
 #include "core/math/fanMathUtils.hpp"
 #include "core/input/fanInput.hpp"
 #include "network/singletons/fanTime.hpp"
-#include "render/fanRenderer.hpp"
 #include "scene/singletons/fanRenderWorld.hpp"
 #include "scene/systems/fanUpdateTransforms.hpp"
 #include "scene/systems/fanUpdateRenderWorld.hpp"
@@ -20,8 +19,8 @@ namespace fan
 {
 	//========================================================================================================
     //========================================================================================================
-    GameHolder::GameHolder( const LaunchSettings& _settings, IGame& _game ) :
-            IHolder( mLaunchSettings ),
+    GameHolder::GameHolder( LaunchSettings& _settings, IGame& _game ) :
+            IHolder( AdaptSettings( _settings ) ),
             mGame( _game )
     {
         _game.Init();
@@ -29,31 +28,10 @@ namespace fan
 		SerializedValues::Get().LoadKeyBindings();
 		GameClient::CreateGameAxes();
 
-		// creates window
-		glm::ivec2 windowPosition, windowSize;
-        GetInitialWindowPositionAndSize( windowPosition, windowSize );
-		mWindow.Create( _settings.windowName.c_str(), windowPosition, windowSize );
-        Mouse::SetCallbacks( mWindow.mWindow );
+		InitWorld( _game.mWorld );
 
-		// creates renderer
-		mRenderer = new Renderer( mWindow, Renderer::ViewType::Game );
-        RenderResources::SetupResources( mRenderer->mMeshManager,
-                                         mRenderer->mMesh2DManager,
-                                         mRenderer->mTextureManager,
-                                         mRenderer->mFontManager );
-
-        RenderResources& renderResources = mGame.mWorld.GetSingleton<RenderResources>();
-        renderResources.SetPointers(&mRenderer->mMeshManager,
-                                    &mRenderer->mMesh2DManager,
-                                    &mRenderer->mTextureManager,
-                                    &mRenderer->mFontManager );
-
-        Application& app = mGame.mWorld.GetSingleton<Application>();
+        Application& app = _game.mWorld.GetSingleton<Application>();
         app.mOnQuit.Connect( &IHolder::Exit, (IHolder*)this );
-
-        SceneResources::SetupResources( mPrefabManager );
-        SceneResources& sceneResources = mGame.mWorld.GetSingleton<SceneResources>();
-        sceneResources.SetPointers( &mPrefabManager );
 
 		// load scene
 		Scene& scene = mGame.mWorld.GetSingleton<Scene>();
@@ -65,11 +43,18 @@ namespace fan
         }
 	}
 
-	//========================================================================================================
-	//========================================================================================================
-	GameHolder::~GameHolder()
-	{
-	}
+    //========================================================================================================
+    //========================================================================================================
+    LaunchSettings& GameHolder::AdaptSettings( LaunchSettings& _settings )
+    {
+        if( ! _settings.mForceWindowDimensions )
+        {
+            SerializedValues::LoadWindowPosition( _settings.window_position );
+            SerializedValues::LoadWindowSize( _settings.window_size );
+        }
+        _settings.mIconPath = RenderGlobal::sGameIcon;
+        return _settings;
+    }
 
 	//========================================================================================================
 	//========================================================================================================
@@ -179,10 +164,10 @@ namespace fan
 
 			Time::RegisterFrameDrawn();	// used for stats
 
-            UpdateRenderWorld( *mRenderer,
+            UpdateRenderWorld( mRenderer,
                                mGame,
                                { mWindow.GetExtent().width, mWindow.GetExtent().height } );
-			mRenderer->DrawFrame();
+			mRenderer.DrawFrame();
 			Profiler::Get().End();
 			Profiler::Get().Begin();
 		}
@@ -202,14 +187,4 @@ namespace fan
 // 				}
 		}
 	}
-
-    //========================================================================================================
-    //========================================================================================================
-    void GameHolder::GetInitialWindowPositionAndSize( glm::ivec2& _position, glm::ivec2& _size ) const
-    {
-        _position = mLaunchSettings.window_position;
-        _size = mLaunchSettings.window_size;
-        if( _position == glm::ivec2( 0, 0 ) ) { SerializedValues::LoadWindowPosition( _position ); }
-        if( _size == glm::ivec2( 0, 0 ) )     { SerializedValues::LoadWindowSize( _size ); }
-    }
 }

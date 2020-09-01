@@ -72,7 +72,7 @@ namespace fan
 		Window&         mWindow;
 		Device&         mDevice;
 
-		const ViewType  mViewType;
+        const ViewType  mViewType;
 		VkExtent2D		mGameExtent = { 1,1 };
 		glm::vec4		mClearColor = glm::vec4( 0.f, 0.f, 0.2f, 1.f );;
 		CommandBuffer	mPrimaryCommandBuffers;

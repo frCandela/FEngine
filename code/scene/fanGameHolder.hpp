@@ -19,15 +19,15 @@ namespace fan
 	class GameHolder : public IHolder
 	{
 	public:
-		GameHolder( const LaunchSettings& _settings, IGame& _game );
-		~GameHolder();
+		GameHolder( LaunchSettings& _settings, IGame& _game );
+		~GameHolder() override {};
 
 		void Run();
 		void Step();
 
 	private:
-        IGame&               mGame;
+        IGame& mGame;
 
-        void GetInitialWindowPositionAndSize( glm::ivec2& _position, glm::ivec2& _size ) const;
+        LaunchSettings& AdaptSettings( LaunchSettings& _settings );
 	};
 }

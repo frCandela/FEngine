@@ -9,21 +9,32 @@ namespace fan
 {
     Window::GetWindowUserPtrFunc Window::sGetWindowUserPtr = &glfwGetWindowUserPointer;
 
+    //========================================================================================================
+    //========================================================================================================
+    Window::~Window()
+    {
+        Destroy();
+    }
+
 	//========================================================================================================
 	//========================================================================================================
-	void Window::Create( const char* _name, const glm::ivec2 _position, const glm::ivec2 _size )
+    Window::Window( const std::string& _name, const glm::ivec2 _position, const glm::ivec2 _size )
 	{
         mInstance.Create( &mDevice.mDebugNames );
 
-        glm::ivec2 validSize = _size;
-        glm::ivec2 validPosition = _position;
-        MakeValidPositionAndSize( validPosition, validSize );
+        glm::ivec2 position = _position;
+        glm::ivec2 size = _size;
+        if( ! ValidSize( size ) )
+        {
+            size = GetDefaultSize();
+            position = GetDefaultPosition();
+        }
 
-        CreateGLFWWIndow( _name, validPosition, validSize );
+        CreateGLFWWIndow( _name.c_str(), position, size );
 
 		mDevice.Create( mInstance, mSurface );
 
-		PostCreateWindow(validSize);
+		PostCreateWindow( size );
 	}
 
     //========================================================================================================
@@ -58,16 +69,48 @@ namespace fan
 
     //========================================================================================================
     //========================================================================================================
-    void Window::MakeValidPositionAndSize( glm::ivec2& _position,  glm::ivec2& _size )
+    void Window::SetPosition( const glm::ivec2 _position )
     {
-        if( _size.x <= 0 || _size.y <= 0)
+        glfwSetWindowPos( mWindow, _position.x, _position.y );
+    }
+
+    //========================================================================================================
+    //========================================================================================================
+    void Window::SetSize( const glm::ivec2 _size )
+    {
+        glm::ivec2 size = _size;
+        if( ! ValidSize( _size ) )
         {
-            GLFWmonitor* monitor = glfwGetPrimaryMonitor();
-            int x, y, w, h;
-            glfwGetMonitorWorkarea( monitor, &x, &y, &w, &h );
-            _size     = glm::ivec2( w, h - 30 );
-            _position = glm::ivec2( x, y + 30 );
+            size = GetDefaultSize();
         }
+        glfwSetWindowSize( mWindow, size.x, size.y );
+    }
+
+    //========================================================================================================
+    //========================================================================================================
+    bool Window::ValidSize( const glm::ivec2 _size )
+    {
+        return _size.x > 0 && _size.y > 0;
+    }
+
+    //========================================================================================================
+    //========================================================================================================
+    glm::ivec2 Window::GetDefaultSize()
+    {
+        GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+        int x, y, w, h;
+        glfwGetMonitorWorkarea( monitor, &x, &y, &w, &h );
+        return glm::ivec2( w, h - 30 );
+    }
+
+    //========================================================================================================
+    //========================================================================================================
+    glm::ivec2 Window::GetDefaultPosition()
+    {
+        GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+        int x, y, w, h;
+        glfwGetMonitorWorkarea( monitor, &x, &y, &w, &h );
+        return glm::ivec2( x, y + 30 );
     }
 
     //========================================================================================================
@@ -85,22 +128,24 @@ namespace fan
     void Window::SetWindowed( const glm::ivec2 _position, const glm::ivec2 _size )
     {
 	    glm::ivec2 pos = _position, size = _size;
-	    MakeValidPositionAndSize( pos, size );
+	    if( ! ValidSize(size) )
+        {
+            pos = GetDefaultPosition();
+            size = GetDefaultSize();
+        }
         glfwSetWindowMonitor( mWindow, nullptr, pos.x, pos.y, size.x, size.y, GLFW_DONT_CARE );
     }
 
     //========================================================================================================
     //========================================================================================================
-    void Window::CreateGLFWWIndow(const char* _name, const glm::ivec2 _position, const glm::ivec2 _size )
+    void Window::CreateGLFWWIndow( const std::string& _name, const glm::ivec2 _position, const glm::ivec2 _size )
     {
         glfwWindowHint( GLFW_CLIENT_API, GLFW_NO_API );
         glfwWindowHint( GLFW_RESIZABLE, GLFW_TRUE );
-        mWindow = glfwCreateWindow( _size.x, _size.y, _name, nullptr/* fullscreen monitor */, nullptr );
+        mWindow = glfwCreateWindow( _size.x, _size.y, _name.c_str(), nullptr/* fullscreen monitor */, nullptr );
         glfwCreateWindowSurface( mInstance.mInstance, mWindow, nullptr, &mSurface );
         Debug::Log() << std::hex << "VkSurfaceKHR          " << mSurface << std::dec << Debug::Endl();
         glfwSetWindowPos( mWindow, _position.x, _position.y );
-
-
     }
 
 	//========================================================================================================

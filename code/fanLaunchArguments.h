@@ -209,6 +209,7 @@ namespace fan
 		_settings.window_position.y = std::atoi( _args[1].c_str() );
 		_settings.window_size.x = std::atoi( _args[2].c_str() );
 		_settings.window_size.y = std::atoi( _args[3].c_str() );
+        _settings.mForceWindowDimensions = true;
 
 		std::cout << "cmd : window position(" << _settings.window_position.x
 		          << "," << _settings.window_position.y << ")";
@@ -245,6 +246,7 @@ namespace fan
 		if( _args.size() != 0 ) { return false; }
 
 		_settings.launchMode = LaunchSettings::Mode::EditorClient;
+        _settings.launchEditor = true;
 
 		std::cout << "cmd : launch editor client" << std::endl;
 		return true;
@@ -260,6 +262,7 @@ namespace fan
 		if( _args.size() != 0 ) { return false; }
 
 		_settings.launchMode = LaunchSettings::Mode::EditorServer;
+        _settings.launchEditor = true;
 
 		std::cout << "cmd : launch editor server" << std::endl;
 		return true;
@@ -275,6 +278,7 @@ namespace fan
 		if( _args.size() != 0 ) { return false; }
 
 		_settings.launchMode = LaunchSettings::Mode::EditorClientServer;
+        _settings.launchEditor = true;
 
 		std::cout << "cmd : launch editor client_server" << std::endl;
 		return true;
@@ -290,6 +294,7 @@ namespace fan
 		if( _args.size() != 0 ) { return false; }
 
 		_settings.launchMode = LaunchSettings::Mode::Server;
+        _settings.launchEditor = false;
 
 		std::cout << "cmd : launch game server" << std::endl;
 		return true;
@@ -305,6 +310,7 @@ namespace fan
 		if( _args.size() != 0 ) { return false; }
 
 		_settings.launchMode = LaunchSettings::Mode::Client;
+        _settings.launchEditor = false;
 
 		std::cout << "cmd : launch game client" << std::endl;
 		return true;

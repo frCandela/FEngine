@@ -58,7 +58,6 @@ namespace fan
                 case LaunchSettings::Mode::EditorClientServer:
                 {
                     _settings.windowName = _settings.windowName + "_editor_client_server";
-
                     // attaches an editor to a game client and runs it
                     fan::GameClient client;
                     fan::GameServer server;

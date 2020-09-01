@@ -7,6 +7,7 @@
 #include "scene/components/fanCamera.hpp"
 #include "scene/components/fanExpirationTime.hpp"
 #include "scene/components/fanFollowTransform.hpp"
+#include "scene/components/fanBounds.hpp"
 #include "scene/singletons/fanScene.hpp"
 #include "scene/singletons/fanSceneResources.hpp"
 #include "scene/singletons/fanScenePointers.hpp"
@@ -72,6 +73,7 @@ namespace fan
         _world.AddComponentType<Camera>();
         _world.AddComponentType<ExpirationTime>();
         _world.AddComponentType<FollowTransform>();
+        _world.AddComponentType<Bounds>();
 
         _world.AddSingletonType<Scene>();
         _world.AddSingletonType<SceneResources>();

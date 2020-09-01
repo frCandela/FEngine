@@ -6,7 +6,6 @@
 #include "core/input/fanInputManager.hpp"
 #include "core/input/fanInput.hpp"
 #include "network/singletons/fanTime.hpp"
-#include "render/fanRenderer.hpp"
 #include "editor/windows/fanPreferencesWindow.hpp"	
 #include "editor/windows/fanUnitsTestsWindow.hpp"
 #include "editor/windows/fanSingletonsWindow.hpp"
@@ -33,8 +32,8 @@ namespace fan
 {
     //========================================================================================================
     //========================================================================================================
-    EditorHolder::EditorHolder( const LaunchSettings& _settings, std::vector<IGame*> _games ) :
-            IHolder( mLaunchSettings ),
+    EditorHolder::EditorHolder( LaunchSettings& _settings, const std::vector<IGame*>& _games ) :
+            IHolder( AdaptSettings(_settings) ),
             mGames( _games )
     {
         for( IGame* gameBase : mGames )
@@ -66,26 +65,6 @@ namespace fan
         Input::Get().Manager().CreateKeyboardAxis( "editor_boost", Keyboard::LEFT_SHIFT, Keyboard::NONE );
         GameClient::CreateGameAxes();
 
-        // creates window
-        glm::ivec2 windowPosition = mLaunchSettings.window_position;
-        glm::ivec2 windowSize = mLaunchSettings.window_size;
-        if( windowPosition == glm::ivec2(-1,-1) ){ SerializedValues::LoadWindowPosition( windowPosition ); }
-        if( windowSize == glm::ivec2(-1,-1) ){ SerializedValues::LoadWindowSize( windowSize ); }
-        mWindow.Create( _settings.windowName.c_str(), windowPosition, windowSize );
-        mFullScreen.SavePreviousPositionAndSize( mWindow );
-        mWindow.SetIcon( RenderGlobal::sEditorIcon );
-
-        Mouse::SetCallbacks( mWindow.mWindow );
-
-        // creates renderer
-        mRenderer = new Renderer( mWindow, Renderer::ViewType::Editor );
-        RenderResources::SetupResources( mRenderer->mMeshManager,
-                                         mRenderer->mMesh2DManager,
-                                         mRenderer->mTextureManager,
-                                         mRenderer->mFontManager );
-        SceneResources::SetupResources( mPrefabManager );
-
-
         // Initialize editor components
         mMainMenuBar    = new MainMenuBar();
         mGameViewWindow = new GameViewWindow( _settings.launchMode );
@@ -93,24 +72,24 @@ namespace fan
         mMainMenuBar->SetWindows( {
             mGameViewWindow,
             &sceneWindow,
-            new RenderWindow( *mRenderer ),
+            new RenderWindow( mRenderer ),
             new InspectorWindow(),
             new ConsoleWindow(),
             new EcsWindow(),
             new ProfilerWindow(),
-            new PreferencesWindow( *mRenderer, mFullScreen ),
+            new PreferencesWindow( mRenderer, mFullScreen ),
             new SingletonsWindow(),
             new UnitTestsWindow()
         } );
 
         // Instance messages
-        mMainMenuBar->mOnReloadShaders.Connect( &Renderer::ReloadShaders, mRenderer );
-        mMainMenuBar->mOnReloadIcons.Connect( &Renderer::ReloadIcons, mRenderer );
+        mMainMenuBar->mOnReloadShaders.Connect( &Renderer::ReloadShaders, &mRenderer );
+        mMainMenuBar->mOnReloadIcons.Connect( &Renderer::ReloadIcons, &mRenderer );
         mMainMenuBar->mOnExit.Connect( &IHolder::Exit, (IHolder*)this );
 
         // Events linking
         InputManager& manager = Input::Get().Manager();
-        manager.FindEvent( "reload_shaders" )->Connect( &Renderer::ReloadShaders, mRenderer );
+        manager.FindEvent( "reload_shaders" )->Connect( &Renderer::ReloadShaders, &mRenderer );
         manager.FindEvent( "play_pause" )->Connect( &EditorHolder::OnCurrentGameSwitchPlayStop, this );
         manager.FindEvent( "copy" )->Connect( &EditorHolder::OnCurrentGameCopy, this );
         manager.FindEvent( "paste" )->Connect( &EditorHolder::OnCurrentGamePaste, this );
@@ -120,11 +99,11 @@ namespace fan
         manager.FindEvent( "save_scene" )->Connect( &EditorHolder::OnCurrentGameSave, this );
         manager.FindEvent( "reload_scene" )->Connect( &EditorHolder::OnCurrentGameReload, this );
         manager.FindEvent( "toogle_world" )->Connect( &EditorHolder::OnCycleCurrentGame, this );
-        manager.FindEvent( "reload_icons" )->Connect( &Renderer::ReloadIcons, mRenderer );
+        manager.FindEvent( "reload_icons" )->Connect( &Renderer::ReloadIcons, &mRenderer );
         manager.FindEvent( "delete" )->Connect( &EditorHolder::OnCurrentGameDeleteSelection, this );
         manager.FindEvent( "toogle_follow_transform_lock" )->Connect( &EditorHolder::OnCurrentGameToogleTransformLock, this );
 
-        mGameViewWindow->mOnSizeChanged.Connect( &Renderer::ResizeGame, mRenderer );
+        mGameViewWindow->mOnSizeChanged.Connect( &Renderer::ResizeGame, &mRenderer );
         mGameViewWindow->mOnPlay.Connect( &EditorHolder::OnCurrentGameStart, this );
         mGameViewWindow->mOnPause.Connect( &EditorHolder::OnCurrentGamePause, this );
         mGameViewWindow->mOnResume.Connect( &EditorHolder::OnCurrentGameResume, this );
@@ -132,14 +111,12 @@ namespace fan
         mGameViewWindow->mOnStep.Connect( &EditorHolder::OnCurrentGameStep, this );
         mGameViewWindow->mOnSelectGame.Connect( &EditorHolder::OnCurrentGameSelect, this );
 
-
         // Loop over all worlds to initialize them
         for( int gameIndex = 0; gameIndex < (int)mGames.size(); gameIndex++ )
         {
             IGame   & game  = *mGames[gameIndex];
             EcsWorld& world = game.mWorld;
 
-            world.AddComponentType<Bounds>();
             world.AddSingletonType<EditorPlayState>();
             world.AddSingletonType<EditorCamera>();
             world.AddSingletonType<EditorGrid>();
@@ -148,17 +125,10 @@ namespace fan
             world.AddSingletonType<EditorGizmos>();
             world.AddTagType<TagEditorOnly>();
 
+            InitWorld( world );
+
             RenderWorld& renderWorld = world.GetSingleton<RenderWorld>();
             renderWorld.mIsHeadless = ( &game != &GetCurrentGame() );
-
-            RenderResources& renderResources = world.GetSingleton<RenderResources>();
-            renderResources.SetPointers( &mRenderer->mMeshManager,
-                                         &mRenderer->mMesh2DManager,
-                                         &mRenderer->mTextureManager,
-                                         &mRenderer->mFontManager);
-
-            SceneResources& sceneResources = world.GetSingleton<SceneResources>();
-            sceneResources.SetPointers( &mPrefabManager );
 
             Scene          & scene     = world.GetSingleton<Scene>();
             EditorSelection& selection = world.GetSingleton<EditorSelection>();
@@ -186,19 +156,27 @@ namespace fan
 
     //========================================================================================================
     //========================================================================================================
+    LaunchSettings& EditorHolder::AdaptSettings( LaunchSettings& _settings )
+    {
+        if( ! _settings.mForceWindowDimensions )
+        {
+            SerializedValues::LoadWindowPosition( _settings.window_position );
+            SerializedValues::LoadWindowSize( _settings.window_size );
+        }
+        _settings.mIconPath = RenderGlobal::sEditorIcon;
+        return _settings;
+    }
+
+    //========================================================================================================
+    //========================================================================================================
     EditorHolder::~EditorHolder()
     {
         // Deletes ui
         delete mMainMenuBar;
-
-        // Save window position/size if it was not modified by a launch command
-        if( mLaunchSettings.window_size == glm::ivec2( -1, -1 ) )
-        {
-            SerializedValues::SaveWindowSize( mWindow.GetSize() );
-        }
-        if( mLaunchSettings.window_position == glm::ivec2( -1, -1 ) )
+        if( ! mLaunchSettings.mForceWindowDimensions )
         {
             SerializedValues::SaveWindowPosition( mWindow.GetPosition() );
+            SerializedValues::SaveWindowSize( mWindow.GetSize() );
         }
         SerializedValues::Get().SaveValuesToDisk();
     }
@@ -357,9 +335,9 @@ namespace fan
             Time::RegisterFrameDrawn();    // used for stats
 
 
-            UpdateRenderWorld( *mRenderer, GetCurrentGame(), ToGLM( mGameViewWindow->GetSize() ) );
+            UpdateRenderWorld( mRenderer, GetCurrentGame(), ToGLM( mGameViewWindow->GetSize() ) );
 
-            mRenderer->DrawFrame();
+            mRenderer.DrawFrame();
             Profiler::Get().End();
             Profiler::Get().Begin();
         }
@@ -428,7 +406,8 @@ namespace fan
             world.GetComponent<Transform>( newCameraID ).mTransform = mPrevCameraTransform;
 
             // restore selection
-            if( mPrevSelectionHandle != 0 && mScene.mNodes.find( mPrevSelectionHandle ) != mScene.mNodes.end() )
+            if( mPrevSelectionHandle != 0 &&
+                mScene.mNodes.find( mPrevSelectionHandle ) != mScene.mNodes.end() )
             {
                 fan::SceneNode& node = world.GetComponent<fan::SceneNode>
                         ( world.GetEntity( mPrevSelectionHandle ) );

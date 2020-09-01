@@ -15,6 +15,7 @@ namespace fan
 	{
 	public:
         PrefabManager(){}
+        ~PrefabManager();
         PrefabManager( PrefabManager const& ) = delete;
         PrefabManager& operator=( PrefabManager const& ) = delete;
 

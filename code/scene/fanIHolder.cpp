@@ -1,23 +1,36 @@
 #include "scene/fanIHolder.hpp"
 #include "core/time/fanProfiler.hpp"
 #include "core/math/fanMathUtils.hpp"
-#include "render/fanRenderer.hpp"
 #include "scene/fanIGame.hpp"
 #include "scene/singletons/fanRenderWorld.hpp"
 #include "scene/singletons/fanRenderDebug.hpp"
 #include "scene/singletons/fanScene.hpp"
+#include "scene/singletons/fanApplication.hpp"
 #include "scene/components/fanCamera.hpp"
 #include "scene/components/fanTransform.hpp"
+#include "scene/singletons/fanRenderResources.hpp"
+#include "scene/singletons/fanSceneResources.hpp"
 
 namespace fan
 {
     //========================================================================================================
     //========================================================================================================
-    IHolder::~IHolder()
+    IHolder::IHolder( const LaunchSettings& _settings ) :
+            mLaunchSettings( _settings ),
+            mWindow( _settings.windowName, _settings.window_position, _settings.window_size ),
+            mRenderer( mWindow,
+                       _settings.launchEditor ? Renderer::ViewType::Editor : Renderer::ViewType::Game ),
+            mApplicationShouldExit( false )
     {
-        mPrefabManager.Clear();
-        delete mRenderer;
-        mWindow.Destroy();
+        Mouse::SetCallbacks( mWindow.mWindow );
+        mFullScreen.SavePreviousPositionAndSize( mWindow );
+
+        SceneResources::SetupResources( mPrefabManager );
+        RenderResources::SetupResources( mRenderer.mMeshManager,
+                                         mRenderer.mMesh2DManager,
+                                         mRenderer.mTextureManager,
+                                         mRenderer.mFontManager );
+        mWindow.SetIcon( _settings.mIconPath );
     }
 
     //========================================================================================================
@@ -25,6 +38,19 @@ namespace fan
     void IHolder::Exit()
     {
         mApplicationShouldExit = true;
+    }
+
+    //========================================================================================================
+    //========================================================================================================
+    void IHolder::InitWorld( EcsWorld& _world )
+    {
+        RenderResources& renderResources = _world.GetSingleton<RenderResources>();
+        renderResources.SetPointers(&mRenderer.mMeshManager,
+                                    &mRenderer.mMesh2DManager,
+                                    &mRenderer.mTextureManager,
+                                    &mRenderer.mFontManager );
+        SceneResources& sceneResources = _world.GetSingleton<SceneResources>();
+        sceneResources.SetPointers( &mPrefabManager );
     }
 
     //========================================================================================================

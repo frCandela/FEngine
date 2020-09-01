@@ -21,12 +21,11 @@ namespace fan
 	class EditorHolder : public IHolder
 	{
 	public:
-		EditorHolder( const LaunchSettings& _settings, std::vector<IGame*>  _games );
-		~EditorHolder();
+		EditorHolder( LaunchSettings& _settings, const std::vector<IGame*>& _games );
+		~EditorHolder() override;
 
 		void Run();
 		void Step();
-			   
 	private:
 		std::vector<IGame*>  mGames;
 		int                  mCurrentGame    = 0;
@@ -35,7 +34,7 @@ namespace fan
         GameViewWindow *     mGameViewWindow;
 
 		IGame& GetCurrentGame() { return *mGames[ mCurrentGame ]; }
-		
+        LaunchSettings& AdaptSettings( LaunchSettings& _settings );
 		static void UseEditorCamera( EcsWorld& _world );
 
 		void OnCycleCurrentGame();

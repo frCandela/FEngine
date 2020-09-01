@@ -1,17 +1,11 @@
 #include "render/fanRenderer.hpp"
 
 #include "core/fanDebug.hpp"
-#include "core/input/fanInput.hpp"
 #include "core/time/fanProfiler.hpp"
 #include "network/singletons/fanTime.hpp"
-#include "render/fanRenderGlobal.hpp"
 #include "render/resources/fanMesh2D.hpp"
 #include "render/resources/fanMesh.hpp"
-#include "render/core/fanSwapChain.hpp"
 #include "render/core/fanInstance.hpp"
-#include "render/resources/fanTexture.hpp"
-#include "render/core/fanDevice.hpp"
-#include "render/fanVertex.hpp"
 #include "render/fanWindow.hpp"
 
 namespace fan
