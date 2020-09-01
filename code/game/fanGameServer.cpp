@@ -12,30 +12,16 @@
 #include "scene/systems/fanUpdateBounds.hpp"
 #include "scene/systems/fanUpdateTimers.hpp"
 #include "scene/systems/fanUpdateTransforms.hpp"
-#include "scene/components/fanCamera.hpp"
 #include "scene/singletons/fanScene.hpp"
-#include "scene/singletons/fanMouse.hpp"
 #include "scene/singletons/fanRenderResources.hpp"
-#include "scene/singletons/fanSceneResources.hpp"
-#include "scene/singletons/fanScenePointers.hpp"
-#include "scene/singletons/fanRenderDebug.hpp"
-#include "scene/singletons/fanApplication.hpp"
-
+#include "scene/components/fanCamera.hpp"
 #include "network/singletons/fanServerConnection.hpp"
 #include "network/singletons/fanLinkingContext.hpp"
-#include "network/singletons/fanHostManager.hpp"
 #include "network/singletons/fanSpawnManager.hpp"
-#include "network/components/fanLinkingContextUnregisterer.hpp"
-#include "network/components/fanHostGameData.hpp"
-#include "network/components/fanHostConnection.hpp"
 #include "network/components/fanHostReplication.hpp"
-#include "network/components/fanReliabilityLayer.hpp"
-#include "network/components/fanHostPersistentHandle.hpp"
-#include "network/components/fanEntityReplication.hpp"
 #include "network/systems/fanServerUpdates.hpp"
 #include "network/systems/fanServerSendReceive.hpp"
 #include "network/systems/fanTimeout.hpp"
-
 #include "game/fanGameTags.hpp"
 #include "game/singletons/fanServerNetworkManager.hpp"
 #include "game/singletons/fanGameCamera.hpp"
@@ -57,24 +43,11 @@ namespace fan
 	//========================================================================================================
 	void GameServer::Init()
 	{
-		// base components
-		mWorld.AddComponentType<SceneNode>();
-		mWorld.AddComponentType<Transform>();
-		mWorld.AddComponentType<DirectionalLight>();
-		mWorld.AddComponentType<PointLight>();
-		mWorld.AddComponentType<MeshRenderer>();
-		mWorld.AddComponentType<Material>();
-		mWorld.AddComponentType<Camera>();
-		mWorld.AddComponentType<ParticleEmitter>();
-		mWorld.AddComponentType<Particle>();
-		mWorld.AddComponentType<Rigidbody>();
-		mWorld.AddComponentType<MotionState>();
-		mWorld.AddComponentType<BoxShape>();
-		mWorld.AddComponentType<SphereShape>();
-		mWorld.AddComponentType<Bounds>();
-		mWorld.AddComponentType<ExpirationTime>();
-		mWorld.AddComponentType<FollowTransform>();
-		mWorld.AddComponentType<UIProgressBar>();
+        EcsIncludeBase(mWorld);
+        EcsIncludePhysics(mWorld);
+        EcsIncludeRender3D(mWorld);
+        EcsIncludeNetworkServer( mWorld );
+
 		// game components
 		mWorld.AddComponentType<Planet>();
 		mWorld.AddComponentType<SpaceShip>();
@@ -84,43 +57,17 @@ namespace fan
 		mWorld.AddComponentType<Battery>();
 		mWorld.AddComponentType<SolarPanel>();
 		mWorld.AddComponentType<Health>();
-		mWorld.AddComponentType<SpaceshipUI>();
 		mWorld.AddComponentType<Damage>();
-		// net components
-		mWorld.AddComponentType<HostGameData>();
-		mWorld.AddComponentType<HostConnection>();
-		mWorld.AddComponentType<HostReplication>();
-		mWorld.AddComponentType<ReliabilityLayer>();
-		mWorld.AddComponentType<HostPersistentHandle>();
-		mWorld.AddComponentType<EntityReplication>();
-		mWorld.AddComponentType<LinkingContextUnregisterer>();
 
-		// base singleton components
-		mWorld.AddSingletonType<Scene>();
-        mWorld.AddSingletonType<RenderResources>();
-        mWorld.AddSingletonType<SceneResources>();
-		mWorld.AddSingletonType<RenderWorld>();
-		mWorld.AddSingletonType<PhysicsWorld>();
-		mWorld.AddSingletonType<ScenePointers>();
-		mWorld.AddSingletonType<RenderDebug>();
-        mWorld.AddSingletonType<Mouse>();
-        mWorld.AddSingletonType<Application>();
 		// game singleton components
 		mWorld.AddSingletonType<SunLight>();
 		mWorld.AddSingletonType<GameCamera>();
 		mWorld.AddSingletonType<CollisionManager>();
 		mWorld.AddSingletonType<Game>();
 		mWorld.AddSingletonType<SolarEruption>();
-		mWorld.AddSingletonType<SpawnManager>();
 		mWorld.AddSingletonType<ServerNetworkManager>();
-		// net singleton components
-		mWorld.AddSingletonType<ServerConnection>();
-		mWorld.AddSingletonType<LinkingContext>();
-		mWorld.AddSingletonType<HostManager>();
-		mWorld.AddSingletonType<Time>();
 
         mWorld.AddTagType<TagSunlightOcclusion>();
-
 
         mName = "server";
         Game& game = mWorld.GetSingleton<Game>();
@@ -218,10 +165,6 @@ namespace fan
 			if( ! renderWorld.mIsHeadless )
 			{
 				SCOPED_PROFILE( game_late );
-				mWorld.Run<SParticlesOcclusion>( _delta );
-				mWorld.Run<SUpdateParticles>( _delta );
-				mWorld.Run<SEmitParticles>( _delta );
-				mWorld.Run<SGenerateParticles>( _delta );
 				mWorld.Run<SUpdateBoundsFromRigidbody>( _delta );
 				mWorld.Run<SUpdateBoundsFromModel>();
 				mWorld.Run<SUpdateBoundsFromTransform>();

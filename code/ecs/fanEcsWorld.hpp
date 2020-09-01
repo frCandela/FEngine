@@ -193,6 +193,7 @@ namespace fan
 	{
 		static_assert( std::is_base_of< EcsTag, _TagType>::value );
 		fanAssert( mNextTagIndex >= NumComponents() );
+		fanAssert( mTypeToIndex.find(_TagType::Info::sType) == mTypeToIndex.end() );
 		const int newTagIndex = mNextTagIndex--;
         mTypeToIndex[_TagType::Info::sType] = newTagIndex;
 
@@ -230,6 +231,7 @@ namespace fan
 	{
 		static_assert( std::is_base_of< EcsComponent, _ComponentType>::value );
 
+		fanAssert( mTypeToIndex.find(_ComponentType::Info::sType) == mTypeToIndex.end() );
 		const int nextTypeIndex = NumComponents();
         fanAssert( mNextTagIndex >= nextTypeIndex );
 

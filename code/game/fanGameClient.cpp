@@ -20,20 +20,11 @@
 #include "scene/systems/fanUpdateUIText.hpp"
 #include "scene/components/fanCamera.hpp"
 #include "scene/singletons/fanScene.hpp"
-#include "scene/singletons/fanSceneResources.hpp"
-#include "scene/singletons/fanScenePointers.hpp"
-#include "scene/singletons/fanRenderDebug.hpp"
-#include "scene/singletons/fanApplication.hpp"
 
 #include "network/fanPacket.hpp"
 #include "network/singletons/fanLinkingContext.hpp"
 #include "network/singletons/fanSpawnManager.hpp"
-#include "network/components/fanLinkingContextUnregisterer.hpp"
-#include "network/components/fanClientReplication.hpp"
 #include "network/components/fanClientGameData.hpp"
-#include "network/components/fanReliabilityLayer.hpp"
-#include "network/components/fanClientConnection.hpp"
-#include "network/components/fanClientRollback.hpp"
 #include "network/systems/fanClientUpdates.hpp"
 #include "network/systems/fanClientSendReceive.hpp"
 #include "network/systems/fanTimeout.hpp"
@@ -63,30 +54,12 @@ namespace fan
 	//========================================================================================================
 	void GameClient::Init()
 	{
-		// base components
-		mWorld.AddComponentType<SceneNode>();
-		mWorld.AddComponentType<Transform>();
-		mWorld.AddComponentType<DirectionalLight>();
-		mWorld.AddComponentType<PointLight>();
-		mWorld.AddComponentType<MeshRenderer>();
-		mWorld.AddComponentType<Material>();
-		mWorld.AddComponentType<Camera>();
-		mWorld.AddComponentType<ParticleEmitter>();
-		mWorld.AddComponentType<Particle>();
-		mWorld.AddComponentType<Rigidbody>();
-		mWorld.AddComponentType<MotionState>();
-		mWorld.AddComponentType<BoxShape>();
-		mWorld.AddComponentType<SphereShape>();
-		mWorld.AddComponentType<UITransform>();
-		mWorld.AddComponentType<UIRenderer>();
-		mWorld.AddComponentType<Bounds>();
-		mWorld.AddComponentType<ExpirationTime>();
-		mWorld.AddComponentType<FollowTransform>();
-		mWorld.AddComponentType<UIProgressBar>();
-		mWorld.AddComponentType<UIButton>();
-        mWorld.AddComponentType<UILayout>();
-        mWorld.AddComponentType<UIAlign>();
-        mWorld.AddComponentType<UIText>();
+        EcsIncludeBase(mWorld);
+        EcsIncludePhysics(mWorld);
+        EcsIncludeRender3D(mWorld);
+        EcsIncludeRenderUI(mWorld);
+        EcsIncludeNetworkClient( mWorld );
+
 		// game components
 		mWorld.AddComponentType<Planet>();
 		mWorld.AddComponentType<SpaceShip>();
@@ -99,26 +72,7 @@ namespace fan
 		mWorld.AddComponentType<SpaceshipUI>();
 		mWorld.AddComponentType<Damage>();
 		mWorld.AddComponentType<PlayerController>();
-		// network components
-		mWorld.AddComponentType<ReliabilityLayer>();
-		mWorld.AddComponentType<ClientConnection>();
-		mWorld.AddComponentType<ClientReplication>();
-		mWorld.AddComponentType<ClientRPC>();
-		mWorld.AddComponentType<ClientGameData>();
-		mWorld.AddComponentType<ClientRollback>();
-		mWorld.AddComponentType<LinkingContextUnregisterer>();
-
-		// base singleton components
-		mWorld.AddSingletonType<Scene>();
-        mWorld.AddSingletonType<RenderResources>();
-        mWorld.AddSingletonType<SceneResources>();
-		mWorld.AddSingletonType<RenderWorld>();
-		mWorld.AddSingletonType<PhysicsWorld>();
-		mWorld.AddSingletonType<ScenePointers>();
-		mWorld.AddSingletonType<RenderDebug>();
-		mWorld.AddSingletonType<Mouse>();
-        mWorld.AddSingletonType<Application>();
-		// game singleton components
+		// game singletons
 		mWorld.AddSingletonType<SunLight>();
 		mWorld.AddSingletonType<GameCamera>();
 		mWorld.AddSingletonType<CollisionManager>();
@@ -127,14 +81,8 @@ namespace fan
 		mWorld.AddSingletonType<SpawnManager>();
 		mWorld.AddSingletonType<ClientNetworkManager>();
         mWorld.AddSingletonType<UIMainMenu>();
-		// network singleton components
-		mWorld.AddSingletonType<LinkingContext>();
-		mWorld.AddSingletonType<Time>();
-
+        // game tags
 		mWorld.AddTagType<TagSunlightOcclusion>();
-		mWorld.AddTagType<TagUIModified>();
-		mWorld.AddTagType<TagUIEnabled>();
-		mWorld.AddTagType<TagUIVisible>();
 
         mName = "client";
         mWorld.GetSingleton<Scene>().mOnEditorUseGameCamera.Connect( &GameClient::UseGameCamera, this );

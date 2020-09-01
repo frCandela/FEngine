@@ -8,13 +8,14 @@
 #include "network/singletons/fanTime.hpp"
 #include "render/fanRenderer.hpp"
 #include "editor/windows/fanPreferencesWindow.hpp"	
+#include "editor/windows/fanUnitsTestsWindow.hpp"
 #include "editor/windows/fanSingletonsWindow.hpp"
-#include "editor/windows/fanInspectorWindow.hpp"	
-#include "editor/windows/fanProfilerWindow.hpp"	
-#include "editor/windows/fanConsoleWindow.hpp"
-#include "editor/windows/fanRenderWindow.hpp"	
-#include "editor/windows/fanSceneWindow.hpp"	
+#include "editor/windows/fanInspectorWindow.hpp"
+#include "editor/windows/fanProfilerWindow.hpp"
 #include "editor/windows/fanGameViewWindow.hpp"
+#include "editor/windows/fanConsoleWindow.hpp"
+#include "editor/windows/fanRenderWindow.hpp"
+#include "editor/windows/fanSceneWindow.hpp"
 #include "editor/windows/fanEcsWindow.hpp"
 #include "editor/singletons/fanEditorSelection.hpp"
 #include "editor/singletons/fanEditorCopyPaste.hpp"
@@ -25,7 +26,6 @@
 #include "scene/singletons/fanRenderWorld.hpp"
 #include "scene/components/fanPointLight.hpp"
 #include "scene/components/fanDirectionalLight.hpp"
-#include "scene/components/fanCamera.hpp"
 #include "scene/systems/fanUpdateTransforms.hpp"
 #include "scene/systems/fanDrawDebug.hpp"
 
@@ -33,8 +33,9 @@ namespace fan
 {
     //========================================================================================================
     //========================================================================================================
-    EditorHolder::EditorHolder( const LaunchSettings _settings, std::vector<IGame*> _games ) :
-            mGames( _games ), mApplicationShouldExit( false ), mLaunchSettings( _settings )
+    EditorHolder::EditorHolder( const LaunchSettings& _settings, std::vector<IGame*> _games ) :
+            IHolder( mLaunchSettings ),
+            mGames( _games )
     {
         for( IGame* gameBase : mGames )
         {
@@ -105,7 +106,7 @@ namespace fan
         // Instance messages
         mMainMenuBar->mOnReloadShaders.Connect( &Renderer::ReloadShaders, mRenderer );
         mMainMenuBar->mOnReloadIcons.Connect( &Renderer::ReloadIcons, mRenderer );
-        mMainMenuBar->mOnExit.Connect( &EditorHolder::Exit, this );
+        mMainMenuBar->mOnExit.Connect( &IHolder::Exit, (IHolder*)this );
 
         // Events linking
         InputManager& manager = Input::Get().Manager();
@@ -138,6 +139,7 @@ namespace fan
             IGame   & game  = *mGames[gameIndex];
             EcsWorld& world = game.mWorld;
 
+            world.AddComponentType<Bounds>();
             world.AddSingletonType<EditorPlayState>();
             world.AddSingletonType<EditorCamera>();
             world.AddSingletonType<EditorGrid>();
@@ -199,18 +201,6 @@ namespace fan
             SerializedValues::SaveWindowPosition( mWindow.GetPosition() );
         }
         SerializedValues::Get().SaveValuesToDisk();
-
-        mPrefabManager.Clear();
-
-        delete mRenderer;
-        mWindow.Destroy();
-    }
-
-    //========================================================================================================
-    //========================================================================================================
-    void EditorHolder::Exit()
-    {
-        mApplicationShouldExit = true;
     }
 
     //========================================================================================================
@@ -510,58 +500,6 @@ namespace fan
         if( &world == &GetCurrentGame().mWorld )
         {
             world.GetSingleton<EditorSelection>().Deselect();
-        }
-    }
-
-    //========================================================================================================
-    // Updates the render world singleton component
-    //========================================================================================================
-    void EditorHolder::UpdateRenderWorld( Renderer& _renderer, IGame& _game, const glm::vec2 _size )
-    {
-        EcsWorld& world = _game.mWorld;
-
-        SCOPED_PROFILE( update_RW );
-        RenderWorld      & renderWorld = world.GetSingleton<RenderWorld>();
-        const RenderDebug& renderDebug = world.GetSingleton<RenderDebug>();
-        renderWorld.mTargetSize = _size;
-
-        _game.UpdateRenderWorld();
-
-        // particles mesh
-        RenderDataModel particlesDrawData;
-        particlesDrawData.mMesh        = renderWorld.mParticlesMesh;
-        particlesDrawData.mModelMatrix  = glm::mat4( 1.f );
-        particlesDrawData.mNormalMatrix = glm::mat4( 1.f );
-        particlesDrawData.mColor       = glm::vec4( 1.f, 1.f, 1.f, 1.f );
-        particlesDrawData.mShininess    = 1;
-        particlesDrawData.mTextureIndex = 1;
-        renderWorld.drawData.push_back( particlesDrawData );
-
-        {
-            SCOPED_PROFILE( set_render_data );
-            _renderer.SetDrawData( renderWorld.drawData );
-            _renderer.SetUIDrawData( renderWorld.uiDrawData );
-            _renderer.SetPointLights( renderWorld.pointLights );
-            _renderer.SetDirectionalLights( renderWorld.directionalLights );
-            _renderer.SetDebugDrawData( renderDebug.mDebugLines,
-                                        renderDebug.mDebugLinesNoDepthTest,
-                                        renderDebug.mDebugTriangles,
-                                        renderDebug.mDebugLines2D);
-        }
-
-        // Camera
-        {
-            SCOPED_PROFILE( update_camera );
-            Scene& scene = world.GetSingleton<Scene>();
-            EcsEntity cameraID = world.GetEntity( scene.mMainCameraHandle );
-            Camera& camera = world.GetComponent<Camera>( cameraID );
-            camera.mAspectRatio = _size[0] / _size[1];
-            Transform& cameraTransform = world.GetComponent<Transform>( cameraID );
-            _renderer.SetMainCamera(
-                    camera.GetProjection(),
-                    camera.GetView( cameraTransform ),
-                    ToGLM( cameraTransform.GetPosition() )
-            );
         }
     }
 

@@ -34,7 +34,6 @@ namespace fan
 		void		SpawnEruptionNow();
 		void		ScheduleNextEruption( EcsWorld& _world );
 
-
 		ComponentPtr<Material>        mSunlightMaterial;
 		ComponentPtr<MeshRenderer>    mSunlightRenderer;
 		ComponentPtr<ParticleEmitter> mParticleEmitter;

@@ -9,7 +9,6 @@
 #include "network/singletons/fanTime.hpp"
 #include "render/fanRenderer.hpp"
 #include "scene/singletons/fanRenderWorld.hpp"
-#include "scene/components/fanCamera.hpp"
 #include "scene/systems/fanUpdateTransforms.hpp"
 #include "scene/systems/fanUpdateRenderWorld.hpp"
 #include "scene/singletons/fanScene.hpp"
@@ -20,12 +19,11 @@
 namespace fan
 {
 	//========================================================================================================
-	//========================================================================================================
-	GameHolder::GameHolder( const LaunchSettings _settings, IGame& _game ) :
+    //========================================================================================================
+    GameHolder::GameHolder( const LaunchSettings& _settings, IGame& _game ) :
+            IHolder( mLaunchSettings ),
             mGame( _game )
-		, mApplicationShouldExit( false )
-		, mLaunchSettings( _settings )
-	{
+    {
         _game.Init();
 
 		SerializedValues::Get().LoadKeyBindings();
@@ -51,7 +49,7 @@ namespace fan
                                     &mRenderer->mFontManager );
 
         Application& app = mGame.mWorld.GetSingleton<Application>();
-        app.mOnQuit.Connect( &GameHolder::Exit, this );
+        app.mOnQuit.Connect( &IHolder::Exit, (IHolder*)this );
 
         SceneResources::SetupResources( mPrefabManager );
         SceneResources& sceneResources = mGame.mWorld.GetSingleton<SceneResources>();
@@ -71,18 +69,8 @@ namespace fan
 	//========================================================================================================
 	GameHolder::~GameHolder()
 	{
-		mPrefabManager.Clear();
-		delete mRenderer;
-		mWindow.Destroy();
 	}
 
-	//========================================================================================================
-	//========================================================================================================
-	void GameHolder::Exit()
-	{
-        mApplicationShouldExit = true;
-	}
-	
 	//========================================================================================================
 	//========================================================================================================
 	void GameHolder::Run()
@@ -180,9 +168,9 @@ namespace fan
 				ImGui::Render();
 			}
             mGame.mWorld.ApplyTransitions();
-		}		
+		}
 
-		onLPPSynch.Emmit();	
+        mOnLPPSynch.Emmit();
 
 		// Render world		
 		if( renderIsThisFrame && logicIsThisFrame )
@@ -192,7 +180,7 @@ namespace fan
 			Time::RegisterFrameDrawn();	// used for stats
 
             UpdateRenderWorld( *mRenderer,
-                               mGame.mWorld,
+                               mGame,
                                { mWindow.GetExtent().width, mWindow.GetExtent().height } );
 			mRenderer->DrawFrame();
 			Profiler::Get().End();
@@ -213,48 +201,6 @@ namespace fan
 // 					std::this_thread::sleep_for( std::chrono::milliseconds( int( sleepTimeMiliseconds / 2 ) ) );
 // 				}
 		}
-	}
-
-	//========================================================================================================
-	// Updates the render world singleton component
-	//========================================================================================================
-	void GameHolder::UpdateRenderWorld( Renderer& _renderer, EcsWorld& _world, const glm::vec2 _size )
-	{
-		RenderWorld& renderWorld = _world.GetSingleton<RenderWorld>();
-		const RenderDebug& renderDebug = _world.GetSingleton<RenderDebug>();
-		renderWorld.mTargetSize = _size;
-
-        mGame.UpdateRenderWorld();
-
-		// particles mesh
-		RenderDataModel particlesDrawData;
-		particlesDrawData.mMesh         = renderWorld.mParticlesMesh;
-		particlesDrawData.mModelMatrix  = glm::mat4( 1.f );
-		particlesDrawData.mNormalMatrix = glm::mat4( 1.f );
-		particlesDrawData.mColor        = glm::vec4( 1.f, 1.f, 1.f, 1.f );
-		particlesDrawData.mShininess    = 1;
-		particlesDrawData.mTextureIndex = 1;
-		renderWorld.drawData.push_back( particlesDrawData );
-
-		_renderer.SetDrawData( renderWorld.drawData );
-		_renderer.SetUIDrawData( renderWorld.uiDrawData );
-		_renderer.SetPointLights( renderWorld.pointLights );
-		_renderer.SetDirectionalLights( renderWorld.directionalLights );
-        _renderer.SetDebugDrawData( renderDebug.mDebugLines,
-                                    renderDebug.mDebugLinesNoDepthTest,
-                                    renderDebug.mDebugTriangles,
-                                    renderDebug.mDebugLines2D);
-		// Camera
-		Scene& scene = _world.GetSingleton<Scene>();
-		EcsEntity cameraID = _world.GetEntity( scene.mMainCameraHandle );
-		Camera& camera = _world.GetComponent<Camera>( cameraID );
-		camera.mAspectRatio = _size[0] / _size[1];
-		Transform& cameraTransform = _world.GetComponent<Transform>( cameraID );
-		_renderer.SetMainCamera(
-			camera.GetProjection(),
-			camera.GetView( cameraTransform ),
-			ToGLM( cameraTransform.GetPosition() )
-		);
 	}
 
     //========================================================================================================

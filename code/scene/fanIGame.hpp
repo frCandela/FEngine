@@ -20,6 +20,13 @@ namespace fan
         virtual void Step( const float _delta ) = 0;
         virtual void UpdateRenderWorld() = 0;
 
+        static void EcsIncludeBase    ( EcsWorld& _world );
+        static void EcsIncludePhysics ( EcsWorld& _world );
+        static void EcsIncludeRender3D( EcsWorld& _world );
+        static void EcsIncludeRenderUI( EcsWorld& _world );
+        static void EcsIncludeNetworkClient ( EcsWorld& _world );
+        static void EcsIncludeNetworkServer ( EcsWorld& _world );
+
         EcsWorld    mWorld;
         std::string mName;
     };

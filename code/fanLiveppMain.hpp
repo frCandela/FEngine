@@ -78,7 +78,7 @@ namespace fan
                     fan::GameHolder gameHolder( _settings, client );
                     if( _settings.enableLivepp )
                     {
-                        gameHolder.onLPPSynch.Connect( &LPPMain::OnSync, this );
+                        gameHolder.mOnLPPSynch.Connect( &LPPMain::OnSync, this );
                     }
                     gameHolder.Run();
                 } break;
@@ -91,7 +91,7 @@ namespace fan
                     fan::GameHolder gameHolder( _settings, server );
                     if( _settings.enableLivepp )
                     {
-                        gameHolder.onLPPSynch.Connect( &LPPMain::OnSync, this );
+                        gameHolder.mOnLPPSynch.Connect( &LPPMain::OnSync, this );
                     }
                     gameHolder.Run();
                 } break;

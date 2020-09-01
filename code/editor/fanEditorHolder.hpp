@@ -1,25 +1,15 @@
 #pragma once
 
-#include <editor/windows/fanUnitsTestsWindow.hpp>
-#include "fanDisableWarnings.hpp"
-WARNINGS_GLM_PUSH()
-#include "glm/glm.hpp"
-WARNINGS_POP()
 #include "core/fanSerializedValues.hpp"
 #include "ecs/fanEcsWorld.hpp"
-#include "render/fanWindow.hpp"
-#include "scene/fanPrefabManager.hpp"
-#include "scene/fanFullscreen.hpp"
+#include "scene/fanIHolder.hpp"
 #include "game/fanGameClient.hpp"
 #include "game/fanGameServer.hpp"
-#include "game/fanLaunchSettings.hpp"
 
 namespace fan
 {
 	class GameViewWindow;
 	class MainMenuBar;
-	class EcsWorld;
-	class Renderer;
 	class Window;
 	struct Scene;
 
@@ -28,30 +18,19 @@ namespace fan
 	// contains a game, a renderer, editions windows/ui and references on EcsWorld
 	// here can be multiple IGame for client and server to run in the same process
 	//========================================================================================================
-	class EditorHolder
+	class EditorHolder : public IHolder
 	{
 	public:
-		Signal <> mOnLPPSynch;
-
-		EditorHolder( const LaunchSettings _settings, std::vector<IGame*>  _games );
+		EditorHolder( const LaunchSettings& _settings, std::vector<IGame*>  _games );
 		~EditorHolder();
 
 		void Run();
-		void Exit();
 		void Step();
 			   
-	private:		
-		Renderer*            mRenderer;
-		Window               mWindow;
-		PrefabManager        mPrefabManager;
-		FullScreen           mFullScreen;
+	private:
 		std::vector<IGame*>  mGames;
 		int                  mCurrentGame    = 0;
-		double               mLastRenderTime = 0.;
-		const LaunchSettings mLaunchSettings;
-        bool                 mApplicationShouldExit;
         bool                 mShowUi = true;
-
         MainMenuBar *        mMainMenuBar;
         GameViewWindow *     mGameViewWindow;
 
@@ -80,7 +59,6 @@ namespace fan
 		static void GameStop( IGame& _game );
 		static void GamePause( IGame& _game );
 		static void GameResume( IGame& _game );
-		static void UpdateRenderWorld( Renderer& _renderer, IGame& _game, const glm::vec2 _size );
 
 		void OnSceneLoad( Scene& _scene );
 		void OnToogleShowUI() { mShowUi = !mShowUi; }
