@@ -3,7 +3,7 @@
 #include "core/ecs/fanSlot.hpp"
 #include "core/ecs/fanEcsWorld.hpp"
 #include "core/fanAssert.hpp"
-#include "editor/fanGroupsColors.hpp"
+#include "fanGroupsColors.hpp"
 
 namespace ImGui
 {

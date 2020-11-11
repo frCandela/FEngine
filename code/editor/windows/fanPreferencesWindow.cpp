@@ -2,13 +2,13 @@
 
 #include "core/fanColor.hpp"
 #include "core/input/fanInput.hpp"
-#include "core/fanSerializedValues.hpp"
+#include "core/memory/fanSerializedValues.hpp"
 #include "core/time/fanProfiler.hpp"
 #include "core/fanDebug.hpp"
 #include "scene/fanFullscreen.hpp"
 #include "render/fanRenderer.hpp"
 #include "editor/fanModals.hpp"
-#include "editor/fanGroupsColors.hpp"
+#include "editor/gui/fanGroupsColors.hpp"
 
 namespace fan
 {

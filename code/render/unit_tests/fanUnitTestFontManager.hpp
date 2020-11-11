@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/fanUnitTest.hpp"
+#include "core/unit_tests/fanUnitTest.hpp"
 #include "render/resources/fanFontManager.hpp"
 #include "render/resources/fanFont.hpp"
 

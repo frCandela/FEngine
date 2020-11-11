@@ -1,4 +1,4 @@
-#include "editor/fanImguiIcons.hpp"
+#include "fanImguiIcons.hpp"
 
 namespace ImGui
 {

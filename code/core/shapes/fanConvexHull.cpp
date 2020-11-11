@@ -1,9 +1,9 @@
 #include "core/shapes/fanConvexHull.hpp"
 
 #include "quickhull/QuickHull.hpp"
+#include "bullet/LinearMath/btConvexHull.h"
 #include "core/fanDebug.hpp"
 #include "core/shapes/fanTriangle.hpp"
-#include "bullet/LinearMath/btConvexHull.h"
 
 namespace fan
 {

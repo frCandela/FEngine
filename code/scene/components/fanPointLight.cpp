@@ -1,6 +1,6 @@
 #include "scene/components/fanPointLight.hpp"
 #include "bullet/LinearMath/btVector3.h"
-#include "core/fanSerializable.hpp"
+#include "core/memory/fanSerializable.hpp"
 #include "editor/fanModals.hpp"
 
 namespace fan

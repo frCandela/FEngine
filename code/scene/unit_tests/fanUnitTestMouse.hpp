@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/fanUnitTest.hpp"
+#include "core/unit_tests/fanUnitTest.hpp"
 #include "render/fanWindow.hpp"
 #include "scene/singletons/fanMouse.hpp"
 

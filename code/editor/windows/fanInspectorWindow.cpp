@@ -16,7 +16,7 @@
 #include "render/resources/fanTexture.hpp"
 #include "render/resources/fanMesh.hpp"
 #include "editor/singletons/fanEditorSelection.hpp"
-#include "editor/fanGroupsColors.hpp"
+#include "editor/gui/fanGroupsColors.hpp"
 
 
 namespace fan

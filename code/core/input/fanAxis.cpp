@@ -1,7 +1,7 @@
 #include "core/input/fanAxis.hpp"
 
-#include "imgui/imgui.h"
 #include "core/fanDebug.hpp"
+#include "core/memory/fanSerializable.hpp"
 
 namespace fan
 {

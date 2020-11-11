@@ -1,10 +1,10 @@
 #pragma once
 
 #include <string>
-#include "editor/fanImguiIcons.hpp"
-#include "core/fanHash.hpp"
 #include "fanJson.hpp"
-#include "fanEcsTypes.hpp"
+#include "core/fanHash.hpp"
+#include "core/ecs/fanEcsTypes.hpp"
+#include "core/fanImguiIcons.hpp"
 
 namespace sf { class Packet; }
 

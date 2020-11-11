@@ -6,7 +6,7 @@
 #include "scene/fanPrefab.hpp"
 #include "scene/singletons/fanScene.hpp"
 #include "render/resources/fanTexture.hpp"
-#include "editor/fanGroupsColors.hpp"
+#include "editor/gui/fanGroupsColors.hpp"
 
 namespace ImGui
 {

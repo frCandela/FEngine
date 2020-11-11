@@ -1,6 +1,6 @@
 #include "scene/components/fanTransform.hpp"
 #include "glm/gtc/matrix_transform.hpp"
-#include "core/fanSerializable.hpp"
+#include "core/memory/fanSerializable.hpp"
 #include "core/math/fanMathUtils.hpp"
 #include "network/fanPacket.hpp"
 

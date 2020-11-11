@@ -1,7 +1,7 @@
 #pragma once
 
 #include <string>
-#include "editor/fanImguiIcons.hpp"
+#include "core/fanImguiIcons.hpp"
 
 namespace fan
 {

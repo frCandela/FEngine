@@ -1,7 +1,7 @@
 #pragma once
 
 #include "editor/windows/fanEditorWindow.hpp"
-#include "core/fanUnitTest.hpp"
+#include "core/unit_tests/fanUnitTest.hpp"
 
 namespace fan
 {

@@ -1,6 +1,5 @@
-#include "fanEcsWorld.hpp"
+#include "core/ecs/fanEcsWorld.hpp"
 #include "core/time/fanProfiler.hpp"
-#include "core/fanAssert.hpp"
 #include "core/fanDebug.hpp"
 
 namespace fan

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/fanUnitTest.hpp"
+#include "core/unit_tests/fanUnitTest.hpp"
 #include "scene/fanPrefabManager.hpp"
 #include "scene/fanPrefab.hpp"
 #include "scene/fanSceneResourcePtr.hpp"

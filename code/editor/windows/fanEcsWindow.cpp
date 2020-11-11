@@ -8,7 +8,7 @@
 #include "core/ecs/fanEcsTag.hpp"
 #include "scene/fanSceneTags.hpp"
 #include "editor/fanModals.hpp"
-#include "editor/fanGroupsColors.hpp"
+#include "editor/gui/fanGroupsColors.hpp"
 
 namespace fan
 {

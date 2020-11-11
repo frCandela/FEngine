@@ -1,6 +1,6 @@
 #include "editor/singletons/fanEditorGrid.hpp"
 
-#include "core/fanSerializedValues.hpp"
+#include "core/memory/fanSerializedValues.hpp"
 #include "core/ecs/fanEcsWorld.hpp"
 #include "scene/singletons/fanRenderDebug.hpp"
 #include "scene/fanSceneSerializable.hpp"

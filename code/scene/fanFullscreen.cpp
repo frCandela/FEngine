@@ -1,6 +1,6 @@
 #include "scene/fanFullscreen.hpp"
 #include "render/fanWindow.hpp"
-#include "core/fanSerializedValues.hpp"
+#include "core/memory/fanSerializedValues.hpp"
 
 namespace fan
 {

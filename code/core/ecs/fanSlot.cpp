@@ -1,6 +1,6 @@
 #include "fanSlot.hpp"
 #include "fanEcsWorld.hpp"
-#include "core/ecs/gui/fanGuiSlotPtr.hpp"
+#include "editor/gui/fanGuiSlotPtr.hpp"
 #include "scene/fanDragnDrop.hpp"
 #include "scene/components/fanSceneNode.hpp"
 #include "editor/fanModals.hpp"

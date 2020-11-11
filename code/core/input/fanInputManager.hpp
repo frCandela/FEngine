@@ -2,7 +2,7 @@
 
 #include "fanJson.hpp"
 #include "core/fanSingleton.hpp"
-#include "core/fanSerializable.hpp"
+#include "core/memory/fanSerializable.hpp"
 #include "core/input/fanAxis.hpp"
 
 namespace fan

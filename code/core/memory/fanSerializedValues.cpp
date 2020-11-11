@@ -1,11 +1,11 @@
-#include "core/fanSerializedValues.hpp"
+#include "fanSerializedValues.hpp"
 
 #include <fstream>
 #include "core/fanDebug.hpp"
 #include "core/math/fanVector2.hpp"
 #include "core/fanColor.hpp"
 #include "bullet/LinearMath/btQuaternion.h"
-#include "core/fanSerializable.hpp"
+#include "fanSerializable.hpp"
 #include "core/input/fanInput.hpp"
 #include "core/input/fanInputManager.hpp"
 

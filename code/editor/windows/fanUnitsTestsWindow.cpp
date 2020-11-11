@@ -9,8 +9,8 @@
 #include "render/unit_tests/fanUnitTestFontManager.hpp"
 #include "scene/unit_tests/fanUnitTestPrefabManager.hpp"
 #include "scene/unit_tests/fanUnitTestMouse.hpp"
-#include "core/ecs/unit_tests/fanUnitTestSignal.hpp"
-#include "core/ecs/unit_tests/fanUnitTestEcs.hpp"
+#include "core/unit_tests/fanUnitTestSignal.hpp"
+#include "core/unit_tests/fanUnitTestEcs.hpp"
 
 
 namespace fan

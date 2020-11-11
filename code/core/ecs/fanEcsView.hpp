@@ -1,6 +1,6 @@
 #pragma once
 
-#include "fanEcsArchetype.hpp"
+#include "core/ecs/fanEcsArchetype.hpp"
 
 namespace fan
 {

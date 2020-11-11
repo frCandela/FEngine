@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/fanSerializedValues.hpp"
+#include "core/memory/fanSerializedValues.hpp"
 #include "core/ecs/fanEcsWorld.hpp"
 #include "scene/fanIHolder.hpp"
 #include "game/fanGameClient.hpp"

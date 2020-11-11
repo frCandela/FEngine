@@ -2,7 +2,6 @@
 
 #include "core/input/fanKeyboard.hpp"
 #include "core/input/fanJoystick.hpp"
-#include "scene/fanSceneSerializable.hpp"
 
 namespace fan
 {

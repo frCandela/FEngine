@@ -2,11 +2,11 @@
 
 #include <string>
 #include <type_traits>
-#include "core/fanHash.hpp"
-#include "editor/fanImguiIcons.hpp"
-#include "fanEcsEntity.hpp"
-#include "fanEcsTypes.hpp"
 #include "fanJson.hpp"
+#include "core/fanHash.hpp"
+#include "core/ecs/fanEcsEntity.hpp"
+#include "core/ecs/fanEcsTypes.hpp"
+#include "core/fanImguiIcons.hpp"
 
 namespace sf
 {

@@ -1,6 +1,6 @@
 #include "scene/components/ui/fanUITransform.hpp"
 
-#include "core/fanSerializable.hpp"
+#include "core/memory/fanSerializable.hpp"
 
 namespace fan
 {

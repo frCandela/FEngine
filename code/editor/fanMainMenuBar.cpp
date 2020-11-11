@@ -1,7 +1,7 @@
 #include "editor/fanMainMenuBar.hpp"
 
 #include "core/fanDebug.hpp"
-#include "core/fanSerializedValues.hpp"
+#include "core/memory/fanSerializedValues.hpp"
 #include "core/input/fanInput.hpp"
 #include "core/time/fanProfiler.hpp"
 #include "network/singletons/fanTime.hpp"

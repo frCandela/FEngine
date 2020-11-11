@@ -4,8 +4,8 @@
 #include <iostream>
 #include <functional>
 #include "core/fanAssert.hpp"
-#include "fanEcsWorld.hpp"
-#include "fanSlot.hpp"
+#include "core/ecs/fanEcsWorld.hpp"
+#include "core/ecs/fanSlot.hpp"
 
 namespace fan
 {

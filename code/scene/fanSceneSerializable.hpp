@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/fanSerializable.hpp"
+#include "core/memory/fanSerializable.hpp"
 
 namespace fan
 {
