@@ -1,7 +1,7 @@
 #pragma once
 
 #include "core/fanSerializedValues.hpp"
-#include "ecs/fanEcsWorld.hpp"
+#include "core/ecs/fanEcsWorld.hpp"
 #include "scene/fanIHolder.hpp"
 #include "game/fanGameClient.hpp"
 #include "game/fanGameServer.hpp"

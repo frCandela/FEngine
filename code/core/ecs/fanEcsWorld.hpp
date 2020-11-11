@@ -3,12 +3,12 @@
 #include <unordered_map>
 #include "core/fanHash.hpp"
 #include "core/fanAssert.hpp"
-#include "ecs/fanEcsEntity.hpp"
-#include "ecs/fanEcsComponent.hpp"
-#include "ecs/fanEcsSingleton.hpp"
-#include "ecs/fanEcsTag.hpp"
-#include "ecs/fanEcsArchetype.hpp"
-#include "ecs/fanEcsView.hpp"
+#include "fanEcsEntity.hpp"
+#include "fanEcsComponent.hpp"
+#include "fanEcsSingleton.hpp"
+#include "fanEcsTag.hpp"
+#include "fanEcsArchetype.hpp"
+#include "fanEcsView.hpp"
 
 namespace fan
 {

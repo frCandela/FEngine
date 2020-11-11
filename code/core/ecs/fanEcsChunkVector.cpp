@@ -1,4 +1,4 @@
-#include "ecs/fanEcsChunkVector.hpp"
+#include "fanEcsChunkVector.hpp"
 #include "core/fanAssert.hpp"
 
 namespace fan

@@ -1,4 +1,4 @@
-#include "ecs/fanEcsSystem.hpp"
+#include "core/ecs/fanEcsSystem.hpp"
 #include "core/shapes/fanRay.hpp"
 #include "scene/components/fanSceneNode.hpp"
 #include "scene/components/fanBounds.hpp"

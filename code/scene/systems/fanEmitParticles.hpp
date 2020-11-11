@@ -1,4 +1,4 @@
-#include "ecs/fanEcsSystem.hpp"
+#include "core/ecs/fanEcsSystem.hpp"
 #include "core/math/fanMathUtils.hpp"
 #include "core/fanRandom.hpp"
 #include "scene/components/fanTransform.hpp"

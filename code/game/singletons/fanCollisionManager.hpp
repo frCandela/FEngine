@@ -4,7 +4,7 @@
 WARNINGS_BULLET_PUSH()
 #include "bullet/btBulletDynamicsCommon.h"
 WARNINGS_POP()
-#include "ecs/fanEcsSingleton.hpp"
+#include "core/ecs/fanEcsSingleton.hpp"
 
 namespace fan
 {

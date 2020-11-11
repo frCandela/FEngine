@@ -2,7 +2,7 @@
 
 #include <cstdint>
 #include "imgui/imgui.h"
-#include "ecs/fanEcsTypes.hpp"
+#include "core/ecs/fanEcsTypes.hpp"
 
 namespace fan
 {

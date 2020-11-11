@@ -2,7 +2,7 @@
 
 #include <deque>
 #include <queue>
-#include "ecs/fanEcsComponent.hpp"
+#include "core/ecs/fanEcsComponent.hpp"
 #include "network/fanPacket.hpp"
 
 namespace fan

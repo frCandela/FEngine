@@ -1,9 +1,9 @@
 #pragma once
 
 #include <unordered_map>
-#include "ecs/fanEcsComponent.hpp"
+#include "core/ecs/fanEcsComponent.hpp"
 #include "network/fanPacket.hpp"
-#include "ecs/fanSignal.hpp"
+#include "core/ecs/fanSignal.hpp"
 
 namespace fan
 {

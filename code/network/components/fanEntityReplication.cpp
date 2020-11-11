@@ -1,5 +1,5 @@
 #include "network/components/fanEntityReplication.hpp"
-#include "ecs/fanEcsWorld.hpp"
+#include "core/ecs/fanEcsWorld.hpp"
 
 namespace fan
 {

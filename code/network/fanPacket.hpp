@@ -7,7 +7,7 @@
 #include "bullet/LinearMath/btVector3.h"
 
 #include "network/fanNetConfig.hpp"
-#include "ecs/fanSignal.hpp"
+#include "core/ecs/fanSignal.hpp"
 #include "core/fanDebug.hpp"
 
 namespace fan

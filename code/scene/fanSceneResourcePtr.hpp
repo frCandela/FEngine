@@ -2,7 +2,7 @@
 
 #include "core/resources/fanResourcePtr.hpp"
 #include "scene/fanPrefab.hpp"
-#include "ecs/fanEcsWorld.hpp"
+#include "core/ecs/fanEcsWorld.hpp"
 
 namespace fan
 {

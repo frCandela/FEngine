@@ -1,4 +1,4 @@
-#include "ecs/fanEcsSystem.hpp"
+#include "core/ecs/fanEcsSystem.hpp"
 #include "core/time/fanProfiler.hpp"
 #include "scene/components/fanParticle.hpp"
 #include "scene/singletons/fanRenderWorld.hpp"

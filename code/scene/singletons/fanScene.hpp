@@ -1,9 +1,9 @@
 #pragma once
 
 #include <set>
-#include "ecs/fanSignal.hpp"
+#include "core/ecs/fanSignal.hpp"
 #include "scene/fanSceneSerializable.hpp"
-#include "ecs/fanEcsSingleton.hpp"
+#include "core/ecs/fanEcsSingleton.hpp"
 
 namespace fan
 {

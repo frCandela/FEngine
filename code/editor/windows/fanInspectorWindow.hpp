@@ -3,7 +3,7 @@
 #include <set>
 #include <filesystem>
 #include "editor/windows/fanEditorWindow.hpp"
-#include "ecs/fanEcsTypes.hpp"
+#include "core/ecs/fanEcsTypes.hpp"
 
 namespace fan
 {

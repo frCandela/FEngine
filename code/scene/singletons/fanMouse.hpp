@@ -5,7 +5,7 @@
 WARNINGS_GLM_PUSH()
 #include "glm/glm.hpp"
 WARNINGS_POP()
-#include "ecs/fanEcsSingleton.hpp"
+#include "core/ecs/fanEcsSingleton.hpp"
 
 struct GLFWwindow;
 

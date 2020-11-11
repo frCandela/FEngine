@@ -4,7 +4,7 @@
 WARNINGS_GLM_PUSH()
 #include "glm/glm.hpp"
 WARNINGS_POP()
-#include "ecs/fanSignal.hpp"
+#include "core/ecs/fanSignal.hpp"
 #include "render/fanWindow.hpp"
 #include "render/fanRenderer.hpp"
 #include "scene/fanPrefabManager.hpp"

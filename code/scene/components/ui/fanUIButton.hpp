@@ -1,7 +1,7 @@
 #pragma once
 
-#include "ecs/fanEcsComponent.hpp"
-#include "ecs/fanSlot.hpp"
+#include "core/ecs/fanEcsComponent.hpp"
+#include "core/ecs/fanSlot.hpp"
 #include "scene/components/ui/fanUITransform.hpp"
 #include "scene/fanSceneResourcePtr.hpp"
 #include "core/fanColor.hpp"

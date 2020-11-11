@@ -1,4 +1,4 @@
-#include "ecs/gui/fanGuiSlotPtr.hpp"
+#include "fanGuiSlotPtr.hpp"
 #include <sstream>
 
 namespace ImGui

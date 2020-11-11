@@ -1,4 +1,4 @@
-#include "ecs/fanEcsSystem.hpp"
+#include "core/ecs/fanEcsSystem.hpp"
 #include "scene/components/ui/fanUITransform.hpp"
 #include "scene/components/ui/fanUIAlign.hpp"
 #include "scene/singletons/fanRenderWorld.hpp"

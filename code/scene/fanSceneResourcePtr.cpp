@@ -3,7 +3,7 @@
 #include "scene/singletons/fanScenePointers.hpp"
 #include "scene/singletons/fanScene.hpp"
 #include "scene/components/fanSceneNode.hpp"
-#include "ecs/fanEcsWorld.hpp"
+#include "core/ecs/fanEcsWorld.hpp"
 #include "editor/fanModals.hpp"
 #include "scene/fanDragnDrop.hpp"
 #include "render/fanRenderGlobal.hpp"

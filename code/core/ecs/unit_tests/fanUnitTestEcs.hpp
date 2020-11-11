@@ -1,10 +1,10 @@
 #pragma once
 
 #include "core/fanUnitTest.hpp"
-#include "ecs/fanSlot.hpp"
-#include "ecs/fanEcsWorld.hpp"
-#include "ecs/fanEcsComponent.hpp"
-#include "ecs/fanEcsSingleton.hpp"
+#include "core/ecs/fanSlot.hpp"
+#include "core/ecs/fanEcsWorld.hpp"
+#include "core/ecs/fanEcsComponent.hpp"
+#include "core/ecs/fanEcsSingleton.hpp"
 
 namespace fan
 {

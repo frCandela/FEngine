@@ -1,7 +1,7 @@
 #pragma once
 
 #include "bullet/LinearMath/btVector3.h"
-#include "ecs/fanEcsSingleton.hpp"
+#include "core/ecs/fanEcsSingleton.hpp"
 #include "core/fanColor.hpp"
 
 namespace fan

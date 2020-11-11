@@ -1,4 +1,4 @@
-#include "ecs/fanEcsWorld.hpp"
+#include "fanEcsWorld.hpp"
 #include "core/time/fanProfiler.hpp"
 #include "core/fanAssert.hpp"
 #include "core/fanDebug.hpp"

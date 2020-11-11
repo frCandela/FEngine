@@ -3,9 +3,9 @@
 #include <sstream>
 #include "core/time/fanProfiler.hpp"
 #include "core/fanDebug.hpp"
-#include "ecs/fanEcsWorld.hpp"
-#include "ecs/fanEcsSystem.hpp"
-#include "ecs/fanEcsTag.hpp"
+#include "core/ecs/fanEcsWorld.hpp"
+#include "core/ecs/fanEcsSystem.hpp"
+#include "core/ecs/fanEcsTag.hpp"
 #include "scene/fanSceneTags.hpp"
 #include "editor/fanModals.hpp"
 #include "editor/fanGroupsColors.hpp"

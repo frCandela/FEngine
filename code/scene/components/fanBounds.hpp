@@ -1,6 +1,6 @@
 #pragma  once
 
-#include "ecs/fanEcsComponent.hpp"
+#include "core/ecs/fanEcsComponent.hpp"
 #include "core/shapes/fanAABB.hpp"
 
 namespace fan

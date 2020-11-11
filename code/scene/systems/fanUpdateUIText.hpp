@@ -1,5 +1,5 @@
-#include "ecs/fanEcsSystem.hpp"
-#include "ecs/fanEcsWorld.hpp"
+#include "core/ecs/fanEcsSystem.hpp"
+#include "core/ecs/fanEcsWorld.hpp"
 #include "scene/components/ui/fanUITransform.hpp"
 #include "scene/components/ui/fanUIText.hpp"
 #include "scene/components/ui/fanUIRenderer.hpp"

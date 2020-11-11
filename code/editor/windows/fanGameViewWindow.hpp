@@ -1,7 +1,7 @@
 #pragma once
 
 #include "core/math/fanVector2.hpp"
-#include "ecs/fanSignal.hpp"
+#include "core/ecs/fanSignal.hpp"
 #include "editor/windows/fanEditorWindow.hpp"
 #include "game/fanLaunchSettings.hpp"
 #include "glfw/glfw3.h"

@@ -2,7 +2,7 @@
 
 #include "core/fanSerializable.hpp"
 #include "core/input/fanJoystick.hpp"
-#include "ecs/fanEcsWorld.hpp"
+#include "core/ecs/fanEcsWorld.hpp"
 #include "editor/fanModals.hpp"	
 #include "network/fanPacket.hpp"
 

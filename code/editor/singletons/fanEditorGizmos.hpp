@@ -4,7 +4,7 @@
 #include "bullet/LinearMath/btVector3.h"
 #include "bullet/LinearMath/btTransform.h"
 
-#include "ecs/fanEcsSingleton.hpp"
+#include "core/ecs/fanEcsSingleton.hpp"
 
 namespace fan
 {

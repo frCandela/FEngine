@@ -7,7 +7,6 @@ file(GLOB_RECURSE FAN_NETWORK_H *.hpp)
 
 set(FAN_NETWORK_LIBS
     fanCore
-	fanEcs
 	ws2_32
 	sfml-system-s
 	sfml-network-s

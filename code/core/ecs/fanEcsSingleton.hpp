@@ -4,7 +4,7 @@
 #include "editor/fanImguiIcons.hpp"
 #include "core/fanHash.hpp"
 #include "fanJson.hpp"
-#include "ecs/fanEcsTypes.hpp"
+#include "fanEcsTypes.hpp"
 
 namespace sf { class Packet; }
 

@@ -9,7 +9,7 @@
 #include <type_traits>
 #include "SFML/System.hpp"
 #include "SFML/Network.hpp"
-#include "ecs/fanEcsTypes.hpp"
+#include "core/ecs/fanEcsTypes.hpp"
 
 namespace fan
 {

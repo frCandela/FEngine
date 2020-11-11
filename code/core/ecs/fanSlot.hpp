@@ -1,9 +1,9 @@
 #pragma once
 
 #include <string>
-#include "ecs/fanEcsTypes.hpp"
-#include "ecs/fanEcsComponent.hpp"
-#include "ecs/fanEcsSingleton.hpp"
+#include "fanEcsTypes.hpp"
+#include "fanEcsComponent.hpp"
+#include "fanEcsSingleton.hpp"
 
 namespace fan
 {

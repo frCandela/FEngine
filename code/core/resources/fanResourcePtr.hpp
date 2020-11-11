@@ -1,7 +1,7 @@
 #pragma once
 
 #include "core/fanHash.hpp"
-#include "ecs/fanSignal.hpp"
+#include "core/ecs/fanSignal.hpp"
 #include "core/resources/fanResource.hpp"
 
 namespace fan

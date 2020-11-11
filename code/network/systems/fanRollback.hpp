@@ -1,4 +1,4 @@
-#include "ecs/fanEcsSystem.hpp"
+#include "core/ecs/fanEcsSystem.hpp"
 #include "network/components/fanClientRollback.hpp"
 #include "network/singletons/fanTime.hpp"
 #include "game/singletons/fanClientNetworkManager.hpp"

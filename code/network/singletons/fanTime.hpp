@@ -1,7 +1,7 @@
 #pragma once
 
 #include "glfw/glfw3.h"
-#include "ecs/fanEcsSingleton.hpp"
+#include "core/ecs/fanEcsSingleton.hpp"
 #include "network/fanNetConfig.hpp"
 #include "scene/fanSceneResourcePtr.hpp"
 

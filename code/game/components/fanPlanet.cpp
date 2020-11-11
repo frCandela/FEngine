@@ -1,6 +1,6 @@
 #include "game/components/fanPlanet.hpp"
 
-#include "ecs/fanEcsWorld.hpp"
+#include "core/ecs/fanEcsWorld.hpp"
 #include "scene/singletons/fanRenderDebug.hpp"
 #include "scene/fanSceneSerializable.hpp"
 

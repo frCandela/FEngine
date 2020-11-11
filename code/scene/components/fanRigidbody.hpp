@@ -4,8 +4,8 @@
 WARNINGS_BULLET_PUSH()
 #include "bullet/btBulletDynamicsCommon.h"
 WARNINGS_POP()
-#include "ecs/fanEcsComponent.hpp"
-#include "ecs/fanSignal.hpp"
+#include "core/ecs/fanEcsComponent.hpp"
+#include "core/ecs/fanSignal.hpp"
 
 class btCollisionShape;
 class btPersistentManifold;

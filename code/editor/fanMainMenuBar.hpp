@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ecs/fanSignal.hpp"
+#include "core/ecs/fanSignal.hpp"
 #include <filesystem>
 #include <set>
 

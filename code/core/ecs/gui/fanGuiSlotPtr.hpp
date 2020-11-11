@@ -1,7 +1,7 @@
 #pragma once
 
-#include "ecs/fanSlot.hpp"
-#include "ecs/fanEcsWorld.hpp"
+#include "core/ecs/fanSlot.hpp"
+#include "core/ecs/fanEcsWorld.hpp"
 #include "core/fanAssert.hpp"
 #include "editor/fanGroupsColors.hpp"
 

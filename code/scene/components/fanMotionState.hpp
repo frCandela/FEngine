@@ -1,6 +1,6 @@
 #pragma  once
 
-#include "ecs/fanEcsComponent.hpp"
+#include "core/ecs/fanEcsComponent.hpp"
 #include "fanDisableWarnings.hpp"
 WARNINGS_BULLET_PUSH()
 #include "bullet/btBulletDynamicsCommon.h"

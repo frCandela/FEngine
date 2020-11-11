@@ -1,4 +1,4 @@
-#include "ecs/fanSlot.hpp"
+#include "core/ecs/fanSlot.hpp"
 #include "scene/singletons/fanScenePointers.hpp"
 #include "scene/components/fanSceneNode.hpp"
 #include "scene/singletons/fanScene.hpp"

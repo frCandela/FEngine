@@ -1,4 +1,4 @@
-#include "ecs/fanEcsWorld.hpp"
+#include "core/ecs/fanEcsWorld.hpp"
 #include "render/resources/fanMesh2D.hpp"
 #include "render/resources/fanMesh2DManager.hpp"
 #include "scene/components/ui/fanUIText.hpp"

@@ -1,6 +1,6 @@
 #include "scene/components/fanMotionState.hpp"
 #include "scene/singletons/fanPhysicsWorld.hpp"
-#include "ecs/fanEcsWorld.hpp"
+#include "core/ecs/fanEcsWorld.hpp"
 
 namespace fan
 {

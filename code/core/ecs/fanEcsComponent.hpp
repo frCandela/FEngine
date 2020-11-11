@@ -4,8 +4,8 @@
 #include <type_traits>
 #include "core/fanHash.hpp"
 #include "editor/fanImguiIcons.hpp"
-#include "ecs/fanEcsEntity.hpp"
-#include "ecs/fanEcsTypes.hpp"
+#include "fanEcsEntity.hpp"
+#include "fanEcsTypes.hpp"
 #include "fanJson.hpp"
 
 namespace sf
