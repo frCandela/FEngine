@@ -49,10 +49,6 @@ namespace fan
 			RollbackNoOverwrite = 1 // on a rollback, old rollback states are not overwritten with new ones
 		};
 
-		std::string            mName;
-		ImGui::IconType        mIcon  = ImGui::IconType::None16;	// editor icon
-		EngineGroups           mGroup = EngineGroups::None;	    // editor group
-		const char*		       mEditorPath = "";				// editor path for the addComponent menu
 		uint32_t               mType;
 		int                    mIndex;
 		uint32_t               mSize;
@@ -60,14 +56,13 @@ namespace fan
 		int                    mFlags          = ComponentFlags::None;
 		std::vector<SlotBase*> mSlots;                         // callable methods
 
-		void ( *init )( EcsWorld&, EcsEntity, EcsComponent& ) = nullptr;			// called once at creation
-        void ( *setInfo ) ( EcsComponentInfo& ) = nullptr;                          // called once at startup
-		void ( *destroy )( EcsWorld&, EcsEntity, EcsComponent& ) = nullptr;			// called at destruction
-		void ( *onGui )( EcsWorld&, EcsEntity, EcsComponent& ) = nullptr;			// draw gui
-		void ( *save )( const EcsComponent&, Json& ) = nullptr;						// Serialize to json
-		void ( *load )( EcsComponent&, const Json& ) = nullptr;						// Deserialize from json
-		void ( *netSave ) ( const EcsComponent&, sf::Packet& _packet ) = nullptr;	// Serialize to packet
-		void ( *netLoad ) ( EcsComponent&, sf::Packet& _packet ) = nullptr;		    // Deserialize from packet
+		void ( *init )( EcsWorld&, EcsEntity, EcsComponent& ) = nullptr;			  // called once at creation
+        void ( *setInfo ) ( EcsComponentInfo& ) = nullptr;                            // called once at startup
+		void ( *destroy )( EcsWorld&, EcsEntity, EcsComponent& ) = nullptr;			  // called at destruction
+		void ( *save )( const EcsComponent&, Json& ) = nullptr;						  // Serialize to json
+		void ( *load )( EcsComponent&, const Json& ) = nullptr;						  // Deserialize from json
+		void ( *netSave ) ( const EcsComponent&, sf::Packet& _packet ) = nullptr;	  // Serialize to packet
+		void ( *netLoad ) ( EcsComponent&, sf::Packet& _packet ) = nullptr;		      // Deserialize from packet
 		void ( *rollbackSave ) ( const EcsComponent&, sf::Packet& _packet ) = nullptr;// Serializes rollback
 		void ( *rollbackLoad ) ( EcsComponent&, sf::Packet& _packet ) = nullptr;	  // Deserializes rollback
 		EcsComponent& ( *construct )( void* ) = nullptr;

@@ -7,14 +7,9 @@ namespace fan
 	//========================================================================================================
 	void SphereShape::SetInfo( EcsComponentInfo& _info )
 	{
-		_info.mIcon       = ImGui::IconType::SphereShape16;
-		_info.mGroup      = EngineGroups::ScenePhysics;
-		_info.onGui       = &SphereShape::OnGui;
 		_info.destroy     = &SphereShape::Destroy;
 		_info.load        = &SphereShape::Load;
 		_info.save        = &SphereShape::Save;
-		_info.mEditorPath = "/";
-		_info.mName       = "sphere shape";
 	}
 
 	//========================================================================================================
@@ -68,21 +63,4 @@ namespace fan
 	{
 		return mSphereShape->getRadius();
 	}
-
-    //========================================================================================================
-    //========================================================================================================
-    void SphereShape::OnGui( EcsWorld& /*_world*/, EcsEntity /*_entityID*/, EcsComponent& _component )
-    {
-        SphereShape& sphereShape = static_cast<SphereShape&>( _component );
-
-        ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() );
-        {
-            float radius = sphereShape.GetRadius();
-            if( ImGui::DragFloat( "radius##sphshapradius", &radius, 0.1f, 0.f ) )
-            {
-                sphereShape.SetRadius( radius );
-            }
-        }
-        ImGui::PopItemWidth();
-    }
 }

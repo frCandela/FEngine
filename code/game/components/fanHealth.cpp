@@ -8,13 +8,8 @@ namespace fan
 	//========================================================================================================
 	void Health::SetInfo( EcsComponentInfo& _info )
 	{
-		_info.mIcon       = ImGui::IconType::Heart16;
-		_info.mGroup      = EngineGroups::Game;
-		_info.onGui       = &Health::OnGui;
 		_info.load        = &Health::Load;
 		_info.save        = &Health::Save;
-		_info.mEditorPath = "game/";
-		_info.mName       = "health";
 	}
 
 	//========================================================================================================
@@ -44,18 +39,4 @@ namespace fan
 		Serializable::LoadFloat( _json, "max_energy", health.mMaxHealth );
 		Serializable::LoadBool( _json, "invincible", health.mInvincible );
 	}
-
-    //========================================================================================================
-    //========================================================================================================
-    void Health::OnGui( EcsWorld& /*_world*/, EcsEntity /*_entityID*/, EcsComponent& _component )
-    {
-        Health& health = static_cast<Health&>( _component );
-
-        ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() );
-        {
-            ImGui::SliderFloat( "current health", &health.mCurrentHealth, 0.f, health.mMaxHealth );
-            ImGui::DragFloat( "max health", &health.mMaxHealth );
-            ImGui::Checkbox( "invincible", &health.mInvincible );
-        } ImGui::PopItemWidth();
-    }
 }

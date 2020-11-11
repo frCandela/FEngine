@@ -9,13 +9,8 @@ namespace fan
 	//========================================================================================================
 	void MeshRenderer::SetInfo( EcsComponentInfo& _info )
 	{
-		_info.mIcon       = ImGui::IconType::MeshRenderer16;
-		_info.mGroup      = EngineGroups::SceneRender;
-		_info.onGui       = &MeshRenderer::OnGui;
 		_info.load        = &MeshRenderer::Load;
 		_info.save        = &MeshRenderer::Save;
-		_info.mEditorPath = "/";
-		_info.mName       = "mesh renderer";
 	}
 
 	//========================================================================================================
@@ -41,12 +36,4 @@ namespace fan
 		MeshRenderer& meshRenderer = static_cast<MeshRenderer&>( _component );
 		Serializable::LoadMeshPtr( _json, "path", meshRenderer.mMesh );
 	}
-
-    //========================================================================================================
-    //========================================================================================================
-    void MeshRenderer::OnGui( EcsWorld& /*_world*/, EcsEntity /*_entityID*/, EcsComponent& _component )
-    {
-        MeshRenderer& meshRenderer = static_cast<MeshRenderer&>( _component );
-        ImGui::FanMeshPtr( "mesh", meshRenderer.mMesh );
-    }
 }

@@ -20,7 +20,6 @@ namespace fan
 		ECS_SINGLETON( Scene )
 		static void SetInfo( EcsSingletonInfo& _info );
 		static void Init( EcsWorld& _world, EcsSingleton& _component );
-		static void OnGui( EcsWorld&, EcsSingleton& _component );
 
         SceneNode& CreateSceneNode( const std::string _name,
                                     SceneNode* const _parentNode,

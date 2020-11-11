@@ -6,12 +6,8 @@ namespace fan
 	//========================================================================================================
 	void Game::SetInfo( EcsSingletonInfo& _info )
 	{
-		_info.mIcon  = ImGui::Joystick16;
-		_info.mGroup = EngineGroups::Game;
-		_info.onGui  = &Game::OnGui;
 		_info.save   = &Game::Save;
 		_info.load   = &Game::Load;
-		_info.mName  = "game";
 	}
 
 	//========================================================================================================
@@ -35,13 +31,5 @@ namespace fan
 	{
 		Game& gameData = static_cast<Game&>( _component );
 		Serializable::LoadPrefabPtr( _json, "spaceship", gameData.mSpaceshipPrefab );
-	}
-
-	//========================================================================================================
-	//========================================================================================================
-	void Game::OnGui( EcsWorld&, EcsSingleton& _component )
-	{
-		Game& gameData = static_cast<Game&>( _component );
-		ImGui::FanPrefab( "spaceship", gameData.mSpaceshipPrefab );
 	}
 }

@@ -18,12 +18,8 @@ namespace fan
 {
 	//========================================================================================================
 	//========================================================================================================
-	void Scene::SetInfo( EcsSingletonInfo& _info )
+	void Scene::SetInfo( EcsSingletonInfo& /*_info*/ )
 	{
-		_info.mIcon  = ImGui::Scene16;
-		_info.mGroup = EngineGroups::Scene;
-		_info.onGui  = &Scene::OnGui;
-		_info.mName  = "scene";
 	}
 
 	//========================================================================================================
@@ -161,7 +157,8 @@ namespace fan
 				{
 					Json& jSingleton_i = jSingletons[nextIndex++];
 					Serializable::SaveUInt( jSingleton_i, "singleton_id", info.mType);
-					Serializable::SaveString( jSingleton_i, "singleton", info.mName );
+                    fanAssert(false);
+					//Serializable::SaveString( jSingleton_i, "singleton", info.mName );
 					EcsSingleton& singleton = mWorld->GetSingleton( info.mType);
 					info.save( singleton, jSingleton_i );
 				}
@@ -204,7 +201,8 @@ namespace fan
 				{
 					Json& jComponent_i = jComponents[nextIndex++];
 					Serializable::SaveUInt( jComponent_i, "component_type", info.mType);
-					Serializable::SaveString( jComponent_i, "type_name", info.mName );
+                    fanAssert(false);
+					//Serializable::SaveString( jComponent_i, "type_name", info.mName );
 					info.save( component, jComponent_i );
 				}				
 			}
@@ -415,21 +413,4 @@ namespace fan
 
 		return node;
 	}
-
-    //========================================================================================================
-    //========================================================================================================
-    void Scene::OnGui( EcsWorld& _world, EcsSingleton& _component )
-    {
-        Scene& scene = static_cast<Scene&>( _component );
-        ImGui::Text( "path: %s", scene.mPath.c_str() );
-
-        if( ImGui::CollapsingHeader( "nodes" ) )
-        {
-            for( EcsHandle handle : scene.mNodes )
-            {
-                SceneNode& sceneNode = _world.GetComponent<SceneNode>( _world.GetEntity( handle ) );
-                ImGui::Text( "%s : %d", sceneNode.mName.c_str(), sceneNode.mHandle );
-            }
-        }
-    }
 }

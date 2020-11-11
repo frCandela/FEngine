@@ -7,13 +7,8 @@ namespace fan
 	//========================================================================================================
 	void ExpirationTime::SetInfo( EcsComponentInfo& _info )
 	{
-		_info.mIcon       = ImGui::IconType::Expiration16;
-		_info.mGroup      = EngineGroups::Scene;
-		_info.onGui       = &ExpirationTime::OnGui;
 		_info.load        = &ExpirationTime::Load;
 		_info.save        = &ExpirationTime::Save;
-		_info.mEditorPath = "/";
-		_info.mName       = "expiration time";
 	}
 
 	//========================================================================================================
@@ -40,16 +35,4 @@ namespace fan
 		ExpirationTime& expiration = static_cast<ExpirationTime&>( _component );
 		Serializable::LoadFloat( _json, "duration", expiration.mDuration );
 	}
-
-    //========================================================================================================
-    //========================================================================================================
-    void ExpirationTime::OnGui( EcsWorld& /*_world*/, EcsEntity /*_entityID*/, EcsComponent& _component )
-    {
-        ExpirationTime& expiration = static_cast<ExpirationTime&>( _component );
-        ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() );
-        {
-            ImGui::DragFloat( "duration##ExpirationTime", &expiration.mDuration, 0.1f, 0.f, 10.f );
-        }
-        ImGui::PopItemWidth();
-    }
 }

@@ -7,13 +7,8 @@ namespace fan
 	//========================================================================================================
 	void Bullet::SetInfo( EcsComponentInfo& _info )
 	{
-		_info.mIcon       = ImGui::IconType::Joystick16;
-		_info.mGroup      = EngineGroups::Game;
-		_info.onGui       = &Bullet::OnGui;
 		_info.load        = &Bullet::Load;
 		_info.save        = &Bullet::Save;
-		_info.mEditorPath = "game/";
-		_info.mName       = "bullet";
 	}
 
 	//========================================================================================================
@@ -41,16 +36,4 @@ namespace fan
 		Bullet& bullet = static_cast<Bullet&>( _component );
 		Serializable::LoadPrefabPtr( _json, "explosion_prefab", bullet.mExplosionPrefab );
 	}
-
-    //========================================================================================================
-    //========================================================================================================
-    void Bullet::OnGui( EcsWorld& /*_world*/, EcsEntity /*_entityID*/, EcsComponent& _component )
-    {
-        Bullet& bullet = static_cast<Bullet&>( _component );
-
-        ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() );
-        {
-            ImGui::FanPrefab( "explosion prefab", bullet.mExplosionPrefab );
-        } ImGui::PopItemWidth();
-    }
 }

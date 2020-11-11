@@ -8,12 +8,8 @@ namespace fan
 	//========================================================================================================
 	void SunLight::SetInfo( EcsSingletonInfo& _info )
 	{
-		_info.mIcon  = ImGui::Sun16;
-		_info.mGroup = EngineGroups::Game;
-		_info.onGui  = &SunLight::OnGui;
 		_info.save   = &SunLight::Save;
 		_info.load   = &SunLight::Load;
-		_info.mName  = "sun light";
 	}
 
 	//========================================================================================================
@@ -69,13 +65,4 @@ namespace fan
 		_vertices.push_back( { p1,		normal, color, uv1 } );
 		_vertices.push_back( { p2,		normal, color, uv2 } );
 	}
-
-    //========================================================================================================
-    //========================================================================================================
-    void SunLight::OnGui( EcsWorld&, EcsSingleton& _component )
-    {
-        SunLight& sunLight = static_cast<SunLight&>( _component );
-        ImGui::DragFloat( "sub angle", &sunLight.mSubAngle, 1.f, 0.f, 90.f );
-        ImGui::DragFloat( "radius", &sunLight.mRadius, 1.f, 1.f, 1000.f );
-    }
 }

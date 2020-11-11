@@ -13,12 +13,8 @@ namespace fan
     //========================================================================================================
     void UIMainMenu::SetInfo( EcsSingletonInfo& _info )
     {
-        _info.mIcon       = ImGui::IconType::MainMenu16;
-        _info.mGroup      = EngineGroups::Game;
-        _info.onGui       = &UIMainMenu::OnGui;
         _info.load        = &UIMainMenu::Load;
         _info.save        = &UIMainMenu::Save;
-        _info.mName       = "main menu";
         _info.mSlots.push_back( new Slot<>("hide_all", &UIMainMenu::HideAll ) );
         _info.mSlots.push_back( new Slot<>("show_main", &UIMainMenu::ShowMainMenu ) );
         _info.mSlots.push_back( new Slot<>("show_option", &UIMainMenu::ShowOptions ) );
@@ -135,29 +131,5 @@ namespace fan
         Serializable::LoadComponentPtr( _json, "main_menu_node", menu.mMainMenuNode );
         Serializable::LoadComponentPtr( _json, "options_node", menu.mOptionsNode );
         Serializable::LoadComponentPtr( _json, "credits_node", menu.mCreditsNode );
-    }
-
-    //========================================================================================================
-    //========================================================================================================
-    void UIMainMenu::OnGui( EcsWorld& /*_world*/, EcsSingleton& _singleton )
-    {
-        UIMainMenu& menu = static_cast<UIMainMenu&>( _singleton );
-        ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() );
-        {
-            ImGui::FanComponent( "main menu", menu.mMainMenuNode);
-            ImGui::FanComponent( "options", menu.mOptionsNode );
-            ImGui::FanComponent( "credits", menu.mCreditsNode );
-
-            ImGui::Spacing();
-
-            if( ImGui::Button("hide all")){ HideAll( menu ); }
-            ImGui::SameLine();
-            if( ImGui::Button("show main menu")){ ShowMainMenu( menu ); }
-            ImGui::SameLine();
-            if( ImGui::Button("show options")){ ShowOptions( menu ); }
-            ImGui::SameLine();
-            if( ImGui::Button("show credits")){ ShowCredits( menu ); }
-
-        } ImGui::PopItemWidth();
     }
 }

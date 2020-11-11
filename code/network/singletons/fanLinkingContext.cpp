@@ -4,12 +4,8 @@ namespace fan
 {
 	//========================================================================================================
 	//========================================================================================================
-	void LinkingContext::SetInfo( EcsSingletonInfo& _info )
+	void LinkingContext::SetInfo( EcsSingletonInfo& /*_info*/ )
 	{
-		_info.mIcon  = ImGui::Link16;
-		_info.mGroup = EngineGroups::Network;
-		_info.onGui  = &LinkingContext::OnGui;
-		_info.mName  = "linking context";
 	}
 
 	//========================================================================================================
@@ -45,24 +41,5 @@ namespace fan
 			mNetIDToEcsHandle.erase( netID );
 			mEcsHandleToNetID.erase( _handle );
 		}
-	}
-
-	//========================================================================================================
-	//========================================================================================================
-	void LinkingContext::OnGui( EcsWorld&, EcsSingleton& _component )
-	{
-		LinkingContext& linkingContext = static_cast<LinkingContext&>( _component );
-		ImGui::Columns( 2 );
-
-		ImGui::Text( "net ID" );		ImGui::NextColumn();
-		ImGui::Text( "entity handle" ); ImGui::NextColumn();
-		for( std::pair<NetID, EcsHandle> pair : linkingContext.mNetIDToEcsHandle )
-		{
-			ImGui::Text( "%d", pair.first );
-			ImGui::NextColumn();
-			ImGui::Text( "%d", pair.second );
-			ImGui::NextColumn();
-		}
-		ImGui::Columns( 1 );
 	}
 }

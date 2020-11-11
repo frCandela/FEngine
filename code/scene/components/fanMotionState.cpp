@@ -8,14 +8,9 @@ namespace fan
 	//========================================================================================================
 	void MotionState::SetInfo( EcsComponentInfo& _info )
 	{
-		_info.mIcon       = ImGui::IconType::Rigidbody16;
-		_info.mGroup      = EngineGroups::ScenePhysics;
 		_info.destroy     = &MotionState::Destroy;
 		_info.save        = &MotionState::Save;
 		_info.load        = &MotionState::Load;
-		_info.onGui       = &MotionState::OnGui;
-		_info.mEditorPath = "/";
-		_info.mName       = "motion state";
 	}
 
 	//========================================================================================================
@@ -36,8 +31,4 @@ namespace fan
 		delete motionState.mMotionState;
 		motionState.mMotionState = nullptr;
 	}
-
-	//========================================================================================================
-	//========================================================================================================
-	void MotionState::OnGui( EcsWorld& /*_world*/, EcsEntity /*_entityID*/, EcsComponent& /*_component*/ ){}
 }

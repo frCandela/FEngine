@@ -13,12 +13,8 @@ namespace fan
 {
 	//========================================================================================================
 	//========================================================================================================
-	void ServerNetworkManager::SetInfo( EcsSingletonInfo& _info )
+	void ServerNetworkManager::SetInfo( EcsSingletonInfo& /*_info*/ )
 	{
-		_info.mIcon  = ImGui::Network16;
-		_info.mGroup = EngineGroups::GameNetwork;
-		_info.onGui  = &ServerNetworkManager::OnGui;
-		_info.mName  = "server network manager";
 	}
 
 	//========================================================================================================
@@ -56,13 +52,5 @@ namespace fan
 		ServerConnection& connection = _world.GetSingleton<ServerConnection>();
 		Debug::Log() << "unbind from port " << connection.mSocket.GetPort() << Debug::Endl();
 		connection.mSocket.Unbind();
-	}
-
-	//========================================================================================================
-	//========================================================================================================
-	void ServerNetworkManager::OnGui( EcsWorld& /*_world*/, EcsSingleton& /*_component*/ )
-	{
-		//ServerNetworkManager& netManager = static_cast<ServerNetworkManager&>( _component );
-		ImGui::Text( "Stop looking at me plz" );
 	}
 }

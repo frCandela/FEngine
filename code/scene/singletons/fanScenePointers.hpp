@@ -20,7 +20,6 @@ namespace fan
 		ECS_SINGLETON( ScenePointers )
 		static void SetInfo( EcsSingletonInfo& _info );
 		static void Init( EcsWorld& _world, EcsSingleton& _component );
-		static void OnGui( EcsWorld&, EcsSingleton& _component );
 
 		std::vector< SlotPtr* >          mUnresolvedSlotPtr;
         std::vector< ComponentPtrBase* > mUnresolvedComponentPtr;

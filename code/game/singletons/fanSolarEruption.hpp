@@ -22,10 +22,8 @@ namespace fan
 		ECS_SINGLETON( SolarEruption )
 		static void SetInfo( EcsSingletonInfo& _info );
 		static void Init( EcsWorld& _world, EcsSingleton& _component );
-		static void OnGui( EcsWorld& _world, EcsSingleton& _component );
 		static void Save( const EcsSingleton& _component, Json& _json );
 		static void Load( EcsSingleton& _component, const Json& _json );
-		static void NetSave( const EcsSingleton& _component, sf::Packet& _packet );
 
 		enum State { WAITING = 0, WARMING = 1, COLLAPSING = 2, EXPODING= 3, BACK_TO_NORMAL = 4, SIZE = 5 };
 

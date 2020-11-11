@@ -27,9 +27,10 @@ namespace ImGui
 
     //========================================================================================================
     //========================================================================================================
-    void FanPopupSetSingletonSlot::Draw( fan::EcsWorld& _world , fan::SlotPtr& _slotPtr )
+    void FanPopupSetSingletonSlot::Draw( fan::EcsWorld& /*_world*/ , fan::SlotPtr& /*slotPtr*/ )
     {
-        ImGui::SetNextWindowSize( { 400, 400 } );
+        fanAssert(false);
+       /* ImGui::SetNextWindowSize( { 400, 400 } );
         if( ImGui::BeginPopupModal( sName,
                                     NULL,
                                     ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove ) )
@@ -73,7 +74,7 @@ namespace ImGui
                 ImGui::CloseCurrentPopup();
             }
             ImGui::EndPopup();
-        }
+        }*/
     }
 
     //========================================================================================================
@@ -85,9 +86,10 @@ namespace ImGui
 
     //========================================================================================================
     //========================================================================================================
-    void FanPopupSetComponentSlot::Draw( fan::EcsWorld& _world , fan::SlotPtr& _slotPtr )
+    void FanPopupSetComponentSlot::Draw( fan::EcsWorld& /*_world*/ , fan::SlotPtr& /*_slotPtr*/ )
     {
-        ImGui::SetNextWindowSize( { 400, 400 } );
+        fanAssert(false);
+        /*ImGui::SetNextWindowSize( { 400, 400 } );
         if( ImGui::BeginPopupModal( sName,
                                     NULL,
                                     ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove ) )
@@ -142,6 +144,6 @@ namespace ImGui
                 ImGui::CloseCurrentPopup();
             }
             ImGui::EndPopup();
-        }
+        }*/
     }
 }

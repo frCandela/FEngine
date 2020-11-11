@@ -16,8 +16,10 @@ namespace fan
 	//========================================================================================================
 	// draw all singletons of the ecs world
 	//========================================================================================================
-	void SingletonsWindow::OnGui( EcsWorld& _world )
+	void SingletonsWindow::OnGui( EcsWorld& /*_world*/ )
 	{
+        fanAssert(false);
+	    /*
 		SCOPED_PROFILE( singleton_win );		
 
 		const std::vector< EcsSingletonInfo >& infos = _world.GetVectorSingletonInfo();
@@ -45,6 +47,6 @@ namespace fan
                     ImGui::FanBeginDragDropSourceSingleton( _world, info.mType );
                 }
 			}
-		}
+		}*/
 	}
 }

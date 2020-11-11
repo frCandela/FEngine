@@ -7,9 +7,6 @@ namespace fan
 	//========================================================================================================
 	void Application::SetInfo( EcsSingletonInfo& _info )
 	{
-		_info.mIcon       = ImGui::IconType::Application16;
-		_info.mGroup      = EngineGroups::Scene;
-		_info.mName       = "application";
         _info.mSlots.push_back( new Slot<>("quit", &Application::OnQuit ) );
 	}
 

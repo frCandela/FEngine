@@ -19,7 +19,6 @@ namespace fan
 		ECS_COMPONENT( ClientRPC )
 		static void SetInfo( EcsComponentInfo& _info );
 		static void Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component );
-		static void OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component );
 
 		using RpcID = sf::Uint32;
 		using RpcUnwrapMethod = void ( ClientRPC::* )( sf::Packet& );

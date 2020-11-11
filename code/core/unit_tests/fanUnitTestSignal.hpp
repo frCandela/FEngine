@@ -15,7 +15,8 @@ namespace fan
         ECS_SINGLETON( TestSingleton );
         static void SetInfo( EcsSingletonInfo& _info )
         {
-            _info.mName = "test singleton";
+            fanAssert(false);
+            //_info.mName = "test singleton";
             _info.mSlots.push_back( new Slot<int>( "test int", &TestSingleton::SetValueInt ) );
         }
         static void	Init( EcsWorld& /*_world*/, EcsSingleton& _singleton )
@@ -38,7 +39,8 @@ namespace fan
         ECS_COMPONENT( TestComponent )
         static void SetInfo( EcsComponentInfo& _info )
         {
-            _info.mName = "test";
+            fanAssert(false);
+            //_info.mName = "test";
             _info.mSlots.push_back( new Slot<int>( "test int", &TestComponent::SetValueInt ) );
             _info.mSlots.push_back( new Slot<float>( "test float", &TestComponent::SetValueFloat ) );
         }

@@ -14,7 +14,6 @@ namespace fan
 		ECS_SINGLETON( Time )
 		static void SetInfo( EcsSingletonInfo& _info );
 		static void Init( EcsWorld& _world, EcsSingleton& _component );
-		static void OnGui( EcsWorld&, EcsSingleton& _component );
 
 		FrameIndex mFrameIndex;			// the index of the current frame
 		FrameIndex mFrameStart;			// the index of the first frame of the game

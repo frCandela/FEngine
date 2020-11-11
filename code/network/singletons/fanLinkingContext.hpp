@@ -15,7 +15,6 @@ namespace fan
 		ECS_SINGLETON( LinkingContext )
 		static void SetInfo( EcsSingletonInfo& _info );
 		static void Init( EcsWorld& _world, EcsSingleton& _component );
-		static void OnGui( EcsWorld&, EcsSingleton& _component );
 
 		std::unordered_map<NetID, EcsHandle > mNetIDToEcsHandle;
 		std::unordered_map<EcsHandle, NetID > mEcsHandleToNetID;

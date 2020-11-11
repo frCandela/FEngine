@@ -8,13 +8,8 @@ namespace fan
 	//========================================================================================================
 	void UITransform::SetInfo( EcsComponentInfo& _info )
 	{
-		_info.mIcon       = ImGui::IconType::UiTransform16;
-		_info.mGroup      = EngineGroups::SceneUI;
-		_info.onGui       = &UITransform::OnGui;
 		_info.load        = &UITransform::Load;
 		_info.save        = &UITransform::Save;
-		_info.mEditorPath = "ui/";
-		_info.mName       = "ui transform";
 	}
 
 	//========================================================================================================
@@ -45,23 +40,4 @@ namespace fan
 		Serializable::LoadIVec2( _json, "position", transform.mPosition );
 		Serializable::LoadIVec2( _json,"size", transform.mSize );
 	}
-
-    //========================================================================================================
-    //========================================================================================================
-    void UITransform::OnGui( EcsWorld& /*_world*/, EcsEntity /*_entityID*/, EcsComponent& _component )
-    {
-        UITransform& transform = static_cast<UITransform&>( _component );
-
-        ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() );
-        {
-            if( ImGui::Button( "##TransUIPos" ) ){	transform.mPosition = glm::vec2( 0, 0 ); }
-            ImGui::SameLine();
-            ImGui::DragInt2( "position", &transform.mPosition.x, 1, 0 );
-
-            if( ImGui::Button( "##resetUIsize" ) ) { transform.mSize = glm::ivec2( 100, 100 ); }
-            ImGui::SameLine();
-            ImGui::DragInt2( "size##sizeUI", &transform.mSize.x, 0.1f );
-        }
-        ImGui::PopItemWidth();
-    }
 }

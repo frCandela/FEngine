@@ -13,7 +13,6 @@ namespace fan
 		ECS_COMPONENT( PointLight )
 		static void SetInfo( EcsComponentInfo& _info );
 		static void Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component );
-		static void OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component );
 		static void Save( const EcsComponent& _component, Json& _json );
 		static void Load( EcsComponent& _component, const Json& _json );
 

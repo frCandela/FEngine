@@ -43,8 +43,8 @@ namespace fan
  			ImGui::Icon( GetIconType(), { 16,16 } ); ImGui::SameLine();
 			ImGui::Text( "Scene node : %s", node.mName.c_str() );
 
-			
-			for( const EcsComponentInfo& info : _world.GetComponentInfos() )
+            fanAssert(false);
+			/*for( const EcsComponentInfo& info : _world.GetComponentInfos() )
 			{
 				if( !_world.HasComponent( entity, info.mType ) ) { continue; }
 
@@ -80,7 +80,7 @@ namespace fan
 				{
 					info.onGui( _world, entity, component );
 				} 
-			}
+			}*/
 			ImGui::Separator();
 			//Add component button
 			if( ImGui::Button( "Add component" ) )
@@ -93,9 +93,10 @@ namespace fan
 	//========================================================================================================
 	// menu item in the NewComponentPopup
 	//========================================================================================================
-	void InspectorWindow::NewComponentItem( EcsWorld& _world, const EcsComponentInfo& _info )
+	void InspectorWindow::NewComponentItem( EcsWorld& /*_world*/, const EcsComponentInfo& /*_info*/ )
 	{
-		ImGui::Icon( _info.mIcon, { 16, 16 }, GroupsColors::GetColor( _info.mGroup ) ); ImGui::SameLine();
+        fanAssert(false);
+		/*ImGui::Icon( _info.mIcon, { 16, 16 }, GroupsColors::GetColor( _info.mGroup ) ); ImGui::SameLine();
 		if( ImGui::MenuItem( _info.mName.c_str() ) )
 		{
 			// Create new EcsComponent 
@@ -106,15 +107,17 @@ namespace fan
 				_world.AddComponent( entity, _info.mType );
 			}			
 			ImGui::CloseCurrentPopup();
-		}
+		}*/
 	}
 
 	//========================================================================================================
 	// context menu when clicking "add component"
 	//========================================================================================================
-	void InspectorWindow::NewComponentPopup( EcsWorld& _world )
+	void InspectorWindow::NewComponentPopup( EcsWorld& /*_world*/ )
 	{
-		using Path = std::filesystem::path;
+
+        fanAssert(false);
+		/*using Path = std::filesystem::path;
 		if( ImGui::BeginPopup( "new_component" ) )
 		{
 			// Get components and remove components with an empty path
@@ -160,7 +163,7 @@ namespace fan
 			}
 
 			ImGui::EndPopup();
-		}
+		}*/
 	}
 
 	//========================================================================================================

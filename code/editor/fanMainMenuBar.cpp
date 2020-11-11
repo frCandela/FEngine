@@ -179,16 +179,18 @@ namespace fan
 				ImGui::EndMenu();
 			}
 
+            fanAssert(false);
 			// Grid
-			if ( ImGui::BeginMenu( "Grid" ) )
+			/*if ( ImGui::BeginMenu( "Grid" ) )
 			{
 				ImGui::PushItemWidth( 150.f );
                 EditorGrid& grid = _world.GetSingleton<EditorGrid>();
+
                 EditorGrid::OnGui( _world, grid );		;
 				ImGui::PopItemWidth();
 
 				ImGui::EndMenu();
-			}
+			}*/
 
 			// Framerate
 			ImGui::SameLine( ImGui::GetWindowWidth() - 60 );

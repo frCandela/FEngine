@@ -13,9 +13,10 @@ namespace fan
     struct TestEcsSingleton : public EcsSingleton
     {
         ECS_SINGLETON( TestEcsSingleton );
-        static void SetInfo( EcsSingletonInfo& _info )
+        static void SetInfo( EcsSingletonInfo& /*_info*/ )
         {
-            _info.mName = "test singleton";
+            fanAssert(false);
+           // _info.mName = "test singleton";
         }
         static void	Init( EcsWorld& /*_world*/, EcsSingleton& _singleton )
         {
@@ -35,9 +36,10 @@ namespace fan
     struct TestEcsComponent : public EcsComponent
     {
         ECS_COMPONENT( TestEcsComponent )
-        static void SetInfo( EcsComponentInfo& _info )
+        static void SetInfo( EcsComponentInfo& /*_info*/ )
         {
-            _info.mName = "test";
+            fanAssert(false);
+            //_info.mName = "test";
         }
         static void	Init( EcsWorld& /*_world*/, EcsEntity /*_entity*/, EcsComponent& _component )
         {

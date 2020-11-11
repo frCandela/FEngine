@@ -48,12 +48,13 @@ namespace ImGui
 
 	//========================================================================================================
 	//========================================================================================================
-    void FanBeginDragDropSourceComponent( fan::EcsWorld& _world,
-                                          fan::EcsHandle& _handle,
-                                          uint32_t _type,
-                                          ImGuiDragDropFlags _flags )
+    void FanBeginDragDropSourceComponent( fan::EcsWorld& /*_world*/,
+                                          fan::EcsHandle& /*_handle*/,
+                                          uint32_t /*_type*/,
+                                          ImGuiDragDropFlags /*_flags*/ )
 	{
-		if( ImGui::BeginDragDropSource( _flags ) )
+	    fanAssert(false);
+		/*if( ImGui::BeginDragDropSource( _flags ) )
 		{
 			const fan::EcsComponentInfo& info = _world.GetComponentInfo( _type );
 
@@ -64,14 +65,15 @@ namespace ImGui
 			ImGui::SameLine();
 			ImGui::Text( info.mName.c_str() );
 			ImGui::EndDragDropSource();
-		}		
+		}*/
 	}
 
     //========================================================================================================
     //========================================================================================================
-    void FanBeginDragDropSourceSingleton( fan::EcsWorld& _world, uint32_t _type, ImGuiDragDropFlags _flags )
+    void FanBeginDragDropSourceSingleton( fan::EcsWorld& /*_world*/, uint32_t /*_type*/, ImGuiDragDropFlags /*_flags*/ )
     {
-        if( ImGui::BeginDragDropSource( _flags ) )
+	    fanAssert(false);
+        /*if( ImGui::BeginDragDropSource( _flags ) )
         {
             const fan::EcsSingletonInfo& info = _world.GetSingletonInfo( _type );
 
@@ -82,7 +84,7 @@ namespace ImGui
             ImGui::SameLine();
             ImGui::Text( info.mName.c_str() );
             ImGui::EndDragDropSource();
-        }
+        }*/
     }
 
     //========================================================================================================
@@ -110,9 +112,10 @@ namespace ImGui
 	//========================================================================================================
 	// if _type == 0 accepts all components types
 	//========================================================================================================
-	ComponentPayload FanBeginDragDropTargetComponent( fan::EcsWorld& _world, uint32_t _type )
+	ComponentPayload FanBeginDragDropTargetComponent( fan::EcsWorld& /*world*/, uint32_t /*_type*/ )
 	{
-	    using namespace fan;
+	    fanAssert(false);
+	   /* using namespace fan;
 
  		if( ImGui::BeginDragDropTarget() )
  		{
@@ -163,7 +166,7 @@ namespace ImGui
 			}
 
  			ImGui::EndDragDropTarget();
- 		}
+ 		}*/
  		return ComponentPayload();
 	}
 }

@@ -13,7 +13,6 @@ namespace fan
         ECS_SINGLETON( UIMainMenu )
         static void SetInfo( EcsSingletonInfo& _info );
         static void Init( EcsWorld& _world, EcsSingleton& _this );
-        static void OnGui( EcsWorld&, EcsSingleton& _this );
         static void Save( const EcsSingleton& _this, Json& _json );
         static void Load( EcsSingleton& _this, const Json& _json );
 

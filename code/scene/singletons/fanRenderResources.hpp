@@ -17,7 +17,6 @@ namespace fan
         ECS_SINGLETON( RenderResources )
         static void SetInfo( EcsSingletonInfo& _info );
         static void Init( EcsWorld& _world, EcsSingleton& _singleton );
-        static void OnGui( EcsWorld& _world, EcsSingleton& _singleton );
 
         static Mesh2D* CreateMesh2DQuad();
 

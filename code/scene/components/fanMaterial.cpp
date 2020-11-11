@@ -8,13 +8,8 @@ namespace fan
 	//========================================================================================================
 	void Material::SetInfo( EcsComponentInfo& _info )
 	{
-		_info.mIcon       = ImGui::IconType::Material16;
-		_info.mGroup      = EngineGroups::SceneRender;
-		_info.onGui       = &Material::OnGui;
 		_info.load        = &Material::Load;
 		_info.save        = &Material::Save;
-		_info.mEditorPath = "/";
-		_info.mName       = "material";
 	}
 
 	//========================================================================================================
@@ -49,25 +44,4 @@ namespace fan
 		Serializable::LoadColor( _json, "color", material.mColor );
 		Serializable::LoadTexturePtr( _json, "material", material.mTexture );
 	}
-
-    //========================================================================================================
-    //========================================================================================================
-    void Material::OnGui( EcsWorld& /*_world*/, EcsEntity /*_entityID*/, EcsComponent& _component )
-    {
-        Material& material = static_cast<Material&>( _component );
-
-        ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() - 16 );
-        {
-            // Filter color
-            if( ImGui::Button( "##color" ) ) { material.mColor = Color::sWhite; } ImGui::SameLine();
-            ImGui::ColorEdit4( "color", material.mColor.Data(), ImGui::fanColorEditFlags );
-
-            if( ImGui::Button( "##shininess" ) ) { material.mShininess = 1; } ImGui::SameLine();
-            ImGui::DragInt( "shininess", (int*)&material.mShininess, 1, 1, 256 );
-            ImGui::SameLine(); ImGui::FanShowHelpMarker( "sharpness of the specular reflection" );
-        }
-        ImGui::PopItemWidth();
-
-        ImGui::FanTexturePtr( "mat texture", material.mTexture );
-    }
 }

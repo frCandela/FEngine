@@ -15,7 +15,6 @@ namespace fan
 		ECS_SINGLETON( EditorCamera )
 		static void SetInfo( EcsSingletonInfo& _info );
 		static void Init( EcsWorld& _world, EcsSingleton& _component );
-		static void OnGui( EcsWorld&, EcsSingleton& _component );
 
 		EcsHandle mCameraHandle;
 		float     mSpeed           = 10.f;

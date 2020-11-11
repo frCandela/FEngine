@@ -5,12 +5,8 @@ namespace fan
 {
 	//========================================================================================================
 	//========================================================================================================
-	void ClientRPC::SetInfo( EcsComponentInfo& _info )
+	void ClientRPC::SetInfo( EcsComponentInfo& /*_info*/ )
 	{
-		_info.mIcon  = ImGui::Network16;
-		_info.mGroup = EngineGroups::Network;
-		_info.onGui  = &ClientRPC::OnGui;
-		_info.mName  = "Client RPC";
 	}
 
 	//========================================================================================================
@@ -139,19 +135,5 @@ namespace fan
 		sf::Int32 framesDelta;
 		_packet >> framesDelta;
 		mOnShiftFrameIndex.Emmit( framesDelta );
-	}
-
-	//========================================================================================================
-	//========================================================================================================
-	void ClientRPC::OnGui( EcsWorld& /*_world*/, EcsEntity /*_entityID*/, EcsComponent& _component )
-	{
-		ClientRPC& rpc = static_cast<ClientRPC&>( _component );
-		ImGui::Text( "rpc list: " );
-		ImGui::Indent();
-		for( std::pair<RpcID, RpcUnwrapMethod> pair : rpc.mNameToRPCTable )
-		{
-			ImGui::Text( "%d", pair.first );
-		}
-		ImGui::Unindent();
 	}
 }

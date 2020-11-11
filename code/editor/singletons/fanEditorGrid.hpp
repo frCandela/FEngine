@@ -16,7 +16,6 @@ namespace fan
 		static void Init( EcsWorld& _world, EcsSingleton& _component );
 		static void Save( const EcsSingleton& _component, Json& _json );
 		static void Load( EcsSingleton& _component, const Json& _json );
-        static void OnGui( EcsWorld&, EcsSingleton& _component );
 
 		btVector3 mOffset;
 		Color     mColor;

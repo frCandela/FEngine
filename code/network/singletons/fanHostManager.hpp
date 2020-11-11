@@ -15,7 +15,6 @@ namespace fan
 		ECS_SINGLETON( HostManager )
 		static void SetInfo( EcsSingletonInfo& _info );
 		static void Init( EcsWorld& _world, EcsSingleton& _component );
-		static void OnGui( EcsWorld&, EcsSingleton& _component );
 
 		//================================================================
 		// Hold an ip & port + defines some operators for storing in a unordered_map

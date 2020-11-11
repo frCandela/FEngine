@@ -80,7 +80,8 @@ namespace fan
 
 
 				// chunks
-				const std::vector< EcsComponentInfo >& infos = _world.GetComponentInfos();
+                fanAssert(false);
+				/*const std::vector< EcsComponentInfo >& infos = _world.GetComponentInfos();
 				for( int componentIndex = 0; componentIndex < _world.NumComponents(); componentIndex++ )
 				{
 					if( archetype->GetSignature()[componentIndex] )
@@ -110,7 +111,7 @@ namespace fan
 						ssTooltip << "component size: " << info.mSize;
 						ImGui::FanToolTip( ssTooltip.str().c_str() );
 					}
-				}
+				}*/
 				ImGui::NextColumn();
 				ImGui::Separator();
 			}

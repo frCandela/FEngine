@@ -18,7 +18,6 @@ namespace fan
         ECS_SINGLETON( Mouse )
         static void SetInfo( EcsSingletonInfo& _info );
         static void Init( EcsWorld& _world, EcsSingleton& _singleton );
-        static void OnGui( EcsWorld& _world, EcsSingleton& _singleton );
 
         enum CursorState
         {

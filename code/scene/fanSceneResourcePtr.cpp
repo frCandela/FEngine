@@ -48,12 +48,13 @@ namespace ImGui
 	//========================================================================================================
  	// returns true if the component pointer changed value
 	//========================================================================================================
- 	bool FanComponentBase( const char* _label, fan::ComponentPtrBase& _ptr )
+ 	bool FanComponentBase( const char* /*_label*/, fan::ComponentPtrBase& /*_ptr*/ )
  	{
-		fan::EcsWorld& world = *_ptr.mWorld;
+ 	    fanAssert(false);
+		//fan::EcsWorld& world = *_ptr.mWorld;
  		bool returnValue = false;
  
-		const fan::EcsComponentInfo& info = world.GetComponentInfo( _ptr.mType );
+		/*const fan::EcsComponentInfo& info = world.GetComponentInfo( _ptr.mType );
 
 		// create button title
 		std::string name;
@@ -116,7 +117,7 @@ namespace ImGui
  
  		// label	
  		ImGui::Text( _label );
- 
+ */
  		return returnValue;
  	}
 

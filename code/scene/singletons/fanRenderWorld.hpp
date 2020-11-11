@@ -16,7 +16,6 @@ namespace fan
 		ECS_SINGLETON( RenderWorld )
 		static void SetInfo( EcsSingletonInfo& _info );
 		static void Init( EcsWorld& _world, EcsSingleton& _component );
-		static void OnGui( EcsWorld&, EcsSingleton& _component );
 
 		std::vector<RenderDataModel>            drawData;
 		std::vector<RenderDataMesh2D>           uiDrawData;

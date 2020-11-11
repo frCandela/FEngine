@@ -237,7 +237,8 @@ namespace fan
 
 		// Set component info
 		EcsComponentInfo info;
-		info.mName      = _ComponentType::Info::sName;
+        fanAssert(false);
+		//info.mName      = _ComponentType::Info::sName;
 		info.construct  = &_ComponentType::Info::Instanciate;
         info.copy       = std::is_trivially_copyable<_ComponentType>::value
                 ? &std::memcpy

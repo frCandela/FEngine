@@ -16,7 +16,6 @@ namespace fan
 		ECS_SINGLETON( ServerConnection )
 		static void SetInfo( EcsSingletonInfo& _info );
 		static void Init( EcsWorld& _world, EcsSingleton& _component );
-		static void OnGui( EcsWorld&, EcsSingleton& _component );
 
 		UdpSocket mSocket;
 		Port      mServerPort;

@@ -45,15 +45,11 @@ namespace fan
 	//========================================================================================================
 	struct EcsSingletonInfo
 	{
-		std::string            mName;
 		uint32_t               mType;
-		ImGui::IconType        mIcon  = ImGui::IconType::None16;
-		EngineGroups           mGroup = EngineGroups::None;
         std::vector<SlotBase*> mSlots;                         // callable methods
 
 		void ( *init ) ( EcsWorld&, EcsSingleton& ) = nullptr;
         void ( *setInfo ) ( EcsSingletonInfo& ) = nullptr;
-		void ( *onGui ) ( EcsWorld&, EcsSingleton& ) = nullptr;
 		void ( *save ) ( const EcsSingleton&, Json& ) = nullptr;
 		void ( *load ) ( EcsSingleton&, const Json& ) = nullptr;
 		void ( *netSave ) ( const EcsSingleton&, sf::Packet& _packet ) = nullptr;

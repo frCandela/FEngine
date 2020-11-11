@@ -110,9 +110,11 @@ namespace ImGui
 {
     //========================================================================================================
     //========================================================================================================
-    void DrawTooltipSingleton( fan::EcsWorld& _world, fan::SlotPtr& _ptr )
+    void DrawTooltipSingleton( fan::EcsWorld& /*_world*/, fan::SlotPtr& /*_ptr*/ )
     {
-        ImGui::BeginTooltip();
+        fanAssert(false);
+
+        /*ImGui::BeginTooltip();
         const fan::EcsSingletonInfo& targetSingletonInfo =
                                            _world.GetSingletonInfo( _ptr.Data().mType );
         ImGui::Icon( targetSingletonInfo.mIcon,
@@ -126,13 +128,15 @@ namespace ImGui
         ImGui::Icon( ImGui::IconType::SignalSlot16, { 16, 16 } );
         ImGui::SameLine();
         ImGui::Text( "target slot     : %s", targetSlotName.c_str() );
-        ImGui::EndTooltip();
+        ImGui::EndTooltip();*/
     }
 
     //========================================================================================================
     //========================================================================================================
-    void DrawTooltipComponent( fan::EcsWorld& _world, fan::SlotPtr& _ptr )
+    void DrawTooltipComponent( fan::EcsWorld& /*_world*/, fan::SlotPtr& /*_ptr*/ )
     {
+        fanAssert( false );
+        /*
         ImGui::BeginTooltip();
         fan::EcsEntity entity = _world.GetEntity( _ptr.Data().mHandle );
         const fan::EcsComponentInfo& sceneNodeInfo =
@@ -157,13 +161,15 @@ namespace ImGui
         ImGui::Icon( ImGui::IconType::SignalSlot16, { 16, 16 } );
         ImGui::SameLine();
         ImGui::Text( "target slot     : %s", targetSlotName.c_str() );
-        ImGui::EndTooltip();
+        ImGui::EndTooltip();*/
     }
 
     //========================================================================================================
     //========================================================================================================
-    void FanSlotPtr( const char* _label, fan::EcsWorld& _world, fan::SlotPtr& _ptr )
+    void FanSlotPtr( const char* /*_label*/, fan::EcsWorld& /*_world*/, fan::SlotPtr& /*_ptr*/ )
     {
+        fanAssert(false);
+        /*
         if( ImGui::ButtonIcon( ImGui::IconType::SignalSlot16, { 16, 16 } ) )
         {
             _ptr.Clear();
@@ -217,6 +223,6 @@ namespace ImGui
         ImGui::FanShowHelpMarker("drag a scene node to add a component slot");
 
         FanPopupSetSingletonSlot::Draw( _world, _ptr );
-        FanPopupSetComponentSlot::Draw( _world, _ptr );
+        FanPopupSetComponentSlot::Draw( _world, _ptr );*/
     }
 }
