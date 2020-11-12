@@ -4,6 +4,7 @@
 #include "core/time/fanProfiler.hpp"
 #include "scene/fanDragnDrop.hpp"
 #include "editor/gui/fanGroupsColors.hpp"
+#include "editor/singletons/fanEditorGuiInfo.hpp"
 
 namespace fan
 {
@@ -16,29 +17,28 @@ namespace fan
 	//========================================================================================================
 	// draw all singletons of the ecs world
 	//========================================================================================================
-	void SingletonsWindow::OnGui( EcsWorld& /*_world*/ )
+	void SingletonsWindow::OnGui( EcsWorld& _world )
 	{
-        fanAssert(false);
-	    /*
-		SCOPED_PROFILE( singleton_win );		
-
+		SCOPED_PROFILE( singleton_win );
+        const EditorGuiInfo& gui = _world.GetSingleton<EditorGuiInfo>();
 		const std::vector< EcsSingletonInfo >& infos = _world.GetVectorSingletonInfo();
 		for( const EcsSingletonInfo& info : infos )
 		{
-            if( info.onGui != nullptr )
+            const fan::GuiSingletonInfo& guiInfo = gui.GetSingletonInfo( info.mType );
+            if( guiInfo.onGui != nullptr )
             {
                 ImGui::SetCursorPosY( ImGui::GetCursorPosY() + 3); // moves cursor lower to center the icon
-                ImGui::Icon( info.mIcon, { 16, 16 }, GroupsColors::GetColor( info.mGroup ) );
+                ImGui::Icon( guiInfo.mIcon, { 16, 16 }, GroupsColors::GetColor( guiInfo.mGroup ) );
                 ImGui::SameLine();
                 ImGui::SetCursorPosY( ImGui::GetCursorPosY() - 3 );		// resets the cursor
                 if( ImGui::CollapsingHeader( info.mName.c_str() ) )
                 {
                     ImGui::FanBeginDragDropSourceSingleton( _world, info.mType );
                     // draws gui
-                    if( info.onGui != nullptr )
+                    if( guiInfo.onGui != nullptr )
                     {
                         ImGui::Indent(); ImGui::Indent();
-                        info.onGui( _world, _world.GetSingleton( info.mType ) );
+                        guiInfo.onGui( _world, _world.GetSingleton( info.mType ) );
                         ImGui::Unindent(); ImGui::Unindent();
                     }
                 }
@@ -47,6 +47,6 @@ namespace fan
                     ImGui::FanBeginDragDropSourceSingleton( _world, info.mType );
                 }
 			}
-		}*/
+		}
 	}
 }

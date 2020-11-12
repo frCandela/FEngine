@@ -170,6 +170,7 @@ namespace fan
 		// Registers singleton info
 		EcsSingletonInfo info;
         info.setInfo = &_SingletonType::SetInfo;
+        info.mName = _SingletonType::Info::sName;
 		_SingletonType::SetInfo( info );
 		info.init  = &_SingletonType::Init;
 		info.mType = _SingletonType::Info::sType;
@@ -237,8 +238,7 @@ namespace fan
 
 		// Set component info
 		EcsComponentInfo info;
-        fanAssert(false);
-		//info.mName      = _ComponentType::Info::sName;
+		info.mName      = _ComponentType::Info::sName;
 		info.construct  = &_ComponentType::Info::Instanciate;
         info.copy       = std::is_trivially_copyable<_ComponentType>::value
                 ? &std::memcpy

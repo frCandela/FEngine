@@ -45,6 +45,7 @@ namespace fan
 	//========================================================================================================
 	struct EcsSingletonInfo
 	{
+        std::string            mName;
 		uint32_t               mType;
         std::vector<SlotBase*> mSlots;                         // callable methods
 

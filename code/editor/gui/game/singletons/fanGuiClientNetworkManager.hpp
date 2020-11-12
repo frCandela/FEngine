@@ -1,22 +1,30 @@
-#prama once
+#pragma once
+
+#include "game/singletons/fanClientNetworkManager.hpp"
+#include "editor/singletons/fanEditorGuiInfo.hpp"
 
 namespace fan
 {
-	//========================================================================================================
-	//========================================================================================================
-	void ClientNetworkManager::SetInfo( EcsSingletonInfo& _info )
-	{
-		_info.mIcon  = ImGui::ClientNet16;
-		_info.mGroup = EngineGroups::GameNetwork;
-		_info.onGui  = &ClientNetworkManager::OnGui;
-		_info.mName  = "client network manager";
-	}
+    struct GuiClientNetworkManager
+    {
+        //====================================================================================================
+        //====================================================================================================
+        static GuiSingletonInfo GetInfo()
+        {
+            GuiSingletonInfo info;
+            info.mIcon  = ImGui::ClientNet16;
+            info.mGroup = EngineGroups::GameNetwork;
+            info.onGui  = &GuiClientNetworkManager::OnGui;
+            info.mEditorName  = "client network manager";
+            return info;
+        }
 
-	//========================================================================================================
-	//========================================================================================================
-	void ClientNetworkManager::OnGui( EcsWorld& /*_world*/, EcsSingleton& _component )
-	{
-		ClientNetworkManager& netManager = static_cast<ClientNetworkManager&>( _component );
-		ImGui::Text( "persistent handle : %d", netManager.mPersistentHandle );
-	}
+        //========================================================================================================
+        //========================================================================================================
+        static void OnGui( EcsWorld& /*_world*/, EcsSingleton& _component )
+        {
+            ClientNetworkManager& netManager = static_cast<ClientNetworkManager&>( _component );
+            ImGui::Text( "persistent handle : %d", netManager.mPersistentHandle );
+        }
+    };
 }

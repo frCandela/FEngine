@@ -1,4 +1,4 @@
-#prama once
+#pragma once
 
 #include "network/components/fanHostConnection.hpp"
 

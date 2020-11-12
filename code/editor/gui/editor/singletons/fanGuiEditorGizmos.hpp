@@ -1,13 +1,21 @@
-#prama once
+#pragma once
+
+#include "editor/singletons/fanEditorGizmos.hpp"
+#include "editor/singletons/fanEditorGuiInfo.hpp"
 
 namespace fan
 {
-	//========================================================================================================
-	//========================================================================================================
-	void EditorGizmos::SetInfo( EcsSingletonInfo& _info )
-	{
-		_info.mName  = "editor gizmo";
-		_info.mIcon  = ImGui::Gizmos16;
-		_info.mGroup = EngineGroups::Editor;
-	}
+    struct GuiEditorGizmos
+    {
+        //====================================================================================================
+        //====================================================================================================
+        static GuiSingletonInfo GetInfo()
+        {
+            GuiSingletonInfo info;
+            info.mEditorName  = "editor gizmo";
+            info.mIcon  = ImGui::Gizmos16;
+            info.mGroup = EngineGroups::Editor;
+            return info;
+        }
+    };
 }

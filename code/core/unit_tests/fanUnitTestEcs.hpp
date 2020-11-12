@@ -15,8 +15,6 @@ namespace fan
         ECS_SINGLETON( TestEcsSingleton );
         static void SetInfo( EcsSingletonInfo& /*_info*/ )
         {
-            fanAssert(false);
-           // _info.mName = "test singleton";
         }
         static void	Init( EcsWorld& /*_world*/, EcsSingleton& _singleton )
         {
@@ -38,8 +36,6 @@ namespace fan
         ECS_COMPONENT( TestEcsComponent )
         static void SetInfo( EcsComponentInfo& /*_info*/ )
         {
-            fanAssert(false);
-            //_info.mName = "test";
         }
         static void	Init( EcsWorld& /*_world*/, EcsEntity /*_entity*/, EcsComponent& _component )
         {

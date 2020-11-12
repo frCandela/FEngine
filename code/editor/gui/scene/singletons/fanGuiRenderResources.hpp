@@ -1,49 +1,58 @@
-#prama once
+#pragma once
 
 #include "scene/singletons/fanRenderResources.hpp"
+#include "editor/singletons/fanEditorGuiInfo.hpp"
+#include "render/resources/fanMesh.hpp"
+#include "render/resources/fanMesh2D.hpp"
+#include "render/resources/fanTexture.hpp"
 
 namespace fan
 {
-    //========================================================================================================
-    //========================================================================================================
-    void RenderResources::SetInfo( EcsSingletonInfo& _info )
+    struct GuiRenderResources
     {
-        _info.mIcon  = ImGui::Renderer16;
-        _info.mGroup = EngineGroups::SceneRender;
-        _info.mName  = "render resources";
-        _info.onGui = &RenderResources::OnGui;
-    }
-
-    //========================================================================================================
-    //========================================================================================================
-    void RenderResources::OnGui( EcsWorld& /*_world*/, EcsSingleton& _singleton )
-    {
-        RenderResources& renderResources = static_cast<RenderResources&>( _singleton );
-        if( ImGui::CollapsingHeader( "meshes" ) )
+        //====================================================================================================
+        //====================================================================================================
+        static GuiSingletonInfo GetInfo()
         {
-            const std::vector<Mesh*>& meshes = renderResources.mMeshManager->GetMeshes();
-            for( const Mesh         * mesh : meshes )
-            {
-                ImGui::Text( mesh->mPath.c_str() );
-            }
+            GuiSingletonInfo info;
+            info.mIcon  = ImGui::Renderer16;
+            info.mGroup = EngineGroups::SceneRender;
+            info.mEditorName  = "render resources";
+            info.onGui  = &GuiRenderResources::OnGui;
+            return info;
         }
 
-        if( ImGui::CollapsingHeader( "meshes2D" ) )
+        //========================================================================================================
+        //========================================================================================================
+        static void OnGui( EcsWorld& /*_world*/, EcsSingleton& _singleton )
         {
-            const std::vector<Mesh2D*>& meshes = renderResources.mMesh2DManager->GetMeshes();
-            for( const Mesh2D         * mesh : meshes )
+            RenderResources& renderResources = static_cast<RenderResources&>( _singleton );
+            if( ImGui::CollapsingHeader( "meshes" ) )
             {
-                ImGui::Text( mesh->mPath.c_str() );
+                const std::vector<Mesh*>& meshes = renderResources.mMeshManager->GetMeshes();
+                for( const Mesh         * mesh : meshes )
+                {
+                    ImGui::Text( mesh->mPath.c_str() );
+                }
             }
-        }
 
-        if( ImGui::CollapsingHeader( "textures" ) )
-        {
-            const std::vector<Texture*>& textures = renderResources.mTextureManager->GetTextures();
-            for( const Texture         * texture : textures )
+            if( ImGui::CollapsingHeader( "meshes2D" ) )
             {
-                ImGui::Text( texture->mPath.c_str() );
+                const std::vector<Mesh2D*>& meshes = renderResources.mMesh2DManager->GetMeshes();
+                for( const Mesh2D         * mesh : meshes )
+                {
+                    ImGui::Text( mesh->mPath.c_str() );
+                }
+            }
+
+            if( ImGui::CollapsingHeader( "textures" ) )
+            {
+                const std::vector<Texture*>& textures = renderResources.mTextureManager->GetTextures();
+                for( const Texture         * texture : textures )
+                {
+                    ImGui::Text( texture->mPath.c_str() );
+                }
             }
         }
-    }
+    };
 }

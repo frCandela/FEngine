@@ -1,5 +1,6 @@
-#include "fanGuiSlotPtr.hpp"
+#include "editor/gui/fanGuiSlotPtr.hpp"
 #include <sstream>
+#include "editor/singletons/fanEditorGuiInfo.hpp"
 
 namespace ImGui
 {
@@ -27,10 +28,11 @@ namespace ImGui
 
     //========================================================================================================
     //========================================================================================================
-    void FanPopupSetSingletonSlot::Draw( fan::EcsWorld& /*_world*/ , fan::SlotPtr& /*slotPtr*/ )
+    void FanPopupSetSingletonSlot::Draw( fan::EcsWorld& _world , fan::SlotPtr& _slotPtr )
     {
-        fanAssert(false);
-       /* ImGui::SetNextWindowSize( { 400, 400 } );
+        const fan::EditorGuiInfo& gui = _world.GetSingleton<fan::EditorGuiInfo>();
+
+        ImGui::SetNextWindowSize( { 400, 400 } );
         if( ImGui::BeginPopupModal( sName,
                                     NULL,
                                     ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove ) )
@@ -45,7 +47,8 @@ namespace ImGui
 
                     didNotDrawAnything = false;
                     // display the slot
-                    ImGui::Icon( info.mIcon, { 16, 16 }, fan::GroupsColors::GetColor( info.mGroup ) );
+                    const fan::GuiSingletonInfo& guiInfo = gui.GetSingletonInfo( info.mType );
+                    ImGui::Icon( guiInfo.mIcon, { 16, 16 }, fan::GroupsColors::GetColor( guiInfo.mGroup ) );
                     ImGui::SameLine();
                     if( ImGui::TreeNode( info.mName.c_str() ) )
                     {
@@ -74,7 +77,7 @@ namespace ImGui
                 ImGui::CloseCurrentPopup();
             }
             ImGui::EndPopup();
-        }*/
+        }
     }
 
     //========================================================================================================
@@ -86,10 +89,9 @@ namespace ImGui
 
     //========================================================================================================
     //========================================================================================================
-    void FanPopupSetComponentSlot::Draw( fan::EcsWorld& /*_world*/ , fan::SlotPtr& /*_slotPtr*/ )
+    void FanPopupSetComponentSlot::Draw( fan::EcsWorld& _world , fan::SlotPtr& _slotPtr )
     {
-        fanAssert(false);
-        /*ImGui::SetNextWindowSize( { 400, 400 } );
+        ImGui::SetNextWindowSize( { 400, 400 } );
         if( ImGui::BeginPopupModal( sName,
                                     NULL,
                                     ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove ) )
@@ -114,7 +116,10 @@ namespace ImGui
                     if( !HasCompatibleSlots( info.mSlots, _slotPtr.GetArgsType() ) ){ continue; }
 
                     didNotDrawAnything = false;
-                    ImGui::Icon( info.mIcon, { 16, 16 }, fan::GroupsColors::GetColor( info.mGroup ) );
+
+                    const fan::EditorGuiInfo& gui = _world.GetSingleton<fan::EditorGuiInfo>();
+                    const fan::GuiComponentInfo& guiInfo = gui.GetComponentInfo( info.mType );
+                    ImGui::Icon( guiInfo.mIcon, { 16, 16 }, fan::GroupsColors::GetColor( guiInfo.mGroup ) );
                     ImGui::SameLine();
                     if( ImGui::TreeNode( info.mName.c_str() ) )
                     {
@@ -144,6 +149,6 @@ namespace ImGui
                 ImGui::CloseCurrentPopup();
             }
             ImGui::EndPopup();
-        }*/
+        }
     }
 }

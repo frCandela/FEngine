@@ -1,13 +1,21 @@
-#prama once
+#pragma once
+
+#include "editor/singletons/fanEditorPlayState.hpp"
+#include "editor/singletons/fanEditorGuiInfo.hpp"
 
 namespace fan
 {
-	//========================================================================================================
-	//========================================================================================================
-	void EditorPlayState::SetInfo( EcsSingletonInfo& _info )
-	{
-		_info.mIcon  = ImGui::IconType::Play16;
-		_info.mName  = "editor play state";
-		_info.mGroup = EngineGroups::Editor;
-	}
+    struct GuiEditorPlayState
+    {
+        //====================================================================================================
+        //====================================================================================================
+        static GuiSingletonInfo GetInfo()
+        {
+            GuiSingletonInfo info;
+            info.mEditorName  = "editor play state";
+            info.mIcon  = ImGui::IconType::Play16;
+            info.mGroup = EngineGroups::Editor;
+            return info;
+        }
+    };
 }

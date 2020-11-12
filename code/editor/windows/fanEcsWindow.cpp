@@ -9,6 +9,7 @@
 #include "scene/fanSceneTags.hpp"
 #include "editor/fanModals.hpp"
 #include "editor/gui/fanGroupsColors.hpp"
+#include "editor/singletons/fanEditorGuiInfo.hpp"
 
 namespace fan
 {
@@ -80,15 +81,18 @@ namespace fan
 
 
 				// chunks
-                fanAssert(false);
-				/*const std::vector< EcsComponentInfo >& infos = _world.GetComponentInfos();
+                const fan::EditorGuiInfo& gui = _world.GetSingleton<EditorGuiInfo>();
+				const std::vector< EcsComponentInfo >& infos = _world.GetComponentInfos();
 				for( int componentIndex = 0; componentIndex < _world.NumComponents(); componentIndex++ )
 				{
 					if( archetype->GetSignature()[componentIndex] )
 					{
 						const EcsComponentInfo& info = infos[componentIndex];
+                        const fan::GuiComponentInfo& guiInfo = gui.GetComponentInfo( info.mType );
+
 						std::stringstream ss;
-						ImGui::Icon( info.mIcon, { 16, 16 }, GroupsColors::GetColor( info.mGroup ) ); ImGui::SameLine();
+                        ImGui::Icon( guiInfo.mIcon, { 16, 16 }, GroupsColors::GetColor( guiInfo.mGroup ) );
+                        ImGui::SameLine();
 						ss << info.mName.c_str();
 						for( int i = 0; i < 19 - (int)info.mName.size(); i++ )
 						{
@@ -111,7 +115,7 @@ namespace fan
 						ssTooltip << "component size: " << info.mSize;
 						ImGui::FanToolTip( ssTooltip.str().c_str() );
 					}
-				}*/
+				}
 				ImGui::NextColumn();
 				ImGui::Separator();
 			}

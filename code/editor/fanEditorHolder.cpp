@@ -16,12 +16,13 @@
 #include "editor/windows/fanRenderWindow.hpp"
 #include "editor/windows/fanSceneWindow.hpp"
 #include "editor/windows/fanEcsWindow.hpp"
+#include "editor/fanMainMenuBar.hpp"
 #include "editor/singletons/fanEditorSelection.hpp"
 #include "editor/singletons/fanEditorCopyPaste.hpp"
 #include "editor/singletons/fanEditorGizmos.hpp"
-#include "editor/fanMainMenuBar.hpp"
 #include "editor/singletons/fanEditorCamera.hpp"
 #include "editor/singletons/fanEditorGrid.hpp"
+#include "editor/singletons/fanEditorGuiInfo.hpp"
 #include "scene/singletons/fanRenderWorld.hpp"
 #include "scene/components/fanPointLight.hpp"
 #include "scene/components/fanDirectionalLight.hpp"
@@ -117,6 +118,7 @@ namespace fan
             IGame   & game  = *mGames[gameIndex];
             EcsWorld& world = game.mWorld;
 
+            world.AddSingletonType<EditorGuiInfo>();
             world.AddSingletonType<EditorPlayState>();
             world.AddSingletonType<EditorCamera>();
             world.AddSingletonType<EditorGrid>();

@@ -175,15 +175,15 @@ namespace fan
 	//========================================================================================================
 	// Gui / serialization helper
 	//========================================================================================================
-	std::string StateToString( const SolarEruption::State  _state )
+	std::string SolarEruption::StateToString( const SolarEruption::State  _state )
 	{
 		switch( _state )
 		{
 		case SolarEruption::WAITING:		return "waiting";		 break;
 		case SolarEruption::WARMING:		return "warming";		 break;
-		case SolarEruption::COLLAPSING:	return "collapsing";	 break;
+		case SolarEruption::COLLAPSING:	    return "collapsing";	 break;
 		case SolarEruption::EXPODING:		return "exploding";		 break;
-		case SolarEruption::BACK_TO_NORMAL:return "back to normal"; break;
+		case SolarEruption::BACK_TO_NORMAL: return "back to normal"; break;
 		default:			return "ERROR";			 break;
 		}
 	}

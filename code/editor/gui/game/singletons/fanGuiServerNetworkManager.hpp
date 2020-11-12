@@ -1,22 +1,30 @@
-#prama once
+#pragma once
+
+#include "game/singletons/fanServerNetworkManager.hpp"
+#include "editor/singletons/fanEditorGuiInfo.hpp"
 
 namespace fan
 {
-	//========================================================================================================
-	//========================================================================================================
-	void ServerNetworkManager::SetInfo( EcsSingletonInfo& _info )
-	{
-		_info.mIcon  = ImGui::Network16;
-		_info.mGroup = EngineGroups::GameNetwork;
-		_info.onGui  = &ServerNetworkManager::OnGui;
-		_info.mName  = "server network manager";
-	}
+    struct GuiServerNetworkManager
+    {
+        //====================================================================================================
+        //====================================================================================================
+        static GuiSingletonInfo GetInfo()
+        {
+            GuiSingletonInfo info;
+            info.mIcon  = ImGui::Network16;
+            info.mGroup = EngineGroups::GameNetwork;
+            info.onGui  = &GuiServerNetworkManager::OnGui;
+            info.mEditorName  = "server network manager";
+            return info;
+        }
 
-	//========================================================================================================
-	//========================================================================================================
-	void ServerNetworkManager::OnGui( EcsWorld& /*_world*/, EcsSingleton& /*_component*/ )
-	{
-		//ServerNetworkManager& netManager = static_cast<ServerNetworkManager&>( _component );
-		ImGui::Text( "Stop looking at me plz" );
-	}
+        //========================================================================================================
+        //========================================================================================================
+        static void OnGui( EcsWorld& /*_world*/, EcsSingleton& /*_component*/ )
+        {
+            //ServerNetworkManager& netManager = static_cast<ServerNetworkManager&>( _component );
+            ImGui::Text( "Stop looking at me plz" );
+        }
+    };
 }

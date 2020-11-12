@@ -1,13 +1,21 @@
-#prama once
+#pragma once
+
+#include "game/singletons/fanCollisionManager.hpp"
+#include "editor/singletons/fanEditorGuiInfo.hpp"
 
 namespace fan
 {
-	//========================================================================================================
-	//========================================================================================================
-	void CollisionManager::SetInfo( EcsSingletonInfo& _info )
-	{
-		_info.mIcon  = ImGui::Rigidbody16;
-		_info.mGroup = EngineGroups::Game;
-		_info.mName  = "collision manager";
-	}
+    struct GuiCollisionManager
+    {
+        //====================================================================================================
+        //====================================================================================================
+        static GuiSingletonInfo GetInfo()
+        {
+            GuiSingletonInfo info;
+            info.mIcon  = ImGui::Rigidbody16;
+            info.mGroup = EngineGroups::Game;
+            info.mEditorName  = "collision manager";
+            return info;
+        }
+    };
 }

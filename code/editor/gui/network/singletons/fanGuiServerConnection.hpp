@@ -1,26 +1,32 @@
-#prama once
+#pragma once
 
 #include "network/singletons/fanServerConnection.hpp"
+#include "editor/singletons/fanEditorGuiInfo.hpp"
 
 namespace fan
 {
-	//========================================================================================================
-	//========================================================================================================
-	void ServerConnection::SetInfo( EcsSingletonInfo& _info )
-	{
-		_info.mIcon  = ImGui::Connection16;
-		_info.mGroup = EngineGroups::Network;
-		_info.onGui  = &ServerConnection::OnGui;
-		_info.mName  = "server connection";
-	}
+    struct GuiServerConnection
+    {
+        //====================================================================================================
+        //====================================================================================================
+        static GuiSingletonInfo GetInfo()
+        {
+            GuiSingletonInfo info;
+            info.mIcon  = ImGui::Connection16;
+            info.mGroup = EngineGroups::Network;
+            info.onGui  = &GuiServerConnection::OnGui;
+            info.mEditorName  = "server connection";
+            return info;
+        }
 
-	//========================================================================================================
-	//========================================================================================================
-	void ServerConnection::OnGui( EcsWorld&, EcsSingleton& _component )
-	{
-		ServerConnection& connection = static_cast<ServerConnection&>( _component );
-		ImGui::Text( "Server" );
-		ImGui::Spacing();
-		ImGui::Text( "port: %u", connection.mServerPort );
-	}
+        //====================================================================================================
+        //====================================================================================================
+        static void OnGui( EcsWorld&, EcsSingleton& _component )
+        {
+            ServerConnection& connection = static_cast<ServerConnection&>( _component );
+            ImGui::Text( "Server" );
+            ImGui::Spacing();
+            ImGui::Text( "port: %u", connection.mServerPort );
+        }
+    };
 }

@@ -1,38 +1,46 @@
-#prama once
+#pragma once
+
+#include "game/singletons/ui/fanUIMainMenu.hpp"
+#include "editor/singletons/fanEditorGuiInfo.hpp"
 
 namespace fan
 {
-    //========================================================================================================
-    //========================================================================================================
-    void UIMainMenu::SetInfo( EcsSingletonInfo& _info )
+    struct GuiUIMainMenu
     {
-        _info.mIcon       = ImGui::IconType::MainMenu16;
-        _info.mGroup      = EngineGroups::Game;
-        _info.onGui       = &UIMainMenu::OnGui;
-        _info.mName       = "main menu";
-    }
-
-    //========================================================================================================
-    //========================================================================================================
-    void UIMainMenu::OnGui( EcsWorld& /*_world*/, EcsSingleton& _singleton )
-    {
-        UIMainMenu& menu = static_cast<UIMainMenu&>( _singleton );
-        ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() );
+        //====================================================================================================
+        //====================================================================================================
+        static GuiSingletonInfo GetInfo()
         {
-            ImGui::FanComponent( "main menu", menu.mMainMenuNode);
-            ImGui::FanComponent( "options", menu.mOptionsNode );
-            ImGui::FanComponent( "credits", menu.mCreditsNode );
+            GuiSingletonInfo info;
+            info.mIcon  = ImGui::IconType::MainMenu16;
+            info.mGroup = EngineGroups::Game;
+            info.onGui  = &GuiUIMainMenu::OnGui;
+            info.mEditorName  = "main menu";
+            return info;
+        }
 
-            ImGui::Spacing();
+        //====================================================================================================
+        //====================================================================================================
+        static void OnGui( EcsWorld& /*_world*/, EcsSingleton& _singleton )
+        {
+            UIMainMenu& menu = static_cast<UIMainMenu&>( _singleton );
+            ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() );
+            {
+                ImGui::FanComponent( "main menu", menu.mMainMenuNode );
+                ImGui::FanComponent( "options", menu.mOptionsNode );
+                ImGui::FanComponent( "credits", menu.mCreditsNode );
 
-            if( ImGui::Button("hide all")){ HideAll( menu ); }
-            ImGui::SameLine();
-            if( ImGui::Button("show main menu")){ ShowMainMenu( menu ); }
-            ImGui::SameLine();
-            if( ImGui::Button("show options")){ ShowOptions( menu ); }
-            ImGui::SameLine();
-            if( ImGui::Button("show credits")){ ShowCredits( menu ); }
+                ImGui::Spacing();
 
-        } ImGui::PopItemWidth();
-    }
+                if( ImGui::Button( "hide all" ) ){ UIMainMenu::HideAll( menu ); }
+                ImGui::SameLine();
+                if( ImGui::Button( "show main menu" ) ){ UIMainMenu::ShowMainMenu( menu ); }
+                ImGui::SameLine();
+                if( ImGui::Button( "show options" ) ){ UIMainMenu::ShowOptions( menu ); }
+                ImGui::SameLine();
+                if( ImGui::Button( "show credits" ) ){ UIMainMenu::ShowCredits( menu ); }
+            }
+            ImGui::PopItemWidth();
+        }
+    };
 }

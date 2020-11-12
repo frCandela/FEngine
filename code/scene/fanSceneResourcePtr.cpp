@@ -1,12 +1,13 @@
 #include "scene/fanSceneResourcePtr.hpp"
 
+#include "core/ecs/fanEcsWorld.hpp"
+#include "render/fanRenderGlobal.hpp"
 #include "scene/singletons/fanScenePointers.hpp"
 #include "scene/singletons/fanScene.hpp"
 #include "scene/components/fanSceneNode.hpp"
-#include "core/ecs/fanEcsWorld.hpp"
-#include "editor/fanModals.hpp"
 #include "scene/fanDragnDrop.hpp"
-#include "render/fanRenderGlobal.hpp"
+#include "editor/fanModals.hpp"
+#include "editor/singletons/fanEditorGuiInfo.hpp"
 
 namespace fan
 {
@@ -48,13 +49,12 @@ namespace ImGui
 	//========================================================================================================
  	// returns true if the component pointer changed value
 	//========================================================================================================
- 	bool FanComponentBase( const char* /*_label*/, fan::ComponentPtrBase& /*_ptr*/ )
+ 	bool FanComponentBase( const char* _label, fan::ComponentPtrBase& _ptr )
  	{
- 	    fanAssert(false);
-		//fan::EcsWorld& world = *_ptr.mWorld;
+		fan::EcsWorld& world = *_ptr.mWorld;
  		bool returnValue = false;
  
-		/*const fan::EcsComponentInfo& info = world.GetComponentInfo( _ptr.mType );
+		const fan::EcsComponentInfo& info = world.GetComponentInfo( _ptr.mType );
 
 		// create button title
 		std::string name;
@@ -68,7 +68,9 @@ namespace ImGui
 			name = info.mName + " : " + node.mName;
 		}		
  		// icon
- 		if (ImGui::ButtonIcon( info.mIcon, { 16, 16 } ))
+        const fan::EditorGuiInfo& gui = world.GetSingleton<fan::EditorGuiInfo>();
+        const fan::GuiComponentInfo& guiInfo = gui.GetComponentInfo( info.mType );
+        if (ImGui::ButtonIcon( guiInfo.mIcon, { 16, 16 } ))
  		{
  			returnValue = true;
  		}
@@ -117,7 +119,7 @@ namespace ImGui
  
  		// label	
  		ImGui::Text( _label );
- */
+
  		return returnValue;
  	}
 

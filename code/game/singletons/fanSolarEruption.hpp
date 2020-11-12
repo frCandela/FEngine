@@ -27,6 +27,7 @@ namespace fan
 
 		enum State { WAITING = 0, WARMING = 1, COLLAPSING = 2, EXPODING= 3, BACK_TO_NORMAL = 4, SIZE = 5 };
 
+		static std::string StateToString( const SolarEruption::State  _state );
 		static void Start( EcsWorld& _world );
 		static void Step( EcsWorld& _world, const float _delta );
 		void		SpawnEruptionNow();

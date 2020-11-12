@@ -157,8 +157,7 @@ namespace fan
 				{
 					Json& jSingleton_i = jSingletons[nextIndex++];
 					Serializable::SaveUInt( jSingleton_i, "singleton_id", info.mType);
-                    fanAssert(false);
-					//Serializable::SaveString( jSingleton_i, "singleton", info.mName );
+					Serializable::SaveString( jSingleton_i, "singleton", info.mName );
 					EcsSingleton& singleton = mWorld->GetSingleton( info.mType);
 					info.save( singleton, jSingleton_i );
 				}
@@ -201,8 +200,7 @@ namespace fan
 				{
 					Json& jComponent_i = jComponents[nextIndex++];
 					Serializable::SaveUInt( jComponent_i, "component_type", info.mType);
-                    fanAssert(false);
-					//Serializable::SaveString( jComponent_i, "type_name", info.mName );
+					Serializable::SaveString( jComponent_i, "type_name", info.mName );
 					info.save( component, jComponent_i );
 				}				
 			}

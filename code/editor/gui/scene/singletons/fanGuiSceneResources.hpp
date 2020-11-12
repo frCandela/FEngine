@@ -1,31 +1,40 @@
-#prama once
+#pragma once
 
 #include "scene/singletons/fanSceneResources.hpp"
+#include "editor/singletons/fanEditorGuiInfo.hpp"
+#include "scene/fanPrefabManager.hpp"
+#include "scene/fanPrefab.hpp"
 
 namespace fan
 {
-    //========================================================================================================
-    //========================================================================================================
-    void SceneResources::SetInfo( EcsSingletonInfo& _info )
+    struct GuiSceneResources
     {
-        _info.mIcon  = ImGui::IconType::Scene16;
-        _info.mGroup = EngineGroups::SceneRender;
-        _info.mName  = "scene resources";
-        _info.onGui = &SceneResources::OnGui;
-    }
-
-    //========================================================================================================
-    //========================================================================================================
-    void SceneResources::OnGui( EcsWorld& /*_world*/, EcsSingleton& _singleton )
-    {
-        if( ImGui::CollapsingHeader( "prefabs" ) )
+        //====================================================================================================
+        //====================================================================================================
+        static GuiSingletonInfo GetInfo()
         {
-            SceneResources& sceneResources = static_cast<SceneResources&>( _singleton );
-            const std::map<std::string, Prefab*>& prefabs = sceneResources.mPrefabManager->GetPrefabs();
-            for( auto pair : prefabs )
+            GuiSingletonInfo info;
+            info.mIcon  = ImGui::IconType::Scene16;
+            info.mGroup = EngineGroups::SceneRender;
+            info.onGui  = &GuiSceneResources::OnGui;
+            info.mEditorName  = "scene resources";
+            return info;
+        }
+
+        //========================================================================================================
+        //========================================================================================================
+        static void OnGui( EcsWorld& /*_world*/, EcsSingleton& _singleton )
+        {
+            if( ImGui::CollapsingHeader( "prefabs" ) )
             {
-                ImGui::Text( pair.second->mPath.c_str() );
+                SceneResources         & sceneResources = static_cast<SceneResources&>( _singleton );
+                const std::map<std::string,
+                               Prefab*>& prefabs        = sceneResources.mPrefabManager->GetPrefabs();
+                for( auto pair : prefabs )
+                {
+                    ImGui::Text( pair.second->mPath.c_str() );
+                }
             }
         }
-    }
+    };
 }

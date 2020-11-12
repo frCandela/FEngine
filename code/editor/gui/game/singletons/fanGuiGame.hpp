@@ -1,22 +1,30 @@
-#prama once
+#pragma once
+
+#include "game/singletons/fanGame.hpp"
+#include "editor/singletons/fanEditorGuiInfo.hpp"
 
 namespace fan
 {
-	//========================================================================================================
-	//========================================================================================================
-	void Game::SetInfo( EcsSingletonInfo& _info )
-	{
-		_info.mIcon  = ImGui::Joystick16;
-		_info.mGroup = EngineGroups::Game;
-		_info.onGui  = &Game::OnGui;
-		_info.mName  = "game";
-	}
+    struct GuiGame
+    {
+        //====================================================================================================
+        //====================================================================================================
+        static GuiSingletonInfo GetInfo()
+        {
+            GuiSingletonInfo info;
+            info.mIcon  = ImGui::Joystick16;
+            info.mGroup = EngineGroups::Game;
+            info.onGui  = &GuiGame::OnGui;
+            info.mEditorName  = "game";
+            return info;
+        }
 
-	//========================================================================================================
-	//========================================================================================================
-	void Game::OnGui( EcsWorld&, EcsSingleton& _component )
-	{
-		Game& gameData = static_cast<Game&>( _component );
-		ImGui::FanPrefab( "spaceship", gameData.mSpaceshipPrefab );
-	}
+        //========================================================================================================
+        //========================================================================================================
+        static void OnGui( EcsWorld&, EcsSingleton& _component )
+        {
+            Game& gameData = static_cast<Game&>( _component );
+            ImGui::FanPrefab( "spaceship", gameData.mSpaceshipPrefab );
+        }
+    };
 }

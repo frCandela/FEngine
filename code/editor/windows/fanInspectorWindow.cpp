@@ -16,6 +16,7 @@
 #include "render/resources/fanTexture.hpp"
 #include "render/resources/fanMesh.hpp"
 #include "editor/singletons/fanEditorSelection.hpp"
+#include "editor/singletons/fanEditorGuiInfo.hpp"
 #include "editor/gui/fanGroupsColors.hpp"
 
 
@@ -43,19 +44,20 @@ namespace fan
  			ImGui::Icon( GetIconType(), { 16,16 } ); ImGui::SameLine();
 			ImGui::Text( "Scene node : %s", node.mName.c_str() );
 
-            fanAssert(false);
-			/*for( const EcsComponentInfo& info : _world.GetComponentInfos() )
+            const EditorGuiInfo& gui = _world.GetSingleton<EditorGuiInfo>();
+			for( const EcsComponentInfo& info : _world.GetComponentInfos() )
 			{
 				if( !_world.HasComponent( entity, info.mType ) ) { continue; }
 
 				EcsComponent& component = _world.GetComponent( entity, info.mType );
 
-				if( info.onGui == nullptr ) { continue; }
+                const fan::GuiComponentInfo& guiInfo = gui.GetComponentInfo( info.mType );
+				if( guiInfo.onGui == nullptr ) { continue; }
 
  				ImGui::Separator();
 				 
  				// Icon
-				ImGui::Icon( info.mIcon, { 16, 16 }, GroupsColors::GetColor( info.mGroup ) );
+				ImGui::Icon( guiInfo.mIcon, { 16, 16 }, GroupsColors::GetColor( guiInfo.mGroup ) );
 				ImGui::SameLine();
                 ImGui::FanBeginDragDropSourceComponent( _world,
                                                         node.mHandle,
@@ -78,9 +80,9 @@ namespace fan
  				// Draw component
 				else
 				{
-					info.onGui( _world, entity, component );
+                    guiInfo.onGui( _world, entity, component );
 				} 
-			}*/
+			}
 			ImGui::Separator();
 			//Add component button
 			if( ImGui::Button( "Add component" ) )
@@ -93,10 +95,12 @@ namespace fan
 	//========================================================================================================
 	// menu item in the NewComponentPopup
 	//========================================================================================================
-	void InspectorWindow::NewComponentItem( EcsWorld& /*_world*/, const EcsComponentInfo& /*_info*/ )
+	void InspectorWindow::NewComponentItem( EcsWorld& _world, const EcsComponentInfo& _info )
 	{
-        fanAssert(false);
-		/*ImGui::Icon( _info.mIcon, { 16, 16 }, GroupsColors::GetColor( _info.mGroup ) ); ImGui::SameLine();
+        const EditorGuiInfo& gui = _world.GetSingleton<EditorGuiInfo>();
+        const fan::GuiComponentInfo& guiInfo = gui.GetComponentInfo( _info.mType );
+
+		ImGui::Icon( guiInfo.mIcon, { 16, 16 }, GroupsColors::GetColor( guiInfo.mGroup ) ); ImGui::SameLine();
 		if( ImGui::MenuItem( _info.mName.c_str() ) )
 		{
 			// Create new EcsComponent 
@@ -107,36 +111,38 @@ namespace fan
 				_world.AddComponent( entity, _info.mType );
 			}			
 			ImGui::CloseCurrentPopup();
-		}*/
+		}
 	}
 
 	//========================================================================================================
 	// context menu when clicking "add component"
 	//========================================================================================================
-	void InspectorWindow::NewComponentPopup( EcsWorld& /*_world*/ )
+	void InspectorWindow::NewComponentPopup( EcsWorld& _world )
 	{
+        const EditorGuiInfo& gui = _world.GetSingleton<EditorGuiInfo>();
 
-        fanAssert(false);
-		/*using Path = std::filesystem::path;
+        using Path = std::filesystem::path;
 		if( ImGui::BeginPopup( "new_component" ) )
 		{
 			// Get components and remove components with an empty path
 			std::vector< EcsComponentInfo > components = _world.GetComponentInfos();			
 			for( int i = (int)components.size() - 1; i >= 0; i-- )
 			{
-				if( std::string( components[i].mEditorPath ).empty() )
+                const fan::GuiComponentInfo& guiInfo = gui.GetComponentInfo( components[i].mType );
+				if( std::string( guiInfo.mEditorPath ).empty() )
 				{
 					components.erase( components.begin() + i );
 				}
 			}
 
- 			// Get components paths
-			std::vector<Path> componentsPath;
-			componentsPath.reserve( components.size() );
-			for( int componentIndex = 0; componentIndex < (int)components.size(); componentIndex++ )
-			{
-				componentsPath.push_back(  components[componentIndex].mEditorPath );
-			}
+            // Get components paths
+            std::vector<Path> componentsPath;
+            componentsPath.reserve( components.size() );
+            for( int i = 0; i < (int)components.size(); i++ )
+            {
+                const fan::GuiComponentInfo& guiInfo = gui.GetComponentInfo( components[i].mType );
+                componentsPath.push_back( guiInfo.mEditorPath );
+            }
 
 			// Sort components paths
 			std::set< Path > componentsPathSet;
@@ -163,7 +169,7 @@ namespace fan
 			}
 
 			ImGui::EndPopup();
-		}*/
+		}
 	}
 
 	//========================================================================================================

@@ -12,6 +12,7 @@
 #include "editor/singletons/fanEditorGrid.hpp"
 #include "editor/windows/fanEditorWindow.hpp"
 #include "editor/singletons/fanEditorSelection.hpp"
+#include "editor/singletons/fanEditorGuiInfo.hpp"
 #include "editor/fanModals.hpp"
 #include "editor/singletons/fanEditorPlayState.hpp"
 
@@ -179,18 +180,20 @@ namespace fan
 				ImGui::EndMenu();
 			}
 
-            fanAssert(false);
 			// Grid
-			/*if ( ImGui::BeginMenu( "Grid" ) )
+			if ( ImGui::BeginMenu( "Grid" ) )
 			{
 				ImGui::PushItemWidth( 150.f );
+
+                const EditorGuiInfo& gui = _world.GetSingleton<EditorGuiInfo>();
+                const fan::GuiSingletonInfo& guiInfo = gui.GetSingletonInfo( EditorGrid::Info::sType );
                 EditorGrid& grid = _world.GetSingleton<EditorGrid>();
 
-                EditorGrid::OnGui( _world, grid );		;
+                ( *guiInfo.onGui )( _world, grid );
 				ImGui::PopItemWidth();
 
 				ImGui::EndMenu();
-			}*/
+			}
 
 			// Framerate
 			ImGui::SameLine( ImGui::GetWindowWidth() - 60 );

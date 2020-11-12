@@ -49,6 +49,7 @@ namespace fan
 			RollbackNoOverwrite = 1 // on a rollback, old rollback states are not overwritten with new ones
 		};
 
+        std::string            mName;
 		uint32_t               mType;
 		int                    mIndex;
 		uint32_t               mSize;
