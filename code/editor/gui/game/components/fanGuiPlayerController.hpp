@@ -1,62 +1,33 @@
-#include "game/components/fanPlayerController.hpp"
+#pragma once
 
-#include "core/input/fanJoystick.hpp"
+#include "game/components/fanPlayerController.hpp"
+#include "editor/singletons/fanEditorGuiInfo.hpp"
 
 namespace fan
 {
-	//========================================================================================================
-	//========================================================================================================
-	void PlayerController::SetInfo( EcsComponentInfo& _info )
-	{
-		_info.mIcon       = ImGui::IconType::Joystick16;
-		_info.mGroup      = EngineGroups::Game;
-		_info.onGui       = &PlayerController::OnGui;
-		_info.load        = &PlayerController::Load;
-		_info.save        = &PlayerController::Save;
-		_info.mEditorPath = "game/player/";
-		_info.mName       = "player_controller";
-	}
-
-	//========================================================================================================
-	//========================================================================================================
-	void PlayerController::Init( EcsWorld& /*_world*/, EcsEntity /*_entity*/, EcsComponent& /*_component*/ )
-	{
-		//PlayerController& playerController = static_cast<PlayerController&>( _component );
-
-	}
-
-	//========================================================================================================
-	//========================================================================================================
-	void PlayerController::Load( EcsComponent& /*_component*/, const Json& /*_json*/ )
-	{
-//		PlayerController& playerController = static_cast<PlayerController&>( _component );
-//
-// 		int tmp;
-// 		if( Serializable::LoadInt( _json, "direction_buffer_size", tmp ) )
-// 		{
-// 			playerInput.directionBuffer.resize( tmp, glm::vec3( 0.f ) );
-// 		}
-// 		Serializable::LoadFloat( _json, "direction_cut_treshold", playerInput.directionCutTreshold );
-	}
-
-	//========================================================================================================
-	//========================================================================================================
-	void PlayerController::Save( const EcsComponent& /*_component*/, Json& /*_json*/ )
-	{
-//		const PlayerController& playerController = static_cast<const PlayerController&>( _component );
-
-// 		Serializable::SaveInt( _json, "direction_buffer_size", (int)playerInput.directionBuffer.size() );
-// 		Serializable::SaveFloat( _json, "direction_cut_treshold", playerInput.directionCutTreshold );
-	}
-
-    //========================================================================================================
-    //========================================================================================================
-    void PlayerController::OnGui( EcsWorld& /*_world*/, EcsEntity /*_entityID*/, EcsComponent& /*_component*/ )
+    struct GuiPlayerController
     {
+        //====================================================================================================
+        //====================================================================================================
+        static GuiComponentInfo GetInfo()
+        {
+            GuiComponentInfo info;
+            info.mIcon       = ImGui::IconType::Joystick16;
+            info.mGroup      = EngineGroups::Game;
+            info.onGui       = &GuiPlayerController::OnGui;
+            info.mEditorPath = "game/player/";
+            info.mEditorName = "player_controller";
+            return info;
+        }
+
+        //========================================================================================================
+        //========================================================================================================
+        static void OnGui( EcsWorld& /*_world*/, EcsEntity /*_entityID*/, EcsComponent& /*_component*/ )
+        {
 //		PlayerController& playerController = static_cast<PlayerController&>( _component );
 
-        ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() );
-        {
+            ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() );
+            {
 // 			// Input type
 // 			int type = playerInput.type;
 // 			if( ImGui::Combo( "input type", &type, "keyboard+mouse\0joystick\0" ) )
@@ -81,6 +52,8 @@ namespace fan
 // 			// direction cut threshold
 // 			ImGui::DragFloat( "direction cut threshold", &playerInput.directionCutTreshold, 0.01f, 0.f, 1.f );
 
-        } ImGui::PopItemWidth();
-    }
+            }
+            ImGui::PopItemWidth();
+        }
+    };
 }

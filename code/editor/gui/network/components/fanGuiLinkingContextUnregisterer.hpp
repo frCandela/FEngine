@@ -1,22 +1,28 @@
 #pragma once
 
 #include "network/components/fanLinkingContextUnregisterer.hpp"
+#include "editor/singletons/fanEditorGuiInfo.hpp"
 
 namespace fan
 {
-	//========================================================================================================
-	//========================================================================================================
-	void LinkingContextUnregisterer::SetInfo( EcsComponentInfo& _info )
-	{
-		_info.mIcon   = ImGui::IconType::Network16;
-		_info.mGroup  = EngineGroups::Network;
-		_info.onGui   = &LinkingContextUnregisterer::OnGui;
-		_info.mName   = "linking context unregisterer";
-	}
+    struct GuiLinkingContextUnregisterer
+    {
+        //====================================================================================================
+        //====================================================================================================
+        static GuiComponentInfo GetInfo()
+        {
+            GuiComponentInfo info;
+            info.mIcon       = ImGui::IconType::Network16;
+            info.mGroup      = EngineGroups::Network;
+            info.onGui       = &GuiLinkingContextUnregisterer::OnGui;
+            info.mEditorName = "linking context unregisterer";
+            return info;
+        }
 
-	//========================================================================================================
-	//========================================================================================================
-	void LinkingContextUnregisterer::OnGui( EcsWorld& , EcsEntity /*_entity*/, EcsComponent& /*_cpnt*/ )
-	{
-	}
+        //========================================================================================================
+        //========================================================================================================
+        static void OnGui( EcsWorld&, EcsEntity /*_entity*/, EcsComponent& /*_cpnt*/ )
+        {
+        }
+    };
 }

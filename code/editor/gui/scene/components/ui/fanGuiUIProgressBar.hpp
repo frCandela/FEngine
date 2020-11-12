@@ -1,34 +1,41 @@
 #pragma once
 
 #include "scene/components/ui/fanUIProgressBar.hpp"
+#include "editor/singletons/fanEditorGuiInfo.hpp"
 
 namespace fan
 {
-	//========================================================================================================
-	//========================================================================================================
-	void UIProgressBar::SetInfo( EcsComponentInfo& _info )
-	{
-		_info.mIcon       = ImGui::IconType::UiProgressBar16;
-		_info.mGroup      = EngineGroups::SceneUI;
-		_info.onGui       = &UIProgressBar::OnGui;
-		_info.mEditorPath = "ui/";
-		_info.mName       = "ui progress bar";
-	}
-
-    //========================================================================================================
-    //========================================================================================================
-    void UIProgressBar::OnGui( EcsWorld& /*_world*/, EcsEntity /*_entityID*/, EcsComponent& _component )
+    struct GuiUIProgressBar
     {
-        UIProgressBar& progressBar = static_cast<UIProgressBar&>( _component );
-
-        ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() );
+        //====================================================================================================
+        //====================================================================================================
+        static GuiComponentInfo GetInfo()
         {
-            bool update = false;
-            update |= ImGui::DragFloat( "progress", &progressBar.mProgress, 0.01f, 0.f, 1.f );
-            update |= ImGui::DragInt( "max width", &progressBar.mMaxSize, 0.01f );
-            update |= ImGui::FanComponent( "target transform", progressBar.mTargetTransform );
+            GuiComponentInfo info;
+            info.mIcon       = ImGui::IconType::UiProgressBar16;
+            info.mGroup      = EngineGroups::SceneUI;
+            info.onGui       = &GuiUIProgressBar::OnGui;
+            info.mEditorPath = "ui/";
+            info.mEditorName       = "ui progress bar";
+            return info;
+        }
 
-            if( update ) { progressBar. SetProgress( progressBar.mProgress ); }
-        } ImGui::PopItemWidth();
-    }
+        //========================================================================================================
+        //========================================================================================================
+        static  void OnGui( EcsWorld& /*_world*/, EcsEntity /*_entityID*/, EcsComponent& _component )
+        {
+            UIProgressBar& progressBar = static_cast<UIProgressBar&>( _component );
+
+            ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() );
+            {
+                bool update = false;
+                update |= ImGui::DragFloat( "progress", &progressBar.mProgress, 0.01f, 0.f, 1.f );
+                update |= ImGui::DragInt( "max width", &progressBar.mMaxSize, 0.01f );
+                update |= ImGui::FanComponent( "target transform", progressBar.mTargetTransform );
+
+                if( update ){ progressBar.SetProgress( progressBar.mProgress ); }
+            }
+            ImGui::PopItemWidth();
+        }
+    };
 }

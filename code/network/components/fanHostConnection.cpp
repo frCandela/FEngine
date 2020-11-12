@@ -1,6 +1,5 @@
 #include "network/components/fanHostConnection.hpp"
 #include "network/singletons/fanTime.hpp"
-#include "editor/gui/fanImGuiNetwork.hpp"
 
 namespace fan
 {

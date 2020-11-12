@@ -1,14 +1,20 @@
 #pragma once
 
 #include "scene/components/fanParticle.hpp"
+#include "editor/singletons/fanEditorGuiInfo.hpp"
 
 namespace fan
 {
-	//========================================================================================================
-	//========================================================================================================
-	void Particle::SetInfo( EcsComponentInfo& _info )
-	{
-		_info.mName  = "particle";
-		_info.mGroup = EngineGroups::Scene;
-	}
+    struct GuiParticle
+    {
+        //====================================================================================================
+        //====================================================================================================
+        static GuiComponentInfo GetInfo()
+        {
+            GuiComponentInfo info;
+            info.mEditorName = "particle";
+            info.mGroup      = EngineGroups::Scene;
+            return info;
+        }
+    };
 }

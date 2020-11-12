@@ -1,37 +1,46 @@
 #pragma once
 
 #include "scene/components/fanDirectionalLight.hpp"
+#include "editor/singletons/fanEditorGuiInfo.hpp"
+#include "editor/fanModals.hpp"
 
 namespace fan
 {
-	//========================================================================================================
-	//========================================================================================================
-	void DirectionalLight::SetInfo( EcsComponentInfo& _info )
-	{
-		_info.mIcon       = ImGui::IconType::DirLight16;
-		_info.mGroup      = EngineGroups::SceneRender;
-		_info.onGui       = &DirectionalLight::OnGui;
-		_info.mEditorPath = "lights/";
-		_info.mName       = "directional light";
-	}
-
-    //========================================================================================================
-    //========================================================================================================
-    void DirectionalLight::OnGui( EcsWorld& /*_world*/, EcsEntity /*_entityID*/, EcsComponent& _component )
+    struct GuiDirectionalLight
     {
-        DirectionalLight& light = static_cast<DirectionalLight&>( _component );
-
-        ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() );
+        //====================================================================================================
+        //====================================================================================================
+        static GuiComponentInfo GetInfo()
         {
-            // Filter color
-            if( ImGui::Button( "##ambiant" ) ) { light.mAmbiant = Color::sBlack; } ImGui::SameLine();
-            ImGui::ColorEdit3( "ambiant", light.mAmbiant.Data(), ImGui::fanColorEditFlags );
+            GuiComponentInfo info;
+            info.mIcon       = ImGui::IconType::DirLight16;
+            info.mGroup      = EngineGroups::SceneRender;
+            info.onGui       = &GuiDirectionalLight::OnGui;
+            info.mEditorPath = "lights/";
+            info.mEditorName = "directional light";
+            return info;
+        }
 
-            if( ImGui::Button( "##diffuse" ) ) { light.mDiffuse = Color::sBlack; } ImGui::SameLine();
-            ImGui::ColorEdit3( "diffuse", light.mDiffuse.Data(), ImGui::fanColorEditFlags );
+        //========================================================================================================
+        //========================================================================================================
+        static void OnGui( EcsWorld& /*_world*/, EcsEntity /*_entityID*/, EcsComponent& _component )
+        {
+            DirectionalLight& light = static_cast<DirectionalLight&>( _component );
 
-            if( ImGui::Button( "##specular" ) ) { light.mSpecular = Color::sBlack; } ImGui::SameLine();
-            ImGui::ColorEdit3( "specular", light.mSpecular.Data(), ImGui::fanColorEditFlags );
+            ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() );
+            {
+                // Filter color
+                if( ImGui::Button( "##ambiant" ) ){ light.mAmbiant = Color::sBlack; }
+                ImGui::SameLine();
+                ImGui::ColorEdit3( "ambiant", light.mAmbiant.Data(), ImGui::fanColorEditFlags );
+
+                if( ImGui::Button( "##diffuse" ) ){ light.mDiffuse = Color::sBlack; }
+                ImGui::SameLine();
+                ImGui::ColorEdit3( "diffuse", light.mDiffuse.Data(), ImGui::fanColorEditFlags );
+
+                if( ImGui::Button( "##specular" ) ){ light.mSpecular = Color::sBlack; }
+                ImGui::SameLine();
+                ImGui::ColorEdit3( "specular", light.mSpecular.Data(), ImGui::fanColorEditFlags );
 
 
 // 			const Transform& transform = m_gameobject->GetTransform();
@@ -49,6 +58,8 @@ namespace fan
 // 				_world.GetSingleton<RenderDebug>().DebugLine( pos + offset, pos + offset + length * dir, color );
 // 			}
 // 			_world.GetSingleton<RenderDebug>().DebugSphere( transform.GetBtTransform(), radius, 0, color );
-        } ImGui::PopItemWidth();
-    }
+            }
+            ImGui::PopItemWidth();
+        }
+    };
 }

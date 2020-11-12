@@ -1,14 +1,20 @@
 #pragma once
 
 #include "scene/components/fanBounds.hpp"
+#include "editor/singletons/fanEditorGuiInfo.hpp"
 
 namespace fan
 {
-	//========================================================================================================
-	//========================================================================================================
-	void Bounds::SetInfo( EcsComponentInfo& _info )
-	{
-		_info.mGroup = EngineGroups::Scene;
-		_info.mName  = "bounds";
-	}
+    struct GuiBounds
+    {
+        //====================================================================================================
+        //====================================================================================================
+        static GuiComponentInfo GetInfo()
+        {
+            GuiComponentInfo info;
+            info.mGroup = EngineGroups::Scene;
+            info.mEditorName  = "bounds";
+            return info;
+        }
+    };
 }
