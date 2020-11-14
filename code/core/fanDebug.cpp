@@ -1,7 +1,7 @@
 #include "core/fanDebug.hpp"
 
 #include <iostream>
-#include "network/singletons/fanTime.hpp"
+#include "glfw/glfw3.h"
 
 namespace fan
 {
@@ -22,11 +22,11 @@ namespace fan
 		item.message = mStringstream.str();
 		item.severity = mCurrentSeverity;
 		item.type = mCurrentType;
-		item.time = Time::ElapsedSinceStartup();
+		item.time = glfwGetTime();
 		mLogBuffer.push_back( item );
 
 		// stdio
-		std::cout << Time::SecondsToString( item.time );
+		std::cout << Debug::SecondsToString( item.time );
 		switch ( mCurrentSeverity )
 		{
 		case Severity::log:
@@ -94,4 +94,38 @@ namespace fan
 	//========================================================================================================
 	//========================================================================================================
 	void Debug::Clear() { Get().mLogBuffer.clear(); }
+
+    //========================================================================================================
+    // Returns a hours:minuts:seconds ex: 3783s = 01:02:03
+    //========================================================================================================
+    std::string Debug::SecondsToString( const double _seconds )
+    {
+        std::stringstream ss;
+        unsigned remainingSeconds = static_cast<unsigned>( _seconds );
+
+        const unsigned hours = remainingSeconds / 3600;
+        remainingSeconds -= hours * 3600;
+        ss << '[';
+        if( hours < 10 )
+        {
+            ss << '0';
+        }
+        ss << hours << ':';
+
+        const unsigned minuts = remainingSeconds / 60;
+        remainingSeconds -= minuts * 60;
+        if( minuts < 10 )
+        {
+            ss << 0;
+        }
+        ss << minuts << ':';
+
+        const unsigned seconds = remainingSeconds;
+        if( seconds < 10 )
+        {
+            ss << '0';
+        }
+        ss << seconds << ']';
+        return ss.str();
+    }
 }

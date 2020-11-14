@@ -3,6 +3,7 @@
 #include <sstream>
 #include "render/fanRenderDragnDrop.hpp"
 #include "editor/fanModals.hpp"
+#include "editor/fanImguiIcons.hpp"
 
 namespace ImGui
 {

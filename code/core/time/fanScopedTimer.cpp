@@ -1,7 +1,6 @@
 #include "core/time/fanScopedTimer.hpp"
 
 #include "core/fanDebug.hpp"
-#include "network/singletons/fanTime.hpp"
 
 namespace fan
 {
@@ -10,17 +9,17 @@ namespace fan
 	ScopedTimer::ScopedTimer( const std::string _label )
 		: mLabel( _label )
 	{
-        mStartValue = Time::ElapsedSinceStartup();
+        mClock.Reset();
 	}
 
 	//========================================================================================================
 	//========================================================================================================
 	ScopedTimer::~ScopedTimer()
 	{
-		const double stopValue = Time::ElapsedSinceStartup();
+		const double elapsedSeconds = mClock.ElapsedSeconds();
 
 		Debug::Highlight()  << "Scoped timer - " << mLabel
-		                    << " - took: " << ( stopValue - mStartValue ) * 1000 << " ms"
+		                    << " - took: " << elapsedSeconds * 1000 << " ms"
 		                    << Debug::Endl();
 	}
 }

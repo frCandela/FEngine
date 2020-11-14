@@ -102,11 +102,4 @@ namespace fan
         SlotCallData* mCallData = nullptr;
         EcsWorld    * mWorld    = nullptr;
     };
-
-
-}
-
-namespace ImGui
-{
-    void FanSlotPtr( const char* _label, fan::EcsWorld& _world, fan::SlotPtr& _ptr );
 }

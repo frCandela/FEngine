@@ -3,7 +3,6 @@
 #include "glfw/glfw3.h"
 #include "core/ecs/fanEcsSingleton.hpp"
 #include "network/fanNetConfig.hpp"
-#include "scene/fanSceneResourcePtr.hpp"
 
 namespace fan
 {
@@ -32,7 +31,6 @@ namespace fan
 
 		static double		ElapsedSinceStartup() { return glfwGetTime(); }
 		static void			RegisterFrameDrawn();
-		static std::string	SecondsToString( const double _seconds );	
 
 		void OnShiftFrameIndex( const int _framesDelta );
 	};

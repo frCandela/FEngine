@@ -2,6 +2,7 @@
 #include "render/resources/fanTexture.hpp"
 #include "render/resources/fanMesh.hpp"
 #include "render/resources/fanFont.hpp"
+#include "editor/fanImguiIcons.hpp"
 
 namespace ImGui
 {

@@ -1,5 +1,4 @@
-#include "fanSerializable.hpp"
-
+#include "core/memory/fanSerializable.hpp"
 #include "bullet/LinearMath/btVector3.h"
 #include "bullet/LinearMath/btQuaternion.h"
 #include "core/fanDebug.hpp"

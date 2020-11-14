@@ -39,9 +39,10 @@ namespace fan
 		static Debug& Highlight();
 
 		static void Clear();
+        static std::string	SecondsToString( const double _seconds );
 		const std::vector< LogItem >& GetLogBuffer() { return mLogBuffer; }
 
-	protected:
+    protected:
 		Debug();
 
 	private:

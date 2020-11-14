@@ -2,6 +2,7 @@
 
 #include "network/singletons/fanTime.hpp"
 #include "scene/components/fanRigidbody.hpp"
+#include "core/memory/fanSerializable.hpp"
 
 namespace fan
 {

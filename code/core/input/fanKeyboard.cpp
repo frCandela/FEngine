@@ -1,6 +1,6 @@
 #include "core/input/fanKeyboard.hpp"
 
-#include <cctype>	
+#include <cctype>
 #include "imgui/imgui.h"
 #include "core/input/fanInput.hpp"
 #include "core/fanAssert.hpp"

@@ -11,7 +11,7 @@ namespace fan
 	ConsoleWindow::LogItemCompiled::LogItemCompiled( const Debug::LogItem& _logItem )
 	{
         mSeverity   = _logItem.severity;
-        mLogMessage = Time::SecondsToString( _logItem.time ).c_str() + std::string( " " ) + _logItem.message;
+        mLogMessage = Debug::SecondsToString( _logItem.time ).c_str() + std::string( " " ) + _logItem.message;
         mColor      = GetSeverityColor( _logItem.severity );
 	}
 

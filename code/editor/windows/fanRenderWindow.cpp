@@ -12,6 +12,7 @@
 #include "scene/singletons/fanSceneResources.hpp"
 #include "scene/singletons/fanRenderResources.hpp"
 #include "scene/fanPrefabManager.hpp"
+#include "scene/fanPrefab.hpp"
 
 namespace fan
 {

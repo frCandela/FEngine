@@ -1,9 +1,6 @@
 #pragma once
 
 #include "core/ecs/fanSlot.hpp"
-#include "core/ecs/fanEcsWorld.hpp"
-#include "core/fanAssert.hpp"
-#include "fanGroupsColors.hpp"
 
 namespace ImGui
 {
@@ -25,4 +22,6 @@ namespace ImGui
         static void Open();
         static void Draw( fan::EcsWorld& _world, fan::SlotPtr& _slotPtr );
     };
+
+    void FanSlotPtr( const char* _label, fan::EcsWorld& _world, fan::SlotPtr& _ptr );
 }

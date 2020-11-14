@@ -3,6 +3,7 @@
 #include "scene/components/ui/fanUIButton.hpp"
 #include "scene/fanSceneTags.hpp"
 #include "editor/singletons/fanEditorGuiInfo.hpp"
+#include "editor/gui/fanGuiSlot.hpp"
 #include "editor/fanModals.hpp"
 
 namespace fan

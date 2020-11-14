@@ -1,13 +1,12 @@
 #include "fanSerializedValues.hpp"
 
 #include <fstream>
-#include "core/fanDebug.hpp"
-#include "core/math/fanVector2.hpp"
-#include "core/fanColor.hpp"
 #include "bullet/LinearMath/btQuaternion.h"
-#include "fanSerializable.hpp"
-#include "core/input/fanInput.hpp"
+#include "core/memory/fanSerializable.hpp"
 #include "core/input/fanInputManager.hpp"
+#include "core/input/fanInput.hpp"
+#include "core/fanDebug.hpp"
+#include "core/fanColor.hpp"
 
 
 namespace fan

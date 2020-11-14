@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include "core/time/fanClock.hpp"
 
 namespace fan
 {
@@ -14,7 +15,7 @@ namespace fan
 		~ScopedTimer();
 
 	private:
-		double      mStartValue;
-		std::string mLabel;
+        Clock               mClock;
+		std::string         mLabel;
 	};
 }
