@@ -2,8 +2,6 @@
 #include "core/fanDebug.hpp"
 #include "core/input/fanInput.hpp"
 #include "render/resources/fanTexture.hpp"
-#include "render/fanRenderGlobal.hpp"
-
 
 namespace fan
 {

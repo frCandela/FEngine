@@ -1,4 +1,4 @@
-#include "fanFont.hpp"
+#include "render/resources/fanFont.hpp"
 #include "SFML/System/Utf.hpp"
 #include "core/fanDebug.hpp"
 #include "render/resources/fanTextureManager.hpp"

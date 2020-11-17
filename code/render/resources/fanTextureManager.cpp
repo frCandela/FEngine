@@ -1,4 +1,4 @@
-#include "fanTextureManager.hpp"
+#include "render/resources/fanTextureManager.hpp"
 #include "render/fanRenderResourcePtr.hpp"
 #include "render/core/fanDevice.hpp"
 

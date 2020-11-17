@@ -4,6 +4,7 @@
 #include "scene/fanSceneTags.hpp"
 #include "editor/singletons/fanEditorGuiInfo.hpp"
 #include "editor/gui/fanGuiSlot.hpp"
+#include "editor/gui/fanGuiRenderResources.hpp"
 #include "editor/fanModals.hpp"
 
 namespace fan

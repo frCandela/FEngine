@@ -36,8 +36,8 @@ namespace fan
         void SetPosition( const glm::ivec2 _position );
         void SetSize( const glm::ivec2 _size );
 
-        void Destroy();
         void DestroyWindow();
+        void Destroy();
 
         VkExtent2D	GetExtent()	 const;
         glm::ivec2	GetSize()	 const;
