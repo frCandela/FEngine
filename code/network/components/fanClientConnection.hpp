@@ -1,7 +1,6 @@
 #pragma once
 
-#include "ecs/fanEcsComponent.hpp"
-
+#include "core/ecs/fanEcsComponent.hpp"
 #include "network/fanUdpSocket.hpp"
 #include "network/fanPacket.hpp"
 
@@ -9,17 +8,15 @@ namespace fan
 {
 	class EcsWorld;
 
-	//================================================================================================================================
+	//========================================================================================================
 	// Manages the connection of the client with the server
-	//================================================================================================================================	
+	//========================================================================================================
 	struct ClientConnection : public EcsComponent
 	{
 		ECS_COMPONENT( ClientConnection )
-	public:
 		static void SetInfo( EcsComponentInfo& _info );
 		static void Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component );
 		static void Destroy( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component );
-		static void OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component );
 
 		enum class ClientState { 
 			Disconnected,		// Client needs to send a Hello packet to the server to login
@@ -28,19 +25,19 @@ namespace fan
 			Stopping			// Client is being stopped, a disconnect packet must be sent to the server
 		};
 		
-		Signal< PlayerID > onLoginSuccess;
+		Signal< PlayerID > mOnLoginSuccess;
 
-		UdpSocket*		socket;
-		Port			clientPort;
-		sf::IpAddress	serverIP;
-		Port			serverPort;
-		ClientState		state;
-		float			rtt;
-		float			timeoutDelay;			// disconnects from server after X seconds without a response
-		float			bandwidth;				// in Ko/s
-		double			serverLastResponse;
-		PacketPing		lastPacketPing;
-		bool			mustSendBackPacketPing;
+		UdpSocket*	  mSocket;
+		Port          mClientPort;
+		sf::IpAddress mServerIP;
+		Port          mServerPort;
+		ClientState   mState;
+		float         mRtt;
+		float         mTimeoutDelay;			// disconnects from server after X seconds without a response
+		float         mBandwidth;				// in Ko/s
+		double        mServerLastResponse;
+		PacketPing    mLastPacketPing;
+		bool          mMustSendBackPacketPing;
 
 		void Write( EcsWorld& _world, EcsEntity _entity, Packet& _packet );
 		void OnLoginFail( const PacketTag _packetTag );

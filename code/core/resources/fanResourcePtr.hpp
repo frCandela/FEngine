@@ -1,79 +1,79 @@
 #pragma once
 
 #include "core/fanHash.hpp"
-#include "ecs/fanSignal.hpp"
+#include "core/ecs/fanSignal.hpp"
 #include "core/resources/fanResource.hpp"
 
 namespace fan
 {
-	//================================================================================================================================
-	//================================================================================================================================
-	template< typename _ResourceType>
+	//========================================================================================================
+	//========================================================================================================
+	template< typename ResourceType>
 	class ResourcePtr
 	{
 	public:
-		static Signal< ResourcePtr<_ResourceType>& > s_onResolve;
+		static Signal< ResourcePtr<ResourceType>& > sOnResolve;
 
 		ResourcePtr( Resource* _resource = nullptr );
 		virtual ~ResourcePtr();
 
-		void			Resolve() { SetResource( nullptr ); s_onResolve.Emmit( *this ); }
-		bool			IsValid()       const { return m_resource != nullptr; }
-		_ResourceType*  GetResource()   const { return static_cast< _ResourceType* >( m_resource ); }
+		void			Resolve() { SetResource( nullptr ); sOnResolve.Emmit( *this ); }
+		bool			IsValid()       const { return mResource != nullptr; }
+		ResourceType*  GetResource()   const { return static_cast< ResourceType* >( mResource ); }
 
-		_ResourceType* operator->() const { return ( _ResourceType* ) ( m_resource ); } //@todo return a reference
-		_ResourceType* operator*()  const { return ( _ResourceType* ) ( m_resource ); } //@todo return a reference
-		bool operator==( const _ResourceType* _other ) const { return _other == m_resource; }
-		bool operator!=( const _ResourceType* _other ) const { return _other != m_resource; }		
+		ResourceType* operator->() const { return ( ResourceType* ) ( mResource ); } //@todo return a reference
+		ResourceType* operator*()  const { return ( ResourceType* ) ( mResource ); } //@todo return a reference
+		bool operator==( const ResourceType* _other ) const { return _other == mResource; }
+		bool operator!=( const ResourceType* _other ) const { return _other != mResource; }
 	protected:
 		void SetResource(Resource* _resource);
 
 	private:
-		Resource* m_resource = nullptr;
+		Resource* mResource = nullptr;
 
 	};
 
 	template< typename _ResourceType>
-	Signal< ResourcePtr<_ResourceType>& > ResourcePtr<_ResourceType>::s_onResolve;
+	Signal< ResourcePtr<_ResourceType>& > ResourcePtr<_ResourceType>::sOnResolve;
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	template< typename _ResourceType >
 	ResourcePtr<_ResourceType>::ResourcePtr( Resource* _resource ) :
-		m_resource( _resource )
-	{		
-		assert( m_resource == nullptr );
+		mResource( _resource )
+	{
+        fanAssert( mResource == nullptr );
 		SetResource( _resource );
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	template< typename _ResourceType >
 	void ResourcePtr<_ResourceType>::SetResource( Resource * _resource ) 
 	{
-		if ( _resource == m_resource ) { return; }
+		if ( _resource == mResource ) { return; }
 
-		if ( m_resource != nullptr ) 
+		if ( mResource != nullptr )
 		{ 
-			m_resource->DecreaseRefCount(); 
-			m_resource = nullptr;
+			mResource->DecreaseRefCount();
+            mResource = nullptr;
 		}
 
 		if ( _resource != nullptr )
 		{
-			m_resource = _resource;
-			m_resource->IncreaseRefCount();
+            mResource = _resource;
+			mResource->IncreaseRefCount();
 		}
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	template< typename _ResourceType >
 	ResourcePtr<_ResourceType>::~ResourcePtr()
 	{
-		if ( m_resource != nullptr )
+		if ( mResource != nullptr )
 		{
-			m_resource->DecreaseRefCount();
+			mResource->DecreaseRefCount();
 		}
 	}
 }

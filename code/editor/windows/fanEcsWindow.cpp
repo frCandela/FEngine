@@ -3,20 +3,21 @@
 #include <sstream>
 #include "core/time/fanProfiler.hpp"
 #include "core/fanDebug.hpp"
-#include "ecs/fanEcsWorld.hpp"
-#include "ecs/fanEcsSystem.hpp"
-#include "ecs/fanEcsTag.hpp"
-#include "scene/fanSceneTags.hpp"
+#include "core/ecs/fanEcsWorld.hpp"
+#include "core/ecs/fanEcsSystem.hpp"
+#include "core/ecs/fanEcsTag.hpp"
+#include "engine/fanSceneTags.hpp"
 #include "editor/fanModals.hpp"
-#include "editor/fanGroupsColors.hpp"
+#include "editor/gui/fanGroupsColors.hpp"
+#include "editor/singletons/fanEditorGuiInfo.hpp"
 
 namespace fan
 {
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	EcsWindow::EcsWindow() :
-		EditorWindow( "ecs", ImGui::IconType::ECS16 )
+		EditorWindow( "ecs", ImGui::IconType::Ecs16 )
 	{
 	}
 
@@ -30,16 +31,17 @@ namespace fan
 		return ssStorage.str();
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void EcsWindow::OnGui( EcsWorld& _world )
 	{
 		// Global
 		if( ImGui::CollapsingHeader( "Global" ) )
 		{
-			ImGui::Text( "num chunks     : %d", EcsChunk::s_allocator.Size() );
-			ImGui::Text( "total size (Mo): %.1f", float( EcsChunk::s_allocator.Size() * EcsChunk::s_allocator.chunkSize ) * 0.000001f );
-		}
+			ImGui::Text( "num chunks     : %d", EcsChunk::sAllocator.Size() );
+            ImGui::Text( "total size (Mo): %.1f",
+                         float( EcsChunk::sAllocator.Size() * EcsChunk::sAllocator.sChunkSize ) * 0.000001f );
+        }
 
 		// Archetypes
 		if( ImGui::CollapsingHeader( "Archetypes" ) )
@@ -61,7 +63,7 @@ namespace fan
 			{
 				std::stringstream ssSignature;
 				ssSignature << archetype->GetSignature();
-				ImGui::Text( ssSignature.str().c_str() );	ImGui::NextColumn();		// signature
+				ImGui::Text( ssSignature.str().c_str() );	ImGui::NextColumn();	// signature
 				ImGui::Text( "%d ", archetype->Size() );	ImGui::NextColumn();	// size
 				if( ImGui::IsItemHovered() )
 				{
@@ -70,7 +72,7 @@ namespace fan
 					std::stringstream ss;
 					for (int i = 0; i < archetype->Size() ; i++)
 					{
-						ss <<archetype->GetEntityData( i ).handle << " ";
+						ss <<archetype->GetEntityData( i ).mHandle << " ";
 					}
 					ImGui::TextUnformatted( ss.str().c_str() );
 					ImGui::PopTextWrapPos();
@@ -79,31 +81,38 @@ namespace fan
 
 
 				// chunks
+                const fan::EditorGuiInfo& gui = _world.GetSingleton<EditorGuiInfo>();
 				const std::vector< EcsComponentInfo >& infos = _world.GetComponentInfos();
 				for( int componentIndex = 0; componentIndex < _world.NumComponents(); componentIndex++ )
 				{
 					if( archetype->GetSignature()[componentIndex] )
 					{
 						const EcsComponentInfo& info = infos[componentIndex];
+                        const fan::GuiComponentInfo& guiInfo = gui.GetComponentInfo( info.mType );
+
 						std::stringstream ss;
-						ImGui::Icon( info.icon, { 16,16 }, GroupsColors::GetColor( info.group ) ); ImGui::SameLine();
-						ss << info.name.c_str();
-						for( int i = 0; i < 19 - (int)info.name.size(); i++ )
+                        ImGui::Icon( guiInfo.mIcon, { 16, 16 }, GroupsColors::GetColor( guiInfo.mGroup ) );
+                        ImGui::SameLine();
+						ss << info.mName.c_str();
+						for( int i = 0; i < 19 - (int)info.mName.size(); i++ )
 						{
 							ss << " ";
 						}
 						ss << ": ";
 
-						for( int chunkIndex = 0; chunkIndex < archetype->GetChunkVector(componentIndex).NumChunk(); chunkIndex++ )
-						{
-							ss << archetype->GetChunkVector(componentIndex).GetChunk( chunkIndex ).Size() << " ";
+                        for( int chunkIndex = 0;
+                             chunkIndex < archetype->GetChunkVector( componentIndex ).NumChunk();
+                             chunkIndex++ )
+                        {
+							ss  << archetype->GetChunkVector(componentIndex).GetChunk( chunkIndex ).Size()
+							    << " ";
 						}
 						ImGui::Text( ss.str().c_str() );
 
 
 						std::stringstream ssTooltip;
-						ssTooltip << info.name << '\n';
-						ssTooltip << "component size: " << info.size;
+						ssTooltip << info.mName << '\n';
+						ssTooltip << "component size: " << info.mSize;
 						ImGui::FanToolTip( ssTooltip.str().c_str() );
 					}
 				}
@@ -132,9 +141,9 @@ namespace fan
 				ImGui::Text( "%d", i++ );		ImGui::NextColumn();
 				ImGui::Text( "%d", handle );	ImGui::NextColumn();
 				std::stringstream ss;
-				ss << entity.archetype->GetSignature();
+				ss << entity.mArchetype->GetSignature();
 				ImGui::Text( "%s", ss.str().c_str() );	ImGui::NextColumn();
-				ImGui::Text( "%d", entity.index );	ImGui::NextColumn();
+				ImGui::Text( "%d", entity.mIndex );	ImGui::NextColumn();
 			}
 			ImGui::Columns( 1 );
 		}

@@ -1,13 +1,13 @@
-#include "ecs/fanEcsSystem.hpp"
-#include "scene/components/fanTransform.hpp"
+#include "core/ecs/fanEcsSystem.hpp"
+#include "engine/components/fanTransform.hpp"
 #include "game/components/fanPlanet.hpp"
 
 namespace fan
 {
-	//==============================================================================================================================================================
+	//========================================================================================================
 	// moves the planets in circles around their origin ( zero for now )
-	//==============================================================================================================================================================
-	struct S_MovePlanets : EcsSystem
+	//========================================================================================================
+	struct SMovePlanets : EcsSystem
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world )
 		{
@@ -22,7 +22,7 @@ namespace fan
 			if( _delta == 0.f ) { return; }
 
 			Time& time = _world.GetSingleton<Time>();
-			const float currentTime = time.frameIndex * time.logicDelta;
+			const float currentTime = time.mFrameIndex * time.mLogicDelta;
 
 			auto transformIt = _view.begin<Transform>();
 			auto planetIt = _view.begin<Planet>();
@@ -33,19 +33,21 @@ namespace fan
 				Transform& transform = *transformIt;
 				const Planet& planet = *planetIt;
 
-				float const planetTime = -planet.speed * currentTime;
-				btVector3 position( std::cosf( planetTime + planet.phase ), 0, std::sinf( planetTime + planet.phase ) );
-				transform.SetPosition( /*parentTransform.getOrigin()*/ planet.radius * position );
+				float const planetTime = -planet.mSpeed * currentTime;
+                btVector3 position( std::cosf( planetTime + planet.mPhase ),
+                                    0,
+                                    std::sinf( planetTime + planet.mPhase ) );
+				transform.SetPosition( /*parentTransform.getOrigin()*/ planet.mRadius * position );
 
 				sceneNode.AddFlag( SceneNode::BoundsOutdated );
 			}
 		}
 	};
 
-	//==============================================================================================================================================================
+	//========================================================================================================
 	// generates a light mesh from the planets positions & radius
-	//==============================================================================================================================================================
-	struct S_GenerateLightMesh : EcsSystem
+	//========================================================================================================
+	struct SGenerateLightMesh : EcsSystem
 	{
 		//================================================================
 		// helper struct for the S_GenerateLightMesh system
@@ -83,7 +85,7 @@ namespace fan
 			{
 				Transform& transform = *transformIt;
 
-				btVector3& scale = transform.scale;
+				btVector3& scale = transform.mScale;
 
 				const btVector3 planetPos = transform.GetPosition();
 				const btVector3 direction = planetPos - btVector3::Zero();
@@ -102,13 +104,17 @@ namespace fan
 			std::sort( std::begin( segments ), std::end( segments ),
 				[]( OrientedSegment& _s1, OrientedSegment& _s2 )
 			{
-				return SignedAngle( btVector3::Left(), _s1.direction, btVector3::Up() ) < SignedAngle( btVector3::Left(), _s2.direction, btVector3::Up() );
+                return SignedAngle( btVector3::Left(),
+                                    _s1.direction,
+                                    btVector3::Up() ) < SignedAngle( btVector3::Left(),
+                                                                     _s2.direction,
+                                                                     btVector3::Up() );
 			} );
 
 			// Finds the starting point of mesh generation loop
 			int startIndex = 0;
 			{
-				// Finds the index of a RIGHT axis that has a minimal number of nested levels of planets	(depth)	
+				// Finds the index of a RIGHT axis that has a minimal number of nested levels of planets
 				int startIndexDepth = 10000;
 				int depth = 0;	//			
 				for( int axisIndex = 0; axisIndex < (int)segments.size(); axisIndex++ )
@@ -126,7 +132,7 @@ namespace fan
 			// generates the mesh
 			std::vector<Vertex>	vertices;
 			vertices.reserve( 3 * _view.Size() );
-			const float minGapRadians = btRadians( sunLight.subAngle );
+			const float minGapRadians = btRadians( sunLight.mSubAngle );
 			std::set<float> norms;	// Stores the nested opening segments norms
 			for( int axisIndex = 0; axisIndex < (int)segments.size(); axisIndex++ )
 			{
@@ -161,7 +167,7 @@ namespace fan
 								const int numSubdivistions = int( angle / minGapRadians ) + 1;
 								const float subdivisionAngle = angle / numSubdivistions;
 								btTransform rotate( btQuaternion( btVector3::Up(), subdivisionAngle ) );
-								btVector3 subAxisNext = sunLight.radius * axis.direction / axis.norm;
+								btVector3 subAxisNext = sunLight.mRadius * axis.direction / axis.norm;
 								for( int subAxisIndex = 0; subAxisIndex < numSubdivistions; subAxisIndex++ )
 								{
 									btVector3 subAxis = subAxisNext;
@@ -171,7 +177,7 @@ namespace fan
 							}
 							else // gap size is small enough
 							{
-								length = sunLight.radius;
+								length = sunLight.mRadius;
 							}
 						}
 						else
@@ -191,7 +197,7 @@ namespace fan
 			}
 
 			// Load mesh
-			sunLight.mesh->LoadFromVertices( vertices );
+			sunLight.mMesh->LoadFromVertices( vertices );
 		}
 	};
 }

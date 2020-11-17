@@ -9,7 +9,7 @@ set( FAN_GAME_LIBS
     fanCore
     fanRender
     fanNetwork
-    fanScene
+    fanEngine
 )
 
 add_compile_options( ${COMPILATION_FLAGS} )

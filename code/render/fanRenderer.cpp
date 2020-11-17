@@ -1,25 +1,21 @@
 #include "render/fanRenderer.hpp"
 
 #include "core/fanDebug.hpp"
-#include "core/input/fanInput.hpp"
 #include "core/time/fanProfiler.hpp"
 #include "network/singletons/fanTime.hpp"
-#include "render/fanRenderGlobal.hpp"
 #include "render/resources/fanMesh2D.hpp"
 #include "render/resources/fanMesh.hpp"
-#include "render/core/fanSwapChain.hpp"
 #include "render/core/fanInstance.hpp"
-#include "render/resources/fanTexture.hpp"
-#include "render/core/fanDevice.hpp"
-#include "render/fanVertex.hpp"
 #include "render/fanWindow.hpp"
 
 namespace fan
 {
 	//========================================================================================================
-	//========================================================================================================
-    Renderer::Renderer( Window& _window, const ViewType _viewType )
-            : mWindow( _window ), mDevice( _window.mDevice ), mViewType( _viewType )
+    //========================================================================================================
+    Renderer::Renderer( Window& _window, const ViewType _viewType ) :
+            mWindow( _window ),
+            mDevice( _window.mDevice ),
+            mViewType( _viewType )
     {
 		const uint32_t imagesCount = mWindow.mSwapchain.mImagesCount;
 		mGameExtent = mWindow.mSwapchain.mExtent;
@@ -68,18 +64,13 @@ namespace fan
 		mDrawModels.Destroy( mDevice );
 		mDrawUI.mPipeline.Destroy( mDevice );
 		mDrawDebug.Destroy( mDevice );
+		mDrawUI.Destroy( mDevice );
+        mDrawPostprocess.Destroy( mDevice );
 
 		mMeshManager.Clear( mDevice );
         mMesh2DManager.Clear( mDevice );
         mTextureManager.Clear( mDevice );
-
-		mDrawUI.Destroy( mDevice );
-
 		mDescriptorTextures.Destroy( mDevice );
-
-		mDrawDebug.mPipelineLines.Destroy( mDevice );
-		mDrawDebug.mPipelineLinesNDT.Destroy( mDevice );
-		mDrawDebug.mPipelineTriangles.Destroy( mDevice );
 
 		DestroyShaders();
 
@@ -90,22 +81,17 @@ namespace fan
 		mSamplerGameColor.Destroy( mDevice );
 		mImageGameColor.Destroy( mDevice );
 		mImageViewGameColor.Destroy( mDevice );
-
 		// pp frame buffers & attachements
 		mFramebuffersPostprocess.Destroy( mDevice );
 		mSamplerPostprocessColor.Destroy( mDevice );
 		mImagePostprocessColor.Destroy( mDevice );
 		mImageViewPostprocessColor.Destroy( mDevice );
-		
 		// render passes
 		mRenderPassGame.Destroy( mDevice );
 		mRenderPassPostprocess.Destroy( mDevice );
 		mRenderPassImgui.Destroy( mDevice );
 
 		mFramebuffersSwapchain.Destroy( mDevice );
-
-		mDrawPostprocess.mPipeline.Destroy( mDevice );
-		mDrawPostprocess.Destroy( mDevice );
 	}
 
 	//========================================================================================================
@@ -118,6 +104,8 @@ namespace fan
 		mDrawDebug.mFragmentShaderLinesNDT.Create( mDevice, "code/shaders/debugLines.frag" );
 		mDrawDebug.mVertexShaderTriangles.Create( mDevice, "code/shaders/debugTriangles.vert" );
 		mDrawDebug.mFragmentShaderTriangles.Create( mDevice, "code/shaders/debugTriangles.frag" );
+        mDrawDebug.mVertexShaderLines2D.Create( mDevice, "code/shaders/debugLines2D.vert" );
+        mDrawDebug.mFragmentShaderLines2D.Create( mDevice, "code/shaders/debugLines2D.frag" );
 		mDrawModels.mVertexShader.Create( mDevice, "code/shaders/models.vert" );
 		mDrawModels.mFragmentShader.Create( mDevice, "code/shaders/models.frag" );
 		mDrawUI.mVertexShader.Create( mDevice, "code/shaders/ui.vert" );
@@ -136,6 +124,8 @@ namespace fan
 		mDrawDebug.mFragmentShaderLinesNDT	.Destroy( mDevice );
 		mDrawDebug.mVertexShaderTriangles	.Destroy( mDevice );
 		mDrawDebug.mFragmentShaderTriangles	.Destroy( mDevice );
+        mDrawDebug.mVertexShaderLines2D		.Destroy( mDevice );
+        mDrawDebug.mFragmentShaderLines2D	.Destroy( mDevice );
 		mDrawModels.mVertexShader			.Destroy( mDevice );
 		mDrawModels.mFragmentShader			.Destroy( mDevice );
 		mDrawUI.mVertexShader				.Destroy( mDevice );
@@ -151,6 +141,7 @@ namespace fan
 		const PipelineConfig debugLinesPipelineConfig = mDrawDebug.GetPipelineConfigLines();
 		const PipelineConfig debugLinesNoDepthTestPipelineConfig = mDrawDebug.GetPipelineConfigLinesNDT();
 		const PipelineConfig debugTrianglesPipelineConfig = mDrawDebug.GetPipelineConfigTriangles();
+        const PipelineConfig debugLines2DPipelineConfig = mDrawDebug.GetPipelineConfigLines2D();
 		const PipelineConfig ppPipelineConfig = mDrawPostprocess.GetPipelineConfig();
 		const PipelineConfig modelsPipelineConfig = mDrawModels.GetPipelineConfig( mDescriptorTextures );
 		const PipelineConfig uiPipelineConfig = mDrawUI.GetPipelineConfig( mDescriptorTextures );
@@ -171,6 +162,10 @@ namespace fan
                                       modelsPipelineConfig,
                                       mGameExtent,
                                       mRenderPassGame.mRenderPass );
+        mDrawDebug.mPipelineLines2D.Create( mDevice,
+                                          debugLines2DPipelineConfig,
+                                          mGameExtent,
+                                          mRenderPassPostprocess.mRenderPass );
         mDrawUI.mPipeline.Create( mDevice,
                                   uiPipelineConfig,
                                   mGameExtent,
@@ -191,6 +186,7 @@ namespace fan
 		mDrawDebug.mPipelineLines.Destroy( mDevice );
 		mDrawDebug.mPipelineLinesNDT.Destroy( mDevice );
 		mDrawDebug.mPipelineTriangles.Destroy( mDevice );
+        mDrawDebug.mPipelineLines2D.Destroy( mDevice );
 	}
 
 	//========================================================================================================
@@ -291,6 +287,7 @@ namespace fan
                                                   &mDrawPostprocess.mSampler.mSampler );
 
 		mDrawImgui.UpdateGameImageDescriptor( mDevice, mImageViewPostprocessColor );
+        mDrawDebug.mUniformsScreenSize.mScreenSize = { mGameExtent.width, mGameExtent.height };
 
 		RecordAllCommandBuffers();
 	}
@@ -308,7 +305,7 @@ namespace fan
 		}
 
 		Debug::Highlight() << "Resize renderer: " << extent.width << "x" << extent.height << Debug::Endl();
-		mWindow.mSwapchain.Resize( mDevice , extent );
+		mWindow.mSwapchain.Resize( mDevice, mWindow.mSurface, extent );
 
 		mFramebuffersSwapchain.Destroy( mDevice );
         RenderPass& finalRenderPass = ( mViewType == ViewType::Editor
@@ -355,22 +352,16 @@ namespace fan
                                   const glm::vec3 _position )
     {
         SCOPED_PROFILE( set_main_camera );
-        mDrawModels.mUniforms.mUniformsProjView.view = _view;
-        mDrawModels.mUniforms.mUniformsProjView.proj = _projection;
-        mDrawModels.mUniforms.mUniformsProjView.proj[1][1] *= -1;
+        mDrawModels.mUniforms.mUniformsProjView.mView = _view;
+        mDrawModels.mUniforms.mUniformsProjView.mProj = _projection;
+        mDrawModels.mUniforms.mUniformsProjView.mProj[1][1] *= -1;
 
-        mDrawModels.mUniforms.mUniformsCameraPosition.cameraPosition = _position;
+        mDrawModels.mUniforms.mUniformsCameraPosition.mCameraPosition = _position;
 
-        UniformsDebug* debugUniforms[3] = { &mDrawDebug.mUniformsLines,
-                                            &mDrawDebug.mUniformsLinesNDT,
-                                            &mDrawDebug.mUniformsTriangles };
-        for( int i = 0; i < 3; i++ )
-		{
-			debugUniforms[i]->model = glm::mat4( 1.0 );
-			debugUniforms[i]->view = _view;
-			debugUniforms[i]->proj = mDrawModels.mUniforms.mUniformsProjView.proj;
-			debugUniforms[i]->color = glm::vec4( 1, 1, 1, 1 );
-		}
+		mDrawDebug.mUniformsMVPColor.mModel = glm::mat4( 1.0 );
+		mDrawDebug.mUniformsMVPColor.mView  = _view;
+		mDrawDebug.mUniformsMVPColor.mProj  = mDrawModels.mUniforms.mUniformsProjView.mProj;
+		mDrawDebug.mUniformsMVPColor.mColor = glm::vec4( 1, 1, 1, 1 );
 	}
 
 	//========================================================================================================
@@ -399,7 +390,7 @@ namespace fan
 
 	//========================================================================================================
 	//========================================================================================================
-	void Renderer::SetUIDrawData( const std::vector<RenderDataUIMesh>& _drawData )
+	void Renderer::SetUIDrawData( const std::vector<RenderDataMesh2D>& _drawData )
 	{
         SCOPED_PROFILE( set_ui_draw_data );
 		mDrawUI.SetUIDrawData( _drawData );
@@ -409,14 +400,16 @@ namespace fan
     //========================================================================================================
     void Renderer::SetDebugDrawData( const std::vector<DebugVertex>& _debugLines,
                                      const std::vector<DebugVertex>& _debugLinesNoDepthTest,
-                                     const std::vector<DebugVertex>& _debugTriangles )
+                                     const std::vector<DebugVertex>& _debugTriangles,
+                                     const std::vector<DebugVertex2D>& _debugLines2D  )
     {
         SCOPED_PROFILE( set_debug_draw_data );
         mDrawDebug.SetDebugDrawData( mWindow.mSwapchain.mCurrentFrame,
                                      mDevice,
                                      _debugLines,
                                      _debugLinesNoDepthTest,
-                                     _debugTriangles );
+                                     _debugTriangles,
+                                     _debugLines2D);
     }
 
     //========================================================================================================
@@ -436,6 +429,7 @@ namespace fan
                                          mGameExtent,
                                          mDescriptorTextures );
         mDrawDebug.RecordCommandBuffer( _index, mRenderPassGame, mFrameBuffersGame, mGameExtent );
+        mDrawDebug.RecordCommandBuffer2D( _index, mRenderPassPostprocess, finalFramebuffer, mGameExtent );
         mDrawUI.RecordCommandBuffer( _index,
                                      mRenderPassPostprocess,
                                      finalFramebuffer,
@@ -512,8 +506,13 @@ namespace fan
                                   &renderPassInfoPostprocess,
                                   VK_SUBPASS_CONTENTS_SECONDARY_COMMAND_BUFFERS );
             {
+
 				vkCmdExecuteCommands( commandBuffer, 1, &mDrawPostprocess.mCommandBuffers.mBuffers[_index] );
 				vkCmdExecuteCommands( commandBuffer, 1, &mDrawUI.mCommandBuffers.mBuffers[_index] );
+                if ( mDrawDebug.mNumLines2D != 0 )
+                {
+                    vkCmdExecuteCommands( commandBuffer, 1, &mDrawDebug.mCommandBuffers2D.mBuffers[_index] );
+                }
 
 				if( mViewType == ViewType::Game )
 				{
@@ -605,6 +604,7 @@ namespace fan
 		mDrawUI.mCommandBuffers.Create( mDevice, count, VK_COMMAND_BUFFER_LEVEL_SECONDARY );
 		mDrawPostprocess.mCommandBuffers.Create( mDevice, count, VK_COMMAND_BUFFER_LEVEL_SECONDARY );
 		mDrawDebug.mCommandBuffers.Create( mDevice, count, VK_COMMAND_BUFFER_LEVEL_SECONDARY );
+        mDrawDebug.mCommandBuffers2D.Create( mDevice, count, VK_COMMAND_BUFFER_LEVEL_SECONDARY );
 	}
 
 	//========================================================================================================
@@ -613,11 +613,12 @@ namespace fan
     {
         // game
         {
-            VkAttachmentDescription colorAtt           = RenderPass::GetColorAttachment( mWindow.mSwapchain.mSurfaceFormat.format,
-                                                                                         VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL );
-            VkAttachmentReference   colorAttRef        = RenderPass::GetColorAttachmentReference( 0 );
-            VkAttachmentDescription depthAtt           = RenderPass::GetDepthAttachment( mDevice.FindDepthFormat() );
-            VkAttachmentReference   depthAttRef        = RenderPass::GetDepthAttachmentReference( 1 );
+            VkAttachmentDescription colorAtt = RenderPass::GetColorAttachment(
+                    mWindow.mSwapchain.mSurfaceFormat.format,
+                    VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL );
+            VkAttachmentReference   colorAttRef = RenderPass::GetColorAttachmentReference( 0 );
+            VkAttachmentDescription depthAtt    = RenderPass::GetDepthAttachment( mDevice.FindDepthFormat() );
+            VkAttachmentReference   depthAttRef = RenderPass::GetDepthAttachmentReference( 1 );
             VkSubpassDescription    subpassDescription = RenderPass::GetSubpassDescription( &colorAttRef,
                                                                                             1,
                                                                                             &depthAttRef );

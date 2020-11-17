@@ -1,18 +1,18 @@
-#include "ecs/fanEcsSystem.hpp"
-#include "core/input/fanMouse.hpp"
+#include "core/ecs/fanEcsSystem.hpp"
 #include "core/shapes/fanRay.hpp"
 #include "core/input/fanInputManager.hpp"
 #include "core/input/fanInput.hpp"
-#include "scene/components/fanTransform.hpp"
+#include "engine/singletons/fanMouse.hpp"
+#include "engine/components/fanTransform.hpp"
 #include "game/components/fanPlayerInput.hpp"
 #include "game/components/fanPlayerController.hpp"
 
 namespace fan
 {
-	//==============================================================================================================================================================
+	//========================================================================================================
 	// refresh player input data from the mouse & keyboard
-	//==============================================================================================================================================================
-	struct S_RefreshPlayerInput : EcsSystem
+	//========================================================================================================
+	struct SRefreshPlayerInput : EcsSystem
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world )
 		{
@@ -27,7 +27,8 @@ namespace fan
 			if( _delta == 0.f ) { return; }
 
 			const Scene& scene = _world.GetSingleton<Scene>();
-			const EcsEntity cameraID = _world.GetEntity( scene.mainCameraHandle );
+            const Mouse& mouse = _world.GetSingleton<Mouse>();
+			const EcsEntity cameraID = _world.GetEntity( scene.mMainCameraHandle );
 			const Transform& cameraTransform = _world.GetComponent<Transform>( cameraID );
 			const Camera& camera = _world.GetComponent<Camera>( cameraID );
 
@@ -38,16 +39,18 @@ namespace fan
 				const Transform& transform = *transformIt;
 				PlayerInput& input = *inputIt;
 
-				input.left = Input::Get().Manager().GetAxis( "game_left" );
-				input.forward = Input::Get().Manager().GetAxis( "game_forward" );
-				input.boost = Input::Get().Manager().GetAxis( "game_boost" );
-				input.fire = Input::Get().Manager().GetAxis( "game_fire" );
+				input.mLeft    = Input::Get().Manager().GetAxis( "game_left" );
+				input.mForward = Input::Get().Manager().GetAxis( "game_forward" );
+				input.mBoost   = Input::Get().Manager().GetAxis( "game_boost" );
+				input.mFire    = Input::Get().Manager().GetAxis( "game_fire" );
 
-				btVector3 mouseWorldPos = camera.ScreenPosToRay( cameraTransform, Mouse::Get().GetScreenSpacePosition() ).origin; // Get mouse world pos
-				mouseWorldPos.setY( 0 );
-				btVector3 mouseDir = mouseWorldPos - transform.GetPosition();// Get mouse direction
-				mouseDir.normalize();
-				input.orientation = mouseDir;
+                btVector3 mouseWorldPos = camera.ScreenPosToRay(
+                        cameraTransform,
+                        ToBullet( mouse.LocalScreenSpacePosition() ) ).origin;
+                mouseWorldPos.setY( 0 );
+                btVector3 mouseDir = mouseWorldPos - transform.GetPosition();// Get mouse direction
+                mouseDir.normalize();
+				input.mOrientation = mouseDir;
 			}
 		}
 	};
@@ -59,9 +62,9 @@ namespace fan
 
 
 
-//================================================================================================================================
+//============================================================================================================
 // 	 Old joystick code below
-//================================================================================================================================
+//============================================================================================================
 //
 //
 // 	if( input.type == fan::PlayerInput::JOYSTICK )
@@ -75,8 +78,8 @@ namespace fan
 // 		inputData.direction = input.direction;
 // 	}
 // 
-// 	//================================================================================================================================
-// 	//================================================================================================================================
+// 	//========================================================================================================
+// 	//========================================================================================================
 // 	float S_RefreshPlayerInput::GetInputLeft( const PlayerInput& _input )
 // 	{
 // 		switch( _input.type )
@@ -93,8 +96,8 @@ namespace fan
 // 		}
 // 	}
 // 
-// 	//================================================================================================================================
-// 	//================================================================================================================================
+// 	//========================================================================================================
+// 	//========================================================================================================
 // 	float S_RefreshPlayerInput::GetInputForward( const PlayerInput& _input )
 // 	{
 // 		switch( _input.type )
@@ -112,8 +115,8 @@ namespace fan
 // 		}
 // 	}
 // 
-// 	//================================================================================================================================
-// 	//================================================================================================================================
+// 	//========================================================================================================
+// 	//========================================================================================================
 // 	float S_RefreshPlayerInput::GetInputBoost( const PlayerInput& _input )
 // 	{
 // 		switch( _input.type )
@@ -127,8 +130,8 @@ namespace fan
 // 		}
 // 	}
 // 
-// 	//================================================================================================================================
-// 	//================================================================================================================================
+// 	//========================================================================================================
+// 	//========================================================================================================
 // 	float S_RefreshPlayerInput::GetInputFire( const PlayerInput& _input )
 // 	{
 // 		switch( _input.type )
@@ -142,8 +145,8 @@ namespace fan
 // 		}
 // 	}
 // 
-// 	//================================================================================================================================
-// 	//================================================================================================================================
+// 	//========================================================================================================
+// 	//========================================================================================================
 // 	glm::vec2 S_RefreshPlayerInput::GetDirectionAverage( PlayerInput& _input )
 // 	{
 // 		const size_t index = Input::Get().FrameCount() % _input.directionBuffer.size();

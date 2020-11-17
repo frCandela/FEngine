@@ -2,15 +2,15 @@
 
 #include "fanJson.hpp"
 #include "core/fanSingleton.hpp"
-#include "core/fanSerializable.hpp"
+#include "core/memory/fanSerializable.hpp"
 #include "core/input/fanAxis.hpp"
 
 namespace fan
 {
-	//================================================================================================================================
+	//========================================================================================================
 	// stores input axis and keyboard events.
 	// @todo the input manager must DIE
-	//================================================================================================================================
+	//========================================================================================================
 	class InputManager
 	{
 	public:
@@ -28,30 +28,33 @@ namespace fan
 
 		//================================================================
 		//================================================================
-		void		CreateKeyboardAxis( const std::string& _name, const Keyboard::Key _keyPositive, const Keyboard::Key _keyNegative );
-		void		CreateJoystickAxis( const std::string& _name, const Joystick::JoystickID _GLFW_JOYSTICK, const Joystick::Axis _axis );
-		void		CreateJoystickButtons( const std::string& _name, const Joystick::JoystickID _GLFW_JOYSTICK, const Joystick::Button _positive, const Joystick::Button _negative = Joystick::BUTTON_NONE );
-		Signal<>* CreateKeyboardEvent( const std::string& _name, const Keyboard::Key _key, const Keyboard::Key _mod0 = Keyboard::NONE, const Keyboard::Key _mod1 = Keyboard::NONE, const  Keyboard::Key _mod2 = Keyboard::NONE );
-		Signal<>* FindEvent( const std::string& _name );
+        void CreateKeyboardAxis( const std::string& _name,
+                                 const Keyboard::Key _keyPositive,
+                                 const Keyboard::Key _keyNegative );
+        void CreateJoystickAxis( const std::string& _name,
+                                 const Joystick::JoystickID _GLFW_JOYSTICK,
+                                 const Joystick::Axis _axis );
+        void CreateJoystickButtons( const std::string& _name,
+                                    const Joystick::JoystickID _GLFW_JOYSTICK,
+                                    const Joystick::Button _positive,
+                                    const Joystick::Button _negative = Joystick::BUTTON_NONE );
+        Signal<>* CreateKeyboardEvent( const std::string& _name,
+                                       const Keyboard::Key _key,
+                                       const Keyboard::Key _mod0 = Keyboard::NONE,
+                                       const Keyboard::Key _mod1 = Keyboard::NONE,
+                                       const Keyboard::Key _mod2 = Keyboard::NONE );
+        Signal<>* FindEvent( const std::string& _name );
 		float		GetAxis( const std::string& _name, const int _joystickIDOverride = -1 );
 
-		std::map< std::string, Axis >& GetListAxis() { return m_axis; }
-		std::map< std::string, KeyboardEvent >& GetListKeyboardEvents() { return m_keyboardEvents; }
+		std::map< std::string, Axis >& GetListAxis() { return mAxis; }
+		std::map< std::string, KeyboardEvent >& GetListKeyboardEvents() { return mKeyboardEvents; }
 
 		void PullEvents();
 		bool Load( const Json& _json );
 		bool Save( Json& _json ) const;
 
 	private:
-
-		std::map< std::string, Axis >			m_axis;
-		std::map< std::string, KeyboardEvent >	m_keyboardEvents;
+		std::map< std::string, Axis >          mAxis;
+		std::map< std::string, KeyboardEvent > mKeyboardEvents;
 	};
-}
-
-namespace ImGui
-{
-	//================================================================================================================================
-	//================================================================================================================================
-	bool FanKeyboardKey( const char* _label, fan::Keyboard::Key* _key );
 }

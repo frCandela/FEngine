@@ -1,14 +1,15 @@
-#include "ecs/fanEcsSystem.hpp"
-#include "scene/components/fanTransform.hpp"
+#include "core/ecs/fanEcsSystem.hpp"
+#include "engine/components/fanTransform.hpp"
 #include "game/components/fanSpaceShip.hpp"
 #include "game/singletons/fanGameCamera.hpp"
+#include "engine/components/fanCamera.hpp"
 
 namespace fan
 {
-	//==============================================================================================================================================================
+	//========================================================================================================
 	// moves the camera above the players spaceships
-	//==============================================================================================================================================================
-	struct S_UpdateGameCamera : EcsSystem
+	//========================================================================================================
+	struct SUpdateGameCamera : EcsSystem
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world )
 		{
@@ -28,7 +29,9 @@ namespace fan
 			btVector3 center = btVector3::Zero();
 
 			// calculates players center and bounding box	
-			for( auto transformIt = _view.begin<Transform>(); transformIt != _view.end<Transform>(); ++transformIt )
+            for( auto transformIt = _view.begin<Transform>();
+                 transformIt != _view.end<Transform>();
+                 ++transformIt )
 			{
 				const Transform& transform = *transformIt;
 				const btVector3 position = transform.GetPosition();
@@ -42,30 +45,36 @@ namespace fan
 			}
 
 			center /= (float)_view.Size();
-			assert( low[0] <= high[0] && low[2] <= high[2] );
+            fanAssert( low[0] <= high[0] && low[2] <= high[2] );
 
 			// set main camera
 			GameCamera& gameCamera = _world.GetSingleton<GameCamera>();
-			if( gameCamera.cameraHandle != 0 )
+			if( gameCamera.cmCameraHandle != 0 )
 			{
 				// set position
-				const EcsEntity cameraID = _world.GetEntity( gameCamera.cameraHandle );
+				const EcsEntity cameraID = _world.GetEntity( gameCamera.cmCameraHandle );
 				Transform& cameraTransform = _world.GetComponent<Transform>( cameraID );
-				cameraTransform.SetPosition( center + gameCamera.heightFromTarget * btVector3::Up() );
+				cameraTransform.SetPosition( center + gameCamera.mHeightFromTarget * btVector3::Up() );
 
 				// set size
 				Camera& camera = _world.GetComponent<Camera>( cameraID );
 				if( _view.Size() == 1 )
 				{
-					camera.orthoSize = 10.f;
+					camera.mOrthoSize = 10.f;
 				}
 				else
 				{
-					const float requiredSizeX = 0.5f * ( 1.f + gameCamera.marginRatio[0] ) * ( high[0] - low[0] ) / camera.aspectRatio;
-					const float requiredSizeZ = ( 1.f + gameCamera.marginRatio[1] ) * ( high[2] - low[2] ) / camera.aspectRatio;
+                    const float requiredSizeX = 0.5f *
+                                                ( 1.f + gameCamera.mMarginRatio[0] ) *
+                                                ( high[0] - low[0] ) /
+                                                camera.mAspectRatio;
+                    const float requiredSizeZ = ( 1.f + gameCamera.mMarginRatio[1] ) *
+                                                ( high[2] - low[2] ) /
+                                                camera.mAspectRatio;
 
-					const float orthoSize = std::max( std::max( requiredSizeX, requiredSizeZ ), gameCamera.minOrthoSize );
-					camera.orthoSize = orthoSize;
+                    const float orthoSize = std::max( std::max( requiredSizeX, requiredSizeZ ),
+                                                      gameCamera.mMinOrthoSize );
+					camera.mOrthoSize = orthoSize;
 				}
 			}
 		}

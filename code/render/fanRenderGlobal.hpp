@@ -16,12 +16,21 @@ namespace fan
 		static const std::set<std::string> sImagesExtensions;
 		static const std::set<std::string> sSceneExtensions;
 		static const std::set<std::string> sPrefabExtensions;
+        static const std::set<std::string> sFontsExtensions;
+
+        static const char* sContentPath;
+        static const char* sFontsPath;
+        static const char* sModelsPath;
 
 		static const char* sDefaultMesh;
 		static const char* sDefaultTexture;
 		static const char* sWhiteTexture;
+
+		static const char* sEditorIcon;
+		static const char* sGameIcon;
 		static const char* sDefaultIcons;
 		static const char* sDefaultImguiFont;
+        static const char* sDefaultGameFont;
 
 		static const char* sMeshCone;
 		static const char* sMeshCube;

@@ -1,670 +1,604 @@
-#include <scene/singletons/fanRenderResources.hpp>
-#include <scene/singletons/fanSceneResources.hpp>
-#include "editor/fanEditorHolder.hpp"
 
 #include "core/input/fanInputManager.hpp"
-#include "core/input/fanMouse.hpp"
 #include "core/input/fanInput.hpp"
 #include "network/singletons/fanTime.hpp"
-#include "render/fanRenderer.hpp"
-#include "network/singletons/fanTime.hpp"
-#include "editor/windows/fanPreferencesWindow.hpp"	
-#include "editor/windows/fanSingletonsWindow.hpp"
-#include "editor/windows/fanInspectorWindow.hpp"	
-#include "editor/windows/fanProfilerWindow.hpp"	
-#include "editor/windows/fanConsoleWindow.hpp"	
-#include "editor/windows/fanNetworkWindow.hpp"	
-#include "editor/windows/fanRenderWindow.hpp"	
-#include "editor/windows/fanSceneWindow.hpp"	
-#include "editor/windows/fanGameViewWindow.hpp"
-#include "editor/windows/fanEcsWindow.hpp"
+#include "editor/windows/fanPreferencesWindow.hpp"
 #include "editor/windows/fanUnitsTestsWindow.hpp"
+#include "editor/windows/fanSingletonsWindow.hpp"
+#include "editor/windows/fanInspectorWindow.hpp"
+#include "editor/windows/fanProfilerWindow.hpp"
+#include "editor/windows/fanGameViewWindow.hpp"
+#include "editor/windows/fanConsoleWindow.hpp"
+#include "editor/windows/fanRenderWindow.hpp"
+#include "editor/windows/fanSceneWindow.hpp"
+#include "editor/windows/fanEcsWindow.hpp"
+#include "editor/fanMainMenuBar.hpp"
+#include "editor/fanEditorHolder.hpp"
 #include "editor/singletons/fanEditorSelection.hpp"
 #include "editor/singletons/fanEditorCopyPaste.hpp"
 #include "editor/singletons/fanEditorGizmos.hpp"
-#include "editor/fanMainMenuBar.hpp"
 #include "editor/singletons/fanEditorCamera.hpp"
 #include "editor/singletons/fanEditorGrid.hpp"
-#include "scene/singletons/fanRenderWorld.hpp"
-#include "scene/components/fanPointLight.hpp"
-#include "scene/components/fanCamera.hpp"
-#include "scene/systems/fanUpdateTransforms.hpp"
-#include "scene/systems/fanDrawDebug.hpp"
-#include "scene/systems/fanUpdateRenderWorld.hpp"
-#include "scene/singletons/fanScene.hpp"
-#include "scene/singletons/fanScenePointers.hpp"
-#include "scene/fanSceneTags.hpp"
-#include "scene/fanPrefab.hpp"
-#include "game/singletons/fanGameCamera.hpp"
-#include "game/singletons/fanGame.hpp"
+#include "editor/singletons/fanEditorGuiInfo.hpp"
+#include "engine/singletons/fanRenderWorld.hpp"
+#include "editor/singletons/fanEditorPlayState.hpp"
+#include "engine/components/fanPointLight.hpp"
+#include "engine/components/fanDirectionalLight.hpp"
+#include "engine/systems/fanUpdateTransforms.hpp"
+#include "engine/systems/fanDrawDebug.hpp"
 
 namespace fan
 {
-	//================================================================================================================================
-	//================================================================================================================================
-	EditorHolder::EditorHolder( const LaunchSettings _settings, std::vector<EcsWorld*> _gameWorlds ) :
-		m_worlds( _gameWorlds )
-		, m_applicationShouldExit( false )
-		, m_launchSettings( _settings )
-	{
+    //========================================================================================================
+    //========================================================================================================
+    EditorHolder::EditorHolder( LaunchSettings& _settings, const std::vector<IGame*>& _games ) :
+            IHolder( AdaptSettings(_settings) ),
+            mGames( _games )
+    {
+        for( IGame* gameBase : mGames )
+        {
+            fanAssert( gameBase != nullptr );
+            gameBase->Init();
+        }
 
-		// Creates keyboard events
-		Input::Get().Manager().CreateKeyboardEvent( "delete", Keyboard::DELETE );
-		Input::Get().Manager().CreateKeyboardEvent( "open_scene", Keyboard::O, Keyboard::LEFT_CONTROL );
-		Input::Get().Manager().CreateKeyboardEvent( "save_scene", Keyboard::S, Keyboard::LEFT_CONTROL );
-		Input::Get().Manager().CreateKeyboardEvent( "reload_scene", Keyboard::R, Keyboard::LEFT_CONTROL );
-		Input::Get().Manager().CreateKeyboardEvent( "freeze_capture", Keyboard::END );
-		Input::Get().Manager().CreateKeyboardEvent( "copy", Keyboard::C, Keyboard::LEFT_CONTROL );
-		Input::Get().Manager().CreateKeyboardEvent( "paste", Keyboard::V, Keyboard::LEFT_CONTROL );
-		Input::Get().Manager().CreateKeyboardEvent( "toogle_camera", Keyboard::TAB );
-		Input::Get().Manager().CreateKeyboardEvent( "toogle_world", Keyboard::F1 );
-		Input::Get().Manager().CreateKeyboardEvent( "show_ui", Keyboard::F3 );
-		Input::Get().Manager().CreateKeyboardEvent( "play_pause", Keyboard::F5 );
-		Input::Get().Manager().CreateKeyboardEvent( "reload_shaders", Keyboard::F11 );
-		Input::Get().Manager().CreateKeyboardEvent( "reload_icons", Keyboard::F12 );
-		Input::Get().Manager().CreateKeyboardEvent( "toogle_follow_transform_lock", Keyboard::L );
-		Input::Get().Manager().CreateKeyboardEvent( "test", Keyboard::T );
-		//editor axis
-		Input::Get().Manager().CreateKeyboardAxis( "editor_forward", Keyboard::W, Keyboard::S );
-		Input::Get().Manager().CreateKeyboardAxis( "editor_left", Keyboard::A, Keyboard::D );
-		Input::Get().Manager().CreateKeyboardAxis( "editor_up", Keyboard::E, Keyboard::Q );
-		Input::Get().Manager().CreateKeyboardAxis( "editor_boost", Keyboard::LEFT_SHIFT, Keyboard::NONE );
-		GameClient::CreateGameAxes();
+        // Creates keyboard events
+        Input::Get().Manager().CreateKeyboardEvent( "delete", Keyboard::DELETE );
+        Input::Get().Manager().CreateKeyboardEvent( "open_scene", Keyboard::O, Keyboard::LEFT_CONTROL );
+        Input::Get().Manager().CreateKeyboardEvent( "save_scene", Keyboard::S, Keyboard::LEFT_CONTROL );
+        Input::Get().Manager().CreateKeyboardEvent( "reload_scene", Keyboard::R, Keyboard::LEFT_CONTROL );
+        Input::Get().Manager().CreateKeyboardEvent( "freeze_capture", Keyboard::END );
+        Input::Get().Manager().CreateKeyboardEvent( "copy", Keyboard::C, Keyboard::LEFT_CONTROL );
+        Input::Get().Manager().CreateKeyboardEvent( "paste", Keyboard::V, Keyboard::LEFT_CONTROL );
+        Input::Get().Manager().CreateKeyboardEvent( "toogle_camera", Keyboard::TAB );
+        Input::Get().Manager().CreateKeyboardEvent( "toogle_world", Keyboard::F1 );
+        Input::Get().Manager().CreateKeyboardEvent( "show_ui", Keyboard::F3 );
+        Input::Get().Manager().CreateKeyboardEvent( "play_pause", Keyboard::F5 );
+        Input::Get().Manager().CreateKeyboardEvent( "reload_shaders", Keyboard::F11 );
+        Input::Get().Manager().CreateKeyboardEvent( "reload_icons", Keyboard::F12 );
+        Input::Get().Manager().CreateKeyboardEvent( "toogle_follow_transform_lock", Keyboard::L );
+        Input::Get().Manager().CreateKeyboardEvent( "test", Keyboard::T );
+        //editor axis
+        Input::Get().Manager().CreateKeyboardAxis( "editor_forward", Keyboard::W, Keyboard::S );
+        Input::Get().Manager().CreateKeyboardAxis( "editor_left", Keyboard::A, Keyboard::D );
+        Input::Get().Manager().CreateKeyboardAxis( "editor_up", Keyboard::E, Keyboard::Q );
+        Input::Get().Manager().CreateKeyboardAxis( "editor_boost", Keyboard::LEFT_SHIFT, Keyboard::NONE );
+        GameClient::CreateGameAxes();
 
-		// creates window
-		glm::ivec2 windowPosition;
-		glm::ivec2 windowSize;
-		SerializedValues::LoadWindowSizeAndPosition( _settings, windowPosition, windowSize );
-		m_window.Create( _settings.windowName.c_str(), windowSize, windowPosition );
-
-		// creates renderer
-		m_renderer = new Renderer( m_window, Renderer::ViewType::Editor );
-        RenderResources::SetupResources( m_renderer->mMeshManager,
-                                         m_renderer->mMesh2DManager,
-                                         m_renderer->mTextureManager );
-        SceneResources::SetupResources( mPrefabManager );
-
-
-		// Initialize editor components		
-		mGameViewWindow    = new GameViewWindow( _settings.launchMode );
-        mRenderWindow      = new RenderWindow( *m_renderer );
-        mSceneWindow       = new SceneWindow();
-        mInspectorWindow   = new InspectorWindow();
-        mConsoleWindow     = new ConsoleWindow();
-        mEcsWindow         = new EcsWindow();
-        mProfilerWindow    = new ProfilerWindow();
-        mPreferencesWindow = new PreferencesWindow( *m_renderer );
-        mNetworkWindow     = new NetworkWindow();
-        mSingletonsWindow  = new SingletonsWindow();
-        mUnitTestsWindow   = new UnitTestsWindow();
-        mMainMenuBar       = new MainMenuBar();
+        // Initialize editor components
+        mMainMenuBar    = new MainMenuBar();
+        mGameViewWindow = new GameViewWindow( _settings.launchMode );
+        SceneWindow& sceneWindow = *new SceneWindow();
         mMainMenuBar->SetWindows( {
-                mRenderWindow,
-                mSceneWindow,
-                mInspectorWindow,
-                mConsoleWindow,
-                mEcsWindow,
-                mSingletonsWindow,
-                mProfilerWindow,
-                mGameViewWindow,
-                mNetworkWindow,
-                mPreferencesWindow,
-                mUnitTestsWindow
+            mGameViewWindow,
+            &sceneWindow,
+            new RenderWindow( mRenderer ),
+            new InspectorWindow(),
+            new ConsoleWindow(),
+            new EcsWindow(),
+            new ProfilerWindow(),
+            new PreferencesWindow( mRenderer, mFullScreen ),
+            new SingletonsWindow(),
+            new UnitTestsWindow()
         } );
 
-		// Instance messages				
-		mMainMenuBar->onReloadShaders.Connect( &Renderer::ReloadShaders, m_renderer );
-		mMainMenuBar->onReloadIcons.Connect( &Renderer::ReloadIcons, m_renderer );
-		mMainMenuBar->onExit.Connect( &EditorHolder::Exit, this );
+        // Instance messages
+        mMainMenuBar->mOnReloadShaders.Connect( &Renderer::ReloadShaders, &mRenderer );
+        mMainMenuBar->mOnReloadIcons.Connect( &Renderer::ReloadIcons, &mRenderer );
+        mMainMenuBar->mOnExit.Connect( &IHolder::Exit, (IHolder*)this );
 
-		// Events linking
-		Input::Get().Manager().FindEvent( "reload_shaders" )->Connect( &Renderer::ReloadShaders, m_renderer );
-		Input::Get().Manager().FindEvent( "play_pause" )->Connect( &EditorHolder::OnCurrentGameSwitchPlayStop, this );
-		Input::Get().Manager().FindEvent( "copy" )->Connect( &EditorHolder::OnCurrentGameCopy, this );
-		Input::Get().Manager().FindEvent( "paste" )->Connect( &EditorHolder::OnCurrentGamePaste, this );
-		Input::Get().Manager().FindEvent( "show_ui" )->Connect( &EditorHolder::OnToogleShowUI, this );
-		Input::Get().Manager().FindEvent( "toogle_camera" )->Connect( &EditorHolder::OnCurrentGameToogleCamera, this );
-		Input::Get().Manager().FindEvent( "open_scene" )->Connect( &EditorHolder::OnCurrentGameOpen, this );
-		Input::Get().Manager().FindEvent( "save_scene" )->Connect( &EditorHolder::OnCurrentGameSave, this );
-		Input::Get().Manager().FindEvent( "reload_scene" )->Connect( &EditorHolder::OnCurrentGameReload, this );
-		Input::Get().Manager().FindEvent( "toogle_world" )->Connect( &EditorHolder::OnCycleCurrentGame, this );
-		Input::Get().Manager().FindEvent( "reload_icons" )->Connect( &Renderer::ReloadIcons, m_renderer );		
+        // Events linking
+        InputManager& manager = Input::Get().Manager();
+        manager.FindEvent( "reload_shaders" )->Connect( &Renderer::ReloadShaders, &mRenderer );
+        manager.FindEvent( "play_pause" )->Connect( &EditorHolder::OnCurrentGameSwitchPlayStop, this );
+        manager.FindEvent( "copy" )->Connect( &EditorHolder::OnCurrentGameCopy, this );
+        manager.FindEvent( "paste" )->Connect( &EditorHolder::OnCurrentGamePaste, this );
+        manager.FindEvent( "show_ui" )->Connect( &EditorHolder::OnToogleShowUI, this );
+        manager.FindEvent( "toogle_camera" )->Connect( &EditorHolder::OnCurrentGameToogleCamera, this );
+        manager.FindEvent( "open_scene" )->Connect( &EditorHolder::OnCurrentGameOpen, this );
+        manager.FindEvent( "save_scene" )->Connect( &EditorHolder::OnCurrentGameSave, this );
+        manager.FindEvent( "reload_scene" )->Connect( &EditorHolder::OnCurrentGameReload, this );
+        manager.FindEvent( "toogle_world" )->Connect( &EditorHolder::OnCycleCurrentGame, this );
+        manager.FindEvent( "reload_icons" )->Connect( &Renderer::ReloadIcons, &mRenderer );
+        manager.FindEvent( "delete" )->Connect( &EditorHolder::OnCurrentGameDeleteSelection, this );
+        manager.FindEvent( "toogle_follow_transform_lock" )->Connect( &EditorHolder::OnCurrentGameToogleTransformLock, this );
 
-		mGameViewWindow->onSizeChanged.Connect( &Renderer::ResizeGame, m_renderer );
-		mGameViewWindow->onPlay.Connect( &EditorHolder::OnCurrentGameStart, this );
-		mGameViewWindow->onPause.Connect( &EditorHolder::OnCurrentGamePause, this );
-		mGameViewWindow->onResume.Connect( &EditorHolder::OnCurrentGameResume, this );
-		mGameViewWindow->onStop.Connect( &EditorHolder::OnCurrentGameStop, this );
-		mGameViewWindow->onStep.Connect( &EditorHolder::OnCurrentGameStep, this );
-		mGameViewWindow->onSelectGame.Connect( &EditorHolder::OnCurrentGameSelect, this );
+        mGameViewWindow->mOnSizeChanged.Connect( &Renderer::ResizeGame, &mRenderer );
+        mGameViewWindow->mOnPlay.Connect( &EditorHolder::OnCurrentGameStart, this );
+        mGameViewWindow->mOnPause.Connect( &EditorHolder::OnCurrentGamePause, this );
+        mGameViewWindow->mOnResume.Connect( &EditorHolder::OnCurrentGameResume, this );
+        mGameViewWindow->mOnStop.Connect( &EditorHolder::OnCurrentGameStop, this );
+        mGameViewWindow->mOnStep.Connect( &EditorHolder::OnCurrentGameStep, this );
+        mGameViewWindow->mOnSelectGame.Connect( &EditorHolder::OnCurrentGameSelect, this );
 
         // Loop over all worlds to initialize them
-		for (int worldIndex = 0; worldIndex < (int)m_worlds.size() ; worldIndex++)
-		{
-			assert( m_worlds[worldIndex] != nullptr );
-			EcsWorld& world = *m_worlds[worldIndex];
+        for( int gameIndex = 0; gameIndex < (int)mGames.size(); gameIndex++ )
+        {
+            IGame   & game  = *mGames[gameIndex];
+            EcsWorld& world = game.mWorld;
 
-			world.AddSingletonType<EditorCamera>();
-			world.AddSingletonType<EditorGrid>();
-			world.AddSingletonType<EditorSelection>();
-			world.AddSingletonType<EditorCopyPaste>();
-			world.AddSingletonType<EditorGizmos>();
-			world.AddTagType<tag_editorOnly>();
+            world.AddSingletonType<EditorGuiInfo>();
+            world.AddSingletonType<EditorPlayState>();
+            world.AddSingletonType<EditorCamera>();
+            world.AddSingletonType<EditorGrid>();
+            world.AddSingletonType<EditorSelection>();
+            world.AddSingletonType<EditorCopyPaste>();
+            world.AddSingletonType<EditorGizmos>();
+            world.AddTagType<TagEditorOnly>();
+
+            InitWorld( world );
 
             RenderWorld& renderWorld = world.GetSingleton<RenderWorld>();
-            renderWorld.isHeadless = ( &world != &GetCurrentWorld() );
+            renderWorld.mIsHeadless = ( &game != &GetCurrentGame() );
 
-            RenderResources& renderResources = world.GetSingleton<RenderResources>();
-            renderResources.SetPointers( &m_renderer->mMeshManager,
-                                         &m_renderer->mMesh2DManager,
-                                         &m_renderer->mTextureManager );
+            Scene          & scene     = world.GetSingleton<Scene>();
+            EditorSelection& selection = world.GetSingleton<EditorSelection>();
 
-            SceneResources& sceneResources = world.GetSingleton<SceneResources>();
-            sceneResources.SetPointers( &mPrefabManager );
+            selection.ConnectCallbacks( scene );
+            sceneWindow.onSelectSceneNode.Connect( &EditorSelection::SetSelectedSceneNode, &selection );
 
-			Scene& scene = world.GetSingleton<Scene>();
-			EditorSelection& selection = world.GetSingleton<EditorSelection>();
+            scene.mOnLoad.Connect( &SceneWindow::OnExpandHierarchy, &sceneWindow );
+            scene.mOnLoad.Connect( &EditorHolder::OnSceneLoad, this );
 
-			selection.ConnectCallbacks( scene );
-			mSceneWindow->onSelectSceneNode.Connect( &EditorSelection::SetSelectedSceneNode, &selection );
+            // load scene
+            scene.New();
+            if( !_settings.loadScene.empty() )
+            {
+                scene.LoadFrom( _settings.loadScene );
 
-			scene.onLoad.Connect( &SceneWindow::OnExpandHierarchy, mSceneWindow );
-			scene.onLoad.Connect( &EditorHolder::OnSceneLoad, this );
+                // auto play the scene
+                if( _settings.autoPlay )
+                {
+                    GameStart( game );
+                }
+            }
+        }
+    }
 
-			// load scene
-			scene.New();
-			if( !_settings.loadScene.empty() )
-			{
-				scene.LoadFrom( _settings.loadScene );
+    //========================================================================================================
+    //========================================================================================================
+    LaunchSettings& EditorHolder::AdaptSettings( LaunchSettings& _settings )
+    {
+        if( ! _settings.mForceWindowDimensions )
+        {
+            SerializedValues::LoadWindowPosition( _settings.window_position );
+            SerializedValues::LoadWindowSize( _settings.window_size );
+        }
+        _settings.mIconPath = RenderGlobal::sEditorIcon;
+        return _settings;
+    }
 
-				// auto play the scene
-				if( _settings.autoPlay )
-				{
-					GameStart( world );
-				}
-			}
-		}
-	}
+    //========================================================================================================
+    //========================================================================================================
+    EditorHolder::~EditorHolder()
+    {
+        // Deletes ui
+        delete mMainMenuBar;
+        if( ! mLaunchSettings.mForceWindowDimensions )
+        {
+            SerializedValues::SaveWindowPosition( mWindow.GetPosition() );
+            SerializedValues::SaveWindowSize( mWindow.GetSize() );
+        }
+        SerializedValues::Get().SaveValuesToDisk();
+    }
 
-	//================================================================================================================================
-	//================================================================================================================================
-	EditorHolder::~EditorHolder()
-	{
-		// Deletes ui
-		delete mMainMenuBar;
+    //========================================================================================================
+    //========================================================================================================
+    void EditorHolder::Run()
+    {
+        // initializes timers
+        mLastRenderTime = Time::ElapsedSinceStartup();
+        for( IGame* game : mGames )
+        {
+            Time& time = game->mWorld.GetSingleton<Time>();
+            time.mLastLogicTime = Time::ElapsedSinceStartup();
+        }
+        Profiler::Get().Begin();
 
-		// Serialize editor positions if it was not modified by a launch command
-		if( m_launchSettings.window_size == glm::ivec2( -1, -1 ) )
-		{
-			const VkExtent2D rendererSize = m_window.GetExtent();
-			const glm::ivec2 windowPosition = m_window.GetPosition();
-			SerializedValues::Get().SetUInt( "renderer_extent_width", rendererSize.width );
-			SerializedValues::Get().SetUInt( "renderer_extent_height", rendererSize.height );
-			SerializedValues::Get().SetInt( "renderer_position_x", windowPosition.x );
-			SerializedValues::Get().SetInt( "renderer_position_y", windowPosition.y );
-		}
+        // main loop
+        while( mApplicationShouldExit == false && mWindow.IsOpen() == true )
+        {
+            Step();
+        }
 
-		SerializedValues::Get().SaveValuesToDisk();
+        // Exit sequence
+        Debug::Log( "Exit application" );
+    }
 
-		mPrefabManager.Clear();
+    //========================================================================================================
+    //========================================================================================================
+    void EditorHolder::Step()
+    {
+        const double currentTime       = Time::ElapsedSinceStartup();
+        const bool   renderIsThisFrame = currentTime > mLastRenderTime + Time::sRenderDelta;
+        const Time& currentWorldTime = GetCurrentGame().mWorld.GetSingleton<Time>();
+        const bool logicIsThisFrame = currentTime >
+                                      currentWorldTime.mLastLogicTime + currentWorldTime.mLogicDelta;
 
-		delete m_renderer;
-		m_window.Destroy();
-	}
+        // Update all worlds
+        for( int gameIndex = 0; gameIndex < (int)mGames.size(); gameIndex++ )
+        {
+            IGame   & game  = *mGames[gameIndex];
+            EcsWorld& world = game.mWorld;
+            const bool isCurrentWorld = ( &game == &GetCurrentGame() );
 
-	//================================================================================================================================
-	//================================================================================================================================
-	void EditorHolder::Exit()
-	{
-		m_applicationShouldExit = true;
-	}
+            // runs logic, renders ui
+            Time& time = world.GetSingleton<Time>();
+            while( currentTime > time.mLastLogicTime + time.mLogicDelta )
+            {
+                world.GetSingleton<RenderDebug>().Clear();
 
-	//================================================================================================================================
-	//================================================================================================================================
-	void EditorHolder::Run()
-	{
-		// initializes timers
-		m_lastRenderTime = Time::ElapsedSinceStartup();
-		for( EcsWorld* world : m_worlds )
-		{
-			Time& time = world->GetSingleton<Time>();
-			time.lastLogicTime = Time::ElapsedSinceStartup();
-		}
-		Profiler::Get().Begin();
+                if( isCurrentWorld )
+                {
+                    // Update input
+                    ImGui::GetIO().DeltaTime = time.mLogicDelta;
+                    const btVector2 gamePos  = mGameViewWindow->GetPosition();
+                    const btVector2 gameSize = mGameViewWindow->GetSize();
+                    //todo mGameViewWindow->IsHovered()
+                    Mouse::NextFrame( mWindow.mWindow, ToGLM( gamePos ), ToGLM( gameSize ) );
+                    Input::Get().NewFrame();
+                    Input::Get().Manager().PullEvents();
+                    world.GetSingleton<Mouse>().UpdateData( mWindow.mWindow );
+                }
 
-		// main loop
-		while( m_applicationShouldExit == false && m_window.IsOpen() == true )
-		{
-			Step();
-		}
+                // checking the loop timing is not late
+                const double loopDelayMilliseconds = 1000. *
+                                                     ( currentTime -
+                                                       ( time.mLastLogicTime + time.mLogicDelta ) );
+                if( loopDelayMilliseconds > 30 )
+                {
+                    //Debug::Warning() << "logic is late of " << loopDelayMilliseconds
+                    //                 << "ms" << Debug::Endl();
+                    // if we are really really late, resets the timer
+                    if( loopDelayMilliseconds > 100 )
+                    {
+                        time.mLastLogicTime = currentTime - time.mLogicDelta;
+                        //Debug::Warning() << "reset logic timer " << Debug::Endl();
+                    }
+                }
 
-		// Exit sequence
-		Debug::Log( "Exit application" );
-	}
+                // increase the logic time of a timeScaleDelta with n timeScaleIncrements
+                if( std::abs( time.mTimeScaleDelta ) >= time.mTimeScaleIncrement )
+                {
+                    const float increment = time.mTimeScaleDelta > 0.f
+                            ? time.mTimeScaleIncrement
+                            : -time.mTimeScaleIncrement;
+                    time.mLastLogicTime -= increment;
+                    time.mTimeScaleDelta -= increment;
+                }
 
-	//================================================================================================================================
-	//================================================================================================================================
-	void EditorHolder::Step()
-	{
-		const double currentTime = Time::ElapsedSinceStartup();
-		const bool renderIsThisFrame = currentTime > m_lastRenderTime + Time::s_renderDelta;
-		const Time& currentWorldTime = GetCurrentWorld().GetSingleton<Time>();
-		const bool logicIsThisFrame = currentTime > currentWorldTime.lastLogicTime + currentWorldTime.logicDelta;
+                time.mLastLogicTime += time.mLogicDelta;
 
-		// Update all worlds
-		for( int worldIndex = 0; worldIndex < (int)m_worlds.size(); worldIndex++ )
-		{
-			EcsWorld& world = *m_worlds[worldIndex];
-			const bool isCurrentWorld = ( &world == &GetCurrentWorld() );			
+                const EditorPlayState& playState = world.GetSingleton<EditorPlayState>();
+                game.Step( playState.mState == EditorPlayState::PLAYING ? time.mLogicDelta : 0.f );
 
-			// runs logic, renders ui
-			Time& time = world.GetSingleton<Time>();
-			while ( currentTime > time.lastLogicTime + time.logicDelta )
-			{
-				world.GetSingleton<RenderDebug>().Clear();
+                // ui & debug
+                if( mShowUi )
+                {
+                    world.Run<SMoveFollowTransforms>();
+                }
 
-				if( isCurrentWorld )
-				{
-					// Update input
-					ImGui::GetIO().DeltaTime = time.logicDelta;
-					Input::Get().NewFrame();
-					Mouse::Get().Update( mGameViewWindow->GetPosition(), mGameViewWindow->GetSize(), mGameViewWindow->IsHovered() );
-					Input::Get().Manager().PullEvents();
-				}
+                if( isCurrentWorld )
+                {
+                    fanAssert( logicIsThisFrame );
+                    EditorCamera& editorCamera = world.GetSingleton<EditorCamera>();
+                    Scene       & scene        = world.GetSingleton<Scene>();
+                    // only update the editor camera when we are using it
+                    if( scene.mMainCameraHandle == editorCamera.mCameraHandle )
+                    {
+                        EditorCamera::Update( world, time.mLogicDelta );
+                    }
+                    world.GetSingleton<EditorSelection>().Update( mGameViewWindow->IsHovered() );
 
-				// checking the loop timing is not late
-				const double loopDelayMilliseconds = 1000. * ( currentTime - ( time.lastLogicTime + time.logicDelta ) );
-				if( loopDelayMilliseconds > 30 )
-				{
-					//Debug::Warning() << "logic is late of " << loopDelayMilliseconds << "ms" << Debug::Endl();
-					// if we are really really late, resets the timer
-					if( loopDelayMilliseconds > 100 )
-					{
-						time.lastLogicTime = currentTime - time.logicDelta;
-						Debug::Warning() << "reset logic timer " << Debug::Endl();
-					}
-				}
-
-				// increase the logic time of a timeScaleDelta with n timeScaleIncrements
-				if( std::abs( time.timeScaleDelta ) >= time.timeScaleIncrement )
-				{
-					const float increment = time.timeScaleDelta > 0.f ? time.timeScaleIncrement : -time.timeScaleIncrement;
-					time.lastLogicTime -= increment;
-					time.timeScaleDelta -= increment;
-				}
-
-				time.lastLogicTime += time.logicDelta;		
-
-				GameStep( world, time.logicDelta );							
-
-				// ui & debug
-				if( m_showUI )
-				{					
-					world.Run<S_MoveFollowTransforms>();
-					world.Run<S_MoveFollowTransformsUI>();
-				}
-
-				if( isCurrentWorld )
-				{
-					assert( logicIsThisFrame );
-					EditorCamera& editorCamera = world.GetSingleton<EditorCamera>();
-					Scene& scene = world.GetSingleton<Scene>();
-					// only update the editor camera when we are using it
-					if( scene.mainCameraHandle == editorCamera.cameraHandle )
-					{
-						EditorCamera::Update( world, time.logicDelta );
-					}
-					world.GetSingleton<EditorSelection>().Update( mGameViewWindow->IsHovered() );
-
-					if( renderIsThisFrame )
-					{
+                    if( renderIsThisFrame )
+                    {
                         SCOPED_PROFILE( debug_draw );
-						// Debug Draw
-						if( mMainMenuBar->ShowWireframe() ) { world.Run<S_DrawDebugWireframe>(); }
-						if( mMainMenuBar->ShowNormals() ) { world.Run<S_DrawDebugNormals>(); }
-						if( mMainMenuBar->ShowAABB() ) { world.Run<S_DrawDebugBounds>(); }
-						if( mMainMenuBar->ShowHull() ) { world.Run<S_DrawDebugHull>(); }
-						if( mMainMenuBar->ShowLights() )
-						{
-							world.Run<S_DrawDebugPointLights>();
-							world.Run<S_DrawDebugDirectionalLights>();
-						}
-						EditorGrid::Draw( GetCurrentWorld() );
+                        // Debug Draw
+                        if( mMainMenuBar->ShowWireframe() ){ world.Run<SDrawDebugWireframe>(); }
+                        if( mMainMenuBar->ShowNormals() ){ world.Run<SDrawDebugNormals>(); }
+                        if( mMainMenuBar->ShowAABB() ){ world.Run<SDrawDebugBounds>(); }
+                        if( mMainMenuBar->ShowHull() ){ world.Run<SDrawDebugHull>(); }
+                        if( mMainMenuBar->ShowUiBounds() ){ world.Run<SDrawDebugUiBounds>(); }
+                        if( mMainMenuBar->ShowLights() )
+                        {
+                            world.Run<SDrawDebugPointLights>();
+                            world.Run<SDrawDebugDirectionalLights>();
+                        }
+                        EditorGrid::Draw( GetCurrentGame().mWorld );
 
-						// ImGui render
+                        // ImGui render
                         {
                             SCOPED_PROFILE( ImGui_render );
-						    ImGui::NewFrame();
-						    mMainMenuBar->Draw( world );
-						    ImGui::Render();
+                            ImGui::NewFrame();
+                            mMainMenuBar->Draw( game.mWorld );
+                            /*if( ImGui::Begin( "test" ) )
+                            {
+                                ImGui::End();
+                            }*/
+                            ImGui::Render();
                         }
-					}
-				}
+                    }
+                }
                 {
                     SCOPED_PROFILE( apply_transitions );
-				    world.ApplyTransitions();
+                    world.ApplyTransitions();
                 }
-			}
-		}
-
-        onLPPSynch.Emmit();
-
-		// Render world		
-		if( renderIsThisFrame && logicIsThisFrame )
-		{
-		    EcsWorld& currentWorld = GetCurrentWorld();
-			m_lastRenderTime = currentTime;
-
-			Time::RegisterFrameDrawn();	// used for stats
-
-			UpdateRenderWorld( *m_renderer, currentWorld, ToGLM( mGameViewWindow->GetSize() ) );
-
-			m_renderer->DrawFrame();
-			Profiler::Get().End();
-			Profiler::Get().Begin();
-		}
-
-		// sleep for the rest of the frame
-		if( m_launchSettings.mainLoopSleep )
-		{
-			// @todo repair this to work with multiple worlds running 
-// 				const double minSleepTime = 1;
-// 				const double endFrameTime = Time::ElapsedSinceStartup();
-// 				const double timeBeforeNextLogic = lastLogicTime + time.logicDelta - endFrameTime;
-// 				const double timeBeforeNextRender = lastRenderTime + Time::s_renderDelta - endFrameTime;
-// 				const double sleepTimeMiliseconds = 1000. * std::min( timeBeforeNextLogic, timeBeforeNextRender );
-// 				if( sleepTimeMiliseconds > minSleepTime )
-// 				{
-// 					std::this_thread::sleep_for( std::chrono::milliseconds( int( sleepTimeMiliseconds / 2 ) ) );
-// 				}
-		}
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void EditorHolder::GameStart( EcsWorld& _world )
-	{
-		Game& game = _world.GetSingleton<Game>();
-		if( game.state == Game::STOPPED )
-		{
-			// saves the scene before playing
-			Scene& scene = _world.GetSingleton<Scene>();
-			if( scene.path.empty() )
-			{
-				Debug::Warning() << "please save the scene before playing" << Debug::Endl();
-				return;
-			}
-
-			scene.Save();
-
-			Debug::Highlight() << game.name << ": play" << Debug::Endl();
-			game.state = Game::PLAYING;
-
-			if( game.gameServer != nullptr ) game.gameServer->Start();
-			else							 game.gameClient->Start();
-
-			UseGameCamera( _world );
-		}
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void  EditorHolder::GameStop( EcsWorld& _world )
-	{
-		Game& game = _world.GetSingleton<Game>();
-		if( game.state == Game::PLAYING || game.state == Game::PAUSED )
-		{
-			UseEditorCamera( _world );
-
-			Scene& scene = _world.GetSingleton<Scene>();
-
-			// Saves the camera position for restoring it later
-			const EcsEntity oldCameraID = _world.GetEntity( scene.mainCameraHandle );
-			const btTransform oldCameraTransform = _world.GetComponent<Transform>( oldCameraID ).transform;
-
-			// save old selection
-			SceneNode* prevSelectionNode = _world.GetSingleton<EditorSelection>().GetSelectedSceneNode();
-			const uint32_t prevSelectionHandle = prevSelectionNode != nullptr ? prevSelectionNode->handle : 0;
-
-			Debug::Highlight() << game.name << ": stopped" << Debug::Endl();
-			game.state = Game::STOPPED;
-			if( game.gameServer != nullptr ) game.gameServer->Stop();
-			else							 game.gameClient->Stop();
-
-			scene.LoadFrom( scene.path ); // reload the scene 
-
-			// restore camera transform
-			const EcsEntity newCameraID = _world.GetEntity( scene.mainCameraHandle );
-			_world.GetComponent<Transform>( newCameraID ).transform = oldCameraTransform;
-
-			// restore selection
-			if( prevSelectionHandle != 0 && scene.nodes.find( prevSelectionHandle ) != scene.nodes.end() )
-			{
-				fan::SceneNode& node = _world.GetComponent<fan::SceneNode>( _world.GetEntity( prevSelectionHandle ) );
-
-				_world.GetSingleton<EditorSelection>().SetSelectedSceneNode( &node );
-			}
-		}
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void  EditorHolder::GamePause( EcsWorld& _world )
-	{
-		Game& game = _world.GetSingleton<Game>();
-		if( game.state == Game::PLAYING )
-		{
-			Debug::Highlight() << game.name << ": paused" << Debug::Endl();
-			game.state = Game::PAUSED;
-		}
-	}	
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void  EditorHolder::GameResume( EcsWorld& _world )
-	{
-		Game& game = _world.GetSingleton<Game>();
-		if( game.state == Game::PAUSED )
-		{
-			Debug::Highlight() << game.name << ": resumed" << Debug::Endl();
-			game.state = Game::PLAYING;
-		}
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void  EditorHolder::GameStep( EcsWorld& _world, float _delta )
-	{
-        SCOPED_PROFILE(game_step );
- 		Game& game = _world.GetSingleton<Game>();
- 		if( game.state == Game::PLAYING )
- 		{
- 			const float delta = ( game.state == Game::PLAYING ? _delta : 0.f );
- 			if( game.gameServer != nullptr ) game.gameServer->Step( delta );
- 			else							 game.gameClient->Step( delta );
- 		}		
-	}
-
-	//================================================================================================================================
-	// Todo save camera position depending on the scene
-	//================================================================================================================================
-	void EditorHolder::OnSceneLoad( Scene& _scene )
-	{
-		EcsWorld& world = *_scene.world;		
- 		EditorCamera::CreateEditorCamera( world );
-
-		if( &world == &GetCurrentWorld() )
-		{
-			world.GetSingleton<EditorSelection>().Deselect();
-		}
-	}
-
-	//================================================================================================================================
-	// Updates the render world singleton component
-	//================================================================================================================================
-	void EditorHolder::UpdateRenderWorld( Renderer& _renderer, EcsWorld& _world, const glm::vec2 _size )
-	{
-        SCOPED_PROFILE( update_RW );
-		RenderWorld& renderWorld = _world.GetSingleton<RenderWorld>();
-		const RenderDebug& renderDebug = _world.GetSingleton<RenderDebug>();
-		renderWorld.targetSize = _size;
-
-		// update render data
-        {
-            SCOPED_PROFILE( update_render_data );
-            _world.Run<S_UpdateRenderWorldModels>();
-            _world.Run<S_UpdateRenderWorldUI>();
-            _world.Run<S_UpdateRenderWorldPointLights>();
-            _world.Run<S_UpdateRenderWorldDirectionalLights>();
+            }
         }
 
-		// particles mesh
-		RenderDataModel particlesDrawData;
-		particlesDrawData.mesh = renderWorld.particlesMesh;
-		particlesDrawData.modelMatrix = glm::mat4( 1.f );
-		particlesDrawData.normalMatrix = glm::mat4( 1.f );
-		particlesDrawData.color = glm::vec4( 1.f, 1.f, 1.f, 1.f );
-		particlesDrawData.shininess = 1;
-		particlesDrawData.textureIndex = 1;
-		renderWorld.drawData.push_back( particlesDrawData );
+        mOnLPPSynch.Emmit();
 
+        // Render world
+        if( renderIsThisFrame && logicIsThisFrame )
         {
-            SCOPED_PROFILE(set_render_data);
-            _renderer.SetDrawData(renderWorld.drawData);
-            _renderer.SetUIDrawData(renderWorld.uiDrawData);
-            _renderer.SetPointLights(renderWorld.pointLights);
-            _renderer.SetDirectionalLights(renderWorld.directionalLights);
-            _renderer.SetDebugDrawData(renderDebug.debugLines, renderDebug.debugLinesNoDepthTest, renderDebug.debugTriangles);
+            mLastRenderTime = currentTime;
+
+            Time::RegisterFrameDrawn();    // used for stats
+
+
+            UpdateRenderWorld( mRenderer, GetCurrentGame(), ToGLM( mGameViewWindow->GetSize() ) );
+
+            mRenderer.DrawFrame();
+            Profiler::Get().End();
+            Profiler::Get().Begin();
         }
 
-		// Camera
+        // sleep for the rest of the frame
+        if( mLaunchSettings.mainLoopSleep )
         {
-            SCOPED_PROFILE( update_camera );
-            Scene& scene = _world.GetSingleton<Scene>();
-            EcsEntity cameraID = _world.GetEntity( scene.mainCameraHandle );
-            Camera& camera = _world.GetComponent<Camera>( cameraID );
-            camera.aspectRatio = _size[0] / _size[1];
-            Transform& cameraTransform = _world.GetComponent<Transform>( cameraID );
-            _renderer.SetMainCamera(
-                    camera.GetProjection(),
-                    camera.GetView( cameraTransform ),
-                    ToGLM( cameraTransform.GetPosition() )
-            );
+            // @todo repair this to work with multiple worlds running
+// 			const double minSleepTime = 1;
+// 			const double endFrameTime = Time::ElapsedSinceStartup();
+// 			const double timeBeforeNextLogic = lastLogicTime + time.logicDelta - endFrameTime;
+// 			const double timeBeforeNextRender = lastRenderTime + Time::s_renderDelta - endFrameTime;
+// 			const double sleepTimeMiliseconds = 1000. * std::min( timeBeforeNextLogic, timeBeforeNextRender );
+// 			if( sleepTimeMiliseconds > minSleepTime )
+// 			{
+// 				std::this_thread::sleep_for( std::chrono::milliseconds( int( sleepTimeMiliseconds / 2 ) ) );
+// 			}
         }
-	}
+    }
 
-	//================================================================================================================================
-	//================================================================================================================================
-	void EditorHolder::OnCycleCurrentGame()
-	{
-		OnCurrentGameSelect( ( m_currentWorld + 1 ) % ( m_worlds.size() ) );
-	}
+    //========================================================================================================
+    //========================================================================================================
+    void EditorHolder::GameStart( IGame& _game )
+    {
+        // saves the scene before playing
+        Scene& scene = _game.mWorld.GetSingleton<Scene>();
+        if( scene.mPath.empty() )
+        {
+            Debug::Warning() << "please save the scene before playing" << Debug::Endl();
+            return;
+        }
 
-	//================================================================================================================================
-	//================================================================================================================================
-	void EditorHolder::OnCurrentGameSwitchPlayStop()
-	{
-		EcsWorld& world = GetCurrentWorld();
-		Game& game = world.GetSingleton<Game>();
-		if( game.state == Game::STOPPED )
-		{
-			GameStart( world );
-		}
-		else
-		{
-			GameStop( world );
-		}
-	}
+        EditorPlayState& playState = _game.mWorld.GetSingleton<EditorPlayState>();
+        if( playState.mState == EditorPlayState::STOPPED )
+        {
+            scene.Save();
+            Debug::Highlight() << _game.mName << ": start" << Debug::Endl();
+            playState.mState = EditorPlayState::PLAYING;
+            _game.Start();
+        }
+    }
 
-	//================================================================================================================================
-	//================================================================================================================================
-	void EditorHolder::UseEditorCamera( EcsWorld& _world )
-	{
-		Scene& scene = _world.GetSingleton<Scene>();
-		EditorCamera& editorCamera = _world.GetSingleton<EditorCamera>();
- 		scene.SetMainCamera( editorCamera.cameraHandle );
-	}
+    //========================================================================================================
+    //========================================================================================================
+    struct SceneRestoreState
+    {
+        SceneRestoreState( Scene& _scene ) : mScene( _scene ) {}
+        void Save()
+        {
+            EcsWorld& world = *mScene.mWorld;
 
-	//================================================================================================================================
-	//================================================================================================================================
-	void EditorHolder::UseGameCamera( EcsWorld& _world )
-	{
-		Scene& scene = _world.GetSingleton<Scene>();
-		GameCamera& gameCamera = _world.GetSingleton<GameCamera>();
-		scene.SetMainCamera( gameCamera.cameraHandle );
-	}
+            // Saves the camera position for restoring it later
+            const EcsEntity oldCameraID = world.GetEntity( mScene.mMainCameraHandle );
+            mPrevCameraTransform = world.GetComponent<Transform>( oldCameraID ).mTransform;
+            // save old selection
+            SceneNode* prevSelectionNode = world.GetSingleton<EditorSelection>().GetSelectedSceneNode();
+            mPrevSelectionHandle = prevSelectionNode != nullptr ? prevSelectionNode->mHandle : 0;
+        }
 
-	//================================================================================================================================
-	//================================================================================================================================
-	void EditorHolder::OnCurrentGameOpen() { mMainMenuBar->Open( GetCurrentWorld() ); }
-	void EditorHolder::OnCurrentGameReload() { mMainMenuBar->Reload( GetCurrentWorld() ); }
-	void EditorHolder::OnCurrentGameSave() { mMainMenuBar->Save( GetCurrentWorld() ); }
-	void EditorHolder::OnCurrentGameCopy() { GetCurrentWorld().GetSingleton<EditorCopyPaste>().OnCopy(); }
-	void EditorHolder::OnCurrentGamePaste() { GetCurrentWorld().GetSingleton<EditorCopyPaste>().OnPaste(); }
+        void Restore() const
+        {
+            EcsWorld& world = *mScene.mWorld;
 
-	//================================================================================================================================
-	// sets which ecs world will be displayed in the editor
-	//================================================================================================================================
-	void EditorHolder::OnCurrentGameSelect( const int _index )
-	{
-		assert( _index < (int)m_worlds.size() );
+            // restore camera transform
+            const EcsEntity newCameraID = world.GetEntity( mScene.mMainCameraHandle );
+            world.GetComponent<Transform>( newCameraID ).mTransform = mPrevCameraTransform;
 
-		m_currentWorld = _index;
+            // restore selection
+            if( mPrevSelectionHandle != 0 &&
+                mScene.mNodes.find( mPrevSelectionHandle ) != mScene.mNodes.end() )
+            {
+                fan::SceneNode& node = world.GetComponent<fan::SceneNode>
+                        ( world.GetEntity( mPrevSelectionHandle ) );
 
-		// Set all to headless except the current
-		for( int worldIndex = 0; worldIndex < (int)m_worlds.size(); worldIndex++ )
-		{
-			EcsWorld& world = *m_worlds[worldIndex];
-			RenderWorld& renderWorld = world.GetSingleton<RenderWorld>();
-			renderWorld.isHeadless = ( worldIndex != m_currentWorld );
-		}
+                world.GetSingleton<EditorSelection>().SetSelectedSceneNode( &node );
+            }
+        }
 
-		mGameViewWindow->SetCurrentGameSelected( m_currentWorld );
-	}
+        Scene& mScene;
+        EcsHandle   mPrevSelectionHandle = 0;
+        btTransform mPrevCameraTransform;
+    };
 
-	//================================================================================================================================
-	// toogle the camera between editor and game
-	//================================================================================================================================
-	void EditorHolder::OnCurrentGameToogleCamera()
-	{
-		EcsWorld& world = GetCurrentWorld();
+    //========================================================================================================
+    //========================================================================================================
+    void EditorHolder::GameStop( IGame& _game )
+    {
+        EcsWorld& world = _game.mWorld;
 
-		Game& game = world.GetSingleton<Game>();
-		if( game.state == Game::STOPPED )
-		{
-			Debug::Warning() << "You cannot toogle camera outside of play mode" << Debug::Endl();
-			return;
-		}
+        EditorPlayState& playState = _game.mWorld.GetSingleton<EditorPlayState>();
+        if( playState.mState == EditorPlayState::PLAYING || playState.mState == EditorPlayState::PAUSED )
+        {
+            UseEditorCamera( world );
 
-		Scene& scene = world.GetSingleton<Scene>();
-		EditorCamera& editorCamera = world.GetSingleton<EditorCamera>();
+            Scene& scene = world.GetSingleton<Scene>();
+            SceneRestoreState restoreState( scene );
+            restoreState.Save();
 
-		if( scene.mainCameraHandle == editorCamera.cameraHandle )
-		{
-			UseGameCamera( world );
-		}
-		else
-		{
-			UseEditorCamera( world );
-		}
-	}
+            Debug::Highlight() << _game.mName << ": stopped" << Debug::Endl();
+            playState.mState = EditorPlayState::STOPPED;
+            _game.Stop();
+            scene.LoadFrom( scene.mPath ); // reload the scene
 
-	//================================================================================================================================
-	// callback of the game view step button
-	//================================================================================================================================
-	void EditorHolder::OnCurrentGameStep( )
-	{
-		EcsWorld& world = GetCurrentWorld();
-		Game& game = world.GetSingleton<Game>();
-		Time& time = world.GetSingleton<Time>();
+            restoreState.Restore();
+        }
+    }
 
-		if( game.gameServer != nullptr )
-		{
-			game.gameServer->Step( time.logicDelta );
-		}
-		else
-		{
-			game.gameClient->Step( time.logicDelta );
-		}
-	}
+    //========================================================================================================
+    //========================================================================================================
+    void EditorHolder::GamePause( IGame& _game )
+    {
+        EditorPlayState& playState = _game.mWorld.GetSingleton<EditorPlayState>();
+        if( playState.mState == EditorPlayState::PLAYING )
+        {
+            Debug::Highlight() << _game.mName << ": paused" << Debug::Endl();
+            playState.mState = EditorPlayState::PAUSED;
+        }
+    }
+
+    //========================================================================================================
+    //========================================================================================================
+    void EditorHolder::GameResume( IGame& _game )
+    {
+        EditorPlayState& playState = _game.mWorld.GetSingleton<EditorPlayState>();
+        if( playState.mState == EditorPlayState::PAUSED )
+        {
+            Debug::Highlight() << _game.mName << ": resumed" << Debug::Endl();
+            playState.mState = EditorPlayState::PLAYING;
+        }
+    }
+
+    //========================================================================================================
+    //========================================================================================================
+    void EditorHolder::OnSceneLoad( Scene& _scene )
+    {
+        EcsWorld& world = *_scene.mWorld;
+        EditorCamera::CreateEditorCamera( world );
+
+        if( &world == &GetCurrentGame().mWorld )
+        {
+            world.GetSingleton<EditorSelection>().Deselect();
+        }
+    }
+
+    //========================================================================================================
+    //========================================================================================================
+    void EditorHolder::OnCycleCurrentGame()
+    {
+        OnCurrentGameSelect( ( mCurrentGame + 1 ) % ( mGames.size() ) );
+    }
+
+    //========================================================================================================
+    //========================================================================================================
+    void EditorHolder::OnCurrentGameStart()
+    {
+        IGame& game = GetCurrentGame();
+        GameStart( game );
+    }
+
+    //========================================================================================================
+    //========================================================================================================
+    void EditorHolder::OnCurrentGameSwitchPlayStop()
+    {
+        IGame                & game      = GetCurrentGame();
+        const EditorPlayState& playState = game.mWorld.GetSingleton<EditorPlayState>();
+        if( playState.mState == EditorPlayState::STOPPED )
+        {
+            GameStart( game );
+        }
+        else
+        {
+            GameStop( game );
+        }
+    }
+
+    //========================================================================================================
+    //========================================================================================================
+    void EditorHolder::UseEditorCamera( EcsWorld& _world )
+    {
+        Scene       & scene        = _world.GetSingleton<Scene>();
+        EditorCamera& editorCamera = _world.GetSingleton<EditorCamera>();
+        scene.SetMainCamera( editorCamera.mCameraHandle );
+    }
+
+    //========================================================================================================
+    //========================================================================================================
+    void EditorHolder::OnCurrentGameOpen() { mMainMenuBar->Open( GetCurrentGame().mWorld ); }
+    void EditorHolder::OnCurrentGameReload() { mMainMenuBar->Reload( GetCurrentGame().mWorld ); }
+    void EditorHolder::OnCurrentGameSave() { mMainMenuBar->Save( GetCurrentGame().mWorld ); }
+    void EditorHolder::OnCurrentGameCopy()
+    {
+        GetCurrentGame().mWorld.GetSingleton<EditorCopyPaste>().OnCopy();
+    }
+    void EditorHolder::OnCurrentGamePaste()
+    {
+        GetCurrentGame().mWorld.GetSingleton<EditorCopyPaste>().OnPaste();
+    }
+    void EditorHolder::OnCurrentGameDeleteSelection()
+    {
+        GetCurrentGame().mWorld.GetSingleton<EditorSelection>().DeleteSelection();
+    }
+    void EditorHolder::OnCurrentGameToogleTransformLock()
+    {
+        GetCurrentGame().mWorld.GetSingleton<EditorSelection>().OnToogleTransformLock();
+    }
+
+    //========================================================================================================
+    // sets which ecs world will be displayed in the editor
+    //========================================================================================================
+    void EditorHolder::OnCurrentGameSelect( const int _index )
+    {
+        fanAssert( _index < (int)mGames.size() );
+
+        mCurrentGame = _index;
+
+        // Set all to headless except the current
+        for( int gameIndex = 0; gameIndex < (int)mGames.size(); gameIndex++ )
+        {
+            IGame      & game        = *mGames[gameIndex];
+            RenderWorld& renderWorld = game.mWorld.GetSingleton<RenderWorld>();
+            renderWorld.mIsHeadless = ( gameIndex != mCurrentGame );
+        }
+
+        mGameViewWindow->SetCurrentGameSelected( mCurrentGame );
+    }
+
+    //========================================================================================================
+    // toogle the camera between editor and game
+    //========================================================================================================
+    void EditorHolder::OnCurrentGameToogleCamera()
+    {
+        IGame   & currentGame = GetCurrentGame();
+        EcsWorld& world       = currentGame.mWorld;
+
+        const EditorPlayState& playState = world.GetSingleton<EditorPlayState>();
+        if( playState.mState == EditorPlayState::STOPPED )
+        {
+            Debug::Warning() << "You cannot toogle camera outside of play mode" << Debug::Endl();
+            return;
+        }
+
+        Scene       & scene        = world.GetSingleton<Scene>();
+        EditorCamera& editorCamera = world.GetSingleton<EditorCamera>();
+
+        if( scene.mMainCameraHandle == editorCamera.mCameraHandle )
+        {
+            world.GetSingleton<Scene>().mOnEditorUseGameCamera.Emmit();
+        }
+        else
+        {
+            UseEditorCamera( world );
+        }
+    }
+
+    //========================================================================================================
+    // callback of the game view step button
+    //========================================================================================================
+    void EditorHolder::OnCurrentGameStep()
+    {
+        IGame& game = GetCurrentGame();
+        Time & time = game.mWorld.GetSingleton<Time>();
+        game.Step( time.mLogicDelta );
+    }
 }

@@ -1,13 +1,12 @@
 #include "fanTexture.hpp"
 
 #include <algorithm>
-
 #pragma warning(push, 0)   
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 #pragma warning(pop)
-
 #include "core/fanDebug.hpp"
+#include "core/fanAssert.hpp"
 #include "render/core/fanDevice.hpp"
 #include "render/core/fanBuffer.hpp"
 
@@ -205,8 +204,7 @@ namespace fan
 		if ( vkCreateImage( _device.mDevice, &imageInfo, nullptr, &mImage ) != VK_SUCCESS )
 			throw std::runtime_error( "failed to create image!" );
 
-		Debug::Get() << Debug::Severity::log << std::hex << "VkImage               ";
-        Debug::Get() << mImage << std::dec << Debug::Endl();
+		Debug::Log() << std::hex << "VkImage               " << mImage << std::dec << Debug::Endl();
 
 		// Allocate memory for the image
 		VkMemoryRequirements memRequirements;
@@ -315,7 +313,7 @@ namespace fan
 	bool Texture::LoadFromFile( const std::string& _path )
 	{
         static_assert( sizeof(uint8_t) == sizeof( stbi_uc ) );
-        assert( mPixels == nullptr );
+       fanAssert( mPixels == nullptr );
 
 		mPath = _path;
 
@@ -338,18 +336,21 @@ namespace fan
 
     //========================================================================================================
     //========================================================================================================
-    void Texture::LoadFromPixels( const uint8_t* _pixelsRGBA32, const VkExtent2D _extent, const uint32_t _mipLevels )
+    void Texture::LoadFromPixels( const uint8_t* _pixelsRGBA32,
+                                  const glm::ivec2 _size,
+                                  const uint32_t _mipLevels )
     {
-	    assert( mPixels == nullptr );
+	    fanAssert( mPixels == nullptr );
+	    fanAssert( _mipLevels >= 1 );
 
         mBuffersOutdated = true;
         if( _pixelsRGBA32 == nullptr ) { return; }
 
-	    const size_t size = _extent.width * _extent.height * 4 * sizeof( uint8_t );
+	    const size_t size = _size.x * _size.y * 4 * sizeof( uint8_t );
 	    mPixels = (uint8_t*) malloc( size ); // I use malloc to be able to free it using stbi_image_free()
 	    memcpy( mPixels, _pixelsRGBA32, size );
         mMipLevels = _mipLevels;
-        mExtent = _extent;
+        mExtent =  {(uint32_t)_size.x, (uint32_t)_size.y };
 
     }
 
@@ -361,10 +362,10 @@ namespace fan
 
 	    if( mPixels == nullptr ) { return; }
 
-		assert( mMemory == VK_NULL_HANDLE );
-		assert( mImageView == VK_NULL_HANDLE );
-		assert( mImage == VK_NULL_HANDLE );
-		assert( mPixels != nullptr );
+        fanAssert( mMemory == VK_NULL_HANDLE );
+        fanAssert( mImageView == VK_NULL_HANDLE );
+        fanAssert( mImage == VK_NULL_HANDLE );
+        fanAssert( mPixels != nullptr );
 
 		VkDeviceSize imageSize = mExtent.width * mExtent.height * 4 * sizeof( unsigned char );
 

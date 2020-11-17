@@ -5,12 +5,11 @@
 #include "render/core/fanRenderPass.hpp"
 #include "render/core/fanFrameBuffer.hpp"
 #include "render/resources/fanMesh2D.hpp"
-#include "render/resources/fanTexture.hpp"
 
 namespace fan
 {
-    //================================================================================================================================
-    //================================================================================================================================
+    //========================================================================================================
+    //========================================================================================================
     void DrawUI::Create( Device& _device, uint32_t _imagesCount )
     {
         mUniforms.Create( _device.mDeviceProperties.limits.minUniformBufferOffsetAlignment );
@@ -25,8 +24,8 @@ namespace fan
         mDescriptorTransform.Create( _device, _imagesCount );
     }
 
-    //================================================================================================================================
-    //================================================================================================================================
+    //========================================================================================================
+    //========================================================================================================
     void DrawUI::Destroy( Device& _device )
     {
         mDescriptorTransform.Destroy( _device );
@@ -34,8 +33,8 @@ namespace fan
         mSampler.Destroy( _device );
     }
 
-    //================================================================================================================================
-    //================================================================================================================================
+    //========================================================================================================
+    //========================================================================================================
     void
     DrawUI::BindDescriptors( VkCommandBuffer _commandBuffer,
                              const size_t _indexFrame,
@@ -60,8 +59,8 @@ namespace fan
         );
     }
 
-    //================================================================================================================================
-    //================================================================================================================================
+    //========================================================================================================
+    //========================================================================================================
     PipelineConfig DrawUI::GetPipelineConfig( DescriptorImages& _descriptorImages ) const
     {
         PipelineConfig config( mVertexShader, mFragmentShader );
@@ -72,12 +71,15 @@ namespace fan
                 _descriptorImages.mDescriptorSetLayout,
                 mDescriptorSampler.mDescriptorSetLayout
         };
+        config.attachmentBlendStates[0].colorWriteMask =    VK_COLOR_COMPONENT_R_BIT |
+                                                            VK_COLOR_COMPONENT_G_BIT |
+                                                            VK_COLOR_COMPONENT_B_BIT;
 
         return config;
     }
 
-    //================================================================================================================================
-    //================================================================================================================================
+    //========================================================================================================
+    //========================================================================================================
     void DrawUI::UpdateUniformBuffers( Device& _device, const size_t _index )
     {
         mDescriptorTransform.SetData( _device,
@@ -89,8 +91,8 @@ namespace fan
                                       0 );
     }
 
-    //================================================================================================================================
-    //================================================================================================================================
+    //========================================================================================================
+    //========================================================================================================
     void
     DrawUI::RecordCommandBuffer( const size_t _index,
                                  RenderPass& _renderPass,
@@ -102,7 +104,8 @@ namespace fan
         VkCommandBufferInheritanceInfo commandBufferInheritanceInfo = CommandBuffer::GetInheritanceInfo(
                 _renderPass.mRenderPass,
                 _framebuffer.mFrameBuffers[_index] );
-        VkCommandBufferBeginInfo       commandBufferBeginInfo       = CommandBuffer::GetBeginInfo( &commandBufferInheritanceInfo );
+        VkCommandBufferBeginInfo       commandBufferBeginInfo =
+                CommandBuffer::GetBeginInfo( &commandBufferInheritanceInfo );
 
         if( vkBeginCommandBuffer( commandBuffer, &commandBufferBeginInfo ) == VK_SUCCESS )
         {
@@ -113,12 +116,12 @@ namespace fan
             for( uint32_t meshIndex = 0; meshIndex < mDrawData.size(); meshIndex++ )
             {
                 UIDrawData drawData = mDrawData[meshIndex];
-                Mesh2D* mesh = drawData.mesh;
-                VkBuffer vertexBuffers[] = { mesh->mVertexBuffer[mesh->mCurrentBuffer].mBuffer };
+                Mesh2D* mesh = drawData.mMesh;
+                VkBuffer vertexBuffers[] = { mesh->mVertexBuffer.mBuffer };
                 BindDescriptors( commandBuffer, _index, meshIndex );
                 vkCmdBindVertexBuffers( commandBuffer, 0, 1, vertexBuffers, offsets );
                 BindTexture( commandBuffer,
-                             drawData.textureIndex,
+                             drawData.mTextureIndex,
                              mDescriptorSampler,
                              _descriptorTextures,
                              mPipeline.mPipelineLayout );
@@ -127,8 +130,7 @@ namespace fan
 
             if( vkEndCommandBuffer( commandBuffer ) != VK_SUCCESS )
             {
-                Debug::Get()
-                        << Debug::Severity::error
+                Debug::Error()
                         << "Could not record command buffer "
                         << _index
                         << "."
@@ -137,8 +139,7 @@ namespace fan
         }
         else
         {
-            Debug::Get()
-                    << Debug::Severity::error
+            Debug::Error()
                     << "Could not record command buffer "
                     << _index
                     << "."
@@ -146,15 +147,15 @@ namespace fan
         }
     }
 
-    //================================================================================================================================
-    //================================================================================================================================
+    //========================================================================================================
+    //========================================================================================================
     void DrawUI::BindTexture( VkCommandBuffer _commandBuffer,
                               const uint32_t _textureIndex,
                               DescriptorSampler& _descriptorSampler,
                               DescriptorImages& _descriptorTextures,
                               VkPipelineLayout _pipelineLayout )
     {
-        assert( _textureIndex < _descriptorTextures.mDescriptorSets.size() );
+       fanAssert( _textureIndex < _descriptorTextures.mDescriptorSets.size() );
 
         std::vector<VkDescriptorSet> descriptors = {
                 _descriptorTextures.mDescriptorSets[_textureIndex], _descriptorSampler.mDescriptorSet
@@ -172,26 +173,26 @@ namespace fan
         );
     }
 
-    //================================================================================================================================
-    //================================================================================================================================
-    void DrawUI::SetUIDrawData( const std::vector<RenderDataUIMesh>& _drawData )
+    //========================================================================================================
+    //========================================================================================================
+    void DrawUI::SetUIDrawData( const std::vector<RenderDataMesh2D>& _drawData )
     {
         mDrawData.resize( _drawData.size() );
         for( int meshIndex = 0; meshIndex < (int)_drawData.size(); meshIndex++ )
         {
-            const RenderDataUIMesh& uiData = _drawData[meshIndex];
+            const RenderDataMesh2D& uiData = _drawData[meshIndex];
 
-            mDrawData[meshIndex].mesh                      = uiData.mesh;
-            mDrawData[meshIndex].textureIndex              = uiData.textureIndex;
-            mUniforms.mDynamicUniforms[meshIndex].position = uiData.position;
-            mUniforms.mDynamicUniforms[meshIndex].scale    = uiData.scale;
-            mUniforms.mDynamicUniforms[meshIndex].color    = uiData.color;
+            mDrawData[meshIndex].mMesh                      = uiData.mMesh;
+            mDrawData[meshIndex].mTextureIndex              = uiData.mTextureIndex;
+            mUniforms.mDynamicUniforms[meshIndex].mPosition = uiData.mPosition;
+            mUniforms.mDynamicUniforms[meshIndex].mScale = uiData.mScale;
+            mUniforms.mDynamicUniforms[meshIndex].mColor = uiData.mColor;
         }
     }
 
-    //================================================================================================================================
+    //========================================================================================================
     // UiUniforms
-    //================================================================================================================================
+    //========================================================================================================
     void UniformsUI::Create( const VkDeviceSize _minUniformBufferOffsetAlignment )
     {
         // Calculate required alignment based on minimum device offset alignment

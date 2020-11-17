@@ -1,7 +1,7 @@
 #include "fanMeshManager.hpp"
 
-#include <filesystem>
-#include "fanMesh.hpp"
+#include "core/fanAssert.hpp"
+#include "render/resources/fanMesh.hpp"
 #include "render/fanRenderResourcePtr.hpp"
 #include "render/core/fanDevice.hpp"
 
@@ -57,7 +57,7 @@ namespace fan
     //========================================================================================================
     void MeshManager::Add( Mesh * _mesh, const std::string& _name )
     {
-        assert( _mesh != nullptr );
+       fanAssert( _mesh != nullptr );
         _mesh->mIndex = (int)mMeshes.size();
         _mesh->mPath = _name;
         mMeshes.push_back( _mesh );
@@ -122,7 +122,7 @@ namespace fan
     //========================================================================================================
     void MeshManager::ResolvePtr( ResourcePtr<Mesh >& _resourcePtr )
     {
-        assert( ! _resourcePtr.IsValid() );
+       fanAssert( ! _resourcePtr.IsValid() );
 
         MeshPtr& meshPtr = static_cast< MeshPtr& >( _resourcePtr );
         Mesh    * mesh    = GetOrLoad( meshPtr.GetPath() );

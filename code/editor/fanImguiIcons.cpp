@@ -1,22 +1,26 @@
-#include "editor/fanImguiIcons.hpp"
+#include "fanImguiIcons.hpp"
 
 namespace ImGui
 {
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	struct IconData
 	{
-		ImVec2 uv0;
-		ImVec2 uv1;
+		ImVec2 mUv0;
+		ImVec2 mUv1;
 	};
 
-	const float IconImpl::s_iconImageSize = 512.f;
+	const float IconImpl::sIconImageSize = 512.f;
 
-#define DECL_ICON(_size, _x, _y) {{ (_x) * _size / s_iconImageSize, ((_y) * _size) / s_iconImageSize},{ (_x+1) * _size /s_iconImageSize,((_y+1) * _size) /s_iconImageSize}}
+#define DECL_ICON(_size, _x, _y)                                                    \
+	{                                                                               \
+	    { (_x) * _size   / sIconImageSize, ((_y) * _size)    / sIconImageSize},     \
+	    { (_x+1) * _size /  sIconImageSize, ((_y+1) * _size) /  sIconImageSize}     \
+	}
 
-	//================================================================================================================================
-	//================================================================================================================================
-	const IconImpl::IconData IconImpl::s_iconsList[ IconType::NUM_ICONS ] = {
+	//========================================================================================================
+	//========================================================================================================
+	const IconImpl::IconData IconImpl::sIconsList[ IconType::NumIcons ] = {
 		 DECL_ICON( 16.f, 0,0 )	// NONE
 
 		// editor windows
@@ -37,6 +41,8 @@ namespace ImGui
 		,DECL_ICON( 16.f, 3, 6 )  // LOCK_OPEN16,
 		,DECL_ICON( 16.f, 4, 6 )  // LOCK_CLOSED16,
 		,DECL_ICON( 16.f, 5, 6 )  // NETWORK16,
+		,DECL_ICON( 16.f, 6, 6 )  // Font16,
+		,DECL_ICON( 16.f, 7, 6 )  // Application16,
 
 		,DECL_ICON( 16.f, 1, 0 )  // PLAY16
 		,DECL_ICON( 16.f, 2, 0 )  // PAUSE16
@@ -45,6 +51,13 @@ namespace ImGui
         ,DECL_ICON( 16.f, 5, 0 )  // CHECK_NEUTRAL16,
         ,DECL_ICON( 16.f, 6, 0 )  // CHECK_FAILED16,
         ,DECL_ICON( 16.f, 7, 0 )  // CHECK_SUCCESS16,
+        ,DECL_ICON( 16.f, 8, 0 )  // SIGNAL_SLOT16,
+        ,DECL_ICON( 16.f, 9, 0 )  // PLUS16,
+        ,DECL_ICON( 16.f, 10, 0 ) // MINUS16
+
+        // small
+        ,DECL_ICON( 8.f, 0, 2 )  // PLUS8,
+        ,DECL_ICON( 8.f, 1, 2 ) // MINUS8
 
 		// scene components
 		,DECL_ICON( 16.f, 0, 8 )  // IMAGE16,
@@ -65,6 +78,11 @@ namespace ImGui
 		,DECL_ICON( 16.f, 15, 8 ) // INPUT16
 		,DECL_ICON( 16.f, 16, 8 ) // FOLLOW_TRANSFORM_UI16
 		,DECL_ICON( 16.f, 17, 8 ) // EXPIRATION16
+		,DECL_ICON( 16.f, 18, 8 ) // BUTTON16
+		,DECL_ICON( 16.f, 19, 8 ) // Text16,
+		,DECL_ICON( 16.f, 20, 8 ) // Layout16
+		,DECL_ICON( 16.f, 21, 8 ) // Align16
+
 
 		,DECL_ICON( 16.f, 0, 2 ) // TIME16
 		,DECL_ICON( 16.f, 1, 2 ) // SPAWN16
@@ -87,7 +105,8 @@ namespace ImGui
 		,DECL_ICON( 16.f, 4, 10 )  // SPACE_SHIP16,
 		,DECL_ICON( 16.f, 5, 10 )  // PLANET16,		
 		,DECL_ICON( 16.f, 6, 10 )  // SUN16,	
-		,DECL_ICON( 16.f, 7, 10 )  // SUN_RED16,	
+		,DECL_ICON( 16.f, 7, 10 )  // SUN_RED16,
+		,DECL_ICON( 16.f, 8, 10 )  // MainMenu16
 
 		//network
 		,DECL_ICON( 16.f, 0, 12 )  // RELIABILITY_LAYER16,	

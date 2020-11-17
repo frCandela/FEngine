@@ -7,15 +7,22 @@ namespace fan
 {
 	struct Device;
 
-	//================================================================================================================================
+	//========================================================================================================
 	// abstraction of a gpu buffer
-	//================================================================================================================================
+	//========================================================================================================
 	struct Buffer
-	{	
-		bool Create( Device& _device, VkDeviceSize _size, VkBufferUsageFlags _usage, VkMemoryPropertyFlags _memoryProperties, VkDeviceSize  _alignement = 1 );
+	{
+        bool Create( Device& _device,
+                     VkDeviceSize _size,
+                     VkBufferUsageFlags _usage,
+                     VkMemoryPropertyFlags _memoryProperties,
+                     VkDeviceSize _alignement = 1 );
 		void Destroy( Device& _device );
 
-		void		SetData( Device& _device, const void* _data, VkDeviceSize _size, VkDeviceSize _offset = 0 );
+        void SetData( Device& _device,
+                      const void* _data,
+                      VkDeviceSize _size,
+                      VkDeviceSize _offset = 0 );
 		VkResult	Bind( Device& _device, VkDeviceSize _offset = 0 );
 		VkResult	Map( Device& _device, VkDeviceSize _size = VK_WHOLE_SIZE, VkDeviceSize _offset = 0 );
 		void		Unmap( Device& _device );
@@ -26,7 +33,6 @@ namespace fan
 		VkDeviceMemory	mMemory = VK_NULL_HANDLE;
 		VkDeviceSize	mSize = 0;
 		VkDeviceSize	mAlignment = 0;
-
-		void* mappedData = nullptr;
+		void*           mMappedData = nullptr;
 	};
 }

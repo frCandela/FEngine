@@ -1,7 +1,7 @@
-#include "ecs/fanEcsSystem.hpp"
-#include "scene/components/fanTransform.hpp"
-#include "scene/components/fanRigidbody.hpp"
-#include "scene/components/fanSceneNode.hpp"
+#include "core/ecs/fanEcsSystem.hpp"
+#include "engine/components/fanTransform.hpp"
+#include "engine/components/fanRigidbody.hpp"
+#include "engine/components/fanSceneNode.hpp"
 
 #include "game/components/fanBattery.hpp"
 #include "game/components/fanPlayerInput.hpp"
@@ -11,11 +11,11 @@
 
 namespace fan
 {
-	//==============================================================================================================================================================
+	//========================================================================================================
 	// moves the spaceships
 	// @todo split this in multiple sub systems for force application & energy management
-	//==============================================================================================================================================================
-	struct S_MoveSpaceships : EcsSystem
+	//========================================================================================================
+	struct SMoveSpaceships : EcsSystem
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world )
 		{
@@ -38,7 +38,8 @@ namespace fan
 			auto batteryIt = _view.begin<Battery>();
 			auto playerInputIt = _view.begin<PlayerInput>();
 			auto sceneNodeIt = _view.begin<SceneNode>();
-			for( ; rbIt != _view.end<Rigidbody>(); ++rbIt, ++transformIt, ++spaceshipIt, ++batteryIt, ++playerInputIt, ++sceneNodeIt )
+			for( ; rbIt != _view.end<Rigidbody>();
+                   ++rbIt, ++transformIt, ++spaceshipIt, ++batteryIt, ++playerInputIt, ++sceneNodeIt )
 			{
 				const SpaceShip& spaceship = *spaceshipIt;
 				const PlayerInput& playerInput = *playerInputIt;
@@ -47,10 +48,12 @@ namespace fan
 				Battery& battery = *batteryIt;
 
 				// get player input
-				const btVector3 orientation = btVector3( playerInput.orientation.x(), 0.f, playerInput.orientation.z() );
-				const float leftForce = _delta * spaceship.lateralForce * playerInput.left;
-				const float forwardAxis = _delta * playerInput.forward;
-				const float boost = playerInput.boost;
+                const btVector3 orientation = btVector3( playerInput.mOrientation.x(),
+                                                         0.f,
+                                                         playerInput.mOrientation.z() );
+				const float leftForce = _delta * spaceship.mLateralForce * playerInput.mLeft;
+				const float forwardAxis = _delta * playerInput.mForward;
+				const float boost = playerInput.mBoost;
 
 				// Orientation
 				if( !orientation.isZero() )
@@ -70,10 +73,12 @@ namespace fan
 				else { speedMode = SpaceShip::NORMAL; }
 
 				// Consume energy
-				float totalConsumption = spaceship.energyConsumedPerUnitOfForce * ( std::abs( leftForce ) + std::abs( spaceship.forwardForces[speedMode] * forwardAxis ) );
-				if( battery.currentEnergy < totalConsumption )
+                float totalConsumption = spaceship.mEnergyConsumedPerUnitOfForce *
+                                         ( std::abs( leftForce ) +
+                                           std::abs( spaceship.mForwardForces[speedMode] * forwardAxis ) );
+				if( battery.mCurrentEnergy < totalConsumption )
 				{
-					battery.currentEnergy = 0.f;
+					battery.mCurrentEnergy = 0.f;
 					if( speedMode != SpaceShip::REVERSE )
 					{
 						speedMode = SpaceShip::SLOW;
@@ -81,62 +86,66 @@ namespace fan
 				}
 				else
 				{
-					battery.currentEnergy -= totalConsumption;
+					battery.mCurrentEnergy -= totalConsumption;
 				}
 
 				// Enable particle systems
-				if( spaceship.fastForwardParticlesR != nullptr &&
-					spaceship.fastForwardParticlesL != nullptr &&
-					spaceship.slowForwardParticlesR != nullptr &&
-					spaceship.slowForwardParticlesL != nullptr &&
-					spaceship.reverseParticles != nullptr &&
-					spaceship.leftParticles != nullptr &&
-					spaceship.rightParticles != nullptr
+				if( spaceship.mFastForwardParticlesR != nullptr &&
+                    spaceship.mFastForwardParticlesL != nullptr &&
+                    spaceship.mSlowForwardParticlesR != nullptr &&
+                    spaceship.mSlowForwardParticlesL != nullptr &&
+                    spaceship.mReverseParticles != nullptr &&
+                    spaceship.mLeftParticles != nullptr &&
+                    spaceship.mRightParticles != nullptr
 					)
 				{
-					spaceship.fastForwardParticlesR->enabled = false;
-					spaceship.fastForwardParticlesL->enabled = false;
-					spaceship.slowForwardParticlesR->enabled = false;
-					spaceship.slowForwardParticlesL->enabled = false;
-					spaceship.reverseParticles->enabled = false;
-					spaceship.leftParticles->enabled = false;
-					spaceship.rightParticles->enabled = false;
+					spaceship.mFastForwardParticlesR->mEnabled = false;
+					spaceship.mFastForwardParticlesL->mEnabled = false;
+					spaceship.mSlowForwardParticlesR->mEnabled = false;
+					spaceship.mSlowForwardParticlesL->mEnabled = false;
+					spaceship.mReverseParticles->mEnabled      = false;
+					spaceship.mLeftParticles->mEnabled         = false;
+					spaceship.mRightParticles->mEnabled        = false;
 
 
 					if( forwardAxis != 0.f )
 					{
 						if( speedMode == SpaceShip::SLOW || speedMode == SpaceShip::NORMAL )
 						{
-							spaceship.slowForwardParticlesL->enabled = true;
-							spaceship.slowForwardParticlesR->enabled = true;
+							spaceship.mSlowForwardParticlesL->mEnabled = true;
+							spaceship.mSlowForwardParticlesR->mEnabled = true;
 						}
 						else if( speedMode == SpaceShip::FAST )
 						{
-							spaceship.fastForwardParticlesL->enabled = true;
-							spaceship.fastForwardParticlesR->enabled = true;
+							spaceship.mFastForwardParticlesL->mEnabled = true;
+							spaceship.mFastForwardParticlesR->mEnabled = true;
 						}
 						else if( speedMode == SpaceShip::REVERSE )
 						{
-							spaceship.reverseParticles->enabled = true;
+							spaceship.mReverseParticles->mEnabled = true;
 						}
 					}
 					if( leftForce < 0.f )
 					{
-						spaceship.leftParticles->enabled = true;
+						spaceship.mLeftParticles->mEnabled = true;
 					}
 					else if( leftForce > 0.f )
 					{
-						spaceship.rightParticles->enabled = true;
+						spaceship.mRightParticles->mEnabled = true;
 					}
 				}
 
 				// Forces application		
-				rb.rigidbody->applyCentralForce( leftForce * transform.Left() );
-				rb.rigidbody->applyCentralForce( spaceship.forwardForces[speedMode] * forwardAxis * transform.Forward() );
-				rb.rigidbody->setAngularVelocity( btVector3::Zero() );
+				rb.mRigidbody->applyCentralForce( leftForce * transform.Left() );
+                rb.mRigidbody->applyCentralForce( spaceship.mForwardForces[speedMode] *
+                                                  forwardAxis *
+                                                  transform.Forward() );
+				rb.mRigidbody->setAngularVelocity( btVector3::Zero() );
 
 				// Drag
-				btVector3 newVelocity = ( totalConsumption > 0.f ? spaceship.activeDrag : spaceship.passiveDrag )* rb.GetVelocity();
+                btVector3 newVelocity = ( totalConsumption > 0.f ?
+                        spaceship.mActiveDrag :
+                        spaceship.mPassiveDrag ) * rb.GetVelocity();
 				newVelocity.setY( 0.f );
 				rb.SetVelocity( newVelocity );
 
@@ -146,10 +155,10 @@ namespace fan
 		}
 	};
 
-	//==============================================================================================================================================================
+	//========================================================================================================
 	// Deals damage to the health entities that are in the sunlight when the sun is bursting
-	//==============================================================================================================================================================
-	struct S_EruptionDamage : EcsSystem
+	//========================================================================================================
+	struct SEruptionDamage : EcsSystem
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world )
 		{
@@ -170,26 +179,28 @@ namespace fan
 			{
 				Health& health = *healthIt;
 				const SolarPanel& solarPanel = *solarPanelIt;
-				if( !health.invincible && solarPanel.isInSunlight && eruption.state == SolarEruption::EXPODING )
+                if( !health.mInvincible &&
+                    solarPanel.mIsInSunlight &&
+                    eruption.mState == SolarEruption::EXPODING )
 				{
-					const float damage = _delta * eruption.damagePerSecond;
-					if( health.currentHealth < damage )
+					const float damage = _delta * eruption.mDamagePerSecond;
+					if( health.mCurrentHealth < damage )
 					{
-						health.currentHealth = 0.f;
+						health.mCurrentHealth = 0.f;
 					}
 					else
 					{
-						health.currentHealth -= damage;
+						health.mCurrentHealth -= damage;
 					}
 				}
 			}
 		}
 	};
 
-	//==============================================================================================================================================================
+	//========================================================================================================
 	// checks if any player is death and makes an explosion
-	//==============================================================================================================================================================
-	struct S_PlayerDeath : EcsSystem
+	//========================================================================================================
+	struct SPlayerDeath : EcsSystem
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world )
 		{
@@ -212,18 +223,18 @@ namespace fan
 				const SpaceShip& spaceShip = *spaceShipIt;
 				const EcsEntity entity = healthIt.GetEntity();
 
-				if( health.currentHealth == 0.f && !health.invincible )
+				if( health.mCurrentHealth == 0.f && !health.mInvincible )
 				{
 					Scene& scene = _world.GetSingleton<Scene>();
 
-					if( spaceShip.deathFx == nullptr )
+					if( spaceShip.mDeathFx == nullptr )
 					{
-						Debug::Error() << "S_PlayerDeath: SpaceShip has no death fx" << Debug::Endl();
+						Debug::Error() << "SPlayerDeath: SpaceShip has no death fx" << Debug::Endl();
 					}
 					else
 					{
-						SceneNode& fxNode = *spaceShip.deathFx->Instantiate( scene.GetRootNode() );
-						EcsEntity fxId = _world.GetEntity( fxNode.handle );
+						SceneNode& fxNode = *spaceShip.mDeathFx->Instantiate( scene.GetRootNode() );
+						EcsEntity fxId = _world.GetEntity( fxNode.mHandle );
 						Transform& fxTransform = _world.GetComponent<Transform>( fxId );
 						fxTransform.SetPosition( transform.GetPosition() );
 					}
@@ -232,6 +243,5 @@ namespace fan
 				}
 			}
 		}
-
 	};
 }

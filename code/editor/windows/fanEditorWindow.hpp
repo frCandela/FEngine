@@ -7,10 +7,10 @@ namespace fan
 {
 	class EcsWorld;
 
-	//================================================================================================================================
+	//========================================================================================================
 	// base class for editor windows
 	// automagic hide/show & show buttons in the tools main menu bar
-	//================================================================================================================================
+	//========================================================================================================
 	class EditorWindow
 	{
 	public:
@@ -19,24 +19,24 @@ namespace fan
 
 		void Draw( EcsWorld& _world );
 
-		void SetVisible( bool _value ) { m_isVisible = _value; }
-		bool IsVisible() const { return  m_isVisible; }
-		void AddFlag( const ImGuiWindowFlags _flags ) { m_flags |= _flags; }
+		void SetVisible( bool _value ) { mIsVisible = _value; }
+		bool IsVisible() const { return  mIsVisible; }
+		void AddFlag( const ImGuiWindowFlags _flags ) { mFlags |= _flags; }
 
-		std::string		GetName() const { return m_name; }
-		ImGui::IconType	GetIconType() const { return m_iconType; }
+		std::string		GetName() const { return mName; }
+		ImGui::IconType	GetIconType() const { return mIconType; }
 
 	protected:
 		virtual void OnGui( EcsWorld& _world ) = 0;
 
 	private:
-		bool m_isVisible;
+		bool mIsVisible;
 
-		ImGuiWindowFlags m_flags = ImGuiWindowFlags_None;
+		ImGuiWindowFlags mFlags = ImGuiWindowFlags_None;
 
-		std::string m_name;
-		std::string m_jsonShowWindowKey;
-		ImGui::IconType m_iconType;
+		std::string     mName;
+		std::string     mJsonShowWindowKey;
+		ImGui::IconType mIconType;
 	};
 }
 

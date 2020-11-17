@@ -1,7 +1,7 @@
 #pragma once
 
 #include "editor/windows/fanEditorWindow.hpp"
-#include "core/fanUnitTest.hpp"
+#include "core/unit_tests/fanUnitTest.hpp"
 
 namespace fan
 {
@@ -35,5 +35,10 @@ namespace fan
         UnitTestResult mMesh2DManagerResult;
         UnitTestResult mTextureManagerResult;
         UnitTestResult mPrefabManagerResult;
+        UnitTestResult mFontManagerResult;
+        UnitTestResult mFanAssertResult;
+        UnitTestResult mGlfwMouseResult;
+        UnitTestResult mSignalResult;
+        UnitTestResult mEcsResult;
     };
 }

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <unordered_map>
-#include "ecs/fanEcsSingleton.hpp"
+#include "core/ecs/fanEcsSingleton.hpp"
 #include "bullet/LinearMath/btVector3.h"
 #include "network/components/fanClientRPC.hpp"
 #include "network/fanPacket.hpp"
@@ -22,12 +22,11 @@ namespace fan
 		sf::Packet data;
 	};
 
-	//================================================================================================================================
-	//================================================================================================================================	
+	//========================================================================================================
+	//========================================================================================================
 	struct SpawnManager : public EcsSingleton
 	{
 		ECS_SINGLETON( SpawnManager )
-	public:		
 		using SpawnMethod = void ( * )( EcsWorld & _world, sf::Packet _data );
 
 		static void SetInfo( EcsSingletonInfo& _info );
@@ -36,7 +35,6 @@ namespace fan
 
 		static void Update( EcsWorld& _world );	
 
-		void RegisterSpawnMethods();
 		void RegisterSpawnMethod( const SpawnID _spawnID, const SpawnMethod _spawnMethod );
 		void OnSpawn( const SpawnID _spawnID, const FrameIndex _frameIndex, sf::Packet _data );
 		void OnDespawn( const NetID _netID );

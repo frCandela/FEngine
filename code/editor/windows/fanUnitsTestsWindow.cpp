@@ -2,16 +2,22 @@
 
 #include "core/fanDebug.hpp"
 #include "core/time/fanProfiler.hpp"
+#include "core/unit_tests/fanUnitTestFanAssert.hpp"
 #include "render/unit_tests/fanUnitTestMeshManager.hpp"
 #include "render/unit_tests/fanUnitTestMesh2DManager.hpp"
 #include "render/unit_tests/fanUnitTestTextureManager.hpp"
-#include "scene/unit_tests/fanUnitTestPrefabManager.hpp"
+#include "render/unit_tests/fanUnitTestFontManager.hpp"
+#include "engine/unit_tests/fanUnitTestPrefabManager.hpp"
+#include "engine/unit_tests/fanUnitTestMouse.hpp"
+#include "core/unit_tests/fanUnitTestSignal.hpp"
+#include "core/unit_tests/fanUnitTestEcs.hpp"
+
 
 namespace fan
 {
     //========================================================================================================
     //========================================================================================================
-    UnitTestsWindow::UnitTestsWindow() : EditorWindow( "unit tests", ImGui::IconType::NONE ) {}
+    UnitTestsWindow::UnitTestsWindow() : EditorWindow( "unit tests", ImGui::IconType::None16 ) {}
 
     //========================================================================================================
     //========================================================================================================
@@ -21,6 +27,14 @@ namespace fan
                 { "Mesh2D manager",     &UnitTestMesh2DManager::RunTests,   mMesh2DManagerResult },
                 { "Texture manager",    &UnitTestTextureManager::RunTests,  mTextureManagerResult },
                 { "Prefab manager",     &UnitTestPrefabManager::RunTests,   mPrefabManagerResult },
+                { "Font manager",       &UnitTestFontManager::RunTests,   mFontManagerResult },
+#ifndef NDEBUG
+                 { "fanAssert",          &UnitTestFanAssert::RunTests,       mFanAssertResult },
+#endif
+                { "Mouse",      &UnitTestMouse::RunTests, mGlfwMouseResult },
+                { "Signal",     &UnitTestSignal::RunTests, mSignalResult },
+                { "Ecs",     &UnitTestEcs::RunTests, mEcsResult },
+
         };
     }
 
@@ -42,8 +56,13 @@ namespace fan
         {
             for( const TestArgument& testArgument : tests ){ ClearTest( testArgument ); }
         }
-        ImGui::SameLine();
-        ImGui::Checkbox("enable break", &UnitTestsUtils::sBreakWhenUnitTestFails );
+#ifndef NDEBUG
+        if( System::HasDebugger())
+        {
+            ImGui::SameLine();
+            ImGui::Checkbox( "enable break", &AssertUtils::sFanAssertBreakEnabled );
+        }
+#endif
         ImGui::Spacing();
         for( const TestArgument& testArgument : tests ){ DrawUnitTest( testArgument ); }
     }
@@ -107,16 +126,16 @@ namespace fan
         switch( _status )
         {
             case UnitTestResult::Status::Unknown :
-                ImGui::Icon(  ImGui::IconType::CHECK_NEUTRAL16, iconSize, ImVec4( 1, 1, 1, 1 ) );
+                ImGui::Icon( ImGui::IconType::CheckNeutral16, iconSize, ImVec4( 1, 1, 1, 1 ) );
                 break;
             case UnitTestResult::Status::Failed :
-                ImGui::Icon(  ImGui::IconType::CHECK_FAILED16, iconSize, ImVec4( 1, 0, 0, 1 ) );
+                ImGui::Icon( ImGui::IconType::CheckFailed16, iconSize, ImVec4( 1, 0, 0, 1 ) );
                 break;
             case UnitTestResult::Status::Success :
-                ImGui::Icon(  ImGui::IconType::CHECK_SUCCESS16, iconSize, ImVec4( 0, 1, 0, 1 ) );
+                ImGui::Icon( ImGui::IconType::CheckSuccess16, iconSize, ImVec4( 0, 1, 0, 1 ) );
                 break;
             default:
-                assert( false );
+               fanAssert( false );
                 break;
         }
     }

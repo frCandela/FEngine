@@ -5,27 +5,30 @@
 
 namespace fan
 {
-	//================================================================================================================================
-	// 3D cube
-	// @todo remake this properly without using triangles
-	//================================================================================================================================
+	//========================================================================================================
+	// @todo remake this properly without using triangles and name it "Box"
+	//========================================================================================================
 	struct Cube : public Shape
 	{
 		Cube( const btVector3 _position, const float _halfSize );
 
 		void SetPosition( const btVector3 _pos );
 
-		const		std::array< Triangle, 12 >& GetTriangles() const { return m_triangles; }
-		float		GetHalfSize() const { return m_halfSize; }
-		btVector3	GetPosition() const { return m_position; }
+		const		std::array< Triangle, 12 >& GetTriangles() const { return mTriangles; }
+		float		GetHalfSize() const { return mHalfSize; }
+		btVector3	GetPosition() const { return mPosition; }
 
-		virtual bool RayCast( const btVector3 _origin, const btVector3 _direction, btVector3& outIntersection ) const override;
+        virtual bool RayCast( const btVector3 _origin,
+                              const btVector3 _direction,
+                              btVector3& outIntersection ) const override;
+
+        std::array< Triangle, 12 > mTriangles;
+        btVector3                  mPosition;
+        float                      mHalfSize;
 
 	private:
-		std::array< Triangle, 12 > m_triangles;
-		btVector3 m_position;
-		float m_halfSize;
-
 		void InitCube();
+
+
 	};
 }

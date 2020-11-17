@@ -1,4 +1,4 @@
-#include "ecs/fanEcsSystem.hpp"
+#include "core/ecs/fanEcsSystem.hpp"
 #include "network/components/fanHostConnection.hpp"
 #include "network/components/fanHostReplication.hpp"
 #include "network/components/fanHostGameData.hpp"
@@ -12,10 +12,10 @@
 
 namespace fan
 {
-	//==============================================================================================================================================================
+	//========================================================================================================
 	// Runs the spawn ship RPC on synchronized hosts
-	//==============================================================================================================================================================
-	struct S_HostSpawnShip : EcsSystem
+	//========================================================================================================
+	struct SHostSpawnShip : EcsSystem
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world )
 		{
@@ -37,27 +37,34 @@ namespace fan
 			auto hostConnectionIt = _view.begin<HostConnection>();
 			auto hostDataIt = _view.begin<HostGameData>();
 			auto hostReplicationIt = _view.begin<HostReplication>();
-			for( ; hostConnectionIt != _view.end<HostConnection>(); ++hostConnectionIt, ++hostDataIt, ++hostReplicationIt )
+            for( ; hostConnectionIt != _view.end<HostConnection>();
+                   ++hostConnectionIt, ++hostDataIt, ++hostReplicationIt )
 			{
 				const EcsHandle hostHandle = _world.GetHandle( hostConnectionIt.GetEntity() );
 				const HostConnection& hostConnection = *hostConnectionIt;
 				HostReplication& hostReplication = *hostReplicationIt;
 				HostGameData& hostData = *hostDataIt;
-				
-				if( hostConnection.state == HostConnection::Connected && hostConnection.synced  && hostData.spaceshipID == 0 )
+
+                if( hostConnection.mState == HostConnection::Connected &&
+                    hostConnection.mSynced &&
+                    hostData.mSpaceshipID == 0 )
 				{
 					// spawns new host spaceship
-					hostData.spaceshipID = linkingContext.nextNetID++;	// assigns net id for the new ship
-					const FrameIndex spawnFrame = time.frameIndex + 60;
-					const SpawnInfo spawnInfo = spawn::SpawnShip::GenerateInfo( hostHandle, spawnFrame, hostData.spaceshipID, btVector3::Zero() );
-					hostData.nextPlayerStateFrame = spawnFrame + 60;	// set the timing of the first player state snapshot					
-					spawnManager.spawns.push_back( spawnInfo );			// triggers spaceship spawn on server
+					hostData.mSpaceshipID = linkingContext.mNextNetID++;	// assigns net id for the new ship
+					const FrameIndex spawnFrame = time.mFrameIndex + 60;
+                    const SpawnInfo spawnInfo = spawn::SpawnShip::GenerateInfo( hostHandle,
+                                                                                spawnFrame,
+                                                                                hostData.mSpaceshipID,
+                                                                                btVector3::Zero() );
+					hostData.mNextPlayerStateFrame = spawnFrame + 60; // timing of the first state snapshot
+					spawnManager.spawns.push_back( spawnInfo );		  // triggers spaceship spawn on server
 					
 					// spawn new ship on all hosts
-					_world.Run<S_ReplicateOnAllHosts>( ClientRPC::RPCSpawn( spawnInfo ), HostReplication::ResendUntilReplicated );	
+                    _world.Run<SReplicateOnAllHosts>( ClientRPC::RPCSpawn( spawnInfo ),
+                                                      HostReplication::ResendUntilReplicated );
 
 					// replicate all other hosts on new host
-					for( const auto& pair : hostManager.hostHandles )
+					for( const auto& pair : hostManager.mHostHandles )
 					{
 						// do not replicate  itself
 						const EcsHandle otherHostHandle = pair.second;
@@ -67,10 +74,15 @@ namespace fan
 						}	
 
 						// replicate all other ships that are already spawned
-						HostGameData& otherHostData = _world.GetComponent< HostGameData >( _world.GetEntity( otherHostHandle ) );
-						if( otherHostData.spaceshipID != 0 )
+						EcsEntity otherHostEntity = _world.GetEntity( otherHostHandle );
+						HostGameData& otherHostData = _world.GetComponent< HostGameData >( otherHostEntity );
+						if( otherHostData.mSpaceshipID != 0 )
 						{
-							const SpawnInfo otherHostspawnInfo = spawn::SpawnShip::GenerateInfo( otherHostHandle, spawnFrame, otherHostData.spaceshipID, btVector3::Zero() );
+                            const SpawnInfo otherHostspawnInfo = spawn::SpawnShip::GenerateInfo(
+                                    otherHostHandle,
+                                    spawnFrame,
+                                    otherHostData.mSpaceshipID,
+                                    btVector3::Zero() );
 							hostReplication.Replicate(
 								ClientRPC::RPCSpawn( otherHostspawnInfo )
 								, HostReplication::ResendUntilReplicated
@@ -80,7 +92,7 @@ namespace fan
 
 					// replicates solar eruption spawn
 					const SolarEruption& solarEruption = _world.GetSingleton<SolarEruption>();
-					const SpawnInfo eruptionSpawnInfo = spawn::SpawnSolarEruption::GenerateInfo( solarEruption.spawnFrame );
+					const SpawnInfo eruptionSpawnInfo = spawn::SpawnSolarEruption::GenerateInfo( solarEruption.mSpawnFrame );
 					hostReplication.Replicate(
 						ClientRPC::RPCSpawn( eruptionSpawnInfo )
 						, HostReplication::ResendUntilReplicated
@@ -90,10 +102,10 @@ namespace fan
 		}
 	};
 
-	//==============================================================================================================================================================
+	//========================================================================================================
 	// When host frame index is offset too far from the server frame index, syncs it brutally
-	//==============================================================================================================================================================
-	struct S_HostSyncFrame : EcsSystem
+	//========================================================================================================
+	struct SHostSyncFrame : EcsSystem
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world )
 		{
@@ -116,23 +128,30 @@ namespace fan
 
 				// sync the client frame index with the server
 				const double currentTime = Time::ElapsedSinceStartup();
-				if( currentTime - hostConnection.lastSync > 1.f )
+				if( currentTime - hostConnection.mLastSync > 1.f )
 				{
-					int max = hostConnection.framesDelta[0];
-					int min = hostConnection.framesDelta[0];
-					for( int i = 1; i < (int)hostConnection.framesDelta.size(); i++ )
+					int max = hostConnection.mFramesDelta[0];
+					int min = hostConnection.mFramesDelta[0];
+					for( int i = 1; i < (int)hostConnection.mFramesDelta.size(); i++ )
 					{
-						max = std::max( max, hostConnection.framesDelta[i] );
-						min = std::min( min, hostConnection.framesDelta[i] );
+						max = std::max( max, hostConnection.mFramesDelta[i] );
+						min = std::min( min, hostConnection.mFramesDelta[i] );
 					}
 
 					if( max - min <= 1 ) // we have consistent readings
 					{
 						// @todo calculate buffer size depending on jitter, not rtt
-						hostConnection.targetBufferSize = int( 1000.f * hostConnection.rtt * ( 5.f - 2.f ) / 100.f + 2.f ); // size 5 at 100 ms rtt
-						hostConnection.targetBufferSize = std::min( hostConnection.targetBufferSize, 15 );
+                        hostConnection.mTargetBufferSize = int( 1000.f *
+                                                                hostConnection.mRtt *
+                                                                ( 5.f - 2.f )
+                                                                / 100.f
+                                                                + 2.f ); // size 5 at 100 ms rtt
+						hostConnection.mTargetBufferSize = std::min( hostConnection.mTargetBufferSize, 15 );
 
-						const int targetFrameDifference = int( hostConnection.rtt / 2.f / time.logicDelta ) + hostConnection.targetBufferSize;
+                        const int targetFrameDifference = int( hostConnection.mRtt /
+                                                               2.f /
+                                                               time.mLogicDelta ) +
+                                                          hostConnection.mTargetBufferSize;
 						const int diff = std::abs( min + targetFrameDifference );
 						if( diff > 1 ) // only sync when we have a big enough frame index difference
 						{
@@ -140,12 +159,15 @@ namespace fan
 								ClientRPC::RPCShiftClientFrame( min + targetFrameDifference )
 								, HostReplication::ResendUntilReplicated
 							);
-							hostConnection.lastSync = currentTime;
-							success.Connect( &HostConnection::OnSyncSuccess, _world, _world.GetHandle( hostConnectionIt.GetEntity() ) );
+							hostConnection.mLastSync = currentTime;
+                            success.Connect( &HostConnection::OnSyncSuccess,
+                                             _world,
+                                             _world.GetHandle( hostConnectionIt.GetEntity() ) );
 							if( diff > 10 )
 							{
 								Debug::Log() << "shifting host frame index : " << min + targetFrameDifference;
-								Debug::Get() << " " << hostConnection.ip.toString() << "::" << hostConnection.port << Debug::Endl();
+								Debug::Get() << " " << hostConnection.mIp.toString()
+								             << "::" << hostConnection.mPort << Debug::Endl();
 							}
 						}
 					}
@@ -154,10 +176,10 @@ namespace fan
 		}
 	};
 
-	//==============================================================================================================================================================
+	//========================================================================================================
 	// Save the host state ( transform & rigidbody ) for detecting desync with the host simulation
-	//==============================================================================================================================================================
-	struct S_HostSaveState : EcsSystem
+	//========================================================================================================
+	struct SHostSaveState : EcsSystem
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world )
 		{
@@ -170,31 +192,33 @@ namespace fan
 
 			const Time& time = _world.GetSingleton<Time>();
 
-			for( auto hostDataIt = _view.begin<HostGameData>(); hostDataIt != _view.end<HostGameData>(); ++hostDataIt )
+            for( auto hostDataIt = _view.begin<HostGameData>();
+                 hostDataIt != _view.end<HostGameData>();
+                 ++hostDataIt )
 			{
 				HostGameData& hostData = *hostDataIt;
 
-				if( hostData.spaceshipHandle != 0 && time.frameIndex >= hostData.nextPlayerStateFrame )
+				if( hostData.mSpaceshipHandle != 0 && time.mFrameIndex >= hostData.mNextPlayerStateFrame )
 				{
-					const EcsEntity shipEntityID = _world.GetEntity( hostData.spaceshipHandle );
+					const EcsEntity shipEntityID = _world.GetEntity( hostData.mSpaceshipHandle );
 					const Rigidbody& rb = _world.GetComponent<Rigidbody>( shipEntityID );
 					const Transform& transform = _world.GetComponent<Transform>( shipEntityID );
-					hostData.nextPlayerState.frameIndex = time.frameIndex;
-					hostData.nextPlayerState.position = transform.GetPosition();
-					hostData.nextPlayerState.orientation = transform.GetRotationEuler();
-					hostData.nextPlayerState.velocity = rb.GetVelocity();
-					hostData.nextPlayerState.angularVelocity = rb.GetAngularVelocity();
+					hostData.mNextPlayerState.mFrameIndex      = time.mFrameIndex;
+					hostData.mNextPlayerState.mPosition        = transform.GetPosition();
+					hostData.mNextPlayerState.mOrientation     = transform.GetRotationEuler();
+					hostData.mNextPlayerState.mVelocity        = rb.GetVelocity();
+					hostData.mNextPlayerState.mAngularVelocity = rb.GetAngularVelocity();
 
-					hostData.nextPlayerStateFrame = time.frameIndex + 7;
+					hostData.mNextPlayerStateFrame = time.mFrameIndex + 7;
 				}
 			}
 		}
 	};
 
-	//==============================================================================================================================================================
+	//========================================================================================================
 	// Updates the host input with the one received over network
-	//==============================================================================================================================================================
-	struct S_HostUpdateInput : EcsSystem
+	//========================================================================================================
+	struct SHostUpdateInput : EcsSystem
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world )
 		{
@@ -206,19 +230,22 @@ namespace fan
 
 			const Time& time = _world.GetSingleton<Time>();
 
-			for( auto hostDataIt = _view.begin<HostGameData>(); hostDataIt != _view.end<HostGameData>(); ++hostDataIt )
+            for( auto hostDataIt = _view.begin<HostGameData>();
+                 hostDataIt != _view.end<HostGameData>();
+                 ++hostDataIt )
 			{
 				HostGameData& hostData = *hostDataIt;
 
-				if( hostData.spaceshipID != 0 )
+				if( hostData.mSpaceshipID != 0 )
 				{
 					// Get the current input (current frame) for this client
-					while( !hostData.inputs.empty() )
+					while( !hostData.mInputs.empty() )
 					{
-						const PacketInput::InputData& inputData = hostData.inputs.front();
-						if( inputData.frameIndex < time.frameIndex || inputData.frameIndex > time.frameIndex + 60 )
+						const PacketInput::InputData& inputData = hostData.mInputs.front();
+                        if( inputData.mFrameIndex < time.mFrameIndex ||
+                            inputData.mFrameIndex > time.mFrameIndex + 60 )
 						{
-							hostData.inputs.pop();
+							hostData.mInputs.pop();
 						}
 						else
 						{
@@ -226,25 +253,24 @@ namespace fan
 						}
 					}
 
-					if( hostData.spaceshipHandle != 0 )
+					if( hostData.mSpaceshipHandle != 0 )
 					{
 						// Updates spaceship input
-						if( !hostData.inputs.empty() && hostData.inputs.front().frameIndex == time.frameIndex )
+                        if( !hostData.mInputs.empty() &&
+                            hostData.mInputs.front().mFrameIndex == time.mFrameIndex )
 						{
-							const PacketInput::InputData& inputData = hostData.inputs.front();
-							hostData.inputs.pop();
+							const PacketInput::InputData& inputData = hostData.mInputs.front();
+							hostData.mInputs.pop();
 
-							const EcsEntity shipEntityID = _world.GetEntity( hostData.spaceshipHandle );
+							const EcsEntity shipEntityID = _world.GetEntity( hostData.mSpaceshipHandle );
 							PlayerInput& input = _world.GetComponent<PlayerInput>( shipEntityID );
-							input.orientation = btVector3( inputData.orientation.x, 0.f, inputData.orientation.y );
-							input.left = inputData.left ? 1.f : ( inputData.right ? -1.f : 0.f );
-							input.forward = inputData.forward ? 1.f : ( inputData.backward ? -1.f : 0.f );
-							input.boost = inputData.boost;
-							input.fire = inputData.fire;
-						}
-						else
-						{
-							//Debug::Warning() << "no available input from player " << Debug::Endl();
+                            input.mOrientation = btVector3( inputData.mOrientation.x,
+                                                            0.f,
+                                                            inputData.mOrientation.y );
+							input.mLeft        = inputData.mLeft ? 1.f : ( inputData.mRight ? -1.f : 0.f );
+							input.mForward     = inputData.mForward ? 1.f : ( inputData.mBackward ? -1.f : 0.f );
+							input.mBoost       = inputData.mBoost;
+							input.mFire        = inputData.mFire;
 						}
 					}
 				}

@@ -4,11 +4,11 @@
 
 namespace fan
 {
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void DescriptorSampler::Create( Device& _device, VkSampler _sampler ) 
 	{
-		assert( _sampler != VK_NULL_HANDLE );
+        fanAssert( _sampler != VK_NULL_HANDLE );
 
 		// Descriptor pool
 		{
@@ -42,7 +42,10 @@ namespace fan
 			descriptorSetLayoutCreateInfo.pBindings = setLayoutBindings.data();
 			descriptorSetLayoutCreateInfo.bindingCount = static_cast< uint32_t >( setLayoutBindings.size() );
 
-			vkCreateDescriptorSetLayout( _device.mDevice, &descriptorSetLayoutCreateInfo, nullptr, &mDescriptorSetLayout );
+            vkCreateDescriptorSetLayout( _device.mDevice,
+                                         &descriptorSetLayoutCreateInfo,
+                                         nullptr,
+                                         &mDescriptorSetLayout );
 
 			// Descriptor set
 			std::vector<VkDescriptorSetLayout>  layouts = { mDescriptorSetLayout };
@@ -57,8 +60,8 @@ namespace fan
 		}
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void DescriptorSampler::Destroy( Device& _device )
 	{
 		if ( mDescriptorPool != VK_NULL_HANDLE )

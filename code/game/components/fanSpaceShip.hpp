@@ -1,44 +1,40 @@
 #pragma  once
 
-#include "ecs/fanEcsComponent.hpp"
-#include "scene/components/fanParticleEmitter.hpp"
-#include "scene/fanSceneResourcePtr.hpp"
+#include "core/ecs/fanEcsComponent.hpp"
+#include "engine/components/fanParticleEmitter.hpp"
+#include "engine/fanSceneResourcePtr.hpp"
 
 namespace fan
 {
-	//==============================================================================================================================================================
+	//========================================================================================================
 	// vehicle controlled by the player
-	//==============================================================================================================================================================
+	//========================================================================================================
 	struct SpaceShip : public EcsComponent
 	{
 		ECS_COMPONENT( SpaceShip )
-	public:
 		static void SetInfo( EcsComponentInfo& _info );
 		static void Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component );
-		static void OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component );
 		static void Save( const EcsComponent& _component, Json& _json );
 		static void Load( EcsComponent& _component, const Json& _json );
 
 		enum SpeedMode { REVERSE = 0, SLOW, NORMAL, FAST };
 
-		btVector4 forwardForces;
-		float lateralForce;
-		float activeDrag;
-		float passiveDrag;
-		float energyConsumedPerUnitOfForce;
-		float remainingChargeEnergy;
-		float planetDamage;		// @todo remove this. Planets should have a damage component
-		float collisionRepulsionForce;
+		btVector4 mForwardForces;
+		float     mLateralForce;
+		float     mActiveDrag;
+		float     mPassiveDrag;
+		float     mEnergyConsumedPerUnitOfForce;
+		float     mPlanetDamage;		// @todo remove this. Planets should have a damage component
+		float     mCollisionRepulsionForce;
 
-		ComponentPtr<ParticleEmitter> fastForwardParticlesL;
-		ComponentPtr<ParticleEmitter> fastForwardParticlesR;
-		ComponentPtr<ParticleEmitter> slowForwardParticlesL;
-		ComponentPtr<ParticleEmitter> slowForwardParticlesR;
-		ComponentPtr<ParticleEmitter> reverseParticles;
-		ComponentPtr<ParticleEmitter> leftParticles;
-		ComponentPtr<ParticleEmitter> rightParticles;
+		ComponentPtr<ParticleEmitter> mFastForwardParticlesL;
+		ComponentPtr<ParticleEmitter> mFastForwardParticlesR;
+		ComponentPtr<ParticleEmitter> mSlowForwardParticlesL;
+		ComponentPtr<ParticleEmitter> mSlowForwardParticlesR;
+		ComponentPtr<ParticleEmitter> mReverseParticles;
+		ComponentPtr<ParticleEmitter> mLeftParticles;
+		ComponentPtr<ParticleEmitter> mRightParticles;
 
-		PrefabPtr deathFx;
+		PrefabPtr mDeathFx;
 	};
-	static constexpr size_t sizeof_spaceship = sizeof( SpaceShip );
 }

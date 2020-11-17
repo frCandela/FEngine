@@ -1,21 +1,27 @@
 #pragma once
 
-#include "ecs/fanEcsWorld.hpp"
+#include "engine/fanIGame.hpp"
 
 namespace fan
 {
-	//================================================================================================================================
-	//================================================================================================================================
-	struct GameClient
-	{
-		GameClient( const std::string _name );
+    struct Scene;
 
-		void Start();
-		void Stop();
-		void Step( const float _delta );
-		EcsWorld			  world;
-		void RollbackResimulate();
+	//========================================================================================================
+	//========================================================================================================
+	class GameClient : public IGame
+	{
+	public:
+        void Init() override;
+        void Start() override;
+        void Stop() override;
+        void Step( const float _delta ) override;
+        void UpdateRenderWorld() override;
 
 		static void CreateGameAxes();
+
+	private:
+		void RollbackResimulate( const float _delta );
+        void UseGameCamera();
+        void OnLoadScene( Scene& _scene );
 	};
 }

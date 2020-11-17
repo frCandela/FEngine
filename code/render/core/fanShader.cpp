@@ -1,5 +1,4 @@
 #include "render/core/fanShader.hpp"
-
 #include <filesystem>
 #include <fstream>
 #include "core/fanDebug.hpp"
@@ -9,21 +8,23 @@
 
 namespace fan
 {
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	bool Shader::Create( Device& _device, const std::string _path )
 	{
-		assert( mShaderModule == VK_NULL_HANDLE );
+        fanAssert( mShaderModule == VK_NULL_HANDLE );
 
 		std::vector<unsigned int> spirvCode = SpirvCompiler::Compile( _path );
 		if ( spirvCode.empty() )
 		{
-			Debug::Get() << Debug::Severity::error << "Could not create shader module: " << _path << Debug::Endl();
+			Debug::Error() << "Could not create shader module: " << _path << Debug::Endl();
 
 			std::filesystem::directory_entry path( _path );
 			std::string extension = path.path().extension().generic_string();
-			std::string tmpPath = ( extension == ".frag" ? RenderGlobal::sDefaultFragmentShader : RenderGlobal::sDefaultVertexShader );
-			Debug::Get() << Debug::Severity::log << "loading default shader " << tmpPath << Debug::Endl();
+            std::string tmpPath = ( extension == ".frag" ?
+                    RenderGlobal::sDefaultFragmentShader :
+                    RenderGlobal::sDefaultVertexShader );
+			Debug::Log() << "loading default shader " << tmpPath << Debug::Endl();
 			spirvCode = SpirvCompiler::Compile( tmpPath );
 
 			if ( spirvCode.empty() )
@@ -39,20 +40,23 @@ namespace fan
 		shaderModuleCreateInfo.codeSize = spirvCode.size() * sizeof( unsigned int );
 		shaderModuleCreateInfo.pCode = spirvCode.data();
 
-		if ( vkCreateShaderModule( _device.mDevice, &shaderModuleCreateInfo, nullptr, &mShaderModule ) != VK_SUCCESS )
+        if( vkCreateShaderModule( _device.mDevice,
+                                  &shaderModuleCreateInfo,
+                                  nullptr,
+                                  &mShaderModule ) != VK_SUCCESS )
 		{
-			Debug::Get() << Debug::Severity::error << "Could not create shader module: " << _path << Debug::Endl();
+			Debug::Error()  << "Could not create shader module: " << _path << Debug::Endl();
 			return false;
 		}
-		Debug::Get() << Debug::Severity::log << std::hex << "VkShaderModule        " << mShaderModule << std::dec << Debug::Endl();
+		Debug::Log() << std::hex << "VkShaderModule        " << mShaderModule << std::dec << Debug::Endl();
 		
 		_device.AddDebugName( (uint64_t)mShaderModule, _path );
 
 		return true;
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void Shader::Destroy( Device& _device )
 	{
 		if( mShaderModule != VK_NULL_HANDLE )
@@ -63,11 +67,12 @@ namespace fan
 		}
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	std::vector<char> Shader::ReadFile( const std::string& _filename )
 	{
-		std::ifstream file( _filename, std::ios::ate | std::ios::binary ); //ate -> seek to the end of stream immediately after open 
+        //ate -> seek to the end of stream immediately after open
+		std::ifstream file( _filename, std::ios::ate | std::ios::binary );
 
 		if ( file.is_open() == false )
 		{

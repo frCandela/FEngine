@@ -1,24 +1,21 @@
 #pragma once
 
-#include "ecs/fanEcsWorld.hpp"
-
-#include "network/fanUDPSocket.hpp"
+#include "engine/fanIGame.hpp"
 
 namespace fan
 {
-	struct ServerNetworkManager;
-	struct Game;
-
-	//================================================================================================================================
-	//================================================================================================================================
-	struct GameServer
+	//========================================================================================================
+	//========================================================================================================
+	class GameServer : public IGame
 	{
-		GameServer( const std::string _name );
+	public:
+		void Init() override;
+        void Start() override;
+        void Stop() override;
+        void Step( const float _delta ) override;
+        void UpdateRenderWorld() override;
 
-		void Start();
-		void Stop();
-		void Step( const float _delta );
-
-		EcsWorld			  world;
+	private:
+        void UseGameCamera();
 	};					  
 }

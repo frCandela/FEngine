@@ -6,9 +6,9 @@
 
 namespace fan
 {
-	//================================================================================================================================
+	//========================================================================================================
 	// The vulkan instance of the application
-	//================================================================================================================================
+	//========================================================================================================
 	struct Instance
 	{
 		void Create( void * _debugCallbackUserData );
@@ -24,10 +24,12 @@ namespace fan
 		void FindDesiredValidationLayers( const std::vector < const char*> _desiredLayers );
 		void FindDesiredExtensions( const std::vector < const char*> _desiredExtensions );
 		bool SetupDebugCallback( void* _userData );
-		
-		static bool IsExtensionAvailable( const std::vector< VkExtensionProperties >& _availableExtensions, const std::string _requiredExtension );
-		static bool IsLayerAvailable( const std::vector<VkLayerProperties>& _availableLayers, const std::string _requiredLayer );
-		static VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(
+
+        static bool IsExtensionAvailable( const std::vector<VkExtensionProperties>& _availableExtensions,
+                                          const std::string _requiredExtension );
+        static bool IsLayerAvailable( const std::vector<VkLayerProperties>& _availableLayers,
+                                      const std::string _requiredLayer );
+        static VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(
 			VkDebugReportFlagsEXT _flags,
 			VkDebugReportObjectTypeEXT _objType,
 			uint64_t _obj,

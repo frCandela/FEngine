@@ -4,15 +4,17 @@
 
 namespace fan
 {
-	//================================================================================================================================
+	//========================================================================================================
 	// straight line in a 3D space (origin + direction)
-	//================================================================================================================================
+	//========================================================================================================
 	struct Ray
 	{
 		Ray();
 		Ray( const btVector3 _origin, const btVector3 _direction );
 
-		void RayClosestPoints( const Ray _ray, btVector3& _outIntersectionRay, btVector3& _outIntersectionOtherRay ) const;
+        void RayClosestPoints( const Ray _ray,
+                               btVector3& _outIntersectionRay,
+                               btVector3& _outIntersectionOtherRay ) const;
 
 		btVector3 origin;
 		btVector3 direction;

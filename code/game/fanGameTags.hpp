@@ -1,11 +1,13 @@
 #pragma once
 
-#include "ecs/fanEcsTag.hpp"
+#include "core/ecs/fanEcsTag.hpp"
 
 namespace fan
 {
-	//==============================================================================================================================================================
+	//========================================================================================================
 	// game tags
-	//==============================================================================================================================================================
-	struct tag_sunlight_occlusion : EcsTag { ECS_TAG( tag_sunlight_occlusion ) }; // a particle is destroyed when out of the sunlight
+	//========================================================================================================
+
+	// a particle is destroyed when out of the sunlight
+	struct TagSunlightOcclusion : EcsTag { ECS_TAG( TagSunlightOcclusion ) };
 }

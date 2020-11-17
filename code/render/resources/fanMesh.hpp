@@ -12,10 +12,10 @@ struct Device;
 
 namespace fan
 {
-    //================================================================================================================================
+    //========================================================================================================
     // 3D mesh composed of triangles
     // can have a convex hull computed for it
-    //================================================================================================================================
+    //========================================================================================================
     struct Mesh : public Resource
     {
         bool RayCast( const btVector3 _origin, const btVector3 _dir, btVector3& _outIntersection ) const;
@@ -30,8 +30,8 @@ namespace fan
         std::vector<Vertex>     mVertices;
         std::vector<uint32_t>   mIndices;
         ConvexHull              mConvexHull;
-        Buffer                  mIndexBuffer [ SwapChain::s_maxFramesInFlight ];
-        Buffer                  mVertexBuffer[ SwapChain::s_maxFramesInFlight ];
+        Buffer                  mIndexBuffer [ SwapChain::sMaxFramesInFlight ];
+        Buffer                  mVertexBuffer[ SwapChain::sMaxFramesInFlight ];
         uint32_t                mCurrentBuffer = 0;
         int                     mIndex = -1;
         bool                    mHostVisible      = false;

@@ -1,4 +1,4 @@
-#include "ecs/fanEcsSystem.hpp"
+#include "core/ecs/fanEcsSystem.hpp"
 #include "network/components/fanClientConnection.hpp"
 #include "network/components/fanClientGameData.hpp"
 #include "network/components/fanReliabilityLayer.hpp"
@@ -7,10 +7,10 @@
 
 namespace fan
 {
-	//==============================================================================================================================================================
+	//========================================================================================================
 	// Sends packet for each client connection
-	//==============================================================================================================================================================
-	struct S_ClientSend : EcsSystem
+	//========================================================================================================
+	struct SClientSend : EcsSystem
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world )
 		{
@@ -29,7 +29,8 @@ namespace fan
 			auto reliabilityLayerIt = _view.begin<ReliabilityLayer>();
 			auto connectionIt = _view.begin<ClientConnection>();
 			auto gameDataIt = _view.begin<ClientGameData>();
-			for( ; reliabilityLayerIt != _view.end<ReliabilityLayer>(); ++reliabilityLayerIt, ++connectionIt, ++gameDataIt )
+            for( ; reliabilityLayerIt != _view.end<ReliabilityLayer>();
+                   ++reliabilityLayerIt, ++connectionIt, ++gameDataIt )
 			{
 				ReliabilityLayer& reliabilityLayer = *reliabilityLayerIt;
 				ClientConnection& connection = *connectionIt;
@@ -43,7 +44,7 @@ namespace fan
 				connection.Write( _world, entity, packet );
 				gameData.Write( _world, entity, packet );
 
-				if( packet.GetSize() == sizeof( PacketTag ) ) { packet.onlyContainsAck = true; }
+				if( packet.GetSize() == sizeof( PacketTag ) ) { packet.mOnlyContainsAck = true; }
 
 				reliabilityLayer.Write( packet );
 
@@ -51,21 +52,24 @@ namespace fan
 				if( packet.GetSize() > sizeof( PacketTag ) )
 				{
 					reliabilityLayer.RegisterPacket( packet );
-					connection.bandwidth = 1.f / time.logicDelta * float( packet.GetSize() ) / 1000.f; // in Ko/s
-					connection.socket->Send( packet, connection.serverIP, connection.serverPort );
+                    connection.mBandwidth = 1.f /
+                                            time.mLogicDelta *
+                                            float( packet.GetSize() )
+                                            / 1000.f; // in Ko/s
+					connection.mSocket->Send( packet, connection.mServerIP, connection.mServerPort );
 				}
 				else
 				{
-					reliabilityLayer.nextPacketTag--;
+					reliabilityLayer.mNextPacketTag--;
 				}
 			}
 		}
 	};
 
-	//==============================================================================================================================================================
+	//========================================================================================================
 	// Receives packets for each client connection
-	//==============================================================================================================================================================
-	struct S_ClientReceive : EcsSystem
+	//========================================================================================================
+	struct SClientReceive : EcsSystem
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world )
 		{
@@ -86,7 +90,8 @@ namespace fan
 			auto connectionIt = _view.begin<ClientConnection>();
 			auto replicationIt = _view.begin<ClientReplication>();
 			auto gameDataIt = _view.begin<ClientGameData>();
-			for( ; reliabilityLayerIt != _view.end<ReliabilityLayer>(); ++reliabilityLayerIt, ++connectionIt, ++replicationIt, ++gameDataIt )
+            for( ; reliabilityLayerIt != _view.end<ReliabilityLayer>();
+                   ++reliabilityLayerIt, ++connectionIt, ++replicationIt, ++gameDataIt )
 			{
 				ReliabilityLayer& reliabilityLayer = *reliabilityLayerIt;
 				ClientConnection& connection = *connectionIt;
@@ -102,10 +107,10 @@ namespace fan
 				do
 				{
 					packet.Clear();
-					socketStatus = connection.socket->Receive( packet, receiveIP, receivePort );
+					socketStatus = connection.mSocket->Receive( packet, receiveIP, receivePort );
 
 					// only receive from the server
-					if( receiveIP != connection.serverIP || receivePort != connection.serverPort )
+					if( receiveIP != connection.mServerIP || receivePort != connection.mServerPort )
 					{
 						continue;
 					}
@@ -114,18 +119,18 @@ namespace fan
 					{
 					case sf::UdpSocket::Done:
 					{
-						connection.serverLastResponse = Time::ElapsedSinceStartup();
+						connection.mServerLastResponse = Time::ElapsedSinceStartup();
 
 						// read the first packet type separately
 						PacketType packetType = packet.ReadType();
 						if( packetType == PacketType::Ack )
 						{
-							packet.onlyContainsAck = true;
+							packet.mOnlyContainsAck = true;
 						}
 						else if( packetType == PacketType::Disconnect )
 						{
 							// disconnection can cause the reliability layer tags to be off
-							reliabilityLayer.expectedPacketTag = packet.tag;
+							reliabilityLayer.mExpectedPacketTag = packet.mTag;
 						}
 
 						if( !reliabilityLayer.ValidatePacket( packet ) )
@@ -149,7 +154,7 @@ namespace fan
 							{
 								PacketPing packetPing;
 								packetPing.Read( packet );
-								connection.ProcessPacket( packetPing, time.frameIndex );
+								connection.ProcessPacket( packetPing, time.mFrameIndex );
 							} break;
 							case PacketType::LoggedIn:
 							{
@@ -177,7 +182,8 @@ namespace fan
 								gameData.ProcessPacket( packetPlayerGameState );
 							} break;
 							default:
-								Debug::Warning() << "Invalid packet " << int( packetType ) << " received. Reading canceled." << Debug::Endl();
+								Debug::Warning() << "Invalid packet " << int( packetType )
+								                 << " received. Reading canceled." << Debug::Endl();
 								packetValid = false;
 								break;
 							}
@@ -206,7 +212,7 @@ namespace fan
 						// disconnect
 					} break;
 					default:
-						assert( false );
+                        fanAssert( false );
 						break;
 					}
 				} while( socketStatus == sf::UdpSocket::Done );

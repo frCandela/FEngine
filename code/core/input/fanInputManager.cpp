@@ -1,21 +1,23 @@
 #include "core/input/fanInputManager.hpp"
 
 #include "fanJson.hpp"
-#include "imgui/imgui.h"
-#include "core/input/fanKeyboard.hpp"
 #include "core/fanDebug.hpp"
 
 namespace fan
 {
-	//================================================================================================================================
-	//================================================================================================================================
-	Signal<>* InputManager::CreateKeyboardEvent( const std::string& _name, const Keyboard::Key _key, const Keyboard::Key _mod0, const Keyboard::Key _mod1, const  Keyboard::Key _mod2 )
-	{
+	//========================================================================================================
+	//========================================================================================================
+    Signal<>* InputManager::CreateKeyboardEvent( const std::string& _name,
+                                                 const Keyboard::Key _key,
+                                                 const Keyboard::Key _mod0,
+                                                 const Keyboard::Key _mod1,
+                                                 const Keyboard::Key _mod2 )
+    {
 		// Already exists
 		Signal<>* keyEvent = FindEvent( _name );
 		if ( keyEvent != nullptr )
 		{
-			return &m_keyboardEvents[ _name ].onEvent;
+			return &mKeyboardEvents[ _name ].onEvent;
 		}
 
 		// Creates new one
@@ -24,93 +26,102 @@ namespace fan
 		newKeyEvent.mod0 = _mod0;
 		newKeyEvent.mod1 = _mod1;
 		newKeyEvent.mod2 = _mod2;
-		m_keyboardEvents[ _name ] = newKeyEvent;
+		mKeyboardEvents[ _name ] = newKeyEvent;
 
-		return &m_keyboardEvents[ _name ].onEvent;
+		return &mKeyboardEvents[ _name ].onEvent;
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
-	void InputManager::CreateKeyboardAxis( const std::string& _name, const Keyboard::Key _keyPositive, const Keyboard::Key _keyNegative )
+	//========================================================================================================
+	//========================================================================================================
+    void InputManager::CreateKeyboardAxis( const std::string& _name,
+                                           const Keyboard::Key _keyPositive,
+                                           const Keyboard::Key _keyNegative )
 	{
 		// Already exists
-		if ( m_axis.find( _name ) != m_axis.end() )
+		if ( mAxis.find( _name ) != mAxis.end() )
 		{
 			return;
 		}
 
 		// Creates new one
-		Axis axis( _name, Axis::KEYBOARD );
+		Axis axis( _name, Axis::Keyboard );
 		axis.SetFromKeyboardKeys( _keyPositive, _keyNegative );
-		m_axis[ _name ] = axis;
+        mAxis[ _name ] = axis;
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
-	void InputManager::CreateJoystickAxis( const std::string& _name, const Joystick::JoystickID _GLFW_JOYSTICK, const Joystick::Axis _axis )
+	//========================================================================================================
+	//========================================================================================================
+    void InputManager::CreateJoystickAxis( const std::string& _name,
+                                           const Joystick::JoystickID _GLFW_JOYSTICK,
+                                           const Joystick::Axis _axis )
 	{
 		// Already exists
-		if ( m_axis.find( _name ) != m_axis.end() )
+		if ( mAxis.find( _name ) != mAxis.end() )
 		{
 			Debug::Warning( "Axis already exists" );
 			return;
 		}
 
 		// Creates new one
-		Axis axis( _name, Axis::JOYSTICK_AXIS );
+		Axis axis( _name, Axis::JoystickAxis );
 		axis.SetFromJoystickAxis( _GLFW_JOYSTICK, _axis );
-		m_axis[ _name ] = axis;
+        mAxis[ _name ] = axis;
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
-	void InputManager::CreateJoystickButtons( const std::string& _name, const Joystick::JoystickID _GLFW_JOYSTICK, const Joystick::Button _positive, const Joystick::Button _negative )
-	{
-		// Already exists
-		if ( m_axis.find( _name ) != m_axis.end() )
+	//========================================================================================================
+    //========================================================================================================
+    void InputManager::CreateJoystickButtons( const std::string& _name,
+                                              const Joystick::JoystickID _GLFW_JOYSTICK,
+                                              const Joystick::Button _positive,
+                                              const Joystick::Button _negative )
+    {
+        // Already exists
+		if ( mAxis.find( _name ) != mAxis.end() )
 		{
 			Debug::Warning( "Axis already exists" );
 			return;
 		}
 
 		// Creates new one
-		Axis axis( _name, Axis::JOYSTICK_BUTTONS );
+		Axis axis( _name, Axis::JoystickButton );
 		axis.SetFromJoystickButtons( _GLFW_JOYSTICK, _positive, _negative );
-		m_axis[ _name ] = axis;
+        mAxis[ _name ] = axis;
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	float InputManager::GetAxis( const std::string& _name, const int _joystickIDOverride )
 	{
-		assert( m_axis.find( _name ) != m_axis.end() );
-		Axis& axis = m_axis[ _name ];
+        fanAssert( mAxis.find( _name ) != mAxis.end() );
+		Axis& axis = mAxis[ _name ];
 		return  axis.GetValue( _joystickIDOverride );
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	Signal<>* InputManager::FindEvent( const std::string& _name )
 	{
 
-		std::map< std::string, KeyboardEvent >::iterator it = m_keyboardEvents.find( _name );
-		if ( it != m_keyboardEvents.end() )
+		std::map< std::string, KeyboardEvent >::iterator it = mKeyboardEvents.find( _name );
+		if ( it != mKeyboardEvents.end() )
 		{
 			return &it->second.onEvent;
 		}
 		return nullptr;
 	}
 
-	//================================================================================================================================
+	//========================================================================================================
 	// Iterates over all events and calls them if the necessary keys are pressed
-	//================================================================================================================================
+	//========================================================================================================
 	void InputManager::PullEvents()
 	{
-		for ( auto& pair : m_keyboardEvents )
+		for ( auto& pair : mKeyboardEvents )
 		{
 			KeyboardEvent& keyEvent = pair.second;
 
-			bool modifiersPressed = ( keyEvent.mod0 == Keyboard::NONE ? true : Keyboard::IsKeyDown( keyEvent.mod0 ) ) &&
+            bool modifiersPressed = ( keyEvent.mod0 == Keyboard::NONE
+                    ? true
+                    : Keyboard::IsKeyDown( keyEvent.mod0 ) ) &&
 				( keyEvent.mod1 == Keyboard::NONE ? true : Keyboard::IsKeyDown( keyEvent.mod1 ) ) &&
 				( keyEvent.mod2 == Keyboard::NONE ? true : Keyboard::IsKeyDown( keyEvent.mod2 ) );
 
@@ -121,8 +132,8 @@ namespace fan
 		}
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	bool InputManager::Load( const Json& _json )
 	{
 		if( _json.is_null() )
@@ -146,7 +157,7 @@ namespace fan
 				Serializable::LoadInt( jEvent_i, "mod1", keyEvent.mod1 );
 				Serializable::LoadInt( jEvent_i, "mod2", keyEvent.mod2 );
 
-				m_keyboardEvents[ name ] = keyEvent;
+				mKeyboardEvents[ name ] = keyEvent;
 
 				++index;
 			}
@@ -161,7 +172,7 @@ namespace fan
 
 				Axis axis;
 				axis.Load( jAxis_i );
-				m_axis[ axis.GetName() ] = axis;
+                mAxis[ axis.GetName() ] = axis;
 
 				++index;
 			}
@@ -170,14 +181,14 @@ namespace fan
 		return true;
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	bool InputManager::Save( Json& _json ) const
 	{
 		{// Events
 			size_t index = 0;
 			Json& jEvents = _json[ "events" ];
-			for ( auto keyEvent : m_keyboardEvents )
+			for ( auto keyEvent : mKeyboardEvents )
 			{
 				Json& jEvent_i = jEvents[ index ];
 				Serializable::SaveString( jEvent_i, "name", keyEvent.first );
@@ -192,7 +203,7 @@ namespace fan
 		{ // Axis
 			size_t index = 0;
 			Json& jAxis = _json[ "axis" ];
-			for ( auto axisPair : m_axis )
+			for ( auto axisPair : mAxis )
 			{
 				Json& jEvent_i = jAxis[ index ];
 				axisPair.second.Save( jEvent_i );
@@ -200,57 +211,5 @@ namespace fan
 			}
 		}
 		return true;
-	}
-}
-
-namespace ImGui
-{
-	//================================================================================================================================
-	// Imgui function for setting a keyboard key
-	// left clic opens a capture popup
-	// right clic resets the key 
-	//================================================================================================================================
-	bool FanKeyboardKey( const char* _label, fan::Keyboard::Key* _key )
-	{
-		using namespace fan;
-		ImGui::PushID( _key );
-		{
-			// Button
-			if ( ImGui::Button( Keyboard::GetKeyName( *_key ).c_str() ) )
-			{
-				ImGui::OpenPopup( "capture_keyboard_key" );
-			}
-
-			// Reset key
-			if ( ImGui::IsItemClicked( 1 ) )
-			{
-				*_key = Keyboard::NONE;
-			}
-
-			// Text
-			if ( !std::string( _label ).empty() )
-			{
-				ImGui::SameLine();
-				ImGui::Text( _label );
-			}
-
-			// capture popup
-			if ( ImGui::BeginPopup( "capture_keyboard_key" ) )
-			{
-				ImGui::Text( "PRESS ANY KEY" );
-				const std::vector<Keyboard::Key>& keysList = Keyboard::Get().GetKeysList();
-				for ( int keyIndex = 0; keyIndex < (int) keysList.size(); keyIndex++ )
-				{
-					if ( Keyboard::IsKeyDown( keysList[ keyIndex ] ) )
-					{
-						*_key = keysList[ keyIndex ];
-						ImGui::CloseCurrentPopup();
-						break;
-					}
-				}
-				ImGui::EndPopup();
-			}
-		} ImGui::PopID();
-		return false;
 	}
 }

@@ -3,19 +3,18 @@
 #include "fanJson.hpp"
 #include <string>
 
-
 namespace fan
 {
 
 	struct Mesh;
 
-	//================================================================================================================================
+	//========================================================================================================
 	// For importing GLTF file
-	// glTF� is a specification for the efficient transmission and loading of 3D scenes and models by applications.
+	// glTF is a specification for the efficient transmission and loading of 3D scenes and models.
 	// It consist in a json header describing the data and binary (or base64) buffers
 	// Some nested structs are defined below to help extracting data from the json.
 	// see https://github.com/KhronosGroup/glTF
-	//================================================================================================================================
+	//========================================================================================================
 	class GLTFImporter
 	{
 	public:
@@ -25,7 +24,7 @@ namespace fan
 	private:
 		enum ComponentTypes
 		{
-			FLOAT = 5126, SCALAR = 5123
+            Float = 5126, Scalar = 5123
 		};
 
 		//================================================================		
@@ -35,12 +34,12 @@ namespace fan
 		struct GLTFPrimitive
 		{
 			GLTFPrimitive( const Json& jPrimitive );
-			int	indices = -1;
-			int	positions = -1;
-			int	normal = -1;
-			int	texcoord0 = -1;
-			bool HasNormals() const { return normal >= 0; }
-			bool HasTexcoords0() const { return texcoord0 >= 0; }
+			int mIndices   = -1;
+			int mPositions = -1;
+			int mNormal    = -1;
+			int mTexcoord0 = -1;
+			bool HasNormals() const { return mNormal >= 0; }
+			bool HasTexcoords0() const { return mTexcoord0 >= 0; }
 		};
 
 		//================================================================
@@ -49,10 +48,10 @@ namespace fan
 		struct GLTFAccessor
 		{
 			GLTFAccessor( const Json& _jAccessor );
-			int view = -1;
-			int	type = -1;
-			int	count = -1;
-			std::string typeStr;
+			int         mView  = -1;
+			int         mType  = -1;
+			int         mCount = -1;
+			std::string mTypeStr;
 		};
 
 		//================================================================
@@ -62,9 +61,9 @@ namespace fan
 		struct GLTFBufferView
 		{
 			GLTFBufferView( const Json& _jView );
-			int buffer = -1;
-			int	byteLength = -1;
-			int	byteOffset = -1;
+			int mBuffer     = -1;
+			int mByteLength = -1;
+			int mByteOffset = -1;
 		};
 
 		//================================================================
@@ -75,7 +74,7 @@ namespace fan
 		{
 			GLTFBuffer( const Json& _jBuffer );
 
-			int byteLength = -1;
+			int mByteLength = -1;
 
 			std::string GetBuffer( const GLTFBufferView& _view, const std::string& _decodedBuffer ) const;
 		};
@@ -91,8 +90,8 @@ namespace fan
 			GLTFPrimitive primitive0;
 		};
 
-		std::string m_path;	// file relative path
-		Json m_json;		// gltf json data
+		std::string mPath;	// file relative path
+		Json        mJson;	// gltf json data
 
 		std::string GLTFImporter::DecodeBuffer( const std::string& _uri );
 	};

@@ -12,6 +12,8 @@ WARNINGS_POP()
 #include "render/resources/fanMeshManager.hpp"
 #include "render/resources/fanMesh2DManager.hpp"
 #include "render/resources/fanTextureManager.hpp"
+#include "render/resources/fanFontManager.hpp"
+#include "render/resources/fanFont.hpp"
 #include "render/core/fanCommandBuffer.hpp"
 #include "render/core/fanRenderPass.hpp"
 #include "render/core/fanSampler.hpp"
@@ -34,9 +36,9 @@ namespace fan
 {
 	class Window;
 
-	//================================================================================================================================
+	//========================================================================================================
 	// Contains all the rendering data
-	//================================================================================================================================
+	//========================================================================================================
 	class Renderer
 	{
 	public:
@@ -57,21 +59,25 @@ namespace fan
 		void SetDirectionalLights( const std::vector<RenderDataDirectionalLight>& _lightData );
 		void SetPointLights( const std::vector<RenderDataPointLight>& _lightData );
 		void SetDrawData( const std::vector<RenderDataModel>& _drawData );
-		void SetUIDrawData( const std::vector<RenderDataUIMesh>& _drawData );
-		void SetDebugDrawData( const std::vector<DebugVertex>& _debugLines, const std::vector<DebugVertex>& _debugLinesNoDepthTest, const std::vector<DebugVertex>& _debugTriangles );
+		void SetUIDrawData( const std::vector<RenderDataMesh2D>& _drawData );
+        void SetDebugDrawData( const std::vector<DebugVertex>& _debugLines,
+                               const std::vector<DebugVertex>& _debugLinesNoDepthTest,
+                               const std::vector<DebugVertex>& _debugTriangles,
+                               const std::vector<DebugVertex2D>& _debugLines2D );
 
 		MeshManager     mMeshManager;
         Mesh2DManager   mMesh2DManager;
         TextureManager  mTextureManager;
-		Window& mWindow;
-		Device& mDevice;
+        FontManager     mFontManager;
+		Window&         mWindow;
+		Device&         mDevice;
 
-		const ViewType  mViewType;
+        const ViewType  mViewType;
 		VkExtent2D		mGameExtent = { 1,1 };
 		glm::vec4		mClearColor = glm::vec4( 0.f, 0.f, 0.2f, 1.f );;
 		CommandBuffer	mPrimaryCommandBuffers;
 
-		// data
+		// draw units
 		DrawModels		mDrawModels;
 		DrawDebug		mDrawDebug;
 		DrawUI			mDrawUI;

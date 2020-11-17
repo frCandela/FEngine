@@ -1,12 +1,11 @@
 #include "render/core/fanImageView.hpp"
-
 #include "core/fanDebug.hpp"
 #include "render/core/fanDevice.hpp"
 
 namespace fan
 {
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void ImageView::Destroy( Device& _device )
 	{
 		if ( mImageView != VK_NULL_HANDLE )
@@ -17,11 +16,15 @@ namespace fan
 		}
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
-	bool ImageView::Create( Device& _device, VkImage _image, const VkFormat _format, const VkImageAspectFlags _aspectFlags, const VkImageViewType _viewType )
+	//========================================================================================================
+	//========================================================================================================
+    bool ImageView::Create( Device& _device,
+                            VkImage _image,
+                            const VkFormat _format,
+                            const VkImageAspectFlags _aspectFlags,
+                            const VkImageViewType _viewType )
 	{
-		assert( mImageView == VK_NULL_HANDLE );
+        fanAssert( mImageView == VK_NULL_HANDLE );
 
 		VkImageViewCreateInfo imageViewCreateInfo;
 		imageViewCreateInfo.sType							= VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
@@ -41,7 +44,7 @@ namespace fan
 		imageViewCreateInfo.subresourceRange.layerCount		= VK_REMAINING_ARRAY_LAYERS;
 
 		VkResult result = vkCreateImageView( _device.mDevice, &imageViewCreateInfo, nullptr, &mImageView );
-		Debug::Get() << Debug::Severity::log << std::hex << "VkImageView           " << mImageView << std::dec << Debug::Endl();
+		Debug::Log() << std::hex << "VkImageView           " << mImageView << std::dec << Debug::Endl();
 		
 		_device.AddDebugName( (uint64_t)mImageView, "ImageView" );
 		

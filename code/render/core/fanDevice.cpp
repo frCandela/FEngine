@@ -7,20 +7,24 @@
 
 namespace fan
 {
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void Device::Create( Instance& _instance, VkSurfaceKHR _surface )
 	{
-		assert( mDevice == VK_NULL_HANDLE );
+        fanAssert( mDevice == VK_NULL_HANDLE );
 
 		VkPhysicalDeviceFeatures availableFeatures;
 		std::vector<VkExtensionProperties>	availableExtensions;
 		SelectPhysicalDevice( _instance, availableFeatures, availableExtensions );
 
-		std::vector< const char* > existingExtensions = GetDesiredExtensions( availableExtensions, RenderGlobal::sDesiredDeviceExtensions );
+        std::vector<const char*> existingExtensions = GetDesiredExtensions( availableExtensions,
+                                                                            RenderGlobal::sDesiredDeviceExtensions );
 
 		uint32_t graphicsQueueFamilyIndex = 0, computeQueueFamilyIndex = 0, presentQueueFamilyIndex = 0;
-		GetQueueFamiliesIndices( _surface, graphicsQueueFamilyIndex, computeQueueFamilyIndex, presentQueueFamilyIndex );
+        GetQueueFamiliesIndices( _surface,
+                                 graphicsQueueFamilyIndex,
+                                 computeQueueFamilyIndex,
+                                 presentQueueFamilyIndex );
 
 		float queuePriority = 1.0f;
 		std::vector <VkDeviceQueueCreateInfo> queueCreateInfos;
@@ -59,7 +63,8 @@ namespace fan
 		{
 			Debug::Error() << "vulkan device creation failed" << Debug::Endl();
 		}
-		Debug::Log() << std::hex << "vkDevice:             " << mDeviceProperties.deviceName << std::dec << Debug::Endl();
+		Debug::Log() << std::hex << "vkDevice:             " << mDeviceProperties.deviceName
+		             << std::dec << Debug::Endl();
 
 		VkQueue		computeQueue = VK_NULL_HANDLE, presentQueue = VK_NULL_HANDLE;
 		vkGetDeviceQueue( mDevice, graphicsQueueFamilyIndex, 0, &mGraphicsQueue );
@@ -68,7 +73,7 @@ namespace fan
 		vkGetPhysicalDeviceMemoryProperties( mPhysicalDevice, &mMemoryProperties );
 
 		// Creates command pool 
-		assert( mCommandPool == VK_NULL_HANDLE );
+        fanAssert( mCommandPool == VK_NULL_HANDLE );
 		VkCommandPoolCreateInfo commandPoolCreateInfo;
 		commandPoolCreateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
 		commandPoolCreateInfo.pNext = nullptr;
@@ -82,8 +87,8 @@ namespace fan
 		Debug::Log() << std::hex << "VkCommandPool         " << mCommandPool << std::dec << Debug::Endl();
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void Device::Destroy()
 	{
 		vkDestroyCommandPool( mDevice, mCommandPool, nullptr );
@@ -92,8 +97,8 @@ namespace fan
 		mDevice = VK_NULL_HANDLE;
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	VkCommandBuffer Device::BeginSingleTimeCommands()
 	{
 		// Allocate a temporary command buffer for memory transfer operations
@@ -116,8 +121,8 @@ namespace fan
 		return commandBuffer;
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void Device::EndSingleTimeCommands( VkCommandBuffer _commandBuffer )
 	{
 		vkEndCommandBuffer( _commandBuffer );
@@ -135,8 +140,8 @@ namespace fan
 		vkFreeCommandBuffers( mDevice, mCommandPool, 1, &_commandBuffer );
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	bool Device::ResetCommandPool()
 	{
 		VkCommandPoolResetFlags releaseResources = VK_COMMAND_POOL_RESET_RELEASE_RESOURCES_BIT;
@@ -149,24 +154,26 @@ namespace fan
 		return true;
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	uint32_t Device::FindMemoryType( uint32_t _typeFilter, VkMemoryPropertyFlags _properties )
 	{
 		//check for the support of the properties
 		for ( uint32_t propertyIndex = 0; propertyIndex < mMemoryProperties.memoryTypeCount; propertyIndex++ )
 		{
-			if ( ( _typeFilter & ( 1 << propertyIndex ) ) && ( mMemoryProperties.memoryTypes[ propertyIndex ].propertyFlags & _properties ) == _properties )
+            if( ( _typeFilter & ( 1 << propertyIndex ) ) &&
+                ( mMemoryProperties.memoryTypes[propertyIndex].propertyFlags & _properties ) == _properties )
 			{
 				return propertyIndex;
 			}
 		}
-		Debug::Get() << Debug::Severity::error << "Failed to find suitable memory type " << _typeFilter << " " << _properties << Debug::Endl();
+		Debug::Error() << "Failed to find suitable memory type " << _typeFilter
+		                << " " << _properties << Debug::Endl();
 		return ~0u;
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	VkFormat Device::FindDepthFormat()
 	{
 		const std::vector<VkFormat> candidates{
@@ -187,31 +194,53 @@ namespace fan
 				return candidates[ candidateIndex ];
 			}
 
-			else if ( tiling == VK_IMAGE_TILING_OPTIMAL && ( props.optimalTilingFeatures & features ) == features )
-			{
+            else if( tiling == VK_IMAGE_TILING_OPTIMAL &&
+                     ( props.optimalTilingFeatures & features ) == features )
+            {
 				return candidates[ candidateIndex ];
 			}
 		}
 		return VK_FORMAT_MAX_ENUM;
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
-	bool Device::SelectPhysicalDevice( Instance& _instance, VkPhysicalDeviceFeatures& _outAvailableFeatures, std::vector<VkExtensionProperties>& _outAvailableExtensions )
+	//========================================================================================================
+	//========================================================================================================
+    bool Device::SelectPhysicalDevice( Instance& _instance,
+                                       VkPhysicalDeviceFeatures& _outAvailableFeatures,
+                                       std::vector<VkExtensionProperties>& _outAvailableExtensions )
 	{
 		uint32_t devicesCount;
-		if ( vkEnumeratePhysicalDevices( _instance.mInstance, &devicesCount, nullptr ) != VK_SUCCESS ) { return false; }
+		if ( vkEnumeratePhysicalDevices( _instance.mInstance, &devicesCount, nullptr ) != VK_SUCCESS )
+		{
+		    return false;
+		}
 		std::vector< VkPhysicalDevice> availableDevices( devicesCount );
-		if ( vkEnumeratePhysicalDevices( _instance.mInstance, &devicesCount, availableDevices.data() ) != VK_SUCCESS ) { return false; }
+        if( vkEnumeratePhysicalDevices( _instance.mInstance,
+                                        &devicesCount,
+                                        availableDevices.data() ) != VK_SUCCESS )
+		{
+		    return false;
+		}
 
 		for ( int deviceIndex = 0; deviceIndex < (int)availableDevices.size(); deviceIndex++ )
 		{
-			mPhysicalDevice = availableDevices[ deviceIndex ];
+            mPhysicalDevice = availableDevices[deviceIndex];
 
-			uint32_t extensionsCount;
-			if ( vkEnumerateDeviceExtensionProperties( mPhysicalDevice, nullptr, &extensionsCount, nullptr ) != VK_SUCCESS ) { return false; }
-			_outAvailableExtensions.resize( extensionsCount );
-			if ( vkEnumerateDeviceExtensionProperties( mPhysicalDevice, nullptr, &extensionsCount, _outAvailableExtensions.data() ) != VK_SUCCESS ) { return false; }
+            uint32_t extensionsCount;
+            if( vkEnumerateDeviceExtensionProperties( mPhysicalDevice,
+                                                      nullptr,
+                                                      &extensionsCount,
+                                                      nullptr ) != VK_SUCCESS )
+            {
+                return false;
+            }
+            _outAvailableExtensions.resize( extensionsCount );
+            if( vkEnumerateDeviceExtensionProperties( mPhysicalDevice,
+                                                      nullptr, &extensionsCount,
+                                                      _outAvailableExtensions.data() ) != VK_SUCCESS )
+            {
+                return false;
+            }
 
 			vkGetPhysicalDeviceProperties( mPhysicalDevice, &mDeviceProperties );
 			vkGetPhysicalDeviceFeatures( mPhysicalDevice, &_outAvailableFeatures );
@@ -224,9 +253,11 @@ namespace fan
 		return true;
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
-	std::vector < const char*> Device::GetDesiredExtensions( const std::vector<VkExtensionProperties>& _availableExtensions, const std::vector < const char*> _desiredExtensions )
+	//========================================================================================================
+	//========================================================================================================
+    std::vector<const char*>
+    Device::GetDesiredExtensions( const std::vector<VkExtensionProperties>& _availableExtensions,
+                                  const std::vector<const char*> _desiredExtensions )
 	{
 		std::vector < const char*> existingExtensions;
 		existingExtensions.reserve( _desiredExtensions.size() );
@@ -241,13 +272,14 @@ namespace fan
 		return existingExtensions;
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
-	bool Device::IsExtensionAvailable( const std::vector<VkExtensionProperties>& _availableExtensions, std::string _requiredExtension )
+	//========================================================================================================
+    //========================================================================================================
+    bool Device::IsExtensionAvailable( const std::vector<VkExtensionProperties>& _availableExtensions,
+                                       std::string _requiredExtension )
 	{
-		for ( int availableExtensionIndex = 0; availableExtensionIndex < (int)_availableExtensions.size(); availableExtensionIndex++ )
+		for ( int i = 0; i < (int)_availableExtensions.size(); i++ )
 		{
-			if ( _requiredExtension.compare( _availableExtensions[ availableExtensionIndex ].extensionName ) == 0 )
+			if ( _requiredExtension.compare( _availableExtensions[ i ].extensionName ) == 0 )
 			{
 				return true;
 			}
@@ -255,14 +287,19 @@ namespace fan
 		return false;
 	}	
 
-	//================================================================================================================================
-	//================================================================================================================================
-	void Device::GetQueueFamiliesIndices( VkSurfaceKHR _surface, uint32_t& _outGraphics, uint32_t& _outCompute, uint32_t& _outPresent )
+	//========================================================================================================
+	//========================================================================================================
+    void Device::GetQueueFamiliesIndices( VkSurfaceKHR _surface,
+                                          uint32_t& _outGraphics,
+                                          uint32_t& _outCompute,
+                                          uint32_t& _outPresent )
 	{
 		uint32_t queueFamiliesCount;
 		vkGetPhysicalDeviceQueueFamilyProperties( mPhysicalDevice, &queueFamiliesCount, nullptr );
 		std::vector<VkQueueFamilyProperties>	queueFamilyProperties( queueFamiliesCount );
-		vkGetPhysicalDeviceQueueFamilyProperties( mPhysicalDevice, &queueFamiliesCount, queueFamilyProperties.data() );
+        vkGetPhysicalDeviceQueueFamilyProperties( mPhysicalDevice,
+                                                  &queueFamiliesCount,
+                                                  queueFamilyProperties.data() );
 
 		VkQueueFlags desiredGraphicsCapabilities = VK_QUEUE_GRAPHICS_BIT;
 		VkQueueFlags desiredComputeCapabilities = VK_QUEUE_COMPUTE_BIT;
@@ -291,7 +328,10 @@ namespace fan
 			if ( queueFamilyProperties[ queueIndex ].queueCount > 0 )
 			{
 				VkBool32 presentationSupported;
-				if ( vkGetPhysicalDeviceSurfaceSupportKHR( mPhysicalDevice, queueIndex, _surface, &presentationSupported ) == VK_SUCCESS &&
+                if( vkGetPhysicalDeviceSurfaceSupportKHR( mPhysicalDevice,
+                                                          queueIndex,
+                                                          _surface,
+                                                          &presentationSupported ) == VK_SUCCESS &&
 					 presentationSupported == VK_TRUE )
 				{
 					_outPresent = queueIndex;
@@ -301,15 +341,15 @@ namespace fan
 		}
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void Device::AddDebugName( const uint64_t _object, const std::string& _name )
 	{
 		mDebugNames[_object] = _name;
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void Device::RemoveDebugName( const uint64_t _object )
 	{
 		auto it = mDebugNames.find( _object );
@@ -319,8 +359,8 @@ namespace fan
 		}
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	const std::string Device::GetDebugName( const uint64_t _object ) const
 	{
 		auto it = mDebugNames.find( _object );

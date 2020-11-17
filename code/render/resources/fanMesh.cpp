@@ -9,8 +9,8 @@
 
 namespace fan
 {
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	bool Mesh::LoadFromFile( const std::string& _path )
 	{
 		GLTFImporter importer;
@@ -33,8 +33,8 @@ namespace fan
 		return false;
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	bool Mesh::LoadFromVertices( const std::vector<Vertex>& _vertices )
 	{
 		mVertices = _vertices;
@@ -56,9 +56,9 @@ namespace fan
 	}
 
 
-	//================================================================================================================================
+	//========================================================================================================
 	// Removes duplicates vertices & generates a corresponding index buffer
-	//================================================================================================================================
+	//========================================================================================================
 	void Mesh::OptimizeVertices()
 	{
 
@@ -90,7 +90,7 @@ namespace fan
 
 	//================================================================================================================================
 	// Creates a convex hull from the mesh geometry
-	//================================================================================================================================
+	//========================================================================================================
 	void  Mesh::GenerateConvexHull()
 	{
 		if ( mVertices.empty() || !mAutoUpdateHull ) { return; }
@@ -101,23 +101,25 @@ namespace fan
 		for ( int point = 0; point < (int)mVertices.size(); point++ )
 		{
 			Vertex& vertex = mVertices[ point ];
-			pointCloud.push_back( btVector3( vertex.pos.x, vertex.pos.y, vertex.pos.z ) );
+			pointCloud.push_back( btVector3( vertex.mPos.x, vertex.mPos.y, vertex.mPos.z ) );
 		}
 		mConvexHull.ComputeQuickHull( pointCloud );
 	}
 
-	//================================================================================================================================
+	//========================================================================================================
 	// Raycast on all triangles of the convex hull
-	//================================================================================================================================
-	bool Mesh::RayCast( const btVector3 _origin, const btVector3 _direction, btVector3& _outIntersection ) const
+	//========================================================================================================
+    bool Mesh::RayCast( const btVector3 _origin,
+                        const btVector3 _direction,
+                        btVector3& _outIntersection ) const
 	{
 		btVector3 intersection;
 		float closestDistance = std::numeric_limits<float>::max();
 		for ( int triIndex = 0; triIndex < (int)mIndices.size() / 3; triIndex++ )
 		{
-			const btVector3 v0 = ToBullet( mVertices[ mIndices[ 3 * triIndex + 0 ] ].pos );
-			const btVector3 v1 = ToBullet( mVertices[ mIndices[ 3 * triIndex + 1 ] ].pos );
-			const btVector3 v2 = ToBullet( mVertices[ mIndices[ 3 * triIndex + 2 ] ].pos );
+			const btVector3 v0 = ToBullet( mVertices[ mIndices[ 3 * triIndex + 0 ] ].mPos );
+			const btVector3 v1 = ToBullet( mVertices[ mIndices[ 3 * triIndex + 1 ] ].mPos );
+			const btVector3 v2 = ToBullet( mVertices[ mIndices[ 3 * triIndex + 2 ] ].mPos );
 			const Triangle triangle( v0, v1, v2 );
 
 			if ( triangle.RayCast( _origin, _direction, intersection ) )
@@ -137,7 +139,7 @@ namespace fan
     //========================================================================================================
     void Mesh::Destroy( Device & _device )
     {
-        for( int i = 0 ; i < SwapChain::s_maxFramesInFlight; i++)
+        for( int i = 0 ; i < SwapChain::sMaxFramesInFlight; i++)
         {
             mIndexBuffer[i].Destroy( _device );
             mVertexBuffer[i].Destroy( _device );
@@ -152,7 +154,7 @@ namespace fan
 
         if ( mIndices.empty() || mVertices.empty() ) { return; }
 
-        mCurrentBuffer = ( mCurrentBuffer + 1 ) % SwapChain::s_maxFramesInFlight;
+        mCurrentBuffer = ( mCurrentBuffer + 1 ) % SwapChain::sMaxFramesInFlight;
 
         const VkMemoryPropertyFlags memPropertyFlags = ( mHostVisible ?
                 VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT :

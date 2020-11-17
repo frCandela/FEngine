@@ -1,7 +1,7 @@
 #pragma once
 
 #include <filesystem>
-#include "ecs/fanSignal.hpp"
+#include "core/ecs/fanSignal.hpp"
 #include "editor/windows/fanEditorWindow.hpp"
 
 namespace fan
@@ -9,9 +9,9 @@ namespace fan
 	struct Scene;
 	struct SceneNode;
 
-	//================================================================================================================================
+	//========================================================================================================
 	// shows the scene nodes tree
-	//================================================================================================================================
+	//========================================================================================================
 	class SceneWindow : public EditorWindow
 	{
 	public:
@@ -21,16 +21,16 @@ namespace fan
 		~SceneWindow();
 
 		// Callbacks
-		void OnExpandHierarchy( Scene& /*_scene*/ ) { m_expandSceneHierarchy = true; }
+		void OnExpandHierarchy( Scene& /*_scene*/ ) { mExpandSceneHierarchy = true; }
 
 	protected:
 		void OnGui( EcsWorld& _world ) override;
 
 	private:
-		std::filesystem::path m_pathBuffer;
-		char m_textBuffer[ 32 ];
-		SceneNode* m_lastSceneNodeRightClicked = nullptr;
-		bool m_expandSceneHierarchy = false;
+		std::filesystem::path   mPathBuffer;
+		char                    mTextBuffer[ 32 ];
+		SceneNode*              mLastSceneNodeRightClicked = nullptr;
+		bool                    mExpandSceneHierarchy = false;
 
 		void NewSceneNodeModal( EcsWorld& _world );
 		void RenameSceneNodeModal();

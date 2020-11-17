@@ -9,8 +9,8 @@ namespace fan
 {
 	struct Device;
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	struct PipelineConfig
 	{
 		PipelineConfig( const Shader& _vert, const Shader& _frag );
@@ -30,18 +30,22 @@ namespace fan
 		std::vector<VkDynamicState>                      dynamicStates;
 	};
 
-	//================================================================================================================================
+	//========================================================================================================
 	// base class for render pipelines
-	//================================================================================================================================
+	//========================================================================================================
 	struct Pipeline
 	{
 		void Bind( VkCommandBuffer _commandBuffer, VkExtent2D _extent );
 
-		bool Create( Device& _device, PipelineConfig _pipelineConfig, VkExtent2D _extent, VkRenderPass _renderPass, const bool _createCache = false );
+        bool Create( Device& _device,
+                     PipelineConfig _pipelineConfig,
+                     VkExtent2D _extent,
+                     VkRenderPass _renderPass,
+                     const bool _createCache = false );
 		void Destroy( Device& _device );
 
 		VkPipelineLayout	mPipelineLayout = VK_NULL_HANDLE;
-		VkPipeline			mPipeline = VK_NULL_HANDLE;
-		VkPipelineCache		mPipelineCache = VK_NULL_HANDLE;;
+		VkPipeline			mPipeline       = VK_NULL_HANDLE;
+		VkPipelineCache		mPipelineCache  = VK_NULL_HANDLE;;
 	};
 }

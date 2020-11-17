@@ -2,21 +2,18 @@
 
 #include <iostream>
 #include <limits>
-#include <assert.h>
 #include <type_traits>
-
 #include "bullet/LinearMath/btVector3.h"
-
-#include "network/fanNetConfig.hpp"
-#include "ecs/fanSignal.hpp"
+#include "core/ecs/fanSignal.hpp"
 #include "core/fanDebug.hpp"
+#include "network/fanNetConfig.hpp"
 
 namespace fan
 {
 	struct Client;
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	struct Packet
 	{
 		Packet(){} // for receiving only
@@ -25,40 +22,40 @@ namespace fan
 		template <typename T>
 		Packet& operator<<( T _value )
 		{
-			m_packet << _value;
+			mPacket << _value;
 			return *this;
 		}
 
 		template <typename T>
 		Packet& operator>>( T& _value )
 		{
-			m_packet >> _value;
+			mPacket >> _value;
 			return *this;
 		}
 
-		bool		EndOfPacket() const { return m_packet.endOfPacket(); }
-		sf::Packet& ToSfml() { return m_packet; }
+		bool		EndOfPacket() const { return mPacket.endOfPacket(); }
+		sf::Packet& ToSfml() { return mPacket; }
 		void		Clear();
 		PacketType  ReadType();
-		size_t		GetSize() const{ return m_packet.getDataSize(); }
+		size_t		GetSize() const{ return mPacket.getDataSize(); }
 
-		PacketTag		 tag;
-		Signal< PacketTag > onFail;		// packet was dropped
-		Signal< PacketTag > onSuccess;	// packet was received
-		bool onlyContainsAck = false;
+		PacketTag           mTag;
+		Signal< PacketTag > mOnFail;		// packet was dropped
+		Signal< PacketTag > mOnSuccess;	// packet was received
+		bool                mOnlyContainsAck = false;
 	private:
-		sf::Packet m_packet;
+		sf::Packet mPacket;
 	};
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	struct PacketAck
 	{
 		void Write( Packet& _packet )
 		{
 			_packet << PacketTypeInt( PacketType::Ack );
-			_packet << sf::Uint16( tags.size() );
-			for( PacketTag tag : tags )
+			_packet << sf::Uint16( mTags.size() );
+			for( PacketTag tag : mTags )
 			{
 				_packet << tag;
 			}
@@ -67,66 +64,66 @@ namespace fan
 		{
 			sf::Uint16 size;
 			_packet >> size;
-			tags.resize( size );
+			mTags.resize( size );
 			for( int i = 0; i < size; i++ )
 			{
-				_packet >> tags[i];
+				_packet >> mTags[i];
 			}
 		}
 
-		std::vector<PacketTag> tags;
+		std::vector<PacketTag> mTags;
 	};
 
-	//================================================================================================================================
+	//========================================================================================================
 	// server -> client then client -> server	
 	// Used to calculate a the connection RTT & frame index synch delta with the client
-	//================================================================================================================================
+	//========================================================================================================
 	struct PacketPing
 	{
 		void Read( Packet& _packet ) 
 		{
-			_packet >> serverFrame;
-			_packet >> clientFrame;
-			_packet >> previousRtt;
+			_packet >> mServerFrame;
+			_packet >> mClientFrame;
+			_packet >> mPreviousRtt;
 		}
 
 		void Write( Packet& _packet ) const
 		{ 
 			_packet << PacketTypeInt( PacketType::Ping );
-			_packet << serverFrame;
-			_packet << clientFrame;
-			_packet << previousRtt;
+			_packet << mServerFrame;
+			_packet << mClientFrame;
+			_packet << mPreviousRtt;
 		}
 
-		FrameIndex serverFrame;	// frame index of the server when sending the packet
-		FrameIndex clientFrame; // frame index of the client when sending back the packet
-		float previousRtt;		// client rtt from the previous ping
+		FrameIndex mServerFrame; // frame index of the server when sending the packet
+		FrameIndex mClientFrame; // frame index of the client when sending back the packet
+		float      mPreviousRtt; // client rtt from the previous ping
 	};
 
-	//================================================================================================================================
+	//========================================================================================================
 	// client -> server
 	// first packet send from the client to login into the server
 	// server should respond with a LoggedIn packet
-	//================================================================================================================================
+	//========================================================================================================
 	struct PacketHello
 	{
 		void Write( Packet& _packet ) const
 		{
 			_packet << PacketTypeInt( PacketType::Hello );
-			_packet << name;
+			_packet << mName;
 		}
 		void Read( Packet& _packet )
 		{
-			_packet >> name;
+			_packet >> mName;
 		}
 
-		std::string name = "";
+		std::string mName = "";
 	};
 
-	//================================================================================================================================
+	//========================================================================================================
 	// client -> server when the client disconnects
 	// server -> client when the server shuts down
-	//================================================================================================================================
+	//========================================================================================================
 	struct PacketDisconnect
 	{
 		void Write( Packet& _packet ) const
@@ -136,29 +133,29 @@ namespace fan
 		void Read( Packet& /*_packet*/ ){}
 	};	
 
-	//================================================================================================================================
+	//========================================================================================================
 	// server -> client
 	// Packet send from the server to the client after a Hello to acknowledge successful login
-	//================================================================================================================================
+	//========================================================================================================
 	struct PacketLoginSuccess
 	{
 		void Write( Packet& _packet ) const
 		{
 			_packet << PacketTypeInt( PacketType::LoggedIn );
-			_packet << playerID;
+			_packet << mPlayerId;
 		}
 		void Read( Packet& _packet )
 		{
-			_packet >> playerID;
+			_packet >> mPlayerId;
 		}
 
-		PlayerID playerID = 0; // corresponds to the player persistent entity handle
+		PlayerID mPlayerId = 0; // corresponds to the player persistent entity handle
 	};
 
-	//================================================================================================================================
+	//========================================================================================================
 	// server->client  Replication packet for singleton components, components & RPC
 	// serialized data is stored in a sf::Packet, it must be generated from the server replication manager
-	//================================================================================================================================
+	//========================================================================================================
 	struct PacketReplication
 	{
 		void Read( Packet& _packet );
@@ -172,112 +169,112 @@ namespace fan
 			, Count
 		};
 
-		ReplicationType replicationType = ReplicationType::Count;
-		sf::Packet		packetData;	
+		ReplicationType mReplicationType = ReplicationType::Count;
+		sf::Packet      mPacketData;
 	};
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	struct PacketInput
 	{
 		struct InputData
 		{
-			bool left : 1;
-			bool right : 1;
-			bool forward : 1;
-			bool backward : 1;
-			bool boost : 1;
-			bool fire : 1;
-			sf::Vector2f	orientation;
-			FrameIndex	frameIndex;
+			bool         mLeft : 1;
+			bool         mRight : 1;
+			bool         mForward : 1;
+			bool         mBackward : 1;
+			bool         mBoost : 1;
+			bool         mFire : 1;
+			sf::Vector2f mOrientation;
+			FrameIndex   mFrameIndex;
 		}; 
 
-		std::vector<InputData> inputs;
+		std::vector<InputData> mInputs;
 
 		void Read( Packet& _packet )
 		{
 			sf::Uint8 size;
 			_packet >> size;
 
-			inputs.resize( size );
+			mInputs.resize( size );
 			for( int i = 0; i < size; i++ )
 			{
-				InputData& inputData = inputs[i];
-				_packet >> inputData.frameIndex;
-				_packet >> inputData.orientation.x >> inputData.orientation.y;
+				InputData& inputData = mInputs[i];
+				_packet >> inputData.mFrameIndex;
+				_packet >> inputData.mOrientation.x >> inputData.mOrientation.y;
 				sf::Uint8 keyBits;
 				_packet >> keyBits;
 
-				inputData.left		= keyBits & (1<<0);
-				inputData.right		= keyBits & (1<<1);
-				inputData.forward	= keyBits & (1<<2);
-				inputData.backward	= keyBits & (1<<3);
-				inputData.boost		= keyBits & (1<<4);
-				inputData.fire		= keyBits & (1<<5);
+				inputData.mLeft     = keyBits & (1<<0);
+				inputData.mRight    = keyBits & (1<<1);
+				inputData.mForward  = keyBits & (1<<2);
+				inputData.mBackward = keyBits & (1<<3);
+				inputData.mBoost    = keyBits & (1<<4);
+				inputData.mFire     = keyBits & (1<<5);
 			}
 		}
 
 		void Write( Packet& _packet ) const
 		{
 			_packet << PacketTypeInt( PacketType::PlayerInput );
-			_packet << sf::Uint8(inputs.size());
+			_packet << sf::Uint8( mInputs.size());
 
-			for( int i = 0; i < (int)inputs.size(); i++ )
+			for( int i = 0; i < (int)mInputs.size(); i++ )
 			{
-				const InputData& inputData = inputs[i];
+				const InputData& inputData = mInputs[i];
 				const sf::Uint8 keyBits =
-				inputData.left		<< 0 |
-				inputData.right		<< 1 |
-				inputData.forward	<< 2 |
-				inputData.backward	<< 3 |
-				inputData.boost		<< 4 |
-				inputData.fire		<< 5;
+                                        inputData.mLeft		<< 0 |
+                                        inputData.mRight		<< 1 |
+                                        inputData.mForward	<< 2 |
+                                        inputData.mBackward	<< 3 |
+                                        inputData.mBoost		<< 4 |
+                                        inputData.mFire		<< 5;
 
-				_packet << inputData.frameIndex;
-				_packet << inputData.orientation.x << inputData.orientation.y;
+				_packet << inputData.mFrameIndex;
+				_packet << inputData.mOrientation.x << inputData.mOrientation.y;
 				_packet << keyBits;
 			}
 		}
 	};
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	struct PacketPlayerGameState
 	{
 		void Read( Packet& _packet )
 		{
-			_packet >> frameIndex;
-			_packet >> position[0]			>> position[1]			>> position[2];
-			_packet >> orientation[0]		>> orientation[1]		>> orientation[2];
-			_packet >> velocity[0]			>> velocity[1]			>> velocity[2];
-			_packet >> angularVelocity[0]	>> angularVelocity[1]	>> angularVelocity[2];
+			_packet >> mFrameIndex;
+			_packet >> mPosition[0]			>> mPosition[1]			>> mPosition[2];
+			_packet >> mOrientation[0]		>> mOrientation[1]		>> mOrientation[2];
+			_packet >> mVelocity[0]			>> mVelocity[1]			>> mVelocity[2];
+			_packet >> mAngularVelocity[0]	>> mAngularVelocity[1]	>> mAngularVelocity[2];
 		}
 
 		void Write( Packet& _packet ) const
 		{
 			_packet << PacketTypeInt( PacketType::PlayerGameState );
-			_packet << frameIndex;
-			_packet << position[0]			<< position[1]			<< position[2];
-			_packet << orientation[0]		<< orientation[1]		<< orientation[2];
-			_packet << velocity[0]			<< velocity[1]			<< velocity[2];
-			_packet << angularVelocity[0]	<< angularVelocity[1]	<< angularVelocity[2];
+			_packet << mFrameIndex;
+			_packet << mPosition[0]			<< mPosition[1]			<< mPosition[2];
+			_packet << mOrientation[0]		<< mOrientation[1]		<< mOrientation[2];
+			_packet << mVelocity[0]			<< mVelocity[1]			<< mVelocity[2];
+			_packet << mAngularVelocity[0]	<< mAngularVelocity[1]	<< mAngularVelocity[2];
 		}
 
 		bool operator==( const PacketPlayerGameState& _other ) const
 		{
-			return    frameIndex == _other.frameIndex &&
-				( position			- _other.position			).fuzzyZero() &&
-				( orientation		- _other.orientation		).fuzzyZero() &&
-				( velocity			- _other.velocity			).fuzzyZero() &&
-				( angularVelocity	- _other.angularVelocity	).fuzzyZero();
+			return mFrameIndex == _other.mFrameIndex &&
+                   ( mPosition - _other.mPosition			).fuzzyZero() &&
+                   ( mOrientation - _other.mOrientation		).fuzzyZero() &&
+                   ( mVelocity - _other.mVelocity			).fuzzyZero() &&
+                   ( mAngularVelocity - _other.mAngularVelocity	).fuzzyZero();
 		}
 		bool operator!=( const PacketPlayerGameState& _other ) const { return !( *this == _other ); }
 
-		FrameIndex	frameIndex = 0;			// the  frame index when creating state		
-		btVector3		position;			
-		btVector3		orientation;		
-		btVector3		velocity;			
-		btVector3		angularVelocity;
+		FrameIndex mFrameIndex = 0;			// the  frame index when creating state
+		btVector3  mPosition;
+		btVector3  mOrientation;
+		btVector3  mVelocity;
+		btVector3  mAngularVelocity;
 	};
 	
 }

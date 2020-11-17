@@ -1,101 +1,83 @@
 #include "game/singletons/fanGameCamera.hpp"
 
 #include "network/singletons/fanTime.hpp"
-#include "ecs/fanEcsWorld.hpp"
-#include "scene/singletons/fanScene.hpp"
-#include "scene/components/fanSceneNode.hpp"
-#include "scene/components/fanTransform.hpp"
-#include "scene/components/fanCamera.hpp"
+#include "engine/singletons/fanScene.hpp"
+#include "engine/components/fanSceneNode.hpp"
+#include "engine/components/fanTransform.hpp"
+#include "engine/components/fanCamera.hpp"
 
 namespace fan
 {
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void GameCamera::SetInfo( EcsSingletonInfo& _info )
 	{
-		_info.icon = ImGui::CAMERA16;
-		_info.group = EngineGroups::Game;
-		_info.onGui = &GameCamera::OnGui;
-		_info.save = &GameCamera::Save;
-		_info.load = &GameCamera::Load;
-		_info.name = "game camera";
+		_info.save   = &GameCamera::Save;
+		_info.load   = &GameCamera::Load;
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void GameCamera::Init( EcsWorld& /*_world*/, EcsSingleton& _component )
 	{
 		GameCamera& gameCamera = static_cast<GameCamera&>( _component );
-		gameCamera.heightFromTarget = 30.f;
-		gameCamera.marginRatio = btVector2( 1.f, 1.f );
-		gameCamera.minOrthoSize = 15.f;
+		gameCamera.mHeightFromTarget = 30.f;
+		gameCamera.mMarginRatio      = btVector2( 1.f, 1.f );
+		gameCamera.mMinOrthoSize     = 15.f;
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
-	void GameCamera::OnGui( EcsWorld&, EcsSingleton& _component )
-	{
-		GameCamera& gameCamera = static_cast<GameCamera&>( _component );
-
-		ImGui::Indent(); ImGui::Indent();
-		{
-			ImGui::DragFloat( "height from target", &gameCamera.heightFromTarget, 0.25f, 0.5f, 30.f );
-			ImGui::DragFloat2( "margin ratio", &gameCamera.marginRatio[0], 0.1f, 0.f, 10.f );
-			ImGui::DragFloat( "minSize", &gameCamera.minOrthoSize, 0.1f, 0.f, 100.f );
-		}
-		ImGui::Unindent(); ImGui::Unindent();
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void GameCamera::Save( const EcsSingleton& _component, Json& _json )
 	{
 		const GameCamera& gameCamera = static_cast<const GameCamera&>( _component );
- 		Serializable::SaveVec2( _json, "margin_ratio", gameCamera.marginRatio );
- 		Serializable::SaveFloat( _json, "min_size", gameCamera.minOrthoSize );
- 		Serializable::SaveFloat( _json, "height_from_target", gameCamera.heightFromTarget );
+ 		Serializable::SaveVec2( _json, "margin_ratio", gameCamera.mMarginRatio );
+ 		Serializable::SaveFloat( _json, "min_size", gameCamera.mMinOrthoSize );
+ 		Serializable::SaveFloat( _json, "height_from_target", gameCamera.mHeightFromTarget );
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void GameCamera::Load( EcsSingleton& _component, const Json& _json )
 	{
 		GameCamera& gameCamera = static_cast<GameCamera&>( _component );
-		Serializable::LoadVec2( _json, "margin_ratio", gameCamera.marginRatio );
-		Serializable::LoadFloat( _json, "min_size", gameCamera.minOrthoSize );
-		Serializable::LoadFloat( _json, "height_from_target", gameCamera.heightFromTarget );
+		Serializable::LoadVec2( _json, "margin_ratio", gameCamera.mMarginRatio );
+		Serializable::LoadFloat( _json, "min_size", gameCamera.mMinOrthoSize );
+		Serializable::LoadFloat( _json, "height_from_target", gameCamera.mHeightFromTarget );
 	}
 
-	//================================================================================================================================
+	//========================================================================================================
 	// creates the game camera entity & components
 	// setups the GameCamera singleton
-	//================================================================================================================================
-	void GameCamera::CreateGameCamera( EcsWorld & _world )
+	//========================================================================================================
+    GameCamera& GameCamera::CreateGameCamera( EcsWorld & _world )
 	{
 		Scene& scene = _world.GetSingleton<Scene>();
 		SceneNode& cameraNode = scene.CreateSceneNode( "game_camera", &scene.GetRootNode() );
 		cameraNode.AddFlag( SceneNode::NoSave | SceneNode::NoDelete | SceneNode::NoRaycast );
-		const EcsEntity cameraID = _world.GetEntity( cameraNode.handle );
+		const EcsEntity cameraID = _world.GetEntity( cameraNode.mHandle );
 		
 		Camera& camera = _world.AddComponent<Camera>( cameraID );
-		camera.type = Camera::ORTHOGONAL;
+		camera.mType = Camera::Orthogonal;
 
 		Transform& transform = _world.AddComponent<Transform>( cameraID );
 		transform.SetRotationEuler( btVector3( 90.f, 0.f, 0.f ) );
 		transform.SetPosition( btVector3( 0, 5, 0 ) );
 
 		GameCamera& gameCamera = _world.GetSingleton<GameCamera>();
-		gameCamera.cameraHandle = cameraNode.handle;
+		gameCamera.cmCameraHandle = cameraNode.mHandle;
+
+		return gameCamera;
 	}
 
-	//================================================================================================================================
+	//========================================================================================================
 	// deletes the games camera entity & components
 	// unregisters is from the GameCamera singleton
-	//================================================================================================================================
+	//========================================================================================================
 	void GameCamera::DeleteGameCamera( EcsWorld& _world )
 	{
 		GameCamera& gameCamera = _world.GetSingleton<GameCamera>();
-		_world.Kill( _world.GetEntity( gameCamera.cameraHandle ) );
-		gameCamera.cameraHandle = 0;
+		_world.Kill( _world.GetEntity( gameCamera.cmCameraHandle ) );
+		gameCamera.cmCameraHandle = 0;
 	}
 }

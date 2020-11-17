@@ -1,20 +1,18 @@
 #include "editor/singletons/fanEditorCopyPaste.hpp"
 
 #include <sstream>
-#include "ecs/fanEcsWorld.hpp"
+#include "imgui/imgui.h"
+#include "core/ecs/fanEcsWorld.hpp"
 #include "editor/singletons/fanEditorSelection.hpp"
-#include "scene/fanPrefab.hpp"
-#include "scene/singletons/fanScene.hpp"
+#include "engine/fanPrefab.hpp"
+#include "engine/singletons/fanScene.hpp"
 
 namespace fan
 {
 	//========================================================================================================
 	//========================================================================================================
-	void EditorCopyPaste::SetInfo( EcsSingletonInfo& _info )
+	void EditorCopyPaste::SetInfo( EcsSingletonInfo& /*_info*/ )
 	{
-		_info.name = "editor copy/paste";
-		_info.icon = ImGui::COPY_PASTE16;
-		_info.group = EngineGroups::Editor;
 	}
 
 	//========================================================================================================
@@ -23,17 +21,17 @@ namespace fan
 	{
 		EditorCopyPaste& editorCopyPaste = static_cast<EditorCopyPaste&>( _component );
 
-		editorCopyPaste.m_selection = &_world.GetSingleton<EditorSelection>();
+		editorCopyPaste.mSelection = &_world.GetSingleton<EditorSelection>();
 	}
 
 	//========================================================================================================
 	//========================================================================================================
 	void EditorCopyPaste::OnCopy()
 	{
-		if ( m_selection->GetSelectedSceneNode() != nullptr )
+		if ( mSelection->GetSelectedSceneNode() != nullptr )
 		{
 			Prefab prefab;
-			prefab.CreateFromSceneNode( *m_selection->GetSelectedSceneNode() );
+			prefab.CreateFromSceneNode( *mSelection->GetSelectedSceneNode() );
 
 			std::stringstream ss;
 			ss << prefab.mJson;
@@ -54,7 +52,7 @@ namespace fan
 		Prefab prefab;
 		if ( prefab.CreateFromJson( pastedJson ) )
 		{
-            prefab.Instantiate( *m_selection->GetSelectedSceneNode() );
+            prefab.Instantiate( *mSelection->GetSelectedSceneNode() );
 		}
 	}
 } 

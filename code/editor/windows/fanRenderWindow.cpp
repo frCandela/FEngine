@@ -7,17 +7,20 @@
 #include "render/resources/fanTexture.hpp"
 #include "render/fanRenderer.hpp"
 #include "render/resources/fanMesh.hpp"
-#include "scene/singletons/fanSceneResources.hpp"
-#include "scene/singletons/fanRenderResources.hpp"
-#include "scene/fanPrefabManager.hpp"
+#include "render/resources/fanMesh2D.hpp"
+#include "editor/fanRenderDragnDrop.hpp"
+#include "engine/singletons/fanSceneResources.hpp"
+#include "engine/singletons/fanRenderResources.hpp"
+#include "engine/fanPrefabManager.hpp"
+#include "engine/fanPrefab.hpp"
 
 namespace fan
 {
 	//========================================================================================================
 	//========================================================================================================
 	RenderWindow::RenderWindow( Renderer& _renderer )
-		: EditorWindow( "renderer", ImGui::IconType::RENDERER16 )
-		, m_renderer( _renderer )
+		: EditorWindow( "renderer", ImGui::IconType::Renderer16 )
+		, mRenderer( _renderer )
 	{}
 
 	//========================================================================================================
@@ -31,13 +34,22 @@ namespace fan
 		ImGui::Icon( GetIconType(), { 16,16 } ); ImGui::SameLine();
 		ImGui::Text( "Renderer" );
 
-		if ( ImGui::CollapsingHeader( "Loaded meshes : " ) )
+		if ( ImGui::CollapsingHeader( "Loaded 3D meshes : " ) )
 		{
 			for ( Mesh * mesh : renderResources.mMeshManager->GetMeshes() )
 			{
 				ImGui::Text("ref: %d name: %s", mesh->GetRefCount(), mesh->mPath.c_str() );
+                ImGui::FanBeginDragDropSourceMesh( mesh, ImGuiDragDropFlags_SourceAllowNullID );
 			}
 		}
+
+        if ( ImGui::CollapsingHeader( "Loaded 2D meshes : " ) )
+        {
+            for ( Mesh2D * mesh : renderResources.mMesh2DManager->GetMeshes() )
+            {
+                ImGui::Text("name: %s", mesh->mPath.c_str() );
+            }
+        }
 
 		if ( ImGui::CollapsingHeader( "Loaded textures : " ) )
 		{
@@ -48,8 +60,18 @@ namespace fan
                              tex->mExtent.width,
                              tex->mExtent.height,
                              tex->mPath.c_str() );
+                ImGui::FanBeginDragDropSourceTexture( tex, ImGuiDragDropFlags_SourceAllowNullID );
             }
 		}
+
+        if ( ImGui::CollapsingHeader( "Loaded fonts : " ) )
+        {
+            for ( Font * font : renderResources.mFontManager->GetFonts() )
+            {
+                ImGui::Text( font->GetPath().c_str() );
+                ImGui::FanBeginDragDropSourceFont( font, ImGuiDragDropFlags_SourceAllowNullID );
+            }
+        }
 
 		// Display mesh list
 		if ( ImGui::CollapsingHeader( "Loaded prefabs : " ) )
@@ -63,13 +85,13 @@ namespace fan
 
 		if ( ImGui::CollapsingHeader( "Rendered Mesh : " ) )
 		{
-			const std::vector<DrawData>& meshArray = m_renderer.mDrawModels.mDrawData;
+			const std::vector<DrawData>& meshArray = mRenderer.mDrawModels.mDrawData;
 			for ( uint32_t meshIndex = 0; meshIndex < meshArray.size(); meshIndex++ )
 			{
 				const DrawData& drawData = meshArray[ meshIndex ];
-				if ( drawData.mesh != nullptr )
+				if ( drawData.mMesh != nullptr )
 				{
-					ImGui::Text( drawData.mesh->mPath.c_str() );
+					ImGui::Text( drawData.mMesh->mPath.c_str() );
 				}
 				else
 				{
@@ -78,28 +100,28 @@ namespace fan
 			}
 		}
 
-		UniformLights& lights = m_renderer.mDrawModels.mUniforms.mUniformsLights;
+		UniformLights& lights = mRenderer.mDrawModels.mUniforms.mUniformsLights;
 		if ( ImGui::CollapsingHeader( "Directional lights : " ) )
 		{
 			ImGui::PushItemWidth( 150 );
-			for ( size_t lightIndex = 0; lightIndex < lights.dirLightsNum; lightIndex++ )
+			for ( size_t lightIndex = 0; lightIndex < lights.mDirLightsNum; lightIndex++ )
 			{
-				UniformDirectionalLight light = lights.dirLights[ lightIndex ];
-				ImGui::DragFloat3( "dir ", &light.direction[ 0 ] );
+				UniformDirectionalLight light = lights.mDirLights[ lightIndex ];
+				ImGui::DragFloat3( "dir ", &light.mDirection[ 0 ] );
 				ImGui::SameLine();
-				ImGui::ColorEdit3( "diffuse", &light.diffuse[ 0 ], ImGui::fanColorEditFlags );
+				ImGui::ColorEdit3( "diffuse", &light.mDiffuse[ 0 ], ImGui::fanColorEditFlags );
 			}
 			ImGui::PopItemWidth();
 		}
 		if ( ImGui::CollapsingHeader( "Point lights : " ) )
 		{
 			ImGui::PushItemWidth( 150 );
-			for ( size_t lightIndex = 0; lightIndex < lights.pointLightNum; lightIndex++ )
+			for ( size_t lightIndex = 0; lightIndex < lights.mPointLightNum; lightIndex++ )
 			{
-				UniformPointLight& light = lights.pointlights[ lightIndex ];
-				ImGui::DragFloat3( "pos ##pos", &light.position[ 0 ] );
+				UniformPointLight& light = lights.mPointlights[ lightIndex ];
+				ImGui::DragFloat3( "pos ##pos", &light.mPosition[ 0 ] );
 				ImGui::SameLine();
-				ImGui::ColorEdit3( "diffuse", &light.diffuse[ 0 ], ImGui::fanColorEditFlags );
+				ImGui::ColorEdit3( "diffuse", &light.mDiffuse[ 0 ], ImGui::fanColorEditFlags );
 			}
 			ImGui::PopItemWidth();
 		}

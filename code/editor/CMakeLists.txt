@@ -9,7 +9,7 @@ set( FAN_EDITOR_LIBS
     fanCore	
     fanRender
     fanNetwork
-    fanScene
+    fanEngine
     fanGame
 )
 

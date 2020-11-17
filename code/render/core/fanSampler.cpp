@@ -1,12 +1,11 @@
 #include "render/core/fanSampler.hpp"
-
 #include "core/fanDebug.hpp"
 #include "render/core/fanDevice.hpp"
 
 namespace fan
 {
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void Sampler::Destroy( Device& _device )
 	{
 		if( mSampler != VK_NULL_HANDLE )
@@ -17,11 +16,14 @@ namespace fan
 		}
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
-	void Sampler::Create( Device& _device, const float _maxLod, const float _maxAnisotropy, const VkFilter _filter )
+	//========================================================================================================
+	//========================================================================================================
+    void Sampler::Create( Device& _device,
+                          const float _maxLod,
+                          const float _maxAnisotropy,
+                          const VkFilter _filter )
 	{
-		assert( mSampler == VK_NULL_HANDLE );
+        fanAssert( mSampler == VK_NULL_HANDLE );
 
 		VkSamplerCreateInfo samplerInfo = {};
 		samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;

@@ -4,32 +4,35 @@
 
 #include "game/singletons/fanCollisionManager.hpp"
 #include "network/singletons/fanLinkingContext.hpp"
-#include "scene/singletons/fanPhysicsWorld.hpp"
-#include "scene/singletons/fanScene.hpp"
-#include "scene/components/fanTransform.hpp"
-#include "scene/components/fanRigidbody.hpp"
-#include "scene/components/fanMotionState.hpp"
-#include "scene/components/fanSphereShape.hpp"
+#include "engine/singletons/fanPhysicsWorld.hpp"
+#include "engine/singletons/fanScene.hpp"
+#include "engine/components/fanTransform.hpp"
+#include "engine/components/fanRigidbody.hpp"
+#include "engine/components/fanMotionState.hpp"
+#include "engine/components/fanSphereShape.hpp"
 #include "game/components/fanWeapon.hpp"
-#include "scene/components/fanSceneNode.hpp"
+#include "engine/components/fanSceneNode.hpp"
 
 namespace fan
 {
 	namespace spawn
 	{
-		//================================================================================================================================
-		//================================================================================================================================
+		//====================================================================================================
+		//====================================================================================================
 		struct SpawnBullet
 		{
-			static const SpawnID  s_id = SSID( "SpawnBullet" );
+			static const SpawnID sID = SSID( "SpawnBullet" );
 
 			//================================================================
 			//================================================================
-			static SpawnInfo GenerateInfo( const FrameIndex _spawnFrameIndex, const NetID _owner, const  btVector3 _position, const btVector3 _velocity )
-			{
+            static SpawnInfo GenerateInfo( const FrameIndex _spawnFrameIndex,
+                                           const NetID _owner,
+                                           const btVector3 _position,
+                                           const btVector3 _velocity )
+            {
 				SpawnInfo info;
 				info.spawnFrameIndex = _spawnFrameIndex;
-				info.spawnID = s_id;
+				info.spawnID = sID;
 
 				// Write data to packet
 				info.data << _position[0] << _position[2];
@@ -58,36 +61,40 @@ namespace fan
 
 			//================================================================
 			//================================================================
-			static void Instanciate( EcsWorld& _world, const NetID _owner, const btVector3& _position, const btVector3& _velocity )
-			{
+            static void Instanciate( EcsWorld& _world,
+                                     const NetID _owner,
+                                     const btVector3& _position,
+                                     const btVector3& _velocity )
+            {
 				Scene& scene = _world.GetSingleton<Scene>();
 				PhysicsWorld& physicsWorld = _world.GetSingleton<PhysicsWorld>();
 				CollisionManager& collisionManager = _world.GetSingleton<CollisionManager>();
 				const LinkingContext& linkingContext = _world.GetSingleton<LinkingContext>();
 
 				// spawn the bullet now
-				const EcsHandle ownerHandle = linkingContext.netIDToEcsHandle.at( _owner );
+				const EcsHandle ownerHandle = linkingContext.mNetIDToEcsHandle.at( _owner );
 				const EcsEntity ownerEntity = _world.GetEntity( ownerHandle );
 				const Weapon& ownerWeapon = _world.GetComponent<Weapon>( ownerEntity );
 				const Rigidbody& ownerRigidbody = _world.GetComponent<Rigidbody>( ownerEntity );
 
 				// creates the bullet
-				if( *ownerWeapon.bulletPrefab != nullptr )
+				if( *ownerWeapon.mBulletPrefab != nullptr )
 				{
-					SceneNode& node = *ownerWeapon.bulletPrefab->Instantiate( scene.GetRootNode() );
-					EcsEntity bulletID = _world.GetEntity( node.handle );
+					SceneNode& node = *ownerWeapon.mBulletPrefab->Instantiate( scene.GetRootNode() );
+					EcsEntity bulletID = _world.GetEntity( node.mHandle );
 
 					Transform& bulletTransform = _world.GetComponent<Transform>( bulletID );
 					bulletTransform.SetPosition( _position );
 
 					Rigidbody& bulletRigidbody = _world.GetComponent<Rigidbody>( bulletID );
-					bulletRigidbody.onContactStarted.Connect( &CollisionManager::OnBulletContact, &collisionManager );
+                    bulletRigidbody.mOnContactStarted.Connect( &CollisionManager::OnBulletContact,
+                                                               &collisionManager );
 					bulletRigidbody.SetIgnoreCollisionCheck( ownerRigidbody, true );
 					bulletRigidbody.SetVelocity( _velocity );
-					bulletRigidbody.SetMotionState( _world.GetComponent<MotionState>( bulletID ).motionState );
-					bulletRigidbody.SetCollisionShape( _world.GetComponent<SphereShape>( bulletID ).sphereShape );
-					bulletRigidbody.SetTransform( bulletTransform.transform );
-					physicsWorld.dynamicsWorld->addRigidBody( bulletRigidbody.rigidbody );
+					bulletRigidbody.SetMotionState( _world.GetComponent<MotionState>( bulletID ).mMotionState );
+					bulletRigidbody.SetCollisionShape( _world.GetComponent<SphereShape>( bulletID ).mSphereShape );
+					bulletRigidbody.SetTransform( bulletTransform.mTransform );
+					physicsWorld.mDynamicsWorld->addRigidBody( bulletRigidbody.mRigidbody );
 				}
 			}
 		};

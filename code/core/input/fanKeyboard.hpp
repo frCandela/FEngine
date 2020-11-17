@@ -7,14 +7,13 @@
 
 namespace fan
 {
-	//================================================================================================================================
+	//========================================================================================================
 	// helper class to access keyboard input
-	//================================================================================================================================
+	//========================================================================================================
 	class Keyboard : public Singleton<Keyboard>
 	{
 		friend class Singleton < Keyboard >;
 		friend class Input;
-
 	public:
 		using Key = int;
 
@@ -30,8 +29,8 @@ namespace fan
 		static void CharCallback( GLFWwindow* _window, unsigned int _c );
 
 		//Events
-		std::array< uint64_t, GLFW_KEY_LAST + 1 > m_keysPressed;
-		std::array< uint64_t, GLFW_KEY_LAST + 1 > m_keysReleased;
+		std::array< uint64_t, GLFW_KEY_LAST + 1 > mKeysPressed;
+		std::array< uint64_t, GLFW_KEY_LAST + 1 > mKeysReleased;
 
 	public:	
 		static const Key SPACE			= GLFW_KEY_SPACE;

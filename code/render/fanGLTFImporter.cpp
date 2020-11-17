@@ -1,83 +1,84 @@
-#include "render/fanGLTFImporter.hpp"
-#include "render/resources/fanMesh.hpp"
-
 #include <filesystem>
 #include <fstream>
 #include "core/fanDebug.hpp"
 #include "core/memory/fanBase64.hpp"
 #include "core/time/fanScopedTimer.hpp"
+#include "render/fanGLTFImporter.hpp"
+#include "render/resources/fanMesh.hpp"
 
 namespace fan
 {
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	GLTFImporter::GLTFPrimitive::GLTFPrimitive( const Json& jPrimitive )
 	{
 		const Json& jAttribute = jPrimitive[ "attributes" ];
 		const bool hasNormal = jAttribute.find( "NORMAL" ) != jAttribute.end();
 		const bool hasTexcoord0 = jAttribute.find( "TEXCOORD_0" ) != jAttribute.end();
 
-		indices = jPrimitive[ "indices" ];
-		positions = jAttribute[ "POSITION" ];
-		normal = hasNormal ? jAttribute[ "NORMAL" ] : -1;
-		texcoord0 = hasTexcoord0 ? jAttribute[ "TEXCOORD_0" ] : -1;
+        mIndices   = jPrimitive[ "indices" ];
+        mPositions = jAttribute[ "POSITION" ];
+        mNormal    = hasNormal ? jAttribute[ "NORMAL" ] : -1;
+        mTexcoord0 = hasTexcoord0 ? jAttribute[ "TEXCOORD_0" ] : -1;
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	GLTFImporter::GLTFMesh::GLTFMesh( const Json& jMesh ) : primitive0( jMesh[ "primitives" ][ 0 ] )
 	{
 		name = jMesh[ "name" ];
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	GLTFImporter::GLTFBufferView::GLTFBufferView( const Json& _jView )
 	{
-		assert( _jView.find( "byteStride" ) == _jView.end() ); // buffers using stride are not supported
-		buffer = _jView[ "buffer" ];
-		byteLength = _jView[ "byteLength" ];
-		byteOffset = _jView[ "byteOffset" ];
+        fanAssert( _jView.find( "byteStride" ) == _jView.end() ); // buffers using stride are not supported
+		mBuffer     = _jView[ "buffer" ];
+        mByteLength = _jView[ "byteLength" ];
+        mByteOffset = _jView[ "byteOffset" ];
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	GLTFImporter::GLTFAccessor::GLTFAccessor( const Json& _jAccessor )
 	{
-		view = _jAccessor[ "bufferView" ];
-		type = _jAccessor[ "componentType" ];
-		count = _jAccessor[ "count" ];
-		typeStr = _jAccessor[ "type" ];
+        mView    = _jAccessor[ "bufferView" ];
+        mType    = _jAccessor[ "componentType" ];
+        mCount   = _jAccessor[ "count" ];
+        mTypeStr = _jAccessor[ "type" ];
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	GLTFImporter::GLTFBuffer::GLTFBuffer( const Json& _jBuffer )
 	{
-		byteLength = _jBuffer[ "byteLength" ];
+        mByteLength = _jBuffer[ "byteLength" ];
 	}
 
-	//================================================================================================================================
+	//========================================================================================================
 	// Decodes a buffer from base64 to binary
 	// there is some header data at the beginnig of the buffer delimited with a ','
-	//================================================================================================================================
+	//========================================================================================================
 	std::string GLTFImporter::DecodeBuffer( const std::string& _uri )
 	{
 		const std::string::const_iterator fullBufferBegin = _uri.begin() + _uri.find_first_of( ',' ) + 1;
 		return Base64::Decode( std::string( fullBufferBegin, _uri.end() ) );
 	}
 
-	//================================================================================================================================
+	//========================================================================================================
 	// Extracts, decodes and returns a segment of buffer from a view
-	//================================================================================================================================
-	std::string GLTFImporter::GLTFBuffer::GetBuffer( const GLTFBufferView& _view, const std::string& _decodedBuffer ) const
-	{
-		return std::string( _decodedBuffer.begin() + _view.byteOffset, _decodedBuffer.begin() + _view.byteOffset + _view.byteLength );
+	//========================================================================================================
+    std::string GLTFImporter::GLTFBuffer::GetBuffer( const GLTFBufferView& _view,
+                                                     const std::string& _decodedBuffer ) const
+    {
+        return std::string( _decodedBuffer.begin() + _view.mByteOffset,
+                            _decodedBuffer.begin() + _view.mByteOffset + _view.mByteLength );
 	}
 
-	//================================================================================================================================
+	//========================================================================================================
 	// Parse and load the gltf into a json 
-	//================================================================================================================================
+	//========================================================================================================
 	bool GLTFImporter::Load( const std::string _path )
 	{
 		// Checks extension
@@ -97,19 +98,19 @@ namespace fan
 			return false;
 		}
 
-		m_json.clear();
-		inFile >> m_json;
-		m_path = _path;
+		mJson.clear();
+		inFile >> mJson;
+        mPath = _path;
 		inFile.close();
 
 		return true;
 	}
 
-	//================================================================================================================================
+	//========================================================================================================
 	// Converts gltf into a usable mesh
 	// For a gltf file we only load the first mesh and the first primitive.
 	// All other features are not supported yet
-	//================================================================================================================================
+	//========================================================================================================
 	bool GLTFImporter::GetMesh( Mesh& _mesh )
 	{
 		// Get mesh data references
@@ -117,17 +118,17 @@ namespace fan
 		std::vector<Vertex>& meshVertices = _mesh.mVertices;
 
 		// Get main json lists		
-		const Json& jmeshes = m_json[ "meshes" ];
-		const Json& jAccessors = m_json[ "accessors" ];
-		const Json& jBufferViews = m_json[ "bufferViews" ];
-		const Json& jBuffers = m_json[ "buffers" ];
+		const Json& jmeshes = mJson[ "meshes" ];
+		const Json& jAccessors = mJson[ "accessors" ];
+		const Json& jBufferViews = mJson[ "bufferViews" ];
+		const Json& jBuffers = mJson[ "buffers" ];
 		std::vector< std::string > m_loadedBuffers;
 		m_loadedBuffers.resize( jBuffers.size() );
 
 		// Returns if there is no mesh
 		if ( jmeshes.is_null() || jmeshes.empty() )
 		{
-			Debug::Error() << "mesh is empty : " << m_path << Debug::Endl();
+			Debug::Error() << "mesh is empty : " << mPath << Debug::Endl();
 			return false;
 		}
 
@@ -136,80 +137,80 @@ namespace fan
 
 		// Loads indices
 		{
-			GLTFAccessor accessorIndices( jAccessors[ mesh.primitive0.indices ] );
-			GLTFBufferView viewIndices( jBufferViews[ accessorIndices.view ] );
-			GLTFBuffer bufferIndices( jBuffers[ viewIndices.buffer ] );
-			assert( accessorIndices.type == SCALAR );
-			if ( m_loadedBuffers[ viewIndices.buffer ].empty() )
+			GLTFAccessor accessorIndices( jAccessors[ mesh.primitive0.mIndices ] );
+			GLTFBufferView viewIndices( jBufferViews[ accessorIndices.mView ] );
+			GLTFBuffer bufferIndices( jBuffers[ viewIndices.mBuffer ] );
+            fanAssert( accessorIndices.mType == Scalar );
+			if ( m_loadedBuffers[ viewIndices.mBuffer ].empty() )
 			{ // Load the buffer if it's not loaded already
-				m_loadedBuffers[ viewIndices.buffer ] = DecodeBuffer( jBuffers[ viewIndices.buffer ][ "uri" ] );
+				m_loadedBuffers[ viewIndices.mBuffer ] = DecodeBuffer( jBuffers[ viewIndices.mBuffer ][ "uri" ] );
 			}
-			const std::string buffer = bufferIndices.GetBuffer( viewIndices, m_loadedBuffers[ viewIndices.buffer ] );
+			const std::string buffer = bufferIndices.GetBuffer( viewIndices, m_loadedBuffers[ viewIndices.mBuffer ] );
 			const unsigned short* indicesArray = ( const unsigned short* ) buffer.data();
-			meshIndices.resize( accessorIndices.count );
+			meshIndices.resize( accessorIndices.mCount );
 			for ( int i = 0; i < (int)meshIndices.size(); ++i ) { meshIndices[ i ] = indicesArray[ i ]; }
 		}
 
 		// Load positions
 		{
-			GLTFAccessor accessorPositions( jAccessors[ mesh.primitive0.positions ] );
-			GLTFBufferView viewPositions( jBufferViews[ accessorPositions.view ] );
-			GLTFBuffer bufferPositions( jBuffers[ viewPositions.buffer ] );
-			assert( accessorPositions.type == FLOAT );
-			if ( m_loadedBuffers[ viewPositions.buffer ].empty() )
+			GLTFAccessor accessorPositions( jAccessors[ mesh.primitive0.mPositions ] );
+			GLTFBufferView viewPositions( jBufferViews[ accessorPositions.mView ] );
+			GLTFBuffer bufferPositions( jBuffers[ viewPositions.mBuffer ] );
+            fanAssert( accessorPositions.mType == Float );
+			if ( m_loadedBuffers[ viewPositions.mBuffer ].empty() )
 			{ // Load the buffer if it's not loaded already
-				m_loadedBuffers[ viewPositions.buffer ] = DecodeBuffer( jBuffers[ viewPositions.buffer ][ "uri" ] );
+				m_loadedBuffers[ viewPositions.mBuffer ] = DecodeBuffer( jBuffers[ viewPositions.mBuffer ][ "uri" ] );
 			}
-			const std::string buffer = bufferPositions.GetBuffer( viewPositions, m_loadedBuffers[ viewPositions.buffer ] );
+			const std::string buffer = bufferPositions.GetBuffer( viewPositions, m_loadedBuffers[ viewPositions.mBuffer ] );
 			const glm::vec3* positionsArray = ( const glm::vec3* )buffer.data();
-			meshVertices.resize( accessorPositions.count );
-			for ( int i = 0; i < (int)meshVertices.size(); i++ ) { meshVertices[ i ].pos = positionsArray[ i ]; }
+			meshVertices.resize( accessorPositions.mCount );
+			for ( int i = 0; i < (int)meshVertices.size(); i++ ) { meshVertices[ i ].mPos = positionsArray[ i ]; }
 		}
 
 		// Load normals
 		if ( mesh.primitive0.HasNormals() )
 		{
-			GLTFAccessor accessorNormals( jAccessors[ mesh.primitive0.normal ] );
-			GLTFBufferView viewNormals( jBufferViews[ accessorNormals.view ] );
-			GLTFBuffer bufferNormals( jBuffers[ viewNormals.buffer ] );
-			assert( accessorNormals.type == FLOAT );
-			if ( m_loadedBuffers[ viewNormals.buffer ].empty() )
+			GLTFAccessor accessorNormals( jAccessors[ mesh.primitive0.mNormal ] );
+			GLTFBufferView viewNormals( jBufferViews[ accessorNormals.mView ] );
+			GLTFBuffer bufferNormals( jBuffers[ viewNormals.mBuffer ] );
+            fanAssert( accessorNormals.mType == Float );
+			if ( m_loadedBuffers[ viewNormals.mBuffer ].empty() )
 			{ // Load the buffer if it's not loaded already
-				m_loadedBuffers[ viewNormals.buffer ] = DecodeBuffer( jBuffers[ viewNormals.buffer ][ "uri" ] );
+				m_loadedBuffers[ viewNormals.mBuffer ] = DecodeBuffer( jBuffers[ viewNormals.mBuffer ][ "uri" ] );
 			}
-			const std::string buffer = bufferNormals.GetBuffer( viewNormals, m_loadedBuffers[ viewNormals.buffer ] );
+			const std::string buffer = bufferNormals.GetBuffer( viewNormals, m_loadedBuffers[ viewNormals.mBuffer ] );
 			const glm::vec3* normalsArray = ( const glm::vec3* )buffer.data();
-			assert( (int)meshVertices.size() == accessorNormals.count );
-			for ( int i = 0; i < (int)meshVertices.size(); i++ ) { meshVertices[ i ].normal = normalsArray[ i ]; }
+            fanAssert( (int)meshVertices.size() == accessorNormals.mCount );
+			for ( int i = 0; i < (int)meshVertices.size(); i++ ) { meshVertices[ i ].mNormal = normalsArray[ i ]; }
 		}
 		else
 		{
-			for ( int i = 0; i < (int)meshVertices.size(); i++ ) { meshVertices[ i ].normal = glm::vec3( 0, 0, 1 ); }
+			for ( int i = 0; i < (int)meshVertices.size(); i++ ) { meshVertices[ i ].mNormal = glm::vec3( 0, 0, 1 ); }
 		}
 
 		// load textcoords 0
 		if ( mesh.primitive0.HasTexcoords0() )
 		{
-			GLTFAccessor accessorTexcoords0( jAccessors[ mesh.primitive0.texcoord0 ] );
-			GLTFBufferView viewTexcoords0( jBufferViews[ accessorTexcoords0.view ] );
-			GLTFBuffer bufferTexcoord0( jBuffers[ viewTexcoords0.buffer ] );
-			assert( accessorTexcoords0.type == FLOAT );
-			if ( m_loadedBuffers[ viewTexcoords0.buffer ].empty() )
+			GLTFAccessor accessorTexcoords0( jAccessors[ mesh.primitive0.mTexcoord0 ] );
+			GLTFBufferView viewTexcoords0( jBufferViews[ accessorTexcoords0.mView ] );
+			GLTFBuffer bufferTexcoord0( jBuffers[ viewTexcoords0.mBuffer ] );
+            fanAssert( accessorTexcoords0.mType == Float );
+			if ( m_loadedBuffers[ viewTexcoords0.mBuffer ].empty() )
 			{ // Load the buffer if it's not loaded already
-				m_loadedBuffers[ viewTexcoords0.buffer ] = DecodeBuffer( jBuffers[ viewTexcoords0.buffer ][ "uri" ] );
+				m_loadedBuffers[ viewTexcoords0.mBuffer ] = DecodeBuffer( jBuffers[ viewTexcoords0.mBuffer ][ "uri" ] );
 			}
-			const std::string buffer = bufferTexcoord0.GetBuffer( viewTexcoords0, m_loadedBuffers[ viewTexcoords0.buffer ] );
+			const std::string buffer = bufferTexcoord0.GetBuffer( viewTexcoords0, m_loadedBuffers[ viewTexcoords0.mBuffer ] );
 			const glm::vec2* texcoords0Array = ( const glm::vec2* )buffer.data();
-			assert( (int)meshVertices.size() == accessorTexcoords0.count );
-			for ( int i = 0; i < (int)meshVertices.size(); i++ ) { meshVertices[ i ].uv = texcoords0Array[ i ]; }
+            fanAssert( (int)meshVertices.size() == accessorTexcoords0.mCount );
+			for ( int i = 0; i < (int)meshVertices.size(); i++ ) { meshVertices[ i ].mUv = texcoords0Array[ i ]; }
 		}
 		else
 		{
-			for ( int i = 0; i < (int)meshVertices.size(); i++ ) { meshVertices[ i ].uv = glm::vec2( 0, 0 ); }
+			for ( int i = 0; i < (int)meshVertices.size(); i++ ) { meshVertices[ i ].mUv = glm::vec2( 0, 0 ); }
 		}
 
 		// load colors
-		for ( int i = 0; i < (int)meshVertices.size(); i++ ) { meshVertices[ i ].color = glm::vec3( 1, 1, 1 ); }
+		for ( int i = 0; i < (int)meshVertices.size(); i++ ) { meshVertices[ i ].mColor = glm::vec3( 1, 1, 1 ); }
 
 		return true;
 	}

@@ -8,11 +8,11 @@ namespace fan
 {
 	namespace spawn
 	{
-		//================================================================================================================================
-		//================================================================================================================================
+		//====================================================================================================
+		//====================================================================================================
 		struct SpawnSolarEruption
 		{
-			static const SpawnID  s_id = SSID( "SpawnEruption" );
+			static const SpawnID sID = SSID( "SpawnEruption" );
 
 			//================================================================
 			//================================================================
@@ -20,7 +20,7 @@ namespace fan
 			{
 				SpawnInfo info;
 				info.spawnFrameIndex = _spawnFrameIndex;
-				info.spawnID = s_id;
+				info.spawnID = sID;
 
 				// Write data to packet
 				//info.data << s_id;
@@ -36,7 +36,7 @@ namespace fan
 				eruption.SpawnEruptionNow();
 
 				Game& game = _world.GetSingleton<Game>();
-				if( game.IsServer() )
+				if( game.mIsServer )
 				{
 					eruption.ScheduleNextEruption( _world );
 				}

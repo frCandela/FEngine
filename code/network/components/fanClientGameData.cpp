@@ -1,138 +1,137 @@
 #include "network/components/fanClientGameData.hpp"
-
-#include "ecs/fanEcsWorld.hpp"
 #include "network/singletons/fanTime.hpp"
 
 namespace fan
 {
-	//================================================================================================================================
-	//================================================================================================================================
-	void ClientGameData::SetInfo( EcsComponentInfo& _info )
+	//========================================================================================================
+	//========================================================================================================
+	void ClientGameData::SetInfo( EcsComponentInfo& /*_info*/ )
 	{
-		_info.icon = ImGui::GAME_DATA16;
-		_info.group = EngineGroups::Network;
-		_info.onGui = &ClientGameData::OnGui;
-		_info.name = "client game data";
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void ClientGameData::Init( EcsWorld& /*_world*/, EcsEntity /*_entity*/, EcsComponent& _component )
 	{
 		ClientGameData& gameData = static_cast<ClientGameData&>( _component );
-		gameData.spaceshipHandle = 0;
-		gameData.frameSynced = false;
-		gameData.previousInputs					  = std::deque< PacketInput::InputData >();	// clear
-		gameData.previousLocalStates					  = std::queue< PacketPlayerGameState >();	// clear	
-		gameData.maxInputSent = 10;
-		gameData.spaceshipSynced = true;
-		gameData.lastServerState = {};
-		gameData.playerID = 0;
+		gameData.sSpaceshipHandle     = 0;
+		gameData.mFrameSynced         = false;
+		gameData.mPreviousInputs      = std::deque<PacketInput::InputData >();	// clear
+		gameData.mPreviousLocalStates = std::queue<PacketPlayerGameState >();	// clear
+		gameData.mMaxInputSent        = 10;
+		gameData.mSpaceshipSynced     = true;
+		gameData.mLastServerState     = {};
+		gameData.mPlayerId            = 0;
 
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void ClientGameData::ProcessPacket( const PacketPlayerGameState& _packet )
 	{
-		lastServerState = _packet; // @todo store multiple server states to allow deeper rollback
+        mLastServerState = _packet; // @todo store multiple server states to allow deeper rollback
 
 		// get the corresponding game state for the client
-		while( !previousLocalStates.empty() && previousLocalStates.front().frameIndex < _packet.frameIndex )
+		while( !mPreviousLocalStates.empty() && mPreviousLocalStates.front().mFrameIndex < _packet.mFrameIndex )
 		{
-			previousLocalStates.pop();
+			mPreviousLocalStates.pop();
 		}
 
 		// compares the server state & client state to verify we are synchronized				
-		if( !previousLocalStates.empty() && previousLocalStates.front().frameIndex == _packet.frameIndex )
+		if( !mPreviousLocalStates.empty() && mPreviousLocalStates.front().mFrameIndex == _packet.mFrameIndex )
 		{
-			const PacketPlayerGameState& packetState = previousLocalStates.front();
-			previousLocalStates.pop();
+			const PacketPlayerGameState& packetState = mPreviousLocalStates.front();
+			mPreviousLocalStates.pop();
 
 			if( packetState != _packet )
 			{
 				Debug::Warning() << "player is out of sync" << Debug::Endl();
-				spaceshipSynced = false;
+                mSpaceshipSynced = false;
 
-				if( packetState.frameIndex != _packet.frameIndex )
+				if( packetState.mFrameIndex != _packet.mFrameIndex )
 				{
-					Debug::Log() << "frame index difference: " << packetState.frameIndex << " " << _packet.frameIndex << Debug::Endl();
+					Debug::Log() << "frame index difference: " << packetState.mFrameIndex
+					             << " " << _packet.mFrameIndex << Debug::Endl();
 				}
-				if( !( packetState.position - _packet.position ).fuzzyZero() )
+				if( !( packetState.mPosition - _packet.mPosition ).fuzzyZero() )
 				{
-					const btVector3 diff = packetState.position - _packet.position;
-					Debug::Log() << "position difference: " << diff[0] << " " << diff[1] << " " << diff[2] << Debug::Endl();
+					const btVector3 diff = packetState.mPosition - _packet.mPosition;
+					Debug::Log() << "position difference: "
+					             << diff[0] << " " << diff[1] << " " << diff[2] << Debug::Endl();
 				}
-				if( !( packetState.orientation - _packet.orientation ).fuzzyZero() )
+				if( !( packetState.mOrientation - _packet.mOrientation ).fuzzyZero() )
 				{
-					const btVector3 diff = packetState.orientation - _packet.orientation;
-					Debug::Log() << "orientation difference: " << diff[0] << " " << diff[1] << " " << diff[2] << Debug::Endl();
+					const btVector3 diff = packetState.mOrientation - _packet.mOrientation;
+					Debug::Log() << "orientation difference: "
+					             << diff[0] << " " << diff[1] << " " << diff[2] << Debug::Endl();
 				}
-				if( !( packetState.velocity - _packet.velocity ).fuzzyZero() )
+				if( !( packetState.mVelocity - _packet.mVelocity ).fuzzyZero() )
 				{
-					const btVector3 diff = packetState.velocity - _packet.velocity;
-					Debug::Log() << "velocity difference: " << diff[0] << " " << diff[1] << " " << diff[2] << Debug::Endl();
+					const btVector3 diff = packetState.mVelocity - _packet.mVelocity;
+					Debug::Log() << "velocity difference: "
+					             << diff[0] << " " << diff[1] << " " << diff[2] << Debug::Endl();
 				}
-				if( !( packetState.angularVelocity - _packet.angularVelocity ).fuzzyZero() )
+				if( !( packetState.mAngularVelocity - _packet.mAngularVelocity ).fuzzyZero() )
 				{
-					const btVector3 diff = packetState.angularVelocity - _packet.angularVelocity;
-					Debug::Log() << "angular velocity difference: " << diff[0] << " " << diff[1] << " " << diff[2] << Debug::Endl();
+					const btVector3 diff = packetState.mAngularVelocity - _packet.mAngularVelocity;
+					Debug::Log() << "angular velocity difference: "
+					             << diff[0] << " " << diff[1] << " " << diff[2] << Debug::Endl();
 				}
 
 			}
 		}
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void ClientGameData::Write( EcsWorld& _world, EcsEntity _entity,  Packet& _packet )
 	{
 		// calculates the number of inputs to send
-		int numInputs = (int)previousInputs.size();
-		if( numInputs > maxInputSent )
+		int numInputs = (int)mPreviousInputs.size();
+		if( numInputs > mMaxInputSent )
 		{
-			numInputs = maxInputSent;
+			numInputs = mMaxInputSent;
 		}
 
 		if( numInputs > 0 )
 		{
 			// registers packet success
-			_packet.onSuccess.Connect( &ClientGameData::OnInputReceived, _world, _world.GetHandle(_entity) );
-			inputsSent.push_front( { _packet.tag, previousInputs.front().frameIndex } );
+			_packet.mOnSuccess.Connect( &ClientGameData::OnInputReceived, _world, _world.GetHandle( _entity) );
+			mInputsSent.push_front( { _packet.mTag, mPreviousInputs.front().mFrameIndex } );
 
 			// generate & send inputs
 			PacketInput packetInput;
-			packetInput.inputs.resize( numInputs );
+			packetInput.mInputs.resize( numInputs );
 			for( int i = 0; i < numInputs; i++ )
 			{
-				packetInput.inputs[numInputs - i - 1] = * (previousInputs.begin() + i) ;
+				packetInput.mInputs[numInputs - i - 1] = * ( mPreviousInputs.begin() + i) ;
 			}				
 			packetInput.Write( _packet );			
 		}
 	}
 
-	//================================================================================================================================
+	//========================================================================================================
 	// removes all inputs that have been received from the buffer
-	//================================================================================================================================
+	//========================================================================================================
 	void ClientGameData::OnInputReceived( PacketTag _tag )
 	{
-		while( !inputsSent.empty() )
+		while( !mInputsSent.empty() )
 		{
-			const InputSent inputSent = inputsSent.back();
-			if( inputSent.tag < _tag ) // packets were lost but we don't care
+			const InputSent inputSent = mInputsSent.back();
+			if( inputSent.mTag < _tag ) // packets were lost but we don't care
 			{
-				inputsSent.pop_back();
+				mInputsSent.pop_back();
 			}
-			else if( inputSent.tag == _tag ) 
+			else if( inputSent.mTag == _tag )
 			{
-				inputsSent.pop_back();
+				mInputsSent.pop_back();
 				// input packet was received, remove all corresponding inputs from the buffer
-				while( !previousInputs.empty() )
+				while( !mPreviousInputs.empty() )
 				{
-					const PacketInput::InputData packetInput = previousInputs.back();
-					if( packetInput.frameIndex <= inputSent.mostRecentFrame )
+					const PacketInput::InputData packetInput = mPreviousInputs.back();
+					if( packetInput.mFrameIndex <= inputSent.mMostRecentFrame )
 					{
-						previousInputs.pop_back();
+						mPreviousInputs.pop_back();
 					}
 					else
 					{
@@ -148,34 +147,17 @@ namespace fan
 		}
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//========================================================================================================
+	//========================================================================================================
 	void ClientGameData::OnShiftFrameIndex( const int _framesDelta )
 	{
-		previousLocalStates = std::queue< PacketPlayerGameState >(); // clear
-		frameSynced = true;
+        mPreviousLocalStates = std::queue<PacketPlayerGameState >(); // clear
+		mFrameSynced         = true;
 
-		if( std::abs( _framesDelta ) > Time::s_maxFrameDeltaBeforeShift )
+		if( std::abs( _framesDelta ) > Time::sMaxFrameDeltaBeforeShift )
 		{
 			Debug::Log() << "Shifted client frame index : " << _framesDelta << Debug::Endl();
-			previousLocalStates = std::queue< PacketPlayerGameState >(); // clear
+            mPreviousLocalStates = std::queue<PacketPlayerGameState >(); // clear
 		}
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void ClientGameData::OnGui( EcsWorld& /*_world*/, EcsEntity /*_entityID*/, EcsComponent& _component )
-	{
-		ClientGameData& gameData = static_cast<ClientGameData&>( _component );
-		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() - 16 );
-		{
-			ImGui::Text( "player ID           : %u", gameData.playerID );
-			ImGui::DragInt( "max input sent", &gameData.maxInputSent, 1.f, 0, 200 );
-			ImGui::Text( "size previous states:  %d", gameData.previousLocalStates.size());
-			ImGui::Text( "%s", gameData.frameSynced ? "frame synced" : "frame not synced" );
-			ImGui::Text( "size pending inputs:  %d", gameData.previousInputs.size() );
-			ImGui::Text( "size inputs sent:      %d", gameData.inputsSent.size() );
-			
-		} ImGui::PopItemWidth();
 	}
 }

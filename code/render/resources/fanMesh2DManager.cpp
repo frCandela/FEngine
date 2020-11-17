@@ -1,15 +1,16 @@
 #include "fanMesh2DManager.hpp"
 
-#include "fanMesh2D.hpp"
+#include "core/fanAssert.hpp"
+#include "render/resources/fanMesh2D.hpp"
 
 namespace fan
 {
-    //================================================================================================================================
+    //========================================================================================================
     // _externalOwner set to true means the Mesh2DManager will destroy the mesh
-    //================================================================================================================================
+    //========================================================================================================
     void Mesh2DManager::Add( Mesh2D* _mesh, const std::string& _name )
     {
-        assert( _mesh != nullptr );
+        fanAssert( _mesh != nullptr );
         _mesh->mIndex = (int)mMeshes.size();
         _mesh->mPath = _name;
         mMeshes.push_back( _mesh );

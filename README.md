@@ -35,5 +35,8 @@ FEngine is a 3D game engine. It uses Vulkan for Rendering, Dear ImGui for user i
 * rendering : [VulkanSDK 1.1.106.0](https://vulkan.lunarg.com/sdk/home)
 * network : [SFML 2.5.1](https://www.sfml-dev.org/index.php)
 	
+## Content
+* UI assets: [Kenney](https://kenney.nl/assets/ui-pack)
+	
 ## Screenshots
 ![Editor preview](/docs/screenshot3.png)

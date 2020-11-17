@@ -4,10 +4,10 @@
 
 namespace fan
 {
-	//================================================================================================================================
+	//========================================================================================================
 	// Clock for counting time
 	// starts when constructed
-	//================================================================================================================================
+	//========================================================================================================
 	class Clock
 	{
 	public:
@@ -21,15 +21,16 @@ namespace fan
 		float		ElapsedSeconds() const;		
 
 		void operator+=( const Microseconds& _seconds ){
-			m_startPoint += _seconds;
+            mStartPoint += _seconds;
 		}
 
 		static float SecondsBetween( const TimePoint& _t1, const TimePoint& _t2 )
 		{
 			return std::chrono::duration<float>( _t2 - _t1 ).count();
 		}
+
 	private:
-		std::chrono::high_resolution_clock m_clock;
-		std::chrono::time_point<std::chrono::high_resolution_clock> m_startPoint;
+		std::chrono::high_resolution_clock                          mClock;
+		std::chrono::time_point<std::chrono::high_resolution_clock> mStartPoint;
 	};
 }
