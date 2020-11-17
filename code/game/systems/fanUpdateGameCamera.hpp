@@ -1,8 +1,8 @@
 #include "core/ecs/fanEcsSystem.hpp"
-#include "scene/components/fanTransform.hpp"
+#include "engine/components/fanTransform.hpp"
 #include "game/components/fanSpaceShip.hpp"
 #include "game/singletons/fanGameCamera.hpp"
-#include "scene/components/fanCamera.hpp"
+#include "engine/components/fanCamera.hpp"
 
 namespace fan
 {

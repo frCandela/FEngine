@@ -7,8 +7,8 @@
 #include "render/unit_tests/fanUnitTestMesh2DManager.hpp"
 #include "render/unit_tests/fanUnitTestTextureManager.hpp"
 #include "render/unit_tests/fanUnitTestFontManager.hpp"
-#include "scene/unit_tests/fanUnitTestPrefabManager.hpp"
-#include "scene/unit_tests/fanUnitTestMouse.hpp"
+#include "engine/unit_tests/fanUnitTestPrefabManager.hpp"
+#include "engine/unit_tests/fanUnitTestMouse.hpp"
 #include "core/unit_tests/fanUnitTestSignal.hpp"
 #include "core/unit_tests/fanUnitTestEcs.hpp"
 

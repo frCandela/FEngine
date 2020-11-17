@@ -1,6 +1,6 @@
 #pragma once
 
-#include "scene/components/ui/fanUIProgressBar.hpp"
+#include "engine/components/ui/fanUIProgressBar.hpp"
 #include "editor/singletons/fanEditorGuiInfo.hpp"
 
 namespace fan

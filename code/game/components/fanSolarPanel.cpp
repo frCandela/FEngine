@@ -1,6 +1,6 @@
 #include "game/components/fanSolarPanel.hpp"
 
-#include "scene/fanSceneSerializable.hpp"
+#include "engine/fanSceneSerializable.hpp"
 #include "editor/fanModals.hpp"
 
 namespace fan

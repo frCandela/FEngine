@@ -9,10 +9,10 @@
 #include "render/resources/fanMesh.hpp"
 #include "render/resources/fanMesh2D.hpp"
 #include "editor/fanRenderDragnDrop.hpp"
-#include "scene/singletons/fanSceneResources.hpp"
-#include "scene/singletons/fanRenderResources.hpp"
-#include "scene/fanPrefabManager.hpp"
-#include "scene/fanPrefab.hpp"
+#include "engine/singletons/fanSceneResources.hpp"
+#include "engine/singletons/fanRenderResources.hpp"
+#include "engine/fanPrefabManager.hpp"
+#include "engine/fanPrefab.hpp"
 
 namespace fan
 {

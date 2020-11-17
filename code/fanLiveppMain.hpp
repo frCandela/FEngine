@@ -5,7 +5,7 @@
 #include "fanLaunchArguments.h"
 #include "game/fanGameClient.hpp"
 #include "game/fanGameServer.hpp"
-#include "scene/fanGameHolder.hpp"
+#include "engine/fanGameHolder.hpp"
 #include "editor/fanEditorHolder.hpp"
 namespace fan
 {

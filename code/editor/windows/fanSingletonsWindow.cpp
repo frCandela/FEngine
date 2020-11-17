@@ -2,7 +2,7 @@
 
 #include "core/fanDebug.hpp"
 #include "core/time/fanProfiler.hpp"
-#include "scene/fanDragnDrop.hpp"
+#include "engine/fanDragnDrop.hpp"
 #include "editor/gui/fanGroupsColors.hpp"
 #include "editor/singletons/fanEditorGuiInfo.hpp"
 

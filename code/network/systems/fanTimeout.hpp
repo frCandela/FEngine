@@ -1,5 +1,5 @@
 #include "core/ecs/fanEcsSystem.hpp"
-#include "scene/components/fanSceneNode.hpp"
+#include "engine/components/fanSceneNode.hpp"
 #include "network/singletons/fanHostManager.hpp"
 #include "network/components/fanHostConnection.hpp"
 #include "network/components/fanReliabilityLayer.hpp"

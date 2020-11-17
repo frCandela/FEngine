@@ -1,6 +1,6 @@
 #pragma once
 
-#include "scene/components/fanParticle.hpp"
+#include "engine/components/fanParticle.hpp"
 #include "editor/singletons/fanEditorGuiInfo.hpp"
 
 namespace fan

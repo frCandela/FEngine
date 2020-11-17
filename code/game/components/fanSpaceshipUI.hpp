@@ -1,11 +1,11 @@
 #pragma once
 
 #include "core/ecs/fanEcsComponent.hpp"
-#include "scene/fanSceneResourcePtr.hpp"
-#include "scene/components/ui/fanUIRenderer.hpp"
-#include "scene/components/ui/fanUIProgressBar.hpp"
-#include "scene/components/fanSceneNode.hpp"
-#include "scene/components/ui/fanUITransform.hpp"
+#include "engine/fanSceneResourcePtr.hpp"
+#include "engine/components/ui/fanUIRenderer.hpp"
+#include "engine/components/ui/fanUIProgressBar.hpp"
+#include "engine/components/fanSceneNode.hpp"
+#include "engine/components/ui/fanUITransform.hpp"
 
 namespace fan
 {

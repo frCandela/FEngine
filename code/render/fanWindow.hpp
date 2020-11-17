@@ -9,7 +9,7 @@ WARNINGS_POP()
 #include "render/core/fanSwapChain.hpp"
 #include "render/core/fanInstance.hpp"
 #include "render/core/fanDevice.hpp"
-#include "scene/singletons/fanMouse.hpp"
+#include "engine/singletons/fanMouse.hpp"
 
 namespace fan
 {

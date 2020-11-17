@@ -1,7 +1,7 @@
 #pragma once
 
-#include "scene/components/fanSceneNode.hpp"
-#include "scene/singletons/fanScene.hpp"
+#include "engine/components/fanSceneNode.hpp"
+#include "engine/singletons/fanScene.hpp"
 #include "editor/singletons/fanEditorGuiInfo.hpp"
 
 namespace fan

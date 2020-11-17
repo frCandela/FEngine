@@ -1,8 +1,8 @@
 #pragma  once
 
 #include "core/ecs/fanEcsComponent.hpp"
-#include "scene/components/fanParticleEmitter.hpp"
-#include "scene/fanSceneResourcePtr.hpp"
+#include "engine/components/fanParticleEmitter.hpp"
+#include "engine/fanSceneResourcePtr.hpp"
 
 namespace fan
 {

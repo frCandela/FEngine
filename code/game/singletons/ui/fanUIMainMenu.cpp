@@ -1,9 +1,9 @@
 #include "core/fanDebug.hpp"
 #include "game/singletons/ui/fanUIMainMenu.hpp"
-#include "scene/singletons/fanScene.hpp"
-#include "scene/components/ui/fanUIRenderer.hpp"
-#include "scene/components/ui/fanUIButton.hpp"
-#include "scene/fanSceneTags.hpp"
+#include "engine/singletons/fanScene.hpp"
+#include "engine/components/ui/fanUIRenderer.hpp"
+#include "engine/components/ui/fanUIButton.hpp"
+#include "engine/fanSceneTags.hpp"
 #include "core/input/fanInput.hpp"
 #include "core/input/fanInputManager.hpp"
 

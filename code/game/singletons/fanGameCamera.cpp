@@ -1,10 +1,10 @@
 #include "game/singletons/fanGameCamera.hpp"
 
 #include "network/singletons/fanTime.hpp"
-#include "scene/singletons/fanScene.hpp"
-#include "scene/components/fanSceneNode.hpp"
-#include "scene/components/fanTransform.hpp"
-#include "scene/components/fanCamera.hpp"
+#include "engine/singletons/fanScene.hpp"
+#include "engine/components/fanSceneNode.hpp"
+#include "engine/components/fanTransform.hpp"
+#include "engine/components/fanCamera.hpp"
 
 namespace fan
 {

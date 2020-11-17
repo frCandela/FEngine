@@ -1,6 +1,6 @@
 #pragma once
 
-#include "scene/singletons/fanRenderWorld.hpp"
+#include "engine/singletons/fanRenderWorld.hpp"
 #include "editor/singletons/fanEditorGuiInfo.hpp"
 #include "editor/fanModals.hpp"
 

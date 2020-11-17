@@ -4,14 +4,14 @@
 
 #include "game/singletons/fanCollisionManager.hpp"
 #include "network/singletons/fanLinkingContext.hpp"
-#include "scene/singletons/fanPhysicsWorld.hpp"
-#include "scene/singletons/fanScene.hpp"
-#include "scene/components/fanTransform.hpp"
-#include "scene/components/fanRigidbody.hpp"
-#include "scene/components/fanMotionState.hpp"
-#include "scene/components/fanSphereShape.hpp"
+#include "engine/singletons/fanPhysicsWorld.hpp"
+#include "engine/singletons/fanScene.hpp"
+#include "engine/components/fanTransform.hpp"
+#include "engine/components/fanRigidbody.hpp"
+#include "engine/components/fanMotionState.hpp"
+#include "engine/components/fanSphereShape.hpp"
 #include "game/components/fanWeapon.hpp"
-#include "scene/components/fanSceneNode.hpp"
+#include "engine/components/fanSceneNode.hpp"
 
 namespace fan
 {

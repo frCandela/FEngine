@@ -2,8 +2,8 @@
 
 #include "core/memory/fanSerializedValues.hpp"
 #include "core/ecs/fanEcsWorld.hpp"
-#include "scene/singletons/fanRenderDebug.hpp"
-#include "scene/fanSceneSerializable.hpp"
+#include "engine/singletons/fanRenderDebug.hpp"
+#include "engine/fanSceneSerializable.hpp"
 #include "editor/fanModals.hpp"
 
 namespace fan

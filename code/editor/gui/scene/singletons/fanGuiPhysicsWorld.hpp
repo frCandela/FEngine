@@ -1,6 +1,6 @@
 #pragma once
 
-#include "scene/singletons/fanPhysicsWorld.hpp"
+#include "engine/singletons/fanPhysicsWorld.hpp"
 #include "editor/singletons/fanEditorGuiInfo.hpp"
 
 namespace fan

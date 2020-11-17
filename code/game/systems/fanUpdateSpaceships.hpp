@@ -1,7 +1,7 @@
 #include "core/ecs/fanEcsSystem.hpp"
-#include "scene/components/fanTransform.hpp"
-#include "scene/components/fanRigidbody.hpp"
-#include "scene/components/fanSceneNode.hpp"
+#include "engine/components/fanTransform.hpp"
+#include "engine/components/fanRigidbody.hpp"
+#include "engine/components/fanSceneNode.hpp"
 
 #include "game/components/fanBattery.hpp"
 #include "game/components/fanPlayerInput.hpp"

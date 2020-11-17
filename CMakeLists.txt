@@ -51,7 +51,7 @@ add_subdirectory(middleware)
 add_subdirectory(code/core)
 add_subdirectory(code/render)
 add_subdirectory(code/network)
-add_subdirectory(code/scene)
+add_subdirectory(code/engine)
 add_subdirectory(code/game)
 add_subdirectory(code/editor)
 
@@ -66,7 +66,7 @@ set(APP_LIBRARIES
     fanCore
     fanRender
     fanNetwork
-    fanScene
+    fanEngine
     fanGame
     fanEditor
 )

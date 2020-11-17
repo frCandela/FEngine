@@ -4,8 +4,8 @@
 #include "imgui/imgui.h"
 #include "core/ecs/fanEcsWorld.hpp"
 #include "editor/singletons/fanEditorSelection.hpp"
-#include "scene/fanPrefab.hpp"
-#include "scene/singletons/fanScene.hpp"
+#include "engine/fanPrefab.hpp"
+#include "engine/singletons/fanScene.hpp"
 
 namespace fan
 {

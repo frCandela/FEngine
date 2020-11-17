@@ -1,5 +1,5 @@
 #include "core/ecs/fanEcsSystem.hpp"
-#include "scene/components/fanParticle.hpp"
+#include "engine/components/fanParticle.hpp"
 #include "game/singletons/fanSunLight.hpp"
 #include "game/fanGameTags.hpp"
 

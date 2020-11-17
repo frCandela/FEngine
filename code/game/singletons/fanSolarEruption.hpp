@@ -3,11 +3,11 @@
 #include "core/ecs/fanEcsSingleton.hpp"
 
 #include "network/fanNetConfig.hpp"
-#include "scene/fanSceneResourcePtr.hpp"
-#include "scene/components/fanMaterial.hpp"
-#include "scene/components/fanMeshRenderer.hpp"
-#include "scene/components/fanParticleEmitter.hpp"
-#include "scene/components/fanPointLight.hpp"
+#include "engine/fanSceneResourcePtr.hpp"
+#include "engine/components/fanMaterial.hpp"
+#include "engine/components/fanMeshRenderer.hpp"
+#include "engine/components/fanParticleEmitter.hpp"
+#include "engine/components/fanPointLight.hpp"
 
 namespace fan
 {

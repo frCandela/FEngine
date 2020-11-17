@@ -1,6 +1,6 @@
 #pragma once
 
-#include "scene/fanIGame.hpp"
+#include "engine/fanIGame.hpp"
 
 namespace fan
 {

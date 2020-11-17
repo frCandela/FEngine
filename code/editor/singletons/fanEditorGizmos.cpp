@@ -4,12 +4,12 @@
 #include "core/shapes/fanTriangle.hpp"
 #include "core/math/fanBasicModels.hpp"
 #include "core/ecs/fanEcsWorld.hpp"
-#include "scene/components/fanSceneNode.hpp"
-#include "scene/components/fanTransform.hpp"
-#include "scene/components/fanCamera.hpp"
-#include "scene/singletons/fanRenderDebug.hpp"
-#include "scene/singletons/fanMouse.hpp"
-#include "scene/singletons/fanScene.hpp"
+#include "engine/components/fanSceneNode.hpp"
+#include "engine/components/fanTransform.hpp"
+#include "engine/components/fanCamera.hpp"
+#include "engine/singletons/fanRenderDebug.hpp"
+#include "engine/singletons/fanMouse.hpp"
+#include "engine/singletons/fanScene.hpp"
 
 namespace fan
 {

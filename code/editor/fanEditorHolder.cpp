@@ -1,12 +1,8 @@
-#include <scene/singletons/fanRenderResources.hpp>
-#include <scene/singletons/fanSceneResources.hpp>
-#include <editor/singletons/fanEditorPlayState.hpp>
-#include "editor/fanEditorHolder.hpp"
 
 #include "core/input/fanInputManager.hpp"
 #include "core/input/fanInput.hpp"
 #include "network/singletons/fanTime.hpp"
-#include "editor/windows/fanPreferencesWindow.hpp"	
+#include "editor/windows/fanPreferencesWindow.hpp"
 #include "editor/windows/fanUnitsTestsWindow.hpp"
 #include "editor/windows/fanSingletonsWindow.hpp"
 #include "editor/windows/fanInspectorWindow.hpp"
@@ -17,17 +13,19 @@
 #include "editor/windows/fanSceneWindow.hpp"
 #include "editor/windows/fanEcsWindow.hpp"
 #include "editor/fanMainMenuBar.hpp"
+#include "editor/fanEditorHolder.hpp"
 #include "editor/singletons/fanEditorSelection.hpp"
 #include "editor/singletons/fanEditorCopyPaste.hpp"
 #include "editor/singletons/fanEditorGizmos.hpp"
 #include "editor/singletons/fanEditorCamera.hpp"
 #include "editor/singletons/fanEditorGrid.hpp"
 #include "editor/singletons/fanEditorGuiInfo.hpp"
-#include "scene/singletons/fanRenderWorld.hpp"
-#include "scene/components/fanPointLight.hpp"
-#include "scene/components/fanDirectionalLight.hpp"
-#include "scene/systems/fanUpdateTransforms.hpp"
-#include "scene/systems/fanDrawDebug.hpp"
+#include "engine/singletons/fanRenderWorld.hpp"
+#include "editor/singletons/fanEditorPlayState.hpp"
+#include "engine/components/fanPointLight.hpp"
+#include "engine/components/fanDirectionalLight.hpp"
+#include "engine/systems/fanUpdateTransforms.hpp"
+#include "engine/systems/fanDrawDebug.hpp"
 
 namespace fan
 {

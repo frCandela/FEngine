@@ -1,7 +1,7 @@
 #pragma once
 
-#include "scene/components/ui/fanUIRenderer.hpp"
-#include "scene/fanSceneTags.hpp"
+#include "engine/components/ui/fanUIRenderer.hpp"
+#include "engine/fanSceneTags.hpp"
 #include "editor/singletons/fanEditorGuiInfo.hpp"
 #include "editor/fanModals.hpp"
 

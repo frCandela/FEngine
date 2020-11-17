@@ -1,6 +1,6 @@
 #pragma once
 
-#include "scene/components/fanFollowTransform.hpp"
+#include "engine/components/fanFollowTransform.hpp"
 #include "editor/singletons/fanEditorGuiInfo.hpp"
 
 namespace fan

@@ -1,7 +1,7 @@
 #include "network/singletons/fanHostManager.hpp"
 
-#include "scene/singletons/fanScene.hpp"
-#include "scene/components/fanSceneNode.hpp"
+#include "engine/singletons/fanScene.hpp"
+#include "engine/components/fanSceneNode.hpp"
 #include "network/components/fanHostGameData.hpp"
 #include "network/components/fanHostConnection.hpp"
 #include "network/components/fanHostReplication.hpp"

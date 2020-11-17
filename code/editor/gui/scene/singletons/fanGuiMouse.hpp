@@ -1,6 +1,6 @@
 #pragma once
 
-#include "scene/singletons/fanMouse.hpp"
+#include "engine/singletons/fanMouse.hpp"
 #include "editor/singletons/fanEditorGuiInfo.hpp"
 #include "editor/fanModals.hpp"
 

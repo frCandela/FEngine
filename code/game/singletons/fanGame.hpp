@@ -2,7 +2,7 @@
 
 #include "core/ecs/fanEcsSingleton.hpp"
 #include "network/fanNetConfig.hpp"
-#include "scene/fanSceneResourcePtr.hpp"
+#include "engine/fanSceneResourcePtr.hpp"
 
 namespace fan
 {

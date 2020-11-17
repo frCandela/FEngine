@@ -1,9 +1,9 @@
 #pragma once
 
-#include "scene/singletons/fanSceneResources.hpp"
+#include "engine/singletons/fanSceneResources.hpp"
 #include "editor/singletons/fanEditorGuiInfo.hpp"
-#include "scene/fanPrefabManager.hpp"
-#include "scene/fanPrefab.hpp"
+#include "engine/fanPrefabManager.hpp"
+#include "engine/fanPrefab.hpp"
 
 namespace fan
 {

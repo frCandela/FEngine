@@ -1,8 +1,8 @@
 #include "game/singletons/fanClientNetworkManager.hpp"
 
 #include "network/singletons/fanTime.hpp"
-#include "scene/components/fanSceneNode.hpp"
-#include "scene/singletons/fanScene.hpp"
+#include "engine/components/fanSceneNode.hpp"
+#include "engine/singletons/fanScene.hpp"
 #include "network/components/fanClientReplication.hpp"
 #include "network/components/fanClientConnection.hpp"
 #include "network/singletons/fanSpawnManager.hpp"

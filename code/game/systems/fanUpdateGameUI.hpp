@@ -1,5 +1,5 @@
 #include "core/ecs/fanEcsSystem.hpp"
-#include "scene/components/fanTransform.hpp"
+#include "engine/components/fanTransform.hpp"
 #include "game/components/fanSpaceShipUI.hpp"
 #include "game/components/fanBattery.hpp"
 #include "game/components/fanSolarPanel.hpp"

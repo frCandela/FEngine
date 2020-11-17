@@ -5,7 +5,7 @@
 #include "core/memory/fanSerializedValues.hpp"
 #include "core/time/fanProfiler.hpp"
 #include "core/fanDebug.hpp"
-#include "scene/fanFullscreen.hpp"
+#include "engine/fanFullscreen.hpp"
 #include "render/fanRenderer.hpp"
 #include "editor/fanModals.hpp"
 #include "editor/gui/fanGroupsColors.hpp"

@@ -3,11 +3,11 @@
 #include "core/input/fanInput.hpp"
 #include "core/input/fanInputManager.hpp"
 #include "core/shapes/fanRay.hpp"
-#include "scene/components/fanTransform.hpp"
-#include "scene/components/fanCamera.hpp"
-#include "scene/components/fanSceneNode.hpp"
-#include "scene/singletons/fanMouse.hpp"
-#include "scene/singletons/fanScene.hpp"
+#include "engine/components/fanTransform.hpp"
+#include "engine/components/fanCamera.hpp"
+#include "engine/components/fanSceneNode.hpp"
+#include "engine/singletons/fanMouse.hpp"
+#include "engine/singletons/fanScene.hpp"
 
 namespace fan
 {

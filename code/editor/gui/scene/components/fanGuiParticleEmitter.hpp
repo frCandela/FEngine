@@ -1,6 +1,6 @@
 #pragma once
 
-#include "scene/components/fanParticleEmitter.hpp"
+#include "engine/components/fanParticleEmitter.hpp"
 #include "editor/singletons/fanEditorGuiInfo.hpp"
 #include "editor/fanModals.hpp"
 

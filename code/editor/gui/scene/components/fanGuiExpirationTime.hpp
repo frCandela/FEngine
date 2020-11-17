@@ -1,6 +1,6 @@
 #pragma once
 
-#include "scene/components/fanExpirationTime.hpp"
+#include "engine/components/fanExpirationTime.hpp"
 #include "editor/singletons/fanEditorGuiInfo.hpp"
 
 namespace fan

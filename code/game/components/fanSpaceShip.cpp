@@ -1,6 +1,6 @@
 #include "game/components/fanSpaceShip.hpp"
 
-#include "scene/fanSceneSerializable.hpp"
+#include "engine/fanSceneSerializable.hpp"
 
 namespace fan
 {

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "scene/components/fanPointLight.hpp"
+#include "engine/components/fanPointLight.hpp"
 #include "editor/singletons/fanEditorGuiInfo.hpp"
 #include "editor/fanModals.hpp"
 

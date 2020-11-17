@@ -2,7 +2,7 @@
 
 #include "core/memory/fanSerializedValues.hpp"
 #include "core/ecs/fanEcsWorld.hpp"
-#include "scene/fanIHolder.hpp"
+#include "engine/fanIHolder.hpp"
 #include "game/fanGameClient.hpp"
 #include "game/fanGameServer.hpp"
 

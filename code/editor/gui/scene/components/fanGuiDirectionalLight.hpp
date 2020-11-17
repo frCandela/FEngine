@@ -1,6 +1,6 @@
 #pragma once
 
-#include "scene/components/fanDirectionalLight.hpp"
+#include "engine/components/fanDirectionalLight.hpp"
 #include "editor/singletons/fanEditorGuiInfo.hpp"
 #include "editor/fanModals.hpp"
 

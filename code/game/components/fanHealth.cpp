@@ -1,6 +1,6 @@
 #include "game/components/fanHealth.hpp"
 
-#include "scene/fanSceneSerializable.hpp"
+#include "engine/fanSceneSerializable.hpp"
 
 namespace fan
 {

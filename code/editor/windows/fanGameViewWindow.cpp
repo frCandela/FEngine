@@ -1,7 +1,7 @@
 #include "editor/windows/fanGameViewWindow.hpp"
 
 #include "network/singletons/fanTime.hpp"
-#include "scene/singletons/fanScene.hpp"
+#include "engine/singletons/fanScene.hpp"
 #include "game/singletons/fanGame.hpp"
 #include "editor/singletons/fanEditorPlayState.hpp"
 

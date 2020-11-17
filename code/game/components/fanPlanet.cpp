@@ -1,8 +1,8 @@
 #include "game/components/fanPlanet.hpp"
 
 #include "core/ecs/fanEcsWorld.hpp"
-#include "scene/singletons/fanRenderDebug.hpp"
-#include "scene/fanSceneSerializable.hpp"
+#include "engine/singletons/fanRenderDebug.hpp"
+#include "engine/fanSceneSerializable.hpp"
 
 namespace fan
 {

@@ -2,8 +2,8 @@
 #include "core/shapes/fanRay.hpp"
 #include "core/input/fanInputManager.hpp"
 #include "core/input/fanInput.hpp"
-#include "scene/singletons/fanMouse.hpp"
-#include "scene/components/fanTransform.hpp"
+#include "engine/singletons/fanMouse.hpp"
+#include "engine/components/fanTransform.hpp"
 #include "game/components/fanPlayerInput.hpp"
 #include "game/components/fanPlayerController.hpp"
 

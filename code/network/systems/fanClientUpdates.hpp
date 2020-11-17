@@ -5,8 +5,8 @@
 #include "network/components/fanClientRPC.hpp"
 #include "network/singletons/fanTime.hpp"
 #include "game/components/fanPlayerInput.hpp"
-#include "scene/components/fanTransform.hpp"
-#include "scene/components/fanRigidbody.hpp"
+#include "engine/components/fanTransform.hpp"
+#include "engine/components/fanRigidbody.hpp"
 #include "network/singletons/fanLinkingContext.hpp"
 
 namespace fan
