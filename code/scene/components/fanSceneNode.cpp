@@ -1,4 +1,4 @@
-#include "scene/components/fanSceneNode.hpp"
+#include "fanSceneNode.hpp"
 #include <stack>
 #include "core/fanDebug.hpp"
 #include "scene/singletons/fanScene.hpp"

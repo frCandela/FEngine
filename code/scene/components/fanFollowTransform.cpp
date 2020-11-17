@@ -1,6 +1,6 @@
 #include "scene/components/fanFollowTransform.hpp"
 #include "scene/components/fanTransform.hpp"
-#include "scene/components/fanSceneNode.hpp"
+#include "fanSceneNode.hpp"
 #include "scene/systems/fanUpdateTransforms.hpp"
 #include "scene/singletons/fanRenderDebug.hpp"
 #include "scene/fanSceneSerializable.hpp"

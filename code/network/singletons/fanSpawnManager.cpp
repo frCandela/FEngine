@@ -1,10 +1,7 @@
 #include "network/singletons/fanSpawnManager.hpp"
 
-#include "core/fanDebug.hpp"
 #include "network/singletons/fanTime.hpp"
-#include "game/spawn/fanSpawnBullet.hpp"
-#include "game/spawn/fanSpawnShip.hpp"
-#include "game/spawn/fanSpawnSolarEruption.hpp"
+#include "network/singletons/fanLinkingContext.hpp"
 
 namespace fan
 {
@@ -19,8 +16,8 @@ namespace fan
 	void SpawnManager::Init( EcsWorld& /*_world*/, EcsSingleton& _component )
 	{
 		SpawnManager& spawnManager = static_cast<SpawnManager&>( _component );
-		spawnManager.RegisterSpawnMethods();
-	}
+        (void)spawnManager;
+    }
 
 	//========================================================================================================
 	// register one spawn method, checks that there is no spawnID collision
@@ -29,17 +26,6 @@ namespace fan
 	{
         fanAssert( spawnMethods.find( _spawnID ) == spawnMethods.end() );
 		spawnMethods[_spawnID] = _spawnMethod;
-	}
-
-	//========================================================================================================
-	// @todo put this in game lib to prevent linking issues
-	//========================================================================================================
-	void SpawnManager::RegisterSpawnMethods()
-	{
-		spawnMethods.clear();		
-		RegisterSpawnMethod( spawn::SpawnBullet::sID, &spawn::SpawnBullet::Spawn );
-		RegisterSpawnMethod( spawn::SpawnShip::sID, &spawn::SpawnShip::Spawn );
-		RegisterSpawnMethod( spawn::SpawnSolarEruption::sID, &spawn::SpawnSolarEruption::Spawn );
 	}
 
 	//========================================================================================================

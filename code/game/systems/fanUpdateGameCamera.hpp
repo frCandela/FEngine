@@ -2,6 +2,7 @@
 #include "scene/components/fanTransform.hpp"
 #include "game/components/fanSpaceShip.hpp"
 #include "game/singletons/fanGameCamera.hpp"
+#include "scene/components/fanCamera.hpp"
 
 namespace fan
 {

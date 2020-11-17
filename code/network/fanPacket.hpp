@@ -3,12 +3,10 @@
 #include <iostream>
 #include <limits>
 #include <type_traits>
-
 #include "bullet/LinearMath/btVector3.h"
-
-#include "network/fanNetConfig.hpp"
 #include "core/ecs/fanSignal.hpp"
 #include "core/fanDebug.hpp"
+#include "network/fanNetConfig.hpp"
 
 namespace fan
 {

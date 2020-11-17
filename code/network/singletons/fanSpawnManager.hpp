@@ -35,7 +35,6 @@ namespace fan
 
 		static void Update( EcsWorld& _world );	
 
-		void RegisterSpawnMethods();
 		void RegisterSpawnMethod( const SpawnID _spawnID, const SpawnMethod _spawnMethod );
 		void OnSpawn( const SpawnID _spawnID, const FrameIndex _frameIndex, sf::Packet _data );
 		void OnDespawn( const NetID _netID );

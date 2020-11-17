@@ -47,6 +47,7 @@
 #include "game/components/fanBullet.hpp"
 #include "game/components/fanDamage.hpp"
 #include "game/singletons/ui/fanUIMainMenu.hpp"
+#include "game/spawn/fanRegisterSpawnMethods.hpp"
 
 namespace fan
 {
@@ -87,6 +88,8 @@ namespace fan
         mName = "client";
         mWorld.GetSingleton<Scene>().mOnEditorUseGameCamera.Connect( &GameClient::UseGameCamera, this );
         mWorld.GetSingleton<Scene>().mOnLoad.Connect( &GameClient::OnLoadScene, this );
+
+        RegisterGameSpawnMethods( mWorld.GetSingleton<SpawnManager>() );
 	}
 
 	//========================================================================================================

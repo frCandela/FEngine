@@ -1,4 +1,4 @@
-#include "fanUDPSocket.hpp"
+#include "network/fanUDPSocket.hpp"
 
 namespace fan
 {

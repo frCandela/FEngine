@@ -14,10 +14,8 @@
 #include "scene/systems/fanUpdateTransforms.hpp"
 #include "scene/singletons/fanScene.hpp"
 #include "scene/singletons/fanRenderResources.hpp"
-#include "scene/components/fanCamera.hpp"
 #include "network/singletons/fanServerConnection.hpp"
 #include "network/singletons/fanLinkingContext.hpp"
-#include "network/singletons/fanSpawnManager.hpp"
 #include "network/components/fanHostReplication.hpp"
 #include "network/systems/fanServerUpdates.hpp"
 #include "network/systems/fanServerSendReceive.hpp"
@@ -36,6 +34,7 @@
 #include "game/systems/fanParticlesOcclusion.hpp"
 #include "game/components/fanBullet.hpp"
 #include "game/components/fanDamage.hpp"
+#include "game/spawn/fanRegisterSpawnMethods.hpp"
 
 namespace fan
 {
@@ -73,6 +72,8 @@ namespace fan
         Game& game = mWorld.GetSingleton<Game>();
         game.mIsServer = true;
         mWorld.GetSingleton<Scene>().mOnEditorUseGameCamera.Connect( &GameServer::UseGameCamera, this );
+
+        RegisterGameSpawnMethods( mWorld.GetSingleton<SpawnManager>() );
 	}
 
 	//========================================================================================================

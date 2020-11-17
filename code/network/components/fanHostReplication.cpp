@@ -1,5 +1,4 @@
 #include "network/components/fanHostReplication.hpp"
-
 #include "network/singletons/fanLinkingContext.hpp"
 
 namespace fan
