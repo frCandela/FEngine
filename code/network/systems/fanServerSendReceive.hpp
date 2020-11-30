@@ -3,7 +3,7 @@
 #include "network/components/fanHostGameData.hpp"
 #include "network/components/fanHostReplication.hpp"
 #include "network/components/fanReliabilityLayer.hpp"
-#include "game/singletons/fanGame.hpp"
+#include "project_spaceships/singletons/fanGame.hpp"
 
 namespace fan
 {

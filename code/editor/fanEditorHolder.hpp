@@ -2,9 +2,9 @@
 
 #include "core/memory/fanSerializedValues.hpp"
 #include "core/ecs/fanEcsWorld.hpp"
-#include "engine/fanIHolder.hpp"
-#include "game/fanGameClient.hpp"
-#include "game/fanGameServer.hpp"
+#include "engine/project/fanIHolder.hpp"
+#include "project_spaceships/fanGameClient.hpp"
+#include "project_spaceships/fanGameServer.hpp"
 
 namespace fan
 {

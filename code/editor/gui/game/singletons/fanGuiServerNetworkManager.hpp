@@ -1,6 +1,6 @@
 #pragma once
 
-#include "game/singletons/fanServerNetworkManager.hpp"
+#include "project_spaceships/singletons/fanServerNetworkManager.hpp"
 #include "editor/singletons/fanEditorGuiInfo.hpp"
 
 namespace fan

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "game/components/fanSolarPanel.hpp"
+#include "project_spaceships/components/fanSolarPanel.hpp"
 #include "editor/singletons/fanEditorGuiInfo.hpp"
 #include "editor/fanModals.hpp"
 

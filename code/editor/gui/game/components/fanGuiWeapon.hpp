@@ -1,6 +1,6 @@
 #pragma once
 
-#include "game/components/fanWeapon.hpp"
+#include "project_spaceships/components/fanWeapon.hpp"
 #include "editor/singletons/fanEditorGuiInfo.hpp"
 #include "editor/fanModals.hpp"
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "game/components/fanBullet.hpp"
+#include "project_spaceships/components/fanBullet.hpp"
 #include "editor/singletons/fanEditorGuiInfo.hpp"
 
 namespace fan

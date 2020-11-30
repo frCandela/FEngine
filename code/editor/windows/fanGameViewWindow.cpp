@@ -2,7 +2,6 @@
 
 #include "network/singletons/fanTime.hpp"
 #include "engine/singletons/fanScene.hpp"
-#include "game/singletons/fanGame.hpp"
 #include "editor/singletons/fanEditorPlayState.hpp"
 
 namespace fan

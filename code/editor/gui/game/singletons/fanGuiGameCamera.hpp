@@ -1,6 +1,6 @@
 #pragma once
 
-#include "game/singletons/fanGameCamera.hpp"
+#include "project_spaceships/singletons/fanGameCamera.hpp"
 #include "editor/singletons/fanEditorGuiInfo.hpp"
 
 namespace fan
