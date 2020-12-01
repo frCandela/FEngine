@@ -2,7 +2,7 @@
 #include "render/resources/fanMesh2D.hpp"
 #include "render/resources/fanMesh2DManager.hpp"
 #include "engine/components/ui/fanUIText.hpp"
-#include "engine/fanSceneSerializable.hpp"
+#include "engine/fanEngineSerializable.hpp"
 #include "engine/singletons/fanRenderResources.hpp"
 #include "engine/fanSceneTags.hpp"
 #include "render/resources/fanFont.hpp"

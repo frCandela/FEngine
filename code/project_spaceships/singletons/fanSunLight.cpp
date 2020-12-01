@@ -1,6 +1,6 @@
 #include "project_spaceships/singletons/fanSunLight.hpp"
 
-#include "engine/fanSceneSerializable.hpp"
+#include "engine/fanEngineSerializable.hpp"
 
 namespace fan
 {

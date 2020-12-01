@@ -2,7 +2,7 @@
 
 #include "core/memory/fanSerializedValues.hpp"
 #include "core/ecs/fanEcsWorld.hpp"
-#include "engine/project/fanIHolder.hpp"
+#include "engine/project/fanIProjectContainer.hpp"
 
 namespace fan
 {
@@ -10,21 +10,21 @@ namespace fan
 	struct Scene;
 
 	//========================================================================================================
-	// This holder displays the game
+	// This container runs the game
 	// Auto load a scene & displays it, no editor features
 	// runs the main loop & manages events
 	//========================================================================================================
-	class GameHolder : public IHolder
+	class GameProjectContainer : public IProjectContainer
 	{
 	public:
-		GameHolder( LaunchSettings& _settings, IGame& _game );
-		~GameHolder() override {};
+		GameProjectContainer( LaunchSettings& _settings, IProject& _project );
+		~GameProjectContainer() override {};
 
 		void Run();
 		void Step();
 
 	private:
-        IGame& mGame;
+        IProject& mProject;
 
         LaunchSettings& AdaptSettings( LaunchSettings& _settings );
 	};

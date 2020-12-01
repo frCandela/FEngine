@@ -1,6 +1,6 @@
 #include "project_spaceships/components/fanSolarPanel.hpp"
 
-#include "engine/fanSceneSerializable.hpp"
+#include "engine/fanEngineSerializable.hpp"
 #include "editor/fanModals.hpp"
 
 namespace fan

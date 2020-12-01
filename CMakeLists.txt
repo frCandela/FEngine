@@ -1,15 +1,8 @@
 ﻿cmake_minimum_required (VERSION 3.8)
 
 project ("FEngine")
+
 set(CMAKE_CXX_STANDARD 17)
-
-# FORCE C++17 STANDARD
-#set_target_properties(${APP_NAME} PROPERTIES
-#    CXX_STANDARD 17
-#    CXX_STANDARD_REQUIRED ON
-#)
-
-#set( APP_NAME "fengine_editor")
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR})
 

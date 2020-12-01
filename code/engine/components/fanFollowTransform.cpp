@@ -3,7 +3,7 @@
 #include "fanSceneNode.hpp"
 #include "engine/systems/fanUpdateTransforms.hpp"
 #include "engine/singletons/fanRenderDebug.hpp"
-#include "engine/fanSceneSerializable.hpp"
+#include "engine/fanEngineSerializable.hpp"
 #include "engine/singletons/fanScene.hpp"
 #include "editor/fanModals.hpp"
 

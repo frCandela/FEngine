@@ -1,12 +1,12 @@
 #pragma once
 
-#include "engine/project/fanIGame.hpp"
+#include "engine/project/fanIProject.hpp"
 
 namespace fan
 {
 	//========================================================================================================
 	//========================================================================================================
-	class GameServer : public IGame
+	class GameServer : public IProject
 	{
 	public:
 		void Init() override;

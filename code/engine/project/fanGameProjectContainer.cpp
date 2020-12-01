@@ -1,4 +1,4 @@
-#include "engine/project/fanGameHolder.hpp"
+#include "engine/project/fanGameProjectContainer.hpp"
 #include "core/fanDebug.hpp"
 #include "core/input/fanInputManager.hpp"
 #include "core/time/fanProfiler.hpp"
@@ -11,38 +11,38 @@
 #include "engine/singletons/fanScene.hpp"
 #include "engine/singletons/fanRenderDebug.hpp"
 #include "engine/singletons/fanApplication.hpp"
-#include "engine/project/fanIGame.hpp"
+#include "engine/project/fanIProject.hpp"
 
 namespace fan
 {
 	//========================================================================================================
     //========================================================================================================
-    GameHolder::GameHolder( LaunchSettings& _settings, IGame& _game ) :
-            IHolder( AdaptSettings( _settings ) ),
-            mGame( _game )
+    GameProjectContainer::GameProjectContainer( LaunchSettings& _settings, IProject& _project ) :
+            IProjectContainer( AdaptSettings( _settings ) ),
+            mProject( _project )
     {
-        _game.Init();
+        _project.Init();
 
 		SerializedValues::Get().LoadKeyBindings();
 
-		InitWorld( _game.mWorld );
+		InitWorld( _project.mWorld );
 
-        Application& app = _game.mWorld.GetSingleton<Application>();
-        app.mOnQuit.Connect( &IHolder::Exit, (IHolder*)this );
+        Application& app = _project.mWorld.GetSingleton<Application>();
+        app.mOnQuit.Connect( &IProjectContainer::Exit, (IProjectContainer*)this );
 
 		// load scene
-		Scene& scene = mGame.mWorld.GetSingleton<Scene>();
+		Scene& scene = mProject.mWorld.GetSingleton<Scene>();
 		scene.New();
 		if( !_settings.loadScene.empty() )
 		{
 			scene.LoadFrom( _settings.loadScene );
-            mGame.Start();
         }
+        mProject.Start();
 	}
 
     //========================================================================================================
     //========================================================================================================
-    LaunchSettings& GameHolder::AdaptSettings( LaunchSettings& _settings )
+    LaunchSettings& GameProjectContainer::AdaptSettings( LaunchSettings& _settings )
     {
         if( ! _settings.mForceWindowDimensions )
         {
@@ -55,11 +55,11 @@ namespace fan
 
 	//========================================================================================================
 	//========================================================================================================
-	void GameHolder::Run()
+	void GameProjectContainer::Run()
 	{
 		// initializes timers
 		mLastRenderTime = Time::ElapsedSinceStartup();
-		Time& time = mGame.mWorld.GetSingleton<Time>();
+		Time& time = mProject.mWorld.GetSingleton<Time>();
 		time.mLastLogicTime = Time::ElapsedSinceStartup();
 		
 		Profiler::Get().Begin();
@@ -75,18 +75,18 @@ namespace fan
 	
 	//========================================================================================================
 	//========================================================================================================
-	void GameHolder::Step()
+	void GameProjectContainer::Step()
 	{
 		const double currentTime = Time::ElapsedSinceStartup();
 		const bool renderIsThisFrame = currentTime > mLastRenderTime + Time::sRenderDelta;
-		Time& time = mGame.mWorld.GetSingleton<Time>();
+		Time& time = mProject.mWorld.GetSingleton<Time>();
         const bool logicIsThisFrame = currentTime >
                                       time.mLastLogicTime + time.mLogicDelta;
 
 		// runs logic, renders ui
 		while( currentTime > time.mLastLogicTime + time.mLogicDelta )
 		{
-            mGame.mWorld.GetSingleton<RenderDebug>().Clear();
+            mProject.mWorld.GetSingleton<RenderDebug>().Clear();
 
 			// Update input
 			ImGui::GetIO().DeltaTime = time.mLogicDelta;
@@ -100,7 +100,7 @@ namespace fan
             Mouse::NextFrame( mWindow.mWindow, glm::vec2( 0, 0) , windowSize ); /*todo true window hovered*/
             Input::Get().NewFrame();
             Input::Get().Manager().PullEvents();
-            Mouse& mouse = mGame.mWorld.GetSingleton<Mouse>();
+            Mouse& mouse = mProject.mWorld.GetSingleton<Mouse>();
             mouse.UpdateData( mWindow.mWindow );
 
 			// checking the loop timing is not late
@@ -129,9 +129,9 @@ namespace fan
 
 			time.mLastLogicTime += time.mLogicDelta;
 
-            mGame.Step( time.mLogicDelta );
+            mProject.Step( time.mLogicDelta );
 
-            mGame.mWorld.Run<SMoveFollowTransforms>();
+            mProject.mWorld.Run<SMoveFollowTransforms>();
 
             fanAssert( logicIsThisFrame );
 
@@ -149,7 +149,7 @@ namespace fan
 
 				ImGui::Render();
 			}
-            mGame.mWorld.ApplyTransitions();
+            mProject.mWorld.ApplyTransitions();
 		}
 
         mOnLPPSynch.Emmit();
@@ -162,7 +162,7 @@ namespace fan
 			Time::RegisterFrameDrawn();	// used for stats
 
             UpdateRenderWorld( mRenderer,
-                               mGame,
+                               mProject,
                                { mWindow.GetExtent().width, mWindow.GetExtent().height } );
 			mRenderer.DrawFrame();
 			Profiler::Get().End();

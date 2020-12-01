@@ -1,4 +1,4 @@
-#include "editor/windows/fanGameViewWindow.hpp"
+#include "editor/windows/fanProjectViewWindow.hpp"
 
 #include "network/singletons/fanTime.hpp"
 #include "engine/singletons/fanScene.hpp"
@@ -8,23 +8,23 @@ namespace fan
 {
 	//========================================================================================================
 	//========================================================================================================
-	GameViewWindow::GameViewWindow( const LaunchSettings::Mode _launchMode )
-		: EditorWindow( "game view", ImGui::IconType::Joystick16 )
+	ProjectViewWindow::ProjectViewWindow( const LaunchSettings::Mode _launchMode )
+		: EditorWindow( "project view", ImGui::IconType::Joystick16 )
 		, mIsHovered( false )
 	{
 		AddFlag( ImGuiWindowFlags_MenuBar );
 
-		// compute game world str for
+		// compute project world str for
 		switch( _launchMode )
 		{
             case LaunchSettings::Mode::EditorClient:
-                memcpy( mGameWorldsStr, "client\0\0", 8 );
+                memcpy( mStringProjectSelectionCombo, "client\0\0", 8 );
                 break;
             case LaunchSettings::Mode::EditorServer:
-                memcpy( mGameWorldsStr, "server\0\0", 8 );
+                memcpy( mStringProjectSelectionCombo, "server\0\0", 8 );
                 break;
             case LaunchSettings::Mode::EditorClientServer:
-                memcpy( mGameWorldsStr, "client\0server\0\0,", 16 );
+                memcpy( mStringProjectSelectionCombo, "client\0server\0\0,", 16 );
                 break;
             default:
                 fanAssert( false );
@@ -34,7 +34,7 @@ namespace fan
 
 	//========================================================================================================
 	//========================================================================================================
-	void GameViewWindow::OnGui( EcsWorld& _world )
+	void ProjectViewWindow::OnGui( EcsWorld& _world )
 	{
 		// update window size
 		const ImVec2 imGuiSize = ImGui::GetContentRegionAvail();
@@ -100,9 +100,9 @@ namespace fan
 			// combo current world			
 			ImGui::Spacing();
 			ImGui::SetNextItemWidth( 200.f );
-			if( ImGui::Combo( "##current game", &mCurrentGameSelected, mGameWorldsStr ) )
+			if( ImGui::Combo( "##current project", &mCurrentProject, mStringProjectSelectionCombo ) )
 			{
-				mOnSelectGame.Emmit( mCurrentGameSelected );
+				mOnSelectProject.Emmit( mCurrentProject );
 			}
 
 			ImGui::EndMenuBar();
@@ -114,7 +114,7 @@ namespace fan
 
         mPosition = btVector2( cursorPos.x + windowPos.x, cursorPos.y + windowPos.y );
 
-		// Draw game
+		// Draw project
 		ImGui::Image( ( void* ) 12, imGuiSize );
 
         mIsHovered = ImGui::IsItemHovered();

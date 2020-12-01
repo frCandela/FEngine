@@ -1,7 +1,7 @@
 #pragma once
 
 #include "core/resources/fanResource.hpp"
-#include "engine/fanSceneSerializable.hpp"
+#include "engine/fanEngineSerializable.hpp"
 
 namespace fan
 {

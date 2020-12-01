@@ -13,15 +13,15 @@ WARNINGS_POP()
 
 namespace fan
 {
-    class IGame;
+    class IProject;
 
     //========================================================================================================
     //========================================================================================================
-    class IHolder
+    class IProjectContainer
     {
     public:
-        IHolder( const LaunchSettings& _settings );
-        virtual ~IHolder() = default;
+        IProjectContainer( const LaunchSettings& _settings );
+        virtual ~IProjectContainer() = default;
 
         void Exit();
 
@@ -38,6 +38,6 @@ namespace fan
         double               mLastRenderTime = 0.;
 
         void InitWorld( EcsWorld& _world );
-        static void UpdateRenderWorld( Renderer& _renderer, IGame& _game, const glm::vec2 _size );
+        static void UpdateRenderWorld( Renderer& _renderer, IProject& _project, const glm::vec2 _size );
     };
 }

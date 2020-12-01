@@ -1,9 +1,9 @@
 #include "project_spaceships/fanGameClient.hpp"
 
 #include "core/time/fanProfiler.hpp"
-#include "network/singletons/fanTime.hpp"
 #include "core/input/fanInput.hpp"
 #include "core/input/fanInputManager.hpp"
+#include "network/singletons/fanTime.hpp"
 
 #include "engine/systems/fanUpdateRenderWorld.hpp"
 #include "engine/systems/fanSynchronizeMotionStates.hpp"
@@ -30,12 +30,8 @@
 #include "network/systems/fanTimeout.hpp"
 #include "network/systems/fanRollback.hpp"
 
+#include "project_spaceships/editor/fanRegisterEditorGui.hpp"
 #include "project_spaceships/fanGameTags.hpp"
-#include "project_spaceships/singletons/fanSunLight.hpp"
-#include "project_spaceships/singletons/fanGameCamera.hpp"
-#include "project_spaceships/singletons/fanCollisionManager.hpp"
-#include "project_spaceships/singletons/fanSolarEruption.hpp"
-#include "project_spaceships/singletons/fanGame.hpp"
 #include "project_spaceships/systems/fanUpdatePlanets.hpp"
 #include "project_spaceships/systems/fanUpdateSpaceships.hpp"
 #include "project_spaceships/systems/fanUpdateGameCamera.hpp"
@@ -44,9 +40,6 @@
 #include "project_spaceships/systems/fanUpdateEnergy.hpp"
 #include "project_spaceships/systems/fanUpdateGameUI.hpp"
 #include "project_spaceships/systems/fanParticlesOcclusion.hpp"
-#include "project_spaceships/components/fanBullet.hpp"
-#include "project_spaceships/components/fanDamage.hpp"
-#include "project_spaceships/singletons/ui/fanUIMainMenu.hpp"
 #include "project_spaceships/spawn/fanRegisterSpawnMethods.hpp"
 
 namespace fan
@@ -55,7 +48,7 @@ namespace fan
 	//========================================================================================================
 	void GameClient::Init()
 	{
-        EcsIncludeBase(mWorld);
+        EcsIncludeEngine( mWorld );
         EcsIncludePhysics(mWorld);
         EcsIncludeRender3D(mWorld);
         EcsIncludeRenderUI(mWorld);
@@ -86,10 +79,11 @@ namespace fan
 		mWorld.AddTagType<TagSunlightOcclusion>();
 
         mName = "client";
-        mWorld.GetSingleton<Scene>().mOnEditorUseGameCamera.Connect( &GameClient::UseGameCamera, this );
+        mWorld.GetSingleton<Scene>().mOnEditorUseProjectCamera.Connect( &GameClient::UseGameCamera, this );
         mWorld.GetSingleton<Scene>().mOnLoad.Connect( &GameClient::OnLoadScene, this );
 
         RegisterGameSpawnMethods( mWorld.GetSingleton<SpawnManager>() );
+        RegisterEditorGuiInfos( mWorld.GetSingleton< EditorGuiInfo >() );
 
         CreateGameAxes();
 	}
@@ -105,7 +99,7 @@ namespace fan
         mWorld.Run<SRegisterAllRigidbodies>();
         GameCamera& gameCamera = GameCamera::CreateGameCamera( mWorld );
         Scene& scene = mWorld.GetSingleton<Scene>();
-        scene.SetMainCamera( gameCamera.cmCameraHandle );
+        scene.SetMainCamera( gameCamera.mCameraHandle );
 
 		SolarEruption::Start( mWorld );
 
@@ -312,7 +306,7 @@ namespace fan
 	{
         GameCamera& gameCamera = mWorld.GetSingleton<GameCamera>();
         Scene& scene = mWorld.GetSingleton<Scene>();
-        scene.SetMainCamera( gameCamera.cmCameraHandle );
+        scene.SetMainCamera( gameCamera.mCameraHandle );
 	}
 
     //========================================================================================================

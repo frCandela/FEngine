@@ -1,38 +1,38 @@
-#include "project_spaceships/components/fanDamage.hpp"
-
+#include "project_empty/game/components/fanTestComponent.hpp"
 #include "engine/fanEngineSerializable.hpp"
 
 namespace fan
 {
+
 	//========================================================================================================
 	//========================================================================================================
-	void Damage::SetInfo( EcsComponentInfo& _info )
+	void TestComponent::SetInfo( EcsComponentInfo& _info )
 	{
-		_info.load        = &Damage::Load;
-		_info.save        = &Damage::Save;
+		_info.load        = &TestComponent::Load;
+		_info.save        = &TestComponent::Save;
 	}
 
 	//========================================================================================================
 	//========================================================================================================
-	void Damage::Init( EcsWorld& /*_world*/, EcsEntity /*_entity*/, EcsComponent& _component )
+	void TestComponent::Init( EcsWorld& /*_world*/, EcsEntity /*_entity*/, EcsComponent& _component )
 	{
-		Damage& damage = static_cast<Damage&>( _component );
-		damage.mDamage = 1.f;
+        TestComponent& testComponent = static_cast<TestComponent&>( _component );
+        testComponent.mValue = 42;
 	}
 
 	//========================================================================================================
 	//========================================================================================================
-	void Damage::Save( const EcsComponent& _component, Json& _json )
+	void TestComponent::Save( const EcsComponent& _component, Json& _json )
 	{
-		const Damage& damage = static_cast<const Damage&>( _component );
-		Serializable::SaveFloat( _json, "damage", damage.mDamage );
+		const TestComponent& testComponent = static_cast<const TestComponent&>( _component );
+		Serializable::SaveInt( _json, "test_value", testComponent.mValue );
 	}
 
 	//========================================================================================================
 	//========================================================================================================
-	void Damage::Load( EcsComponent& _component, const Json& _json )
+	void TestComponent::Load( EcsComponent& _component, const Json& _json )
 	{
-		Damage& damage = static_cast<Damage&>( _component );
-		Serializable::LoadFloat( _json, "damage", damage.mDamage );
+        TestComponent& testComponent = static_cast<TestComponent&>( _component );
+		Serializable::LoadInt( _json, "test_value", testComponent.mValue );
 	}
 }

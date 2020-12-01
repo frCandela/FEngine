@@ -65,28 +65,6 @@
 #include "editor/gui/scene/components/fanGuiSphereShape.hpp"
 #include "editor/gui/scene/components/fanGuiTransform.hpp"
 
-// GAME
-#include "editor/gui/game/singletons/ui/fanGuiUIMainMenu.hpp"
-#include "editor/gui/game/singletons/fanGuiClientNetworkManager.hpp"
-#include "editor/gui/game/singletons/fanGuiCollisionManager.hpp"
-#include "editor/gui/game/singletons/fanGuiGame.hpp"
-#include "editor/gui/game/singletons/fanGuiGameCamera.hpp"
-#include "editor/gui/game/singletons/fanGuiServerNetworkManager.hpp"
-#include "editor/gui/game/singletons/fanGuiSolarEruption.hpp"
-#include "editor/gui/game/singletons/fanGuiSunLight.hpp"
-
-#include "editor/gui/game/components/fanGuiBattery.hpp"
-#include "editor/gui/game/components/fanGuiBullet.hpp"
-#include "editor/gui/game/components/fanGuiDamage.hpp"
-#include "editor/gui/game/components/fanGuiHealth.hpp"
-#include "editor/gui/game/components/fanGuiPlanet.hpp"
-#include "editor/gui/game/components/fanGuiPlayerController.hpp"
-#include "editor/gui/game/components/fanGuiPlayerInput.hpp"
-#include "editor/gui/game/components/fanGuiSolarPanel.hpp"
-#include "editor/gui/game/components/fanGuiSpaceShip.hpp"
-#include "editor/gui/game/components/fanGuiSpaceshipUI.hpp"
-#include "editor/gui/game/components/fanGuiWeapon.hpp"
-
 namespace fan
 {
     //========================================================================================================
@@ -165,28 +143,6 @@ namespace fan
         editorGui.mComponentInfos[ SceneNode::Info::sType ]   = GuiSceneNode::GetInfo();
         editorGui.mComponentInfos[ SphereShape::Info::sType ]   = GuiSphereShape::GetInfo();
         editorGui.mComponentInfos[ Transform::Info::sType ]   = GuiTransform::GetInfo();
-
-        // game @todo make this local to every game project when projects are done
-        editorGui.mSingletonInfos[ UIMainMenu::Info::sType ]            = GuiUIMainMenu::GetInfo();
-        editorGui.mSingletonInfos[ ClientNetworkManager::Info::sType ]  = GuiClientNetworkManager::GetInfo();
-        editorGui.mSingletonInfos[ CollisionManager::Info::sType ]      = GuiCollisionManager::GetInfo();
-        editorGui.mSingletonInfos[ Game::Info::sType ]                  = GuiGame::GetInfo();
-        editorGui.mSingletonInfos[ GameCamera::Info::sType ]            = GuiGameCamera::GetInfo();
-        editorGui.mSingletonInfos[ ServerNetworkManager::Info::sType ]  = GuiServerNetworkManager::GetInfo();
-        editorGui.mSingletonInfos[ SolarEruption::Info::sType ]         = GuiSolarEruption::GetInfo();
-        editorGui.mSingletonInfos[ SunLight::Info::sType ]              = GuiSunLight::GetInfo();
-
-        editorGui.mComponentInfos[ Battery::Info::sType ]           = GuiBattery::GetInfo();
-        editorGui.mComponentInfos[ Bullet::Info::sType ]            = GuiBullet::GetInfo();
-        editorGui.mComponentInfos[ Damage::Info::sType ]            = GuiDamage::GetInfo();
-        editorGui.mComponentInfos[ Health::Info::sType ]            = GuiHealth::GetInfo();
-        editorGui.mComponentInfos[ Planet::Info::sType ]            = GuiPlanet::GetInfo();
-        editorGui.mComponentInfos[ PlayerController::Info::sType ]  = GuiPlayerController::GetInfo();
-        editorGui.mComponentInfos[ PlayerInput::Info::sType ]       = GuiPlayerInput::GetInfo();
-        editorGui.mComponentInfos[ SolarPanel::Info::sType ]        = GuiSolarPanel::GetInfo();
-        editorGui.mComponentInfos[ SpaceShip::Info::sType ]         = GuiSpaceShip::GetInfo();
-        editorGui.mComponentInfos[ SpaceshipUI::Info::sType ]       = GuiSpaceshipUI::GetInfo();
-        editorGui.mComponentInfos[ Weapon::Info::sType ]            = GuiWeapon::GetInfo();
     }
 
     //========================================================================================================

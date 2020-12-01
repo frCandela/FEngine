@@ -1,4 +1,4 @@
-#include "engine/fanSceneSerializable.hpp"
+#include "engine/fanEngineSerializable.hpp"
 
 #include "engine/fanSceneResourcePtr.hpp"
 #include "engine/singletons/fanScenePointers.hpp"

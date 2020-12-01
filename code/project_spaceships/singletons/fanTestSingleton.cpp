@@ -65,7 +65,7 @@ namespace fan
 		transform.SetPosition( btVector3( 0, 5, 0 ) );
 
 		GameCamera& gameCamera = _world.GetSingleton<GameCamera>();
-		gameCamera.cmCameraHandle = cameraNode.mHandle;
+		gameCamera.mCameraHandle = cameraNode.mHandle;
 
 		return gameCamera;
 	}
@@ -77,7 +77,7 @@ namespace fan
 	void GameCamera::DeleteGameCamera( EcsWorld& _world )
 	{
 		GameCamera& gameCamera = _world.GetSingleton<GameCamera>();
-		_world.Kill( _world.GetEntity( gameCamera.cmCameraHandle ) );
-		gameCamera.cmCameraHandle = 0;
+		_world.Kill( _world.GetEntity( gameCamera.mCameraHandle ) );
+		gameCamera.mCameraHandle = 0;
 	}
 }

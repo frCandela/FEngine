@@ -8,70 +8,73 @@
 
 namespace fan
 {
-    //========================================================================================================
-    //========================================================================================================
-    struct TestSingleton : public EcsSingleton
+    namespace test
     {
+        //====================================================================================================
+        //====================================================================================================
+        struct TestSingleton : public EcsSingleton
+        {
         ECS_SINGLETON( TestSingleton );
-        static void SetInfo( EcsSingletonInfo& _info )
-        {
-            _info.mSlots.push_back( new Slot<int>( "test int", &TestSingleton::SetValueInt ) );
-        }
-        static void	Init( EcsWorld& /*_world*/, EcsSingleton& _singleton )
-        {
-            TestSingleton& testSingleton = static_cast<TestSingleton&>(_singleton);
-            testSingleton.mValueInt = 0;
-        }
-        static void SetValueInt( EcsSingleton& _singleton, int _value )
-        {
-            TestSingleton& testSingleton = static_cast<TestSingleton&>(_singleton);
-            testSingleton.mValueInt = _value;
-        }
-        int     mValueInt = 0;
-    };
+            static void SetInfo( EcsSingletonInfo& _info )
+            {
+                _info.mSlots.push_back( new Slot<int>( "test int", &TestSingleton::SetValueInt ) );
+            }
+            static void	Init( EcsWorld& /*_world*/, EcsSingleton& _singleton )
+            {
+                TestSingleton& testSingleton = static_cast<TestSingleton&>(_singleton);
+                testSingleton.mValueInt = 0;
+            }
+            static void SetValueInt( EcsSingleton& _singleton, int _value )
+            {
+                TestSingleton& testSingleton = static_cast<TestSingleton&>(_singleton);
+                testSingleton.mValueInt = _value;
+            }
+            int     mValueInt = 0;
+        };
 
-    //========================================================================================================
-    //========================================================================================================
-    struct TestComponent : public EcsComponent
-    {
+        //====================================================================================================
+        //====================================================================================================
+        struct TestComponent : public EcsComponent
+        {
         ECS_COMPONENT( TestComponent )
-        static void SetInfo( EcsComponentInfo& _info )
-        {
-            _info.mSlots.push_back( new Slot<int>( "test int", &TestComponent::SetValueInt ) );
-            _info.mSlots.push_back( new Slot<float>( "test float", &TestComponent::SetValueFloat ) );
-        }
-        static void	Init( EcsWorld& /*_world*/, EcsEntity /*_entity*/, EcsComponent& _component )
-        {
-            TestComponent& testComponent = static_cast<TestComponent&>(_component);
-            testComponent.mValueInt = 0;
-            testComponent.mValueFloat = 0;
-        }
-        static void SetValueInt( EcsComponent& _component, int _value )
-        {
-            TestComponent& testComponent = static_cast<TestComponent&>(_component);
-            testComponent.mValueInt = _value;
-        }
-        static void SetValueFloat( EcsComponent& _component,float _value )
-        {
-            TestComponent& testComponent = static_cast<TestComponent&>(_component);
-            testComponent.mValueFloat = _value;
-        }
-        static void DoNothing( EcsComponent& _component )
-        {
-            (void)_component;
-        }
+            static void SetInfo( EcsComponentInfo& _info )
+            {
+                _info.mSlots.push_back( new Slot<int>( "test int", &TestComponent::SetValueInt ) );
+                _info.mSlots.push_back( new Slot<float>( "test float", &TestComponent::SetValueFloat ) );
+            }
+            static void	Init( EcsWorld& /*_world*/, EcsEntity /*_entity*/, EcsComponent& _component )
+            {
+                TestComponent& testComponent = static_cast<TestComponent&>(_component);
+                testComponent.mValueInt = 0;
+                testComponent.mValueFloat = 0;
+            }
+            static void SetValueInt( EcsComponent& _component, int _value )
+            {
+                TestComponent& testComponent = static_cast<TestComponent&>(_component);
+                testComponent.mValueInt = _value;
+            }
+            static void SetValueFloat( EcsComponent& _component,float _value )
+            {
+                TestComponent& testComponent = static_cast<TestComponent&>(_component);
+                testComponent.mValueFloat = _value;
+            }
+            static void DoNothing( EcsComponent& _component )
+            {
+                (void)_component;
+            }
 
 
-        int     mValueInt = 0;
-        float   mValueFloat = 0;
-    };
-
+            int     mValueInt = 0;
+            float   mValueFloat = 0;
+        };
+    }
 
     //========================================================================================================
     //========================================================================================================
     class UnitTestSignal : public UnitTest<UnitTestSignal>
     {
     public:
+
         static std::vector<TestMethod> GetTests()
         {
             return { { &UnitTestSignal::TestConnect,            "Connect " },
@@ -83,6 +86,7 @@ namespace fan
         }
         void Create() override
         {
+            using namespace test;
             mWorld.AddComponentType<TestComponent>();
             mWorld.AddSingletonType<TestSingleton>();
         }
@@ -120,6 +124,7 @@ namespace fan
 
         void TestSlotPtrComponent()
         {
+            using namespace test;
             EcsHandle handle = 1;
             Slot<> slot("null", &TestComponent::DoNothing );
             SlotPtr slotPtr;
@@ -140,6 +145,7 @@ namespace fan
 
         void TestSlotPtrSingleton()
         {
+            using namespace test;
             Slot< int > slot("null", &TestSingleton::SetValueInt );
             SlotPtr slotPtr;
             TEST_ASSERT( ! slotPtr.IsValid() );
@@ -153,6 +159,7 @@ namespace fan
 
         void TestSignalSlotComponent()
         {
+            using namespace test;
             EcsEntity entity = mWorld.CreateEntity();
             EcsHandle handle = mWorld.AddHandle( entity );
             TestComponent& testComponent = mWorld.AddComponent<TestComponent>(entity);
@@ -193,6 +200,7 @@ namespace fan
 
         void TestSignalSlotSingleton()
         {
+            using namespace test;
             TestSingleton& testSingleton = mWorld.GetSingleton<TestSingleton>();
 
             // get slot

@@ -2,7 +2,7 @@
 
 #include "core/ecs/fanEcsWorld.hpp"
 #include "engine/singletons/fanRenderDebug.hpp"
-#include "engine/fanSceneSerializable.hpp"
+#include "engine/fanEngineSerializable.hpp"
 
 namespace fan
 {

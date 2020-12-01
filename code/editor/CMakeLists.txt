@@ -10,7 +10,6 @@ set( FAN_EDITOR_LIBS
     fanRender
     fanNetwork
     fanEngine
-    fanGame
 )
 
 add_compile_options( ${COMPILATION_FLAGS} )

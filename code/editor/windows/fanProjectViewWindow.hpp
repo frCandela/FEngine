@@ -11,9 +11,9 @@ namespace fan
 	class EcsWorld;
 
 	//========================================================================================================
-	// show the game in 3D
+	// 3D view displaying a world in a project
 	//========================================================================================================
-	class GameViewWindow : public EditorWindow
+	class ProjectViewWindow : public EditorWindow
 	{
 	public:
 		Signal< VkExtent2D > mOnSizeChanged;
@@ -22,22 +22,22 @@ namespace fan
 		Signal<>             mOnResume;
 		Signal<>             mOnStop;
 		Signal<>             mOnStep;
-		Signal<int>          mOnSelectGame;
+		Signal<int>          mOnSelectProject;
 
-		GameViewWindow( const LaunchSettings::Mode _launchMode );
+		ProjectViewWindow( const LaunchSettings::Mode _launchMode );
 		btVector2 GetSize()			const { return mSize; }
 		btVector2 GetPosition()		const { return mPosition; }
 		float	  GetAspectRatio()	const { return ( float ) mSize[ 0 ] / ( float ) mSize[ 1 ]; }
 		bool	  IsHovered()		const { return mIsHovered; }
-		void	  SetCurrentGameSelected( const int _index ) { mCurrentGameSelected = _index;  }
+		void	  SetCurrentProject( const int _index ) { mCurrentProject = _index;  }
 	protected:
 		void OnGui( EcsWorld& _world ) override;
 
 	private:
-		btVector2 mSize                = btVector2( 1.f, 1.f );
+		btVector2 mSize           = btVector2( 1.f, 1.f );
 		btVector2 mPosition;
 		bool      mIsHovered;
-		char      mGameWorldsStr[16];
-		int       mCurrentGameSelected = 0;
+		char      mStringProjectSelectionCombo[16];
+		int       mCurrentProject = 0;
 	};
 }

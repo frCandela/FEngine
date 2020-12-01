@@ -1,7 +1,6 @@
 #include "project_spaceships/fanGameServer.hpp"
 
 #include "core/time/fanProfiler.hpp"
-#include "network/singletons/fanTime.hpp"
 
 #include "engine/systems/fanUpdateRenderWorld.hpp"
 #include "engine/systems/fanSynchronizeMotionStates.hpp"
@@ -14,16 +13,16 @@
 #include "engine/systems/fanUpdateTransforms.hpp"
 #include "engine/singletons/fanScene.hpp"
 #include "engine/singletons/fanRenderResources.hpp"
-#include "network/singletons/fanServerConnection.hpp"
-#include "network/singletons/fanLinkingContext.hpp"
+
 #include "network/components/fanHostReplication.hpp"
+#include "network/singletons/fanTime.hpp"
+#include "network/singletons/fanLinkingContext.hpp"
 #include "network/systems/fanServerUpdates.hpp"
 #include "network/systems/fanServerSendReceive.hpp"
 #include "network/systems/fanTimeout.hpp"
+
+#include "project_spaceships/editor/fanRegisterEditorGui.hpp"
 #include "project_spaceships/fanGameTags.hpp"
-#include "project_spaceships/singletons/fanServerNetworkManager.hpp"
-#include "project_spaceships/singletons/fanGameCamera.hpp"
-#include "project_spaceships/singletons/fanSunLight.hpp"
 #include "project_spaceships/systems/fanUpdatePlanets.hpp"
 #include "project_spaceships/systems/fanUpdateSpaceships.hpp"
 #include "project_spaceships/systems/fanUpdateGameCamera.hpp"
@@ -32,8 +31,6 @@
 #include "project_spaceships/systems/fanUpdateEnergy.hpp"
 #include "project_spaceships/systems/fanUpdateGameUI.hpp"
 #include "project_spaceships/systems/fanParticlesOcclusion.hpp"
-#include "project_spaceships/components/fanBullet.hpp"
-#include "project_spaceships/components/fanDamage.hpp"
 #include "project_spaceships/spawn/fanRegisterSpawnMethods.hpp"
 
 namespace fan
@@ -42,7 +39,7 @@ namespace fan
 	//========================================================================================================
 	void GameServer::Init()
 	{
-        EcsIncludeBase(mWorld);
+        EcsIncludeEngine( mWorld );
         EcsIncludePhysics(mWorld);
         EcsIncludeRender3D(mWorld);
         EcsIncludeNetworkServer( mWorld );
@@ -71,9 +68,10 @@ namespace fan
         mName = "server";
         Game& game = mWorld.GetSingleton<Game>();
         game.mIsServer = true;
-        mWorld.GetSingleton<Scene>().mOnEditorUseGameCamera.Connect( &GameServer::UseGameCamera, this );
+        mWorld.GetSingleton<Scene>().mOnEditorUseProjectCamera.Connect( &GameServer::UseGameCamera, this );
 
         RegisterGameSpawnMethods( mWorld.GetSingleton<SpawnManager>() );
+        RegisterEditorGuiInfos( mWorld.GetSingleton< EditorGuiInfo >() );
 	}
 
 	//========================================================================================================
@@ -86,7 +84,7 @@ namespace fan
         mWorld.Run<SRegisterAllRigidbodies>();
         GameCamera& gameCamera = GameCamera::CreateGameCamera( mWorld );
         Scene& scene = mWorld.GetSingleton<Scene>();
-        scene.SetMainCamera( gameCamera.cmCameraHandle );
+        scene.SetMainCamera( gameCamera.mCameraHandle );
 
 		SolarEruption::Start( mWorld );
 
@@ -193,6 +191,6 @@ namespace fan
     {
         GameCamera& gameCamera = mWorld.GetSingleton<GameCamera>();
         Scene& scene = mWorld.GetSingleton<Scene>();
-        scene.SetMainCamera( gameCamera.cmCameraHandle );
+        scene.SetMainCamera( gameCamera.mCameraHandle );
     }
 }

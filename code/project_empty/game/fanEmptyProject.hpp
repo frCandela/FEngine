@@ -1,12 +1,12 @@
 #pragma once
 
-#include "engine/project/fanIGame.hpp"
+#include "engine/project/fanIProject.hpp"
 
 namespace fan
 {
 	//========================================================================================================
 	//========================================================================================================
-	class EmptyProject : public IGame
+	class EmptyProject : public IProject
 	{
 	public:
         void Init() override;
@@ -14,5 +14,7 @@ namespace fan
         void Stop() override;
         void Step( const float _delta ) override;
         void UpdateRenderWorld() override;
+
+
 	};
 }

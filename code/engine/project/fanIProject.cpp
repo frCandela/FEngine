@@ -1,4 +1,4 @@
-#include "fanIGame.hpp"
+#include "fanIProject.hpp"
 
 // base
 #include "engine/fanSceneTags.hpp"
@@ -66,7 +66,7 @@ namespace fan
 {
     //========================================================================================================
     //========================================================================================================
-    void IGame::EcsIncludeBase    ( EcsWorld& _world )
+    void IProject::EcsIncludeEngine    ( EcsWorld& _world )
     {
         _world.AddComponentType<SceneNode>();
         _world.AddComponentType<Transform>();
@@ -85,7 +85,7 @@ namespace fan
 
     //========================================================================================================
     //========================================================================================================
-    void IGame::EcsIncludePhysics ( EcsWorld& _world )
+    void IProject::EcsIncludePhysics ( EcsWorld& _world )
     {
         _world.AddComponentType<Rigidbody>();
         _world.AddComponentType<MotionState>();
@@ -97,7 +97,7 @@ namespace fan
 
     //========================================================================================================
     //========================================================================================================
-    void IGame::EcsIncludeRender3D( EcsWorld& _world )
+    void IProject::EcsIncludeRender3D( EcsWorld& _world )
     {
         _world.AddComponentType<DirectionalLight>();
         _world.AddComponentType<PointLight>();
@@ -113,7 +113,7 @@ namespace fan
 
     //========================================================================================================
     //========================================================================================================
-    void IGame::EcsIncludeRenderUI( EcsWorld& _world )
+    void IProject::EcsIncludeRenderUI( EcsWorld& _world )
     {
         _world.AddComponentType<UITransform>();
         _world.AddComponentType<UIRenderer>();
@@ -130,7 +130,7 @@ namespace fan
 
     //========================================================================================================
     //========================================================================================================
-    void IGame::EcsIncludeNetworkClient ( EcsWorld& _world )
+    void IProject::EcsIncludeNetworkClient ( EcsWorld& _world )
     {
         _world.AddComponentType<ReliabilityLayer>();
         _world.AddComponentType<LinkingContextUnregisterer>();
@@ -145,7 +145,7 @@ namespace fan
 
     //========================================================================================================
     //========================================================================================================
-    void IGame::EcsIncludeNetworkServer( EcsWorld& _world )
+    void IProject::EcsIncludeNetworkServer( EcsWorld& _world )
     {
         _world.AddComponentType<ReliabilityLayer>();
         _world.AddComponentType<LinkingContextUnregisterer>();

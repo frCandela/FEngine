@@ -2,7 +2,7 @@
 
 #include <set>
 #include "core/ecs/fanSignal.hpp"
-#include "engine/fanSceneSerializable.hpp"
+#include "engine/fanEngineSerializable.hpp"
 #include "core/ecs/fanEcsSingleton.hpp"
 
 namespace fan
@@ -46,7 +46,7 @@ namespace fan
 		Signal< Scene& >     mOnClear;
 		Signal< Scene& >     mOnLoad;
 		Signal< SceneNode* > mOnDeleteSceneNode;
-        Signal<>             mOnEditorUseGameCamera;
+        Signal<>             mOnEditorUseProjectCamera;
 
 		EcsWorld* const		mWorld = nullptr;
 		std::string         mPath;

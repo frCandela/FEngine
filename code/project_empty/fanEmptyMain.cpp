@@ -7,8 +7,9 @@
 
 #include <iostream>
 #include "engine/project/fanLaunchSettings.hpp"
-#include "project_empty/fanEmptyProject.hpp"
-#include "editor/fanEditorHolder.hpp"
+#include "engine/project/fanGameProjectContainer.hpp"
+#include "editor/fanEditorProjectContainer.hpp"
+#include "project_empty/game/fanEmptyProject.hpp"
 
 //============================================================================================================
 //============================================================================================================
@@ -17,14 +18,20 @@ int main( int _argc, char* _argv[] )
     (void)_argc;
     (void)_argv;
 
-    std::cout << "testoss" << std::endl;
-
     fan::LaunchSettings settings;
     settings.windowName = "takala";
 
     fan::EmptyProject project;
-    fan::EditorHolder editor( settings, { &project } );
+
+#ifdef FAN_EDITOR
+    fan::EditorProjectContainer editor( settings, { &project } );
     editor.Run();
+#else
+    fan::GameProjectContainer   game( settings, project );
+    game.Run();
+#endif
+
+
 
     return 0;
 }

@@ -1,7 +1,7 @@
-#include "fanIHolder.hpp"
+#include "fanIProjectContainer.hpp"
 #include "core/time/fanProfiler.hpp"
 #include "core/math/fanMathUtils.hpp"
-#include "fanIGame.hpp"
+#include "fanIProject.hpp"
 #include "engine/singletons/fanRenderWorld.hpp"
 #include "engine/singletons/fanRenderDebug.hpp"
 #include "engine/singletons/fanScene.hpp"
@@ -15,7 +15,7 @@ namespace fan
 {
     //========================================================================================================
     //========================================================================================================
-    IHolder::IHolder( const LaunchSettings& _settings ) :
+    IProjectContainer::IProjectContainer( const LaunchSettings& _settings ) :
             mLaunchSettings( _settings ),
             mWindow( _settings.windowName, _settings.window_position, _settings.window_size ),
             mRenderer( mWindow,
@@ -35,14 +35,14 @@ namespace fan
 
     //========================================================================================================
     //========================================================================================================
-    void IHolder::Exit()
+    void IProjectContainer::Exit()
     {
         mApplicationShouldExit = true;
     }
 
     //========================================================================================================
     //========================================================================================================
-    void IHolder::InitWorld( EcsWorld& _world )
+    void IProjectContainer::InitWorld( EcsWorld& _world )
     {
         RenderResources& renderResources = _world.GetSingleton<RenderResources>();
         renderResources.SetPointers(&mRenderer.mMeshManager,
@@ -55,16 +55,16 @@ namespace fan
 
     //========================================================================================================
     //========================================================================================================
-    void IHolder::UpdateRenderWorld( Renderer& _renderer, IGame& _game, const glm::vec2 _size )
+    void IProjectContainer::UpdateRenderWorld( Renderer& _renderer, IProject& _project, const glm::vec2 _size )
     {
-        EcsWorld& world = _game.mWorld;
+        EcsWorld& world = _project.mWorld;
 
         SCOPED_PROFILE( update_RW );
         RenderWorld      & renderWorld = world.GetSingleton<RenderWorld>();
         const RenderDebug& renderDebug = world.GetSingleton<RenderDebug>();
         renderWorld.mTargetSize = _size;
 
-        _game.UpdateRenderWorld();
+        _project.UpdateRenderWorld();
 
         // particles mesh
         RenderDataModel particlesDrawData;

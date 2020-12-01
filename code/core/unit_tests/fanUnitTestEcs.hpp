@@ -12,17 +12,20 @@ namespace fan
     //========================================================================================================
     struct TestEcsSingleton : public EcsSingleton
     {
+
         ECS_SINGLETON( TestEcsSingleton );
         static void SetInfo( EcsSingletonInfo& /*_info*/ )
         {
         }
         static void	Init( EcsWorld& /*_world*/, EcsSingleton& _singleton )
         {
+            using namespace test;
             TestSingleton& testSingleton = static_cast<TestSingleton&>(_singleton);
             testSingleton.mValueInt = 0;
         }
         static void SetValueInt( EcsSingleton& _singleton, int _value )
         {
+            using namespace test;
             TestSingleton& testSingleton = static_cast<TestSingleton&>(_singleton);
             testSingleton.mValueInt = _value;
         }
@@ -39,6 +42,7 @@ namespace fan
         }
         static void	Init( EcsWorld& /*_world*/, EcsEntity /*_entity*/, EcsComponent& _component )
         {
+            using namespace test;
             TestComponent& testComponent = static_cast<TestComponent&>(_component);
             testComponent.mValueInt = 0;
         }

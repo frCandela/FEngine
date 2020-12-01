@@ -1,6 +1,6 @@
 #include "project_spaceships/components/fanBattery.hpp"
 
-#include "engine/fanSceneSerializable.hpp"
+#include "engine/fanEngineSerializable.hpp"
 
 namespace fan
 {
