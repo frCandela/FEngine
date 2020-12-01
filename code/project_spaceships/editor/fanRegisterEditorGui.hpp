@@ -1,5 +1,7 @@
 #pragma once
 
+#ifdef FAN_EDITOR
+
 #include "editor/singletons/fanEditorGuiInfo.hpp"
 
 #include "project_spaceships/editor/singletons/ui/fanGuiUIMainMenu.hpp"
@@ -25,6 +27,9 @@
 
 namespace fan
 {
+    //========================================================================================================
+    // Registers gui informations when launching with an Editor container
+    //========================================================================================================
     inline void RegisterEditorGuiInfos( EditorGuiInfo& _editorGui )
     {
         _editorGui.mSingletonInfos[ UIMainMenu::Info::sType ]            = GuiUIMainMenu::GetInfo();
@@ -49,3 +54,5 @@ namespace fan
         _editorGui.mComponentInfos[ Weapon::Info::sType ]            = GuiWeapon::GetInfo();
     }
 }
+
+#endif

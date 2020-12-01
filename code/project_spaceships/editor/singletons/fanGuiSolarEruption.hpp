@@ -1,7 +1,8 @@
 #pragma once
 
-#include "project_spaceships/singletons/fanSolarEruption.hpp"
+#include "project_spaceships/game/singletons/fanSolarEruption.hpp"
 #include "editor/singletons/fanEditorGuiInfo.hpp"
+#include "editor/fanModals.hpp"
 
 namespace fan
 {

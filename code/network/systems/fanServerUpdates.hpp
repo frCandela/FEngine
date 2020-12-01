@@ -5,10 +5,10 @@
 #include "network/singletons/fanTime.hpp"
 #include "network/singletons/fanHostManager.hpp"
 #include "network/systems/fanHostReplication.hpp"
-#include "project_spaceships/spawn/fanSpawnShip.hpp"
-#include "project_spaceships/components/fanPlayerInput.hpp"
-#include "project_spaceships/singletons/fanSolarEruption.hpp"
-#include "project_spaceships/spawn/fanSpawnSolarEruption.hpp"
+#include "project_spaceships/game/spawn/fanSpawnShip.hpp"
+#include "project_spaceships/game/components/fanPlayerInput.hpp"
+#include "project_spaceships/game/singletons/fanSolarEruption.hpp"
+#include "project_spaceships/game/spawn/fanSpawnSolarEruption.hpp"
 
 namespace fan
 {

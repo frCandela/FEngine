@@ -1,6 +1,6 @@
 #pragma once
 
-#include "project_spaceships/components/fanPlayerInput.hpp"
+#include "project_spaceships/game/components/fanPlayerInput.hpp"
 #include "editor/singletons/fanEditorGuiInfo.hpp"
 #include "editor/fanModals.hpp"
 

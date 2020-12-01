@@ -1,4 +1,4 @@
-#include "fanEmptyProject.hpp"
+#include "fanGameClient.hpp"
 
 #include "core/time/fanProfiler.hpp"
 

@@ -1,7 +1,7 @@
 #include "core/ecs/fanEcsSystem.hpp"
 #include "network/components/fanClientRollback.hpp"
 #include "network/singletons/fanTime.hpp"
-#include "project_spaceships/singletons/fanClientNetworkManager.hpp"
+#include "project_spaceships/game/singletons/fanClientNetworkManager.hpp"
 
 namespace fan
 {

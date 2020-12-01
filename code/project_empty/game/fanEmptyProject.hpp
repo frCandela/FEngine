@@ -14,7 +14,5 @@ namespace fan
         void Stop() override;
         void Step( const float _delta ) override;
         void UpdateRenderWorld() override;
-
-
 	};
 }
