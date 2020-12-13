@@ -17,9 +17,9 @@ namespace fan
     //========================================================================================================
     IProjectContainer::IProjectContainer( const LaunchSettings& _settings ) :
             mLaunchSettings( _settings ),
-            mWindow( _settings.windowName, _settings.window_position, _settings.window_size ),
+            mWindow( _settings.mWindowName, _settings.mWindow_position, _settings.mWindow_size ),
             mRenderer( mWindow,
-                       _settings.launchEditor ? Renderer::ViewType::Editor : Renderer::ViewType::Game ),
+                       _settings.mLaunchEditor ? Renderer::ViewType::Editor : Renderer::ViewType::Game ),
             mApplicationShouldExit( false )
     {
         Mouse::SetCallbacks( mWindow.mWindow );

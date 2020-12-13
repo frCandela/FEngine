@@ -33,9 +33,9 @@ namespace fan
 		// load scene
 		Scene& scene = mProject.mWorld.GetSingleton<Scene>();
 		scene.New();
-		if( !_settings.loadScene.empty() )
+		if( !_settings.mLoadScene.empty() )
 		{
-			scene.LoadFrom( _settings.loadScene );
+			scene.LoadFrom( _settings.mLoadScene );
         }
         mProject.Start();
 	}
@@ -46,10 +46,11 @@ namespace fan
     {
         if( ! _settings.mForceWindowDimensions )
         {
-            SerializedValues::LoadWindowPosition( _settings.window_position );
-            SerializedValues::LoadWindowSize( _settings.window_size );
+            SerializedValues::LoadWindowPosition( _settings.mWindow_position );
+            SerializedValues::LoadWindowSize( _settings.mWindow_size );
         }
-        _settings.mIconPath = RenderGlobal::sGameIcon;
+        _settings.mIconPath     = RenderGlobal::sGameIcon;
+        _settings.mLaunchEditor = false;
         return _settings;
     }
 
@@ -170,7 +171,7 @@ namespace fan
 		}
 
 		// sleep for the rest of the frame
-		if( mLaunchSettings.mainLoopSleep )
+		if( mLaunchSettings.mMainLoopSleep )
 		{
 			// @todo repair this to work with multiple worlds running 
 // 				const double minSleepTime = 1;

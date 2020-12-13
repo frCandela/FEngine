@@ -20,7 +20,7 @@ namespace fan
 		GameProjectContainer( LaunchSettings& _settings, IProject& _project );
 		~GameProjectContainer() override {};
 
-		void Run();
+		void Run() override;
 		void Step();
 
 	private:

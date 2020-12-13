@@ -63,7 +63,7 @@ namespace fan
 
         // Initialize editor components
         mMainMenuBar       = new MainMenuBar();
-        mProjectViewWindow = new ProjectViewWindow( _settings.launchMode );
+        mProjectViewWindow = new ProjectViewWindow( /*_settings.launchMode*/ ); // @todo repair this
         SceneWindow& sceneWindow = *new SceneWindow();
         mMainMenuBar->SetWindows( {
                                           mProjectViewWindow,
@@ -139,12 +139,12 @@ namespace fan
 
             // load scene
             scene.New();
-            if( !_settings.loadScene.empty() )
+            if( !_settings.mLoadScene.empty() )
             {
-                scene.LoadFrom( _settings.loadScene );
+                scene.LoadFrom( _settings.mLoadScene );
 
                 // auto play the scene
-                if( _settings.autoPlay )
+                if( _settings.mAutoPlay )
                 {
                     Start( project );
                 }
@@ -158,10 +158,11 @@ namespace fan
     {
         if( ! _settings.mForceWindowDimensions )
         {
-            SerializedValues::LoadWindowPosition( _settings.window_position );
-            SerializedValues::LoadWindowSize( _settings.window_size );
+            SerializedValues::LoadWindowPosition( _settings.mWindow_position );
+            SerializedValues::LoadWindowSize( _settings.mWindow_size );
         }
-        _settings.mIconPath = RenderGlobal::sEditorIcon;
+        _settings.mIconPath     = RenderGlobal::sEditorIcon;
+        _settings.mLaunchEditor = true;
         return _settings;
     }
 
@@ -341,7 +342,7 @@ namespace fan
         }
 
         // sleep for the rest of the frame
-        if( mLaunchSettings.mainLoopSleep )
+        if( mLaunchSettings.mMainLoopSleep )
         {
             // @todo repair this to work with multiple worlds running
 // 			const double minSleepTime = 1;

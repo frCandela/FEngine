@@ -22,7 +22,7 @@ namespace fan
 		EditorProjectContainer( LaunchSettings& _settings, const std::vector<IProject*>& _projects );
 		~EditorProjectContainer() override;
 
-		void Run();
+		void Run() override;
 		void Step();
 	private:
 		std::vector<IProject*>  mProjects;

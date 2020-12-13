@@ -1,4 +1,4 @@
-#include "fanIProject.hpp"
+#include "engine/project/fanIProject.hpp"
 
 // base
 #include "engine/fanSceneTags.hpp"

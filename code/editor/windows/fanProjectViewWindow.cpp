@@ -8,28 +8,28 @@ namespace fan
 {
 	//========================================================================================================
 	//========================================================================================================
-	ProjectViewWindow::ProjectViewWindow( const LaunchSettings::Mode _launchMode )
+	ProjectViewWindow::ProjectViewWindow( /*const LaunchSettings::NetworkMode _launchMode*/ ) //@todo repair this
 		: EditorWindow( "project view", ImGui::IconType::Joystick16 )
 		, mIsHovered( false )
 	{
 		AddFlag( ImGuiWindowFlags_MenuBar );
 
 		// compute project world str for
-		switch( _launchMode )
+		/*switch( _launchMode )
 		{
-            case LaunchSettings::Mode::EditorClient:
+            case LaunchSettings::NetworkMode::EditorClient:
                 memcpy( mStringProjectSelectionCombo, "client\0\0", 8 );
                 break;
-            case LaunchSettings::Mode::EditorServer:
+            case LaunchSettings::NetworkMode::EditorServer:
                 memcpy( mStringProjectSelectionCombo, "server\0\0", 8 );
                 break;
-            case LaunchSettings::Mode::EditorClientServer:
-                memcpy( mStringProjectSelectionCombo, "client\0server\0\0,", 16 );
+            case LaunchSettings::NetworkMode::EditorClientServer:*/
+                memcpy( mStringProjectSelectionCombo, "client\0server\0\0,", 16 );/*
                 break;
             default:
                 fanAssert( false );
                 break;
-		}
+		}*/
 	}
 
 	//========================================================================================================

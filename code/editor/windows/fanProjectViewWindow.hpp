@@ -24,7 +24,7 @@ namespace fan
 		Signal<>             mOnStep;
 		Signal<int>          mOnSelectProject;
 
-		ProjectViewWindow( const LaunchSettings::Mode _launchMode );
+		ProjectViewWindow( /*const LaunchSettings::NetworkMode _launchMode*/ );
 		btVector2 GetSize()			const { return mSize; }
 		btVector2 GetPosition()		const { return mPosition; }
 		float	  GetAspectRatio()	const { return ( float ) mSize[ 0 ] / ( float ) mSize[ 1 ]; }

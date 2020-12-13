@@ -23,6 +23,7 @@ namespace fan
         IProjectContainer( const LaunchSettings& _settings );
         virtual ~IProjectContainer() = default;
 
+        virtual void Run() = 0;
         void Exit();
 
         Signal <>            mOnLPPSynch;
