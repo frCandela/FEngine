@@ -1,7 +1,8 @@
 ﻿include_directories(
-	${CMAKE_SOURCE_DIR}/middleware/imgui
-	${CMAKE_SOURCE_DIR}/middleware/glslang
-	${CMAKE_SOURCE_DIR}/middleware/bullet
+	imgui
+	glslang
+	bullet
+	freetype
 )
 
 add_compile_options( ${MIDDLEWARE_COMPILATION_FLAGS} )
