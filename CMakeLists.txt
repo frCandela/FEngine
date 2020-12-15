@@ -1,9 +1,6 @@
 ﻿cmake_minimum_required (VERSION 3.8)
-
 project ("FEngine")
-
 set(CMAKE_CXX_STANDARD 17)
-
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR})
 
 include_directories( code )
@@ -49,29 +46,3 @@ add_subdirectory(code/engine)
 add_subdirectory(code/editor)
 add_subdirectory(code/project_spaceships)
 add_subdirectory(code/project_empty)
-
-# sources
-#file( GLOB_RECURSE LPP_SRC deps/LivePP/*.h )
-#list(APPEND APP_SOURCES
-#        code/game/fanMain.cpp
-#    ${LPP_SRC}
-#)
-#
-#set(APP_LIBRARIES
-#    fanCore
-#    fanRender
-#    fanNetwork
-#    fanEngine
-#    fanGame
-#    fanEditor
-#)
-
-#if ( ${CMAKE_BUILD_TYPE} MATCHES Release AND MSVC  )
-#    add_executable(${APP_NAME} WIN32 ${APP_SOURCES} )
-#else()
-#    add_executable(${APP_NAME} ${APP_SOURCES} )
-#endif ()
-
-
-#target_link_libraries(${APP_NAME} ${APP_LIBRARIES})
-#target_compile_options(${APP_NAME} PRIVATE ${COMPILATION_FLAGS} )

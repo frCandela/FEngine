@@ -13,6 +13,7 @@ set( FAN_ENGINE_LIBS
     btCollision
 )
 
-add_compile_options( ${COMPILATION_FLAGS} )
-add_library(fanEngine STATIC ${FAN_ENGINE_SRC} ${FAN_ENGINE_H})
-target_link_libraries(fanEngine ${FAN_ENGINE_LIBS})
+set( LIBRARY_NAME fanEngine )
+
+add_library(${LIBRARY_NAME} STATIC ${FAN_ENGINE_SRC} ${FAN_ENGINE_H})
+target_link_libraries(${LIBRARY_NAME} ${FAN_ENGINE_LIBS})

@@ -12,6 +12,6 @@ set( FAN_EDITOR_LIBS
     fanEngine
 )
 
-add_compile_options( ${COMPILATION_FLAGS} )
-add_library(fanEditor STATIC ${FAN_EDITOR_SRC} ${FAN_EDITOR_H})
-target_link_libraries(fanEditor ${FAN_EDITOR_LIBS})
+set( LIBRARY_NAME fanEditor )
+add_library(${LIBRARY_NAME} STATIC ${FAN_EDITOR_SRC} ${FAN_EDITOR_H})
+target_link_libraries(${LIBRARY_NAME} ${FAN_EDITOR_LIBS})

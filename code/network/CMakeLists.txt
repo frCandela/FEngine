@@ -12,6 +12,7 @@ set(FAN_NETWORK_LIBS
 	sfml-network-s
 )
 
-add_compile_options( ${COMPILATION_FLAGS} )
-add_library(fanNetwork STATIC ${FAN_NETWORK_SRC} ${FAN_NETWORK_H})
-target_link_libraries(fanNetwork ${FAN_NETWORK_LIBS})
+set( LIBRARY_NAME fanNetwork )
+
+add_library(${LIBRARY_NAME} STATIC ${FAN_NETWORK_SRC} ${FAN_NETWORK_H})
+target_link_libraries(${LIBRARY_NAME} ${FAN_NETWORK_LIBS})

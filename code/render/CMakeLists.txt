@@ -10,9 +10,8 @@ set(FAN_RENDER_LIBS
 	fanCore
 	shaderc_combined2
 	vulkan-1
-	glfw3
 )
 
-add_compile_options( ${COMPILATION_FLAGS} )
-add_library(fanRender STATIC ${FAN_RENDER_SRC} ${FAN_RENDER_H})
-target_link_libraries(fanRender ${FAN_RENDER_LIBS})
+set( LIBRARY_NAME fanRender )
+add_library(${LIBRARY_NAME} STATIC ${FAN_RENDER_SRC} ${FAN_RENDER_H})
+target_link_libraries(${LIBRARY_NAME} ${FAN_RENDER_LIBS})

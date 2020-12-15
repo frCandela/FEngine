@@ -12,6 +12,7 @@ set(FAN_CORE_LIBS
 	quickhull
 )
 
-add_compile_options( ${COMPILATION_FLAGS} )
-add_library(fanCore STATIC ${FAN_CORE_SRC} ${FAN_CORE_H})
-target_link_libraries(fanCore ${FAN_CORE_LIBS})
+set( LIBRARY_NAME fanCore )
+
+add_library(${LIBRARY_NAME} STATIC ${FAN_CORE_SRC} ${FAN_CORE_H})
+target_link_libraries(${LIBRARY_NAME} ${FAN_CORE_LIBS})

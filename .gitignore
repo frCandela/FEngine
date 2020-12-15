@@ -21,4 +21,4 @@ cmake-build-release
 content/kenney
 *.ilk
 *.manifest
-project_spaceships_editor.exe
+*.exe
