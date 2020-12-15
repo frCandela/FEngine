@@ -7,3 +7,6 @@
 [submodule "submodules/quickhull"]
 	path = submodules/quickhull
 	url = https://github.com/akuukka/quickhull.git
+[submodule "submodules/SFML"]
+	path = submodules/SFML
+	url = https://github.com/SFML/SFML.git

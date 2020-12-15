@@ -26,10 +26,9 @@ if (MSVC)
 endif ()
 
 set( CMAKE_PDB_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin )
-add_compile_definitions(SFML_STATIC)
 add_compile_definitions(IMGUI_DISABLE_OBSOLETE_FUNCTIONS)
 
-# projects directories
+        # projects directories
 add_subdirectory(submodules)
 add_subdirectory(middleware)
 add_subdirectory(code)
