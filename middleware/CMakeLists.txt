@@ -7,13 +7,6 @@
 
 add_compile_options( ${MIDDLEWARE_COMPILATION_FLAGS} )
 
-# imgui
-file(GLOB_RECURSE IMGUI_SRC imgui/*.cpp)
-file(GLOB_RECURSE IMGUI_H imgui/*.hpp)
-
-add_library( imgui STATIC ${IMGUI_SRC} ${IMGUI_H})
-target_link_libraries(imgui freetype28)
-
 # linear math
 file(GLOB_RECURSE LINEAR_MATH_SRC bullet/LinearMath/*.cpp)
 file(GLOB_RECURSE LINEAR_MATH_H bullet/LinearMath/*.hpp)

@@ -4,6 +4,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR})
 
 link_directories("C:/VulkanSDK/1.1.106.0/Lib")
+link_directories(submodules/SFML/extlibs/libs-msvc/x64)
 IF(${CMAKE_BUILD_TYPE} MATCHES Debug)
     link_directories(lib/debug)
     link_directories(bin/debug)
@@ -26,9 +27,8 @@ if (MSVC)
 endif ()
 
 set( CMAKE_PDB_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin )
-add_compile_definitions(IMGUI_DISABLE_OBSOLETE_FUNCTIONS)
 
-        # projects directories
+#projects directories
 add_subdirectory(submodules)
 add_subdirectory(middleware)
 add_subdirectory(code)
