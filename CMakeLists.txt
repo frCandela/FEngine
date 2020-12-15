@@ -3,14 +3,17 @@ project ("FEngine")
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR})
 
-include_directories( code )
-include_directories( middleware )
-include_directories( middleware/freetype )
-include_directories( "C:/VulkanSDK/1.1.106.0/Include" )
+include_directories( code
+                     submodules/glfw/include
+                     middleware
+                     middleware/freetype
+                     "C:/VulkanSDK/1.1.106.0/Include"
+)
 
 link_directories("C:/VulkanSDK/1.1.106.0/Lib")
 IF(${CMAKE_BUILD_TYPE} MATCHES Debug)
     link_directories(lib/debug)
+    link_directories(bin/debug)
     set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/debug )
     set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/debug )
 ELSEIF(${CMAKE_BUILD_TYPE} MATCHES Release)
@@ -31,18 +34,12 @@ endif ()
 
 set( CMAKE_PDB_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin )
 add_compile_definitions(SFML_STATIC)
-add_compile_definitions(GLFW_INCLUDE_VULKAN)
 add_compile_definitions(GLM_FORCE_RADIANS)
 add_compile_definitions(GLM_FORCE_DEPTH_ZERO_TO_ONE)
 add_compile_definitions(GLM_ENABLE_EXPERIMENTAL)
 add_compile_definitions(IMGUI_DISABLE_OBSOLETE_FUNCTIONS)
 
 # projects directories
+add_subdirectory(submodules)
 add_subdirectory(middleware)
-add_subdirectory(code/core)
-add_subdirectory(code/render)
-add_subdirectory(code/network)
-add_subdirectory(code/engine)
-add_subdirectory(code/editor)
-add_subdirectory(code/project_spaceships)
-add_subdirectory(code/project_empty)
+add_subdirectory(code)

@@ -1,8 +1,4 @@
-﻿ set( PROJECT_NAME         "empty")
-
- include_directories(
-	    ${CMAKE_SOURCE_DIR}/code
- )
+﻿ set( PROJECT_NAME "empty")
 
  file(GLOB_RECURSE PROJECT_SRC *.cpp)
  file(GLOB_RECURSE PROJECT_H *.hpp)

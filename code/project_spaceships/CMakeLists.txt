@@ -1,9 +1,5 @@
 ﻿ set( PROJECT_NAME "spaceships")
 
- include_directories(
-		 ${CMAKE_SOURCE_DIR}/code
- )
-
  file(GLOB_RECURSE PROJECT_SRC *.cpp)
  file(GLOB_RECURSE PROJECT_H *.hpp)
 
