@@ -12,7 +12,7 @@ include_directories(
         ${CMAKE_SOURCE_DIR}/submodules/bullet3/src
         ${CMAKE_SOURCE_DIR}/submodules
         ${CMAKE_SOURCE_DIR}/middleware
-        "C:/VulkanSDK/1.1.106.0/Include"
+        "${VULKAN_DIR}/Include"
 )
 
 add_subdirectory(core)
@@ -22,4 +22,3 @@ add_subdirectory(engine)
 add_subdirectory(editor)
 add_subdirectory(project_spaceships)
 add_subdirectory(project_empty)
-
