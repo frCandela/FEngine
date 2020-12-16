@@ -9,7 +9,7 @@ imgui.ini
 *pdb.patch_*
 enc_temp_folder
 content/_default/texture/blender_icons.png
-middleware/LivePP
+submodules/LivePP
 *.dmp
 *.callstack.txt
 lib/debug

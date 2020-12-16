@@ -15,7 +15,7 @@ namespace fan
     public:
         LPPLauncher()
         {
-            mLivePP = lpp::lppLoadAndRegister( L"middleware/LivePP/", "fanEngine" );
+            mLivePP = lpp::lppLoadAndRegister( L"submodules/LivePP/", "fanEngine" );
             lpp::lppEnableAllCallingModulesSync( mLivePP );
         }
 

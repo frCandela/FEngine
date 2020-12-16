@@ -6,6 +6,7 @@
 #include "core/ecs/fanEcsEntity.hpp"
 #include "core/ecs/fanEcsComponent.hpp"
 #include "core/ecs/fanEcsSingleton.hpp"
+#include "core/ecs/fanEcsSystem.hpp"
 #include "core/ecs/fanEcsTag.hpp"
 #include "core/ecs/fanEcsArchetype.hpp"
 #include "core/ecs/fanEcsView.hpp"

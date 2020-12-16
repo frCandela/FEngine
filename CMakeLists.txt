@@ -12,25 +12,21 @@ IF(${CMAKE_BUILD_TYPE} MATCHES Debug)
     link_directories(${SHADERC_DIR}/debug)
     set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/debug )
     set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/debug )
+    add_compile_options( /FUNCTIONPADMIN )
 ELSEIF(${CMAKE_BUILD_TYPE} MATCHES Release)
     link_directories(${SHADERC_DIR}/release)
     set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/release )
     set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/release )
 ENDIF()
+set( CMAKE_PDB_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin )
 
 if (MSVC)
     #Removes default warning setting
     if (CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
         string(REGEX REPLACE "/W[0-4]" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
     endif ()
-    set( COMPILATION_FLAGS /W4 /WX  )
-    set( MIDDLEWARE_COMPILATION_FLAGS /W0 )
-    add_compile_options( /FUNCTIONPADMIN )
 endif ()
 
-set( CMAKE_PDB_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin )
 
-#projects directories
 add_subdirectory(submodules)
-add_subdirectory(middleware)
 add_subdirectory(code)

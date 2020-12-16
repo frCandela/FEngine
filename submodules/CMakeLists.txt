@@ -1,4 +1,6 @@
-﻿# glfw
+﻿#add_compile_options( /W0 )
+
+# glfw
 set( GLFW_BUILD_DOCS OFF )
 add_subdirectory(glfw)
 
