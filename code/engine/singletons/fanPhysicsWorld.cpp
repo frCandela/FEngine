@@ -3,6 +3,7 @@
 #include "network/singletons/fanTime.hpp"
 #include "engine/components/fanRigidbody.hpp"
 #include "core/memory/fanSerializable.hpp"
+#include "core/math/fanMathUtils.hpp"
 
 namespace fan
 {
@@ -26,7 +27,7 @@ namespace fan
 			btCollisionObject* obj = physicsWorld.mDynamicsWorld->getCollisionObjectArray()[i];
 			physicsWorld.mDynamicsWorld->removeCollisionObject( obj );
 		}
-		physicsWorld.mDynamicsWorld->setGravity( btVector3::Zero() );
+		physicsWorld.mDynamicsWorld->setGravity( btVector3_Zero );
 	}
 
 	//========================================================================================================
@@ -67,7 +68,7 @@ namespace fan
 
 		gContactStartedCallback = ContactStartedCallback;
 		gContactEndedCallback = ContactEndedCallback;
-		mDynamicsWorld->setGravity( btVector3::Zero() );
+		mDynamicsWorld->setGravity( btVector3_Zero );
 
 		// Bullet physics is broken when its internal clock is zero,
 		// this prevents it from happening when the timestep is exactly equal to the fixed timestep

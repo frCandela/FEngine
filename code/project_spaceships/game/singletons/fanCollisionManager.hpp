@@ -2,7 +2,7 @@
 
 #include "fanDisableWarnings.hpp"
 WARNINGS_BULLET_PUSH()
-#include "bullet/btBulletDynamicsCommon.h"
+#include "btBulletDynamicsCommon.h"
 WARNINGS_POP()
 #include "core/ecs/fanEcsSingleton.hpp"
 

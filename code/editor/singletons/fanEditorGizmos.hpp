@@ -1,8 +1,8 @@
 #pragma once
 
 #include <map>
-#include "bullet/LinearMath/btVector3.h"
-#include "bullet/LinearMath/btTransform.h"
+#include "LinearMath/btVector3.h"
+#include "LinearMath/btTransform.h"
 
 #include "core/ecs/fanEcsSingleton.hpp"
 

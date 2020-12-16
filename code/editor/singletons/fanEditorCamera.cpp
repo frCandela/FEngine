@@ -3,6 +3,7 @@
 #include "core/input/fanInput.hpp"
 #include "core/input/fanInputManager.hpp"
 #include "core/shapes/fanRay.hpp"
+#include "core/math/fanMathUtils.hpp"
 #include "engine/components/fanTransform.hpp"
 #include "engine/components/fanCamera.hpp"
 #include "engine/components/fanSceneNode.hpp"
@@ -69,7 +70,7 @@ namespace fan
 		{
 			// Rotation depending on mouse movement
 			const float invertAxis = -1;
-			const btQuaternion rotationY( btVector3::Up(), -editorCamera.mXYSensitivity.x() * mouseDelta.x );
+			const btQuaternion rotationY( btVector3_Up, -editorCamera.mXYSensitivity.x() * mouseDelta.x );
             const btQuaternion rotationX( invertAxis * cameraTransform.Left(),
                                           -editorCamera.mXYSensitivity.y() * mouseDelta.y );
 			cameraTransform.SetRotationQuat( rotationX * rotationY * cameraTransform.GetRotationQuat() );

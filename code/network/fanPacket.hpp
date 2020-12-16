@@ -3,7 +3,7 @@
 #include <iostream>
 #include <limits>
 #include <type_traits>
-#include "bullet/LinearMath/btVector3.h"
+#include "LinearMath/btVector3.h"
 #include "core/ecs/fanSignal.hpp"
 #include "core/fanDebug.hpp"
 #include "network/fanNetConfig.hpp"

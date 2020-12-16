@@ -1,6 +1,6 @@
 #pragma once
 
-#include "bullet/LinearMath/btVector3.h"
+#include "LinearMath/btVector3.h"
 #include "fanDisableWarnings.hpp"
 WARNINGS_GLM_PUSH()
 #include "glm/glm.hpp"

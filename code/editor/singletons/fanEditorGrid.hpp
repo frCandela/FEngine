@@ -1,6 +1,6 @@
 #pragma once
 
-#include "bullet/LinearMath/btVector3.h"
+#include "LinearMath/btVector3.h"
 #include "core/ecs/fanEcsSingleton.hpp"
 #include "core/fanColor.hpp"
 

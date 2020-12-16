@@ -31,10 +31,10 @@ namespace fan
 				SolarPanel& solarPanel = *solarPanelIt;
 
 				// sunlight mesh raycast
-				const btVector3 rayOrigin = transform.GetPosition() + btVector3::Up();
+				const btVector3 rayOrigin = transform.GetPosition() + btVector3_Up;
 				btVector3 outIntersection;
                 solarPanel.mIsInSunlight = sunLight.mMesh->RayCast( rayOrigin,
-                                                                    -btVector3::Up(),
+                                                                    -btVector3_Up,
                                                                     outIntersection );
 
 				// Charging rate

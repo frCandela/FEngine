@@ -9,6 +9,7 @@ include_directories(
         ${CMAKE_SOURCE_DIR}/submodules/SFML/include
         ${CMAKE_SOURCE_DIR}/submodules/glfw/include
         ${CMAKE_SOURCE_DIR}/submodules/glm
+        ${CMAKE_SOURCE_DIR}/submodules/bullet3/src
         ${CMAKE_SOURCE_DIR}/submodules
         ${CMAKE_SOURCE_DIR}/middleware
         "C:/VulkanSDK/1.1.106.0/Include"

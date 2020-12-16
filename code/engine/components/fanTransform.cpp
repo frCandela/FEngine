@@ -24,7 +24,7 @@ namespace fan
 	{
 		Transform& transform = static_cast<Transform&>( _component );
 		transform.mTransform.setIdentity();
-		transform.mScale = btVector3::One();
+		transform.mScale = btVector3_One;
 	}
 
 	//========================================================================================================
@@ -91,13 +91,13 @@ namespace fan
     }
     btVector3 Transform::Left() const
     {
-        return btTransform( GetRotationQuat(), btVector3( 0, 0, 0 ) ) * btVector3::Left();
+        return btTransform( GetRotationQuat(), btVector3( 0, 0, 0 ) ) * btVector3_Left;
     }
-    btVector3 Transform::Forward() const { return btTransform( GetRotationQuat() ) * btVector3::Forward(); }
+    btVector3 Transform::Forward() const { return btTransform( GetRotationQuat() ) * btVector3_Forward; }
     btVector3 Transform::Up() const
     {
         return btTransform( GetRotationQuat(), btVector3( 0, 0, 0 ) ) *
-               btVector3::Up();
+               btVector3_Up;
     }
 
 	//========================================================================================================

@@ -1,7 +1,7 @@
 #include "fanSerializedValues.hpp"
 
 #include <fstream>
-#include "bullet/LinearMath/btQuaternion.h"
+#include "LinearMath/btQuaternion.h"
 #include "core/memory/fanSerializable.hpp"
 #include "core/input/fanInputManager.hpp"
 #include "core/input/fanInput.hpp"

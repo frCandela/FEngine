@@ -1,5 +1,4 @@
 #include "core/shapes/fanAABB.hpp"
-#include "core/math/fanMathUtils.hpp"
 #include "core/fanAssert.hpp"
 
 namespace fan
@@ -27,8 +26,8 @@ namespace fan
 	{
 		if( _pointCloud.empty() )
 		{
-            mLow  = -0.5f * btVector3::One();
-            mHigh = 0.5f * btVector3::One();
+            mLow  = -0.5f * btVector3_One;
+            mHigh = 0.5f * btVector3_One;
 			return;
 		}
 

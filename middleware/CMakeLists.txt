@@ -6,18 +6,3 @@
 )
 
 add_compile_options( ${MIDDLEWARE_COMPILATION_FLAGS} )
-
-# linear math
-file(GLOB_RECURSE LINEAR_MATH_SRC bullet/LinearMath/*.cpp)
-file(GLOB_RECURSE LINEAR_MATH_H bullet/LinearMath/*.hpp)
-add_library( btLinearMath STATIC ${LINEAR_MATH_SRC} ${LINEAR_MATH_H})
-
-# bullet dynamics
-file(GLOB_RECURSE BT_DYNAMICS_SRC bullet/BulletDynamics/*.cpp)
-file(GLOB_RECURSE BT_DYNAMICS_H bullet/BulletDynamics/*.hpp)
-add_library( btDynamics STATIC ${BT_DYNAMICS_SRC} ${BT_DYNAMICS_H})
-
-# bullet collision
-file(GLOB_RECURSE BT_COLLISION_SRC bullet/BulletCollision/*.cpp)
-file(GLOB_RECURSE BT_COLLISION_H bullet/BulletCollision/*.hpp)
-add_library( btCollision STATIC ${BT_COLLISION_SRC} ${BT_COLLISION_H})

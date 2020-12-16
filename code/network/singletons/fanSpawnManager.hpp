@@ -2,7 +2,7 @@
 
 #include <unordered_map>
 #include "core/ecs/fanEcsSingleton.hpp"
-#include "bullet/LinearMath/btVector3.h"
+#include "LinearMath/btVector3.h"
 #include "network/components/fanClientRPC.hpp"
 #include "network/fanPacket.hpp"
 

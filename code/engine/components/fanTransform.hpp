@@ -5,9 +5,9 @@
 WARNINGS_GLM_PUSH()
 #include "glm/glm.hpp"
 WARNINGS_POP()
-#include "bullet/LinearMath/btVector3.h"
-#include "bullet/LinearMath/btQuaternion.h"
-#include "bullet/LinearMath/btTransform.h"
+#include "LinearMath/btVector3.h"
+#include "LinearMath/btQuaternion.h"
+#include "LinearMath/btTransform.h"
 
 namespace fan
 {

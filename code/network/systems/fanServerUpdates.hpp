@@ -55,7 +55,7 @@ namespace fan
                     const SpawnInfo spawnInfo = spawn::SpawnShip::GenerateInfo( hostHandle,
                                                                                 spawnFrame,
                                                                                 hostData.mSpaceshipID,
-                                                                                btVector3::Zero() );
+                                                                                btVector3_Zero );
 					hostData.mNextPlayerStateFrame = spawnFrame + 60; // timing of the first state snapshot
 					spawnManager.spawns.push_back( spawnInfo );		  // triggers spaceship spawn on server
 					
@@ -82,7 +82,7 @@ namespace fan
                                     otherHostHandle,
                                     spawnFrame,
                                     otherHostData.mSpaceshipID,
-                                    btVector3::Zero() );
+                                    btVector3_Zero );
 							hostReplication.Replicate(
 								ClientRPC::RPCSpawn( otherHostspawnInfo )
 								, HostReplication::ResendUntilReplicated

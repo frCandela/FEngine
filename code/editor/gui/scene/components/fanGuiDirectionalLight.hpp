@@ -51,7 +51,7 @@ namespace fan
 // 			const float length = 2.f;
 // 			const float radius = 0.5f;
 // 			const Color color = Color::Yellow;
-// 			btVector3 offsets[5] = { btVector3::Zero(), radius * up ,-radius * up, radius * left ,-radius * left };
+// 			btVector3 offsets[5] = { btVector3_Zero, radius * up ,-radius * up, radius * left ,-radius * left };
 // 			for( int offsetIndex = 0; offsetIndex < 5; offsetIndex++ )
 // 			{
 // 				const btVector3 offset = offsets[offsetIndex];

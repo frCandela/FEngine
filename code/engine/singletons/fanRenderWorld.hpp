@@ -1,6 +1,6 @@
 #pragma once
 
-#include "bullet/LinearMath/btTransform.h"
+#include "LinearMath/btTransform.h"
 #include "core/shapes/fanAABB.hpp"
 #include "core/ecs/fanEcsSingleton.hpp"
 #include "render/fanRenderer.hpp"

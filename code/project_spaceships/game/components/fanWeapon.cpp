@@ -1,6 +1,6 @@
 #include "fanWeapon.hpp"
 
-#include "editor/fanModals.hpp"
+#include "core/math/fanMathUtils.hpp"
 
 namespace fan
 {
@@ -22,7 +22,7 @@ namespace fan
 		weapon.mBulletSpeed      = 0.2f;
 		weapon.mBulletsPerSecond = 10.f;
 		weapon.mBulletEnergyCost = 1.f;
-		weapon.mOriginOffset     = btVector3::Zero();
+		weapon.mOriginOffset     = btVector3_Zero;
 		weapon.bBulletsTimeAccumulator = 0.f;
 		weapon.mBulletPrefab.Set( nullptr );
 	}

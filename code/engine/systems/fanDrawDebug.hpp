@@ -227,7 +227,7 @@ namespace fan
 			const float length = 2.f;
 			const float radius = 0.5f;
 			const Color color = Color::sYellow;
-            btVector3 offsets[5] = { btVector3::Zero(),
+            btVector3 offsets[5] = { btVector3_Zero,
                                      radius * up,
                                      -radius * up,
                                      radius * left,

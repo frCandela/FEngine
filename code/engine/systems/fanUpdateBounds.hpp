@@ -137,8 +137,8 @@ namespace fan
 
 				const btVector3 origin = transform.GetPosition();
 				const float sizeBounds = 0.2f;
-                bounds.mAabb = AABB( origin - sizeBounds * btVector3::One(),
-                                     origin + sizeBounds * btVector3::One() );
+                bounds.mAabb = AABB( origin - sizeBounds * btVector3_One,
+                                     origin + sizeBounds * btVector3_One );
 				sceneNode.RemoveFlag( SceneNode::BoundsOutdated );
 			}
 		}

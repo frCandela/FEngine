@@ -1,11 +1,12 @@
 #pragma once
 
 #include <vector>
-#include "core/shapes/fanTriangle.hpp"
 #include "fanDisableWarnings.hpp"
 WARNINGS_GLM_PUSH()
 #include "glm/glm.hpp"
 WARNINGS_POP()
+#include "core/shapes/fanTriangle.hpp"
+#include "core/math/fanMathUtils.hpp"
 
 namespace fan
 {
@@ -18,7 +19,7 @@ namespace fan
 		AABB( const btVector3 _low, const btVector3 _high );
 		AABB( const std::vector<btVector3> _pointCloud, const glm::mat4 _modelMatrix );
 
-		void					    Clear() { mLow = btVector3::Zero(); mHigh = btVector3::Zero(); }
+		void					    Clear() { mLow = btVector3_Zero; mHigh = btVector3_Zero; }
 		btVector3					GetLow() const { return mLow; }
 		btVector3					GetHigh() const { return mHigh; }
 		std::vector< btVector3 >	GetCorners() const;

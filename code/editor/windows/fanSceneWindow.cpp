@@ -2,6 +2,7 @@
 
 #include <fstream>
 #include "core/fanDebug.hpp"
+#include "core/math/fanMathUtils.hpp"
 #include "engine/singletons/fanRenderResources.hpp"
 #include "engine/fanDragnDrop.hpp"
 #include "render/resources/fanTextureManager.hpp"
@@ -9,7 +10,6 @@
 #include "engine/singletons/fanSceneResources.hpp"
 #include "engine/singletons/fanScene.hpp"
 #include "engine/fanPrefab.hpp"
-#include "engine/singletons/fanPhysicsWorld.hpp"
 #include "engine/components/fanMeshRenderer.hpp"
 #include "engine/components/fanSceneNode.hpp"
 #include "engine/components/fanTransform.hpp"
@@ -82,7 +82,7 @@ namespace fan
                 fanAssert( mLastSceneNodeRightClicked != nullptr );
 				Scene& scene = *mLastSceneNodeRightClicked->mScene;
 				EcsWorld& world = *scene.mWorld;
-				btVector3 origin = btVector3::Zero();
+				btVector3 origin = btVector3_Zero;
 				const EcsEntity parentID = world.GetEntity( mLastSceneNodeRightClicked->mHandle );
 				if( world.HasComponent<Transform>( parentID ) )
 				{

@@ -35,9 +35,9 @@ namespace fan
 	void RenderDebug::DebugPoint( const btVector3 _pos, const Color _color )
 	{
 		const float size = 0.2f;
-		DebugLine( _pos - size * btVector3::Up(), _pos + size * btVector3::Up(), _color );
-		DebugLine( _pos - size * btVector3::Left(), _pos + size * btVector3::Left(), _color );
-		DebugLine( _pos - size * btVector3::Forward(), _pos + size * btVector3::Forward(), _color );
+		DebugLine( _pos - size * btVector3_Up, _pos + size * btVector3_Up, _color );
+		DebugLine( _pos - size * btVector3_Left, _pos + size * btVector3_Left, _color );
+		DebugLine( _pos - size * btVector3_Forward, _pos + size * btVector3_Forward, _color );
 	}
 
 	//========================================================================================================
@@ -220,9 +220,9 @@ namespace fan
                                    const Color _color,
                                    const bool _depthTestEnable )
 	{
-		DebugCircle( _transform.getOrigin(), _radius, btVector3::Up(), 32, _color, _depthTestEnable );
-		DebugCircle( _transform.getOrigin(), _radius, btVector3::Left(), 32, _color, _depthTestEnable );
-		DebugCircle( _transform.getOrigin(), _radius, btVector3::Forward(), 32, _color, _depthTestEnable );
+		DebugCircle( _transform.getOrigin(), _radius, btVector3_Up, 32, _color, _depthTestEnable );
+		DebugCircle( _transform.getOrigin(), _radius, btVector3_Left, 32, _color, _depthTestEnable );
+		DebugCircle( _transform.getOrigin(), _radius, btVector3_Forward, 32, _color, _depthTestEnable );
 	}
 
 	//========================================================================================================

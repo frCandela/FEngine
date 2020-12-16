@@ -59,7 +59,7 @@ namespace fan
 				// Orientation
 				if( !orientation.isZero() )
 				{
-					transform.LookAt( transform.GetPosition() + orientation, btVector3::Up() );
+					transform.LookAt( transform.GetPosition() + orientation, btVector3_Up );
 				}
 
 				// constrain position
@@ -141,7 +141,7 @@ namespace fan
                 rb.mRigidbody->applyCentralForce( spaceship.mForwardForces[speedMode] *
                                                   forwardAxis *
                                                   transform.Forward() );
-				rb.mRigidbody->setAngularVelocity( btVector3::Zero() );
+				rb.mRigidbody->setAngularVelocity( btVector3_Zero );
 
 				// Drag
                 btVector3 newVelocity = ( totalConsumption > 0.f ?

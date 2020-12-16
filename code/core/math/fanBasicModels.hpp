@@ -1,7 +1,7 @@
 #pragma once
 
 #include <vector>
-#include "bullet/LinearMath/btVector3.h"
+#include "LinearMath/btVector3.h"
 
 namespace fan
 {

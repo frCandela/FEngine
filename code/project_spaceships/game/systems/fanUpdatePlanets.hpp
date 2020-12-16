@@ -89,8 +89,8 @@ namespace fan
 				btVector3& scale = transform.mScale;
 
 				const btVector3 planetPos = transform.GetPosition();
-				const btVector3 direction = planetPos - btVector3::Zero();
-				const btVector3 left = btVector3::Up().cross( direction ).normalized();
+				const btVector3 direction = planetPos - btVector3_Zero;
+				const btVector3 left = btVector3_Up.cross( direction ).normalized();
 
 				const btVector3 leftDirection = 0.5f * scale.getX() * left;
 				const btVector3 planetLeft = planetPos + leftDirection;
@@ -105,11 +105,11 @@ namespace fan
 			std::sort( std::begin( segments ), std::end( segments ),
 				[]( OrientedSegment& _s1, OrientedSegment& _s2 )
 			{
-                return SignedAngle( btVector3::Left(),
+                return SignedAngle( btVector3_Left,
                                     _s1.direction,
-                                    btVector3::Up() ) < SignedAngle( btVector3::Left(),
+                                    btVector3_Up ) < SignedAngle( btVector3_Left,
                                                                      _s2.direction,
-                                                                     btVector3::Up() );
+                                                                     btVector3_Up );
 			} );
 
 			// Finds the starting point of mesh generation loop
@@ -161,13 +161,13 @@ namespace fan
 						if( axisNext.openSide == OrientedSegment::RIGHT )
 						{
 							// Empty space with no planets -> fills the space with triangles
-							float angle = SignedAngle( axis.direction, axisNext.direction, btVector3::Up() );
+							float angle = SignedAngle( axis.direction, axisNext.direction, btVector3_Up );
 							if( angle > minGapRadians ) // gap is too large -> subdivise it
 							{
 
 								const int numSubdivistions = int( angle / minGapRadians ) + 1;
 								const float subdivisionAngle = angle / numSubdivistions;
-								btTransform rotate( btQuaternion( btVector3::Up(), subdivisionAngle ) );
+								btTransform rotate( btQuaternion( btVector3_Up, subdivisionAngle ) );
 								btVector3 subAxisNext = sunLight.mRadius * axis.direction / axis.norm;
 								for( int subAxisIndex = 0; subAxisIndex < numSubdivistions; subAxisIndex++ )
 								{

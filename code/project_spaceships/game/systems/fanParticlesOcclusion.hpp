@@ -36,7 +36,7 @@ namespace fan
 				const btVector3 rayOrigin = btVector3( position[0], 1.f, position[2] );
 				btVector3 outIntersection;
                 bool isInsideSunlight = sunlight.mMesh->RayCast( rayOrigin,
-                                                                 -btVector3::Up(),
+                                                                 -btVector3_Up,
                                                                  outIntersection );
 				if( !isInsideSunlight )
 				{

@@ -1,8 +1,8 @@
 #pragma once
 
 #include "glfw/glfw3.h"
-#include "bullet/LinearMath/btVector3.h"
-#include "bullet/LinearMath/btQuaternion.h"
+#include "LinearMath/btVector3.h"
+#include "LinearMath/btQuaternion.h"
 #include "fanDisableWarnings.hpp"
 WARNINGS_GLM_PUSH()
 #include "glm/glm.hpp"
@@ -11,6 +11,12 @@ WARNINGS_POP()
 
 namespace fan
 {
+    static const btVector3 btVector3_Left	    = btVector3( 1.f, 0.f, 0.f);
+    static const btVector3 btVector3_Up	    = btVector3( 0.f, 1.f, 0.f);
+    static const btVector3 btVector3_Forward   = btVector3( 0.f, 0.f, 1.f);
+    static const btVector3 btVector3_Zero	    = btVector3( 0.f, 0.f, 0.f);
+    static const btVector3 btVector3_One	    = btVector3( 1.f, 1.f, 1.f);
+
 	//========================================================================================================
 	//========================================================================================================
 	inline btVector3 ToBullet( const glm::vec3 _vec ) { return btVector3( _vec.x, _vec.y, _vec.z ); }

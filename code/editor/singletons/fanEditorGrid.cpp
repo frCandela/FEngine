@@ -21,7 +21,7 @@ namespace fan
 	void EditorGrid::Init( EcsWorld& /*_world*/, EcsSingleton& _component )
 	{
 		EditorGrid& editorGrid = static_cast<EditorGrid&>( _component );
-		editorGrid.mOffset     = btVector3::Zero();
+		editorGrid.mOffset     = btVector3_Zero;
 		editorGrid.mColor      = Color( 0.164f, 0.287f, 0.331f, 1.f );
 		editorGrid.mSpacing    = 1.f;
 		editorGrid.mLinesCount = 10;

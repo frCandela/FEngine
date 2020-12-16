@@ -26,7 +26,7 @@ namespace fan
 			// bounding box
 			btVector3 low( 10000.f, 0.f, 10000.f );
 			btVector3 high( -10000.f, 0.f, -10000.f );
-			btVector3 center = btVector3::Zero();
+			btVector3 center = btVector3_Zero;
 
 			// calculates players center and bounding box	
             for( auto transformIt = _view.begin<Transform>();
@@ -54,7 +54,7 @@ namespace fan
 				// set position
 				const EcsEntity cameraID = _world.GetEntity( gameCamera.mCameraHandle );
 				Transform& cameraTransform = _world.GetComponent<Transform>( cameraID );
-				cameraTransform.SetPosition( center + gameCamera.mHeightFromTarget * btVector3::Up() );
+				cameraTransform.SetPosition( center + gameCamera.mHeightFromTarget * btVector3_Up );
 
 				// set size
 				Camera& camera = _world.GetComponent<Camera>( cameraID );
