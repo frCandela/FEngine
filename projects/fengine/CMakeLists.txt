@@ -1,0 +1,5 @@
+﻿add_subdirectory(core)
+add_subdirectory(render)
+add_subdirectory(network)
+add_subdirectory(engine)
+add_subdirectory(editor)

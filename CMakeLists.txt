@@ -27,6 +27,5 @@ if (MSVC)
     endif ()
 endif ()
 
-
 add_subdirectory(submodules)
-add_subdirectory(code)
+add_subdirectory(projects)

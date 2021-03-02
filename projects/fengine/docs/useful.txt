@@ -1,0 +1,3 @@
+Ninja can output a huge amount of log when including files. It is caused by an error with /showIncludes in rules.ninja that tries to parse french.
+To prevent it switch visual studio to english.
+
