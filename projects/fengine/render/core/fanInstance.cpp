@@ -31,6 +31,7 @@ namespace fan
 
 		VkApplicationInfo appInfo;
 		appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
+        appInfo.pNext = VK_NULL_HANDLE;
 		appInfo.pApplicationName = "FEngine";
 		appInfo.applicationVersion = VK_MAKE_VERSION( 1, 0, 0 );
 		appInfo.pEngineName = "FEngine";
@@ -38,7 +39,7 @@ namespace fan
 
 		VkInstanceCreateInfo instanceCreateInfo;
 		instanceCreateInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
-		instanceCreateInfo.pNext = nullptr;
+		instanceCreateInfo.pNext = VK_NULL_HANDLE;
 		instanceCreateInfo.flags = 0;
 		instanceCreateInfo.pApplicationInfo = &appInfo;
 		instanceCreateInfo.enabledLayerCount = static_cast< uint32_t >( mEnabledValidationLayers.size() );

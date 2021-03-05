@@ -37,7 +37,7 @@ namespace fan
 
         void TestRemove()
         {
-            const std::string fontPath = "content/fonts/VeraBd.ttf";
+            const std::string fontPath = "fonts/VeraBd.ttf";
             Font * font = mFontManager.Load( RenderGlobal::sDefaultGameFont );
             Font * font2 = mFontManager.Load( fontPath );
             TEST_ASSERT( mFontManager.Find( RenderGlobal::sDefaultGameFont ) == font );

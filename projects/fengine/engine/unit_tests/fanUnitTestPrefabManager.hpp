@@ -25,8 +25,8 @@ namespace fan
         void Destroy() override {}
 
         PrefabManager mPrefabManager;
-        static constexpr char * sPrefabName0 = "content/_default/prefab/unit_test0.prefab";
-        static constexpr char * sPrefabName1 = "content/_default/prefab/unit_test1.prefab";
+        static constexpr char * sPrefabName0 = "_default/prefab/unit_test0.prefab";
+        static constexpr char * sPrefabName1 = "_default/prefab/unit_test1.prefab";
 
         void TestLoad()
         {

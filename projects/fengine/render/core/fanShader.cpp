@@ -2,6 +2,7 @@
 #include <filesystem>
 #include <fstream>
 #include "core/fanDebug.hpp"
+#include "core/fanFileSystem.hpp"
 #include "render/core/fanDevice.hpp"
 #include "render/fanSpirvCompiler.hpp"
 #include "render/fanRenderGlobal.hpp"
@@ -14,18 +15,18 @@ namespace fan
 	{
         fanAssert( mShaderModule == VK_NULL_HANDLE );
 
-		std::vector<unsigned int> spirvCode = SpirvCompiler::Compile( _path );
+		std::vector<unsigned int> spirvCode = SpirvCompiler::Compile( FileSystem::NormalizePath(_path) );
 		if ( spirvCode.empty() )
 		{
 			Debug::Error() << "Could not create shader module: " << _path << Debug::Endl();
 
 			std::filesystem::directory_entry path( _path );
 			std::string extension = path.path().extension().generic_string();
-            std::string tmpPath = ( extension == ".frag" ?
-                    RenderGlobal::sDefaultFragmentShader :
-                    RenderGlobal::sDefaultVertexShader );
+            std::string tmpPath = ( extension == ".frag"
+                    ? RenderGlobal::sDefaultFragmentShader
+                    : RenderGlobal::sDefaultVertexShader );
 			Debug::Log() << "loading default shader " << tmpPath << Debug::Endl();
-			spirvCode = SpirvCompiler::Compile( tmpPath );
+			spirvCode = SpirvCompiler::Compile( FileSystem::NormalizePath(tmpPath) );
 
 			if ( spirvCode.empty() )
 			{

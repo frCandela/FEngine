@@ -2,9 +2,9 @@
 
 #include <array>
 #include "imgui/imgui.h"
+#include "core/fanFileSystem.hpp"
 #include "core/fanDebug.hpp"
 #include "render/fanRenderGlobal.hpp"
-#include "render/core/fanImageView.hpp"
 #include "render/core/fanFrameBuffer.hpp"
 #include "render/core/fanRenderPass.hpp"
 
@@ -31,7 +31,7 @@ namespace fan
 		InitImgui( _device, _window, _extent );
 
 		// create font and sampler
-		ImGui::GetIO().Fonts->AddFontFromFileTTF( RenderGlobal::sDefaultImguiFont, 15 );
+        ImGui::GetIO().Fonts->AddFontFromFileTTF( FileSystem::NormalizePath( RenderGlobal::sDefaultImguiFont ).c_str(), 15 );
 		unsigned char* fontData;
 		int texWidth, texHeight;
 		ImGui::GetIO().Fonts->GetTexDataAsRGBA32( &fontData, &texWidth, &texHeight );
@@ -64,7 +64,7 @@ namespace fan
 		mSamplerIcons.Destroy( _device );
 		mFragmentShader.Destroy( _device );
 		mVertexShader.Destroy( _device );
-		
+
 		mPipeline.Destroy( _device );
 		mDescriptorImages.Destroy( _device );
 
@@ -273,7 +273,7 @@ namespace fan
         io.DisplaySize = ImVec2( static_cast< float >( _extent.width ),
                                  static_cast< float >( _extent.height ) );
 		io.DisplayFramebufferScale = ImVec2( 1.0f, 1.0f );
-		mVertexShader.Create( _device, RenderGlobal::sImguiVertexShader );
+		mVertexShader.Create( _device,   RenderGlobal::sImguiVertexShader );
 		mFragmentShader.Create( _device, RenderGlobal::sImguiFragmentShader );
 
 		// Setup back-end capabilities flags

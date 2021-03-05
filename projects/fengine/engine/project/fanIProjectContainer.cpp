@@ -1,7 +1,7 @@
 #include "fanIProjectContainer.hpp"
 #include "core/time/fanProfiler.hpp"
 #include "core/math/fanMathUtils.hpp"
-#include "fanIProject.hpp"
+#include "engine/project/fanIProject.hpp"
 #include "engine/singletons/fanRenderWorld.hpp"
 #include "engine/singletons/fanRenderDebug.hpp"
 #include "engine/singletons/fanScene.hpp"

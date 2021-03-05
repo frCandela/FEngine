@@ -98,20 +98,20 @@ namespace fan
 	//========================================================================================================
 	void Renderer::CreateShaders()
 	{
-		mDrawDebug.mVertexShaderLines.Create( mDevice, "code/shaders/debugLines.vert" );
-		mDrawDebug.mFragmentShaderLines.Create( mDevice, "code/shaders/debugLines.frag" );
-		mDrawDebug.mVertexShaderLinesNDT.Create( mDevice, "code/shaders/debugLines.vert" );
-		mDrawDebug.mFragmentShaderLinesNDT.Create( mDevice, "code/shaders/debugLines.frag" );
-		mDrawDebug.mVertexShaderTriangles.Create( mDevice, "code/shaders/debugTriangles.vert" );
-		mDrawDebug.mFragmentShaderTriangles.Create( mDevice, "code/shaders/debugTriangles.frag" );
-        mDrawDebug.mVertexShaderLines2D.Create( mDevice, "code/shaders/debugLines2D.vert" );
-        mDrawDebug.mFragmentShaderLines2D.Create( mDevice, "code/shaders/debugLines2D.frag" );
-		mDrawModels.mVertexShader.Create( mDevice, "code/shaders/models.vert" );
-		mDrawModels.mFragmentShader.Create( mDevice, "code/shaders/models.frag" );
-		mDrawUI.mVertexShader.Create( mDevice, "code/shaders/ui.vert" );
-		mDrawUI.mFragmentShader.Create( mDevice, "code/shaders/ui.frag" );
-		mDrawPostprocess.mVertexShader.Create( mDevice, "code/shaders/postprocess.vert" );
-		mDrawPostprocess.mFragmentShader.Create( mDevice, "code/shaders/postprocess.frag" );
+		mDrawDebug.mVertexShaderLines.Create( mDevice,      "shaders/debugLines.vert" );
+		mDrawDebug.mFragmentShaderLines.Create( mDevice,    "shaders/debugLines.frag" );
+		mDrawDebug.mVertexShaderLinesNDT.Create( mDevice,   "shaders/debugLines.vert" );
+		mDrawDebug.mFragmentShaderLinesNDT.Create( mDevice, "shaders/debugLines.frag" );
+		mDrawDebug.mVertexShaderTriangles.Create( mDevice,  "shaders/debugTriangles.vert" );
+		mDrawDebug.mFragmentShaderTriangles.Create( mDevice,"shaders/debugTriangles.frag" );
+        mDrawDebug.mVertexShaderLines2D.Create( mDevice,    "shaders/debugLines2D.vert" );
+        mDrawDebug.mFragmentShaderLines2D.Create( mDevice,  "shaders/debugLines2D.frag" );
+		mDrawModels.mVertexShader.Create( mDevice,          "shaders/models.vert" );
+		mDrawModels.mFragmentShader.Create( mDevice,        "shaders/models.frag" );
+		mDrawUI.mVertexShader.Create( mDevice,              "shaders/ui.vert" );
+		mDrawUI.mFragmentShader.Create( mDevice,            "shaders/ui.frag" );
+		mDrawPostprocess.mVertexShader.Create( mDevice,     "shaders/postprocess.vert" );
+		mDrawPostprocess.mFragmentShader.Create( mDevice,   "shaders/postprocess.frag" );
 	}
 
 	//========================================================================================================

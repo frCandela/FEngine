@@ -5,6 +5,7 @@
 #include "LivePP/API/LPP_API.h"
 #pragma warning( pop )
 
+#include "core/fanFileSystem.hpp"
 #include "engine/project/fanLiveppLauncher.hpp"
 #include "engine/project/fanLaunchArgs.hpp"
 #include "engine/project/fanGameProjectContainer.hpp"
@@ -27,6 +28,8 @@ int main( int _argc, char* _argv[] )
     fan::LaunchArgs     launchArguments;
     fan::LaunchSettings settings;
     launchArguments.Parse( args, settings );
+
+    fan::FileSystem::SetProjectPath( PROJECT_PATH );
 
     fan::EmptyProject project;
 #ifdef FAN_EDITOR

@@ -11,7 +11,7 @@
 #include "engine/unit_tests/fanUnitTestMouse.hpp"
 #include "core/unit_tests/fanUnitTestSignal.hpp"
 #include "core/unit_tests/fanUnitTestEcs.hpp"
-
+#include "core/unit_tests/fanUnitTestFileSystem.hpp"
 
 namespace fan
 {
@@ -29,12 +29,12 @@ namespace fan
                 { "Prefab manager",     &UnitTestPrefabManager::RunTests,   mPrefabManagerResult },
                 { "Font manager",       &UnitTestFontManager::RunTests,   mFontManagerResult },
 #ifndef NDEBUG
-                 { "fanAssert",          &UnitTestFanAssert::RunTests,       mFanAssertResult },
+                 { "fanAssert",         &UnitTestFanAssert::RunTests,       mFanAssertResult },
 #endif
-                { "Mouse",      &UnitTestMouse::RunTests, mGlfwMouseResult },
-                { "Signal",     &UnitTestSignal::RunTests, mSignalResult },
-                { "Ecs",     &UnitTestEcs::RunTests, mEcsResult },
-
+                { "Mouse",              &UnitTestMouse::RunTests, mGlfwMouseResult },
+                { "Signal",             &UnitTestSignal::RunTests, mSignalResult },
+                { "Ecs",                &UnitTestEcs::RunTests, mEcsResult },
+                { "FileSystem",         &UnitTestFileSystem::RunTests, mEcsResult },
         };
     }
 

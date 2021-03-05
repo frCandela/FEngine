@@ -23,5 +23,5 @@ include_directories(
 )
 
 add_subdirectory(fengine)
-add_subdirectory(project_spaceships/code)
-add_subdirectory(project_empty/code)
+add_subdirectory(project_spaceships)
+add_subdirectory(project_empty)

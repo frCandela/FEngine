@@ -1,10 +1,9 @@
 #include "fanMesh.hpp"
-
+#include "core/fanFileSystem.hpp"
 #include "render/fanGLTFImporter.hpp"
 #include "render/core/fanDevice.hpp"
 #include "core/fanDebug.hpp"
 #include "core/math/fanMathUtils.hpp"
-#include "core/shapes/fanConvexHull.hpp"
 #include "core/shapes/fanTriangle.hpp"
 
 namespace fan
@@ -14,7 +13,7 @@ namespace fan
 	bool Mesh::LoadFromFile( const std::string& _path )
 	{
 		GLTFImporter importer;
-		if ( importer.Load( _path ) )
+		if ( importer.Load( FileSystem::NormalizePath(_path) ) )
 		{
 			if ( !importer.GetMesh( *this ) )
 			{

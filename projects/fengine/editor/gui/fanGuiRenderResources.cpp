@@ -1,5 +1,6 @@
 #include "editor/gui/fanGuiRenderResources.hpp"
 #include <sstream>
+#include "core/fanFileSystem.hpp"
 #include "render/fanRenderResourcePtr.hpp"
 #include "editor/fanRenderDragnDrop.hpp"
 #include "editor/fanModals.hpp"
@@ -41,7 +42,7 @@ namespace ImGui
             ImGui::OpenPopup( modalName.c_str() );
             if( sPathBuffer.empty() )
             {
-                sPathBuffer = fan::RenderGlobal::sContentPath;
+                sPathBuffer = fan::FileSystem::NormalizePath( fan::RenderGlobal::sContentPath );
             }
         }
         ImGui::SameLine();
@@ -131,7 +132,7 @@ namespace ImGui
             ImGui::OpenPopup( modalName.c_str() );
             if( sPathBuffer.empty() )
             {
-                sPathBuffer = fan::RenderGlobal::sModelsPath;
+                sPathBuffer = fan::FileSystem::NormalizePath( fan::RenderGlobal::sModelsPath );
             }
         }
         ImGui::SameLine();
@@ -206,7 +207,7 @@ namespace ImGui
             ImGui::OpenPopup( modalName.c_str() );
             if( sPathBuffer.empty() )
             {
-                sPathBuffer = fan::RenderGlobal::sFontsPath;
+                sPathBuffer = fan::FileSystem::NormalizePath( fan::RenderGlobal::sFontsPath );
             }
         }
         ImGui::SameLine();

@@ -21,6 +21,7 @@ namespace fan
         static const char* sContentPath;
         static const char* sFontsPath;
         static const char* sModelsPath;
+        static const char* sScenesPath;
 
 		static const char* sDefaultMesh;
 		static const char* sDefaultTexture;

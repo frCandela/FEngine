@@ -8,17 +8,17 @@ namespace fan
 
     //========================================================================================================
     //========================================================================================================
-    bool FileSystem::Init( const std::string& _projectPath )
+    bool FileSystem::SetProjectPath( const std::string& _projectPath )
     {
-        fanAssertMsg( s_projectPath == "", "project path assigned multiple times" );
-        if( !_projectPath.empty() )
+        fanAssertMsg( s_projectPath.empty(), "project path assigned multiple times" );
+        if( !_projectPath.empty() && IsAbsolute(s_projectPath) )
         {
             s_projectPath = NormalizePath( _projectPath );
-            if( *s_projectPath.rbegin() == '/' )
+            if( *s_projectPath.rbegin() != '/' )
             {
-                s_projectPath.pop_back();
+                s_projectPath += '/';
             }
-
+            s_projectPath += "content";
             return true;
         }
 
@@ -49,6 +49,8 @@ namespace fan
     //========================================================================================================
     std::string FileSystem::NormalizePath( const std::string& _path )
     {
+        if( _path.empty() ) { return ""; }
+
         std::stringstream ss;
 
         // removes backwards slashes and doubles slashes

@@ -1,5 +1,6 @@
 #include "engine/project/fanLiveppLauncher.hpp"
 #include "engine/project/fanGameProjectContainer.hpp"
+#include "core/fanFileSystem.hpp"
 #include "fanLaunchArgsSpaceships.hpp"
 #include "game/fanGameServer.hpp"
 #include "game/fanGameClient.hpp"
@@ -32,6 +33,8 @@ int main( int _argc, char* _argv[] )
     fan::LaunchSettingsSpaceships settings;
     fan::LaunchArgsSpaceships     launchArguments;
     launchArguments.Parse( args, settings );
+
+    fan::FileSystem::SetProjectPath( PROJECT_PATH );
 
 #ifdef FAN_EDITOR
     fan::GameClient             client;

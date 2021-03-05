@@ -1,16 +1,10 @@
 #pragma once
 
-#include "core/fanDebug.hpp"
+#include "core/fanFileSystem.hpp"
 #include "core/unit_tests/fanUnitTest.hpp"
-#include "core/ecs/fanSlot.hpp"
-#include "core/ecs/fanEcsWorld.hpp"
-#include "core/ecs/fanEcsComponent.hpp"
-#include "core/ecs/fanEcsSingleton.hpp"
 
 namespace fan
 {
-    namespace test
-    {
         //========================================================================================================
         //========================================================================================================
         class UnitTestFileSystem : public UnitTest<UnitTestFileSystem>
@@ -23,8 +17,8 @@ namespace fan
                          { &UnitTestFileSystem::TestNormalizeEndsSlashes,   "Normalize  ends slashes" },
                          { &UnitTestFileSystem::TestIsAbsolute,             "Is absolute" },
                          { &UnitTestFileSystem::TestEmptyInit,              "Empty init " },
-                         { &UnitTestFileSystem::TestInitInvalidEnd,         "Init invalid end" },
-                         { &UnitTestFileSystem::TestInitValid,              "Init valid" },
+                         { &UnitTestFileSystem::TestInitAppendContent,      "Init append content 1" },
+                         { &UnitTestFileSystem::TestAppendContent2,         "Init append content 2" },
                          { &UnitTestFileSystem::TestNormalizeAbsolute,      "Normalize absolute" },
                 };
             }
@@ -36,7 +30,7 @@ namespace fan
 
             void Destroy() override
             {
-                Debug::Get().onNewLog.Disconnect( (size_t)this );
+                FileSystem::Reset();
             }
 
             void TestNormalizeBackSlashes()
@@ -70,25 +64,23 @@ namespace fan
 
             void TestEmptyInit()
             {
-                bool result = FileSystem::Init( "" );
+                bool result = FileSystem::SetProjectPath( "" );
                 TEST_ASSERT( result == false );
                 TEST_ASSERT( FileSystem::GetProjectPath() == "" );
             }
 
-            void TestInitInvalidEnd()
+            void TestInitAppendContent()
             {
-                const std::string contentPathInvalid = "D:/code/";
-                bool              result             = FileSystem::Init( contentPathInvalid );
+                bool              result             = FileSystem::SetProjectPath( "D:/code/" );
                 TEST_ASSERT( result == true );
-                TEST_ASSERT( FileSystem::GetProjectPath() == "D:/code" );
+                TEST_ASSERT( FileSystem::GetProjectPath() == "D:/code/content" );
             }
 
-            void TestInitValid()
+            void TestAppendContent2()
             {
-                const std::string contentPathValid = "D:/code";
-                bool              result           = FileSystem::Init( contentPathValid );
+                bool              result           = FileSystem::SetProjectPath( "D:/code" );
                 TEST_ASSERT( result == true );
-                TEST_ASSERT( FileSystem::GetProjectPath() == contentPathValid );
+                TEST_ASSERT( FileSystem::GetProjectPath() == "D:/code/content" );
             }
 
             void TestIsAbsolute()
@@ -103,16 +95,13 @@ namespace fan
 
             void TestNormalizeAbsolute()
             {
-                const std::string contentPath = "D:/code";
-                FileSystem::Init( contentPath );
+                FileSystem::SetProjectPath( "D:/code" );
+                const std::string result         = FileSystem::NormalizePath( "test.png" );
+                TEST_ASSERT( result == "D:/code/content/test.png" );
 
-                const std::string expectedResult = "D:/code/content/test.png";
-                const std::string result         = FileSystem::NormalizePath( "content/test.png" );
-                TEST_ASSERT( result == expectedResult );
-
-                const std::string result2 = FileSystem::NormalizePath( "/content/test.png" );
-                TEST_ASSERT( result2 == expectedResult );
+                const std::string result2 = FileSystem::NormalizePath( "/test.png" );
+                TEST_ASSERT( result2 == "D:/code/content/test.png" );
             }
         };
-    }
+
 }

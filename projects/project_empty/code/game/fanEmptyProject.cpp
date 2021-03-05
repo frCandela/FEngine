@@ -31,9 +31,6 @@ namespace fan
 #ifdef FAN_EDITOR
         RegisterEditorGuiInfos( mWorld.GetSingleton<EditorGuiInfo>() );
 #endif
-
-
-        Debug::Log() << PROJECT_PATH << Debug::Endl();
 	}
 
 	//========================================================================================================
