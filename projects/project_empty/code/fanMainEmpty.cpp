@@ -1,19 +1,20 @@
-#pragma once
+#ifdef FAN_WIN32
+#include <windows.h>
+#endif
 
-#pragma warning( push )
-#pragma warning( disable : 4005 ) // macro redefinition
-#include "LivePP/API/LPP_API.h"
-#pragma warning( pop )
-
-#include "core/fanFileSystem.hpp"
 #include "engine/project/fanLiveppLauncher.hpp"
+#include "core/fanFileSystem.hpp"
 #include "engine/project/fanLaunchArgs.hpp"
-#include "engine/project/fanGameProjectContainer.hpp"
-#include "editor/fanEditorProjectContainer.hpp"
 #include "game/fanEmptyProject.hpp"
 
-//============================================================================================================
-//============================================================================================================
+#ifdef FAN_EDITOR
+    #include "editor/fanEditorProjectContainer.hpp"
+#else
+    #include "engine/project/fanGameProjectContainer.hpp"
+#endif
+
+//==============================================================================================================================
+//==============================================================================================================================
 int main( int _argc, char* _argv[] )
 {
     std::vector<std::string> args;
@@ -31,22 +32,24 @@ int main( int _argc, char* _argv[] )
 
     fan::FileSystem::SetProjectPath( PROJECT_PATH );
 
+    const std::string projectName = "empty_project";
     fan::EmptyProject project;
 #ifdef FAN_EDITOR
-    settings.mWindowName = "empty_project_editor";
+    settings.mWindowName = projectName + "_editor";
     fan::EditorProjectContainer projectContainer( settings, { &project } );
 #else
-    settings.mWindowName = "empty_project_game";
-    fan::GameProjectContainer   projectContainer( settings, project );
+    settings.mWindowName = projectName + "_game";
+    fan::GameProjectContainer projectContainer( settings, project );
 #endif
 
-    // runs with or without livepp
+#ifdef FAN_LIVEPP
     if( settings.mEnableLivepp )
     {
-        fan::LPPLauncher launcher;
+        fan::LPPLauncher launcher( projectName );
         launcher.Run( projectContainer );
     }
     else
+#endif
     {
         projectContainer.Run();
     }
@@ -54,8 +57,9 @@ int main( int _argc, char* _argv[] )
     return 0;
 }
 
-//============================================================================================================
-//============================================================================================================
+#ifdef FAN_WIN32
+//==============================================================================================================================
+//==============================================================================================================================
 int WinMain( HINSTANCE _hInstance, HINSTANCE _hPrevInstance, LPSTR _lpCmdLine, int _nShowCmd )
 {
     (void)_hInstance;
@@ -65,3 +69,4 @@ int WinMain( HINSTANCE _hInstance, HINSTANCE _hPrevInstance, LPSTR _lpCmdLine, i
 
     main( __argc, __argv );
 }
+#endif

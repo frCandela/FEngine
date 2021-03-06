@@ -12,6 +12,12 @@ namespace fan
 	//========================================================================================================
 	bool Mesh::LoadFromFile( const std::string& _path )
 	{
+        if( _path.empty())
+        {
+            Debug::Warning() << "Trying to load mesh with an empty path" << Debug::Endl();
+            return false;
+        }
+
 		GLTFImporter importer;
 		if ( importer.Load( FileSystem::NormalizePath(_path) ) )
 		{

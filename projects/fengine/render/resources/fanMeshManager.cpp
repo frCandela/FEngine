@@ -1,5 +1,6 @@
 #include "fanMeshManager.hpp"
 
+#include "core/fanDebug.hpp"
 #include "core/fanAssert.hpp"
 #include "render/resources/fanMesh.hpp"
 #include "render/fanRenderResourcePtr.hpp"
@@ -120,15 +121,18 @@ namespace fan
 
     //========================================================================================================
     //========================================================================================================
-    void MeshManager::ResolvePtr( ResourcePtr<Mesh >& _resourcePtr )
+    void MeshManager::ResolvePtr( ResourcePtr<Mesh>& _resourcePtr )
     {
-       fanAssert( ! _resourcePtr.IsValid() );
+        fanAssert( !_resourcePtr.IsValid() );
 
         MeshPtr& meshPtr = static_cast< MeshPtr& >( _resourcePtr );
-        Mesh    * mesh    = GetOrLoad( meshPtr.GetPath() );
-        if ( mesh != nullptr )
+        if( !meshPtr.GetPath().empty() )
         {
-            meshPtr = mesh;
+            Mesh* mesh = GetOrLoad( meshPtr.GetPath() );
+            if( mesh != nullptr )
+            {
+                meshPtr = mesh;
+            }
         }
     }
 }

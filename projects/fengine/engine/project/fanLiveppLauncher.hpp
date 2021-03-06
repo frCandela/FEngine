@@ -1,3 +1,5 @@
+#ifdef FAN_LIVEPP
+
 #pragma warning( push )
 #pragma warning( disable : 4005 ) // macro redefinition
 #include "LivePP/API/LPP_API.h"
@@ -7,15 +9,15 @@
 
 namespace fan
 {
-    //========================================================================================================
+    //==========================================================================================================================
     // Runs the engine and connects it to the Live++ hot reload
-    //========================================================================================================
+    //==========================================================================================================================
     class LPPLauncher
     {
     public:
-        LPPLauncher()
+        LPPLauncher ( const std::string& _appName )
         {
-            mLivePP = lpp::lppLoadAndRegister( L"submodules/LivePP/", "fanEngine" );
+            mLivePP = lpp::lppLoadAndRegister( FAN_LIVEPP_PATH, _appName.c_str() );
             lpp::lppEnableAllCallingModulesSync( mLivePP );
         }
 
@@ -34,3 +36,5 @@ namespace fan
         HMODULE            mLivePP;
     };
 }
+
+#endif

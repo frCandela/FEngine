@@ -1,12 +1,17 @@
+#ifdef FAN_WIN32
+#include <windows.h>
+#endif
+
 #include "engine/project/fanLiveppLauncher.hpp"
-#include "engine/project/fanGameProjectContainer.hpp"
 #include "core/fanFileSystem.hpp"
 #include "fanLaunchArgsSpaceships.hpp"
 #include "game/fanGameServer.hpp"
 #include "game/fanGameClient.hpp"
 
 #ifdef FAN_EDITOR
-#include "editor/fanEditorProjectContainer.hpp"
+    #include "editor/fanEditorProjectContainer.hpp"
+#else
+    #include "engine/project/fanGameProjectContainer.hpp"
 #endif
 
 //============================================================================================================
@@ -37,8 +42,8 @@ int main( int _argc, char* _argv[] )
     fan::FileSystem::SetProjectPath( PROJECT_PATH );
 
 #ifdef FAN_EDITOR
-    fan::GameClient             client;
-    fan::GameServer             server;
+    fan::GameClient client;
+    fan::GameServer server;
     settings.mWindowName = "spaceships_project_editor_client+server";
     fan::EditorProjectContainer projectContainer( settings, { &client, &server } );
 #else
@@ -56,13 +61,14 @@ int main( int _argc, char* _argv[] )
     fan::GameProjectContainer   projectContainer( settings, *project );
 #endif
 
-    // runs with or without livepp
+#ifdef FAN_LIVEPP
     if( settings.mEnableLivepp )
     {
-        fan::LPPLauncher launcher;
+        fan::LPPLauncher launcher(settings.mWindowName);
         launcher.Run( projectContainer );
     }
     else
+#endif
     {
         projectContainer.Run();
     }
@@ -70,6 +76,7 @@ int main( int _argc, char* _argv[] )
     return 0;
 }
 
+#ifdef FAN_WIN32
 int WinMain( HINSTANCE _hInstance, HINSTANCE _hPrevInstance, LPSTR _lpCmdLine, int _nShowCmd )
 {
     (void)_hInstance;
@@ -79,3 +86,4 @@ int WinMain( HINSTANCE _hInstance, HINSTANCE _hPrevInstance, LPSTR _lpCmdLine, i
 
     main( __argc, __argv );
 }
+#endif

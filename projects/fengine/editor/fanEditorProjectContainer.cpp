@@ -309,10 +309,7 @@ namespace fan
                             SCOPED_PROFILE( ImGui_render );
                             ImGui::NewFrame();
                             mMainMenuBar->Draw( project.mWorld );
-                            /*if( ImGui::Begin( "test" ) )
-                            {
-                                ImGui::End();
-                            }*/
+                            GetCurrentProject().OnGui();
                             ImGui::Render();
                         }
                     }

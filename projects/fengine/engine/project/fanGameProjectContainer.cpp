@@ -140,6 +140,7 @@ namespace fan
 			{
 				// ImGui render
 				ImGui::NewFrame();
+				mProject.OnGui();
 
                 ImGui::Begin( "test" );
                 mFullScreen.OnGui( mWindow );
