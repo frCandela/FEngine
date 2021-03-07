@@ -12,6 +12,7 @@
 #include "core/unit_tests/fanUnitTestSignal.hpp"
 #include "core/unit_tests/fanUnitTestEcs.hpp"
 #include "core/unit_tests/fanUnitTestFileSystem.hpp"
+#include "core/unit_tests/fanUnitTestFixedPoint.hpp"
 
 namespace fan
 {
@@ -34,7 +35,8 @@ namespace fan
                 { "Mouse",              &UnitTestMouse::RunTests, mGlfwMouseResult },
                 { "Signal",             &UnitTestSignal::RunTests, mSignalResult },
                 { "Ecs",                &UnitTestEcs::RunTests, mEcsResult },
-                { "FileSystem",         &UnitTestFileSystem::RunTests, mEcsResult },
+                { "FileSystem",         &UnitTestFileSystem::RunTests, mFileSystemResult },
+                { "FixedPoint",         &UnitTestFixedPoint::RunTests, mFixedPointResult },
         };
     }
 
