@@ -1,3 +1,4 @@
+#include <core/fanAssert.hpp>
 #include "editor/windows/fanUnitsTestsWindow.hpp"
 
 #include "core/fanDebug.hpp"
@@ -51,7 +52,13 @@ namespace fan
 
         if( ImGui::Button("Test all"))
         {
+            bool oldValueAssertBreakEnabled = AssertUtils::sFanAssertBreakEnabled;
+
+            AssertUtils::sFanAssertBreakEnabled          = false;
+            AssertUtils::sFanAssertBreakUnitTestsEnabled = false;
             for( const TestArgument& testArgument : tests ){ RunTest( testArgument ); }
+            AssertUtils::sFanAssertBreakUnitTestsEnabled = true;
+            AssertUtils::sFanAssertBreakEnabled          = oldValueAssertBreakEnabled;
         }
         ImGui::SameLine();
         if( ImGui::Button("Clear all"))

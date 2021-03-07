@@ -1,14 +1,13 @@
 #include "core/fanAssert.hpp"
 #include "core/fanDebug.hpp"
 
-
-#ifndef NDEBUG
 namespace fan
 {
     bool AssertUtils::sFanAssertBreakEnabled = true;
-
-    //========================================================================================================
-    //========================================================================================================
+    bool AssertUtils::sFanAssertBreakUnitTestsEnabled = true;
+#ifndef NDEBUG
+    //==========================================================================================================================
+    //==========================================================================================================================
     void AssertUtils::LogAssertMessage( const char* _msg, const char* _func, int _line, const char* _file )
     {
         Debug::Error() << "Assert:"
@@ -18,5 +17,6 @@ namespace fan
                 << " file:" << _file
                 << Debug::Endl();
     }
-}
 #endif
+}
+

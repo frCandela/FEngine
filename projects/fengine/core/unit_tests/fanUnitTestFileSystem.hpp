@@ -17,20 +17,22 @@ namespace fan
                          { &UnitTestFileSystem::TestNormalizeEndsSlashes,   "Normalize  ends slashes" },
                          { &UnitTestFileSystem::TestIsAbsolute,             "Is absolute" },
                          { &UnitTestFileSystem::TestEmptyInit,              "Empty init " },
-                         { &UnitTestFileSystem::TestInitAppendContent,      "Init append content 1" },
-                         { &UnitTestFileSystem::TestAppendContent2,         "Init append content 2" },
                          { &UnitTestFileSystem::TestNormalizeAbsolute,      "Normalize absolute" },
                 };
             }
 
+            std::string mOldProjectPath;
+
             void Create() override
             {
+                mOldProjectPath = FileSystem::GetProjectPath();
                 FileSystem::Reset();
             }
 
             void Destroy() override
             {
                 FileSystem::Reset();
+                FileSystem::SetProjectPath(mOldProjectPath);
             }
 
             void TestNormalizeBackSlashes()
@@ -67,20 +69,6 @@ namespace fan
                 bool result = FileSystem::SetProjectPath( "" );
                 TEST_ASSERT( result == false );
                 TEST_ASSERT( FileSystem::GetProjectPath() == "" );
-            }
-
-            void TestInitAppendContent()
-            {
-                bool              result             = FileSystem::SetProjectPath( "D:/code/" );
-                TEST_ASSERT( result == true );
-                TEST_ASSERT( FileSystem::GetProjectPath() == "D:/code/content" );
-            }
-
-            void TestAppendContent2()
-            {
-                bool              result           = FileSystem::SetProjectPath( "D:/code" );
-                TEST_ASSERT( result == true );
-                TEST_ASSERT( FileSystem::GetProjectPath() == "D:/code/content" );
             }
 
             void TestIsAbsolute()
