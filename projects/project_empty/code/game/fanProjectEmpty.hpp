@@ -6,9 +6,10 @@ namespace fan
 {
 	//==========================================================================================================================
 	//==========================================================================================================================
-	class EmptyProject : public IProject
+	class ProjectEmpty : public IProject
 	{
 	public:
+        ProjectEmpty();
         void Init() override;
         void Start() override;
         void Stop() override;

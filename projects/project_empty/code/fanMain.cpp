@@ -5,7 +5,7 @@
 #include "engine/project/fanLiveppLauncher.hpp"
 #include "core/fanFileSystem.hpp"
 #include "engine/project/fanLaunchArgs.hpp"
-#include "game/fanEmptyProject.hpp"
+#include "game/fanProjectEmpty.hpp"
 
 #ifdef FAN_EDITOR
     #include "editor/fanEditorProjectContainer.hpp"
@@ -31,11 +31,9 @@ int main( int _argc, char* _argv[] )
     launchArguments.Parse( args, settings );
 
     fan::FileSystem::SetProjectPath( PROJECT_PATH );
-
-    const std::string projectName = "empty_project";
-    fan::EmptyProject project;
+    fan::ProjectEmpty project;
 #ifdef FAN_EDITOR
-    settings.mWindowName = projectName + "_editor";
+    settings.mWindowName = project.mName + "_editor";
     fan::EditorProjectContainer projectContainer( settings, { &project } );
 #else
     settings.mWindowName = projectName + "_game";
@@ -45,7 +43,7 @@ int main( int _argc, char* _argv[] )
 #ifdef FAN_LIVEPP
     if( settings.mEnableLivepp )
     {
-        fan::LPPLauncher launcher( projectName );
+        fan::LPPLauncher launcher( project.mName );
         launcher.Run( projectContainer );
     }
     else
