@@ -24,4 +24,3 @@ include_directories(
 
 add_subdirectory(fengine)
 add_subdirectory(project_empty)
-add_subdirectory(project_voxels)

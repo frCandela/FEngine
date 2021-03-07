@@ -41,6 +41,5 @@ namespace fan
         UnitTestResult mSignalResult;
         UnitTestResult mEcsResult;
         UnitTestResult mFileSystemResult;
-        UnitTestResult mFixedPointResult;
     };
 }
