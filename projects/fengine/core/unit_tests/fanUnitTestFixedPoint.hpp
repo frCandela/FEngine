@@ -3,7 +3,6 @@
 #include "core/fanAssert.hpp"
 #include "core/unit_tests/fanUnitTest.hpp"
 #include "core/math/fanFixedPoint.hpp"
-#include "core/math/fanFpTest.hpp"
 
 namespace fan
 {
@@ -14,10 +13,14 @@ namespace fan
     public:
         static std::vector<TestMethod> GetTests()
         {
-            return { { &UnitTestFixedPoint::TestIntegers, "Integer constructor" },
-                     { &UnitTestFixedPoint::TestFloats,   "Float constructor" },
-                     { &UnitTestFixedPoint::TestDoubles,  "Double constructor" },
-                     { &UnitTestFixedPoint::TestStrings,  "String constructor" },
+            return { { &UnitTestFixedPoint::TestIntegers,       "Integer constructor" },
+                     { &UnitTestFixedPoint::TestFloats,         "Float constructor" },
+                     { &UnitTestFixedPoint::TestDoubles,        "Double constructor" },
+                     { &UnitTestFixedPoint::TestStrings,        "String constructor" },
+                     { &UnitTestFixedPoint::TestAddition,       "Addition" },
+                     { &UnitTestFixedPoint::TestSubtraction,    "Subtraction" },
+                     { &UnitTestFixedPoint::TestMultiplication, "Addition" },
+                     { &UnitTestFixedPoint::TestDivision,       "Division" },
             };
         }
 
@@ -85,6 +88,70 @@ namespace fan
             TEST_ASSERT( Fixed( 32767.99993896484375_fx ).ToDouble() == 32767.99993896484375 );
             TEST_ASSERT( Fixed( "-32767.00006103515625" ).ToDouble() == -32767.00006103515625 );
             TEST_ASSERT( Fixed( Fixed::sMaxFractional ).ToDouble() == 0.99993896484375 );
+        }
+
+        void TestAddition()
+        {
+            // (+)
+            TEST_ASSERT( 1.5_fx + 2.25_fx == 3.75_fx );
+            TEST_ASSERT( 2.25_fx + 1.5_fx == 3.75_fx );
+            TEST_ASSERT( 2.25_fx + 0_fx == 2.25_fx );
+            TEST_ASSERT( -3.5_fx + -4.125_fx == -7.625_fx );
+            TEST_ASSERT( -4.125_fx + -3.5_fx == -7.625_fx );
+            TEST_ASSERT( -4.125_fx + 0_fx == -4.125_fx );
+            TEST_ASSERT( 3.5_fx + -3.5_fx == 0_fx );
+            // (+=)
+            TEST_ASSERT( ( 1.5_fx += 2.25_fx ) == 3.75_fx );
+            TEST_ASSERT( ( -3.5_fx += -4.125_fx ) == -7.625_fx );
+            // ++
+            Fixed g = 1.5_fx;
+            TEST_ASSERT( ++g == 2.5_fx );
+            TEST_ASSERT( g++ == 2.5_fx );
+            TEST_ASSERT( g == 3.5_fx );
+        }
+
+        void TestSubtraction()
+        {
+            // (-)
+            TEST_ASSERT( 4.5_fx - 1.25_fx == 3.25_fx );
+            TEST_ASSERT( 1.25_fx - 4.5_fx == -3.25_fx );
+            TEST_ASSERT( 1.25_fx - 0_fx == 1.25_fx );
+            // (-=)
+            TEST_ASSERT( ( 4.5_fx -= 1.25_fx ) == 3.25_fx );
+            // --
+            Fixed g = 1.5_fx;
+            TEST_ASSERT( --g == 0.5_fx );
+            TEST_ASSERT( g-- == 0.5_fx );
+            TEST_ASSERT( g == -0.5_fx );
+        }
+
+        void TestMultiplication()
+        {
+            // (*)
+            TEST_ASSERT( 2_fx * 3_fx == 6_fx );
+            TEST_ASSERT( -2_fx * 3_fx == -6_fx );
+            TEST_ASSERT( -2_fx * -3_fx == 6_fx );
+            TEST_ASSERT( 0.5_fx * 3_fx == 1.5_fx );
+            TEST_ASSERT( 2_fx * -3.5_fx == -7_fx );
+
+            // (*=)
+            TEST_ASSERT( ( 4.5_fx *= 2.5_fx ) == 11.25_fx );
+            TEST_ASSERT( ( 4.5_fx *= -2.5_fx ) == -11.25_fx );
+            TEST_ASSERT( ( -4.5_fx *= 2.5_fx ) == -11.25_fx );
+        }
+
+
+        void TestDivision()
+        {
+            // (/)
+            TEST_ASSERT( 6_fx / 2_fx == 3_fx );
+            TEST_ASSERT( -6_fx / 2_fx == -3_fx );
+            TEST_ASSERT( 1_fx / 2_fx == .5_fx );
+            TEST_ASSERT( 1_fx / -2_fx == -.5_fx );
+
+            // (/=)
+            TEST_ASSERT( ( 8_fx /= 2_fx ) == 4._fx );
+            TEST_ASSERT( ( 4.5_fx /= -2_fx ) == -2.25_fx );
         }
     };
 }

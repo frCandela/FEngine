@@ -7,31 +7,9 @@ namespace fan
 {
     //==========================================================================================================================
     //==========================================================================================================================
-    Fixed::Fixed( const int _integer )
-    {
-        mData = static_cast<DataType>(_integer << sFractionalSize);
-    }
-
-    //==========================================================================================================================
-    //==========================================================================================================================
-    Fixed::Fixed( const float _float )
-    {
-        fanAssertMsg( false, "converting floating point to fixed point is not deterministic" );
-        mData = static_cast<DataType>( _float * sFixed_One );
-    }
-
-    //==========================================================================================================================
-    //==========================================================================================================================
-    Fixed::Fixed( const double _double )
-    {
-        fanAssertMsg( false, "converting floating point to fixed point is not deterministic" );
-        mData = static_cast<DataType>( _double * sFixed_One );
-    }
-
-    //==========================================================================================================================
-    //==========================================================================================================================
     Fixed::Fixed( const char* _str )
     {
+        fanAssert( _str[0] != '+' );
         const char* dotStr = strchr( _str, '.' );
         const int64_t  integerValue       = dotStr != nullptr ? AtoiLimited( _str, dotStr ) : _atoi64( _str );
         const uint64_t rawFractionalValue = dotStr != nullptr ? _atoi64( dotStr + 1 ) : 0;
@@ -92,5 +70,34 @@ namespace fan
             val = val * 10 + ( *_begin++ - '0' );
         }
         return isNegative ? -val : val;
+    }
+
+    //==========================================================================================================================
+    //==========================================================================================================================
+    Fixed  Fixed::operator*  ( const Fixed& _value ) const
+    {
+        DataType integer1 = mData >> sFractionalSize;
+        DataType integer2 = _value.mData >> sFractionalSize;
+
+        int fractional1 = mData & sFractionalMask;
+        int fractional2 = _value.mData & sFractionalMask;
+
+        Fixed result;
+        fanAssert( result.mData == 0 );
+        result.mData += (integer1 * integer2) << sFractionalSize;
+        result.mData += (integer1 * fractional2);
+        result.mData += (fractional1 * integer2);
+        result.mData += ((fractional1 * fractional2) >> sFractionalSize) & sFractionalMask;
+        return result;
+    }
+
+    //==========================================================================================================================
+    //==========================================================================================================================
+    Fixed  Fixed::operator/  ( const Fixed& _value ) const
+    {
+        fanAssert( _value != Fixed(0) );
+        Fixed result;
+        result.mData = DataType((int64_t(mData) << sFractionalSize ) / _value.mData);
+        return result;
     }
 }
