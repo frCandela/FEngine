@@ -50,18 +50,12 @@ namespace fan
 
         void TestFloats()
         {
-            Fixed f1( 5.00390625f );
-            float value  = f1.ToFloat();
-            TEST_ASSERT( value == 5.00390625f );
-
-            Fixed f2( -5.00390625f );
-            float value2 = f2.ToFloat();
-            TEST_ASSERT( value2 == -5.00390625f );
-
-            TEST_ASSERT( Fixed( 32767.f ).ToFloat() == 32767.f );
-            TEST_ASSERT( Fixed( -32768.f ).ToFloat() == -32768.f );
-            TEST_ASSERT( Fixed( 32767.f ).ToFloat() != 32768.f );
-            TEST_ASSERT( Fixed( -32768.f ).ToFloat() != -32769.f );
+            TEST_ASSERT( Fixed( 5.0625f ).ToFloat() == 5.0625f );
+            TEST_ASSERT( Fixed( -5.0625f ).ToFloat() == -5.0625f );
+            TEST_ASSERT( Fixed( float( Fixed::sMaxInteger )).ToFloat() == Fixed::sMaxInteger );
+            TEST_ASSERT( Fixed( float( Fixed::sMax ) + 1.f ).ToFloat() != Fixed::sMax + 1.f );
+            TEST_ASSERT( Fixed( float( Fixed::sMin ) ).ToFloat() == Fixed::sMin );
+            TEST_ASSERT( Fixed( float( Fixed::sMin ) - 1.f ).ToFloat() != Fixed::sMin - 1.f );
         }
 
         void TestDoubles()
@@ -78,16 +72,26 @@ namespace fan
 
         void TestStrings()
         {
+            static_assert( 3_fx == 6_fx/2_fx ); // compile time evaluation
+
+            // positives
             TEST_ASSERT( ( 123_fx ).ToFloat() == 123.f );
             TEST_ASSERT( ( .75_fx ).ToFloat() == .75f );
             TEST_ASSERT( ( 0000.0625_fx ).ToFloat() == .0625f );
             TEST_ASSERT( ( 0.625_fx ).ToFloat() == 0.625f );
-            TEST_ASSERT( ( 0.0001220703125_fx ).ToFloat() == 0.0001220703125 );
-            TEST_ASSERT( Fixed( "-32768.5" ).ToDouble() == -32768.5 );
-            TEST_ASSERT( Fixed( "-32769." ).ToDouble() != -32769. );
-            TEST_ASSERT( Fixed( 32767.99993896484375_fx ).ToDouble() == 32767.99993896484375 );
-            TEST_ASSERT( Fixed( "-32767.00006103515625" ).ToDouble() == -32767.00006103515625 );
-            TEST_ASSERT( Fixed( Fixed::sMaxFractional ).ToDouble() == 0.99993896484375 );
+
+            // negatives
+            TEST_ASSERT( Fixed( "-123" ).ToFloat() == -123.f );
+            TEST_ASSERT( Fixed( "-.75" ).ToFloat() == -.75f );
+            TEST_ASSERT( Fixed( "-0000.0625" ).ToFloat() == -.0625f );
+            TEST_ASSERT( Fixed( "-25.625" ).ToFloat() == -25.625f );
+
+            // clamp max digits
+            TEST_ASSERT( ( 0.999999999999999999_fx ).ToDouble() == ( 0.999999999_fx ).ToDouble() );
+
+            // limits
+            TEST_ASSERT( Fixed( std::to_string(Fixed::sMax).c_str() ).ToDouble() == Fixed::sMax );
+            TEST_ASSERT( Fixed( std::to_string(Fixed::sMin).c_str() ).ToDouble() == Fixed::sMin);
         }
 
         void TestAddition()
@@ -116,8 +120,10 @@ namespace fan
             TEST_ASSERT( 4.5_fx - 1.25_fx == 3.25_fx );
             TEST_ASSERT( 1.25_fx - 4.5_fx == -3.25_fx );
             TEST_ASSERT( 1.25_fx - 0_fx == 1.25_fx );
+            TEST_ASSERT( -1.25_fx - 2.5_fx == -3.75_fx );
             // (-=)
             TEST_ASSERT( ( 4.5_fx -= 1.25_fx ) == 3.25_fx );
+            TEST_ASSERT( ( -12.5_fx -= 1.25_fx ) == -13.75_fx );
             // --
             Fixed g = 1.5_fx;
             TEST_ASSERT( --g == 0.5_fx );
