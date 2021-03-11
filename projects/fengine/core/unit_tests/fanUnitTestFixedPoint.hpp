@@ -21,6 +21,10 @@ namespace fan
                      { &UnitTestFixedPoint::TestSubtraction,    "Subtraction" },
                      { &UnitTestFixedPoint::TestMultiplication, "Addition" },
                      { &UnitTestFixedPoint::TestDivision,       "Division" },
+                     { &UnitTestFixedPoint::TestFloor,          "Floor" },
+                     { &UnitTestFixedPoint::TestCeil,           "Ceil" },
+                     { &UnitTestFixedPoint::TestRound,          "Round" },
+                     { &UnitTestFixedPoint::TestAbs,            "Abs" },
             };
         }
 
@@ -146,7 +150,6 @@ namespace fan
             TEST_ASSERT( ( -4.5_fx *= 2.5_fx ) == -11.25_fx );
         }
 
-
         void TestDivision()
         {
             // (/)
@@ -158,6 +161,39 @@ namespace fan
             // (/=)
             TEST_ASSERT( ( 8_fx /= 2_fx ) == 4._fx );
             TEST_ASSERT( ( 4.5_fx /= -2_fx ) == -2.25_fx );
+        }
+
+        void TestFloor()
+        {
+            TEST_ASSERT( (1.5_fx).Floor().ToDouble() == 1. );
+            TEST_ASSERT( (-1.5_fx).Floor().ToDouble()  == -2. );
+            TEST_ASSERT( (3_fx).Floor().ToDouble() == 3. );
+            TEST_ASSERT( (-3_fx).Floor().ToDouble()  == -3. );
+        }
+
+        void TestCeil()
+        {
+            TEST_ASSERT( (1.5_fx).Ceil().ToDouble() == 2. );
+            TEST_ASSERT( (-1.5_fx).Ceil().ToDouble()  == -1. );
+            TEST_ASSERT( (3_fx).Ceil().ToDouble() == 3. );
+            TEST_ASSERT( (-3_fx).Ceil().ToDouble()  == -3. );
+        }
+
+        void TestRound()
+        {
+            TEST_ASSERT( (1.6_fx).Round().ToDouble() == 2. );
+            TEST_ASSERT( (1.4_fx).Round().ToDouble() == 1. );
+            TEST_ASSERT( (-1.6_fx).Round().ToDouble()  == -2. );
+            TEST_ASSERT( (-1.4_fx).Round().ToDouble() == -1. );
+
+            TEST_ASSERT( (1.5_fx).Round().ToDouble()  == 2. );
+            TEST_ASSERT( (-1.5_fx).Round().ToDouble()  == -1. );
+        }
+
+        void TestAbs()
+        {
+            TEST_ASSERT( (1.5_fx).Abs().ToDouble() == 1.5 );
+            TEST_ASSERT( (-1.5_fx).Abs().ToDouble()  == 1.5 );
         }
     };
 }

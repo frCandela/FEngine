@@ -10,12 +10,15 @@ namespace fan
     //==========================================================================================================================
     class Fixed
     {
-    public:
+    private:
         using DataType = int32_t;
         static constexpr int sIntegerSize    = 16;
         static constexpr int sFractionalSize = 16;
         static constexpr uint64_t sFixed_One      = 1 << sFractionalSize;
+        static constexpr uint64_t sFixed_Half     = 1 << (sFractionalSize - 1);
         static constexpr uint64_t sFractionalMask = sFixed_One - 1;
+        static constexpr uint64_t sIntegerMask = ~sFractionalMask;
+        static_assert( (sFractionalMask & sIntegerMask) == 0 );
 
     public:
         static constexpr int32_t sMaxInteger    = ( 1 << ( sIntegerSize - 1 ) ) - 1;
@@ -35,11 +38,8 @@ namespace fan
         static constexpr Fixed CreateFromData( const DataType _data ) { Fixed f; f.mData = _data; return f;}
         DataType GetData() const { return mData; }
 
-        int ToInt() const       { return DataType( mData >> sFractionalSize ); }
-        float ToFloat() const
-        {
-            return float( mData ) / sFixed_One;
-        }
+        int ToInt() const { return DataType( mData >> sFractionalSize ); }
+        float ToFloat() const { return float( mData ) / sFixed_One; }
         double ToDouble() const { return double( mData ) / sFixed_One; }
 
         constexpr Fixed  operator+  ( const Fixed& _value ) const { return CreateFromData( mData + _value.mData ); }
@@ -73,6 +73,27 @@ namespace fan
 
         constexpr bool operator==( const Fixed& _value ) const{ return mData == _value.mData; }
         constexpr bool operator!=( const Fixed& _value ) const{ return mData != _value.mData; }
+
+        constexpr Fixed& Floor() { mData = mData & sIntegerMask; return *this; }
+        constexpr Fixed& Ceil()
+        {
+            if( ( mData & sFractionalMask ) != 0 )
+            {
+                mData = ( ( mData + sFixed_One ) & sIntegerMask );
+            }
+            return *this;
+        }
+        constexpr Fixed& Round()
+        {
+            mData += sFixed_Half;
+            return Floor();
+        }
+        constexpr Fixed& Abs()
+        {
+            if( mData < 0 ){ mData = -mData; }
+            return *this;
+        }
+
 
     private:
         DataType mData;
