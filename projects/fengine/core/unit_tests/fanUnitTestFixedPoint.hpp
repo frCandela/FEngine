@@ -17,14 +17,18 @@ namespace fan
                      { &UnitTestFixedPoint::TestFloats,         "Float constructor" },
                      { &UnitTestFixedPoint::TestDoubles,        "Double constructor" },
                      { &UnitTestFixedPoint::TestStrings,        "String constructor" },
+                     { &UnitTestFixedPoint::TestComparisons,    "Comparisons" },
                      { &UnitTestFixedPoint::TestAddition,       "Addition" },
                      { &UnitTestFixedPoint::TestSubtraction,    "Subtraction" },
                      { &UnitTestFixedPoint::TestMultiplication, "Addition" },
                      { &UnitTestFixedPoint::TestDivision,       "Division" },
+                     { &UnitTestFixedPoint::TestModulo,         "Modulo" },
                      { &UnitTestFixedPoint::TestFloor,          "Floor" },
                      { &UnitTestFixedPoint::TestCeil,           "Ceil" },
                      { &UnitTestFixedPoint::TestRound,          "Round" },
                      { &UnitTestFixedPoint::TestAbs,            "Abs" },
+                     { &UnitTestFixedPoint::TestPowI,           "PowI" },
+                     { &UnitTestFixedPoint::TestSin,            "Sin" },
             };
         }
 
@@ -56,7 +60,7 @@ namespace fan
         {
             TEST_ASSERT( Fixed( 5.0625f ).ToFloat() == 5.0625f );
             TEST_ASSERT( Fixed( -5.0625f ).ToFloat() == -5.0625f );
-            TEST_ASSERT( Fixed( float( Fixed::sMaxInteger )).ToFloat() == Fixed::sMaxInteger );
+            TEST_ASSERT( Fixed( float( Fixed::sMaxInteger ) ).ToFloat() == Fixed::sMaxInteger );
             TEST_ASSERT( Fixed( float( Fixed::sMax ) + 1.f ).ToFloat() != Fixed::sMax + 1.f );
             TEST_ASSERT( Fixed( float( Fixed::sMin ) ).ToFloat() == Fixed::sMin );
             TEST_ASSERT( Fixed( float( Fixed::sMin ) - 1.f ).ToFloat() != Fixed::sMin - 1.f );
@@ -76,8 +80,6 @@ namespace fan
 
         void TestStrings()
         {
-            static_assert( 3_fx == 6_fx/2_fx ); // compile time evaluation
-
             // positives
             TEST_ASSERT( ( 123_fx ).ToFloat() == 123.f );
             TEST_ASSERT( ( .75_fx ).ToFloat() == .75f );
@@ -94,12 +96,30 @@ namespace fan
             TEST_ASSERT( ( 0.999999999999999999_fx ).ToDouble() == ( 0.999999999_fx ).ToDouble() );
 
             // limits
-            TEST_ASSERT( Fixed( std::to_string(Fixed::sMax).c_str() ).ToDouble() == Fixed::sMax );
-            TEST_ASSERT( Fixed( std::to_string(Fixed::sMin).c_str() ).ToDouble() == Fixed::sMin);
+            TEST_ASSERT( Fixed( std::to_string( Fixed::sMax ).c_str() ).ToDouble() == Fixed::sMax );
+            TEST_ASSERT( Fixed( std::to_string( Fixed::sMin ).c_str() ).ToDouble() == Fixed::sMin );
+        }
+
+        void TestComparisons()
+        {
+            static_assert(  1_fx < 2_fx);
+
+            TEST_ASSERT( 2.5_fx > 1.5_fx )
+            TEST_ASSERT( 2.5_fx >= 1.5_fx )
+            TEST_ASSERT( -2.5_fx < -1.5_fx )
+            TEST_ASSERT( -2.5_fx <= -1.5_fx )
+            TEST_ASSERT( 2.5_fx >= 2.5_fx )
+            TEST_ASSERT( -2.5_fx <= -2.5_fx )
+            TEST_ASSERT( -2.5_fx == -2.5_fx )
+            TEST_ASSERT( !( -2.5_fx == -2.6_fx ) )
+            TEST_ASSERT( -2.5_fx != -2.6_fx )
+            TEST_ASSERT( !( -2.5_fx != -2.5_fx ) )
         }
 
         void TestAddition()
         {
+            static_assert(  1_fx + 2_fx == 3_fx );
+
             // (+)
             TEST_ASSERT( 1.5_fx + 2.25_fx == 3.75_fx );
             TEST_ASSERT( 2.25_fx + 1.5_fx == 3.75_fx );
@@ -120,6 +140,8 @@ namespace fan
 
         void TestSubtraction()
         {
+            static_assert(  1_fx - 3_fx == -2_fx );
+
             // (-)
             TEST_ASSERT( 4.5_fx - 1.25_fx == 3.25_fx );
             TEST_ASSERT( 1.25_fx - 4.5_fx == -3.25_fx );
@@ -137,6 +159,8 @@ namespace fan
 
         void TestMultiplication()
         {
+            static_assert(  2_fx * 3_fx == 6_fx );
+
             // (*)
             TEST_ASSERT( 2_fx * 3_fx == 6_fx );
             TEST_ASSERT( -2_fx * 3_fx == -6_fx );
@@ -152,6 +176,8 @@ namespace fan
 
         void TestDivision()
         {
+            static_assert(  6_fx / 2_fx == 3_fx );
+
             // (/)
             TEST_ASSERT( 6_fx / 2_fx == 3_fx );
             TEST_ASSERT( -6_fx / 2_fx == -3_fx );
@@ -163,37 +189,92 @@ namespace fan
             TEST_ASSERT( ( 4.5_fx /= -2_fx ) == -2.25_fx );
         }
 
+        void TestModulo()
+        {
+            static_assert(  3_fx % 2_fx == 1_fx );
+
+            // (%)
+            TEST_ASSERT( 7_fx % 2_fx == 1_fx );
+            TEST_ASSERT( -7_fx % 2_fx == -1_fx );
+            TEST_ASSERT( 7.5_fx % 2_fx == 1.5_fx );
+            TEST_ASSERT( -7.5_fx % 2_fx == -1.5_fx );
+            TEST_ASSERT( 7.5_fx % -2_fx == 1.5_fx );
+            TEST_ASSERT( -7.5_fx % -2_fx == -1.5_fx );
+
+            TEST_ASSERT( 6.28_fx % 3.14_fx == 0_fx );
+            TEST_ASSERT( -6.28_fx % 3.14_fx == 0_fx );
+            TEST_ASSERT( 4.14_fx % 3.14_fx == 1_fx );
+            TEST_ASSERT( -4.14_fx % 3.14_fx == -1_fx );
+
+            // (%=)
+            TEST_ASSERT( ( 8.5_fx %= 2_fx ) == 0.5_fx );
+            TEST_ASSERT( ( -8.5_fx %= -2_fx ) == -0.5_fx );
+        }
+
         void TestFloor()
         {
-            TEST_ASSERT( (1.5_fx).Floor().ToDouble() == 1. );
-            TEST_ASSERT( (-1.5_fx).Floor().ToDouble()  == -2. );
-            TEST_ASSERT( (3_fx).Floor().ToDouble() == 3. );
-            TEST_ASSERT( (-3_fx).Floor().ToDouble()  == -3. );
+            static_assert(  Fixed::Floor( 1.6_fx) == 1_fx );
+
+            TEST_ASSERT( Fixed::Floor( 1.5_fx ) == 1_fx );
+            TEST_ASSERT( Fixed::Floor( -1.5_fx ) == -2_fx );
+            TEST_ASSERT( Fixed::Floor( 3_fx ) == 3_fx );
+            TEST_ASSERT( Fixed::Floor( -3_fx ) == -3_fx );
         }
 
         void TestCeil()
         {
-            TEST_ASSERT( (1.5_fx).Ceil().ToDouble() == 2. );
-            TEST_ASSERT( (-1.5_fx).Ceil().ToDouble()  == -1. );
-            TEST_ASSERT( (3_fx).Ceil().ToDouble() == 3. );
-            TEST_ASSERT( (-3_fx).Ceil().ToDouble()  == -3. );
+            static_assert(  Fixed::Ceil( 0.4_fx) == 1_fx );
+
+            TEST_ASSERT( Fixed::Ceil( 1.5_fx ) == 2_fx );
+            TEST_ASSERT( Fixed::Ceil( -1.5_fx ) == -1_fx );
+            TEST_ASSERT( Fixed::Ceil( 3_fx ) == 3_fx );
+            TEST_ASSERT( Fixed::Ceil( -3_fx ) == -3_fx );
         }
 
         void TestRound()
         {
-            TEST_ASSERT( (1.6_fx).Round().ToDouble() == 2. );
-            TEST_ASSERT( (1.4_fx).Round().ToDouble() == 1. );
-            TEST_ASSERT( (-1.6_fx).Round().ToDouble()  == -2. );
-            TEST_ASSERT( (-1.4_fx).Round().ToDouble() == -1. );
+            static_assert(  Fixed::Round( 1.6_fx) == 2_fx );
 
-            TEST_ASSERT( (1.5_fx).Round().ToDouble()  == 2. );
-            TEST_ASSERT( (-1.5_fx).Round().ToDouble()  == -1. );
+            TEST_ASSERT( Fixed::Round( 1.6_fx ) == 2_fx );
+            TEST_ASSERT( Fixed::Round( 1.4_fx ) == 1_fx );
+            TEST_ASSERT( Fixed::Round( -1.6_fx ) == -2_fx );
+            TEST_ASSERT( Fixed::Round( -1.4_fx ) == -1_fx );
+
+            TEST_ASSERT( Fixed::Round( 1.5_fx ) == 2_fx );
+            TEST_ASSERT( Fixed::Round( -1.5_fx ) == -1_fx );
         }
 
         void TestAbs()
         {
-            TEST_ASSERT( (1.5_fx).Abs().ToDouble() == 1.5 );
-            TEST_ASSERT( (-1.5_fx).Abs().ToDouble()  == 1.5 );
+            static_assert(  Fixed::Abs( -1_fx) == 1_fx );
+
+            TEST_ASSERT( Fixed::Abs( 1.5_fx ) == 1.5_fx );
+            TEST_ASSERT( Fixed::Abs( -1.5_fx ) == 1.5_fx );
+        }
+
+        void TestPowI()
+        {
+            static_assert(  Fixed::PowI( 4_fx, 2) == 16_fx );
+
+            TEST_ASSERT( Fixed::PowI( 1.5_fx, 2 ) == 2.25_fx );
+            TEST_ASSERT( Fixed::PowI( 2_fx, 2 ) == 4_fx );
+            TEST_ASSERT( Fixed::PowI( -2_fx, 3 ) == -8_fx );
+            TEST_ASSERT( Fixed::PowI( 3.5_fx, 3 ) == 42.875_fx );
+        }
+
+        void TestSin()
+        {
+            static_assert(  Fixed::Sin( 0_fx ) == 0_fx );
+
+            // we want at least two digits of precision for now
+            TEST_ASSERT( Fixed::Floor( FX_PI * 10000_fx ) == 31415_fx )
+            TEST_ASSERT( Fixed::Sin( 0_fx ) == 0_fx );
+            TEST_ASSERT( Fixed::Floor( Fixed::Sin( FX_PI ) * 100_fx ) == 0_fx );
+            TEST_ASSERT( Fixed::Floor( Fixed::Sin( FX_HALF_PI ) ) * 100_fx == 100_fx );
+            TEST_ASSERT( Fixed::Floor( Fixed::Sin( -FX_HALF_PI ) ) * 100_fx == -100_fx );
+
+            TEST_ASSERT( Fixed::Sin( 3_fx*FX_PI ) == Fixed::Sin(FX_PI));
+            TEST_ASSERT( Fixed::Sin( -5_fx*FX_PI ) == Fixed::Sin(-FX_PI));
         }
     };
 }
