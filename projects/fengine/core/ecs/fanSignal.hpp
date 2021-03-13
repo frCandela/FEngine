@@ -41,7 +41,7 @@ namespace fan
         void Clear();
         int ConnectionsCount() const { return (int)mConnections.size(); }
         void Disconnect( const size_t _ID );
-        int GetType() const{ return TemplateType::Type<Args...>(); }
+        int GetType() const{ return TemplateType<Args...>::Type(); }
 
     private:
         std::vector<Connection> mConnections;

@@ -166,9 +166,9 @@ namespace fan
 
             // get slots
             const EcsComponentInfo componentInfo = mWorld.GetComponentInfo( TestComponent::Info::sType );
-            TEST_ASSERT( componentInfo.mSlots[0]->GetArgsType() == TemplateType::Type<int>() );
+            TEST_ASSERT( componentInfo.mSlots[0]->GetArgsType() == TemplateType<int>::Type() );
             Slot<int>& slotInt = * ( (Slot<int>*)componentInfo.mSlots[0] );
-            TEST_ASSERT( componentInfo.mSlots[1]->GetArgsType() == TemplateType::Type<float>() );
+            TEST_ASSERT( componentInfo.mSlots[1]->GetArgsType() == TemplateType<float>::Type() );
             Slot<float>& slotFloat = * ( (Slot<float>*)componentInfo.mSlots[1] );
 
             Signal<int>     signalInt;
@@ -205,7 +205,7 @@ namespace fan
 
             // get slot
             const EcsSingletonInfo& singletonInfo = mWorld.GetSingletonInfo( TestSingleton::Info::sType );
-            TEST_ASSERT( singletonInfo.mSlots[0]->GetArgsType() == TemplateType::Type<int>() );
+            TEST_ASSERT( singletonInfo.mSlots[0]->GetArgsType() == TemplateType<int>::Type() );
             Slot<int>& slotInt = * ( (Slot<int>*)singletonInfo.mSlots[0] );
 
             Signal<int>     signalInt;

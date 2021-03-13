@@ -1,6 +1,6 @@
 ﻿cmake_minimum_required(VERSION 3.8)
 project("FEngine")
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 
 set(VULKAN_DIR C:/VulkanSDK/1.2.162.0)
 set(SHADERC_DIR C:/VulkanSDK/shaderc)

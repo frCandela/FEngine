@@ -93,6 +93,6 @@ namespace fan
 		std::string mPath;	// file relative path
 		Json        mJson;	// gltf json data
 
-		std::string GLTFImporter::DecodeBuffer( const std::string& _uri );
+		std::string DecodeBuffer( const std::string& _uri );
 	};
 }

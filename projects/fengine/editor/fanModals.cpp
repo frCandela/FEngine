@@ -2,8 +2,11 @@
 
 #include <sstream>
 #include <core/fanDebug.hpp>
+#include <fanDisableWarnings.hpp>
 #include "core/input/fanKeyboard.hpp"
+WARNINGS_IMGUI_PUSH()
 #include "imgui/imgui_internal.h"
+WARNINGS_POP()
 
 //============================================================================================================
 // Extracts the file name of a path without the extension

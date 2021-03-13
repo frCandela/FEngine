@@ -11,21 +11,20 @@ namespace fan
 
     //========================================================================================================
     //========================================================================================================
+    enum TemplateArgsType{ UnSupported = -1, Void0 = 0, Int1, Float1, Float2 };
+    template< typename... T >
     struct TemplateType
     {
-        enum ArgsType{ UnSupported = -1, Void0 = 0, Int1, Float1, Float2 };
-
-        template< typename... T >
         static int Type()
         {
             fanAssert( false );
-            return ArgsType::UnSupported;
+            return TemplateArgsType::UnSupported;
         }
-        template<> static int Type<>()              { return ArgsType::Void0;  }
-        template<> static int Type<int>()           { return ArgsType::Int1;  }
-        template<> static int Type<float>()         { return ArgsType::Float1;}
-        template<> static int Type<float, float>()  { return ArgsType::Float2;}
     };
+    template<> struct TemplateType<> { static int Type() { return TemplateArgsType::Void0; } };
+    template<> struct TemplateType<int> { static int Type() { return TemplateArgsType::Int1; } };
+    template<> struct TemplateType<float> { static int Type() { return TemplateArgsType::Float1; } };
+    template<> struct TemplateType<float,float> { static int Type() { return TemplateArgsType::Float2; } };
 
     //========================================================================================================
     //========================================================================================================
@@ -67,7 +66,7 @@ namespace fan
             mTargetType = TargetType::Singleton;
         }
 
-        int GetArgsType() const override{ return TemplateType::Type<T...>(); }
+        int GetArgsType() const override{ return TemplateType<T...>::Type(); }
     };
 
     //========================================================================================================
@@ -98,7 +97,7 @@ namespace fan
         bool IsComponentSlot() const { return IsValid() && mCallData->mHandle != 0; }
 
     private:
-        int           mArgsType = TemplateType::UnSupported;
+        int           mArgsType = TemplateArgsType::UnSupported;
         SlotCallData* mCallData = nullptr;
         EcsWorld    * mWorld    = nullptr;
     };

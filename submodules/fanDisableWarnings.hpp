@@ -15,6 +15,12 @@ __pragma(warning( disable : 4201 ))
 
 //================================
 //================================
+#define WARNINGS_IMGUI_PUSH()		\
+__pragma(warning( push ))			\
+__pragma(warning( disable : 5054 ))
+
+//================================
+//================================
 #define WARNINGS_POP()		\
 __pragma(warning( pop ))
 

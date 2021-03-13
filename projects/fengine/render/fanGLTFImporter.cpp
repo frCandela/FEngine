@@ -18,8 +18,8 @@ namespace fan
 
         mIndices   = jPrimitive[ "indices" ];
         mPositions = jAttribute[ "POSITION" ];
-        mNormal    = hasNormal ? jAttribute[ "NORMAL" ] : -1;
-        mTexcoord0 = hasTexcoord0 ? jAttribute[ "TEXCOORD_0" ] : -1;
+        mNormal    = hasNormal ? int( jAttribute["NORMAL"] ) : -1;
+        mTexcoord0 = hasTexcoord0 ? int( jAttribute["TEXCOORD_0"] ) : -1;
 	}
 
 	//========================================================================================================

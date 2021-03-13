@@ -8,7 +8,7 @@ namespace ImGui
     //========================================================================================================
     struct FanPopupSetSingletonSlot
     {
-        static constexpr char * sName = "Select singleton and slot";
+        static constexpr const char * sName = "Select singleton and slot";
         static void Open();
         static void Draw( fan::EcsWorld& _world , fan::SlotPtr& _slotPtr );
     };
