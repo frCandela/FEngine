@@ -15,7 +15,7 @@ namespace fan
 	{
         fanAssert( mShaderModule == VK_NULL_HANDLE );
 
-		std::vector<unsigned int> spirvCode = SpirvCompiler::Compile( FileSystem::NormalizePath(_path) );
+		std::vector<char> spirvCode = SpirvCompiler::GetFromGlsl( _path );
 		if ( spirvCode.empty() )
 		{
 			Debug::Error() << "Could not create shader module: " << _path << Debug::Endl();
@@ -26,7 +26,7 @@ namespace fan
                     ? RenderGlobal::sDefaultFragmentShader
                     : RenderGlobal::sDefaultVertexShader );
 			Debug::Log() << "loading default shader " << tmpPath << Debug::Endl();
-			spirvCode = SpirvCompiler::Compile( FileSystem::NormalizePath(tmpPath) );
+			spirvCode = SpirvCompiler::GetFromGlsl( FileSystem::NormalizePath(tmpPath) );
 
 			if ( spirvCode.empty() )
 			{
@@ -38,8 +38,8 @@ namespace fan
 		shaderModuleCreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
 		shaderModuleCreateInfo.pNext = nullptr;
 		shaderModuleCreateInfo.flags = 0;
-		shaderModuleCreateInfo.codeSize = spirvCode.size() * sizeof( unsigned int );
-		shaderModuleCreateInfo.pCode = spirvCode.data();
+		shaderModuleCreateInfo.codeSize = spirvCode.size();
+		shaderModuleCreateInfo.pCode = (uint32_t*)spirvCode.data();
 
         if( vkCreateShaderModule( _device.mDevice,
                                   &shaderModuleCreateInfo,

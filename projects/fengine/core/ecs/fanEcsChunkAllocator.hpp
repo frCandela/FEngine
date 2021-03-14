@@ -1,4 +1,5 @@
 #include <vector>
+#include <cstdint>
 
 namespace fan
 {
@@ -18,6 +19,6 @@ namespace fan
 
 	private:
 		std::vector<void*> mFreeChunks;
-		size_t             mSize;
+		size_t                mSize;
 	};
 }

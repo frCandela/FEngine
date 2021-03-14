@@ -7,7 +7,6 @@ file(GLOB_RECURSE FAN_RENDER_H *.hpp)
 
 set(FAN_RENDER_LIBS
 	fanCore
-	shaderc_combined2
 	vulkan-1
 )
 

@@ -22,7 +22,7 @@ namespace fan
 	//========================================================================================================
 	inline std::vector<btVector3> GetSphere( const float _radius, const int _numSubdivisions )
  	{
-		const float goldenRatio = ( 1 + std::sqrtf( 5 ) ) / 2.f;
+		const float goldenRatio = ( 1 + (float)std::sqrt( 5 ) ) / 2.f;
 		const float a = _radius * 2.f / sqrtf( goldenRatio * sqrtf( 5.f ) );
 		const float x = a / 2;
 		const float y = goldenRatio * a / 2;
@@ -107,7 +107,7 @@ namespace fan
 		for ( int subdivisionIndex = 0; subdivisionIndex < _numSubdivisions; subdivisionIndex++ )
 		{
 			float angle = 2.f * subdivisionIndex * SIMD_PI / _numSubdivisions;
-			btVector3 point( std::cosf( angle ), 0, std::sinf( angle ) );
+			btVector3 point( std::cos( angle ), 0, std::sin( angle ) );
 			baseVertices.push_back( _radius * point );
 		}
 

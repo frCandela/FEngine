@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdlib.h>
+#include <cstring>
 #include "core/fanAssert.hpp"
 
 namespace fan
@@ -26,7 +27,7 @@ namespace fan
 		size_t	Alignment() const { return mAlignment; }
 		void	SetAlignement( const size_t _alignment )
 		{
-            fanAssert( std::_Is_pow_2( _alignment ) );
+            fanAssert( (_alignment & (_alignment-1)) == 0 );
             fanAssert( _alignment > sizeof( T ) && mAlignment >> 1 < sizeof( T ) );
 
             mAlignment = _alignment;
@@ -43,7 +44,7 @@ namespace fan
 
 			if ( oldData != nullptr )
 			{
-				memcpy( mData, oldData, mSize );
+				std::memcpy( mData, oldData, mSize );
 				AlignedFree( oldData );
 				oldData = nullptr;
 			}
@@ -68,7 +69,7 @@ namespace fan
 		void* AlignedMalloc( size_t _size, size_t _alignment )
 		{
 			void* data = nullptr;
-#if defined(_MSC_VER) || defined(__MINGW32__)
+#if defined(FAN_MSVC) || defined(FAN_MINGW)
 			data = _aligned_malloc( _size, _alignment );
 #else 
 			int res = posix_memalign( &data, _alignment, _size );
@@ -84,7 +85,7 @@ namespace fan
 		{
 			if( _data != nullptr )
 			{
-#if	defined(_MSC_VER) || defined(__MINGW32__)
+#if	defined(FAN_MSVC) || defined(FAN_MINGW)
 				_aligned_free( _data );
 #else 
 				free( _data );

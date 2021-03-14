@@ -24,7 +24,7 @@ namespace ImGui
 
         // Set button icon & modal
         const std::string            modalName = std::string( "Find texture (" ) + _label + ")";
-        static std::filesystem::path sPathBuffer;
+        static std::filesystem::path sPathBuffer = fan::FileSystem::NormalizePath( "/");
         ImGui::PushID( _label );
         {
             if ( ImGui::ButtonIcon( ImGui::IconType::Image16, { 16, 16 } ) )

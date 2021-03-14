@@ -41,7 +41,7 @@ namespace fan
         else
         { // Second order linear differential equation
             float delta = L * L - 4 * q * ( s - 1 / epsilon );
-            float sqrtDelta = std::sqrtf( delta );
+            float sqrtDelta = std::sqrt( delta );
             return ( -L + sqrtDelta ) / ( 2 * q );
         }
     }

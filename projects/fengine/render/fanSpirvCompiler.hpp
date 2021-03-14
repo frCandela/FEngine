@@ -6,11 +6,11 @@
 
 namespace fan
 {
-	//========================================================================================================
-	// compiles glsl to spirv using shaderc
-	//========================================================================================================
+	//==========================================================================================================================
+	// compiles glsl to spirv using the lunarg sdk executable and system commands
+	//==========================================================================================================================
 	struct SpirvCompiler
 	{
-		static std::vector<uint32_t> Compile( const std::string _filename );
+		static std::vector<char> GetFromGlsl( const std::string _filename );
 	};
 }

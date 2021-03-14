@@ -56,8 +56,12 @@ namespace fan
 /// at compile time, you have to call the SSID macro.
 /// It takes in parameter a literal const char *
 /// Example : uint32_t identifier = SSID("MyLiteralIdentifier");
-#define SSID(string) \
-__pragma(warning(suppress: 4307)) \
+#ifdef FAN_MSVC
+#define SSID(string)                                            \
+__pragma(warning(suppress: 4307))                               \
 hash_str::compile_time_hash<hash_str::hash_function(string)>()
-
+#else
+#define SSID(string)                                            \
+hash_str::compile_time_hash<hash_str::hash_function(string)>()
+#endif
 }

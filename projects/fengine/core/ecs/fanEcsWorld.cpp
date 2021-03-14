@@ -346,7 +346,7 @@ namespace fan
     //========================================================================================================
     bool EcsWorld::IndexedHasTag( const EcsEntity _entity, const int _tagIndex ) const
     {
-	    fanAssert( _tagIndex < ecsSignatureLength  );
+	    fanAssert( _tagIndex < (int)ecsSignatureLength  );
         fanAssert( _tagIndex >= GetFistTagIndex() );
         const EcsEntityData& entityData = _entity.mArchetype->GetEntityData( _entity.mIndex );
         if( entityData.mTransitionIndex != -1 )
@@ -368,7 +368,7 @@ namespace fan
     //========================================================================================================
     const EcsTagInfo& EcsWorld::IndexedGetTagInfo( const int _tagIndex ) const
     {
-        fanAssert( _tagIndex < ecsSignatureLength );
+        fanAssert( _tagIndex < (int)ecsSignatureLength );
         fanAssert( _tagIndex >= GetFistTagIndex() );
 	    int reverseIndex = int(ecsSignatureLength) - 1 - _tagIndex;
 	    return mTagsInfo[ reverseIndex ];

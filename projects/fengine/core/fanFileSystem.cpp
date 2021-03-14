@@ -1,23 +1,25 @@
 #include "core/fanFileSystem.hpp"
+#include "core/fanDebug.hpp"
 
 #include <sstream>
 
 namespace fan
 {
-    std::string FileSystem::s_projectPath = "";
+    std::string FileSystem::sProjectPath = "";
 
     //==========================================================================================================================
     //==========================================================================================================================
     bool FileSystem::SetProjectPath( const std::string& _projectPath )
     {
-        fanAssertMsg( s_projectPath.empty(), "project path assigned multiple times" );
-        if( !_projectPath.empty() && IsAbsolute( s_projectPath ) )
+        fanAssertMsg( sProjectPath.empty(), "project path assigned multiple times" );
+        if( !_projectPath.empty() && IsAbsolute( sProjectPath ) )
         {
-            s_projectPath = NormalizePath( _projectPath );
-            if( *s_projectPath.rbegin() != '/' )
+            sProjectPath = NormalizePath( _projectPath );
+            if( *sProjectPath.rbegin() != '/' )
             {
-                s_projectPath += '/';
+                sProjectPath += '/';
             }
+            Debug::Log() << "Project path:" <<  sProjectPath << Debug::Endl();
             return true;
         }
 
@@ -29,7 +31,7 @@ namespace fan
     //==========================================================================================================================
     void FileSystem::Reset()
     {
-        s_projectPath = "";
+        sProjectPath = "";
     }
 
     //==========================================================================================================================
@@ -54,7 +56,7 @@ namespace fan
 
         // removes backwards slashes and doubles slashes
         char     previousLetter = ' ';
-        for( int i              = 0; i < _path.size(); ++i )
+        for( int i              = 0; i < (int)_path.size(); ++i )
         {
             const char currentLetter = _path[i];
             char       normalizedLetter;
@@ -84,15 +86,48 @@ namespace fan
         }
 
         // removes leading slash
-        if( *normalizedPath.begin() == '/' )
+        if( ! normalizedPath.empty() && *normalizedPath.begin() == '/' )
         {
             normalizedPath.erase( normalizedPath.begin() );
         }
 
-        if( !s_projectPath.empty() && !IsAbsolute( normalizedPath ) )
+        if( normalizedPath.empty() || !IsAbsolute( normalizedPath ) )
         {
-            normalizedPath = s_projectPath + "content/" + normalizedPath;
+            normalizedPath = sProjectPath + "content/" + normalizedPath;
         }
         return normalizedPath;
+    }
+
+    //==========================================================================================================================
+    //==========================================================================================================================
+    std::string FileSystem::Directory( const std::string& _path )
+    {
+        std::string directory = _path;
+        while ( !directory.empty() )
+        {
+            if( *directory.rbegin()  == '/' )
+            {
+                return directory;
+            }
+            else
+            {
+                directory.pop_back();
+            }
+        }
+        return "";
+    }
+
+    //==========================================================================================================================
+    //==========================================================================================================================
+    std::string FileSystem::FileName( const std::string& _path )
+    {
+        for( int i = (int)_path.size() - 1; i >= 0; --i )
+        {
+            if ( _path[i] == '/' )
+            {
+                return std::string(_path.begin() + i + 1, _path.end());
+            }
+        }
+        return "";
     }
 }

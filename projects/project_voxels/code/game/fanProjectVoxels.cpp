@@ -2,7 +2,8 @@
 
 #include "core/time/fanProfiler.hpp"
 #include "core/fanDebug.hpp"
-
+#include "core/math/fanFixedPoint.hpp"
+#include "core/time/fanScopedTimer.hpp"
 #include "engine/singletons/fanScene.hpp"
 #include "engine/components/fanCamera.hpp"
 #include "engine/systems/fanUpdateRenderWorld.hpp"
@@ -86,9 +87,42 @@ namespace fan
     //==========================================================================================================================
     void ProjectVoxels::OnGui()
     {
-        /*if( ImGui::Begin("my window"))
+        if( ImGui::Begin("testoss"))
         {
+            static int num     = 10000;
+            ImGui::DragInt("num", &num );
+            if( ImGui::Button("test"))
+            {
+                Debug::Log() << "starting test" << Debug::Endl();
+                Fixed     result1 = 0;
+                {
+                    ScopedTimer s( "test1" );
+                    for( int    i = 0; i < num; ++i )
+                    {
+                        result1 += 1;
+                    }
+                }
+                Fixed     result2 = 0;
+                {
+                    ScopedTimer s( "test2" );
+                    for( int    i = 0; i < num; ++i )
+                    {
+                        result2 += Fixed("1.000000000");
+                    }
+                }
+                Fixed     result3 = 0;
+                {
+                    ScopedTimer s( "test3" );
+                    for( int    i = 0; i < num; ++i )
+                    {
+                        constexpr Fixed val = Fixed("1.000000000");
+                        result3 += val;
+                    }
+                }
+                Debug::Log() << (result1 == result2 && result1 == result3) << Debug::Endl();
+                fanAssert(result1 == result2 && result1 == result3);
+            }
             ImGui::End();
-        }*/
+        }
     }
 }

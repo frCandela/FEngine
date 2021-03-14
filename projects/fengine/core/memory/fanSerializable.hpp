@@ -52,5 +52,5 @@ namespace fan
 
 		bool ContainsToken(const Json& _json, const char* _name);
 		const Json* FindToken(const Json& _json, const char* _name);
-	};
+	}
 }

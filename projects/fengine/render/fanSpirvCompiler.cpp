@@ -1,55 +1,69 @@
 #include "render/fanSpirvCompiler.hpp"
-
-#include "shaderc/shaderc.hpp"
+#include "core/fanFileSystem.hpp"
 #include "core/fanDebug.hpp"
-#include <filesystem>
 #include <fstream>
 
 namespace fan
 {
-	std::vector<uint32_t> SpirvCompiler::Compile( const std::string _filename )
-	{
-		const std::string name = std::filesystem::path( _filename ).filename().string();
+    //==========================================================================================================================
+    //==========================================================================================================================
+    std::vector<char> GetSpvFromFile( const std::string& _spvPath )
+    {
+        std::vector<char> buffer;
+        std::ifstream     file( _spvPath, std::ios::ate | std::ios::binary );
+        if( file.is_open() )
+        {
+            size_t fileSize = (size_t)file.tellg();
+            buffer.resize( fileSize );
+            file.seekg( 0 );
+            file.read( buffer.data(), fileSize );
+            file.close();
+        }
+        return buffer;
+    }
 
-		// Find shader kind based on the file extension
-		const std::string extension = std::filesystem::path( _filename ).extension().string();
-		shaderc_shader_kind shaderKind;
-		if ( extension == ".frag" )
-		{
-			shaderKind = shaderc_shader_kind::shaderc_fragment_shader;
-		}
-		else
-		{
-            fanAssert( extension == ".vert" );
-			shaderKind = shaderc_shader_kind::shaderc_vertex_shader;
-		}
+    //==========================================================================================================================
+    //==========================================================================================================================
+    void CompileGlslToSpv( const std::string& _glslPath, const std::string& _spvPath )
+    {
+        const std::string executablePath = std::string(FAN_VULKAN_PATH) + "/Bin/glslc.exe";
+        const std::string logsPath       = _spvPath + ".logs";
+        std::string       processArgs    = _glslPath + " -o " + _spvPath;
+        if( System::StartProcessAndWait( executablePath, processArgs, logsPath ) )
+        {
+            // read logs file and outputs it on the console
+            std::ifstream logsFile( logsPath );
+            if( logsFile.is_open() )
+            {
+                std::string line;
+                while( std::getline( logsFile, line ) )
+                {
+                    Debug::Error() << line << Debug::Endl();
+                }
+                logsFile.close();
+                std::remove( logsPath.c_str() );
+            }
+        }
+    }
 
-		std::ifstream file( _filename );
-		if ( !file.is_open() )
-		{
-			Debug::Error() << "SpirvCompiler: Failed to load shader: " << _filename << Debug::Endl();
-			return {};
-		}
-        std::string inputGLSL( ( std::istreambuf_iterator<char>( file ) ),
-                               std::istreambuf_iterator<char>() );
+    //==========================================================================================================================
+    //==========================================================================================================================
+    std::vector<char> SpirvCompiler::GetFromGlsl( const std::string _glslPath )
+    {
+        const std::string normalizedGlslPath = FileSystem::NormalizePath( _glslPath );
+        if( !System::Exists( normalizedGlslPath ) )
+        {
+            Debug::Error() << "file not found: " << _glslPath << Debug::Endl();
+            return {};
+        }
+        const std::string buildDir      = FileSystem::Directory( normalizedGlslPath ) + "spv/";
+        const std::string outputSpvPath = buildDir + FileSystem::FileName( normalizedGlslPath ) + ".spv";
 
-		shaderc::Compiler compiler;
-		shaderc::CompileOptions options;
-
-		// Like -DMY_DEFINE=1
-		options.AddMacroDefinition( "MY_DEFINE", "1" );
-
-		shaderc::SpvCompilationResult module = compiler.CompileGlslToSpv(
-			inputGLSL.c_str(), inputGLSL.size(), shaderKind, name.c_str(), options );
-
-		if ( module.GetCompilationStatus() !=
-			 shaderc_compilation_status_success )
-		{
-			Debug::Log() << module.GetErrorMessage() << Debug::Endl();
-		}
-
-		std::vector<uint32_t> result( module.cbegin(), module.cend() );
-		return result;
-
-	}
+        if( !System::Exists( outputSpvPath ) ||
+            System::LastModified( outputSpvPath ) < System::LastModified( normalizedGlslPath ) )
+        {
+            CompileGlslToSpv( normalizedGlslPath, outputSpvPath );
+        }
+        return GetSpvFromFile( outputSpvPath );
+    }
 }

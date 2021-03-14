@@ -30,7 +30,6 @@ FEngine is a 3D game engine. It uses Vulkan for Rendering, Dear ImGui for user i
 * convex hull : [Antti Kuukka - QuickHull ](https://github.com/akuukka/quickhull)
 * window & input : [glfw](https://github.com/glfw/glfw)
 * shader math : [glm](https://github.com/g-truc/glm)
-* spirv compilation: [shaderc](https://github.com/google/shaderc)
 * UI: [Dear ImGui <3](https://github.com/ocornut/imgui)
 * rendering : [VulkanSDK 1.1.106.0](https://vulkan.lunarg.com/sdk/home)
 * network : [SFML 2.5.1](https://www.sfml-dev.org/index.php)
