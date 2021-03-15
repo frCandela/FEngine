@@ -3,7 +3,7 @@
 #endif
 
 #include "engine/project/fanLiveppLauncher.hpp"
-#include "core/fanFileSystem.hpp"
+#include "core/fanPath.hpp"
 #include "engine/project/fanLaunchArgs.hpp"
 #include "game/fanProjectEmpty.hpp"
 
@@ -30,7 +30,7 @@ int main( int _argc, char* _argv[] )
     fan::LaunchSettings settings;
     launchArguments.Parse( args, settings );
 
-    fan::FileSystem::SetProjectPath( PROJECT_PATH );
+    fan::Path::SetProjectPath( PROJECT_PATH );
     fan::ProjectEmpty project;
 #ifdef FAN_EDITOR
     settings.mWindowName = project.mName + "_editor";

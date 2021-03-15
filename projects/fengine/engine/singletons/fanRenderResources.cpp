@@ -1,5 +1,5 @@
 #include "engine/singletons/fanRenderResources.hpp"
-#include "core/fanFileSystem.hpp"
+#include "core/fanPath.hpp"
 #include "render/resources/fanMesh.hpp"
 #include "render/resources/fanMesh2D.hpp"
 #include "render/resources/fanTextureManager.hpp"

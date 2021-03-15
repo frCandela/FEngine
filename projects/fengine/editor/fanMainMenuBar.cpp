@@ -1,7 +1,7 @@
 #include "editor/fanMainMenuBar.hpp"
 
 #include "core/fanDebug.hpp"
-#include "core/fanFileSystem.hpp"
+#include "core/fanPath.hpp"
 #include "core/memory/fanSerializedValues.hpp"
 #include "core/input/fanInput.hpp"
 #include "core/time/fanProfiler.hpp"
@@ -301,7 +301,7 @@ namespace fan
 			return;
 		}
 
-        mPathBuffer             = FileSystem::NormalizePath( RenderGlobal::sScenesPath );
+        mPathBuffer             = Path::Normalize( RenderGlobal::sScenesPath );
         mOpenNewScenePopupLater = true;
 	}
 
@@ -316,7 +316,7 @@ namespace fan
 			return;
 		}
 
-        mPathBuffer              = FileSystem::NormalizePath( RenderGlobal::sScenesPath );
+        mPathBuffer              = Path::Normalize( RenderGlobal::sScenesPath );
         mOpenLoadScenePopupLater = true;
 	}
 
@@ -397,7 +397,7 @@ namespace fan
 	//========================================================================================================
 	void MainMenuBar::SaveAs()
 	{
-        mPathBuffer              = FileSystem::NormalizePath( RenderGlobal::sScenesPath );
+        mPathBuffer              = Path::Normalize( RenderGlobal::sScenesPath );
         mOpenSaveScenePopupLater = true;
 	}
 }

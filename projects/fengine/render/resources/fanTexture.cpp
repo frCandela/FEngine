@@ -7,7 +7,7 @@
 #pragma warning(pop)
 #include "core/fanDebug.hpp"
 #include "core/fanAssert.hpp"
-#include "core/fanFileSystem.hpp"
+#include "core/fanPath.hpp"
 #include "render/core/fanDevice.hpp"
 #include "render/core/fanBuffer.hpp"
 
@@ -320,7 +320,7 @@ namespace fan
 
 		// Load image from disk
 		int texWidth, texHeight, texChannels;
-        mPixels = stbi_load( FileSystem::NormalizePath(_path).c_str(), &texWidth, &texHeight, &texChannels, STBI_rgb_alpha );
+        mPixels = stbi_load( Path::Normalize( _path ).c_str(), &texWidth, &texHeight, &texChannels, STBI_rgb_alpha );
 		if ( mPixels == nullptr )
 		{
 			Debug::Get() << Debug::Severity::error << "Unable to load texture: " << _path << Debug::Endl();

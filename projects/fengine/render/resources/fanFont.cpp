@@ -1,7 +1,7 @@
 #include "render/resources/fanFont.hpp"
 #include "SFML/System/Utf.hpp"
 #include "core/fanDebug.hpp"
-#include "core/fanFileSystem.hpp"
+#include "core/fanPath.hpp"
 #include "render/resources/fanTextureManager.hpp"
 
 namespace fan
@@ -10,7 +10,7 @@ namespace fan
     //========================================================================================================
     Font::Font( FT_Library _ftLib, const std::string _path )
     {
-        if( FT_New_Face( _ftLib, FileSystem::NormalizePath( _path ).c_str() , 0, &mFace ) )
+        if( FT_New_Face( _ftLib, Path::Normalize( _path ).c_str() , 0, &mFace ) )
         {
             Debug::Error() << "Freetype: Failed to load font " << _path << Debug::Endl();
             return;

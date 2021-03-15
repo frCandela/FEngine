@@ -2,7 +2,7 @@
 #include <filesystem>
 #include <fstream>
 #include "core/fanDebug.hpp"
-#include "core/fanFileSystem.hpp"
+#include "core/fanPath.hpp"
 #include "render/core/fanDevice.hpp"
 #include "render/fanSpirvCompiler.hpp"
 #include "render/fanRenderGlobal.hpp"
@@ -26,7 +26,7 @@ namespace fan
                     ? RenderGlobal::sDefaultFragmentShader
                     : RenderGlobal::sDefaultVertexShader );
 			Debug::Log() << "loading default shader " << tmpPath << Debug::Endl();
-			spirvCode = SpirvCompiler::GetFromGlsl( FileSystem::NormalizePath(tmpPath) );
+			spirvCode = SpirvCompiler::GetFromGlsl( Path::Normalize( tmpPath ) );
 
 			if ( spirvCode.empty() )
 			{

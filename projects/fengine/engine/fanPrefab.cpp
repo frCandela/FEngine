@@ -2,7 +2,7 @@
 
 #include <fstream>
 #include "core/fanDebug.hpp"
-#include "core/fanFileSystem.hpp"
+#include "core/fanPath.hpp"
 #include "engine/components/fanSceneNode.hpp"
 #include "engine/singletons/fanScene.hpp"
 #include "engine/singletons/fanScenePointers.hpp"
@@ -33,7 +33,7 @@ namespace fan
 	{
 		Clear();
 
-		std::ifstream inStream( FileSystem::NormalizePath( _path ) );
+		std::ifstream inStream( Path::Normalize( _path ) );
 		if ( inStream.is_open() && inStream.good() )
 		{
 			Debug::Get() << Debug::Severity::log << "loading prefab: " << _path << Debug::Endl();

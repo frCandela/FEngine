@@ -40,7 +40,7 @@ namespace fan
         UnitTestResult mGlfwMouseResult;
         UnitTestResult mSignalResult;
         UnitTestResult mEcsResult;
-        UnitTestResult mFileSystemResult;
+        UnitTestResult mPathResult;
         UnitTestResult mFixedPointResult;
     };
 }

@@ -1,5 +1,5 @@
 #include "render/resources/fanTextureManager.hpp"
-#include "core/fanFileSystem.hpp"
+#include "core/fanPath.hpp"
 #include "render/fanRenderResourcePtr.hpp"
 #include "render/core/fanDevice.hpp"
 

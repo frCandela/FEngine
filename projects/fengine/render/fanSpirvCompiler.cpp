@@ -1,5 +1,5 @@
 #include "render/fanSpirvCompiler.hpp"
-#include "core/fanFileSystem.hpp"
+#include "core/fanPath.hpp"
 #include "core/fanDebug.hpp"
 #include <fstream>
 
@@ -50,14 +50,14 @@ namespace fan
     //==========================================================================================================================
     std::vector<char> SpirvCompiler::GetFromGlsl( const std::string _glslPath )
     {
-        const std::string normalizedGlslPath = FileSystem::NormalizePath( _glslPath );
+        const std::string normalizedGlslPath = Path::Normalize( _glslPath );
         if( !System::Exists( normalizedGlslPath ) )
         {
             Debug::Error() << "file not found: " << _glslPath << Debug::Endl();
             return {};
         }
-        const std::string buildDir      = FileSystem::Directory( normalizedGlslPath ) + "spv/";
-        const std::string outputSpvPath = buildDir + FileSystem::FileName( normalizedGlslPath ) + ".spv";
+        const std::string buildDir      = Path::Directory( normalizedGlslPath ) + "spv/";
+        const std::string outputSpvPath = buildDir + Path::FileName( normalizedGlslPath ) + ".spv";
 
         if( !System::Exists( outputSpvPath ) ||
             System::LastModified( outputSpvPath ) < System::LastModified( normalizedGlslPath ) )

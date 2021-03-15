@@ -2,7 +2,7 @@
 
 #include <array>
 #include "imgui/imgui.h"
-#include "core/fanFileSystem.hpp"
+#include "core/fanPath.hpp"
 #include "core/fanDebug.hpp"
 #include "render/fanRenderGlobal.hpp"
 #include "render/core/fanFrameBuffer.hpp"
@@ -31,7 +31,7 @@ namespace fan
 		InitImgui( _device, _window, _extent );
 
 		// create font and sampler
-        ImGui::GetIO().Fonts->AddFontFromFileTTF( FileSystem::NormalizePath( RenderGlobal::sDefaultImguiFont ).c_str(), 15 );
+        ImGui::GetIO().Fonts->AddFontFromFileTTF( Path::Normalize( RenderGlobal::sDefaultImguiFont ).c_str(), 15 );
 		unsigned char* fontData;
 		int texWidth, texHeight;
 		ImGui::GetIO().Fonts->GetTexDataAsRGBA32( &fontData, &texWidth, &texHeight );

@@ -1,6 +1,6 @@
 #include "editor/gui/fanGuiRenderResources.hpp"
 #include <sstream>
-#include "core/fanFileSystem.hpp"
+#include "core/fanPath.hpp"
 #include "render/fanRenderResourcePtr.hpp"
 #include "editor/fanRenderDragnDrop.hpp"
 #include "editor/fanModals.hpp"
@@ -24,7 +24,7 @@ namespace ImGui
 
         // Set button icon & modal
         const std::string            modalName = std::string( "Find texture (" ) + _label + ")";
-        static std::filesystem::path sPathBuffer = fan::FileSystem::NormalizePath( "/");
+        static std::filesystem::path sPathBuffer = fan::Path::Normalize( "/" );
         ImGui::PushID( _label );
         {
             if ( ImGui::ButtonIcon( ImGui::IconType::Image16, { 16, 16 } ) )
@@ -42,7 +42,7 @@ namespace ImGui
             ImGui::OpenPopup( modalName.c_str() );
             if( sPathBuffer.empty() )
             {
-                sPathBuffer = fan::FileSystem::NormalizePath( fan::RenderGlobal::sContentPath );
+                sPathBuffer = fan::Path::Normalize( fan::RenderGlobal::sContentPath );
             }
         }
         ImGui::SameLine();
@@ -132,7 +132,7 @@ namespace ImGui
             ImGui::OpenPopup( modalName.c_str() );
             if( sPathBuffer.empty() )
             {
-                sPathBuffer = fan::FileSystem::NormalizePath( fan::RenderGlobal::sModelsPath );
+                sPathBuffer = fan::Path::Normalize( fan::RenderGlobal::sModelsPath );
             }
         }
         ImGui::SameLine();
@@ -207,7 +207,7 @@ namespace ImGui
             ImGui::OpenPopup( modalName.c_str() );
             if( sPathBuffer.empty() )
             {
-                sPathBuffer = fan::FileSystem::NormalizePath( fan::RenderGlobal::sFontsPath );
+                sPathBuffer = fan::Path::Normalize( fan::RenderGlobal::sFontsPath );
             }
         }
         ImGui::SameLine();

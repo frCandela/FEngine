@@ -1,62 +1,68 @@
-#include "core/fanFileSystem.hpp"
+#include "core/fanPath.hpp"
 #include "core/fanDebug.hpp"
 
 #include <sstream>
 
 namespace fan
 {
-    std::string FileSystem::sProjectPath = "";
+    std::string Path::sProjectPath = "";
 
     //==========================================================================================================================
     //==========================================================================================================================
-    bool FileSystem::SetProjectPath( const std::string& _projectPath )
+    bool Path::SetProjectPath( const std::string& _projectPath )
     {
         fanAssertMsg( sProjectPath.empty(), "project path assigned multiple times" );
-        if( !_projectPath.empty() && IsAbsolute( sProjectPath ) )
+        if( !_projectPath.empty() && IsAbsolute( _projectPath ) )
         {
-            sProjectPath = NormalizePath( _projectPath );
+            sProjectPath = Normalize( _projectPath );
             if( *sProjectPath.rbegin() != '/' )
             {
                 sProjectPath += '/';
             }
-            Debug::Log() << "Project path:" <<  sProjectPath << Debug::Endl();
+            Debug::Log() << "Project path: " << sProjectPath << Debug::Endl();
             return true;
         }
-
-        fanAssertMsg( false, "invalid project path" );
+        Debug::Warning() << "Path::SetProjectPath: invalid project path : " << _projectPath << Debug::Endl();
         return false;
     }
 
     //==========================================================================================================================
     //==========================================================================================================================
-    void FileSystem::Reset()
+    void Path::Reset()
     {
         sProjectPath = "";
     }
 
     //==========================================================================================================================
     //==========================================================================================================================
-    bool FileSystem::IsAbsolute( const std::string& _path )
+    bool Path::IsAbsolute( const std::string& _path )
     {
-        if( _path.empty() ){ return true; }
         if( _path.size() < 2 ){ return false; }
         return _path[1] == ':';
     }
 
     //==========================================================================================================================
-    // removes backward slashes a
-    // removes double slashes
-    // makes absolute
     //==========================================================================================================================
-    std::string FileSystem::NormalizePath( const std::string& _path )
+    bool Path::IsRootDrive(const std::string& _path )
     {
-        if( _path.empty() ){ return ""; }
+        return _path.size() == 3 && _path[1] == ':';
+    }
 
+    //==========================================================================================================================
+    //==========================================================================================================================
+    bool Path::IsDirectory( const std::string& _path )
+    {
+        return _path.empty() || *( _path.rbegin() ) == '/';
+    }
+
+    //==========================================================================================================================
+    // removes backwards slashes and doubles slashes
+    //==========================================================================================================================
+    std::string ConvertInvalidSlashes( const std::string& _path )
+    {
         std::stringstream ss;
-
-        // removes backwards slashes and doubles slashes
-        char     previousLetter = ' ';
-        for( int i              = 0; i < (int)_path.size(); ++i )
+        char              previousLetter = ' ';
+        for( int          i              = 0; i < (int)_path.size(); ++i )
         {
             const char currentLetter = _path[i];
             char       normalizedLetter;
@@ -76,17 +82,22 @@ namespace fan
                 previousLetter = normalizedLetter;
             }
         }
+        return ss.str();
+    }
 
-        std::string normalizedPath = ss.str();
+    //==========================================================================================================================
+    // removes backward slashes a
+    // removes double slashes
+    // makes absolute
+    //==========================================================================================================================
+    std::string Path::Normalize( const std::string& _path )
+    {
+        if( _path.empty() ){ return ""; }
 
-        // removes trailing slash
-        if( *normalizedPath.rbegin() == '/' )
-        {
-            normalizedPath.pop_back();
-        }
+        std::string normalizedPath = ConvertInvalidSlashes( _path );
 
         // removes leading slash
-        if( ! normalizedPath.empty() && *normalizedPath.begin() == '/' )
+        if( !normalizedPath.empty() && *normalizedPath.begin() == '/' )
         {
             normalizedPath.erase( normalizedPath.begin() );
         }
@@ -100,12 +111,12 @@ namespace fan
 
     //==========================================================================================================================
     //==========================================================================================================================
-    std::string FileSystem::Directory( const std::string& _path )
+    std::string Path::Directory( const std::string& _path )
     {
         std::string directory = _path;
-        while ( !directory.empty() )
+        while( !directory.empty() )
         {
-            if( *directory.rbegin()  == '/' )
+            if( *directory.rbegin() == '/' )
             {
                 return directory;
             }
@@ -114,20 +125,38 @@ namespace fan
                 directory.pop_back();
             }
         }
-        return "";
+        return "/";
     }
 
     //==========================================================================================================================
     //==========================================================================================================================
-    std::string FileSystem::FileName( const std::string& _path )
+    std::string Path::FileName( const std::string& _path )
     {
         for( int i = (int)_path.size() - 1; i >= 0; --i )
         {
-            if ( _path[i] == '/' )
+            if( _path[i] == '/' )
             {
-                return std::string(_path.begin() + i + 1, _path.end());
+                return std::string( _path.begin() + i + 1, _path.end() );
             }
         }
-        return "";
+        return _path;
+    }
+
+    //==========================================================================================================================
+    //==========================================================================================================================
+    std::string Path::Parent( const std::string& _path )
+    {
+        if( _path.empty() ){ return "/"; }
+
+        std::string parent = _path;
+        if( IsDirectory( parent ) )
+        {
+            if( IsRootDrive( parent ) )
+            {
+                return parent;
+            }
+            parent.pop_back();
+        }
+        return Directory( parent );
     }
 }

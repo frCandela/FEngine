@@ -1,5 +1,5 @@
 #include "fanMesh.hpp"
-#include "core/fanFileSystem.hpp"
+#include "core/fanPath.hpp"
 #include "render/fanGLTFImporter.hpp"
 #include "render/core/fanDevice.hpp"
 #include "core/fanDebug.hpp"
@@ -19,7 +19,7 @@ namespace fan
         }
 
 		GLTFImporter importer;
-		if ( importer.Load( FileSystem::NormalizePath(_path) ) )
+		if ( importer.Load( Path::Normalize( _path ) ) )
 		{
 			if ( !importer.GetMesh( *this ) )
 			{
