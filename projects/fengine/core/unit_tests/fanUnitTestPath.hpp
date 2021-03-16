@@ -18,6 +18,7 @@ namespace fan
                      { &UnitTestPath::TestNormalizeAbsolute, "Normalize absolute" },
                      { &UnitTestPath::TestDirectory,         "Directory" },
                      { &UnitTestPath::TestFilename,          "Filename" },
+                     { &UnitTestPath::TestExtension,         "Extension" },
                      { &UnitTestPath::TestParent,            "Parent" },
                      { &UnitTestPath::TestList,              "List" },
             };
@@ -106,6 +107,14 @@ namespace fan
             TEST_ASSERT( Path::FileName( "D:/lol/file.png" ) == "file.png" );
             TEST_ASSERT( Path::FileName("D:/lol/filewithoutextension") == "filewithoutextension" );
             TEST_ASSERT( Path::FileName("D:/lol/") == "" );
+        }
+
+        void TestExtension()
+        {
+            TEST_ASSERT( Path::Extension( "file.png" ) == "png" );
+            TEST_ASSERT( Path::Extension( "/" ) == "" );
+            TEST_ASSERT( Path::Extension( "test/" ) == "" );
+            TEST_ASSERT( Path::Extension( "test/bwa" ) == "" );
         }
 
         void TestParent()

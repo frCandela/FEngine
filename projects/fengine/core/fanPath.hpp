@@ -22,6 +22,7 @@ namespace fan
 
         static std::string Normalize( const std::string& _path );
         static std::string Directory( const std::string& _path );
+        static std::string Extension( const std::string& _path );
         static std::string FileName( const std::string& _path );
         static std::string Parent( const std::string& _path );
         static std::vector<std::string> ListDirectory( const std::string& _path );
