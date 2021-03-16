@@ -19,6 +19,7 @@ namespace fan
                      { &UnitTestPath::TestDirectory,         "Directory" },
                      { &UnitTestPath::TestFilename,          "Filename" },
                      { &UnitTestPath::TestParent,            "Parent" },
+                     { &UnitTestPath::TestList,              "List" },
             };
         }
 
@@ -122,6 +123,17 @@ namespace fan
             TEST_ASSERT( Path::Parent( "" ) == "/" );
             TEST_ASSERT( Path::Parent( "D:/bwa" ) == "D:/" );
             TEST_ASSERT( Path::Parent( "D:/" ) == "D:/" );
+        }
+
+        void TestList()
+        {
+            Path::SetProjectPath( mOldProjectPath );
+            std::vector files = Path::ListDirectory( Path::Normalize("/") );
+            TEST_ASSERT( ! files.empty() );
+            for( std::string path : files )
+            {
+                TEST_ASSERT( Path::Normalize(path) == path );
+            }
         }
     };
 }

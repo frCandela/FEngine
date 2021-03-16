@@ -1,5 +1,6 @@
 #include "core/fanPath.hpp"
 #include "core/fanDebug.hpp"
+#include "core/fanSystem.hpp"
 
 #include <sstream>
 
@@ -19,10 +20,8 @@ namespace fan
             {
                 sProjectPath += '/';
             }
-            Debug::Log() << "Project path: " << sProjectPath << Debug::Endl();
             return true;
         }
-        Debug::Warning() << "Path::SetProjectPath: invalid project path : " << _projectPath << Debug::Endl();
         return false;
     }
 
@@ -43,7 +42,7 @@ namespace fan
 
     //==========================================================================================================================
     //==========================================================================================================================
-    bool Path::IsRootDrive(const std::string& _path )
+    bool Path::IsRootDrive( const std::string& _path )
     {
         return _path.size() == 3 && _path[1] == ':';
     }
@@ -158,5 +157,21 @@ namespace fan
             parent.pop_back();
         }
         return Directory( parent );
+    }
+
+    //==========================================================================================================================
+    //==========================================================================================================================
+    std::vector<std::string> Path::ListDirectory( const std::string& _directoryPath )
+    {
+        if( !IsDirectory( _directoryPath ) )
+        {
+            return {};
+        }
+        std::vector<std::string> childPaths = System::ListDirectory( _directoryPath );
+        for( std::string& childPath : childPaths )
+        {
+            childPath = _directoryPath + childPath;
+        }
+        return childPaths;
     }
 }
