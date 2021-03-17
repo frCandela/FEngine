@@ -94,7 +94,7 @@ namespace fan
 		config.bindingDescription                    = DebugVertex::GetBindingDescription();
 		config.attributeDescriptions                 = DebugVertex::GetAttributeDescriptions();
 		config.inputAssemblyStateInfo.topology       = VK_PRIMITIVE_TOPOLOGY_LINE_LIST;
-		config.depthStencilStateInfo.depthTestEnable = VK_TRUE;
+		config.depthStencilStateInfo.depthTestEnable = VK_FALSE;
 		config.descriptorSetLayouts                  = { mDescriptorMVPColor.mDescriptorSetLayout };
 		config.rasterizationStateInfo.cullMode       = VK_CULL_MODE_NONE;
 
