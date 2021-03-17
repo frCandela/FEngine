@@ -21,6 +21,7 @@ namespace fan
         static bool IsFile( const std::string& _path ) { return !IsDirectory(_path); };
 
         static std::string Normalize( const std::string& _path );
+        static std::string NormalizeSlashes( const std::string& _path );
         static std::string Directory( const std::string& _path );
         static std::string Extension( const std::string& _path );
         static std::string FileName( const std::string& _path );

@@ -1,6 +1,7 @@
 #include "editor/windows/fanSceneWindow.hpp"
 
 #include <fstream>
+#include "core/fanPath.hpp"
 #include "core/fanDebug.hpp"
 #include "core/math/fanMathUtils.hpp"
 #include "engine/singletons/fanRenderResources.hpp"
@@ -241,7 +242,7 @@ namespace fan
 		// export to prefab modal
 		if( exportToPrefabPopup )
 		{
-            mPathBuffer = "content/prefab";
+            mPathBuffer = "new_prefab";
 			ImGui::OpenPopup( "export_prefab" );
 		}
 		ExportPrefabModal( _world);
@@ -249,7 +250,7 @@ namespace fan
 		// load prefab popup
 		if( loadPrefabPopup )
 		{
-            mPathBuffer = "content/prefab";
+            mPathBuffer = Path::Normalize("/");
 			ImGui::OpenPopup( "import_prefab" );
 		}
 		ImportPrefabModal( _world );
@@ -414,7 +415,7 @@ namespace fan
 		if( ImGui::FanLoadFileModal( "import_prefab", RenderGlobal::sPrefabExtensions, mPathBuffer ) )
 		{
             SceneResources& sceneResources = _world.GetSingleton<SceneResources>();
-			Prefab* prefab = sceneResources.mPrefabManager->Load( mPathBuffer.string() );
+			Prefab* prefab = sceneResources.mPrefabManager->Load( mPathBuffer );
 			if( prefab != nullptr )
 			{
                 prefab->Instantiate( *mLastSceneNodeRightClicked );
@@ -433,14 +434,14 @@ namespace fan
 
 		if( ImGui::FanSaveFileModal( "export_prefab", RenderGlobal::sPrefabExtensions, mPathBuffer ) )
 		{
-			Debug::Log() << "Exporting prefab to " << mPathBuffer.string() << Debug::Endl();
+			Debug::Log() << "Exporting prefab to " << mPathBuffer << Debug::Endl();
 
-			std::ofstream outStream( mPathBuffer.string() );
+			std::ofstream outStream( mPathBuffer );
 			if( outStream.is_open() )
 			{
 				// Try to update the existing prefab if it exists
                 SceneResources& sceneResources = _world.GetSingleton<SceneResources>();
-				Prefab* prefab = sceneResources.mPrefabManager->Get( mPathBuffer.string() );
+				Prefab* prefab = sceneResources.mPrefabManager->Get( mPathBuffer );
 				if( prefab != nullptr )
 				{
 					prefab->CreateFromSceneNode( *mLastSceneNodeRightClicked );
@@ -458,7 +459,7 @@ namespace fan
 			}
 			else
 			{
-				Debug::Warning() << "Prefab export failed : " << mPathBuffer.string() << Debug::Endl();
+				Debug::Warning() << "Prefab export failed : " << mPathBuffer << Debug::Endl();
 			}
 		}
 	}

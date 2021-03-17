@@ -1,5 +1,4 @@
 #include "render/core/fanShader.hpp"
-#include <filesystem>
 #include <fstream>
 #include "core/fanDebug.hpp"
 #include "core/fanPath.hpp"
@@ -20,13 +19,18 @@ namespace fan
 		{
 			Debug::Error() << "Could not create shader module: " << _path << Debug::Endl();
 
-			std::filesystem::directory_entry path( _path );
-			std::string extension = path.path().extension().generic_string();
-            std::string tmpPath = ( extension == ".frag"
-                    ? RenderGlobal::sDefaultFragmentShader
-                    : RenderGlobal::sDefaultVertexShader );
-			Debug::Log() << "loading default shader " << tmpPath << Debug::Endl();
-			spirvCode = SpirvCompiler::GetFromGlsl( Path::Normalize( tmpPath ) );
+			const std::string extension = Path::Extension(_path);
+            std::string defaultShaderPath;
+            if( extension == "frag" ){ defaultShaderPath = RenderGlobal::sDefaultFragmentShader; }
+            else if( extension == "vert" ){ defaultShaderPath = RenderGlobal::sDefaultVertexShader; }
+            else
+            {
+                Debug::Error() << "Shader::Unknown extension " << extension << "in path " << _path << Debug::Endl();
+                return false;
+            }
+
+			Debug::Log() << "loading default shader " << defaultShaderPath << Debug::Endl();
+			spirvCode = SpirvCompiler::GetFromGlsl( Path::Normalize( defaultShaderPath ) );
 
 			if ( spirvCode.empty() )
 			{

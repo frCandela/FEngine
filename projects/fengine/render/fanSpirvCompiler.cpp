@@ -26,7 +26,7 @@ namespace fan
     //==========================================================================================================================
     void CompileGlslToSpv( const std::string& _glslPath, const std::string& _spvPath )
     {
-        const std::string executablePath = std::string(FAN_VULKAN_PATH) + "/Bin/glslc.exe";
+        const std::string executablePath = std::string( FAN_VULKAN_PATH ) + "/Bin/glslc.exe";
         const std::string logsPath       = _spvPath + ".logs";
         std::string       processArgs    = _glslPath + " -o " + _spvPath;
         if( System::StartProcessAndWait( executablePath, processArgs, logsPath ) )
@@ -57,7 +57,8 @@ namespace fan
             return {};
         }
         const std::string buildDir      = Path::Directory( normalizedGlslPath ) + "spv/";
-        const std::string outputSpvPath = buildDir + Path::FileName( normalizedGlslPath ) + ".spv";
+        const std::string extension     = Path::Extension( normalizedGlslPath );
+        const std::string outputSpvPath = buildDir + Path::FileName( normalizedGlslPath ) + "." + extension + ".spv";
 
         if( !System::Exists( outputSpvPath ) ||
             System::LastModified( outputSpvPath ) < System::LastModified( normalizedGlslPath ) )

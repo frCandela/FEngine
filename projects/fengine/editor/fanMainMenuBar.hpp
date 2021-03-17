@@ -1,7 +1,6 @@
 #pragma once
 
 #include "core/ecs/fanSignal.hpp"
-#include <filesystem>
 #include <set>
 
 namespace fan
@@ -52,7 +51,7 @@ namespace fan
 		bool mOpenSaveScenePopupLater = false;
 
 		// Temporary buffers
-		std::filesystem::path    mPathBuffer;
+		std::string              mPathBuffer;
 		std::set < std::string > mSceneExtensionFilter;
 
 		void DrawModals( EcsWorld& _world );

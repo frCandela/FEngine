@@ -47,7 +47,7 @@ namespace fan
             return {};
         }
 
-        std::string     path = _directoryPath + "\\*";
+        std::string     path = _directoryPath + "*";
         WIN32_FIND_DATA ffd;
 
         HANDLE hFind = INVALID_HANDLE_VALUE;

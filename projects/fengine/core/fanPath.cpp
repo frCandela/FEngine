@@ -55,7 +55,7 @@ namespace fan
     //==========================================================================================================================
     // removes backwards slashes and doubles slashes
     //==========================================================================================================================
-    std::string ConvertInvalidSlashes( const std::string& _path )
+    std::string Path::NormalizeSlashes( const std::string& _path )
     {
         std::stringstream ss;
         char              previousLetter = ' ';
@@ -79,7 +79,15 @@ namespace fan
                 previousLetter = normalizedLetter;
             }
         }
-        return ss.str();
+        std::string path = ss.str();
+
+        // removes leading slash
+        if( !path.empty() && *path.begin() == '/' )
+        {
+            path.erase( path.begin() );
+        }
+
+        return path;
     }
 
     //==========================================================================================================================
@@ -91,13 +99,7 @@ namespace fan
     {
         if( _path.empty() ){ return ""; }
 
-        std::string normalizedPath = ConvertInvalidSlashes( _path );
-
-        // removes leading slash
-        if( !normalizedPath.empty() && *normalizedPath.begin() == '/' )
-        {
-            normalizedPath.erase( normalizedPath.begin() );
-        }
+        std::string normalizedPath = NormalizeSlashes( _path );
 
         if( normalizedPath.empty() || !IsAbsolute( normalizedPath ) )
         {
@@ -132,7 +134,11 @@ namespace fan
     {
         for( int i = (int)_path.size() - 1; i >= 0; --i )
         {
-            if( _path[i] == '.' )
+            if( _path[i] == '/' )
+            {
+                return "";
+            }
+            else if( _path[i] == '.' )
             {
                 return std::string( _path.begin() + i + 1, _path.end() );
             }
@@ -144,14 +150,30 @@ namespace fan
     //==========================================================================================================================
     std::string Path::FileName( const std::string& _path )
     {
-        for( int i = (int)_path.size() - 1; i >= 0; --i )
+        int endPosition = (int)_path.size() - 1;
+        if( IsDirectory( _path ) )
         {
-            if( _path[i] == '/' )
+            endPosition -= 1; // skip trailing '/'
+        }
+
+        // get filename
+        std::string filenameWithExtension = _path;
+        for( int i = endPosition; i >= 0; --i )
+        {
+            if( _path[i] == '/'  )
             {
-                return std::string( _path.begin() + i + 1, _path.end() );
+                filenameWithExtension = std::string( _path.begin() + i + 1, _path.end() );
+                break;
             }
         }
-        return _path;
+
+        int fileNameSize = (int)filenameWithExtension.size();
+        std::string extension = Extension( filenameWithExtension );
+        if( !extension.empty() )
+        {
+            fileNameSize -= int(extension.size()) + 1; // don't forget the .
+        }
+        return std::string( filenameWithExtension.begin(), filenameWithExtension.begin() + fileNameSize );
     }
 
     //==========================================================================================================================

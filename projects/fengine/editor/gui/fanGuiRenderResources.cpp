@@ -18,13 +18,11 @@ namespace ImGui
         bool returnValue = false;
 
         fan::Texture* texture = *_ptr;
-        const std::string name = texture == nullptr ?
-                "null" :
-                std::filesystem::path( texture->mPath ).filename().string();
+        const std::string name = texture == nullptr ? "null" : fan::Path::FileName( texture->mPath );
 
         // Set button icon & modal
         const std::string            modalName = std::string( "Find texture (" ) + _label + ")";
-        static std::filesystem::path sPathBuffer = fan::Path::Normalize( "/" );
+        static std::string sPathBuffer = fan::Path::Normalize( "/" );
         ImGui::PushID( _label );
         {
             if ( ImGui::ButtonIcon( ImGui::IconType::Image16, { 16, 16 } ) )
@@ -87,7 +85,7 @@ namespace ImGui
         if( ImGui::FanLoadFileModal( modalName.c_str(),
                                      fan::RenderGlobal::sImagesExtensions, sPathBuffer ) )
         {
-            _ptr.Init( sPathBuffer.string() );
+            _ptr.Init( sPathBuffer );
             _ptr.Resolve();
             returnValue = true;
         }
@@ -107,13 +105,11 @@ namespace ImGui
         bool returnValue = false;
 
         fan::Mesh* mesh = *_ptr;
-        const std::string name = ( mesh == nullptr ) ?
-                "null" :
-                std::filesystem::path( mesh->mPath ).filename().string();
+        const std::string name = ( mesh == nullptr ) ? "null" : fan::Path::FileName( mesh->mPath );
 
         // Set button icon & modal
-        const std::string            modalName = std::string( "Find mesh (" ) + _label + ")";
-        static std::filesystem::path sPathBuffer;
+        const std::string  modalName = std::string( "Find mesh (" ) + _label + ")";
+        static std::string sPathBuffer;
         ImGui::PushID( _label );
         {
             if ( ImGui::ButtonIcon( ImGui::IconType::Mesh16, { 16, 16 } ) )
@@ -164,7 +160,7 @@ namespace ImGui
 
         if ( ImGui::FanLoadFileModal( modalName.c_str(), fan::RenderGlobal::sMeshExtensions, sPathBuffer ) )
         {
-            _ptr.Init( sPathBuffer.string() );
+            _ptr.Init( sPathBuffer );
             _ptr.Resolve();
             returnValue = true;
         }
@@ -182,13 +178,11 @@ namespace ImGui
         bool returnValue = false;
 
         fan::Font* font = *_ptr;
-        const std::string name = ( font == nullptr ) ?
-                "null" :
-                std::filesystem::path( font->GetPath() ).filename().string();
+        const std::string name = ( font == nullptr ) ? "null" : fan::Path::FileName( font->GetPath() );
 
         // Set button icon & modal
         const std::string            modalName = std::string( "Find font (" ) + _label + ")";
-        static std::filesystem::path sPathBuffer;
+        static std::string sPathBuffer;
         ImGui::PushID( _label );
         {
             if ( ImGui::ButtonIcon( ImGui::IconType::Font16, { 16, 16 } ) )
@@ -236,7 +230,7 @@ namespace ImGui
 
         if ( ImGui::FanLoadFileModal( modalName.c_str(), fan::RenderGlobal::sFontsExtensions, sPathBuffer ) )
         {
-            _ptr.Init( sPathBuffer.string() );
+            _ptr.Init( sPathBuffer );
             _ptr.Resolve();
             returnValue = true;
         }

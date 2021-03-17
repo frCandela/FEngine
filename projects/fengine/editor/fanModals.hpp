@@ -1,20 +1,8 @@
 #pragma once
 
 #include <set>
-#include <filesystem>
+#include <string>
 #include "imgui/imgui.h"
-
-//================================================================================================================================
-// imgui utilities for the editor
-// @todo clean this
-//================================================================================================================================
-namespace std
-{
-	namespace filesystem
-	{
-		static string file_name( const path& _path );
-	}
-}
 
 namespace ImGui
 {
@@ -26,18 +14,15 @@ namespace ImGui
 	void FanToolTip( const char* _desc );
     bool FanSaveFileModal( const char* _popupName,
                            const std::set<std::string>& _extensionWhiteList,
-                           std::filesystem::path& _outCurrentPath );
+                           std::string& _outCurrentPath );
     bool FanLoadFileModal( const char* _popupName,
                            const std::set<std::string>& _extensionWhiteList,
-                           std::filesystem::path& _path );
+                           std::string& _path );
 	void PushReadOnly();
 	void PopReadOnly();
 
-	namespace impl
-	{
-		bool FilesSelector(
-			const std::set<std::string>& _extensionWhiteList,
-			std::filesystem::path& _path
-		);
-	}
+    namespace impl
+    {
+        bool FilesSelector( const std::set<std::string>& _extensionWhiteList, std::string& _path );
+    }
 }

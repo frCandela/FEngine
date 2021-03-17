@@ -1,6 +1,6 @@
 #include "editor/gui/fanGuiSceneResourcePtr.hpp"
 
-#include <filesystem>
+#include "core/fanPath.hpp"
 #include "engine/components/fanSceneNode.hpp"
 #include "engine/fanDragnDrop.hpp"
 #include "render/fanRenderGlobal.hpp"
@@ -94,13 +94,11 @@ namespace ImGui
         bool returnValue = false;
 
         fan::Prefab* prefab = *_ptr;
-        const std::string name = ( prefab == nullptr
-                ? "null"
-                : std::filesystem::path( prefab->mPath ).filename().string() );
+        const std::string name = ( prefab == nullptr ? "null" : fan::Path::FileName( prefab->mPath ) );
 
         // Set button icon & modal
         const std::string modalName = std::string( "Find prefab (" ) + _label + ")";
-        static std::filesystem::path m_pathBuffer;
+        static std::string m_pathBuffer;
         bool openModal = false;
         ImGui::PushID( _label );
         {
@@ -144,7 +142,7 @@ namespace ImGui
 
         if( ImGui::FanLoadFileModal( modalName.c_str(), fan::RenderGlobal::sPrefabExtensions, m_pathBuffer ) )
         {
-            _ptr.Init( m_pathBuffer.string() );
+            _ptr.Init( m_pathBuffer );
             _ptr.Resolve();
             returnValue = true;
         }

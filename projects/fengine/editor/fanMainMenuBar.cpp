@@ -271,20 +271,20 @@ namespace fan
 		if ( ImGui::FanSaveFileModal( "New scene", RenderGlobal::sSceneExtensions, mPathBuffer ) )
 		{		
 			scene.New();
-			scene.mPath = mPathBuffer.string();
+			scene.mPath = mPathBuffer;
 		}
 
 		// Open scenes
 		if ( ImGui::FanLoadFileModal( "Open scene", mSceneExtensionFilter, mPathBuffer ) )
 		{
-			Debug::Log() << "loading scene: " << mPathBuffer.string() << Debug::Endl();
-			scene.LoadFrom( mPathBuffer.string() );
+			Debug::Log() << "loading scene: " << mPathBuffer << Debug::Endl();
+			scene.LoadFrom( mPathBuffer );
 		}
 
 		// Save scene
 		if ( ImGui::FanSaveFileModal( "Save scene", RenderGlobal::sSceneExtensions, mPathBuffer ) )
 		{
-			scene.mPath = mPathBuffer.string();
+			scene.mPath = mPathBuffer;
 			Debug::Get() << Debug::Severity::log << "saving scene: " << scene.mPath << Debug::Endl();
 			scene.Save();
 		}

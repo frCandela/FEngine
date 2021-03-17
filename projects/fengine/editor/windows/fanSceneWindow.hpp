@@ -1,6 +1,5 @@
 #pragma once
 
-#include <filesystem>
 #include "core/ecs/fanSignal.hpp"
 #include "editor/windows/fanEditorWindow.hpp"
 
@@ -27,10 +26,10 @@ namespace fan
 		void OnGui( EcsWorld& _world ) override;
 
 	private:
-		std::filesystem::path   mPathBuffer;
-		char                    mTextBuffer[ 32 ];
-		SceneNode*              mLastSceneNodeRightClicked = nullptr;
-		bool                    mExpandSceneHierarchy = false;
+		std::string mPathBuffer;
+		char        mTextBuffer[ 32 ];
+		SceneNode*  mLastSceneNodeRightClicked = nullptr;
+		bool        mExpandSceneHierarchy = false;
 
 		void NewSceneNodeModal( EcsWorld& _world );
 		void RenameSceneNodeModal();

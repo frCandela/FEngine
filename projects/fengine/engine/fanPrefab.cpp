@@ -53,7 +53,7 @@ namespace fan
 		}
 		else
 		{
-			Debug::Warning() << "Prefab failed to open file " << _path << Debug::Endl();
+			Debug::Warning() << "Failed to open prefab " << _path << Debug::Endl();
 			return false;
 		}
 	}

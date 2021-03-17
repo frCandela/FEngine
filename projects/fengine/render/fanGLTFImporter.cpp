@@ -1,8 +1,7 @@
-#include <filesystem>
 #include <fstream>
+#include "core/fanPath.hpp"
 #include "core/fanDebug.hpp"
 #include "core/memory/fanBase64.hpp"
-#include "core/time/fanScopedTimer.hpp"
 #include "render/fanGLTFImporter.hpp"
 #include "render/resources/fanMesh.hpp"
 
@@ -82,8 +81,8 @@ namespace fan
 	bool GLTFImporter::Load( const std::string _path )
 	{
 		// Checks extension
-		const std::string extension = std::filesystem::path( _path ).extension().string();
-		if ( extension != ".gltf" )
+		const std::string extension = Path::Extension(_path);
+		if ( extension != "gltf" )
 		{
 			Debug::Warning() << "Loading failed, file is not a gltf: " << _path << Debug::Endl();
 			return false;

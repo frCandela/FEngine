@@ -102,11 +102,12 @@ namespace fan
 
         void TestFilename()
         {
-            TEST_ASSERT( Path::FileName( "file.png" ) == "file.png" );
-            TEST_ASSERT( Path::FileName( "lol/file.png") == "file.png" );
-            TEST_ASSERT( Path::FileName( "D:/lol/file.png" ) == "file.png" );
+            TEST_ASSERT( Path::FileName( "file.png" ) == "file" );
+            TEST_ASSERT( Path::FileName( "file.tar.gz" ) == "file.tar" );
+            TEST_ASSERT( Path::FileName( "lol/file.png") == "file" );
+            TEST_ASSERT( Path::FileName( "D:/lol/file.png" ) == "file" );
             TEST_ASSERT( Path::FileName("D:/lol/filewithoutextension") == "filewithoutextension" );
-            TEST_ASSERT( Path::FileName("D:/lol/") == "" );
+            TEST_ASSERT( Path::FileName("D:/lol/") == "lol/" );
         }
 
         void TestExtension()
@@ -115,6 +116,7 @@ namespace fan
             TEST_ASSERT( Path::Extension( "/" ) == "" );
             TEST_ASSERT( Path::Extension( "test/" ) == "" );
             TEST_ASSERT( Path::Extension( "test/bwa" ) == "" );
+            TEST_ASSERT( Path::Extension( "test.a/bwa" ) == "" );
         }
 
         void TestParent()
