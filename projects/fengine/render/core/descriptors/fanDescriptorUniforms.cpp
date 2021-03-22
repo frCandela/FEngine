@@ -96,7 +96,7 @@ namespace fan
                                       const void* _data,
                                       VkDeviceSize _size, VkDeviceSize _offset )
 	{
-        fanAssert( _indexBinding >= 0 && _indexBinding < mBindingData.size() );
+        fanAssert( _indexBinding < mBindingData.size() );
 		mBindingData[ _indexBinding ].mBuffers[ _indexBuffer ].SetData( _device, _data, _size, _offset );
 	}
 

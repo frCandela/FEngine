@@ -16,7 +16,7 @@ namespace fan
 	//========================================================================================================
 	struct EditorGizmos : EcsSingleton
 	{
-		ECS_SINGLETON( EditorGizmos );
+		ECS_SINGLETON( EditorGizmos )
         static void SetInfo( EcsSingletonInfo& _info );
         static void Init( EcsWorld& _world, EcsSingleton& _component );
 

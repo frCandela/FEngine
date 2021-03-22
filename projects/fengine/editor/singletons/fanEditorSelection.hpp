@@ -13,7 +13,7 @@ namespace fan
 	//========================================================================================================
 	struct EditorSelection : EcsSingleton
 	{
-		ECS_SINGLETON( EditorSelection );
+		ECS_SINGLETON( EditorSelection )
 		static void SetInfo( EcsSingletonInfo& _info );
 		static void Init( EcsWorld& _world, EcsSingleton& _component );
 

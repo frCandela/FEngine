@@ -11,7 +11,7 @@ namespace fan
 	//========================================================================================================
 	struct EditorCopyPaste : EcsSingleton
 	{
-		ECS_SINGLETON( EditorCopyPaste );
+		ECS_SINGLETON( EditorCopyPaste )
 		static void SetInfo( EcsSingletonInfo& _info );
 		static void Init( EcsWorld& _world, EcsSingleton& _component );
 

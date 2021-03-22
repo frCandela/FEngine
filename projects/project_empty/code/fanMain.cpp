@@ -55,7 +55,7 @@ int main( int _argc, char* _argv[] )
     return 0;
 }
 
-#ifdef FAN_WIN32
+#ifdef FAN_MSVC
 //==============================================================================================================================
 //==============================================================================================================================
 int WINAPI WinMain( HINSTANCE _hInstance, HINSTANCE _hPrevInstance, LPSTR _lpCmdLine, int _nShowCmd )

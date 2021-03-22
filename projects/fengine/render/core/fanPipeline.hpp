@@ -46,6 +46,6 @@ namespace fan
 
 		VkPipelineLayout	mPipelineLayout = VK_NULL_HANDLE;
 		VkPipeline			mPipeline       = VK_NULL_HANDLE;
-		VkPipelineCache		mPipelineCache  = VK_NULL_HANDLE;;
+		VkPipelineCache		mPipelineCache  = VK_NULL_HANDLE;
 	};
 }

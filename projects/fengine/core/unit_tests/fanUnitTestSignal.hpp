@@ -14,7 +14,7 @@ namespace fan
         //====================================================================================================
         struct TestSingleton : public EcsSingleton
         {
-        ECS_SINGLETON( TestSingleton );
+            ECS_SINGLETON( TestSingleton )
             static void SetInfo( EcsSingletonInfo& _info )
             {
                 _info.mSlots.push_back( new Slot<int>( "test int", &TestSingleton::SetValueInt ) );

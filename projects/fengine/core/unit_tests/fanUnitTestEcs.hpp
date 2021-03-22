@@ -13,7 +13,7 @@ namespace fan
     struct TestEcsSingleton : public EcsSingleton
     {
 
-        ECS_SINGLETON( TestEcsSingleton );
+        ECS_SINGLETON( TestEcsSingleton )
         static void SetInfo( EcsSingletonInfo& /*_info*/ )
         {
         }

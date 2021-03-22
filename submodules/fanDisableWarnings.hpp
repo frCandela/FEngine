@@ -36,6 +36,11 @@ __pragma(warning( push ))
 #define WARNINGS_POP()		\
 __pragma(warning( pop ))
 
+//================================
+//================================
+#define WARNINGS_SFML_UTF_PUSH() \
+__pragma(warning( push ))
+
 #else
 
 #define DO_PRAGMA(x) _Pragma (#x)
@@ -57,6 +62,10 @@ DO_PRAGMA( GCC diagnostic push     )
 DO_PRAGMA( GCC diagnostic push     )                \
 DO_PRAGMA( GCC diagnostic ignored "-Wsign-compare") \
 DO_PRAGMA( GCC diagnostic ignored "-Wunused-but-set-variable" )
+
+#define WARNINGS_SFML_UTF_PUSH()                    \
+DO_PRAGMA( GCC diagnostic push     )                \
+DO_PRAGMA( GCC diagnostic ignored "-Wimplicit-fallthrough")
 
 //================================
 //================================

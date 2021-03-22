@@ -1,5 +1,9 @@
 #include "render/resources/fanFont.hpp"
+
+#include "fanDisableWarnings.hpp"
+WARNINGS_SFML_UTF_PUSH()
 #include "SFML/System/Utf.hpp"
+WARNINGS_POP()
 #include "core/fanDebug.hpp"
 #include "core/fanPath.hpp"
 #include "render/resources/fanTextureManager.hpp"
