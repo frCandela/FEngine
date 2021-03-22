@@ -2,9 +2,7 @@
 
 #include "glfw/glfw3.h"
 #include "fanDisableWarnings.hpp"
-WARNINGS_GLM_PUSH()
-#include "glm/glm.hpp"
-WARNINGS_POP()
+#include "fanGlm.hpp"
 #include "core/ecs/fanEcsSingleton.hpp"
 
 struct GLFWwindow;
@@ -42,9 +40,10 @@ namespace fan
         glm::vec2   mScreenSize;
         bool        mWindowHovered;
         static bool sLocked;
-        bool        mPressed [ Mouse::count ];
-        bool        mReleased[ Mouse::count ];
-        bool        mDown    [ Mouse::count ];
+        static const constexpr int sButtonsCount = Button::count;
+        bool        mPressed [ sButtonsCount ];
+        bool        mReleased[ sButtonsCount ];
+        bool        mDown    [ sButtonsCount ];
 
         void Clear();
         void UpdateData( GLFWwindow* _window );

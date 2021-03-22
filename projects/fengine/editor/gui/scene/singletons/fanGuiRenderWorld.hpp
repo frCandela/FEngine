@@ -25,11 +25,11 @@ namespace fan
         static void OnGui( EcsWorld&, EcsSingleton& _component )
         {
             RenderWorld& renderWorld = static_cast<RenderWorld&>( _component );
-            ImGui::Text( "mesh:               %d", renderWorld.drawData.size() );
-            ImGui::Text( "ui mesh:            %d", renderWorld.uiDrawData.size() );
-            ImGui::Text( "pointLights:        %d", renderWorld.pointLights.size() );
-            ImGui::Text( "directionalLights:  %d", renderWorld.directionalLights.size() );
-            ImGui::Text( "particles vertices: %d", renderWorld.mParticlesMesh->mVertices.size() );
+            ImGui::Text( "mesh:               %d", (int)renderWorld.drawData.size() );
+            ImGui::Text( "ui mesh:            %d", (int)renderWorld.uiDrawData.size() );
+            ImGui::Text( "pointLights:        %d", (int)renderWorld.pointLights.size() );
+            ImGui::Text( "directionalLights:  %d", (int)renderWorld.directionalLights.size() );
+            ImGui::Text( "particles vertices: %d", (int)renderWorld.mParticlesMesh->mVertices.size() );
             ImGui::Text( "target size:        %d x %d",
                          (int)renderWorld.mTargetSize.x,
                          (int)renderWorld.mTargetSize.y );

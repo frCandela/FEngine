@@ -76,8 +76,7 @@ namespace fan
 
 		if( ImGui::BeginPopup( "scene_window_node_rclicked" ) )
 		{
-			// New scene node 
-			bool itemClicked = false;
+			// New scene node
 			if( ImGui::BeginMenu( "New node" ) )
 			{
                 fanAssert( mLastSceneNodeRightClicked != nullptr );
@@ -88,12 +87,6 @@ namespace fan
 				if( world.HasComponent<Transform>( parentID ) )
 				{
 					origin = world.GetComponent<Transform>( parentID ).GetPosition();
-				}
-
-				// Popup empty gameobject
-				if( ImGui::IsItemClicked() )
-				{
-					itemClicked = true;
 				}
 
 				// Entities templates

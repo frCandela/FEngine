@@ -1,6 +1,4 @@
-﻿#add_compile_options( /W0 )
-
-# glfw
+﻿# glfw
 set( GLFW_BUILD_DOCS OFF )
 add_subdirectory(glfw)
 
@@ -22,19 +20,15 @@ file(GLOB_RECURSE IMGUI_MISC_SRC imgui/misc/*.cpp)
 add_library( imgui STATIC ${IMGUI_MISC_SRC} imgui/imgui.cpp imgui/imgui_demo.cpp imgui/imgui_draw.cpp imgui/imgui_tables.cpp imgui/imgui_widgets.cpp)
 target_link_libraries(imgui freetype)
 
-include_directories(bullet3/src)
+# bullet3
+set( CMAKE_POLICY_DEFAULT_CMP0077 NEW)
+set( BUILD_BULLET2_DEMOS OFF )
+set( BUILD_CLSOCKET OFF )
+set( BUILD_CPU_DEMOS OFF )
+set( BUILD_ENET OFF )
+set( BUILD_EXTRAS OFF )
+set( BUILD_OPENGL3_DEMOS OFF )
+set( BUILD_UNIT_TESTS OFF )
+set( USE_MSVC_RUNTIME_LIBRARY_DLL ON )
 
-# linear math
-file(GLOB_RECURSE LINEAR_MATH_SRC bullet3/src/LinearMath/*.cpp)
-file(GLOB_RECURSE LINEAR_MATH_H bullet3/src/LinearMath/*.hpp)
-add_library( btLinearMath STATIC ${LINEAR_MATH_SRC} ${LINEAR_MATH_H})
-
-# bullet dynamics
-file(GLOB_RECURSE BT_DYNAMICS_SRC bullet3/src/BulletDynamics/*.cpp)
-file(GLOB_RECURSE BT_DYNAMICS_H bullet3/src/BulletDynamics/*.hpp)
-add_library( btDynamics STATIC ${BT_DYNAMICS_SRC} ${BT_DYNAMICS_H})
-
-# bullet collision
-file(GLOB_RECURSE BT_COLLISION_SRC bullet3/src/BulletCollision/*.cpp)
-file(GLOB_RECURSE BT_COLLISION_H bullet3/src/BulletCollision/*.hpp)
-add_library( btCollision STATIC ${BT_COLLISION_SRC} ${BT_COLLISION_H})
+add_subdirectory(bullet3)

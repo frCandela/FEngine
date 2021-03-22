@@ -144,7 +144,7 @@ namespace fan
     //========================================================================================================
     void Mesh::Destroy( Device & _device )
     {
-        for( int i = 0 ; i < SwapChain::sMaxFramesInFlight; i++)
+        for( int i = 0 ; i < (int)SwapChain::sMaxFramesInFlight; i++)
         {
             mIndexBuffer[i].Destroy( _device );
             mVertexBuffer[i].Destroy( _device );

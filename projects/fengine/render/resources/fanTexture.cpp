@@ -1,10 +1,11 @@
 #include "fanTexture.hpp"
 
 #include <algorithm>
-#pragma warning(push, 0)   
+#include "fanDisableWarnings.hpp"
+WARNINGS_STB_PUSH()
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
-#pragma warning(pop)
+WARNINGS_POP()
 #include "core/fanDebug.hpp"
 #include "core/fanAssert.hpp"
 #include "core/fanPath.hpp"

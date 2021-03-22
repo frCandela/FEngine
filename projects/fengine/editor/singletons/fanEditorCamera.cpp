@@ -44,7 +44,6 @@ namespace fan
         EditorCamera& editorCamera = _world.GetSingleton<EditorCamera>();
 		const EcsEntity cameraEntity = _world.GetEntity( editorCamera.mCameraHandle );
 		Transform& cameraTransform = _world.GetComponent<Transform>( cameraEntity );
-		Camera&	cameraCamera = _world.GetComponent<Camera>( cameraEntity );
 
 		btVector3 position = cameraTransform.GetPosition();
 		float forwardAxis	= Input::Get().Manager().GetAxis( "editor_forward" );
@@ -65,7 +64,6 @@ namespace fan
 
 		// Camera rotation
 		const glm::vec2 mouseDelta = mouse.mPositionDelta;
-		const glm::vec2 mousePos = mouse.mLocalPosition;
 		if( mouse.mDown[ Mouse::button2 ] )
 		{
 			// Rotation depending on mouse movement
@@ -89,10 +87,6 @@ namespace fan
 			}
 		}
 		cameraTransform.SetPosition( position );
-
-		const Ray ray = cameraCamera.ScreenPosToRay( cameraTransform, btVector2( 0.9f, 0.9f ) );
-		const float size = 0.002f;
-		btVector3 offset = ray.origin + 0.1f * ray.direction;
 	}
 
 	//========================================================================================================

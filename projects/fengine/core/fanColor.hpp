@@ -2,9 +2,7 @@
 
 #include "imgui/imgui.h"
 #include "fanDisableWarnings.hpp"
-WARNINGS_GLM_PUSH()
-#include "glm/glm.hpp"
-WARNINGS_POP()
+#include "fanGlm.hpp"
 
 namespace fan
 {

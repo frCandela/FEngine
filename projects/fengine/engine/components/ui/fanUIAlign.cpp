@@ -39,9 +39,16 @@ namespace fan
 	void UIAlign::Load( EcsComponent& _component, const Json& _json )
 	{
         UIAlign& align = static_cast<UIAlign&>( _component );
-        Serializable::LoadInt( _json, "corner", (int&)align.mCorner );
-        Serializable::LoadInt( _json, "direction", (int&)align.mDirection );
-        Serializable::LoadInt( _json, "unitType", (int&)align.mUnitType );
+
+        int corner, direction, unitType;
+
+        Serializable::LoadInt( _json, "corner", corner );
+        Serializable::LoadInt( _json, "direction", direction );
+        Serializable::LoadInt( _json, "unitType", unitType );
         Serializable::LoadVec2( _json, "ratio", align.mOffset );
+
+        align.mCorner =     AlignCorner(corner);
+        align.mDirection =  AlignDirection(direction);
+        align.mUnitType =   UnitType(unitType);
     }
 }

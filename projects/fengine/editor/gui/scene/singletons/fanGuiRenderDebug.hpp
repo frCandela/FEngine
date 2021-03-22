@@ -24,10 +24,10 @@ namespace fan
         static void OnGui( EcsWorld&, EcsSingleton& _component )
         {
             RenderDebug& renderDebug = static_cast<RenderDebug&>( _component );
-            ImGui::Text( "debugLines:            %u", renderDebug.mDebugLines.size() );
-            ImGui::Text( "debugLinesNoDepthTest: %u", renderDebug.mDebugLinesNoDepthTest.size() );
-            ImGui::Text( "debugTriangles:        %u", renderDebug.mDebugTriangles.size() );
-            ImGui::Text( "debugLines2D:          %u", renderDebug.mDebugLines2D.size() );
+            ImGui::Text( "debugLines:            %u", (int)renderDebug.mDebugLines.size() );
+            ImGui::Text( "debugLinesNoDepthTest: %u", (int)renderDebug.mDebugLinesNoDepthTest.size() );
+            ImGui::Text( "debugTriangles:        %u", (int)renderDebug.mDebugTriangles.size() );
+            ImGui::Text( "debugLines2D:          %u", (int)renderDebug.mDebugLines2D.size() );
         }
     };
 }

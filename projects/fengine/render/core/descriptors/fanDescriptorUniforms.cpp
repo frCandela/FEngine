@@ -23,7 +23,7 @@ namespace fan
 
 		for ( int bindingIndex = 0; bindingIndex < (int)mBindingData.size(); bindingIndex++ )
 		{
-			for ( int bufferIndex = 0; bufferIndex < SwapChain::sMaxFramesInFlight; bufferIndex++ )
+			for ( int bufferIndex = 0; bufferIndex < (int)SwapChain::sMaxFramesInFlight; bufferIndex++ )
 			{
 				mBindingData[ bindingIndex ].mBuffers[ bufferIndex ].Destroy( _device );
 			}

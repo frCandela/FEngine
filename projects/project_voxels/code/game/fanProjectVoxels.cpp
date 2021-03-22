@@ -115,11 +115,11 @@ namespace fan
                     ScopedTimer s( "test3" );
                     for( int    i = 0; i < num; ++i )
                     {
-                        constexpr Fixed val = Fixed("1.000000000");
-                        result3 += val;
+                        result3 += FIXED(1.000000000);
                     }
                 }
-                Debug::Log() << (result1 == result2 && result1 == result3) << Debug::Endl();
+
+                Debug::Log() << (result1 == result2 && result1 == result3 ) << Debug::Endl();
                 fanAssert(result1 == result2 && result1 == result3);
             }
             ImGui::End();

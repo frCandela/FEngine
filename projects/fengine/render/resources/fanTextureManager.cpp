@@ -72,7 +72,7 @@ namespace fan
     //========================================================================================================
     void TextureManager::Remove( const std::string& _path )
     {
-        for( int textureIndex = 0; textureIndex < mTextures.size(); textureIndex++ )
+        for( int textureIndex = 0; textureIndex < (int)mTextures.size(); textureIndex++ )
         {
             if( mTextures[textureIndex]->mPath == _path )
             {

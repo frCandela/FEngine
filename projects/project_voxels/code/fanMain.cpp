@@ -66,6 +66,6 @@ int WinMain( HINSTANCE _hInstance, HINSTANCE _hPrevInstance, LPSTR _lpCmdLine, i
     (void)_lpCmdLine;
     (void)_nShowCmd;
 
-    main( __argc, __argv );
+    return main( __argc, __argv );
 }
 #endif

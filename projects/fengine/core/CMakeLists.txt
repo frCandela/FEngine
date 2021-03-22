@@ -2,9 +2,9 @@
 file(GLOB_RECURSE FAN_CORE_H *.hpp)
 
 set(FAN_CORE_LIBS
+        LinearMath
         imgui
         glfw
-        btLinearMath
         quickhull
         )
 

@@ -38,6 +38,7 @@ namespace fan
         mIndex = 0;
 		mClock.Reset();
 		const size_t index = OpenTimeInterval( "full_interval" );
+        (void)index;
         fanAssert( index == 0 );
 	}
 

@@ -28,7 +28,7 @@ namespace fan
             {
                 ImGui::Text( "spaceshipID :      %u", hostGameData.mSpaceshipID );
                 ImGui::Text( "spaceship handle : %u", hostGameData.mSpaceshipHandle );
-                ImGui::Text( "inputs size :      %u", hostGameData.mInputs.size() );
+                ImGui::Text( "inputs size :      %u", (int)hostGameData.mInputs.size() );
 
                 if( ImGui::CollapsingHeader( "inputs" ) )
                 {

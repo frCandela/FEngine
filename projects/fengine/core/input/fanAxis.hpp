@@ -42,15 +42,15 @@ namespace fan
                                   const Joystick::Axis _joystickAxis );
 
 	private:
-		bool        mInvert = false;
+		bool        mInvert;
 		std::string mName;
 		Type        mType;
 
 		Keyboard::Key           mKeyPositive = Keyboard::NONE;
 		Keyboard::Key           mKeyNegative = Keyboard::NONE;
 		Joystick::JoystickID    mJoystickId = -1;
-		Joystick::Button        mButtonPositive = -1;
-		Joystick::Button        mButtonNegative = -1;
-		Joystick::Axis          mJoystickAxis = -1;
+        Joystick::Axis          mJoystickAxis = -1;
+        Joystick::Button        mButtonPositive = -1;
+        Joystick::Button        mButtonNegative = -1;
 	};
 }

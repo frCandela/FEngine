@@ -4,10 +4,10 @@
   file(GLOB_RECURSE PROJECT_H *.hpp)
 
   set(PROJECT_LIBS
-          fanCore
+          fanEngine
           fanRender
           fanNetwork
-          fanEngine
+          fanCore
           )
 
   include_directories(${CMAKE_CURRENT_SOURCE_DIR})

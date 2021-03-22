@@ -63,7 +63,6 @@ namespace fan
 
 			// Constants		
 			const float fontHeight = ImGui::GetFontSize();
-			const float fontWidth = 0.75f * fontHeight;
             const float totalTime = Clock::SecondsBetween( mIntervalsCopy[0].mTime,
                                                            mIntervalsCopy[mIntervalsCopy.size() - 1].mTime );
 			const Clock::TimePoint  beginTime = mIntervalsCopy[ 0 ].mTime;
@@ -74,7 +73,6 @@ namespace fan
 
 			const float sizeScrollBar = ( width - ImGui::GetScrollMaxX() ) / width;
 			const float posLeftScrollBar = ImGui::GetScrollX() / width;
-			const float posCenterScrollBar = posLeftScrollBar + 0.5f * sizeScrollBar;
 
             const float mouseWindowPos = std::clamp( ( ImGui::GetMousePos().x - ImGui::GetWindowPos().x ) /
                                                      ImGui::GetWindowSize().x, 0.f, 1.f );

@@ -19,7 +19,7 @@ namespace fan
         constexpr int64_t AtoiLimited( const char* _begin, const char* _end )
         {
             bool isNegative = _begin[0] == '-';
-            if( isNegative ){ *_begin++; }
+            if( isNegative ){ _begin++; }
             int64_t val = 0;
             if( _end == nullptr )
             {

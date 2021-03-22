@@ -10,10 +10,10 @@ namespace fan
     //========================================================================================================
     //========================================================================================================
     #ifdef NDEBUG
-        #define TEST_ASSERT( _condition )               \
-            if( ! (_condition) )                        \
-            {                                           \
-                throw std::exception("test failed");    \
+        #define TEST_ASSERT( _condition )  \
+            if( ! (_condition) )           \
+            {                              \
+                throw std::exception();    \
             }
     #else
         #define TEST_ASSERT( _condition )                       \
@@ -22,7 +22,7 @@ namespace fan
             {                                                   \
                 FAN_DEBUG_BREAK                                 \
             }                                                   \
-            throw std::exception("test failed");                \
+            throw std::exception();                             \
         }
     #endif
 

@@ -271,4 +271,6 @@ namespace fan
     static_assert( sizeof( Fixed ) == 4 );
 
     constexpr Fixed operator "" _fx( const char* _string ) { return Fixed( _string ); }
+
+    #define FIXED(str) [&]() { constexpr Fixed x = Fixed(#str); return x; }()
 }

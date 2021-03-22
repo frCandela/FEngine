@@ -168,7 +168,7 @@ namespace fan
         fanAssert( _next.empty() );
         std::string first = _current[0];
         std::string rootDir( first.begin(), first.begin() + first.find_first_of( '/' ) + 1 );
-        while( !_current.empty() && _current[0].starts_with( rootDir ) )
+        while( !_current.empty() && _current[0].compare(0, rootDir.size(), rootDir ) == 0 )
         {
             std::string nextPath = std::string( _current[0].begin() + rootDir.size(), _current[0].end() );
             if( !nextPath.empty() )

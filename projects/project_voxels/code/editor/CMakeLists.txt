@@ -1,8 +1,8 @@
 ﻿ set( PROJECT_NAME_EDITOR  "project_${PROJECT_NAME}_editor")
 
  set( PROJECT_EDITOR_LIBS
-    ${PROJECT_LIBS}
-    fanEditor
+         fanEditor
+         ${PROJECT_LIBS}
  )
 
  if ( ${CMAKE_BUILD_TYPE} MATCHES Release AND MSVC  )

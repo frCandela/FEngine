@@ -26,8 +26,8 @@ namespace fan
             HostReplication& hostReplication = static_cast<HostReplication&>( _component );
             ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() - 16 );
             {
-                ImGui::Text( "next replication:    %d", hostReplication.mNextReplication.size() );
-                ImGui::Text( "pending replication: %d", hostReplication.mPendingReplication.size() );
+                ImGui::Text( "next replication:    %d", (int)hostReplication.mNextReplication.size() );
+                ImGui::Text( "pending replication: %d", (int)hostReplication.mPendingReplication.size() );
             }
             ImGui::PopItemWidth();
         }

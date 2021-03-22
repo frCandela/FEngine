@@ -1,8 +1,4 @@
-﻿include_directories(
-	${CMAKE_SOURCE_DIR}/middleware
-)
-
-file(GLOB_RECURSE FAN_RENDER_SRC *.cpp)
+﻿file(GLOB_RECURSE FAN_RENDER_SRC *.cpp)
 file(GLOB_RECURSE FAN_RENDER_H *.hpp)
 
 set(FAN_RENDER_LIBS

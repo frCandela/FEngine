@@ -28,10 +28,10 @@ namespace fan
             {
                 ImGui::Text( "player ID           : %u", gameData.mPlayerId );
                 ImGui::DragInt( "max input sent", &gameData.mMaxInputSent, 1.f, 0, 200 );
-                ImGui::Text( "size previous states:  %d", gameData.mPreviousLocalStates.size() );
+                ImGui::Text( "size previous states:  %d", (int)gameData.mPreviousLocalStates.size() );
                 ImGui::Text( "%s", gameData.mFrameSynced ? "frame synced" : "frame not synced" );
-                ImGui::Text( "size pending inputs:  %d", gameData.mPreviousInputs.size() );
-                ImGui::Text( "size inputs sent:      %d", gameData.mInputsSent.size() );
+                ImGui::Text( "size pending inputs:  %d", (int)gameData.mPreviousInputs.size() );
+                ImGui::Text( "size inputs sent:      %d", (int)gameData.mInputsSent.size() );
             }
             ImGui::PopItemWidth();
         }

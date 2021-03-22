@@ -165,7 +165,7 @@ namespace fan
         fanAssert( mSingletons.find( _SingletonType::Info::sType ) == mSingletons.end() );
 
 		// Creates the singleton component
-		_SingletonType* singleton = new _SingletonType();
+		_SingletonType* singleton = new _SingletonType{};
         mSingletons[_SingletonType::Info::sType] = singleton;
 
 		// Registers singleton info

@@ -8,11 +8,11 @@ namespace fan
 {
 	//========================================================================================================
 	//========================================================================================================
-	EditorWindow::EditorWindow( const std::string _name, const ImGui::IconType _iconType ) :
-	     mName( _name ),
-		 mIsVisible( true ),
-		 mIconType( _iconType )
-	{
+    EditorWindow::EditorWindow( const std::string _name, const ImGui::IconType _iconType ) :
+            mIsVisible( true ),
+            mName( _name ),
+            mIconType( _iconType )
+    {
 
 		std::stringstream ss;
 		ss << "show_window_" << _name;

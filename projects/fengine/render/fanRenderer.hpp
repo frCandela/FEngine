@@ -2,10 +2,7 @@
 
 #include <vector>
 #include "fanDisableWarnings.hpp"
-WARNINGS_GLM_PUSH()
-#include "glm/glm.hpp"
-#include "glm/gtc/matrix_transform.hpp"
-WARNINGS_POP()
+#include "fanGlm.hpp"
 #include "glfw/glfw3.h"
 #include "core/math/fanVector2.hpp"
 #include "render/fanVertex.hpp"

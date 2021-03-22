@@ -58,13 +58,13 @@ int main( int _argc, char* _argv[] )
 #ifdef FAN_WIN32
 //==============================================================================================================================
 //==============================================================================================================================
-int WinMain( HINSTANCE _hInstance, HINSTANCE _hPrevInstance, LPSTR _lpCmdLine, int _nShowCmd )
+int WINAPI WinMain( HINSTANCE _hInstance, HINSTANCE _hPrevInstance, LPSTR _lpCmdLine, int _nShowCmd )
 {
     (void)_hInstance;
     (void)_hPrevInstance;
     (void)_lpCmdLine;
     (void)_nShowCmd;
 
-    main( __argc, __argv );
+    return main( __argc, __argv );
 }
 #endif

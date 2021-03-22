@@ -92,9 +92,6 @@ namespace fan
 			// Update input
 			ImGui::GetIO().DeltaTime = time.mLogicDelta;
 
-
-			const glm::ivec2 iPos = mWindow.GetPosition();
-            const glm::vec2 windowPosition = glm::vec2( (float)iPos.x, (float)iPos.y );
 			const VkExtent2D extent = mWindow.GetExtent();
             const glm::vec2 windowSize = glm::vec2( (float)extent.width, (float)extent.height );
 

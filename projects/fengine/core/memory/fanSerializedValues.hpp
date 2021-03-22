@@ -3,9 +3,7 @@
 #include "core/fanSingleton.hpp"
 #include "fanJson.hpp"
 #include "fanDisableWarnings.hpp"
-WARNINGS_GLM_PUSH()
-#include "glm/vec2.hpp"
-WARNINGS_POP()
+#include "fanGlm.hpp"
 
 class btQuaternion;
 class btVector3;

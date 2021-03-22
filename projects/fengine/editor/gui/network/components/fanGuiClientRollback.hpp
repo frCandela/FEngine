@@ -34,7 +34,7 @@ namespace fan
                         ? 0
                         : clientRollback.mRollbackDatas.front().mFrameIndex;
 
-                ImGui::Text( "Num saved states: %d", clientRollback.mRollbackDatas.size() );
+                ImGui::Text( "Num saved states: %d", (int)clientRollback.mRollbackDatas.size() );
                 ImGui::Text( "Range [%d,%d]", oldestFrameIndex, newestFrameIndex );
             }
             ImGui::Unindent();

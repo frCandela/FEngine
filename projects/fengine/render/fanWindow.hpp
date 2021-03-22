@@ -2,10 +2,7 @@
 
 #include "glfw/glfw3.h"
 #include "fanDisableWarnings.hpp"
-WARNINGS_GLM_PUSH()
-#include "glm/glm.hpp"
-WARNINGS_POP()
-
+#include "fanGlm.hpp"
 #include "render/core/fanSwapChain.hpp"
 #include "render/core/fanInstance.hpp"
 #include "render/core/fanDevice.hpp"

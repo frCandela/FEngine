@@ -1,9 +1,7 @@
 #pragma once
 
 #include "fanDisableWarnings.hpp"
-WARNINGS_GLM_PUSH()
-#include "glm/glm.hpp"
-WARNINGS_POP()
+#include "fanGlm.hpp"
 #include "core/ecs/fanSignal.hpp"
 #include "render/fanWindow.hpp"
 #include "render/fanRenderer.hpp"

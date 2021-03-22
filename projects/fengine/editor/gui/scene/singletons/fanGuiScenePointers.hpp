@@ -24,7 +24,7 @@ namespace fan
         static void OnGui( EcsWorld&, EcsSingleton& _component )
         {
             ScenePointers& scenePointers = static_cast<ScenePointers&>( _component );
-            ImGui::Text( "unresolved component pointers: %d", scenePointers.mUnresolvedComponentPtr.size() );
+            ImGui::Text( "unresolved component pointers: %d", (int)scenePointers.mUnresolvedComponentPtr.size() );
         }
     };
 }

@@ -2,9 +2,7 @@
 
 #include <cstdint>
 #include "fanDisableWarnings.hpp"
-WARNINGS_GLM_PUSH()
-#include "glm/glm.hpp"
-WARNINGS_POP()
+#include "fanGlm.hpp"
 #include "fanJson.hpp"
 
 class Color;

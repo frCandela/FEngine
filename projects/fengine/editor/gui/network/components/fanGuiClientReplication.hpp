@@ -24,8 +24,8 @@ namespace fan
         static void OnGui( EcsWorld& /*_world*/, EcsEntity /*_entityID*/, EcsComponent& _component )
         {
             ClientReplication& replicationManager = static_cast<ClientReplication&>( _component );
-            ImGui::Text( "singletons: %d", replicationManager.mReplicationListSingletons.size() );
-            ImGui::Text( "rpc:        %d", replicationManager.mReplicationListRPC.size() );
+            ImGui::Text( "singletons: %d", (int)replicationManager.mReplicationListSingletons.size() );
+            ImGui::Text( "rpc:        %d", (int)replicationManager.mReplicationListRPC.size() );
         }
     };
 }

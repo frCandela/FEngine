@@ -24,7 +24,7 @@ namespace fan
         static void OnGui( EcsWorld&, EcsSingleton& _component )
         {
             const SpawnManager& spawnManager = static_cast<const SpawnManager&>( _component );
-            ImGui::Text( "pending spawns: %d", spawnManager.spawns.size() );
+            ImGui::Text( "pending spawns: %d", (int)spawnManager.spawns.size() );
         }
     };
 }

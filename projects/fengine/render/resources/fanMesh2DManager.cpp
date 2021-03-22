@@ -20,7 +20,7 @@ namespace fan
     //========================================================================================================
     void Mesh2DManager::Remove( const std::string& _path )
     {
-        for( int          meshIndex = 0; meshIndex < mMeshes.size(); meshIndex++ )
+        for( int          meshIndex = 0; meshIndex < (int)mMeshes.size(); meshIndex++ )
         {
             if( mMeshes[meshIndex]->mPath == _path )
             {

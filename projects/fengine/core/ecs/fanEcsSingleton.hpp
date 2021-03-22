@@ -22,11 +22,7 @@ namespace fan
 
     //========================================================================================================
     //========================================================================================================
-    struct EcsSingleton {
-		EcsSingleton(){}
-		EcsSingleton( EcsSingleton const& ) = delete;
-		EcsSingleton& operator=( EcsSingleton const& ) = delete;
-	};
+    struct EcsSingleton {};
 
 	class EcsWorld;
     struct SlotBase;

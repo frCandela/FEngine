@@ -13,12 +13,12 @@
 [submodule "submodules/imgui"]
 	path = submodules/imgui
 	url = https://github.com/ocornut/imgui.git
-[submodule "submodules/bullet3"]
-	path = submodules/bullet3
-	url = https://github.com/bulletphysics/bullet3.git
 [submodule "submodules/json"]
 	path = submodules/json
 	url = https://github.com/nlohmann/json.git
 [submodule "submodules/stb"]
 	path = submodules/stb
 	url = https://github.com/nothings/stb.git
+[submodule "submodules/bullet3"]
+	path = submodules/bullet3
+	url = https://github.com/bulletphysics/bullet3.git

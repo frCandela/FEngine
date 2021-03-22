@@ -33,10 +33,10 @@ namespace fan
             ImGui::Text( "scene     : %s",
                          node.mScene->mPath.empty() ? "<no path>" : node.mScene->mPath.c_str() );
             ImGui::Text( "handle    : %u", node.mHandle );
-            ImGui::Text( "entity id : %u", entity );
+            ImGui::Text( "entity id : %u", (int)entity.mIndex );
 
             ImGui::Text( "tags: " );
-            for( int tagIndex = _world.GetFistTagIndex(); tagIndex < ecsSignatureLength; tagIndex++ )
+            for( int tagIndex = _world.GetFistTagIndex(); tagIndex < (int)ecsSignatureLength; tagIndex++ )
             {
                 if( _world.IndexedHasTag( _entity, tagIndex ) )
                 {

@@ -95,8 +95,8 @@ namespace fan
 			_packet << mPreviousRtt;
 		}
 
-		FrameIndex mServerFrame; // frame index of the server when sending the packet
-		FrameIndex mClientFrame; // frame index of the client when sending back the packet
+		FrameIndex mServerFrame = 0; // frame index of the server when sending the packet
+		FrameIndex mClientFrame = 0; // frame index of the client when sending back the packet
 		float      mPreviousRtt; // client rtt from the previous ping
 	};
 

@@ -39,7 +39,7 @@ namespace fan
 			mImageViews[i].Destroy( _device );
 		}
 
-		for( int i = 0; i < sMaxFramesInFlight; i++ )
+		for( int i = 0; i < (int)sMaxFramesInFlight; i++ )
 		{
 			vkDestroySemaphore( _device.mDevice, mImagesAvailableSemaphores[i], nullptr );
 			vkDestroySemaphore( _device.mDevice, mRenderFinishedSemaphores[i], nullptr );
@@ -283,7 +283,7 @@ namespace fan
 		fenceCreateInfo.pNext = nullptr;
 		fenceCreateInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
 
-		for ( int semaphoreIndex = 0; semaphoreIndex < sMaxFramesInFlight; semaphoreIndex++ )
+		for ( int semaphoreIndex = 0; semaphoreIndex < (int)sMaxFramesInFlight; semaphoreIndex++ )
 		{
 			vkCreateSemaphore( _device.mDevice, &semaphoreCreateInfo, nullptr, &mImagesAvailableSemaphores[ semaphoreIndex ] );
 			vkCreateSemaphore( _device.mDevice, &semaphoreCreateInfo, nullptr, &mRenderFinishedSemaphores[ semaphoreIndex ] );

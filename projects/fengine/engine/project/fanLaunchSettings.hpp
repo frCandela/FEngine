@@ -2,9 +2,7 @@
 
 #include <string>
 #include "fanDisableWarnings.hpp"
-WARNINGS_GLM_PUSH()
-#include "glm/vec2.hpp"
-WARNINGS_POP()
+#include "fanGlm.hpp"
 
 namespace fan
 {

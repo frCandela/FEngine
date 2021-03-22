@@ -49,7 +49,10 @@ namespace fan
 	{
 		Camera& camera = static_cast<Camera&>( _component );
 
-		Serializable::LoadInt(   _json, "camera_type", (int&)camera.mType );
+		int cameraType;
+		Serializable::LoadInt(   _json, "camera_type", cameraType );
+        camera.mType = Type(cameraType);
+
 		Serializable::LoadFloat( _json, "orthoSize",	camera.mOrthoSize );
 		Serializable::LoadFloat( _json, "fov",			camera.mFov );
 		Serializable::LoadFloat( _json, "nearDistance", camera.mNearDistance );

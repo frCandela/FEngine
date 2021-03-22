@@ -85,7 +85,7 @@ namespace fan
 	//========================================================================================================
 	void FrameBuffer::Destroy( Device& _device )
 	{
-		for( int framebufferIndex = 0; framebufferIndex < SwapChain::sMaxFramesInFlight; framebufferIndex++ )
+		for( int framebufferIndex = 0; framebufferIndex < (int)SwapChain::sMaxFramesInFlight; framebufferIndex++ )
 		{
 			if( mFrameBuffers[framebufferIndex] != VK_NULL_HANDLE )
 			{

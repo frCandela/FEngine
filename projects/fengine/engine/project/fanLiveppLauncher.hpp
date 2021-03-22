@@ -1,9 +1,9 @@
 #ifdef FAN_LIVEPP
 
-#pragma warning( push )
-#pragma warning( disable : 4005 ) // macro redefinition
+#include "fanDisableWarnings.hpp"
+WARNINGS_LIVEPP()
 #include "LivePP/API/LPP_API.h"
-#pragma warning( pop )
+WARNINGS_POP()
 
 #include "engine/project/fanIProjectContainer.hpp"
 

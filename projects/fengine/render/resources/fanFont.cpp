@@ -112,7 +112,7 @@ namespace fan
         atlas.mTexture = new Texture();
 
         glm::ivec2 glyphCoord(0,0);
-        for ( int  i = 0; i < unicodeCharacters.size(); i++)
+        for ( int  i = 0; i < (int)unicodeCharacters.size(); i++)
         {
             fanAssert( i < 256 );
             const unsigned long charcode = unicodeCharacters[i];

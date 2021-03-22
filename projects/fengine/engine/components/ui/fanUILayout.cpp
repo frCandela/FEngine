@@ -34,7 +34,10 @@ namespace fan
 	void UILayout::Load( EcsComponent& _component, const Json& _json )
 	{
         UILayout& layout = static_cast<UILayout&>( _component );
-        Serializable::LoadInt(_json, "type", (int&)layout.mType );
+        int layoutType;
+        Serializable::LoadInt(_json, "type", layoutType );
         Serializable::LoadInt(_json, "gap", layout.mGap );
+
+        layout.mType = Type(layoutType);
 	}
 }

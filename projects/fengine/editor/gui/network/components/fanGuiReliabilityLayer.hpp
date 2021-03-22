@@ -28,8 +28,8 @@ namespace fan
             {
                 ImGui::Text( "next packet tag:       %d", deliveryNotification.mNextPacketTag );
                 ImGui::Text( "expected packet tag:   %d", deliveryNotification.mExpectedPacketTag );
-                ImGui::Text( "num pending ack:       %d", deliveryNotification.mPendingAck.size() );
-                ImGui::Text( "num in flight packets: %d", deliveryNotification.mInFlightPackets.size() );
+                ImGui::Text( "num pending ack:       %d", (int)deliveryNotification.mPendingAck.size() );
+                ImGui::Text( "num in flight packets: %d", (int)deliveryNotification.mInFlightPackets.size() );
             }
             ImGui::PopItemWidth();
         }

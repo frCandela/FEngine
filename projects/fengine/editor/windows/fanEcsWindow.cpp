@@ -38,7 +38,7 @@ namespace fan
 		// Global
 		if( ImGui::CollapsingHeader( "Global" ) )
 		{
-			ImGui::Text( "num chunks     : %d", EcsChunk::sAllocator.Size() );
+			ImGui::Text( "num chunks     : %d", (int)EcsChunk::sAllocator.Size() );
             ImGui::Text( "total size (Mo): %.1f",
                          float( EcsChunk::sAllocator.Size() * EcsChunk::sAllocator.sChunkSize ) * 0.000001f );
         }

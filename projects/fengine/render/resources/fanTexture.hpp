@@ -2,9 +2,7 @@
 
 #include <string>
 #include "fanDisableWarnings.hpp"
-WARNINGS_GLM_PUSH()
-#include "glm/glm.hpp"
-WARNINGS_POP()
+#include "fanGlm.hpp"
 #include "glfw/glfw3.h"
 #include "core/resources/fanResource.hpp"
 

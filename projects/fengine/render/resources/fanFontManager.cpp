@@ -47,7 +47,7 @@ namespace fan
     //========================================================================================================
     void FontManager::Remove( const std::string& _path )
     {
-        for( int i = 0; i < mFonts.size(); i++ )
+        for( int i = 0; i < (int)mFonts.size(); i++ )
         {
             Font* font = mFonts[i];
             if( font->GetPath() == _path )

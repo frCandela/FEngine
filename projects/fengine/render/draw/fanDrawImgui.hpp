@@ -3,9 +3,7 @@
 #include <vector>
 #include "glfw/glfw3.h"
 #include "fanDisableWarnings.hpp"
-WARNINGS_GLM_PUSH()
-#include "glm/glm.hpp"
-WARNINGS_POP()
+#include "fanGlm.hpp"
 #include "render/core/fanSampler.hpp"
 #include "render/core/fanShader.hpp"
 #include "render/resources/fanTexture.hpp"
