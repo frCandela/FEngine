@@ -4,6 +4,7 @@
 #include "engine/components/ui/fanUIText.hpp"
 #include "engine/components/ui/fanUIRenderer.hpp"
 #include "engine/singletons/fanRenderResources.hpp"
+#include "render/resources/fanFontManager.hpp"
 
 namespace fan
 {

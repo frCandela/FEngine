@@ -195,6 +195,9 @@ namespace fan
                 DrawData& drawData = mDrawData[meshIndex];
                 Mesh    & mesh     = *drawData.mMesh;
 
+                Buffer& buffer = mesh.mVertexBuffer[mesh.mCurrentBuffer];
+                if( buffer.mBuffer == VK_NULL_HANDLE ) { continue; }
+
                 BindTexture( commandBuffer,
                              drawData.mTextureIndex,
                              mDescriptorSampler,
@@ -203,21 +206,9 @@ namespace fan
                 BindDescriptors( commandBuffer, _index, meshIndex );
                 VkDeviceSize offsets[] = { 0 };
 
-                vkCmdBindVertexBuffers(
-                        commandBuffer,
-                        0,
-                        1,
-                        &mesh.mVertexBuffer[mesh.mCurrentBuffer].mBuffer,
-                        offsets );
-                vkCmdBindIndexBuffer(
-                        commandBuffer,
-                        mesh.mIndexBuffer[mesh.mCurrentBuffer].mBuffer,
-                        0,
-                        VK_INDEX_TYPE_UINT32 );
-                vkCmdDrawIndexed(
-                        commandBuffer,
-                        static_cast<uint32_t>( mesh.mIndices.size() ),
-                        1, 0, 0, 0 );
+                vkCmdBindVertexBuffers( commandBuffer, 0, 1, &mesh.mVertexBuffer[mesh.mCurrentBuffer].mBuffer, offsets );
+                vkCmdBindIndexBuffer( commandBuffer, mesh.mIndexBuffer[mesh.mCurrentBuffer].mBuffer, 0, VK_INDEX_TYPE_UINT32 );
+                vkCmdDrawIndexed( commandBuffer, static_cast<uint32_t>( mesh.mIndices.size() ), 1, 0, 0, 0 );
             }
 
             if( vkEndCommandBuffer( commandBuffer ) != VK_SUCCESS )
@@ -284,11 +275,11 @@ namespace fan
     //========================================================================================================
     void DrawModels::SetPointLights( const std::vector<RenderDataPointLight>& _lightData )
     {
-       fanAssert( _lightData.size() < RenderGlobal::sMaximumNumPointLights );
+        fanAssert( _lightData.size() < RenderGlobal::sMaximumNumPointLights );
         mUniforms.mUniformsLights.mPointLightNum = (uint32_t)_lightData.size();
         for( int i = 0; i < (int)_lightData.size(); ++i )
         {
-            const RenderDataPointLight& light                  = _lightData[i];
+            const RenderDataPointLight& light                    = _lightData[i];
             mUniforms.mUniformsLights.mPointlights[i].mPosition  = light.mPosition;
             mUniforms.mUniformsLights.mPointlights[i].mDiffuse   = light.mDiffuse;
             mUniforms.mUniformsLights.mPointlights[i].mSpecular  = light.mSpecular;
@@ -303,11 +294,11 @@ namespace fan
     //========================================================================================================
     void DrawModels::SetDirectionalLights( const std::vector<RenderDataDirectionalLight>& _lightData )
     {
-       fanAssert( _lightData.size() < RenderGlobal::sMaximumNumDirectionalLight );
+        fanAssert( _lightData.size() < RenderGlobal::sMaximumNumDirectionalLight );
         mUniforms.mUniformsLights.mDirLightsNum = (uint32_t)_lightData.size();
         for( int i = 0; i < (int)_lightData.size(); ++i )
         {
-            const RenderDataDirectionalLight& light          = _lightData[i];
+            const RenderDataDirectionalLight& light            = _lightData[i];
             mUniforms.mUniformsLights.mDirLights[i].mDirection = light.mDirection;
             mUniforms.mUniformsLights.mDirLights[i].mAmbiant   = light.mAmbiant;
             mUniforms.mUniformsLights.mDirLights[i].mDiffuse   = light.mDiffuse;
@@ -324,7 +315,7 @@ namespace fan
             DescriptorImages& _descriptorTextures,
             VkPipelineLayout _pipelineLayout )
     {
-       fanAssert( _textureIndex < _descriptorTextures.mDescriptorSets.size() );
+        fanAssert( _textureIndex < _descriptorTextures.mDescriptorSets.size() );
 
         std::vector<VkDescriptorSet> descriptors = {
                 _descriptorTextures.mDescriptorSets[_textureIndex], _descriptorSampler.mDescriptorSet

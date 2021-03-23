@@ -1,4 +1,5 @@
 
+#include <engine/systems/fanUpdateBounds.hpp>
 #include "core/input/fanInputManager.hpp"
 #include "core/input/fanInput.hpp"
 
@@ -268,13 +269,13 @@ namespace fan
                 time.mLastLogicTime += time.mLogicDelta;
 
                 const EditorPlayState& playState = world.GetSingleton<EditorPlayState>();
-                project.Step( playState.mState == EditorPlayState::PLAYING ? time.mLogicDelta : 0.f );
+                const float delta = playState.mState == EditorPlayState::PLAYING ? time.mLogicDelta : 0.f;
+                project.Step( delta );
 
-                // ui & debug
-                if( mShowUi )
-                {
-                    world.Run<SMoveFollowTransforms>();
-                }
+                // bounds
+                world.Run<SUpdateBoundsFromRigidbody>( delta );
+                world.Run<SUpdateBoundsFromModel>();
+                world.Run<SUpdateBoundsFromTransform>();
 
                 if( isCurrentWorld )
                 {

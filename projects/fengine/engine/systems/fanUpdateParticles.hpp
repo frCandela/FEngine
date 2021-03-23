@@ -1,5 +1,6 @@
 #include "core/ecs/fanEcsSystem.hpp"
 #include "engine/components/fanParticle.hpp"
+#include "core/time/fanProfiler.hpp"
 
 namespace fan
 {

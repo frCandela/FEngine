@@ -1,10 +1,21 @@
 #include "game/fanProjectEmpty.hpp"
 
-#include "core/time/fanProfiler.hpp"
-#include "core/fanDebug.hpp"
-
-#include "engine/singletons/fanScene.hpp"
-#include "engine/components/fanCamera.hpp"
+#include "core/math/fanFixedPoint.hpp"
+#include "core/time/fanScopedTimer.hpp"
+#include "network/singletons/fanTime.hpp"
+#include "engine/systems/fanUpdateBounds.hpp"
+#include "engine/systems/fanUpdateUIText.hpp"
+#include "engine/systems/fanRaycastUI.hpp"
+#include "engine/systems/fanUpdateUILayouts.hpp"
+#include "engine/systems/fanUpdateUIAlign.hpp"
+#include "engine/systems/fanUpdateTransforms.hpp"
+#include "engine/systems/fanSynchronizeMotionStates.hpp"
+#include "engine/singletons/fanPhysicsWorld.hpp"
+#include "engine/systems/fanUpdateTimers.hpp"
+#include "engine/systems/fanUpdateParticles.hpp"
+#include "engine/systems/fanEmitParticles.hpp"
+#include "engine/systems/fanGenerateParticles.hpp"
+#include "engine/systems/fanRegisterPhysics.hpp"
 #include "engine/systems/fanUpdateRenderWorld.hpp"
 
 #include "game/components/fanTestComponent.hpp"
@@ -21,10 +32,10 @@ namespace fan
         mName = "project_empty";
     }
 
-	//==========================================================================================================================
-	//==========================================================================================================================
-	void ProjectEmpty::Init()
-	{
+    //==========================================================================================================================
+    //==========================================================================================================================
+    void ProjectEmpty::Init()
+    {
         EcsIncludeEngine( mWorld );
         EcsIncludePhysics(mWorld);
         EcsIncludeRender3D(mWorld);
@@ -36,40 +47,52 @@ namespace fan
 #ifdef FAN_EDITOR
         RegisterEditorGuiInfos( mWorld.GetSingleton<EditorGuiInfo>() );
 #endif
-	}
+    }
 
-	//==========================================================================================================================
-	//==========================================================================================================================
-	void ProjectEmpty::Start()
-	{
-	    // creates a default camera
-        Scene& scene = mWorld.GetSingleton<Scene>();
-        SceneNode& cameraNode = scene.CreateSceneNode( "game_camera", &scene.GetRootNode() );
-        cameraNode.AddFlag( SceneNode::NoSave | SceneNode::NoDelete | SceneNode::NoRaycast );
+    //==========================================================================================================================
+    //==========================================================================================================================
+    void ProjectEmpty::Start()
+    {
+        mWorld.Run<SRegisterAllRigidbodies>();
+        MeshManager& meshManager = *mWorld.GetSingleton<RenderResources>().mMeshManager;
+        RenderWorld& renderWorld = mWorld.GetSingleton<RenderWorld>();
+        meshManager.Add( renderWorld.mParticlesMesh, "particles_mesh_" + mName );
+    }
 
-        const EcsEntity cameraID = mWorld.GetEntity( cameraNode.mHandle );
-        Camera& camera = mWorld.AddComponent<Camera>( cameraID );
-        camera.mType = Camera::Orthogonal;
+    //==========================================================================================================================
+    //==========================================================================================================================
+    void  ProjectEmpty::Stop()
+    {
 
-        Transform& transform = mWorld.AddComponent<Transform>( cameraID );
-        transform.SetRotationEuler( btVector3( 90.f, 0.f, 0.f ) );
-        transform.SetPosition( btVector3( 0, 5, 0 ) );
+    }
 
-        scene.SetMainCamera( cameraNode.mHandle );
-	}
+    //==========================================================================================================================
+    //==========================================================================================================================
+    void  ProjectEmpty::Step( const float _delta )
+    {
+        SCOPED_PROFILE( step );
 
-	//==========================================================================================================================
-	//==========================================================================================================================
-	void  ProjectEmpty::Stop()
-	{
+        // physics & transforms
+        PhysicsWorld& physicsWorld = mWorld.GetSingleton<PhysicsWorld>();
+        mWorld.Run<SSynchronizeMotionStateFromTransform>();
+        physicsWorld.mDynamicsWorld->stepSimulation( _delta, 10, Time::sPhysicsDelta );
+        mWorld.Run<SSynchronizeTransformFromMotionState>();
+        mWorld.Run<SMoveFollowTransforms>();
 
-	}
+        // ui
+        mWorld.Run<SUpdateUIText>();
+        mWorld.Run<SAlignUI>();
+        mWorld.Run<SUpdateUILayouts>();
+        mWorld.Run<SHoverButtons>();
+        mWorld.Run<SHighlightButtons>();
 
-	//==========================================================================================================================
-	//==========================================================================================================================
-	void  ProjectEmpty::Step( const float /*_delta*/ )
-	{
-	}
+        // gameplay
+        mWorld.Run<SUpdateExpirationTimes>( _delta );
+
+        mWorld.Run<SUpdateParticles>( _delta );
+        mWorld.Run<SEmitParticles>( _delta );
+        mWorld.Run<SGenerateParticles>( _delta );
+    }
 
     //==========================================================================================================================
     //==========================================================================================================================
@@ -86,7 +109,7 @@ namespace fan
     //==========================================================================================================================
     void ProjectEmpty::OnGui()
     {
-        if( ImGui::Begin("my window"))
+        if( ImGui::Begin("testoss"))
         {
             ImGui::End();
         }
