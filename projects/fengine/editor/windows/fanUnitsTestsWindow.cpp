@@ -1,4 +1,3 @@
-#include <core/fanAssert.hpp>
 #include "editor/windows/fanUnitsTestsWindow.hpp"
 
 #include "core/fanDebug.hpp"
@@ -14,6 +13,7 @@
 #include "core/unit_tests/fanUnitTestEcs.hpp"
 #include "core/unit_tests/fanUnitTestPath.hpp"
 #include "core/unit_tests/fanUnitTestFixedPoint.hpp"
+#include "core/unit_tests/fanUnitTestVector3.hpp"
 
 namespace fan
 {
@@ -38,6 +38,8 @@ namespace fan
                 { "Ecs",                &UnitTestEcs::RunTests, mEcsResult },
                 { "Path",               &UnitTestPath::RunTests, mPathResult },
                 { "FixedPoint",         &UnitTestFixedPoint::RunTests, mFixedPointResult },
+                { "Vector3",            &UnitTestVector3::RunTests, mVector3Result },
+
         };
     }
 

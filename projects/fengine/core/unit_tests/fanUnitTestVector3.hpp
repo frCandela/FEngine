@@ -1,0 +1,162 @@
+#pragma once
+
+#include "core/fanAssert.hpp"
+#include "core/unit_tests/fanUnitTest.hpp"
+#include "core/math/fanVector3.hpp"
+#include "core/math/fanMathUtils.hpp"
+
+namespace fan
+{
+    //======================================================================================================================
+    //======================================================================================================================
+    class UnitTestVector3 : public UnitTest<UnitTestVector3>
+    {
+    public:
+        static std::vector<TestMethod> GetTests()
+        {
+            return { { &UnitTestVector3::TestConstructors,   "constructors" },
+                     { &UnitTestVector3::TestMagnitude,      "magnitude" },
+                     { &UnitTestVector3::TestNormalize,      "normalize" },
+                     { &UnitTestVector3::TestComparison,     "comparison" },
+                     { &UnitTestVector3::TestMultiplication, "multiplication" },
+                     { &UnitTestVector3::TestDivision,       "division" },
+                     { &UnitTestVector3::TestAddSubstract,   "addition subtraction" },
+                     { &UnitTestVector3::TestDot,            "dot" },
+                     { &UnitTestVector3::TestCross,          "cross" },
+            };
+        }
+
+        void Create() override
+        {
+        }
+
+        void Destroy() override
+        {
+        }
+
+        void TestConstructors()
+        {
+            Vector3 vec3;
+            TEST_ASSERT( vec3.x == 0 && vec3.y == 0 && vec3.z == 0 )
+
+            vec3 = { 1, 2, 3 };
+            TEST_ASSERT( vec3.x == FIXED( 1 ) )
+            TEST_ASSERT( vec3.y == FIXED( 2 ) )
+            TEST_ASSERT( vec3.z == FIXED( 3 ) )
+
+            Vector3 cpy( vec3 );
+            TEST_ASSERT( vec3.x == cpy.x )
+            TEST_ASSERT( vec3.y == cpy.y )
+            TEST_ASSERT( vec3.z == cpy.z )
+        }
+
+        void TestMagnitude()
+        {
+            TEST_ASSERT( Vector3( -4, 0, 0 ).Magnitude() == 4 )
+            TEST_ASSERT( Vector3( 1, -1, 0 ).Magnitude() == Fixed::Sqrt( 2 ) )
+            TEST_ASSERT( Vector3( -1, 2, -3 ).Magnitude() == Fixed::Sqrt( 14 ) )
+        }
+
+        void TestNormalize()
+        {
+            Vector3 vec3( 2, 0, 0 );
+            vec3.Normalize();
+            TEST_ASSERT( vec3.Magnitude() == 1 )
+            TEST_ASSERT( Fixed::Abs( Fixed( 1 ) - Vector3( 1, 2, 3 ).Normalized().Magnitude() ) < FX_BIAS )
+
+            vec3 = { FIXED( 55.4 ), FIXED( 33.6 ), FIXED( 44.8 ) };
+            TEST_ASSERT( Fixed::Abs( Fixed( 1 ) - vec3.Normalized().Magnitude() ) < FX_BIAS )
+
+            vec3 = { FIXED( -12.867 ), FIXED( 4.6 ), FIXED( -25.8 ) };
+            TEST_ASSERT( Fixed::Abs( Fixed( 1 ) - vec3.Normalized().Magnitude() ) < FX_BIAS )
+        }
+
+        void TestComparison()
+        {
+            TEST_ASSERT( Vector3( 2, -4, 6 ) == Vector3( 2, -4, 6 ) )
+            Vector3 vec3 = { FIXED( 55.4 ), FIXED( 33.6 ), FIXED( 44.8 ) };
+            TEST_ASSERT( vec3 == vec3 )
+            TEST_ASSERT( vec3 != Vector3( FIXED( 55.3 ), FIXED( 33.6 ), FIXED( 44.8 ) ) )
+            TEST_ASSERT( vec3 != Vector3( FIXED( 55.4 ), FIXED( -33.6 ), FIXED( 44.8 ) ) )
+        }
+
+        void TestMultiplication()
+        {
+            Vector3 vec3( 1, -2, 3 );
+            vec3 *= 2;
+            TEST_ASSERT( vec3 == Vector3( 2, -4, 6 ) )
+
+            vec3 = Vector3( 1, -2, 3 );
+            vec3 *= -2;
+            TEST_ASSERT( vec3 == Vector3( -2, 4, -6 ) )
+
+            vec3 = { FIXED( 54.4 ), FIXED( -32.6 ), FIXED( 44.8 ) };
+            vec3 *= FIXED( -0.5 );
+            TEST_ASSERT( vec3 == Vector3( FIXED( -27.2 ), FIXED( 16.3 ), FIXED( -22.4 ) ) )
+
+            Fixed value = FIXED( 78.6 );
+            TEST_ASSERT( value * vec3 == ( vec3 *= value ) )
+            TEST_ASSERT( value * vec3 == vec3 * value )
+        }
+
+        void TestDivision()
+        {
+            Vector3 vec3( 2, -4, 6 );
+            vec3 /= 2;
+            TEST_ASSERT( vec3 == Vector3( 1, -2, 3 ) )
+
+            vec3 = Vector3( 2, -4, 6 );
+            vec3 /= -2;
+            TEST_ASSERT( vec3 == Vector3( -1, 2, -3 ) )
+
+            vec3 = { FIXED( 54.4 ), FIXED( -32.6 ), FIXED( 44.8 ) };
+            vec3 /= -2;
+            TEST_ASSERT( vec3 == Vector3( FIXED( -27.2 ), FIXED( 16.3 ), FIXED( -22.4 ) ) )
+
+            TEST_ASSERT( vec3 / 2 == ( vec3 /= 2 ) )
+        }
+
+        void TestAddSubstract()
+        {
+            TEST_ASSERT( Vector3( 1, 2, 3 ) + Vector3( 4, -5, 6 ) == Vector3( 5, -3, 9 ) )
+            TEST_ASSERT( Vector3( 1, 2, 3 ) + Vector3() == Vector3( 1, 2, 3 ) )
+
+            TEST_ASSERT( Vector3( 1, 2, 3 ) - Vector3( 4, -5, 6 ) == Vector3( -3, 7, -3 ) )
+            TEST_ASSERT( Vector3( 1, 2, 3 ) - Vector3() == Vector3( 1, 2, 3 ) )
+
+            Vector3 vec1( FIXED( 54.4 ), FIXED( -32.3 ), FIXED( 44.8 ) );
+            Vector3 vec2( FIXED( -16.1 ), FIXED( 26.6 ), FIXED( 1.15 ) );
+            TEST_ASSERT( vec1 + vec2 == vec2 + vec1 )
+            TEST_ASSERT( vec1 - vec2 == -( vec2 - vec1 ) )
+        }
+
+        void TestDot()
+        {
+            Vector3 vec1( 1, 2, 3 );
+            Vector3 vec2( 4, 5, 6 );
+            TEST_ASSERT( Vector3::Dot( vec1, vec2 ) == 32 )
+            TEST_ASSERT( Vector3::Dot( vec1, vec2 ) == Vector3::Dot( vec2, vec1 ) )
+            TEST_ASSERT( Fixed::Abs( Vector3::Dot( vec1, vec1 ) - vec1.Magnitude() * vec1.Magnitude() ) <
+                         FX_BIAS ) // precision is bad
+            TEST_ASSERT( Fixed::Abs( Vector3::Dot( vec2, vec2 ) - vec2.Magnitude() * vec2.Magnitude() ) < FX_BIAS )
+        }
+
+        void TestCross()
+        {
+            // axis
+            TEST_ASSERT( Vector3::Cross( Vector3::sUp, Vector3::sRight ) == Vector3::sForward );
+            TEST_ASSERT( Vector3::Cross( Vector3::sForward, Vector3::sUp ) == Vector3::sRight );
+            TEST_ASSERT( Vector3::Cross( Vector3::sRight, Vector3::sForward ) == Vector3::sUp );
+
+            // identities
+            Vector3 v1( 1, 2, 3 );
+            Vector3 v2( 4, 5, 6 );
+            Vector3 v3( 7, 8, 9 );
+            Fixed   s = 42;
+            TEST_ASSERT( Vector3::Cross( v1, v2 ) == -Vector3::Cross( v2, v1 ) );
+            TEST_ASSERT( s * Vector3::Cross( v1, v2 ) == Vector3::Cross( s * v1, v2 ) )
+            TEST_ASSERT( s * Vector3::Cross( v1, v2 ) == Vector3::Cross( v1, s *  v2 ) )
+            TEST_ASSERT( Vector3::Cross( v1, v2 + v3 ) == Vector3::Cross( v1, v2 ) + Vector3::Cross(v1, v3 ) )
+        }
+    };
+}

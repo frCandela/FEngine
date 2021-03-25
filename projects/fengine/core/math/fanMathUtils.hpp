@@ -5,6 +5,7 @@
 #include "LinearMath/btQuaternion.h"
 #include "fanDisableWarnings.hpp"
 #include "fanGlm.hpp"
+#include "core/math/fanVector3.hpp"
 
 namespace fan
 {
@@ -16,8 +17,10 @@ namespace fan
 
 	//========================================================================================================
 	//========================================================================================================
+
 	inline btVector3 ToBullet( const glm::vec3 _vec ) { return btVector3( _vec.x, _vec.y, _vec.z ); }
 	inline btVector3 ToBullet( const glm::vec4 _vec ) { return btVector3( _vec.x, _vec.y, _vec.z ); }
+    inline glm::vec3 ToGLM( const Vector3 _vec ) { return glm::vec3( _vec.x.ToFloat(), _vec.y.ToFloat(), _vec.z.ToFloat() ); }
 	inline glm::vec3 ToGLM( const btVector3 _vec ) { return glm::vec3( _vec[ 0 ], _vec[ 1 ], _vec[ 2 ] ); }
 	inline glm::quat ToGLM( const btQuaternion _quat )
 	{

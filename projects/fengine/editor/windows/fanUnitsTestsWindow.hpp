@@ -42,5 +42,6 @@ namespace fan
         UnitTestResult mEcsResult;
         UnitTestResult mPathResult;
         UnitTestResult mFixedPointResult;
+        UnitTestResult mVector3Result;
     };
 }

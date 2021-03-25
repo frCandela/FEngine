@@ -29,10 +29,11 @@ namespace fan
         static constexpr double  sMax           = sMaxInteger + sMaxFractional;
         static constexpr double  sMin           = sMinInteger;
 
-        #define FX_TWO_PI   Fixed("6.283185307")
-        #define FX_PI       Fixed("3.141592654")
-        #define FX_HALF_PI  Fixed("1.570796327")
-        #define FX_BIAS     Fixed("0.0001")
+        #define FIXED(str) [&]() { constexpr Fixed x = Fixed(#str); return x; }()
+        #define FX_TWO_PI   FIXED(6.283185307)
+        #define FX_PI       FIXED(3.141592654)
+        #define FX_HALF_PI  FIXED(1.570796327)
+        #define FX_BIAS     FIXED(0.0001)
 
         constexpr Fixed() : mData( 0 ) {}
         constexpr Fixed( const int _integer ) : mData( static_cast<DataType>(_integer << sFractionalSize) ) {}
@@ -48,7 +49,7 @@ namespace fan
             f.mData = _data;
             return f;
         }
-        #define FIXED(str) [&]() { constexpr Fixed x = Fixed(#str); return x; }()
+
 
         DataType GetData() const { return mData; }
 
