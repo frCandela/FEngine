@@ -115,8 +115,7 @@ namespace fan
 			const Transform& cameraTransform = world.GetComponent<Transform>( cameraID );
 			const Camera& camera = world.GetComponent<Camera>( cameraID );
 
-            const Ray ray = camera.ScreenPosToRay( cameraTransform,
-                                                   ToBullet( mouse.LocalScreenSpacePosition() ) );
+            const Ray ray = camera.ScreenPosToRay( cameraTransform, mouse.LocalScreenSpacePosition() );
 
 			// raycast on bounds
 			std::vector<EcsEntity> results;

@@ -97,10 +97,10 @@ namespace fan
 	// ( with screenSpacePosition between {-1.f,-1.f} and {1.f,1.f} ).
 	//========================================================================================================
 	Ray Camera::ScreenPosToRay( const Transform& _cameraTransform,
-	                            const btVector2& _screenSpacePosition ) const
+	                            const glm::vec2& _screenSpacePosition ) const
 	{
-        fanAssert( _screenSpacePosition.x() >= -1.f && _screenSpacePosition.x() <= 1.f );
-        fanAssert( _screenSpacePosition.y() >= -1.f && _screenSpacePosition.y() <= 1.f );
+        fanAssert( _screenSpacePosition.x >= -1.f && _screenSpacePosition.x <= 1.f );
+        fanAssert( _screenSpacePosition.y >= -1.f && _screenSpacePosition.y <= 1.f );
 
 		if( mType == Type::Perspective )
 		{
@@ -115,7 +115,7 @@ namespace fan
 			float nearWidth = mAspectRatio * nearHeight;
 
 			Ray ray;
-			ray.origin = nearMiddle - _screenSpacePosition.x() * nearWidth * left - _screenSpacePosition.y() * nearHeight * upVec;
+			ray.origin = nearMiddle - _screenSpacePosition.x * nearWidth * left - _screenSpacePosition.y * nearHeight * upVec;
 			ray.direction = 100.f * ( ray.origin - pos ) ;
 			if( !ray.direction.fuzzyZero() ) { ray.direction.normalize(); }
 
@@ -138,7 +138,7 @@ namespace fan
 
 	//========================================================================================================
 	//========================================================================================================
-	btVector2 Camera::WorldPosToScreen( const Transform& _cameraTransform,
+    glm::vec2 Camera::WorldPosToScreen( const Transform& _cameraTransform,
 	                                    const btVector3& worldPosition ) const
 	{
 		if( mType == Type::Perspective )
@@ -146,13 +146,13 @@ namespace fan
 			const glm::vec4 pos( worldPosition[0], worldPosition[1], worldPosition[2], 1.f );
 			glm::vec4  proj = GetProjection() * GetView( _cameraTransform ) * pos;
 			proj /= proj.z;
-			return btVector2( proj.x, proj.y );
+			return glm::vec2( proj.x, proj.y );
 		}
 		else
 		{
 			const glm::vec4 pos( worldPosition[0], worldPosition[1], worldPosition[2], 1.f );
 			glm::vec4  proj = GetProjection() * GetView( _cameraTransform ) * pos;
-			return btVector2( proj.x, -proj.y );
+			return glm::vec2( proj.x, -proj.y );
 		}
 	}
 }

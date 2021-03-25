@@ -78,11 +78,6 @@ namespace fan
         SerializedValues::Get().GetInt( "renderer_position_x", _outPosition.x );
         SerializedValues::Get().GetInt( "renderer_position_y", _outPosition.y );
     }
-
-    void SerializedValues::SetVec2( const char* _name, const btVector2& _vec2 )
-    {
-        Serializable::SaveVec2( mJson[mValuesName], _name, _vec2 );
-    }
     void SerializedValues::SetVec3( const char* _name, const btVector3& _vec3 )
     {
         Serializable::SaveVec3( mJson[mValuesName], _name, _vec3 );
@@ -114,11 +109,6 @@ namespace fan
     void SerializedValues::SetString( const char* _name, const std::string& _string )
     {
         Serializable::SaveString( mJson[mValuesName], _name, _string );
-    }
-
-    bool SerializedValues::GetVec2( const char* _name, btVector2& _outVec2 )
-    {
-        return Serializable::LoadVec2( mJson[mValuesName], _name, _outVec2 );
     }
     bool SerializedValues::GetVec3( const char* _name, btVector3& _outVec3 )
     {

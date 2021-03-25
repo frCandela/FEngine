@@ -1,6 +1,5 @@
 #pragma once
 
-#include "core/math/fanVector2.hpp"
 #include "core/ecs/fanSignal.hpp"
 #include "editor/windows/fanEditorWindow.hpp"
 #include "engine/project/fanLaunchSettings.hpp"
@@ -25,8 +24,8 @@ namespace fan
 		Signal<int>          mOnSelectProject;
 
 		ProjectViewWindow( /*const LaunchSettings::NetworkMode _launchMode*/ );
-		btVector2 GetSize()			const { return mSize; }
-		btVector2 GetPosition()		const { return mPosition; }
+		glm::vec2 GetSize()			const { return mSize; }
+        glm::vec2 GetPosition()		const { return mPosition; }
 		float	  GetAspectRatio()	const { return ( float ) mSize[ 0 ] / ( float ) mSize[ 1 ]; }
 		bool	  IsHovered()		const { return mIsHovered; }
 		void	  SetCurrentProject( const int _index ) { mCurrentProject = _index;  }
@@ -34,8 +33,8 @@ namespace fan
 		void OnGui( EcsWorld& _world ) override;
 
 	private:
-		btVector2 mSize           = btVector2( 1.f, 1.f );
-		btVector2 mPosition;
+        glm::vec2 mSize           = glm::vec2( 1.f, 1.f );
+        glm::vec2 mPosition;
 		bool      mIsHovered;
 		char      mStringProjectSelectionCombo[16];
 		int       mCurrentProject = 0;

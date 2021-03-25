@@ -82,8 +82,7 @@ namespace fan
 
 			// Raycast on the gizmo shape to determine if the mouse is hovering it
 			Color clickedColor = opaqueColor;
-            const Ray ray = camera.ScreenPosToRay( cameraTransform,
-                                                   ToBullet( mouse.LocalScreenSpacePosition() ) );
+            const Ray ray = camera.ScreenPosToRay( cameraTransform, mouse.LocalScreenSpacePosition() );
 			for ( int triIndex = 0; triIndex < (int)coneTris.size() / 3; triIndex++ )
 			{
                 Triangle triangle( coneTris[3 * triIndex + 0],
@@ -122,8 +121,7 @@ namespace fan
 			{
 				btVector3 axis = rotation * axisDirection[ axisIndex ];
 
-                const Ray screenRay = camera.ScreenPosToRay( cameraTransform,
-                                                             ToBullet( mouse.LocalScreenSpacePosition() ) );
+                const Ray screenRay = camera.ScreenPosToRay( cameraTransform, mouse.LocalScreenSpacePosition() );
 				const Ray axisRay = { origin , axis };
 				btVector3 trash, projectionOnAxis;
 				screenRay.RayClosestPoints( axisRay, trash, projectionOnAxis );

@@ -1,7 +1,7 @@
 #pragma once
 
+#include <cstdint>
 #include "core/fanSingleton.hpp"
-#include "core/math/fanVector2.hpp"
 
 struct GLFWwindow;
 

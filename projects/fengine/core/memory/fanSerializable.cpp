@@ -2,7 +2,6 @@
 #include "LinearMath/btVector3.h"
 #include "LinearMath/btQuaternion.h"
 #include "core/fanDebug.hpp"
-#include "core/math/fanVector2.hpp"
 #include "core/fanColor.hpp"
 
 namespace fan
@@ -13,14 +12,6 @@ namespace fan
 	{
 		_json[_name]["x"] = _vec2.x;
 		_json[_name]["y"] = _vec2.y;
-	}
-
-	//========================================================================================================
-	//========================================================================================================
-	void Serializable::SaveVec2( Json& _json, const char* _name, const btVector2& _vec2 )
-	{
-		_json[ _name ][ "x" ] = _vec2[ 0 ];
-		_json[ _name ][ "y" ] = _vec2[ 1 ];
 	}
 
 	//========================================================================================================
@@ -124,20 +115,6 @@ namespace fan
 		{
 			_outVec2.x = ( *token )["x"];
 			_outVec2.y = ( *token )["y"];
-			return true;
-		}
-		return false;
-	}
-	
-	//========================================================================================================
-	//========================================================================================================
-	bool Serializable::LoadVec2( const Json& _json, const char* _name, btVector2& _outVec2 )
-	{
-		const Json* token = FindToken( _json, _name );
-		if ( token != nullptr )
-		{
-			_outVec2[ 0 ] = ( *token )[ "x" ];
-			_outVec2[ 1 ] = ( *token )[ "y" ];
 			return true;
 		}
 		return false;

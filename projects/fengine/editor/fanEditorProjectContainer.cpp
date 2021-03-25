@@ -231,10 +231,10 @@ namespace fan
                 {
                     // Update input
                     ImGui::GetIO().DeltaTime = time.mLogicDelta;
-                    const btVector2 viewPosition = mProjectViewWindow->GetPosition();
-                    const btVector2 viewSize     = mProjectViewWindow->GetSize();
+                    const glm::vec2 viewPosition = mProjectViewWindow->GetPosition();
+                    const glm::vec2 viewSize     = mProjectViewWindow->GetSize();
                     //todo mGameViewWindow->IsHovered()
-                    Mouse::NextFrame( mWindow.mWindow, ToGLM( viewPosition ), ToGLM( viewSize ) );
+                    Mouse::NextFrame( mWindow.mWindow, viewPosition, viewSize );
                     Input::Get().NewFrame();
                     Input::Get().Manager().PullEvents();
                     world.GetSingleton<Mouse>().UpdateData( mWindow.mWindow );
@@ -332,7 +332,7 @@ namespace fan
             Time::RegisterFrameDrawn();    // used for stats
 
 
-            UpdateRenderWorld( mRenderer, GetCurrentProject(), ToGLM( mProjectViewWindow->GetSize() ) );
+            UpdateRenderWorld( mRenderer, GetCurrentProject(), mProjectViewWindow->GetSize() );
 
             mRenderer.DrawFrame();
             Profiler::Get().End();

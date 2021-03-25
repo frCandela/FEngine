@@ -27,7 +27,7 @@ namespace fan
 		editorCamera.mCameraHandle    = 0;
 		editorCamera.mSpeed           = 10.f;
 		editorCamera.mSpeedMultiplier = 3.f;
-		editorCamera.mXYSensitivity   = btVector2( 0.005f, 0.005f );
+		editorCamera.mXYSensitivity   = glm::vec2( 0.005f, 0.005f );
 	}
 
 	//========================================================================================================
@@ -68,9 +68,9 @@ namespace fan
 		{
 			// Rotation depending on mouse movement
 			const float invertAxis = -1;
-			const btQuaternion rotationY( btVector3_Up, -editorCamera.mXYSensitivity.x() * mouseDelta.x );
+			const btQuaternion rotationY( btVector3_Up, -editorCamera.mXYSensitivity.x * mouseDelta.x );
             const btQuaternion rotationX( invertAxis * cameraTransform.Left(),
-                                          -editorCamera.mXYSensitivity.y() * mouseDelta.y );
+                                          -editorCamera.mXYSensitivity.y * mouseDelta.y );
 			cameraTransform.SetRotationQuat( rotationX * rotationY * cameraTransform.GetRotationQuat() );
 
 			// Remove roll

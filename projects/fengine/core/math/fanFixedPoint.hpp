@@ -42,13 +42,14 @@ namespace fan
                                                                                    sFractionalSize,
                                                                                    sFractionalMask,
                                                                                    sFixed_One ) ) {}
-
         static constexpr Fixed CreateFromData( const DataType _data )
         {
             Fixed f;
             f.mData = _data;
             return f;
         }
+        #define FIXED(str) [&]() { constexpr Fixed x = Fixed(#str); return x; }()
+
         DataType GetData() const { return mData; }
 
         constexpr int ToInt() const { return DataType( mData >> sFractionalSize ); }
@@ -235,7 +236,7 @@ namespace fan
             if( _value < Fixed( 1 ) )
             {
                 a *= Fixed( 100 );
-                pow = Fixed( "0.1" );
+                pow = FIXED( 0.1 );
             }
             else
             {
@@ -248,8 +249,8 @@ namespace fan
                 pow   = Fixed::PowI( Fixed( 10 ), n );
             }
             Fixed approx = a < Fixed( 10 )
-                    ? ( Fixed( "0.28" ) * a + Fixed( "0.89" ) ) * pow
-                    : ( Fixed( "0.089" ) * a + Fixed( "2.8" ) ) * pow;
+                    ? ( FIXED( 0.28 ) * a + FIXED( 0.89 ) ) * pow
+                    : ( FIXED( 0.089 ) * a + FIXED( 2.8 ) ) * pow;
 
             // calculates sqrt using Newton's method
             Fixed result    = approx;
@@ -271,6 +272,4 @@ namespace fan
     static_assert( sizeof( Fixed ) == 4 );
 
     constexpr Fixed operator "" _fx( const char* _string ) { return Fixed( _string ); }
-
-    #define FIXED(str) [&]() { constexpr Fixed x = Fixed(#str); return x; }()
 }

@@ -1,7 +1,8 @@
 #pragma once
 
 #include "core/ecs/fanEcsSingleton.hpp"
-#include "core/math/fanVector2.hpp"
+#include "fanDisableWarnings.hpp"
+#include "fanGlm.hpp"
 
 namespace fan
 {
@@ -19,7 +20,7 @@ namespace fan
 		EcsHandle mCameraHandle;
 		float     mSpeed           = 10.f;
 		float     mSpeedMultiplier = 3.f;
-		btVector2 mXYSensitivity   = btVector2( 0.005f, 0.005f );
+		glm::vec2 mXYSensitivity   = glm::vec2( 0.005f, 0.005f );
 
 		static void Update( EcsWorld& _world, const float _delta );
 		static void CreateEditorCamera( EcsWorld& _world );

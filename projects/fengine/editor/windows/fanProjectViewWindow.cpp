@@ -38,7 +38,7 @@ namespace fan
 	{
 		// update window size
 		const ImVec2 imGuiSize = ImGui::GetContentRegionAvail();
-		btVector2 size = btVector2( imGuiSize.x, imGuiSize.y );
+        glm::vec2 size = glm::vec2( imGuiSize.x, imGuiSize.y );
 		if ( mSize != size )
 		{
             mSize = size;
@@ -49,7 +49,7 @@ namespace fan
 		if ( ImGui::BeginMenuBar() )
 		{
 			
-			ImGui::Text( "%d x %d", ( int ) size.x(), ( int ) size.y() );
+			ImGui::Text( "%d x %d", ( int ) size.x, ( int ) size.y );
 
 			const ImVec4 disabledColor = ImVec4( 0.3f, 0.3f, 0.3f, 0.3f );
 
@@ -112,7 +112,7 @@ namespace fan
 		const ImVec2 cursorPos = ImGui::GetCursorPos();
 		const ImVec2 windowPos = ImGui::GetWindowPos();
 
-        mPosition = btVector2( cursorPos.x + windowPos.x, cursorPos.y + windowPos.y );
+        mPosition = glm::vec2( cursorPos.x + windowPos.x, cursorPos.y + windowPos.y );
 
 		// Draw project
 		ImGui::Image( ( void* ) 12, imGuiSize );

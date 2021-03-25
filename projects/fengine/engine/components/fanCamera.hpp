@@ -2,7 +2,6 @@
 
 #include "core/ecs/fanEcsComponent.hpp"
 #include "render/fanRenderResourcePtr.hpp"
-#include "core/math/fanVector2.hpp"
 
 namespace fan
 {
@@ -30,7 +29,7 @@ namespace fan
 
 		glm::mat4 GetView( const Transform& _cameraTransform ) const;
 		glm::mat4 GetProjection() const;
-        Ray ScreenPosToRay( const Transform& _cameraTransform, const btVector2& _screenSpacePosition ) const;
-		btVector2 WorldPosToScreen( const Transform& _cameraTransform, const btVector3& worldPosition ) const;
+        Ray ScreenPosToRay( const Transform& _cameraTransform, const glm::vec2& _screenSpacePosition ) const;
+		glm::vec2 WorldPosToScreen( const Transform& _cameraTransform, const btVector3& worldPosition ) const;
 	};
 }

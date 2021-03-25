@@ -4,7 +4,6 @@
 #include "fanDisableWarnings.hpp"
 #include "fanGlm.hpp"
 #include "glfw/glfw3.h"
-#include "core/math/fanVector2.hpp"
 #include "render/fanVertex.hpp"
 #include "render/resources/fanMeshManager.hpp"
 #include "render/resources/fanMesh2DManager.hpp"
