@@ -14,6 +14,7 @@
 #include "core/unit_tests/fanUnitTestPath.hpp"
 #include "core/unit_tests/fanUnitTestFixedPoint.hpp"
 #include "core/unit_tests/fanUnitTestVector3.hpp"
+#include "core/unit_tests/fanUnitTestMatrix3.hpp"
 
 namespace fan
 {
@@ -39,6 +40,7 @@ namespace fan
                 { "Path",               &UnitTestPath::RunTests, mPathResult },
                 { "FixedPoint",         &UnitTestFixedPoint::RunTests, mFixedPointResult },
                 { "Vector3",            &UnitTestVector3::RunTests, mVector3Result },
+                { "Matrix3",            &UnitTestMatrix3::RunTests, mMatrix3Result },
 
         };
     }
