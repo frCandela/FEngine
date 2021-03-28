@@ -14,7 +14,7 @@ namespace fan
         using DataType = int32_t;
         static constexpr int      sIntegerSize      = 16;
         static constexpr int      sFractionalSize   = 16;
-        static constexpr uint64_t  sFixed_One        = 1 << sFractionalSize;
+        static constexpr uint64_t sFixed_One        = 1 << sFractionalSize;
         static constexpr uint64_t sFixed_Half       = 1 << ( sFractionalSize - 1 );
         static constexpr uint64_t sFractionalMask   = sFixed_One - 1;
         static constexpr uint64_t sIntegerMask      = ~sFractionalMask;
@@ -38,13 +38,14 @@ namespace fan
 
         constexpr Fixed() : mData( 0 ) {}
         constexpr Fixed( const int _integer ) : mData( static_cast<DataType>(_integer << sFractionalSize) ) {}
-        constexpr explicit Fixed( const float _float ) : mData( static_cast<DataType>( _float * sFixed_One ) ) {}
-        constexpr explicit Fixed( const double _double ) : mData( static_cast<DataType>( _double * sFixed_One ) ) {}
         constexpr explicit Fixed( const char* _str ) : mData( impl::StringToFixed( _str,
                                                                                    sFractionalSize,
                                                                                    sFractionalMask,
                                                                                    sFixed_One ) ) {}
-        static constexpr Fixed CreateFromData( const DataType _data )
+
+        static constexpr Fixed FromFloat( const float _float ) { return FromData( DataType( _float * sFixed_One ) ); }
+        static constexpr Fixed FromDouble( const double _double ) { return FromData( DataType( _double * sFixed_One ) ); }
+        static constexpr Fixed FromData( const DataType _data )
         {
             Fixed f;
             f.mData = _data;
@@ -64,7 +65,7 @@ namespace fan
         constexpr bool operator>( const Fixed& _value ) const { return mData > _value.mData; }
         constexpr bool operator>=( const Fixed& _value ) const { return mData >= _value.mData; }
 
-        constexpr Fixed operator+( const Fixed& _value ) const { return CreateFromData( mData + _value.mData ); }
+        constexpr Fixed operator+( const Fixed& _value ) const { return FromData( mData + _value.mData ); }
         constexpr Fixed& operator+=( const Fixed& _value )
         {
             mData += _value.mData;
@@ -82,13 +83,13 @@ namespace fan
             return result;
         }// postfix (++)
 
-        constexpr Fixed operator-( const Fixed& _value ) const { return CreateFromData( mData - _value.mData ); }
+        constexpr Fixed operator-( const Fixed& _value ) const { return FromData( mData - _value.mData ); }
         constexpr Fixed& operator-=( const Fixed& _value )
         {
             mData -= _value.mData;
             return *this;
         }
-        constexpr Fixed operator-() const { return CreateFromData( -mData ); } // unary (-)
+        constexpr Fixed operator-() const { return FromData( -mData ); } // unary (-)
         constexpr Fixed& operator--()
         {
             mData -= sFixed_One;
@@ -104,7 +105,7 @@ namespace fan
         constexpr Fixed operator*( const Fixed& _value ) const
         {
             Fixed result;
-            result.mData = DataType( int64_t( mData ) * int64_t( _value.mData ) / int64_t(sFixed_One) );
+            result.mData = DataType( int64_t( mData ) * int64_t( _value.mData ) / int64_t( sFixed_One ) );
             return result;
         }
         constexpr Fixed& operator*=( const Fixed& _value )
@@ -197,6 +198,8 @@ namespace fan
                 return _value;
             }
         }
+        static constexpr Fixed Max( const Fixed& _a, const Fixed& _b ) { return _a > _b ? _a : _b; }
+        static constexpr Fixed Min( const Fixed& _a, const Fixed& _b ) { return _a < _b ? _a : _b; }
         static constexpr Fixed PowI( const Fixed& _value, const int _power )
         {
             if( _power == 0 ){ return Fixed( 1 ); }
@@ -226,6 +229,46 @@ namespace fan
             Fixed tmp9 = PowI( clampedValue, 9 ) / Fixed( impl::Factorial( 7 ) );
             tmp9 /= Fixed( 8 ) * Fixed( 9 ); // calculate in two parts to avoid overflow
             return clampedValue - tmp3 + tmp5 - tmp7 + tmp9;
+        }
+        static constexpr Fixed ASin( const Fixed& _value )
+        {
+            Fixed negate = _value < 0 ? 1 : 0;
+            Fixed x      = Fixed::Abs( _value );
+            Fixed ret    = -FIXED( 0.0187293 );
+            ret *= x;
+            ret += FIXED( 0.0742610 );
+            ret *= x;
+            ret -= FIXED( 0.2121144 );
+            ret *= x;
+            ret += FIXED( 1.5707288 );
+            ret          = FX_PI * FIXED( 0.5 ) - Fixed::Sqrt( FIXED( 1 ) - x ) * ret;
+            return ret - FIXED( 2 ) * negate * ret;
+        }
+        static constexpr Fixed ATan2( const Fixed& _y, const Fixed& _x )
+        {
+            Fixed t0, t1, t2, t3, t4;
+
+            t3 = Fixed::Abs( _x );
+            t1 = Fixed::Abs( _y );
+            t0 = Fixed::Max( t3, t1 );
+            t1 = Fixed::Min( t3, t1 );
+            t3 = FIXED( 1 ) / t0;
+            t3 = t1 * t3;
+
+            t4 = t3 * t3;
+            t0 = -FIXED( 0.013480470 );
+            t0 = t0 * t4 + FIXED( 0.057477314 );
+            t0 = t0 * t4 - FIXED( 0.121239071 );
+            t0 = t0 * t4 + FIXED( 0.195635925 );
+            t0 = t0 * t4 - FIXED( 0.332994597 );
+            t0 = t0 * t4 + FIXED( 0.999995630 );
+            t3 = t0 * t3;
+
+            t3 = ( Fixed::Abs( _y ) > Fixed::Abs( _x ) ) ? FIXED( 1.570796327 ) - t3 : t3;
+            t3 = ( _x < 0 ) ? FIXED( 3.141592654 ) - t3 : t3;
+            t3 = ( _y < 0 ) ? -t3 : t3;
+
+            return t3;
         }
         static constexpr Fixed Cos( const Fixed& _value )
         {
