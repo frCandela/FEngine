@@ -62,13 +62,13 @@ namespace fan
             Vector3 vec3( 2, 0, 0 );
             vec3.Normalize();
             TEST_ASSERT( vec3.Magnitude() == 1 )
-            TEST_ASSERT( Fixed::Abs( Fixed( 1 ) - Vector3( 1, 2, 3 ).Normalized().Magnitude() ) < FX_BIAS )
+            TEST_ASSERT( Fixed::IsFuzzyZero( Fixed( 1 ) - Vector3( 1, 2, 3 ).Normalized().Magnitude() ) )
 
             vec3 = { FIXED( 55.4 ), FIXED( 33.6 ), FIXED( 44.8 ) };
-            TEST_ASSERT( Fixed::Abs( Fixed( 1 ) - vec3.Normalized().Magnitude() ) < FX_BIAS )
+            TEST_ASSERT( Fixed::IsFuzzyZero( Fixed( 1 ) - vec3.Normalized().Magnitude() ) )
 
             vec3 = { FIXED( -12.867 ), FIXED( 4.6 ), FIXED( -25.8 ) };
-            TEST_ASSERT( Fixed::Abs( Fixed( 1 ) - vec3.Normalized().Magnitude() ) < FX_BIAS )
+            TEST_ASSERT( Fixed::IsFuzzyZero( Fixed( 1 ) - vec3.Normalized().Magnitude() ) )
         }
 
         void TestComparison()
@@ -136,9 +136,8 @@ namespace fan
             Vector3 vec2( 4, 5, 6 );
             TEST_ASSERT( Vector3::Dot( vec1, vec2 ) == 32 )
             TEST_ASSERT( Vector3::Dot( vec1, vec2 ) == Vector3::Dot( vec2, vec1 ) )
-            TEST_ASSERT( Fixed::Abs( Vector3::Dot( vec1, vec1 ) - vec1.Magnitude() * vec1.Magnitude() ) <
-                         FX_BIAS ) // precision is bad
-            TEST_ASSERT( Fixed::Abs( Vector3::Dot( vec2, vec2 ) - vec2.Magnitude() * vec2.Magnitude() ) < FX_BIAS )
+            TEST_ASSERT( Fixed::IsFuzzyZero( Vector3::Dot( vec1, vec1 ) - vec1.Magnitude() * vec1.Magnitude() ) )
+            TEST_ASSERT( Fixed::IsFuzzyZero( Vector3::Dot( vec2, vec2 ) - vec2.Magnitude() * vec2.Magnitude() ) )
         }
 
         void TestCross()
@@ -155,8 +154,8 @@ namespace fan
             Fixed   s = 42;
             TEST_ASSERT( Vector3::Cross( v1, v2 ) == -Vector3::Cross( v2, v1 ) );
             TEST_ASSERT( s * Vector3::Cross( v1, v2 ) == Vector3::Cross( s * v1, v2 ) )
-            TEST_ASSERT( s * Vector3::Cross( v1, v2 ) == Vector3::Cross( v1, s *  v2 ) )
-            TEST_ASSERT( Vector3::Cross( v1, v2 + v3 ) == Vector3::Cross( v1, v2 ) + Vector3::Cross(v1, v3 ) )
+            TEST_ASSERT( s * Vector3::Cross( v1, v2 ) == Vector3::Cross( v1, s * v2 ) )
+            TEST_ASSERT( Vector3::Cross( v1, v2 + v3 ) == Vector3::Cross( v1, v2 ) + Vector3::Cross( v1, v3 ) )
         }
     };
 }

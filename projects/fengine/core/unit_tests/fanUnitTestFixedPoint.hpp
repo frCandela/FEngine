@@ -23,6 +23,8 @@ namespace fan
                      { &UnitTestFixedPoint::TestMultiplication, "Addition" },
                      { &UnitTestFixedPoint::TestDivision,       "Division" },
                      { &UnitTestFixedPoint::TestModulo,         "Modulo" },
+                     { &UnitTestFixedPoint::TestRadians,        "radians conversion" },
+                     { &UnitTestFixedPoint::TestSign,           "Sign" },
                      { &UnitTestFixedPoint::TestFloor,          "Floor" },
                      { &UnitTestFixedPoint::TestCeil,           "Ceil" },
                      { &UnitTestFixedPoint::TestRound,          "Round" },
@@ -30,6 +32,7 @@ namespace fan
                      { &UnitTestFixedPoint::TestPowI,           "PowI" },
                      { &UnitTestFixedPoint::TestSin,            "Sin" },
                      { &UnitTestFixedPoint::TestCos,            "Cos" },
+                     { &UnitTestFixedPoint::TestACos,           "ACos" },
                      { &UnitTestFixedPoint::TestSqrt,           "Sqrt" },
             };
         }
@@ -43,17 +46,17 @@ namespace fan
         }
 
         // test two functions over an interval with a step size, return the maximal error
-        using FixedFunction = Fixed(*)( const Fixed& );
-        using DoubleFunction = double(*)( double );
+        using FixedFunction = Fixed( * )( const Fixed& );
+        using DoubleFunction = double ( * )( double );
         double MaxErrorFixedVsDouble( FixedFunction _fixed, DoubleFunction _double, double _start, double _end, double _step )
         {
-            double maxError = 0;
-            for( double     i     = _start; i < _end; i += _step )
+            double      maxError = 0;
+            for( double i        = _start; i < _end; i += _step )
             {
-                Fixed  sqrt         = (*_fixed)( Fixed( i ) );
-                double sqrtF        = sqrt.ToDouble();
-                double sqrtF_std    = (*_double)( i );
-                double diff         = std::abs( sqrtF - sqrtF_std );
+                Fixed  sqrt      = ( *_fixed )( Fixed( i ) );
+                double sqrtF     = sqrt.ToDouble();
+                double sqrtF_std = ( *_double )( i );
+                double diff      = std::abs( sqrtF - sqrtF_std );
                 maxError = std::max( maxError, diff );
             }
             return maxError;
@@ -115,7 +118,7 @@ namespace fan
 
         void TestComparisons()
         {
-            static_assert(  1_fx < 2_fx);
+            static_assert( 1_fx < 2_fx );
 
             TEST_ASSERT( 2.5_fx > 1.5_fx )
             TEST_ASSERT( 2.5_fx >= 1.5_fx )
@@ -131,7 +134,7 @@ namespace fan
 
         void TestAddition()
         {
-            static_assert(  1_fx + 2_fx == 3_fx );
+            static_assert( 1_fx + 2_fx == 3_fx );
 
             // (+)
             TEST_ASSERT( 1.5_fx + 2.25_fx == 3.75_fx );
@@ -153,7 +156,7 @@ namespace fan
 
         void TestSubtraction()
         {
-            static_assert(  1_fx - 3_fx == -2_fx );
+            static_assert( 1_fx - 3_fx == -2_fx );
 
             // (-)
             TEST_ASSERT( 4.5_fx - 1.25_fx == 3.25_fx );
@@ -172,7 +175,7 @@ namespace fan
 
         void TestMultiplication()
         {
-            static_assert(  2_fx * 3_fx == 6_fx );
+            static_assert( 2_fx * 3_fx == 6_fx );
 
             // (*)
             TEST_ASSERT( 2_fx * 3_fx == 6_fx );
@@ -189,7 +192,7 @@ namespace fan
 
         void TestDivision()
         {
-            static_assert(  6_fx / 2_fx == 3_fx );
+            static_assert( 6_fx / 2_fx == 3_fx );
 
             // (/)
             TEST_ASSERT( 6_fx / 2_fx == 3_fx );
@@ -204,7 +207,7 @@ namespace fan
 
         void TestModulo()
         {
-            static_assert(  3_fx % 2_fx == 1_fx );
+            static_assert( 3_fx % 2_fx == 1_fx );
 
             // (%)
             TEST_ASSERT( 7_fx % 2_fx == 1_fx );
@@ -224,9 +227,36 @@ namespace fan
             TEST_ASSERT( ( -8.5_fx %= -2_fx ) == -0.5_fx );
         }
 
+        void TestRadians()
+        {
+            static_assert( Fixed::Radians( 0 ) == FIXED( 0 ) );
+            static_assert( Fixed::Degrees( 0 ) == FIXED( 0 ) );
+
+
+            // Radians
+            TEST_ASSERT( Fixed::IsFuzzyZero( Fixed::Radians( 90 ) - FX_HALF_PI ) );
+            TEST_ASSERT( Fixed::IsFuzzyZero( Fixed::Radians( 180 ) - FX_PI ) );
+            TEST_ASSERT( Fixed::IsFuzzyZero( Fixed::Radians( -180 ) - ( -FX_PI ) ) );
+
+            double d = ( Fixed::Degrees( FX_HALF_PI ) - 90 ).ToDouble();
+            (void)d;
+
+            // Radians
+            TEST_ASSERT( Fixed::IsFuzzyZero( Fixed::Degrees( FX_HALF_PI ) - 90 ) );
+            TEST_ASSERT( Fixed::IsFuzzyZero( Fixed::Degrees( FX_PI ) - 180 ) );
+            TEST_ASSERT( Fixed::IsFuzzyZero( Fixed::Degrees( -FX_PI ) - ( -180 ) ) );
+        }
+
+        void TestSign()
+        {
+            static_assert( Fixed::Sign( 1 ) == FIXED( 1 ) );
+            TEST_ASSERT( Fixed::Sign( -1 ) == -1_fx );
+            TEST_ASSERT( Fixed::Sign( 0 ) == 1_fx );
+        }
+
         void TestFloor()
         {
-            static_assert(  Fixed::Floor( 1.6_fx) == 1_fx );
+            static_assert( Fixed::Floor( 1.6_fx ) == 1_fx );
 
             TEST_ASSERT( Fixed::Floor( 1.5_fx ) == 1_fx );
             TEST_ASSERT( Fixed::Floor( -1.5_fx ) == -2_fx );
@@ -236,7 +266,7 @@ namespace fan
 
         void TestCeil()
         {
-            static_assert(  Fixed::Ceil( 0.4_fx) == 1_fx );
+            static_assert( Fixed::Ceil( 0.4_fx ) == 1_fx );
 
             TEST_ASSERT( Fixed::Ceil( 1.5_fx ) == 2_fx );
             TEST_ASSERT( Fixed::Ceil( -1.5_fx ) == -1_fx );
@@ -246,7 +276,7 @@ namespace fan
 
         void TestRound()
         {
-            static_assert(  Fixed::Round( 1.6_fx) == 2_fx );
+            static_assert( Fixed::Round( 1.6_fx ) == 2_fx );
 
             TEST_ASSERT( Fixed::Round( 1.6_fx ) == 2_fx );
             TEST_ASSERT( Fixed::Round( 1.4_fx ) == 1_fx );
@@ -259,7 +289,7 @@ namespace fan
 
         void TestAbs()
         {
-            static_assert(  Fixed::Abs( -1_fx) == 1_fx );
+            static_assert( Fixed::Abs( -1_fx ) == 1_fx );
 
             TEST_ASSERT( Fixed::Abs( 1.5_fx ) == 1.5_fx );
             TEST_ASSERT( Fixed::Abs( -1.5_fx ) == 1.5_fx );
@@ -267,7 +297,7 @@ namespace fan
 
         void TestPowI()
         {
-            static_assert(  Fixed::PowI( 4_fx, 2) == 16_fx );
+            static_assert( Fixed::PowI( 4_fx, 2 ) == 16_fx );
 
             TEST_ASSERT( Fixed::PowI( 1.5_fx, 0 ) == 1_fx );
             TEST_ASSERT( Fixed::PowI( 1.5_fx, 2 ) == 2.25_fx );
@@ -278,36 +308,54 @@ namespace fan
 
         void TestSin()
         {
-            static_assert(  Fixed::Sin( 0_fx ) == 0_fx );
+            static_assert( Fixed::Sin( 0_fx ) == 0_fx );
 
-            TEST_ASSERT( Fixed::Floor( FX_PI * 10000_fx ) == 31415_fx )
-            TEST_ASSERT( Fixed::Floor( Fixed::Sin( FX_PI ) * 100_fx ) == 0_fx );
-            TEST_ASSERT( Fixed::Floor( Fixed::Sin( FX_HALF_PI ) * 100_fx )  == 1_fx * 100_fx );
-            TEST_ASSERT( Fixed::Floor( Fixed::Sin( -FX_HALF_PI ) * 100_fx )  == -1_fx * 100_fx );
+            TEST_ASSERT( Fixed::IsFuzzyZero( FX_PI - FIXED( 3.141592654 ) ) )
+            TEST_ASSERT( Fixed::IsFuzzyZero( Fixed::Sin( FX_PI ) ) );
+            TEST_ASSERT( Fixed::IsFuzzyZero( Fixed::Sin( FX_HALF_PI ) - 1 ) );
+            TEST_ASSERT( Fixed::IsFuzzyZero( Fixed::Sin( -FX_HALF_PI ) - ( -1 ) ) );
             TEST_ASSERT( Fixed::Sin( FX_PI + 1_fx ) == Fixed::Sin( -FX_PI + 1_fx ) );
             TEST_ASSERT( Fixed::Sin( -FX_PI - 1_fx ) == Fixed::Sin( FX_PI - 1_fx ) );
 
-            FixedFunction fxSin = &Fixed::Sin;
+            FixedFunction  fxSin     = &Fixed::Sin;
             DoubleFunction doubleSin = &std::sin;
-            double error = MaxErrorFixedVsDouble( fxSin, doubleSin,(-FX_TWO_PI).ToDouble(), (FX_TWO_PI).ToDouble(), 0.0001 );
+            double         error     = MaxErrorFixedVsDouble( fxSin,
+                                                              doubleSin,
+                                                              ( -FX_TWO_PI ).ToDouble(),
+                                                              ( FX_TWO_PI ).ToDouble(),
+                                                              0.0001 );
             TEST_ASSERT( error < 0.0005 ) // [0,1]
         }
 
         void TestCos()
         {
-            static_assert(  Fixed::Cos( 0_fx ) == 1_fx );
+            static_assert( Fixed::Cos( 0_fx ) == 1_fx );
 
-            TEST_ASSERT( Fixed::Floor( Fixed::Cos( FX_PI ) * 100_fx ) == -100_fx );
-            TEST_ASSERT( Fixed::Floor( Fixed::Cos( FX_HALF_PI ) * 100_fx ) == 0_fx );
-            TEST_ASSERT( Fixed::Floor( Fixed::Cos( -FX_HALF_PI ) * 100_fx ) == 0_fx );
+            TEST_ASSERT( Fixed::IsFuzzyZero( Fixed::Cos( FX_PI ) - ( -1 ) ) );
+            TEST_ASSERT( Fixed::IsFuzzyZero( Fixed::Cos( FX_HALF_PI ) ) );
+            TEST_ASSERT( Fixed::IsFuzzyZero( Fixed::Cos( -FX_HALF_PI ) ) );
 
             TEST_ASSERT( Fixed::Cos( FX_PI + 1_fx ) == Fixed::Cos( -FX_PI + 1_fx ) );
             TEST_ASSERT( Fixed::Cos( -FX_PI - 1_fx ) == Fixed::Cos( FX_PI - 1_fx ) );
 
-            FixedFunction fxCos = &Fixed::Cos;
+            FixedFunction  fxCos     = &Fixed::Cos;
             DoubleFunction doubleCos = &std::cos;
-            double error = MaxErrorFixedVsDouble( fxCos, doubleCos,(-FX_TWO_PI).ToDouble(), (FX_TWO_PI).ToDouble(), 0.0001 );
+            double         error     = MaxErrorFixedVsDouble( fxCos,
+                                                              doubleCos,
+                                                              ( -FX_TWO_PI ).ToDouble(),
+                                                              ( FX_TWO_PI ).ToDouble(),
+                                                              0.0001 );
             TEST_ASSERT( error < 0.0005 ) // [0,1]
+        }
+
+        void TestACos()
+        {
+            static_assert( Fixed::ACos( FIXED( 1 ) ) == 0 );
+
+            FixedFunction  fxACos     = &Fixed::ACos;
+            DoubleFunction doubleACos = &std::acos;
+            double         error      = MaxErrorFixedVsDouble( fxACos, doubleACos, -0.99, 0.99, 0.0001 );
+            TEST_ASSERT( error < 0.0005 ) // [-1,1]
         }
 
         void TestSqrt()

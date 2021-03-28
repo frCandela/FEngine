@@ -32,10 +32,10 @@ namespace fan
         Vector3& operator/=( const Fixed& _value ) { return ( *this = *this / _value ); }
 
         Vector3 operator+( const Vector3& _vec3 ) const { return Vector3( x + _vec3.x, y + _vec3.y, z + _vec3.z ); }
-        Vector3& operator+=( const Vector3& _vec3 ) { return ( *this += _vec3 ); }
+        Vector3& operator+=( const Vector3& _vec3 ) { return ( *this = *this + _vec3 ); }
 
         Vector3 operator-( const Vector3& _vec3 ) const { return Vector3( x - _vec3.x, y - _vec3.y, z - _vec3.z ); }
-        Vector3& operator-=( const Vector3& _vec3 ) { return ( *this -= _vec3 ); }
+        Vector3& operator-=( const Vector3& _vec3 ) { return ( *this = *this - _vec3 ); }
         Vector3 operator-() const { return Vector3( -x, -y, -z ); } // unary (-)
 
         static const Vector3 sBack;

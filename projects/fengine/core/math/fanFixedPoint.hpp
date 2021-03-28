@@ -14,7 +14,7 @@ namespace fan
         using DataType = int32_t;
         static constexpr int      sIntegerSize      = 16;
         static constexpr int      sFractionalSize   = 16;
-        static constexpr uint64_t sFixed_One        = 1 << sFractionalSize;
+        static constexpr uint64_t  sFixed_One        = 1 << sFractionalSize;
         static constexpr uint64_t sFixed_Half       = 1 << ( sFractionalSize - 1 );
         static constexpr uint64_t sFractionalMask   = sFixed_One - 1;
         static constexpr uint64_t sIntegerMask      = ~sFractionalMask;
@@ -29,11 +29,12 @@ namespace fan
         static constexpr double  sMax           = sMaxInteger + sMaxFractional;
         static constexpr double  sMin           = sMinInteger;
 
-        #define FIXED(str) [&]() { constexpr Fixed x = Fixed(#str); return x; }()
-        #define FX_TWO_PI   FIXED(6.283185307)
-        #define FX_PI       FIXED(3.141592654)
-        #define FX_HALF_PI  FIXED(1.570796327)
-        #define FX_BIAS     FIXED(0.0001)
+        #define FIXED( str ) [&]() { constexpr Fixed x = Fixed(#str); return x; }()
+        #define FX_TWO_PI       FIXED(6.283185307)
+        #define FX_PI           FIXED(3.141592654)
+        #define FX_HALF_PI      FIXED(1.570796327)
+        #define FX_BIAS         FIXED(0.0001)
+        #define FX_FUZZY_ZERO   FIXED(0.0005)
 
         constexpr Fixed() : mData( 0 ) {}
         constexpr Fixed( const int _integer ) : mData( static_cast<DataType>(_integer << sFractionalSize) ) {}
@@ -49,7 +50,6 @@ namespace fan
             f.mData = _data;
             return f;
         }
-
 
         DataType GetData() const { return mData; }
 
@@ -104,7 +104,7 @@ namespace fan
         constexpr Fixed operator*( const Fixed& _value ) const
         {
             Fixed result;
-            result.mData = DataType( int64_t( mData ) * int64_t( _value.mData ) / sFixed_One );
+            result.mData = DataType( int64_t( mData ) * int64_t( _value.mData ) / int64_t(sFixed_One) );
             return result;
         }
         constexpr Fixed& operator*=( const Fixed& _value )
@@ -137,6 +137,26 @@ namespace fan
         {
             *this = *this % _value;
             return *this;
+        }
+
+        static constexpr bool IsFuzzyZero( const Fixed& _value )
+        {
+            return Abs( _value ) < FX_FUZZY_ZERO;
+        }
+
+        static constexpr Fixed Degrees( const Fixed& _radians )
+        {
+            return ( FIXED( 180 ) * _radians ) / FX_PI;
+        }
+
+        static constexpr Fixed Radians( const Fixed& _degrees )
+        {
+            return ( FX_PI * _degrees ) / FIXED( 180 );
+        }
+
+        static constexpr Fixed Sign( const Fixed& _value )
+        {
+            return _value < 0 ? -1 : 1;
         }
 
         static constexpr Fixed Floor( const Fixed& _value )
@@ -226,6 +246,25 @@ namespace fan
             tmp8 /= Fixed( 8 ); // calculate in two parts to avoid overflow
             return Fixed( 1 ) - tmp2 + tmp4 - tmp6 + tmp8;
         }
+        static constexpr Fixed ACos( const Fixed& _value )
+        {
+            // https://developer.download.nvidia.com/cg/acos.html
+            // Handbook of Mathematical Functions
+            // M. Abramowitz and I.A. Stegun, Ed.
+            Fixed negate = _value < 0 ? 1 : 0;
+            Fixed x      = Fixed::Abs( _value );
+            Fixed ret    = FIXED( -0.0187293 );
+            ret *= x;
+            ret += FIXED( 0.0742610 );
+            ret *= x;
+            ret -= FIXED( 0.2121144 );
+            ret *= x;
+            ret += FIXED( 1.5707288 );
+            ret *= Fixed::Sqrt( FIXED( 1.0 ) - x );
+            ret -= FIXED( 2 ) * negate * ret;
+            return negate * FIXED( 3.14159265358979 ) + ret;
+        }
+
         static constexpr Fixed Sqrt( const Fixed& _value )
         {
             if( _value <= Fixed( 0 ) ){ return Fixed( 0 ); }
