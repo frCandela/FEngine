@@ -16,7 +16,9 @@ namespace fan
         constexpr Vector3( const Fixed& _x, const Fixed& _y, const Fixed& _z ) : x( _x ), y( _y ), z( _z ) {}
         constexpr Vector3( const Vector3& _other ) : x( _other.x ), y( _other.y ), z( _other.z ) {}
 
-        Fixed Magnitude() const { return Fixed::Sqrt( x * x + y * y + z * z ); }
+        Fixed SqrMagnitude() const { return x * x + y * y + z * z; }
+        Fixed Magnitude() const { return Fixed::Sqrt( SqrMagnitude() ); }
+
         void Normalize();
         Vector3 Normalized() const;
         static Fixed Dot( const Vector3& _v1, const Vector3& _v2 ) { return _v1.x * _v2.x + _v1.y * _v2.y + _v1.z * _v2.z; }

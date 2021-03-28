@@ -52,6 +52,12 @@ namespace fan
 
         void TestMagnitude()
         {
+            // sqrMagnitude
+            TEST_ASSERT( Vector3( -4, 0, 0 ).SqrMagnitude() == 16 )
+            TEST_ASSERT( Vector3( 1, -1, 0 ).SqrMagnitude() == 2 )
+            TEST_ASSERT( Vector3( -1, 2, -3 ).SqrMagnitude() == 14)
+
+            // magnitude
             TEST_ASSERT( Vector3( -4, 0, 0 ).Magnitude() == 4 )
             TEST_ASSERT( Vector3( 1, -1, 0 ).Magnitude() == Fixed::Sqrt( 2 ) )
             TEST_ASSERT( Vector3( -1, 2, -3 ).Magnitude() == Fixed::Sqrt( 14 ) )

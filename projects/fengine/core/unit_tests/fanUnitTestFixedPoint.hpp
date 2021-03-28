@@ -29,10 +29,14 @@ namespace fan
                      { &UnitTestFixedPoint::TestCeil,           "Ceil" },
                      { &UnitTestFixedPoint::TestRound,          "Round" },
                      { &UnitTestFixedPoint::TestAbs,            "Abs" },
+                     { &UnitTestFixedPoint::TestMin,            "Min" },
+                     { &UnitTestFixedPoint::TestMax,            "Max" },
                      { &UnitTestFixedPoint::TestPowI,           "PowI" },
                      { &UnitTestFixedPoint::TestSin,            "Sin" },
+                     { &UnitTestFixedPoint::TestASin,           "ASin" },
                      { &UnitTestFixedPoint::TestCos,            "Cos" },
                      { &UnitTestFixedPoint::TestACos,           "ACos" },
+                     { &UnitTestFixedPoint::TestATan2,          "ATan2" },
                      { &UnitTestFixedPoint::TestSqrt,           "Sqrt" },
             };
         }
@@ -48,15 +52,18 @@ namespace fan
         // test two functions over an interval with a step size, return the maximal error
         using FixedFunction = Fixed( * )( const Fixed& );
         using DoubleFunction = double ( * )( double );
-        double MaxErrorFixedVsDouble( FixedFunction _fixed, DoubleFunction _double, double _start, double _end, double _step )
+        double MaxErrorFixedVsDouble( FixedFunction _fixedFunction,
+                                      DoubleFunction _doubleFunction,
+                                      double _start,
+                                      double _end,
+                                      double _step )
         {
             double      maxError = 0;
             for( double i        = _start; i < _end; i += _step )
             {
-                Fixed  sqrt      = ( *_fixed )( Fixed( i ) );
-                double sqrtF     = sqrt.ToDouble();
-                double sqrtF_std = ( *_double )( i );
-                double diff      = std::abs( sqrtF - sqrtF_std );
+                double fixedResult  = ( *_fixedFunction )( Fixed::FromDouble( i ) ).ToDouble();
+                double doubleResult = ( *_doubleFunction )( i );
+                double diff         = std::abs( fixedResult - doubleResult );
                 maxError = std::max( maxError, diff );
             }
             return maxError;
@@ -74,24 +81,26 @@ namespace fan
 
         void TestFloats()
         {
-            TEST_ASSERT( Fixed( 5.0625f ).ToFloat() == 5.0625f );
-            TEST_ASSERT( Fixed( -5.0625f ).ToFloat() == -5.0625f );
-            TEST_ASSERT( Fixed( float( Fixed::sMaxInteger ) ).ToFloat() == Fixed::sMaxInteger );
-            TEST_ASSERT( Fixed( float( Fixed::sMax ) + 1.f ).ToFloat() != Fixed::sMax + 1.f );
-            TEST_ASSERT( Fixed( float( Fixed::sMin ) ).ToFloat() == Fixed::sMin );
-            TEST_ASSERT( Fixed( float( Fixed::sMin ) - 1.f ).ToFloat() != Fixed::sMin - 1.f );
+            TEST_ASSERT( Fixed::FromFloat( 5.0625f ).ToFloat() == 5.0625f );
+            TEST_ASSERT( Fixed::FromFloat( -5.0625f ).ToFloat() == -5.0625f );
+            TEST_ASSERT( Fixed::FromFloat( float( Fixed::sMaxInteger ) ).ToFloat() == Fixed::sMaxInteger );
+            TEST_ASSERT( Fixed::FromFloat( float( Fixed::sMax ) + 1.f ).ToFloat() != Fixed::sMax + 1.f );
+            TEST_ASSERT( Fixed::FromFloat( float( Fixed::sMin ) ).ToFloat() == Fixed::sMin );
+            TEST_ASSERT( Fixed::FromFloat( float( Fixed::sMin ) - 1.f ).ToFloat() != Fixed::sMin - 1.f );
         }
 
         void TestDoubles()
         {
-            TEST_ASSERT( Fixed( Fixed::sMinFractional ).ToDouble() == Fixed::sMinFractional );
-            TEST_ASSERT( Fixed( Fixed::sMinFractional / 2. ).ToDouble() != Fixed::sMinFractional / 2. );
-            TEST_ASSERT( Fixed( Fixed::sMaxFractional ).ToDouble() == Fixed::sMaxFractional );
-            TEST_ASSERT( Fixed( Fixed::sMaxFractional + Fixed::sMinFractional ).ToDouble() == 1. );
-            TEST_ASSERT( Fixed( Fixed::sMax ).ToDouble() == Fixed::sMax );
-            TEST_ASSERT( Fixed( Fixed::sMin ).ToDouble() == Fixed::sMin );
-            TEST_ASSERT( Fixed( Fixed::sMax + Fixed::sMinFractional ).ToDouble() != Fixed::sMax + Fixed::sMinFractional );
-            TEST_ASSERT( Fixed( Fixed::sMin - Fixed::sMinFractional ).ToDouble() != Fixed::sMin - Fixed::sMinFractional );
+            TEST_ASSERT( Fixed::FromDouble( Fixed::sMinFractional ).ToDouble() == Fixed::sMinFractional );
+            TEST_ASSERT( Fixed::FromDouble( Fixed::sMinFractional / 2. ).ToDouble() != Fixed::sMinFractional / 2. );
+            TEST_ASSERT( Fixed::FromDouble( Fixed::sMaxFractional ).ToDouble() == Fixed::sMaxFractional );
+            TEST_ASSERT( Fixed::FromDouble( Fixed::sMaxFractional + Fixed::sMinFractional ).ToDouble() == 1. );
+            TEST_ASSERT( Fixed::FromDouble( Fixed::sMax ).ToDouble() == Fixed::sMax );
+            TEST_ASSERT( Fixed::FromDouble( Fixed::sMin ).ToDouble() == Fixed::sMin );
+            TEST_ASSERT( Fixed::FromDouble( Fixed::sMax + Fixed::sMinFractional ).ToDouble() !=
+                         Fixed::sMax + Fixed::sMinFractional );
+            TEST_ASSERT( Fixed::FromDouble( Fixed::sMin - Fixed::sMinFractional ).ToDouble() !=
+                         Fixed::sMin - Fixed::sMinFractional );
         }
 
         void TestStrings()
@@ -291,8 +300,30 @@ namespace fan
         {
             static_assert( Fixed::Abs( -1_fx ) == 1_fx );
 
-            TEST_ASSERT( Fixed::Abs( 1.5_fx ) == 1.5_fx );
-            TEST_ASSERT( Fixed::Abs( -1.5_fx ) == 1.5_fx );
+            TEST_ASSERT( Fixed::Abs( 1.5_fx ) == 1.5_fx )
+            TEST_ASSERT( Fixed::Abs( -1.5_fx ) == 1.5_fx )
+        }
+
+        void TestMin()
+        {
+            static_assert( Fixed::Min( 1, 2 ) == 1 );
+
+            TEST_ASSERT( Fixed::Min( 0, 2 ) == 0 )
+            TEST_ASSERT( Fixed::Min( 2, 0 ) == 0 )
+            TEST_ASSERT( Fixed::Min( -2, 0 ) == -2 )
+            TEST_ASSERT( Fixed::Min( 0, -2 ) == -2 )
+            TEST_ASSERT( Fixed::Min( 0, 0 ) == 0 )
+        }
+
+        void TestMax()
+        {
+            static_assert( Fixed::Max( 1, 2 ) == 2 );
+
+            TEST_ASSERT( Fixed::Max( 0, 2 ) == 2 )
+            TEST_ASSERT( Fixed::Max( 2, 0 ) == 2 )
+            TEST_ASSERT( Fixed::Max( -2, 0 ) == 0 )
+            TEST_ASSERT( Fixed::Max( 0, -2 ) == 0 )
+            TEST_ASSERT( Fixed::Max( 0, 0 ) == 0 )
         }
 
         void TestPowI()
@@ -327,6 +358,16 @@ namespace fan
             TEST_ASSERT( error < 0.0005 ) // [0,1]
         }
 
+        void TestASin()
+        {
+            static_assert( Fixed::ASin( 1 ) == FX_HALF_PI );
+
+            FixedFunction  fxASin     = &Fixed::ASin;
+            DoubleFunction doubleASin = &std::asin;
+            double         error      = MaxErrorFixedVsDouble( fxASin, doubleASin, -0.99, 0.99, 0.0001 );
+            TEST_ASSERT( error < 0.0005 ) // [-1,1]
+        }
+
         void TestCos()
         {
             static_assert( Fixed::Cos( 0_fx ) == 1_fx );
@@ -356,6 +397,27 @@ namespace fan
             DoubleFunction doubleACos = &std::acos;
             double         error      = MaxErrorFixedVsDouble( fxACos, doubleACos, -0.99, 0.99, 0.0001 );
             TEST_ASSERT( error < 0.0005 ) // [-1,1]
+        }
+
+        void TestATan2()
+        {
+            static_assert( Fixed::ATan2( 0, 1 ) == 0 );
+
+            // test the error over the trigonometric circle
+            const double step     = 0.001;
+            double       maxError = 0;
+            for( double  angle    = 0; angle < glm::pi<double>(); angle += step )
+            {
+                const double x = std::cos( angle );
+                const double y = std::sin( angle );
+
+                double fixedResult  = Fixed::ATan2( Fixed::FromDouble( y ), Fixed::FromDouble( x ) ).ToDouble();
+                double doubleResult = std::atan2( y, x );
+                double diff         = std::abs( fixedResult - doubleResult );
+                maxError = std::max( maxError, diff );
+            }
+
+            TEST_ASSERT( maxError < 0.0005 )
         }
 
         void TestSqrt()
