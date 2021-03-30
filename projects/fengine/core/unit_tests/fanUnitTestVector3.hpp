@@ -103,6 +103,8 @@ namespace fan
             Fixed value = FIXED( 78.6 );
             TEST_ASSERT( value * vec3 == ( vec3 *= value ) )
             TEST_ASSERT( value * vec3 == vec3 * value )
+
+            TEST_ASSERT( Vector3( 2, -3, 4 ) * Vector3( 5, 6, 7 ) == Vector3( 10, -18, 28 ) )
         }
 
         void TestDivision()

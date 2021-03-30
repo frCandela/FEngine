@@ -29,6 +29,8 @@ namespace fan
 
         Vector3 operator*( const Fixed& _value ) const { return Vector3( _value * x, _value * y, _value * z ); }
         Vector3& operator*=( const Fixed& _value ) { return ( *this = *this * _value ); }
+        Vector3 operator*( const Vector3& _vec3 ) const { return Vector3( _vec3.x * x, _vec3.y * y, _vec3.z * z ); }
+        Vector3& operator*=( const Vector3& _vec3 ) { return ( *this = *this * _vec3 ); }
 
         Vector3 operator/( const Fixed& _value ) const { return Vector3( x / _value, y / _value, z / _value ); }
         Vector3& operator/=( const Fixed& _value ) { return ( *this = *this / _value ); }

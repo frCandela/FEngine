@@ -8,10 +8,9 @@ namespace fan
     //==========================================================================================================================
     // reference : http://www.sunshine2k.de/articles/coding/fp/sunfp.html#ch51
     //==========================================================================================================================
-    class Fixed
+    struct Fixed
     {
     private:
-        using DataType = int32_t;
         static constexpr int      sIntegerSize      = 16;
         static constexpr int      sFractionalSize   = 16;
         static constexpr uint64_t sFixed_One        = 1 << sFractionalSize;
@@ -22,6 +21,7 @@ namespace fan
         static_assert( ( sFractionalMask & sIntegerMask ) == 0 );
 
     public:
+        using DataType = int32_t;
         static constexpr int32_t sMaxInteger    = ( 1 << ( sIntegerSize - 1 ) ) - 1;
         static constexpr int32_t sMinInteger    = -sMaxInteger - 1;
         static constexpr double  sMinFractional = impl::FixedMinPositiveFractional( sFractionalSize );

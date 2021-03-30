@@ -3,6 +3,7 @@
 #include "core/fanAssert.hpp"
 #include "core/unit_tests/fanUnitTest.hpp"
 #include "core/math/fanQuaternion.hpp"
+#include "core/math/fanMathUtils.hpp"
 
 namespace fan
 {
@@ -21,6 +22,7 @@ namespace fan
                      { &UnitTestQuaternion::TestMultiply,       "multiply" },
                      { &UnitTestQuaternion::TestDivide,         "divide" },
                      { &UnitTestQuaternion::TestConjugate,      "conjugate" },
+                     { &UnitTestQuaternion::TestInverse,        "inverse" },
                      { &UnitTestQuaternion::TestEuler,          "euler" },
                      { &UnitTestQuaternion::TestAngle,          "angle" },
                      { &UnitTestQuaternion::TestAxis,           "axis" },
@@ -48,27 +50,27 @@ namespace fan
 
             TEST_ASSERT( Quaternion( 1, 2, 3, 4 ) == Quaternion( 1, { 2, 3, 4 } ) )
 
-            TEST_ASSERT( Quaternion() * Vector3(10,20,30) == Vector3(10,20,30) )
+            TEST_ASSERT( Quaternion() * Vector3( 10, 20, 30 ) == Vector3( 10, 20, 30 ) )
         }
 
         void TestMagnitude()
         {
-            Quaternion q;
-            TEST_ASSERT( q.Magnitude() == 1 );
+            //sqrMagnitude
+            TEST_ASSERT( Quaternion().SqrMagnitude() == 1 );
+            TEST_ASSERT( Quaternion( 1, 1, 1, 1 ).SqrMagnitude() == 4 );
+            TEST_ASSERT( Quaternion( -1, 1, -1, 1 ).SqrMagnitude() == 4 );
+            TEST_ASSERT( Quaternion( 1, 2, 3, 4 ).SqrMagnitude() == 30 );
 
-            q = Quaternion( 1, 1, 1, 1 );
-            TEST_ASSERT( q.Magnitude() == 2 );
-
-            q = Quaternion( -1, 1, -1, 1 );
-            TEST_ASSERT( q.Magnitude() == 2 );
-
-            q = Quaternion( 1, 2, 3, 4 );
-            TEST_ASSERT( q.Magnitude() == Fixed::Sqrt( 30 ) );
+            //magnitude
+            TEST_ASSERT( Quaternion().Magnitude() == 1 );
+            TEST_ASSERT( Quaternion( 1, 1, 1, 1 ).Magnitude() == 2 );
+            TEST_ASSERT( Quaternion( -1, 1, -1, 1 ).Magnitude() == 2 );
+            TEST_ASSERT( Quaternion( 1, 2, 3, 4 ).Magnitude() == Fixed::Sqrt( 30 ) );
         }
 
         void TestComparison()
         {
-            Quaternion q1(0,0,0,0);
+            Quaternion q1( 0, 0, 0, 0 );
             TEST_ASSERT( q1 == q1 );
             TEST_ASSERT( Quaternion( 1, 0, 0, 0 ) != q1 );
             TEST_ASSERT( Quaternion( 0, 1, 0, 0 ) != q1 );
@@ -83,7 +85,7 @@ namespace fan
             Quaternion q3( 12, 10, 11, 9 );
             TEST_ASSERT( q1 + q2 == q2 + q1 )
             TEST_ASSERT( ( q1 + q2 ) + q3 == q1 + ( q2 + q3 ) )
-            TEST_ASSERT( q1 + Quaternion(0,0,0,0) == q1 )
+            TEST_ASSERT( q1 + Quaternion( 0, 0, 0, 0 ) == q1 )
             TEST_ASSERT( q1 + q3 == Quaternion( 13, 14, 14, 11 ) )
 
             TEST_ASSERT( ( q1 += Quaternion( 1, 1, 1, 1 ) ) == Quaternion( 2, 5, 4, 3 ) )
@@ -95,7 +97,7 @@ namespace fan
             Quaternion q2( 7, 6, 5, 8 );
             TEST_ASSERT( q2 - q1 == Quaternion( 6, 2, 2, 6 ) )
             TEST_ASSERT( q1 - q2 == q1 + ( -q2 ) )
-            TEST_ASSERT( -q1 == Quaternion(0,0,0,0) - q1 )
+            TEST_ASSERT( -q1 == Quaternion( 0, 0, 0, 0 ) - q1 )
             TEST_ASSERT( ( q2 -= q1 ) == Quaternion( 6, 2, 2, 6 ) )
         }
 
@@ -103,7 +105,7 @@ namespace fan
         {
             // scalar multiplication
             Quaternion q( 6, 4, 3, 2 );
-            TEST_ASSERT( q * 0 == Quaternion(0,0,0,0) )
+            TEST_ASSERT( q * 0 == Quaternion( 0, 0, 0, 0 ) )
             TEST_ASSERT( q * 1 == q )
             TEST_ASSERT( q * 2 == Quaternion( 12, 8, 6, 4 ) )
             TEST_ASSERT( q * 2 == 2 * q )
@@ -129,6 +131,14 @@ namespace fan
             Quaternion q( 6, 4, 3, 2 );
             Quaternion p( 1, 12, 17, 9 );
             TEST_ASSERT( ( q * p ).Conjugate() == p.Conjugate() * q.Conjugate() )
+        }
+
+        void TestInverse()
+        {
+            Quaternion q( 6, 4, 3, 2 );
+            Vector3 vec( 1, 12, 17 );
+            TEST_ASSERT( Fixed::IsFuzzyZero( ( q * q.Inverse() - Quaternion::sIdentity ).SqrMagnitude() ) )
+            TEST_ASSERT( Fixed::Abs( ( q.Inverse() * ( q * vec ) - vec ).Magnitude() ) < FIXED(0.006) ) // bad precision...
         }
 
         void TestEuler()

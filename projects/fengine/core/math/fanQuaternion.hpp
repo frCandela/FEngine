@@ -17,8 +17,10 @@ namespace fan
 
         static const Quaternion sIdentity;
 
-        Fixed Magnitude() const { return Fixed::Sqrt( n * n + v.x * v.x + v.y * v.y + v.z * v.z ); }
+        Fixed SqrMagnitude() const { return n * n + v.x * v.x + v.y * v.y + v.z * v.z; }
+        Fixed Magnitude() const { return Fixed::Sqrt( SqrMagnitude() ); }
         Quaternion Conjugate() const { return { n, -v }; }
+        Quaternion Inverse() const { return Conjugate() / SqrMagnitude(); }
         Fixed Angle() const { return FIXED( 2 ) * Fixed::ACos( n ); }
         Vector3 Axis() const { return v.Normalized(); }
         Vector3 Euler() const;
