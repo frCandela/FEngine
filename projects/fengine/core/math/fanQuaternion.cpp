@@ -38,24 +38,24 @@ namespace fan
     //==========================================================================================================================
     Vector3 Quaternion::Euler() const
     {
-        Fixed  r11, r21, r31, r32, r33, r12, r13;
-        Fixed  q00, q11, q22, q33;
-        Fixed  tmp;
+        Fixed   r11, r21, r31, r32, r33, r12, r13;
+        Fixed   q00, q11, q22, q33;
+        Fixed   tmp;
         Vector3 u;
         q00 = n * n;
         q11 = v.x * v.x;
         q22 = v.y * v.y;
         q33 = v.z * v.z;
         r11 = q00 + q11 - q22 - q33;
-        r21 = Fixed(2) * ( v.x * v.y + n * v.z );
-        r31 = Fixed(2) * ( v.x * v.z - n * v.y );
-        r32 = Fixed(2) * ( v.y * v.z + n * v.x );
+        r21 = Fixed( 2 ) * ( v.x * v.y + n * v.z );
+        r31 = Fixed( 2 ) * ( v.x * v.z - n * v.y );
+        r32 = Fixed( 2 ) * ( v.y * v.z + n * v.x );
         r33 = q00 - q11 - q22 + q33;
         tmp = Fixed::Abs( r31 );
-        if( tmp > FIXED(0.999999) )
+        if( tmp > FIXED( 0.999999 ) )
         {
-            r12 = Fixed(2) * ( v.x * v.y - n * v.z );
-            r13 = Fixed(2) * ( v.x * v.z + n * v.y );
+            r12 = Fixed( 2 ) * ( v.x * v.y - n * v.z );
+            r13 = Fixed( 2 ) * ( v.x * v.z + n * v.y );
             u.x = Fixed::Degrees( 0 ); //roll
             u.y = Fixed::Degrees( ( -( FX_PI / 2 ) * r31 / tmp ) );   // pitch
             u.z = Fixed::Degrees( Fixed::ATan2( -r12, -r31 * r13 ) ); // yaw
@@ -69,7 +69,18 @@ namespace fan
 
     //==========================================================================================================================
     //==========================================================================================================================
-    Quaternion Quaternion::FromEuler( const Vector3& _degrees )
+    Quaternion Quaternion::AngleAxis( const Fixed _degrees, const Vector3& _axis )
+    {
+        const Fixed halfRadians = Fixed::Radians( _degrees ) / 2;
+        Quaternion  q;
+        q.n = Fixed::Cos( halfRadians );
+        q.v = Fixed::Sin( halfRadians ) * _axis.Normalized();
+        return q;
+    }
+
+    //==========================================================================================================================
+    //==========================================================================================================================
+    Quaternion Quaternion::Euler( const Vector3& _degrees )
     {
         Quaternion q;
         Fixed      roll  = Fixed::Radians( _degrees.x );

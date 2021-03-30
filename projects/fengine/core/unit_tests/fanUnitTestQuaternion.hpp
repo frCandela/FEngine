@@ -27,6 +27,7 @@ namespace fan
                      { &UnitTestQuaternion::TestAngle,          "angle" },
                      { &UnitTestQuaternion::TestAxis,           "axis" },
                      { &UnitTestQuaternion::TestEulerRotations, "euler rotation" },
+                     { &UnitTestQuaternion::TestAngleAxis,      "angle axis" },
             };
         }
 
@@ -136,9 +137,9 @@ namespace fan
         void TestInverse()
         {
             Quaternion q( 6, 4, 3, 2 );
-            Vector3 vec( 1, 12, 17 );
+            Vector3    vec( 1, 12, 17 );
             TEST_ASSERT( Fixed::IsFuzzyZero( ( q * q.Inverse() - Quaternion::sIdentity ).SqrMagnitude() ) )
-            TEST_ASSERT( Fixed::Abs( ( q.Inverse() * ( q * vec ) - vec ).Magnitude() ) < FIXED(0.006) ) // bad precision...
+            TEST_ASSERT( Fixed::Abs( ( q.Inverse() * ( q * vec ) - vec ).Magnitude() ) < FIXED( 0.006 ) ) // bad precision...
         }
 
         void TestEuler()
@@ -146,14 +147,14 @@ namespace fan
             const Fixed angleMinDelta = FIXED( .01 );
 
             Vector3    eulerIn   = Vector3( 10, 20, 30 );
-            Quaternion eulerQuat = Quaternion::FromEuler( eulerIn );
+            Quaternion eulerQuat = Quaternion::Euler( eulerIn );
             Vector3    eulerOut  = eulerQuat.Euler();
             TEST_ASSERT( Fixed::Abs( eulerIn.x - eulerOut.x ) < angleMinDelta )
             TEST_ASSERT( Fixed::Abs( eulerIn.y - eulerOut.y ) < angleMinDelta )
             TEST_ASSERT( Fixed::Abs( eulerIn.z - eulerOut.z ) < angleMinDelta )
 
             eulerIn   = Vector3( -5, 17, 225 );
-            eulerQuat = Quaternion::FromEuler( eulerIn );
+            eulerQuat = Quaternion::Euler( eulerIn );
             eulerOut  = eulerQuat.Euler();
             TEST_ASSERT( ( Fixed::Abs( eulerIn.x - eulerOut.x ) + 360 ) % 360 < angleMinDelta )
             TEST_ASSERT( ( Fixed::Abs( eulerIn.y - eulerOut.y ) + 360 ) % 360 < angleMinDelta )
@@ -163,63 +164,72 @@ namespace fan
         void TestAngle()
         {
             const Fixed angleMinDelta = FIXED( .02 );
-            Fixed       angle         = Fixed::Degrees( Quaternion::FromEuler( 10, 0, 0 ).Angle() );
+            Fixed       angle         = Fixed::Degrees( Quaternion::Euler( 10, 0, 0 ).Angle() );
             TEST_ASSERT( Fixed::Abs( angle - 10 ) < angleMinDelta )
 
-            angle = Fixed::Degrees( Quaternion::FromEuler( 10, 0, 0 ).Angle() );
+            angle = Fixed::Degrees( Quaternion::Euler( 10, 0, 0 ).Angle() );
             TEST_ASSERT( Fixed::Abs( angle - 10 ) < angleMinDelta )
 
-            angle = Fixed::Degrees( Quaternion::FromEuler( 0, 5, 0 ).Angle() );
+            angle = Fixed::Degrees( Quaternion::Euler( 0, 5, 0 ).Angle() );
             TEST_ASSERT( Fixed::Abs( angle - 5 ) < angleMinDelta )
 
-            angle = Fixed::Degrees( Quaternion::FromEuler( 0, 0, 44 ).Angle() );
+            angle = Fixed::Degrees( Quaternion::Euler( 0, 0, 44 ).Angle() );
             TEST_ASSERT( Fixed::Abs( angle - 44 ) < angleMinDelta )
 
-            angle = Fixed::Degrees( Quaternion::FromEuler( 0, 0, 0 ).Angle() );
+            angle = Fixed::Degrees( Quaternion::Euler( 0, 0, 0 ).Angle() );
             TEST_ASSERT( Fixed::IsFuzzyZero( angle ) )
         }
 
         void TestAxis()
         {
-            Vector3 axis = Quaternion::FromEuler( 90, 0, 0 ).Axis();
+            Vector3 axis = Quaternion::Euler( 90, 0, 0 ).Axis();
             TEST_ASSERT( Fixed::IsFuzzyZero( ( axis - Vector3::sLeft ).SqrMagnitude() ) )
 
-            axis = Quaternion::FromEuler( 0, 45, 0 ).Axis();
+            axis = Quaternion::Euler( 0, 45, 0 ).Axis();
             TEST_ASSERT( Fixed::IsFuzzyZero( ( axis - Vector3::sUp ).SqrMagnitude() ) )
 
-            axis = Quaternion::FromEuler( 0, 0, -30 ).Axis();
+            axis = Quaternion::Euler( 0, 0, -30 ).Axis();
             TEST_ASSERT( Fixed::IsFuzzyZero( ( axis - Vector3::sBack ).SqrMagnitude() ) )
         }
 
         void TestEulerRotations()
         {
-            Quaternion rotateX = Quaternion::FromEuler( 90, 0, 0 );
+            Quaternion rotateX = Quaternion::Euler( 90, 0, 0 );
             TEST_ASSERT( rotateX * Vector3::sUp == Vector3::sForward )
             TEST_ASSERT( rotateX * Vector3::sForward == Vector3::sDown )
             TEST_ASSERT( rotateX * Vector3::sDown == Vector3::sBack )
             TEST_ASSERT( rotateX * Vector3::sBack == Vector3::sUp )
 
-            Quaternion rotateY = Quaternion::FromEuler( 0, 90, 0 );
+            Quaternion rotateY = Quaternion::Euler( 0, 90, 0 );
             TEST_ASSERT( rotateY * Vector3::sRight == Vector3::sForward )
             TEST_ASSERT( rotateY * Vector3::sForward == Vector3::sLeft )
             TEST_ASSERT( rotateY * Vector3::sLeft == Vector3::sBack )
             TEST_ASSERT( rotateY * Vector3::sBack == Vector3::sRight )
 
-            Quaternion rotateZ = Quaternion::FromEuler( 0, 0, -90 );
+            Quaternion rotateZ = Quaternion::Euler( 0, 0, -90 );
             TEST_ASSERT( rotateZ * Vector3::sUp == Vector3::sLeft )
             TEST_ASSERT( rotateZ * Vector3::sLeft == Vector3::sDown )
             TEST_ASSERT( rotateZ * Vector3::sDown == Vector3::sRight )
             TEST_ASSERT( rotateZ * Vector3::sRight == Vector3::sUp )
 
-            Vector3 rotated = Quaternion::FromEuler( 0, 45, 0 ) * Vector3::sForward;
+            Vector3 rotated = Quaternion::Euler( 0, 45, 0 ) * Vector3::sForward;
             TEST_ASSERT( rotated.y == 0 )
             TEST_ASSERT( rotated.x == Fixed::Sqrt( 2 ) / 2 )
             TEST_ASSERT( Fixed::IsFuzzyZero( rotated.z - rotated.x ) )
 
-            Vector3 unRotated = ( Quaternion::FromEuler( 0, -45, 0 ) * Quaternion::FromEuler( 0, 45, 0 ) ) * Vector3::sForward;
+            Vector3 unRotated = ( Quaternion::Euler( 0, -45, 0 ) * Quaternion::Euler( 0, 45, 0 ) ) * Vector3::sForward;
             TEST_ASSERT( unRotated == Vector3::sForward )
-            unRotated = Quaternion::FromEuler( 0, -45, 0 ) * ( Quaternion::FromEuler( 0, 45, 0 ) * Vector3::sForward );
+            unRotated = Quaternion::Euler( 0, -45, 0 ) * ( Quaternion::Euler( 0, 45, 0 ) * Vector3::sForward );
             TEST_ASSERT( Fixed::IsFuzzyZero( ( unRotated - Vector3::sForward ).Magnitude() ) )
+        }
+
+        void TestAngleAxis()
+        {
+            TEST_ASSERT( Quaternion::AngleAxis( 45, Vector3::sUp) == Quaternion::Euler(0,45,0))
+            TEST_ASSERT( Quaternion::AngleAxis( 90, Vector3::sLeft) == Quaternion::Euler(90,0,0))
+            TEST_ASSERT( Quaternion::AngleAxis( 135, Vector3::sForward) == Quaternion::Euler(0,0,135))
+
+            TEST_ASSERT( Quaternion::AngleAxis( 90, Vector3::sRight) == Quaternion::Euler(-90,0,0))
         }
     };
 }

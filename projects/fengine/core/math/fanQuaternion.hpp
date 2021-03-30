@@ -24,8 +24,9 @@ namespace fan
         Fixed Angle() const { return FIXED( 2 ) * Fixed::ACos( n ); }
         Vector3 Axis() const { return v.Normalized(); }
         Vector3 Euler() const;
-        static Quaternion FromEuler( const Vector3& _degrees );
-        static Quaternion FromEuler( const Fixed _x, const Fixed _y, const Fixed _z ) { return FromEuler( Vector3( _x, _y, _z ) ); }
+        static Quaternion AngleAxis( const Fixed _degrees, const Vector3& _axis );
+        static Quaternion Euler( const Vector3& _degrees );
+        static Quaternion Euler( const Fixed _x, const Fixed _y, const Fixed _z ) { return Euler( Vector3( _x, _y, _z ) ); }
         static Quaternion Multiply( const Quaternion& q, const Vector3& v );
         static Quaternion Multiply( const Vector3& v, const Quaternion& q );
 
