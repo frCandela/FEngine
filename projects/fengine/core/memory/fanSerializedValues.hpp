@@ -12,7 +12,6 @@ class btVector4;
 namespace fan
 {
 	class Color;
-	struct btVector2;
 
 	//========================================================================================================
 	// holds global editor value that are saved/restored

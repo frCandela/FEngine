@@ -28,6 +28,7 @@ namespace fan
                      { &UnitTestQuaternion::TestAxis,           "axis" },
                      { &UnitTestQuaternion::TestEulerRotations, "euler rotation" },
                      { &UnitTestQuaternion::TestAngleAxis,      "angle axis" },
+                     { &UnitTestQuaternion::TestLookRotation,   "look rotation" },
             };
         }
 
@@ -42,12 +43,12 @@ namespace fan
         void TestConstructors()
         {
             Quaternion q;
-            TEST_ASSERT( q.n == 1 )
-            TEST_ASSERT( q.v == Vector3::sZero )
+            TEST_ASSERT( q.mAngle == 1 )
+            TEST_ASSERT( q.mAxis == Vector3::sZero )
 
             Quaternion q1( 1, 2, 3, 4 );
-            TEST_ASSERT( q1.n == 1 )
-            TEST_ASSERT( q1.v == Vector3( 2, 3, 4 ) )
+            TEST_ASSERT( q1.mAngle == 1 )
+            TEST_ASSERT( q1.mAxis == Vector3( 2, 3, 4 ) )
 
             TEST_ASSERT( Quaternion( 1, 2, 3, 4 ) == Quaternion( 1, { 2, 3, 4 } ) )
 
@@ -66,7 +67,13 @@ namespace fan
             TEST_ASSERT( Quaternion().Magnitude() == 1 );
             TEST_ASSERT( Quaternion( 1, 1, 1, 1 ).Magnitude() == 2 );
             TEST_ASSERT( Quaternion( -1, 1, -1, 1 ).Magnitude() == 2 );
-            TEST_ASSERT( Quaternion( 1, 2, 3, 4 ).Magnitude() == Fixed::Sqrt( 30 ) );
+            TEST_ASSERT( Quaternion( 1, 2, 3, 4 ).Magnitude() == Fixed::Sqrt( 30 ) )
+
+            //normalized
+            TEST_ASSERT( Quaternion::sIdentity.Normalized() == Quaternion::sIdentity )
+            const Quaternion q = Quaternion( 1, 2, 3, 4 );
+            TEST_ASSERT( !Fixed::IsFuzzyZero( q.Magnitude() - 1 ) )
+            TEST_ASSERT( Fixed::IsFuzzyZero( q.Normalized().Magnitude() - 1 ) );
         }
 
         void TestComparison()
@@ -225,11 +232,31 @@ namespace fan
 
         void TestAngleAxis()
         {
-            TEST_ASSERT( Quaternion::AngleAxis( 45, Vector3::sUp) == Quaternion::Euler(0,45,0))
-            TEST_ASSERT( Quaternion::AngleAxis( 90, Vector3::sLeft) == Quaternion::Euler(90,0,0))
-            TEST_ASSERT( Quaternion::AngleAxis( 135, Vector3::sForward) == Quaternion::Euler(0,0,135))
+            TEST_ASSERT( Quaternion::AngleAxis( 45, Vector3::sUp ) == Quaternion::Euler( 0, 45, 0 ) )
+            TEST_ASSERT( Quaternion::AngleAxis( 90, Vector3::sLeft ) == Quaternion::Euler( 90, 0, 0 ) )
+            TEST_ASSERT( Quaternion::AngleAxis( 135, Vector3::sForward ) == Quaternion::Euler( 0, 0, 135 ) )
+            TEST_ASSERT( Quaternion::AngleAxis( 90, Vector3::sRight ) == Quaternion::Euler( -90, 0, 0 ) )
+        }
 
-            TEST_ASSERT( Quaternion::AngleAxis( 90, Vector3::sRight) == Quaternion::Euler(-90,0,0))
+        void TestLookRotation()
+        {
+            TEST_ASSERT( Quaternion::LookRotation( Vector3::sForward ) == Quaternion::sIdentity )
+
+            Quaternion lookRotation = Quaternion::LookRotation( Vector3( 1, 0, 0 ) );
+            TEST_ASSERT( Vector3::IsFuzzyZero( lookRotation * Vector3::sForward - Vector3( 1, 0, 0 ) ) )
+
+            lookRotation = Quaternion::LookRotation( Vector3( 0, 1, 1 ) );
+            TEST_ASSERT( Vector3::IsFuzzyZero( lookRotation * Vector3::sForward - Vector3( 0, 1, 1 ).Normalized() ) )
+
+            lookRotation = Quaternion::LookRotation( Vector3( 1, 1, 1 ) );
+            TEST_ASSERT( Vector3::IsFuzzyZero( lookRotation * Vector3::sForward - Vector3( 1, 1, 1 ).Normalized() ) )
+
+            lookRotation = Quaternion::LookRotation( Vector3( -FIXED( 0.5 ), -FIXED( 0.3 ), FIXED( 0.7 ) ) );
+            TEST_ASSERT( Vector3::IsFuzzyZero( lookRotation * Vector3::sForward - Vector3( -FIXED( 0.5 ), -FIXED( 0.3 ), FIXED( 0.7 ) ).Normalized() ) )
+
+            lookRotation = Quaternion::LookRotation( Vector3::sBack );
+            glm::vec3 glq = Math::ToGLM( lookRotation * Vector3::sForward );
+            TEST_ASSERT( Vector3::IsFuzzyZero( lookRotation * Vector3::sForward - Vector3::sBack ) )
         }
     };
 }

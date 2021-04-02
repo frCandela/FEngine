@@ -16,10 +16,10 @@ namespace fan
     glm::quat Math::ToGLM( const Quaternion& _quat )
     {
         glm::quat rotation;
-        rotation.x = _quat.v.x.ToFloat();
-        rotation.y = _quat.v.y.ToFloat();
-        rotation.z = _quat.v.z.ToFloat();
-        rotation.w = _quat.n.ToFloat();
+        rotation.x = _quat.mAxis.x.ToFloat();
+        rotation.y = _quat.mAxis.y.ToFloat();
+        rotation.z = _quat.mAxis.z.ToFloat();
+        rotation.w = _quat.mAngle.ToFloat();
         return rotation;
     }
 }
