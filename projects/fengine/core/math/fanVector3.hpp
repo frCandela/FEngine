@@ -18,11 +18,14 @@ namespace fan
 
         Fixed SqrMagnitude() const { return x * x + y * y + z * z; }
         Fixed Magnitude() const { return Fixed::Sqrt( SqrMagnitude() ); }
-
         void Normalize();
         Vector3 Normalized() const;
+        bool IsNormalized() const { return Fixed::IsFuzzyZero( SqrMagnitude() - 1 ); }
+        static void OrthoNormalize( Vector3& _normal, Vector3& _tangent );
         static Fixed Dot( const Vector3& _v1, const Vector3& _v2 ) { return _v1.x * _v2.x + _v1.y * _v2.y + _v1.z * _v2.z; }
+        static Fixed SignedAngle( const Vector3& _v1, const Vector3& _v2, const Vector3& _normal );
         static Vector3 Cross( const Vector3& _v1, const Vector3& _v2 );
+        static bool IsFuzzyZero( const Vector3& _vec3 ) { return Fixed::IsFuzzyZero( _vec3.x ) && Fixed::IsFuzzyZero( _vec3.y ) && Fixed::IsFuzzyZero( _vec3.z ); }
 
         bool operator==( const Vector3& _vec3 ) const { return _vec3.x == x && _vec3.y == y && _vec3.z == z; }
         bool operator!=( const Vector3& _vec3 ) const { return !( *this == _vec3 ); }

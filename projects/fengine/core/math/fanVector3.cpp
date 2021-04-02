@@ -1,15 +1,16 @@
+#include <core/fanAssert.hpp>
 #include "core/math/fanVector3.hpp"
 
 namespace fan
 {
-    const Vector3 Vector3::sBack	= Vector3(0, 0, -1);
-    const Vector3 Vector3::sDown	= Vector3(0, -1, 0);
-    const Vector3 Vector3::sForward	= Vector3(0, 0, 1);
-    const Vector3 Vector3::sLeft    = Vector3(1, 0, 0);
-    const Vector3 Vector3::sOne	    = Vector3(1, 1, 1);
-    const Vector3 Vector3::sRight   = Vector3(-1, 0, 0);
-    const Vector3 Vector3::sUp	    = Vector3(0, 1, 0);
-    const Vector3 Vector3::sZero    = Vector3(0, 0, 0);
+    const Vector3 Vector3::sBack    = Vector3( 0, 0, -1 );
+    const Vector3 Vector3::sDown    = Vector3( 0, -1, 0 );
+    const Vector3 Vector3::sForward = Vector3( 0, 0, 1 );
+    const Vector3 Vector3::sLeft    = Vector3( 1, 0, 0 );
+    const Vector3 Vector3::sOne     = Vector3( 1, 1, 1 );
+    const Vector3 Vector3::sRight   = Vector3( -1, 0, 0 );
+    const Vector3 Vector3::sUp      = Vector3( 0, 1, 0 );
+    const Vector3 Vector3::sZero    = Vector3( 0, 0, 0 );
 
     //==========================================================================================================================
     //==========================================================================================================================
@@ -34,6 +35,32 @@ namespace fan
         Vector3 cpy( *this );
         cpy.Normalize();
         return cpy;
+    }
+
+    //==========================================================================================================================
+    // Makes vectors normalized and orthogonal to each other.
+    // Normalizes normal. Normalizes tangent and makes sure it is orthogonal to normal.
+    // Uses Gram–Schmidt process
+    //==========================================================================================================================
+    void Vector3::OrthoNormalize( Vector3& _normal, Vector3& _tangent )
+    {
+        fanAssertMsg( _normal.IsNormalized(), "Vector3::OrthoNormalize: _normal is not normalized" );
+        Fixed dot = Vector3::Dot( _tangent, _normal );
+        _tangent -= dot * _normal;
+        _tangent.Normalize();
+    }
+
+    //==========================================================================================================================
+    //==========================================================================================================================
+    Fixed Vector3::SignedAngle( const Vector3& _v1, const Vector3& _v2, const Vector3& _normal )
+    {
+        const Fixed   angle = Fixed::ACos( Vector3::Dot( _v1.Normalized(), _v2.Normalized() ) );
+        const Vector3 cross = Vector3::Cross( _v1, _v2 );
+        if( Vector3::Dot( _normal, cross ) < 0 )
+        {
+            return -Fixed::Degrees( angle );
+        }
+        return Fixed::Degrees( angle );
     }
 
     //==========================================================================================================================

@@ -23,6 +23,8 @@ namespace fan
                      { &UnitTestVector3::TestAddSubstract,   "addition subtraction" },
                      { &UnitTestVector3::TestDot,            "dot" },
                      { &UnitTestVector3::TestCross,          "cross" },
+                     { &UnitTestVector3::TestOrthoNormalize, "ortho normalize" },
+                     { &UnitTestVector3::TestSignedAngle,    "signed angle" },
             };
         }
 
@@ -55,7 +57,7 @@ namespace fan
             // sqrMagnitude
             TEST_ASSERT( Vector3( -4, 0, 0 ).SqrMagnitude() == 16 )
             TEST_ASSERT( Vector3( 1, -1, 0 ).SqrMagnitude() == 2 )
-            TEST_ASSERT( Vector3( -1, 2, -3 ).SqrMagnitude() == 14)
+            TEST_ASSERT( Vector3( -1, 2, -3 ).SqrMagnitude() == 14 )
 
             // magnitude
             TEST_ASSERT( Vector3( -4, 0, 0 ).Magnitude() == 4 )
@@ -75,6 +77,11 @@ namespace fan
 
             vec3 = { FIXED( -12.867 ), FIXED( 4.6 ), FIXED( -25.8 ) };
             TEST_ASSERT( Fixed::IsFuzzyZero( Fixed( 1 ) - vec3.Normalized().Magnitude() ) )
+
+            // is normalized
+            TEST_ASSERT( Vector3::sUp.IsNormalized() )
+            TEST_ASSERT( !Vector3::sZero.IsNormalized() )
+            TEST_ASSERT( !( 2 * Vector3::sUp ).IsNormalized() )
         }
 
         void TestComparison()
@@ -165,5 +172,57 @@ namespace fan
             TEST_ASSERT( s * Vector3::Cross( v1, v2 ) == Vector3::Cross( v1, s * v2 ) )
             TEST_ASSERT( Vector3::Cross( v1, v2 + v3 ) == Vector3::Cross( v1, v2 ) + Vector3::Cross( v1, v3 ) )
         }
+
+        void TestOrthoNormalize()
+        {
+            Vector3 v1 = Vector3::sUp;
+            Vector3 v2 = Vector3( 0, 1, 1 );
+            Vector3::OrthoNormalize( v1, v2 );
+            TEST_ASSERT( v1 == Vector3::sUp )
+            TEST_ASSERT( v2 == Vector3::sForward )
+            TEST_ASSERT( Vector3::Dot( v1, v2 ) == 0 )
+            TEST_ASSERT( v1.Magnitude() == 1 )
+            TEST_ASSERT( v2.Magnitude() == 1 )
+
+            v1 = Vector3( -5, 4, 7 ).Normalized();
+            v2 = Vector3( 1, -6, -2 );
+            Vector3::OrthoNormalize( v1, v2 );
+            TEST_ASSERT( Fixed::IsFuzzyZero( v1.Magnitude() - 1 ) )
+            TEST_ASSERT( Fixed::IsFuzzyZero( v2.Magnitude() - 1 ) )
+            TEST_ASSERT( Fixed::IsFuzzyZero( Vector3::Dot( v1, v2 ) ) )
+            TEST_ASSERT( Fixed::IsFuzzyZero( Vector3::Dot( v1, v1 ) - v1.SqrMagnitude() ) )
+        }
+
+        void TestSignedAngle()
+        {
+            const Fixed angularTolerance = FIXED( 0.005 );
+
+            Fixed angle = Vector3::SignedAngle( Vector3::sForward, Vector3::sForward, Vector3::sForward );
+            TEST_ASSERT( Fixed::Abs( angle - 0 ) < angularTolerance )
+
+            angle = Vector3::SignedAngle( Vector3::sForward, Vector3::sForward, Vector3::sUp );
+            TEST_ASSERT( Fixed::Abs( angle - 0 ) < angularTolerance )
+
+            angle = Vector3::SignedAngle( Vector3::sForward, Vector3::sUp, Vector3::sRight );
+            TEST_ASSERT( Fixed::Abs( angle - 90 ) < angularTolerance )
+
+            angle = Vector3::SignedAngle( Vector3::sForward, Vector3::sUp, -Vector3::sRight );
+            TEST_ASSERT( Fixed::Abs( angle - ( -90 ) ) < angularTolerance )
+
+            angle = Vector3::SignedAngle( Vector3::sForward, Vector3::sBack, -Vector3::sUp );
+            TEST_ASSERT( Fixed::Abs( angle - ( 180 ) ) < angularTolerance )
+        }
     };
 }
+
+
+
+
+
+
+
+
+
+
+
+
