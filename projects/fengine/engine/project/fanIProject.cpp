@@ -15,6 +15,9 @@
 #include "engine/singletons/fanApplication.hpp"
 #include "network/singletons/fanTime.hpp"
 
+// fixed point
+#include "engine/components/fanFxTransform.hpp"
+
 // physics
 #include "engine/components/fanRigidbody.hpp"
 #include "engine/components/fanMotionState.hpp"
@@ -74,6 +77,8 @@ namespace fan
         _world.AddComponentType<ExpirationTime>();
         _world.AddComponentType<FollowTransform>();
         _world.AddComponentType<Bounds>();
+
+        _world.AddComponentType<FxTransform>();
 
         _world.AddSingletonType<Scene>();
         _world.AddSingletonType<SceneResources>();

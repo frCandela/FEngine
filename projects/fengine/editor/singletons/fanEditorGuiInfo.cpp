@@ -64,6 +64,7 @@
 #include "editor/gui/scene/components/fanGuiSceneNode.hpp"
 #include "editor/gui/scene/components/fanGuiSphereShape.hpp"
 #include "editor/gui/scene/components/fanGuiTransform.hpp"
+#include "editor/gui/scene/components/fanGuiFxTransform.hpp"
 
 namespace fan
 {
@@ -143,6 +144,8 @@ namespace fan
         editorGui.mComponentInfos[ SceneNode::Info::sType ]   = GuiSceneNode::GetInfo();
         editorGui.mComponentInfos[ SphereShape::Info::sType ]   = GuiSphereShape::GetInfo();
         editorGui.mComponentInfos[ Transform::Info::sType ]   = GuiTransform::GetInfo();
+
+        editorGui.mComponentInfos[ FxTransform::Info::sType ]   = GuiFxTransform::GetInfo();
     }
 
     //========================================================================================================

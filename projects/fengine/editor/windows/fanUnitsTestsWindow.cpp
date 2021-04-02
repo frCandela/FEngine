@@ -16,7 +16,7 @@
 #include "core/unit_tests/fanUnitTestVector3.hpp"
 #include "core/unit_tests/fanUnitTestMatrix3.hpp"
 #include "core/unit_tests/fanUnitTestQuaternion.hpp"
-
+#include "engine//unit_tests/fanUnitTestFxTransform.hpp"
 
 namespace fan
 {
@@ -26,25 +26,26 @@ namespace fan
 
     //========================================================================================================
     //========================================================================================================
-    std::vector<UnitTestsWindow::TestArgument> UnitTestsWindow::GetTests() {
+    std::vector<UnitTestsWindow::TestArgument> UnitTestsWindow::GetTests()
+    {
         return {
-                { "Mesh manager",       &UnitTestMeshManager::RunTests,     mMeshManagerResult },
-                { "Mesh2D manager",     &UnitTestMesh2DManager::RunTests,   mMesh2DManagerResult },
-                { "Texture manager",    &UnitTestTextureManager::RunTests,  mTextureManagerResult },
-                { "Prefab manager",     &UnitTestPrefabManager::RunTests,   mPrefabManagerResult },
-                { "Font manager",       &UnitTestFontManager::RunTests,   mFontManagerResult },
+                { "Mesh manager", &UnitTestMeshManager::RunTests, mMeshManagerResult },
+                { "Mesh2D manager", &UnitTestMesh2DManager::RunTests, mMesh2DManagerResult },
+                { "Texture manager", &UnitTestTextureManager::RunTests, mTextureManagerResult },
+                { "Prefab manager", &UnitTestPrefabManager::RunTests, mPrefabManagerResult },
+                { "Font manager", &UnitTestFontManager::RunTests, mFontManagerResult },
 #ifndef NDEBUG
-                 { "fanAssert",         &UnitTestFanAssert::RunTests,       mFanAssertResult },
+                { "fanAssert", &UnitTestFanAssert::RunTests, mFanAssertResult },
 #endif
-                { "Mouse",              &UnitTestMouse::RunTests, mGlfwMouseResult },
-                { "Signal",             &UnitTestSignal::RunTests, mSignalResult },
-                { "Ecs",                &UnitTestEcs::RunTests, mEcsResult },
-                { "Path",               &UnitTestPath::RunTests, mPathResult },
-                { "FixedPoint",         &UnitTestFixedPoint::RunTests, mFixedPointResult },
-                { "Vector3",            &UnitTestVector3::RunTests, mVector3Result },
-                { "Matrix3",            &UnitTestMatrix3::RunTests, mMatrix3Result },
-                { "Quaternion",         &UnitTestQuaternion::RunTests, mQuaternionResult },
-
+                { "Mouse", &UnitTestMouse::RunTests, mGlfwMouseResult },
+                { "Signal", &UnitTestSignal::RunTests, mSignalResult },
+                { "Ecs", &UnitTestEcs::RunTests, mEcsResult },
+                { "Path", &UnitTestPath::RunTests, mPathResult },
+                { "FixedPoint", &UnitTestFixedPoint::RunTests, mFixedPointResult },
+                { "Vector3", &UnitTestVector3::RunTests, mVector3Result },
+                { "Matrix3", &UnitTestMatrix3::RunTests, mMatrix3Result },
+                { "Quaternion", &UnitTestQuaternion::RunTests, mQuaternionResult },
+                { "FxTransform", &UnitTestFxTransform::RunTests, mFxTransformResult },
         };
     }
 
@@ -55,9 +56,9 @@ namespace fan
     {
         SCOPED_PROFILE( unit_tests_window );
 
-       const std::vector<TestArgument> tests = GetTests();
+        const std::vector<TestArgument> tests = GetTests();
 
-        if( ImGui::Button("Test all"))
+        if( ImGui::Button( "Test all" ) )
         {
             bool oldValueAssertBreakEnabled = AssertUtils::sFanAssertBreakEnabled;
 
@@ -68,12 +69,12 @@ namespace fan
             AssertUtils::sFanAssertBreakEnabled          = oldValueAssertBreakEnabled;
         }
         ImGui::SameLine();
-        if( ImGui::Button("Clear all"))
+        if( ImGui::Button( "Clear all" ) )
         {
             for( const TestArgument& testArgument : tests ){ ClearTest( testArgument ); }
         }
 #ifndef NDEBUG
-        if( System::HasDebugger())
+        if( System::HasDebugger() )
         {
             ImGui::SameLine();
             ImGui::Checkbox( "enable break", &AssertUtils::sFanAssertBreakEnabled );
@@ -87,7 +88,7 @@ namespace fan
     //========================================================================================================
     void UnitTestsWindow::RunTest( const TestArgument& _testArgument )
     {
-        _testArgument.mTestDisplay =  ( *_testArgument.mRunMethod )();
+        _testArgument.mTestDisplay = ( *_testArgument.mRunMethod )();
     }
 
     //========================================================================================================
@@ -101,17 +102,17 @@ namespace fan
     //========================================================================================================
     void UnitTestsWindow::DrawUnitTest( const TestArgument& _testArgument )
     {
-        ImGui::SetCursorPosY( ImGui::GetCursorPosY() + 3  );
+        ImGui::SetCursorPosY( ImGui::GetCursorPosY() + 3 );
         DrawStatusIcon( _testArgument.mTestDisplay.mTotalStatus );
         ImGui::SameLine();
-        ImGui::SetCursorPosY( ImGui::GetCursorPosY() - 3  );
+        ImGui::SetCursorPosY( ImGui::GetCursorPosY() - 3 );
         if( ImGui::CollapsingHeader( _testArgument.mName ) )
         {
             ImGui::Indent();
-            std::string testButtonName = "Test##" + std::string(_testArgument.mName);
+            std::string testButtonName = "Test##" + std::string( _testArgument.mName );
             if( ImGui::Button( testButtonName.c_str() ) ){ RunTest( _testArgument ); }
             ImGui::SameLine();
-            std::string clearButtonName = "Clear##" + std::string(_testArgument.mName);
+            std::string clearButtonName = "Clear##" + std::string( _testArgument.mName );
             if( ImGui::Button( clearButtonName.c_str() ) ){ ClearTest( _testArgument ); }
 
             ImGui::Columns( 2 );
@@ -151,7 +152,7 @@ namespace fan
                 ImGui::Icon( ImGui::IconType::CheckSuccess16, iconSize, ImVec4( 0, 1, 0, 1 ) );
                 break;
             default:
-               fanAssert( false );
+                fanAssert( false );
                 break;
         }
     }
