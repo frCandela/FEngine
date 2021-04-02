@@ -355,4 +355,5 @@ namespace fan
     static_assert( sizeof( Fixed ) == 4 );
 
     constexpr Fixed operator "" _fx( const char* _string ) { return Fixed( _string ); }
+    constexpr inline Fixed operator+( const int _int, const Fixed& _value ) { return Fixed(_int) + _value; }
 }

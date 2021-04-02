@@ -161,6 +161,10 @@ namespace fan
             TEST_ASSERT( ++g == 2.5_fx );
             TEST_ASSERT( g++ == 2.5_fx );
             TEST_ASSERT( g == 3.5_fx );
+
+            // integer addition
+            TEST_ASSERT( 2 + FIXED(3.5) == FIXED(5.5) );
+            TEST_ASSERT( -3 + FIXED(3.5) == FIXED(0.5) );
         }
 
         void TestSubtraction()
