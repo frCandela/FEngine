@@ -29,7 +29,7 @@ namespace fan
         static constexpr double  sMax           = sMaxInteger + sMaxFractional;
         static constexpr double  sMin           = sMinInteger;
 
-        #define FIXED( str ) [&]() { constexpr Fixed x = Fixed(#str); return x; }()
+        #define FIXED( str ) ([]() { constexpr Fixed x = Fixed(#str); return x; }())
         #define FX_TWO_PI       FIXED(6.283185307)
         #define FX_PI           FIXED(3.141592654)
         #define FX_HALF_PI      FIXED(1.570796327)
@@ -356,4 +356,5 @@ namespace fan
 
     constexpr Fixed operator "" _fx( const char* _string ) { return Fixed( _string ); }
     constexpr inline Fixed operator+( const int _int, const Fixed& _value ) { return Fixed(_int) + _value; }
+    constexpr inline Fixed operator/( const int _int, const Fixed& _value ) { return Fixed(_int) / _value; }
 }

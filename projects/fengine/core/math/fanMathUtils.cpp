@@ -22,4 +22,23 @@ namespace fan
         rotation.w = _quat.mAngle.ToFloat();
         return rotation;
     }
+
+    //========================================================================================================
+    //========================================================================================================
+    Vector3 Math::ToFixed( const glm::vec3& _vec )
+    {
+        return Vector3( Fixed::FromFloat( _vec.x ), Fixed::FromFloat( _vec.y ), Fixed::FromFloat( _vec.z ) );
+    }
+
+    //========================================================================================================
+    //========================================================================================================
+    Quaternion Math::ToFixed( const glm::quat& _quat )
+    {
+        Quaternion rotation;
+        rotation.mAxis.x = Fixed::FromFloat( _quat.x );
+        rotation.mAxis.y = Fixed::FromFloat( _quat.y );
+        rotation.mAxis.z = Fixed::FromFloat( _quat.z );
+        rotation.mAngle  = Fixed::FromFloat( _quat.w );
+        return rotation;
+    }
 }

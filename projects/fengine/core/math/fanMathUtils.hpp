@@ -14,6 +14,8 @@ namespace fan
     {
         static glm::vec3 ToGLM( const Vector3& _vec );
         static glm::quat ToGLM( const Quaternion& _quat );
+        static Vector3 ToFixed( const glm::vec3& _vec );
+        static Quaternion ToFixed( const glm::quat& _quat );
     };
 
     static const btVector3 btVector3_Left    = btVector3( 1.f, 0.f, 0.f );
