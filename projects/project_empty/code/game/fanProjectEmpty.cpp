@@ -99,7 +99,12 @@ namespace fan
     void ProjectEmpty::UpdateRenderWorld()
     {
         SCOPED_PROFILE( update_render_world );
-        mWorld.ForceRun<SUpdateRenderWorldModels>();
+
+        RenderWorld& renderWorld = mWorld.GetSingleton<RenderWorld>();
+        renderWorld.drawData.clear();
+
+        mWorld.ForceRun<SUpdateRenderWorldModels>( renderWorld );
+        mWorld.ForceRun<SUpdateRenderWorldModelsFixed>( renderWorld );
         mWorld.ForceRun<SUpdateRenderWorldUI>();
         mWorld.ForceRun<SUpdateRenderWorldPointLights>();
         mWorld.ForceRun<SUpdateRenderWorldDirectionalLights>();

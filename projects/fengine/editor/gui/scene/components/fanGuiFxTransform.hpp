@@ -61,15 +61,14 @@ namespace fan
                         std::abs( rotation.y ) < 0.01 ? 0.f : rotation.y,
                         std::abs( rotation.z ) < 0.01 ? 0.f : rotation.z
                 };
-                if( ImGui::DragFloat3( "rotation", &rotation[0], 0.1f ) )
+                const float speed = 0.1f;
+                if( ImGui::DragFloat3( "rotation", &rotation[0], speed ) )
                 {
                     Vector3 newRotation = { Fixed::FromFloat( rotation.x ), Fixed::FromFloat( rotation.y ), Fixed::FromFloat( rotation.z ) };
-                    newRotation         = {
-                            Fixed::IsFuzzyZero( newRotation.x - oldRotation.x ) ? oldRotation.x : newRotation.x,
-                            Fixed::IsFuzzyZero( newRotation.y - oldRotation.y ) ? oldRotation.y : newRotation.y,
-                            Fixed::IsFuzzyZero( newRotation.z - oldRotation.z ) ? oldRotation.z : newRotation.z
-                    };
-                    transform.mRotation = Quaternion::Euler( newRotation );
+                    if( ( newRotation - oldRotation ).Magnitude() > Fixed::FromFloat(speed) )
+                    {
+                        transform.mRotation = Quaternion::Euler( newRotation );
+                    }
                 }
 
                 // Scale

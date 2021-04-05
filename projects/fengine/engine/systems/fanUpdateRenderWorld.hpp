@@ -3,6 +3,7 @@
 #include "engine/singletons/fanRenderWorld.hpp"
 #include "engine/components/fanMeshRenderer.hpp"
 #include "engine/components/fanTransform.hpp"
+#include "engine/components/fanFxTransform.hpp"
 #include "engine/components/fanSceneNode.hpp"
 #include "engine/components/fanMaterial.hpp"
 #include "engine/components/ui/fanUITransform.hpp"
@@ -21,16 +22,12 @@ namespace fan
 		static EcsSignature GetSignature( const EcsWorld& _world )
 		{
 			return	 _world.GetSignature<MeshRenderer>()
-				| _world.GetSignature<SceneNode>()
 				| _world.GetSignature<Transform>()
 				| _world.GetSignature<Material>();
 		}
 
-		static void Run( EcsWorld& _world, const EcsView& _view )
+		static void Run( EcsWorld&, const EcsView& _view, RenderWorld& _renderWorld )
 		{
-			RenderWorld& renderWorld = _world.GetSingleton<RenderWorld>();
-			renderWorld.drawData.clear();
-
 			auto meshRendererIt = _view.begin<MeshRenderer>();
 			auto transformIt = _view.begin<Transform>();
 			auto materialIt = _view.begin<Material>();
@@ -53,11 +50,53 @@ namespace fan
 					data.mColor        = material.mColor.ToGLM();
 					data.mShininess    = material.mShininess;
 
-					renderWorld.drawData.push_back( data );
+                    _renderWorld.drawData.push_back( data );
 				}
 			}
 		}
 	};
+
+    //========================================================================================================
+    // Update the render world rendered meshes
+    //========================================================================================================
+    struct SUpdateRenderWorldModelsFixed : EcsSystem
+    {
+        static EcsSignature GetSignature( const EcsWorld& _world )
+        {
+            return _world.GetSignature<MeshRenderer>()
+                   | _world.GetSignature<FxTransform>()
+                   | _world.GetSignature<Material>();
+        }
+
+        static void Run( EcsWorld&, const EcsView& _view, RenderWorld& _renderWorld  )
+        {
+            auto meshRendererIt = _view.begin<MeshRenderer>();
+            auto transformIt    = _view.begin<FxTransform>();
+            auto materialIt     = _view.begin<Material>();
+            // get all mesh and adds them to the render world
+            for( ; meshRendererIt != _view.end<MeshRenderer>();
+                   ++meshRendererIt, ++transformIt, ++materialIt )
+            {
+                MeshRenderer& meshRenderer = *meshRendererIt;
+                FxTransform   & transform    = *transformIt;
+                Material    & material     = *materialIt;
+
+                if( meshRenderer.mMesh.IsValid() )
+                {
+                    // drawMesh data;
+                    RenderDataModel data;
+                    data.mMesh         = *meshRenderer.mMesh;
+                    data.mModelMatrix  = transform.GetModelMatrix();
+                    data.mNormalMatrix = transform.GetNormalMatrix();
+                    data.mTextureIndex = material.mTexture.IsValid() ? material.mTexture->mIndex : 0;
+                    data.mColor        = material.mColor.ToGLM();
+                    data.mShininess    = material.mShininess;
+
+                    _renderWorld.drawData.push_back( data );
+                }
+            }
+        }
+    };
 
 	//========================================================================================================
     // Get all ui mesh and adds them to the render world
