@@ -134,9 +134,10 @@ namespace fan
 					mOnReloadIcons.Emmit();
 				}
 
-                if ( ImGui::MenuItem( "Reload ecs infos" ) )
+                if( ImGui::MenuItem( "Reload ecs infos" ) )
                 {
                     _world.ReloadInfos();
+                    EditorGuiInfo::Init( _world, _world.GetSingleton<EditorGuiInfo>() );
                 }
 
 				ImGui::Separator();

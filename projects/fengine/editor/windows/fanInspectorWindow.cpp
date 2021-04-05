@@ -138,7 +138,9 @@ namespace fan
             std::vector<std::string> next;
             std::string              rootDir = SplitPaths( _current, next );
 
-            if( ImGui::BeginMenu( rootDir.c_str() ) )
+            std::string dirDisplayName = rootDir;
+            if( dirDisplayName.ends_with('/')){ dirDisplayName.pop_back(); }
+            if( ImGui::BeginMenu( dirDisplayName.c_str() ) )
             {
                 R_DrawHierarchy( next, _fullPath + rootDir, _world, _components, _componentsPath );
                 ImGui::EndMenu();
