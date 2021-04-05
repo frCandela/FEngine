@@ -16,7 +16,7 @@ namespace fan
             info.mIcon       = ImGui::IconType::Transform16;
             info.mGroup      = EngineGroups::Scene;
             info.onGui       = &GuiFxTransform::OnGui;
-            info.mEditorPath = "/";
+            info.mEditorPath = "fixedPoint/";
             info.mEditorName = "fxTransform";
             return info;
         }

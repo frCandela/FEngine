@@ -1,10 +1,11 @@
 #include "game/fanProjectVoxels.hpp"
 
 #include "core/math/fanFixedPoint.hpp"
-#include <core/math/fanQuaternion.hpp>
-#include <engine/singletons/fanRenderDebug.hpp>
+#include "core/math/fanQuaternion.hpp"
 #include "core/time/fanScopedTimer.hpp"
 #include "network/singletons/fanTime.hpp"
+#include "engine/singletons/fanRenderDebug.hpp"
+#include "engine/systems/physics/fanUpdateFxRigidbodies.hpp"
 #include "engine/systems/fanUpdateBounds.hpp"
 #include "engine/systems/fanUpdateUIText.hpp"
 #include "engine/systems/fanRaycastUI.hpp"
@@ -69,7 +70,7 @@ namespace fan
 	}
 
 	//============================================================================================================================
-    //	//========================================================================================================================
+    //============================================================================================================================
 	void  ProjectVoxels::Step( const float _delta )
 	{
         SCOPED_PROFILE( step );
@@ -78,6 +79,11 @@ namespace fan
         PhysicsWorld& physicsWorld = mWorld.GetSingleton<PhysicsWorld>();
         mWorld.Run<SSynchronizeMotionStateFromTransform>();
         physicsWorld.mDynamicsWorld->stepSimulation( _delta, 10, Time::sPhysicsDelta );
+
+        {
+            mWorld.Run<SIntegrateFxRigidbodies>( Fixed::FromFloat( _delta ) );
+        }
+
         mWorld.Run<SSynchronizeTransformFromMotionState>();
         mWorld.Run<SMoveFollowTransforms>();
 

@@ -25,6 +25,9 @@
 #include "engine/components/fanSphereShape.hpp"
 #include "engine/singletons/fanPhysicsWorld.hpp"
 
+// fxPhysics
+#include "engine/components/physics/fanFxRigidbody.hpp"
+
 //render 3D
 #include "engine/components/fanDirectionalLight.hpp"
 #include "engine/components/fanPointLight.hpp"
@@ -96,6 +99,8 @@ namespace fan
         _world.AddComponentType<MotionState>();
         _world.AddComponentType<BoxShape>();
         _world.AddComponentType<SphereShape>();
+
+        _world.AddComponentType<FxRigidbody>();
 
         _world.AddSingletonType<PhysicsWorld>();
     }
