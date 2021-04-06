@@ -15,11 +15,12 @@ namespace fan
         static void Save( const EcsComponent& _component, Json& _json );
         static void Load( EcsComponent& _component, const Json& _json );
 
-        static const constexpr Fixed sGravitation = FIXED(9.807);
-        static const constexpr Fixed sDamping = FIXED( 1 ); // [0,1] removes the energy added from numerical instability in the integrator
-
         Fixed   mInverseMass;
         Vector3 mVelocity;
-        Vector3 mAcceleration;
+        Vector3 mAcceleration; // constant forces
+
+        Vector3 mForcesAccumulator;
+
+        void ApplyForce(const Vector3& _force ){ mForcesAccumulator += _force; }
     };
 }

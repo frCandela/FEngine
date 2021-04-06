@@ -27,6 +27,7 @@
 
 // fxPhysics
 #include "engine/components/physics/fanFxRigidbody.hpp"
+#include "engine/singletons/fanFxPhysicsWorld.hpp"
 
 //render 3D
 #include "engine/components/fanDirectionalLight.hpp"
@@ -83,6 +84,7 @@ namespace fan
 
         _world.AddComponentType<FxTransform>();
 
+
         _world.AddSingletonType<Scene>();
         _world.AddSingletonType<SceneResources>();
         _world.AddSingletonType<ScenePointers>();
@@ -95,14 +97,15 @@ namespace fan
     //========================================================================================================
     void IProject::EcsIncludePhysics ( EcsWorld& _world )
     {
+        _world.AddSingletonType<PhysicsWorld>();
         _world.AddComponentType<Rigidbody>();
         _world.AddComponentType<MotionState>();
         _world.AddComponentType<BoxShape>();
         _world.AddComponentType<SphereShape>();
 
+        _world.AddSingletonType<FxPhysicsWorld>();
         _world.AddComponentType<FxRigidbody>();
 
-        _world.AddSingletonType<PhysicsWorld>();
     }
 
     //========================================================================================================

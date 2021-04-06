@@ -64,10 +64,11 @@
 #include "editor/gui/scene/components/fanGuiSceneNode.hpp"
 #include "editor/gui/scene/components/fanGuiSphereShape.hpp"
 #include "editor/gui/scene/components/fanGuiTransform.hpp"
-#include "editor/gui/scene/components/fanGuiFxTransform.hpp"
 
 // Fx physics
+#include "editor/gui/scene/components/fanGuiFxTransform.hpp"
 #include "editor/gui/scene/components/physics/fanGuiFxRigidbody.hpp"
+#include "editor/gui/scene/singletons/fanGuiFxPhysicsWorld.hpp"
 
 namespace fan
 {
@@ -148,7 +149,9 @@ namespace fan
         editorGui.mComponentInfos[ SphereShape::Info::sType ]   = GuiSphereShape::GetInfo();
         editorGui.mComponentInfos[ Transform::Info::sType ]   = GuiTransform::GetInfo();
 
+        // fx physics
         editorGui.mComponentInfos[ FxRigidbody::Info::sType ]   = GuiFxRigidbody::GetInfo();
+        editorGui.mSingletonInfos[ FxPhysicsWorld::Info::sType ] = GuiFxPhysicsWorld::GetInfo();
 
         editorGui.mComponentInfos[ FxTransform::Info::sType ]   = GuiFxTransform::GetInfo();
     }

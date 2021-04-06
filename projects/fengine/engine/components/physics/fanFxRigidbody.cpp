@@ -18,8 +18,9 @@ namespace fan
         // clear
         FxRigidbody& rb = static_cast<FxRigidbody&>( _component );
         rb.mVelocity     = Vector3::sZero;
-        rb.mAcceleration = Vector3( 0, -sGravitation, 0 );
-        rb.mInverseMass  = 1;
+        rb.mAcceleration = Vector3::sZero;
+        rb.mForcesAccumulator = Vector3::sZero;
+        rb.mInverseMass = 1;
     }
 
     //========================================================================================================

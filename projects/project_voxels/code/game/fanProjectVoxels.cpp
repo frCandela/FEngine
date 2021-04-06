@@ -23,6 +23,7 @@
 
 #include "game/components/fanTestComponent.hpp"
 #include "game/singletons/fanTestSingleton.hpp"
+#include "game/systems/fanTestSystem.hpp"
 
 #include "editor/fanRegisterEditorGui.hpp"
 
@@ -35,14 +36,14 @@ namespace fan
         mName = "project_voxels";
     }
 
-	//==========================================================================================================================
-	//==========================================================================================================================
-	void ProjectVoxels::Init()
-	{
+    //==========================================================================================================================
+    //==========================================================================================================================
+    void ProjectVoxels::Init()
+    {
         EcsIncludeEngine( mWorld );
-        EcsIncludePhysics(mWorld);
-        EcsIncludeRender3D(mWorld);
-        EcsIncludeRenderUI(mWorld);
+        EcsIncludePhysics( mWorld );
+        EcsIncludeRender3D( mWorld );
+        EcsIncludeRenderUI( mWorld );
 
         mWorld.AddComponentType<TestComponent>();
         mWorld.AddSingletonType<TestSingleton>();
@@ -50,30 +51,31 @@ namespace fan
 #ifdef FAN_EDITOR
         RegisterEditorGuiInfos( mWorld.GetSingleton<EditorGuiInfo>() );
 #endif
-	}
+    }
 
-	//==========================================================================================================================
-	//==========================================================================================================================
-	void ProjectVoxels::Start()
-	{
+    //==========================================================================================================================
+    //==========================================================================================================================
+    void ProjectVoxels::Start()
+    {
         mWorld.Run<SRegisterAllRigidbodies>();
         MeshManager& meshManager = *mWorld.GetSingleton<RenderResources>().mMeshManager;
         RenderWorld& renderWorld = mWorld.GetSingleton<RenderWorld>();
         meshManager.Add( renderWorld.mParticlesMesh, "particles_mesh_" + mName );
-	}
+    }
 
-	//==========================================================================================================================
-	//==========================================================================================================================
-	void  ProjectVoxels::Stop()
-	{
+    //==========================================================================================================================
+    //==========================================================================================================================
+    void ProjectVoxels::Stop()
+    {
+    }
 
-	}
-
-	//============================================================================================================================
     //============================================================================================================================
-	void  ProjectVoxels::Step( const float _delta )
-	{
+    //============================================================================================================================
+    void ProjectVoxels::Step( const float _delta )
+    {
         SCOPED_PROFILE( step );
+
+        const Fixed fxDelta = Fixed::FromFloat( _delta );
 
         // physics & transforms
         PhysicsWorld& physicsWorld = mWorld.GetSingleton<PhysicsWorld>();
@@ -81,8 +83,10 @@ namespace fan
         physicsWorld.mDynamicsWorld->stepSimulation( _delta, 10, Time::sPhysicsDelta );
 
         {
-            mWorld.Run<SIntegrateFxRigidbodies>( Fixed::FromFloat( _delta ) );
+            FxPhysicsWorld& fxPhysicsWorld = mWorld.GetSingleton<FxPhysicsWorld>();
+            mWorld.Run<SIntegrateFxRigidbodies>( fxDelta, fxPhysicsWorld );
         }
+        mWorld.Run<STestSystem>( fxDelta );
 
         mWorld.Run<SSynchronizeTransformFromMotionState>();
         mWorld.Run<SMoveFollowTransforms>();
@@ -100,7 +104,7 @@ namespace fan
         mWorld.Run<SUpdateParticles>( _delta );
         mWorld.Run<SEmitParticles>( _delta );
         mWorld.Run<SGenerateParticles>( _delta );
-	}
+    }
 
     //==========================================================================================================================
     //==========================================================================================================================
@@ -127,7 +131,7 @@ namespace fan
     //==========================================================================================================================
     void ProjectVoxels::OnGui()
     {
-        if( ImGui::Begin("testoss"))
+        if( ImGui::Begin( "testoss" ) )
         {
             ImGui::End();
         }

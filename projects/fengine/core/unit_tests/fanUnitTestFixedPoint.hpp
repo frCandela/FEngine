@@ -176,6 +176,8 @@ namespace fan
             TEST_ASSERT( 1.25_fx - 4.5_fx == -3.25_fx );
             TEST_ASSERT( 1.25_fx - 0_fx == 1.25_fx );
             TEST_ASSERT( -1.25_fx - 2.5_fx == -3.75_fx );
+            TEST_ASSERT( 3 - FIXED( 1 ) == 2 )
+
             // (-=)
             TEST_ASSERT( ( 4.5_fx -= 1.25_fx ) == 3.25_fx );
             TEST_ASSERT( ( -12.5_fx -= 1.25_fx ) == -13.75_fx );

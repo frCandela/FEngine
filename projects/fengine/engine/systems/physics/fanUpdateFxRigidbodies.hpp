@@ -1,4 +1,5 @@
 #include "core/ecs/fanEcsSystem.hpp"
+#include "engine/singletons/fanFxPhysicsWorld.hpp"
 #include "engine/components/physics/fanFxRigidbody.hpp"
 #include "engine/components/fanFxTransform.hpp"
 
@@ -13,7 +14,7 @@ namespace fan
 			return	_world.GetSignature<FxRigidbody>() | _world.GetSignature<FxTransform>();
 		}
 
-		static void Run( EcsWorld& /*_world*/, const EcsView& _view, const Fixed _delta )
+		static void Run( EcsWorld& /*_world*/, const EcsView& _view, const Fixed _delta, FxPhysicsWorld& _physicsWorld )
 		{
             auto transformIt = _view.begin<FxTransform>();
             auto rbIt = _view.begin<FxRigidbody>();
@@ -25,9 +26,14 @@ namespace fan
                 transform.mPosition += rb.mVelocity * _delta;
                 transform.mPosition += FIXED(0.5) * rb.mAcceleration * _delta * _delta;
 
-                rb.mVelocity += rb.mAcceleration * _delta;
-                rb.mVelocity *= FxRigidbody::sDamping;
-			}
+                Vector3 resultingAcceleration = rb.mAcceleration;
+                rb.ApplyForce( _physicsWorld.mGravity / rb.mInverseMass );
+                resultingAcceleration += rb.mInverseMass * rb.mForcesAccumulator;
+                rb.mForcesAccumulator = Vector3::sZero;
+
+                rb.mVelocity += resultingAcceleration * _delta;
+                rb.mVelocity *= _physicsWorld.mDamping;
+            }
 		}
 	};
 }
