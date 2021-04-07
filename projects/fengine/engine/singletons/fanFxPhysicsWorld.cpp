@@ -44,12 +44,20 @@ namespace fan
     //========================================================================================================
     void FxPhysicsWorld::ResolveVelocity( const Contact& _contact, Fixed _duration )
     {
-        (void)_duration;
-
         const Fixed separatingVelocity = CalculateSeparatingVelocity( _contact );
         if( separatingVelocity > 0 ){ return; }
 
-        const Fixed deltaVelocity = -separatingVelocity * _contact.restitution - separatingVelocity;
+        Fixed newSeparatingVelocity = -separatingVelocity * _contact.restitution;
+
+        // check the velocity build up due to acceleration only (causes vibrations on resting contacts)
+        Vector3 accCausedVelocity = _contact.rb0->mAcceleration;
+        if( _contact.rb1 ){ accCausedVelocity -= _contact.rb1->mAcceleration; }
+        const Fixed accCausedSeparatingVelocity = _duration * Vector3::Dot( accCausedVelocity, _contact.normal );
+        if( accCausedSeparatingVelocity < 0 )
+        {
+            newSeparatingVelocity += _contact.restitution * accCausedSeparatingVelocity;
+            if( newSeparatingVelocity < 0 ){ newSeparatingVelocity = 0; }
+        }
 
         Fixed totalInverseMass = _contact.rb0->mInverseMass;
         if( _contact.rb1 )
@@ -58,7 +66,8 @@ namespace fan
         }
         if( totalInverseMass <= 0 ){ return; }// infinite mass => immovable
 
-        Vector3 impulsePerMass = ( deltaVelocity / totalInverseMass ) * _contact.normal;
+        const Fixed deltaVelocity  = newSeparatingVelocity - separatingVelocity;
+        Vector3     impulsePerMass = ( deltaVelocity / totalInverseMass ) * _contact.normal;
         _contact.rb0->mVelocity = _contact.rb0->mVelocity + _contact.rb0->mInverseMass * impulsePerMass;
         if( _contact.rb1 )
         {

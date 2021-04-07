@@ -27,7 +27,6 @@ namespace fan
                 transform.mPosition += FIXED(0.5) * rb.mAcceleration * _delta * _delta;
 
                 Vector3 resultingAcceleration = rb.mAcceleration;
-                rb.ApplyForce( _physicsWorld.mGravity / rb.mInverseMass );
                 resultingAcceleration += rb.mInverseMass * rb.mForcesAccumulator;
                 rb.mForcesAccumulator = Vector3::sZero;
 
