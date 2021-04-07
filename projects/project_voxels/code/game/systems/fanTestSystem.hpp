@@ -2,7 +2,6 @@
 
 namespace fan
 {
-
     //========================================================================================================
     // Draw the bounds of all scene nodes
     //========================================================================================================
@@ -31,7 +30,7 @@ namespace fan
                     /*transform.mPosition.y = FIXED(0.5);
                     rb.mVelocity.y = 0;*/
 
-                    FxPhysicsWorld::Contact contact;
+                    Contact contact;
                     contact.rb0         = &rb;
                     contact.transform0  = &transform;
                     contact.normal      = Vector3::sUp;
@@ -39,7 +38,7 @@ namespace fan
                     contact.penetration = -( transform.mPosition.y - FIXED( 0.5 ) );
                     contact.rb1         = nullptr;
                     contact.transform1 = nullptr;
-                    physicsWorld.ResolveContact( contact, _delta );
+                    physicsWorld.mContactSolver.ResolveContacts( {contact}, _delta );
                 }
 
                 (void)rb;

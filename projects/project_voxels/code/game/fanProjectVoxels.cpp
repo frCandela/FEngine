@@ -5,7 +5,7 @@
 #include "core/time/fanScopedTimer.hpp"
 #include "network/singletons/fanTime.hpp"
 #include "engine/singletons/fanRenderDebug.hpp"
-#include "engine/systems/physics/fanUpdateFxRigidbodies.hpp"
+#include "engine/physics/fanUpdateFxRigidbodies.hpp"
 #include "engine/systems/fanUpdateBounds.hpp"
 #include "engine/systems/fanUpdateUIText.hpp"
 #include "engine/systems/fanRaycastUI.hpp"

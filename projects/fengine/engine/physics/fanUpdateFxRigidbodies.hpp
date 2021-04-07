@@ -1,6 +1,6 @@
 #include "core/ecs/fanEcsSystem.hpp"
-#include "engine/singletons/fanFxPhysicsWorld.hpp"
-#include "engine/components/physics/fanFxRigidbody.hpp"
+#include "engine/physics/fanFxPhysicsWorld.hpp"
+#include "engine/physics/fanFxRigidbody.hpp"
 #include "engine/components/fanFxTransform.hpp"
 
 namespace fan

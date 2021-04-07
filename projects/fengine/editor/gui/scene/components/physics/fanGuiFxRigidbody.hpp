@@ -1,6 +1,6 @@
 #pragma once
 
-#include "engine/components/physics/fanFxRigidbody.hpp"
+#include "engine/physics/fanFxRigidbody.hpp"
 #include "editor/singletons/fanEditorGuiInfo.hpp"
 
 namespace fan

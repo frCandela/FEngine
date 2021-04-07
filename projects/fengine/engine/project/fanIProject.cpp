@@ -26,8 +26,8 @@
 #include "engine/singletons/fanPhysicsWorld.hpp"
 
 // fxPhysics
-#include "engine/components/physics/fanFxRigidbody.hpp"
-#include "engine/singletons/fanFxPhysicsWorld.hpp"
+#include "engine/physics/fanFxRigidbody.hpp"
+#include "engine/physics/fanFxPhysicsWorld.hpp"
 
 //render 3D
 #include "engine/components/fanDirectionalLight.hpp"

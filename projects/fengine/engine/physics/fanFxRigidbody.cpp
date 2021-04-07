@@ -1,4 +1,4 @@
-#include "engine/components/physics/fanFxRigidbody.hpp"
+#include "engine/physics/fanFxRigidbody.hpp"
 #include "core/memory/fanSerializable.hpp"
 
 namespace fan

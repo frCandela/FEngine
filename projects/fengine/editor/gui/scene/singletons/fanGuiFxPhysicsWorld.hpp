@@ -1,6 +1,6 @@
 #pragma once
 
-#include "engine/singletons/fanFxPhysicsWorld.hpp"
+#include "engine/physics/fanFxPhysicsWorld.hpp"
 #include "editor/singletons/fanEditorGuiInfo.hpp"
 #include "core/math/fanMathUtils.hpp"
 
