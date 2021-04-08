@@ -15,8 +15,9 @@
 #include "core/unit_tests/fanUnitTestFixedPoint.hpp"
 #include "core/unit_tests/fanUnitTestVector3.hpp"
 #include "core/unit_tests/fanUnitTestMatrix3.hpp"
+#include "core/unit_tests/fanUnitTestMatrix4.hpp"
 #include "core/unit_tests/fanUnitTestQuaternion.hpp"
-#include "engine//unit_tests/fanUnitTestFxTransform.hpp"
+#include "engine/unit_tests/fanUnitTestFxTransform.hpp"
 
 namespace fan
 {
@@ -44,6 +45,7 @@ namespace fan
                 { "FixedPoint", &UnitTestFixedPoint::RunTests, mFixedPointResult },
                 { "Vector3", &UnitTestVector3::RunTests, mVector3Result },
                 { "Matrix3", &UnitTestMatrix3::RunTests, mMatrix3Result },
+                { "Matrix4", &UnitTestMatrix4::RunTests, mMatrix4Result },
                 { "Quaternion", &UnitTestQuaternion::RunTests, mQuaternionResult },
                 { "FxTransform", &UnitTestFxTransform::RunTests, mFxTransformResult },
         };

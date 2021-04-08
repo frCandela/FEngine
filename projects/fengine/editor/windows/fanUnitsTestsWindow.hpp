@@ -18,9 +18,9 @@ namespace fan
         struct TestArgument
         {
             using RunMethod = UnitTestResult ( * )();
-            const char*      mName;
-            RunMethod        mRunMethod;
-            UnitTestResult&  mTestDisplay;
+            const char* mName;
+            RunMethod mRunMethod;
+            UnitTestResult& mTestDisplay;
         };
 
         void OnGui( EcsWorld& _world ) override;
@@ -44,6 +44,7 @@ namespace fan
         UnitTestResult mFixedPointResult;
         UnitTestResult mVector3Result;
         UnitTestResult mMatrix3Result;
+        UnitTestResult mMatrix4Result;
         UnitTestResult mQuaternionResult;
         UnitTestResult mFxTransformResult;
     };
