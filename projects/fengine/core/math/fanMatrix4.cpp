@@ -205,6 +205,40 @@ namespace fan
     }
 
     //==========================================================================================================================
+    // multiply a vector with the inverse of the matrix
+    // inverse(M) == transpose(M) for rotation matrices
+    //==========================================================================================================================
+    Vector3 Matrix4::InverseTransform( const Vector3& _vector3 ) const
+    {
+        Vector3 tmp = _vector3;
+        tmp.x -= e14;
+        tmp.y -= e24;
+        tmp.z -= e34;
+        return Vector3( e11 * tmp.x + e21 * tmp.y + e31 * tmp.z,
+                        e12 * tmp.x + e22 * tmp.y + e32 * tmp.z,
+                        e13 * tmp.x + e23 * tmp.y + e33 * tmp.z );
+    }
+
+    //==========================================================================================================================
+    //==========================================================================================================================
+    Vector3 Matrix4::TransformDirection( const Vector3& _vector3 ) const
+    {
+        return Vector3( e11 * _vector3.x + e12 * _vector3.y + e13 * _vector3.z,
+                        e21 * _vector3.x + e22 * _vector3.y + e23 * _vector3.z,
+                        e31 * _vector3.x + e32 * _vector3.y + e33 * _vector3.z );
+    }
+
+    //==========================================================================================================================
+    // multiply tmp with the inverse of the rotation matrix ( inverse(M) == transpose(M) for rotation matrices )
+    //==========================================================================================================================
+    Vector3 Matrix4::InverseTransformDirection( const Vector3& _vector3 ) const
+    {
+        return Vector3( e11 * _vector3.x + e21 * _vector3.y + e31 * _vector3.z,
+                        e12 * _vector3.x + e22 * _vector3.y + e32 * _vector3.z,
+                        e13 * _vector3.x + e23 * _vector3.y + e33 * _vector3.z );
+    }
+
+    //==========================================================================================================================
     //==========================================================================================================================
     Fixed Matrix4::Determinant() const
     {

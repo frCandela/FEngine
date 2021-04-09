@@ -24,6 +24,7 @@ namespace fan
                      { &UnitTestMatrix4::TestTranspose,            "transpose" },
                      { &UnitTestMatrix4::TestInverse,              "inverse" },
                      { &UnitTestMatrix4::TestVectorMultiplication, "vector multiplication" },
+                     { &UnitTestMatrix4::TestTransforms,           "tranforms" },
             };
         }
 
@@ -231,6 +232,42 @@ namespace fan
             Vector3 vec( 13, 14, 15 );
             TEST_ASSERT( mat * vec == Vector3( 115, 61, 48 ) )
             TEST_ASSERT( mat.Inverse() * ( mat * vec ) == vec )
+        }
+
+        void TestTransforms()
+        {
+            // inverse transform
+            Matrix4 rotationY90translate( 0, 0, 1, 4,
+                                          0, 1, 0, 5,
+                                          -1, 0, 0, 6 );
+            Vector3 vec( 8, -14, 21 );
+            TEST_ASSERT( rotationY90translate * vec == Vector3( 25, -9, -2 ) )
+            TEST_ASSERT( rotationY90translate.InverseTransform( rotationY90translate * vec ) == vec )
+
+            Matrix4   rotationX90Y90Z90translate( 0, 0, 1, 4,
+                                                  0, -1, 0, 5,
+                                                  1, 0, 0, 9 );
+            glm::vec3 v = Math::ToGLM( rotationX90Y90Z90translate * vec );
+            TEST_ASSERT( rotationX90Y90Z90translate * vec == Vector3( 25, 19, 17 ) )
+            TEST_ASSERT( rotationX90Y90Z90translate.InverseTransform( rotationX90Y90Z90translate * vec ) == vec )
+
+
+            // transform direction
+            Matrix4 rotationY90( 0, 0, 1, 0,
+                                 0, 1, 0, 0,
+                                 -1, 0, 0, 0 );
+            TEST_ASSERT( rotationY90translate.TransformDirection( vec ) == rotationY90 * vec )
+
+            Matrix4 rotationX90Y90Z90( 0, 0, 1, 0,
+                                       0, -1, 0, 0,
+                                       1, 0, 0, 0 );
+            TEST_ASSERT( rotationX90Y90Z90translate.TransformDirection( vec ) == rotationX90Y90Z90 * vec )
+
+            // inverse transform direction
+            TEST_ASSERT( rotationY90translate.InverseTransformDirection( vec ) == rotationY90.InverseTransform( vec ) )
+            TEST_ASSERT( rotationX90Y90Z90translate.InverseTransformDirection( vec ) == rotationX90Y90Z90.InverseTransform( vec ) )
+            TEST_ASSERT( rotationY90translate.InverseTransformDirection( rotationY90translate.TransformDirection( vec ) ) == vec )
+            TEST_ASSERT( rotationX90Y90Z90translate.InverseTransformDirection( rotationX90Y90Z90translate.TransformDirection( vec ) ) == vec )
         }
     };
 }
