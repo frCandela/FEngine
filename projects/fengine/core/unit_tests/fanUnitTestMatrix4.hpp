@@ -3,6 +3,7 @@
 #include "core/fanAssert.hpp"
 #include "core/unit_tests/fanUnitTest.hpp"
 #include "core/math/fanMatrix4.hpp"
+#include "core/math/fanQuaternion.hpp"
 
 namespace fan
 {
@@ -13,16 +14,16 @@ namespace fan
     public:
         static std::vector<TestMethod> GetTests()
         {
-            return { { &UnitTestMatrix4::TestConstructors,   "constructors" },
-                     { &UnitTestMatrix4::TestComparison,     "comparison" },
-                     { &UnitTestMatrix4::TestAddition,       "addition" },
-                     { &UnitTestMatrix4::TestSubtraction,    "subtraction" },
-                     { &UnitTestMatrix4::TestMultiplication, "multiplication" },
-                     { &UnitTestMatrix4::TestDivision,       "division" },
-                     { &UnitTestMatrix4::TestDeterminant,    "determinant" },
-                     { &UnitTestMatrix4::TestTranspose,      "transpose" },
-                    //{ &UnitTestMatrix4::TestInverse,              "inverse" },
-                    //{ &UnitTestMatrix4::TestVectorMultiplication, "vector multiplication" },
+            return { { &UnitTestMatrix4::TestConstructors,         "constructors" },
+                     { &UnitTestMatrix4::TestComparison,           "comparison" },
+                     { &UnitTestMatrix4::TestAddition,             "addition" },
+                     { &UnitTestMatrix4::TestSubtraction,          "subtraction" },
+                     { &UnitTestMatrix4::TestMultiplication,       "multiplication" },
+                     { &UnitTestMatrix4::TestDivision,             "division" },
+                     { &UnitTestMatrix4::TestDeterminant,          "determinant" },
+                     { &UnitTestMatrix4::TestTranspose,            "transpose" },
+                     { &UnitTestMatrix4::TestInverse,              "inverse" },
+                     { &UnitTestMatrix4::TestVectorMultiplication, "vector multiplication" },
             };
         }
 
@@ -67,6 +68,17 @@ namespace fan
             TEST_ASSERT( mat2.e32 == 10 )
             TEST_ASSERT( mat2.e33 == 11 )
             TEST_ASSERT( mat2.e34 == 12 )
+
+            // from quaternions
+            Matrix4 mat3( Quaternion::sIdentity, Vector3( 0, 0, 0 ) );
+            TEST_ASSERT( mat3 == Matrix4::sIdentity );
+
+            Quaternion quatRotate180y( 0, 0, 1, 0 );
+            TEST_ASSERT( quatRotate180y * Vector3::sForward == Vector3::sBack );
+            Matrix4 mat3rotate180y = Matrix4( quatRotate180y, Vector3::sZero );
+            TEST_ASSERT( mat3rotate180y * Vector3::sForward == Vector3::sBack );
+            Matrix4 mat3rotate180yTranslateUp = Matrix4( quatRotate180y, Vector3::sUp );
+            TEST_ASSERT( mat3rotate180yTranslateUp * Vector3::sForward == Vector3::sBack + Vector3::sUp );
         }
 
         void TestDeterminant()
@@ -149,6 +161,7 @@ namespace fan
             TEST_ASSERT( mat * 2 == Matrix4( 4, 8, 12, 16, 20, 24, 28, 32, 36, 40, 44, 48 ) );
             TEST_ASSERT( mat * FIXED( 0.5 ) == Matrix4( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 ) );
             TEST_ASSERT( 2 * mat == mat * 2 )
+            TEST_ASSERT( ( Matrix4( mat ) *= 2 ) == 2 * mat );
 
             // matrix multiplication
             Matrix4 mat2( 1, -2, 3, -4, 5, -6, 7, -8, 9, -10, 11, -12 );
@@ -186,27 +199,38 @@ namespace fan
             TEST_ASSERT( ( mat * mat2 ).Transpose() == mat2.Transpose() * mat.Transpose() );
             TEST_ASSERT( ( mat + mat2 ).Transpose() == mat.Transpose() + mat2.Transpose() );
             TEST_ASSERT( mat.Determinant() == mat.Transpose().Determinant() );
-        }/*
+        }
 
         void TestInverse()
         {
-            Matrix4 mat( 3, 1, 1, 3, 2, 1, 2, 1, 2 );
+            Matrix4 mat( 3, 1, 1, 1,
+                         3, 2, 1, 2,
+                         2, 1, 1, 3 );
+            Matrix4 invMat( 1, 0, -1, 2,
+                            -1, 1, 0, -1,
+                            -1, -1, 3, -6 );
+
             TEST_ASSERT( mat.Determinant() != 0 )
+            TEST_ASSERT( mat.Inverse() == invMat )
             TEST_ASSERT( mat.Inverse() * mat == mat * mat.Inverse() )
             TEST_ASSERT( mat.Inverse() * mat == Matrix4::sIdentity )
             TEST_ASSERT( mat * mat.Inverse() == Matrix4::sIdentity )
             TEST_ASSERT( Matrix4::sIdentity.Inverse() == Matrix4::sIdentity )
 
-            Matrix4 mat2( 1, 2, 3, 0, 1, 4, 5, 6, 0 );
+            Matrix4 mat2( 3, 3, 2, 4,
+                          1, 2, 1, 5,
+                          1, 1, 1, 6 );
             TEST_ASSERT( ( mat * mat2 ).Inverse() == mat2.Inverse() * mat.Inverse() )
         }
 
         void TestVectorMultiplication()
         {
-            Matrix4 mat( 1, 2, 3, 0, 1, 4, 5, 6, 0 );
-            Vector3 vec( 4, 5, 6 );
-            TEST_ASSERT( mat * vec == Vector3( 32, 29, 50 ) )
+            Matrix4 mat( 3, 3, 2, 4,
+                         1, 2, 1, 5,
+                         1, 1, 1, 6 );
+            Vector3 vec( 13, 14, 15 );
+            TEST_ASSERT( mat * vec == Vector3( 115, 61, 48 ) )
             TEST_ASSERT( mat.Inverse() * ( mat * vec ) == vec )
-        }*/
+        }
     };
 }

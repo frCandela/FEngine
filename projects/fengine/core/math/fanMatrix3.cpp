@@ -1,5 +1,5 @@
 #include "core/math/fanMatrix3.hpp"
-#include "core/math/fanVector3.hpp"
+#include "core/math/fanQuaternion.hpp"
 
 namespace fan
 {
@@ -23,6 +23,21 @@ namespace fan
             e11( _r1c1 ), e12( _r1c2 ), e13( _r1c3 ),
             e21( _r2c1 ), e22( _r2c2 ), e23( _r2c3 ),
             e31( _r3c1 ), e32( _r3c2 ), e33( _r3c3 ) {}
+
+    //==========================================================================================================================
+    //==========================================================================================================================
+    Matrix3::Matrix3( const Quaternion& _quat )
+    {
+        e11 = 1 - ( 2 * _quat.mAxis.y * _quat.mAxis.y + 2 * _quat.mAxis.z * _quat.mAxis.z );
+        e12 = 2 * _quat.mAxis.x * _quat.mAxis.y + 2 * _quat.mAxis.z * _quat.mAngle;
+        e13 = 2 * _quat.mAxis.x * _quat.mAxis.z - 2 * _quat.mAxis.y * _quat.mAngle;
+        e21 = 2 * _quat.mAxis.x * _quat.mAxis.y - 2 * _quat.mAxis.z * _quat.mAngle;
+        e22 = 1 - ( 2 * _quat.mAxis.x * _quat.mAxis.x + 2 * _quat.mAxis.z * _quat.mAxis.z );
+        e23 = 2 * _quat.mAxis.y * _quat.mAxis.z + 2 * _quat.mAxis.x * _quat.mAngle;
+        e31 = 2 * _quat.mAxis.x * _quat.mAxis.z + 2 * _quat.mAxis.y * _quat.mAngle;
+        e32 = 2 * _quat.mAxis.y * _quat.mAxis.z - 2 * _quat.mAxis.x * _quat.mAngle;
+        e33 = 1 - ( 2 * _quat.mAxis.x * _quat.mAxis.x + 2 * _quat.mAxis.y * _quat.mAxis.y );
+    }
 
     //==========================================================================================================================
     //==========================================================================================================================
@@ -105,15 +120,15 @@ namespace fan
     //==========================================================================================================================
     Matrix3& Matrix3::operator*=( const Fixed& _value )
     {
-        e11 -= _value;
-        e12 -= _value;
-        e13 -= _value;
-        e21 -= _value;
-        e22 -= _value;
-        e23 -= _value;
-        e31 -= _value;
-        e32 -= _value;
-        e33 -= _value;
+        e11 *= _value;
+        e12 *= _value;
+        e13 *= _value;
+        e21 *= _value;
+        e22 *= _value;
+        e23 *= _value;
+        e31 *= _value;
+        e32 *= _value;
+        e33 *= _value;
         return *this;
     }
 

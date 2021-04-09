@@ -3,6 +3,7 @@
 #include "core/fanAssert.hpp"
 #include "core/unit_tests/fanUnitTest.hpp"
 #include "core/math/fanMatrix3.hpp"
+#include "core/math/fanQuaternion.hpp"
 
 namespace fan
 {
@@ -57,6 +58,15 @@ namespace fan
             TEST_ASSERT( mat2.e31 == 7 )
             TEST_ASSERT( mat2.e32 == 8 )
             TEST_ASSERT( mat2.e33 == 9 )
+
+            // from quaternions
+            Matrix3 mat3( Quaternion::sIdentity );
+            TEST_ASSERT( mat3 == Matrix3::sIdentity );
+
+            Quaternion quatRotate180y( 0, 0, 1, 0 );
+            TEST_ASSERT( quatRotate180y * Vector3::sForward == Vector3::sBack );
+            Matrix3 mat3rotate180y = Matrix3( quatRotate180y );
+            TEST_ASSERT( mat3rotate180y * Vector3::sForward == Vector3::sBack );
         }
 
         void TestDeterminant()
@@ -136,6 +146,8 @@ namespace fan
             TEST_ASSERT( mat * 2 == Matrix3( 4, 8, 12, 16, 20, 24, 28, 32, 36 ) );
             TEST_ASSERT( mat * FIXED( 0.5 ) == Matrix3( 1, 2, 3, 4, 5, 6, 7, 8, 9 ) );
             TEST_ASSERT( 2 * mat == mat * 2 )
+            TEST_ASSERT( ( Matrix3( mat ) *= 2 ) == 2 * mat );
+
 
             // matrix multiplication
             Matrix3 mat2( 1, -2, 3, -4, 5, -6, 7, -8, 9 );
