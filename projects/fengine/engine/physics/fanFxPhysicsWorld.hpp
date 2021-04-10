@@ -19,7 +19,8 @@ namespace fan
         static void Load( EcsSingleton& _component, const Json& _json );
 
         Vector3 mGravity;
-        Fixed   mDamping; // [0,1] removes the energy added from numerical instability in the integrator
+        Fixed   mLinearDamping; // [0,1] removes the energy added from numerical instability in the integrator
+        Fixed   mAngularDamping; // [0,1] removes the energy added from numerical instability in the integrator
 
         ContactSolver mContactSolver;
     };

@@ -32,10 +32,11 @@ namespace fan
                     contact.rb0         = &rb0;
                     contact.transform0  = &transform0;
                     contact.normal      = Vector3::sUp;
-                    contact.restitution = FIXED( 0.5 );
+                    contact.restitution = FIXED( 0.9);
                     contact.penetration = FIXED( 0.5 ) - transform0.mPosition.y;
                     contact.rb1         = nullptr;
                     contact.transform1 = nullptr;
+                    float pos = transform0.mPosition.y.ToFloat();(void)pos;
                     float p = contact.penetration.ToFloat();(void)p;
                     glm::vec3  p1 = Math::ToGLM(contact.transform0->mPosition);(void)p1;
                     glm::vec3  n = Math::ToGLM(contact.normal);(void)n;
@@ -55,7 +56,7 @@ namespace fan
                         contact.rb0         = &rb0;
                         contact.transform0  = &transform0;
                         contact.normal      = (transform0.mPosition - transform1.mPosition).Normalized();
-                        contact.restitution = FIXED( 0.5 );
+                        contact.restitution = FIXED( 0.9);
                         contact.penetration = 1 - ( transform0.mPosition - transform1.mPosition ).Magnitude();
                         contact.rb1         = &rb1;
                         contact.transform1 = &transform1;

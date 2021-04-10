@@ -8,23 +8,26 @@ namespace fan
     //==========================================================================================================================
     struct Quaternion
     {
+        static const Quaternion sIdentity;
+
         Fixed   mAngle; // cos( angle / 2 )
         Vector3 mAxis;  // sin( angle / 2 ) * Axis
 
         Quaternion() : mAngle( 1 ), mAxis() {} // identity
-        Quaternion( Fixed _e0, Fixed _e1, Fixed _e2, Fixed _e3 ) : mAngle( _e0 ), mAxis( _e1, _e2, _e3 ) {}
-        Quaternion( Fixed _n, Vector3 _v ) : mAngle( _n ), mAxis( _v ) {}
+        Quaternion( Fixed _angle, Fixed _x, Fixed _y, Fixed _z ) : mAngle( _angle ), mAxis( _x, _y, _z ) {}
 
-        static const Quaternion sIdentity;
+        Quaternion( Fixed _n, Vector3 _v ) : mAngle( _n ), mAxis( _v ) {}
 
         Fixed SqrMagnitude() const { return mAngle * mAngle + mAxis.x * mAxis.x + mAxis.y * mAxis.y + mAxis.z * mAxis.z; }
         Fixed Magnitude() const { return Fixed::Sqrt( SqrMagnitude() ); }
         Quaternion Conjugate() const { return { mAngle, -mAxis }; }
         Quaternion Inverse() const { return Conjugate() / SqrMagnitude(); }
         Quaternion Normalized() const;
+        void Normalize(){ *this = Normalized(); }
         Fixed Angle() const { return FIXED( 2 ) * Fixed::ACos( mAngle ); }
         Vector3 Axis() const { return mAxis.Normalized(); }
         Vector3 Euler() const;
+
         static Quaternion AngleAxis( const Fixed _degrees, const Vector3& _axis );
         static Quaternion Euler( const Vector3& _degrees );
         static Quaternion Euler( const Fixed _x, const Fixed _y, const Fixed _z ) { return Euler( Vector3( _x, _y, _z ) ); }
@@ -53,6 +56,7 @@ namespace fan
     //=============================================================
     //=============================================================
     inline Quaternion operator*( const Fixed& _value, const Quaternion& _quat ) { return _quat * _value; }
+
 
     //=============================================================
     //=============================================================

@@ -26,22 +26,32 @@ namespace fan
         {
             FxPhysicsWorld& physicsWorld = static_cast<FxPhysicsWorld&>( _component );
 
-            ImGui::Indent();
-            {
-                // gravity
-                glm::vec3 gravity = Math::ToGLM( physicsWorld.mGravity );
-                if( ImGui::DragFloat3( "gravity", &gravity.x ) )
-                {
-                    physicsWorld.mGravity = Math::ToFixed( gravity );
-                }
 
-                float damping = physicsWorld.mDamping.ToFloat();
-                if( ImGui::DragFloat( "damping", &damping ) )
-                {
-                    physicsWorld.mDamping = Fixed::FromFloat( damping );
-                }
+            // gravity
+            glm::vec3 gravity = Math::ToGLM( physicsWorld.mGravity );
+            if( ImGui::DragFloat3( "gravity", &gravity.x ) )
+            {
+                physicsWorld.mGravity = Math::ToFixed( gravity );
             }
-            ImGui::Unindent();
+
+            // damping
+            float damping = physicsWorld.mLinearDamping.ToFloat();
+            if( ImGui::DragFloat( "damping", &damping ) )
+            {
+                physicsWorld.mLinearDamping = Fixed::FromFloat( damping );
+            }
+
+            // anglar damping
+            float angularDamping = physicsWorld.mAngularDamping.ToFloat();
+            if( ImGui::DragFloat( "angular damping", &angularDamping ) )
+            {
+                physicsWorld.mAngularDamping = Fixed::FromFloat( angularDamping );
+            }
+
+            // damping
+            if( ImGui::DragInt( "contact solver max iterations", &physicsWorld.mContactSolver.mMaxIterations ) )
+            {
+            }
         }
     };
 }

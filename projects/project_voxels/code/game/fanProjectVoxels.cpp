@@ -27,6 +27,10 @@
 
 #include "editor/fanRegisterEditorGui.hpp"
 
+
+#include "engine/singletons/fanScene.hpp"
+#include "engine/singletons/fanRenderResources.hpp"
+
 namespace fan
 {
     //==========================================================================================================================
@@ -84,9 +88,14 @@ namespace fan
 
         {
             FxPhysicsWorld& fxPhysicsWorld = mWorld.GetSingleton<FxPhysicsWorld>();
+
+
             mWorld.Run<SIntegrateFxRigidbodies>( fxDelta, fxPhysicsWorld );
+            for( int i = 0; i < fxPhysicsWorld.mContactSolver.mMaxIterations; i++ )
+            {
+                mWorld.Run<STestSystem>( fxDelta );
+            }
         }
-        mWorld.Run<STestSystem>( fxDelta );
 
         mWorld.Run<SSynchronizeTransformFromMotionState>();
         mWorld.Run<SMoveFollowTransforms>();
@@ -133,6 +142,118 @@ namespace fan
     {
         if( ImGui::Begin( "testoss" ) )
         {
+
+
+            static glm::vec3 force = { 1, 0, 0 };
+            static glm::vec3 point = { 0, 1, 0 };
+            ImGui::DragFloat3( "force", &force.x );
+            ImGui::DragFloat3( "point", &point.x );
+
+            if( ImGui::CollapsingHeader("fixed"))
+            {
+                static EcsHandle handle = 0;
+                if( ImGui::Button( "instantiate" ) )
+                {
+                    Scene    & scene = mWorld.GetSingleton<Scene>();
+                    SceneNode& node  = scene.CreateSceneNode( "ball", &scene.GetRootNode() );
+                    handle = node.mHandle;
+                    RenderResources& resources = mWorld.GetSingleton<RenderResources>();
+
+                    EcsEntity entity = mWorld.GetEntity( handle );
+                    FxTransform& transform = mWorld.AddComponent<FxTransform>( entity );
+                    transform.mPosition = Vector3::sUp;
+                    mWorld.AddComponent<FxRigidbody>( entity );
+                    Material& mat = mWorld.AddComponent<Material>( entity );
+                    mat.mTexture = resources.mTextureManager->GetOrLoad( "_default/texture/uv_checker.png" );
+
+                    MeshRenderer& meshRenderer = mWorld.AddComponent<MeshRenderer>( entity );
+                    meshRenderer.mMesh = resources.mMeshManager->GetOrLoad( RenderGlobal::sMeshSphere );
+                }
+
+                ImGui::SameLine();
+                if( ImGui::Button( "impulse" ) )
+                {
+                    EcsEntity entity = mWorld.GetEntity( handle );
+                    FxRigidbody& rb = mWorld.GetComponent<FxRigidbody>( entity );
+
+                    rb.ApplyForce( Math::ToFixed( force ), Math::ToFixed( point ) );
+                }
+
+                ImGui::SameLine();
+                if( ImGui::Button( "reset" ) )
+                {
+                    EcsEntity entity = mWorld.GetEntity( handle );
+                    FxRigidbody& rb = mWorld.GetComponent<FxRigidbody>( entity );
+                    rb.mRotation = rb.mVelocity = Vector3::sZero;
+                    FxTransform& transform = mWorld.GetComponent<FxTransform>( entity );
+                    transform.mPosition = FIXED( 0.5 ) * Vector3::sUp;
+                    transform.mRotation = Quaternion::sIdentity;
+
+                    Debug::Log() <<"a"<< sizeof(FxRigidbody) << Debug::Endl();
+                    Debug::Log() <<"b"<< sizeof(btRigidBody) << Debug::Endl();
+                }
+            }
+            static bool registerLater = false;
+            if( registerLater )
+            {
+                registerLater = false;
+                mWorld.Run<SUnregisterAllRigidbodies>();
+                mWorld.Run<SRegisterAllRigidbodies>();
+            }
+
+            if( ImGui::CollapsingHeader("bullet"))
+            {
+                static EcsHandle handle = 0;
+                ImGui::PushID("bullet");
+                if( ImGui::Button( "instantiate" ) )
+                {
+
+                    Scene    & scene = mWorld.GetSingleton<Scene>();
+                    SceneNode& node  = scene.CreateSceneNode( "ball_bullet", &scene.GetRootNode() );
+                    handle = node.mHandle;
+                    RenderResources& resources = mWorld.GetSingleton<RenderResources>();
+
+                    EcsEntity entity = mWorld.GetEntity( handle );
+                    Transform& transform = mWorld.AddComponent<Transform>( entity );
+                    transform.SetPosition( btVector3_Up );
+                    Rigidbody& rigidbody = mWorld.AddComponent<Rigidbody>( entity );
+                    rigidbody.EnableDeactivation(false);
+                    SphereShape& shape = mWorld.AddComponent<SphereShape>( entity );
+                    shape.SetRadius( 0.5f );
+                    mWorld.AddComponent<MotionState>( entity );
+                    Material& mat = mWorld.AddComponent<Material>( entity );
+                    mat.mTexture = resources.mTextureManager->GetOrLoad( "_default/texture/uv_checker.png" );
+
+                    MeshRenderer& meshRenderer = mWorld.AddComponent<MeshRenderer>( entity );
+                    meshRenderer.mMesh = resources.mMeshManager->GetOrLoad( RenderGlobal::sMeshSphere );
+
+                    registerLater = true;
+                }
+
+
+                ImGui::SameLine();
+                if( ImGui::Button( "impulse" ) )
+                {
+                    EcsEntity entity = mWorld.GetEntity( handle );
+                    Rigidbody& rb = mWorld.GetComponent<Rigidbody>( entity );
+
+                    rb.mRigidbody->applyForce( ToBullet(force) ,  ToBullet(point)  );
+                }
+
+                ImGui::SameLine();
+                if( ImGui::Button( "reset" ) )
+                {
+                    EcsEntity entity = mWorld.GetEntity( handle );
+                    Rigidbody& rb = mWorld.GetComponent<Rigidbody>( entity );
+                    rb.mRigidbody->setAngularVelocity( btVector3_Zero);
+                    rb.mRigidbody->setLinearVelocity( btVector3_Zero);
+                    Transform& transform = mWorld.GetComponent<Transform>( entity );
+                    transform.SetPosition( 0.5*btVector3_Up );
+                    transform.SetRotationEuler(btVector3_Zero);
+                }
+                ImGui::PopID();
+            }
+
             ImGui::End();
         }
     }

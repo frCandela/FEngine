@@ -57,6 +57,18 @@ namespace fan
                 }
 
                 // Velocity
+                if( ImGui::Button( "##Rotation" ) )
+                {
+                    rb.mRotation = Vector3( 0, 0, 0 );
+                }
+                ImGui::SameLine();
+                glm::vec3 rotation = Math::ToGLM( rb.mRotation );
+                if( ImGui::DragFloat3( "rotation", &rotation[0], 1.f, -1000.f, 1000.f ) )
+                {
+                    rb.mRotation = Math::ToFixed( rotation );
+                }
+
+                // Velocity
                 if( ImGui::Button( "##Acceleration" ) )
                 {
                     rb.mAcceleration = Vector3( 0, 0, 0 );

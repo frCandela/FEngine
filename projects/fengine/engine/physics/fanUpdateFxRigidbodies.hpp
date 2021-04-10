@@ -16,6 +16,8 @@ namespace fan
 
 		static void Run( EcsWorld& /*_world*/, const EcsView& _view, const Fixed _delta, FxPhysicsWorld& _physicsWorld )
 		{
+		    if( _delta == 0 ){ return; }
+
             auto transformIt = _view.begin<FxTransform>();
             auto rbIt = _view.begin<FxRigidbody>();
             for( ; transformIt != _view.end<FxTransform>(); ++transformIt, ++rbIt )
@@ -23,16 +25,24 @@ namespace fan
                 FxTransform& transform = *transformIt;
                 FxRigidbody& rb = *rbIt;
 
-                transform.mPosition += rb.mVelocity * _delta;
-                transform.mPosition += FIXED(0.5) * rb.mAcceleration * _delta * _delta;
+                // calculates linear/angular accelerations from forces input
+                Vector3 resultingLinearAcceleration = rb.mAcceleration;
+                resultingLinearAcceleration += rb.mInverseMass * rb.mForcesAccumulator;
+                Vector3 resultingAngularAcceleration = rb.mInverseInertiaTensor * rb.mTorqueAccumulator;
 
-                Vector3 resultingAcceleration = rb.mAcceleration;
-                resultingAcceleration += rb.mInverseMass * rb.mForcesAccumulator;
-                rb.mForcesAccumulator = Vector3::sZero;
+                rb.mVelocity += _delta * resultingLinearAcceleration;
+                rb.mRotation += _delta * resultingAngularAcceleration;
 
-                rb.mVelocity += resultingAcceleration * _delta;
-                rb.mVelocity *= _physicsWorld.mDamping;
+                transform.mPosition += _delta * rb.mVelocity;
+                transform.mRotation += FIXED( 0.5 ) * _delta * Quaternion( 0, rb.mRotation ) * transform.mRotation ;
+                transform.mRotation.Normalize();
+
+                rb.mVelocity *= _physicsWorld.mLinearDamping;
+                rb.mRotation *= _physicsWorld.mAngularDamping;
+
+                rb.CalculateDerivedData( transform );
+                rb.ClearAccumulators();
             }
-		}
+        }
 	};
 }

@@ -1,3 +1,4 @@
+#include <core/math/fanMathUtils.hpp>
 #include "engine/physics/fanContactSolver.hpp"
 
 #include "engine/physics/fanFxRigidbody.hpp"
@@ -7,10 +8,21 @@ namespace fan
 {
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void ContactSolver::ResolveContacts( const std::vector<Contact>& _contacts, const Fixed _duration )
+    void ContactSolver::ResolveContacts( std::vector<Contact> _contacts, const Fixed _duration )
     {
-        mIterationUsed = 0;
+       /* mIterationUsed = 0;
         while( mIterationUsed < mMaxIterations )
+        {
+            for( int i = 0; i < _contacts.size(); i++ )
+            {
+                ResolveInterpenetration( _contacts[i], _duration );
+            }
+            mIterationUsed++;
+        }*/
+
+
+        //mIterationUsed = 0;
+        //( mIterationUsed < mMaxIterations )
         {
             // find the contact with the largest closing velocity
             Fixed maxSeparatingVelocity = 0;
@@ -26,13 +38,17 @@ namespace fan
                 }
             }
 
-            if( maxIndex == (int)_contacts.size() ){ break; }
+            if( maxIndex == (int)_contacts.size() )
+            {
+                return;
+                //break;
+            }
 
-            const Contact& contact = _contacts[maxIndex];
+            Contact& contact = _contacts[maxIndex];
             ResolveVelocity( contact, _duration );
             ResolveInterpenetration( contact, _duration );
 
-            mIterationUsed++;
+            //mIterationUsed++;
         }
     }
 
@@ -82,7 +98,7 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void ContactSolver::ResolveInterpenetration( const Contact& _contact, Fixed _duration )
+    void ContactSolver::ResolveInterpenetration( Contact& _contact, Fixed _duration )
     {
         (void)_duration;
 
@@ -97,7 +113,12 @@ namespace fan
 
         Vector3 movePerInvMass = _contact.normal * _contact.penetration / totalInverseMass;
 
+        float m = _contact.rb0->mInverseMass.ToFloat();        (void)m;
+        float pen = _contact.penetration.ToFloat();        (void)pen;
+        glm::vec3 move = Math::ToGLM(movePerInvMass * _contact.rb0->mInverseMass);        (void)move;
+
         _contact.transform0->mPosition = _contact.transform0->mPosition + movePerInvMass * _contact.rb0->mInverseMass;
+        glm::vec3 p = Math::ToGLM( _contact.transform0->mPosition ); (void)p;
         if( _contact.rb1 )
         {
             _contact.transform1->mPosition = _contact.transform1->mPosition - movePerInvMass * _contact.rb1->mInverseMass;
