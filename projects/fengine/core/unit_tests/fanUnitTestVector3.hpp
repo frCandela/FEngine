@@ -14,17 +14,18 @@ namespace fan
     public:
         static std::vector<TestMethod> GetTests()
         {
-            return { { &UnitTestVector3::TestConstructors,   "constructors" },
-                     { &UnitTestVector3::TestMagnitude,      "magnitude" },
-                     { &UnitTestVector3::TestNormalize,      "normalize" },
-                     { &UnitTestVector3::TestComparison,     "comparison" },
-                     { &UnitTestVector3::TestMultiplication, "multiplication" },
-                     { &UnitTestVector3::TestDivision,       "division" },
-                     { &UnitTestVector3::TestAddSubstract,   "addition subtraction" },
-                     { &UnitTestVector3::TestDot,            "dot" },
-                     { &UnitTestVector3::TestCross,          "cross" },
-                     { &UnitTestVector3::TestOrthoNormalize, "ortho normalize" },
-                     { &UnitTestVector3::TestSignedAngle,    "signed angle" },
+            return { { &UnitTestVector3::TestConstructors,     "constructors" },
+                     { &UnitTestVector3::TestMagnitude,        "magnitude" },
+                     { &UnitTestVector3::TestNormalize,        "normalize" },
+                     { &UnitTestVector3::TestComparison,       "comparison" },
+                     { &UnitTestVector3::TestMultiplication,   "multiplication" },
+                     { &UnitTestVector3::TestDivision,         "division" },
+                     { &UnitTestVector3::TestAddSubstract,     "addition subtraction" },
+                     { &UnitTestVector3::TestDot,              "dot" },
+                     { &UnitTestVector3::TestCross,            "cross" },
+                     { &UnitTestVector3::TestOrthoNormalize,   "ortho normalize" },
+                     { &UnitTestVector3::TestSignedAngle,      "signed angle" },
+                     { &UnitTestVector3::TestOrthonormalBasis, "orthonormal basis" },
             };
         }
 
@@ -211,6 +212,47 @@ namespace fan
 
             angle = Vector3::SignedAngle( Vector3::sForward, Vector3::sBack, -Vector3::sUp );
             TEST_ASSERT( Fixed::Abs( angle - ( 180 ) ) < angularTolerance )
+        }
+
+        void TestOrthonormalBasis()
+        {
+            Vector3 v1, v2, v3;
+
+            v1 = Vector3::sLeft;
+            Vector3::MakeOrthonormalBasis(v1,v2,v3 );
+            TEST_ASSERT( v2.IsNormalized() && v3.IsNormalized() )
+            TEST_ASSERT( Vector3::IsFuzzyZero(Vector3::Cross(v1,v2) - v3) )
+            TEST_ASSERT( Vector3::IsFuzzyZero(Vector3::Cross(v2,v3) - v1) )
+
+            v1 = Vector3::sRight;
+            Vector3::MakeOrthonormalBasis(v1,v2,v3 );
+            TEST_ASSERT( v2.IsNormalized() && v3.IsNormalized() )
+            TEST_ASSERT( Vector3::IsFuzzyZero(Vector3::Cross(v1,v2) - v3) )
+            TEST_ASSERT( Vector3::IsFuzzyZero(Vector3::Cross(v2,v3) - v1) )
+
+            v1 = Vector3::sUp;
+            Vector3::MakeOrthonormalBasis(v1,v2,v3 );
+            TEST_ASSERT( v2.IsNormalized() && v3.IsNormalized() )
+            TEST_ASSERT( Vector3::IsFuzzyZero(Vector3::Cross(v1,v2) - v3) )
+            TEST_ASSERT( Vector3::IsFuzzyZero(Vector3::Cross(v2,v3) - v1) )
+
+            v1 = Vector3::sDown;
+            Vector3::MakeOrthonormalBasis(v1,v2,v3 );
+            TEST_ASSERT( v2.IsNormalized() && v3.IsNormalized() )
+            TEST_ASSERT( Vector3::IsFuzzyZero(Vector3::Cross(v1,v2) - v3) )
+            TEST_ASSERT( Vector3::IsFuzzyZero(Vector3::Cross(v2,v3) - v1) )
+
+            v1 = Vector3::sForward;
+            Vector3::MakeOrthonormalBasis(v1,v2,v3 );
+            TEST_ASSERT( v2.IsNormalized() && v3.IsNormalized() )
+            TEST_ASSERT( Vector3::IsFuzzyZero(Vector3::Cross(v1,v2) - v3) )
+            TEST_ASSERT( Vector3::IsFuzzyZero(Vector3::Cross(v2,v3) - v1) )
+
+            v1 = Vector3::sBack;
+            Vector3::MakeOrthonormalBasis(v1,v2,v3 );
+            TEST_ASSERT( v2.IsNormalized() && v3.IsNormalized() )
+            TEST_ASSERT( Vector3::IsFuzzyZero(Vector3::Cross(v1,v2) - v3) )
+            TEST_ASSERT( Vector3::IsFuzzyZero(Vector3::Cross(v2,v3) - v1) )
         }
     };
 }

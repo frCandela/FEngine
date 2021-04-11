@@ -71,4 +71,24 @@ namespace fan
                         -_v1.x * _v2.z + _v1.z * _v2.x,
                         _v1.x * _v2.y - _v1.y * _v2.x );
     }
+
+    //==========================================================================================================================
+    // x is given, y and z are created
+    //==========================================================================================================================
+    void Vector3::MakeOrthonormalBasis( const Vector3& _x, Vector3& _y, Vector3& _z )
+    {
+        fanAssert( _x.IsNormalized() );
+        if( Fixed::Abs( _x.x ) > Fixed::Abs( _x.y ) )
+        {
+            _z = Vector3( -_x.z, 0, _x.x ); // cross(_x,up)
+            _z.Normalize();
+            _y = Vector3( -_z.z * _x.y, -_z.x * _x.z + _z.z * _x.x, _z.x * _x.y );// cross(_z,x)
+        }
+        else
+        {
+            _z = Vector3( 0, _x.z, -_x.y ); // cross( _x, left );
+            _z.Normalize();
+            _y = Vector3( _z.y * _x.z - _z.z * _x.y, _z.z * _x.x, -_z.y * _x.x ); //cross( _z, _x );
+        }
+    }
 }
