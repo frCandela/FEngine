@@ -25,6 +25,12 @@ namespace fan
                 FxTransform& transform = *transformIt;
                 FxRigidbody& rb = *rbIt;
 
+                if( rb.mInverseMass == 0 )
+                {
+                    rb.mVelocity = rb.mRotation = Vector3::sZero;
+                    continue;
+                }
+
                 // calculates linear/angular accelerations from forces input
                 Vector3 resultingLinearAcceleration = rb.mAcceleration;
                 resultingLinearAcceleration += rb.mInverseMass * rb.mForcesAccumulator;
