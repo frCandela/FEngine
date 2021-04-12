@@ -21,6 +21,7 @@ namespace fan
                  Fixed _r2c1, Fixed _r2c2, Fixed _r2c3,
                  Fixed _r3c1, Fixed _r3c2, Fixed _r3c3 );
         Matrix3( const Quaternion& _quat );
+        Matrix3( const Vector3& _v1, const Vector3& _v2, const Vector3& _v3 );
 
         static const Matrix3 sZero;
         static const Matrix3 sIdentity;
