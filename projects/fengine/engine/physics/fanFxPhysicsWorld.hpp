@@ -21,6 +21,7 @@ namespace fan
         Vector3 mGravity;
         Fixed   mLinearDamping; // [0,1] removes the energy added from numerical instability in the integrator
         Fixed   mAngularDamping; // [0,1] removes the energy added from numerical instability in the integrator
+        Fixed   mRestitution; // [0,1]
 
         ContactSolver mContactSolver;
     };

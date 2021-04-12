@@ -36,11 +36,17 @@ namespace fan
                 ImGui::SameLine();
                 float       invMass = rb.mInverseMass.ToFloat();
                 float       mass    = ( invMass > 0.f ? 1.f / invMass : 0.f );
-                const float minMass = 0.01f;
-                if( ImGui::DragFloat( "mass", &mass, 2.f, minMass, 1000 ) )
+                if( ImGui::DragFloat( "mass", &mass, 2.f, 0.01f, 1000 ) )
                 {
-                    if( mass == 0 ){ mass = minMass; }
-                    rb.mInverseMass = 1 / Fixed::FromFloat( mass );
+                    if( mass <= 0 )
+                    {
+                        rb.mInverseMass = 0;
+                    }
+                    else
+                    {
+                        rb.mInverseMass = 1 / Fixed::FromFloat( mass );
+                    }
+
                 }
                 ImGui::PopItemWidth();
 

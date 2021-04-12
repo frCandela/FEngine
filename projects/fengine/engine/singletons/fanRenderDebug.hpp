@@ -26,11 +26,11 @@ namespace fan
         std::vector<DebugVertex2D> mDebugLines2D;
 
 		void Clear();
-        void DebugPoint( const btVector3 _pos, const Color _color );
+        void DebugPoint( const btVector3 _pos, const Color _color, const bool _depthTestEnable = false );
         void DebugLine( const btVector3 _start,
                         const btVector3 _end,
                         const Color _color,
-                        const bool _depthTestEnable = true );
+                        const bool _depthTestEnable = false );
         void DebugTriangle( const btVector3 _v0,
                             const btVector3 _v1,
                             const btVector3 _v2,
@@ -41,20 +41,20 @@ namespace fan
                           btVector3 _axis,
                           uint32_t _nbSegments,
                           const Color _color,
-                          const bool _depthTestEnable = true );
+                          const bool _depthTestEnable = false );
         void DebugCube( const btTransform _transform,
                         const btVector3 _halfExtent,
                         const Color _color,
-                        const bool _depthTestEnable = true );
+                        const bool _depthTestEnable = false );
         void DebugIcoSphere( const btTransform _transform,
                              const float _radius,
                              const int _numSubdivisions,
                              const Color _color,
-                             const bool _depthTestEnable = true );
+                             const bool _depthTestEnable = false );
         void DebugSphere( const btTransform _transform,
                           const float _radius,
                           const Color _color,
-                          const bool _depthTestEnable = true );
+                          const bool _depthTestEnable = false );
         void DebugCone( const btTransform _transform,
                         const float _radius,
                         const float _height,

@@ -63,18 +63,18 @@ namespace fan
 			const int count = grid.mLinesCount;
 
 			for( int coord = -grid.mLinesCount; coord <= grid.mLinesCount; coord++ )
-			{
-				_world.GetSingleton<RenderDebug>().DebugLine( grid.mOffset +
+            {
+                _world.GetSingleton<RenderDebug>().DebugLine( grid.mOffset +
                                                               btVector3( -count * size, 0.f, coord * size ),
                                                               grid.mOffset +
                                                               btVector3( count * size, 0.f, coord * size ),
-                                                              grid.mColor );
+                                                              grid.mColor, true );
 
-				_world.GetSingleton<RenderDebug>().DebugLine( grid.mOffset +
+                _world.GetSingleton<RenderDebug>().DebugLine( grid.mOffset +
                                                               btVector3( coord * size, 0.f, -count * size ),
                                                               grid.mOffset +
                                                               btVector3( coord * size, 0.f, count * size ),
-                                                              grid.mColor );
+                                                              grid.mColor, true );
             }
 		}
 	}

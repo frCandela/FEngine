@@ -48,6 +48,13 @@ namespace fan
                 physicsWorld.mAngularDamping = Fixed::FromFloat( angularDamping );
             }
 
+            // restitution
+            float restitution = physicsWorld.mRestitution.ToFloat();
+            if( ImGui::DragFloat( "restitution", &restitution, 0.01f, 0.f, 1.f ) )
+            {
+                physicsWorld.mRestitution = Fixed::FromFloat( restitution );
+            }
+
             // damping
             if( ImGui::DragInt( "contact solver max iterations", &physicsWorld.mContactSolver.mMaxIterations ) )
             {
