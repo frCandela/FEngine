@@ -12,6 +12,7 @@
 #include "engine/components/fanPointLight.hpp"
 #include "engine/components/fanDirectionalLight.hpp"
 #include "engine/components/fanFollowTransform.hpp"
+#include "engine/components/fanFxTransform.hpp"
 #include "engine/singletons/fanMouse.hpp"
 #include "engine/singletons/fanScene.hpp"
 #include "engine/systems/fanRaycast.hpp"
@@ -75,6 +76,43 @@ namespace fan
 		}
 	}
 
+    //========================================================================================================
+    //========================================================================================================
+    bool DrawMoveGizmo( SceneNode& _sceneNode )
+    {
+        EcsWorld& world = *_sceneNode.mScene->mWorld;
+        EcsEntity entity = world.GetEntity( _sceneNode.mHandle );
+
+        // Transform
+        if( world.HasComponent<Transform>( entity ) )
+        {
+            Transform& transform = world.GetComponent< Transform >( entity );
+            btVector3 newPosition;
+            EditorGizmos& gizmos = world.GetSingleton<EditorGizmos>();
+            if( gizmos.DrawMoveGizmo( btTransform( btQuaternion( 0, 0, 0 ), transform.GetPosition() ), (size_t)&transform, newPosition ) )
+            {
+                transform.SetPosition( newPosition );
+                _sceneNode.AddFlag( SceneNode::BoundsOutdated );
+                return true;
+            }
+        }
+
+        // FxTransform
+        if( world.HasComponent<FxTransform>( entity ) )
+        {
+            FxTransform& transform = world.GetComponent<FxTransform>( entity );
+            btVector3 newPosition;
+            EditorGizmos& gizmos = world.GetSingleton<EditorGizmos>();
+            if( gizmos.DrawMoveGizmo( btTransform( btQuaternion( 0, 0, 0 ), Math::ToBullet( transform.mPosition ) ), (size_t)&transform, newPosition ) )
+            {
+                transform.mPosition = Math::ToFixed( newPosition );
+                _sceneNode.AddFlag( SceneNode::BoundsOutdated );
+                return true;
+            }
+        }
+        return false;
+    }
+
 	//========================================================================================================
 	//========================================================================================================
 	void EditorSelection::Update( const bool _gameWindowHovered )
@@ -87,23 +125,7 @@ namespace fan
 		SceneNode* selectedSceneNode = GetSelectedSceneNode();
 		if ( selectedSceneNode != nullptr && selectedSceneNode->mHandle != mCurrentScene->mMainCameraHandle )
 		{
-			EcsWorld& world = *selectedSceneNode->mScene->mWorld;
-			EcsEntity entity = world.GetEntity( selectedSceneNode->mHandle );
-			if( world.HasComponent<Transform>( entity ) )
-			{
-				Transform& transform = world.GetComponent< Transform >( entity );
-				btVector3 newPosition;
-
-				EditorGizmos& gizmos = world.GetSingleton<EditorGizmos>();
-                if( gizmos.DrawMoveGizmo( btTransform( btQuaternion( 0, 0, 0 ), transform.GetPosition() ),
-                                          (size_t)&transform,
-                                          newPosition ) )
-				{
-					transform.SetPosition( newPosition );
-					selectedSceneNode->AddFlag( SceneNode::BoundsOutdated );
-					mouseCaptured = true;
-				}
-			}
+            mouseCaptured = DrawMoveGizmo( *selectedSceneNode );
 		}
 
 		// mouse selection
@@ -117,26 +139,28 @@ namespace fan
 
             const Ray ray = camera.ScreenPosToRay( cameraTransform, mouse.LocalScreenSpacePosition() );
 
-			// raycast on bounds
-			std::vector<EcsEntity> results;
-			world.Run<SRaycastAll>( ray, results );
-			if( !results.empty() )
-			{
-				// cycle selection
-				static Ray lastRay;
-				static int cycle = 0;
-				int index = 0;
-				if( ray == lastRay )
-				{					
-					index = ( ++cycle % results.size() );
-				}
-				lastRay = ray;
+            // raycast on bounds
+            std::vector<EcsEntity> results, resultsFx;
+            world.Run<SRaycastAll>( ray, results );
+            world.Run<SFxRaycastAll>( ray, results );
+            results.insert( results.end(), resultsFx.begin(), resultsFx.end() );
+            if( !results.empty() )
+            {
+                // cycle selection
+                static Ray lastRay;
+                static int cycle = 0;
+                int        index = 0;
+                if( ray == lastRay )
+                {
+                    index = ( ++cycle % results.size() );
+                }
+                lastRay          = ray;
 
-				// selection
-				SceneNode& sceneNode = world.GetComponent<SceneNode>( results[index] );
-				SetSelectedSceneNode( &sceneNode );
-			}
- 		}
+                // selection
+                SceneNode& sceneNode = world.GetComponent<SceneNode>( results[index] );
+                SetSelectedSceneNode( &sceneNode );
+            }
+        }
 
 		// draw collision shapes, lights @migration
 		if( mSelectedNodeHandle != 0 )
