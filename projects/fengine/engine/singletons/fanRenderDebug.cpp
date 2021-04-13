@@ -215,14 +215,14 @@ namespace fan
 
 	//========================================================================================================
 	//========================================================================================================
-    void RenderDebug::DebugSphere( const btTransform _transform,
+    void RenderDebug::DebugSphere( const btVector3 _origin,
                                    const float _radius,
                                    const Color _color,
                                    const bool _depthTestEnable )
 	{
-		DebugCircle( _transform.getOrigin(), _radius, btVector3_Up, 32, _color, _depthTestEnable );
-		DebugCircle( _transform.getOrigin(), _radius, btVector3_Left, 32, _color, _depthTestEnable );
-		DebugCircle( _transform.getOrigin(), _radius, btVector3_Forward, 32, _color, _depthTestEnable );
+		DebugCircle( _origin, _radius, btVector3_Up, 32, _color, _depthTestEnable );
+		DebugCircle( _origin, _radius, btVector3_Left, 32, _color, _depthTestEnable );
+		DebugCircle( _origin, _radius, btVector3_Forward, 32, _color, _depthTestEnable );
 	}
 
 	//========================================================================================================

@@ -18,6 +18,7 @@ namespace fan
         static Quaternion ToFixed( const glm::quat& _quat );
         static Vector3 ToFixed( const btVector3& _vec );
         static btVector3 ToBullet( const Vector3& _vec );
+        static btQuaternion ToBullet( const Quaternion& _quat );
     };
 
     static const btVector3 btVector3_Left    = btVector3( 1.f, 0.f, 0.f );

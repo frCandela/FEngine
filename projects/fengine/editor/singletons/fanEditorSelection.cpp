@@ -162,30 +162,53 @@ namespace fan
             }
         }
 
-		// draw collision shapes, lights @migration
+		// draw collision shapes, lights
 		if( mSelectedNodeHandle != 0 )
-		{
-			const EcsEntity selectedEntity = world.GetEntity( mSelectedNodeHandle );
-			SDrawDebugCollisionShapes::DrawCollisionShape( world, selectedEntity );
+        {
+            RenderDebug& renderDebug = world.GetSingleton<RenderDebug>();
 
-			if( world.HasComponent<Transform>( selectedEntity ) ) 
-			{
-				RenderDebug& renderDebug = world.GetSingleton<RenderDebug>();
-				const Transform& transform = world.GetComponent<Transform>( selectedEntity );
-				if( world.HasComponent<DirectionalLight>( selectedEntity ) )
+            const EcsEntity selectedEntity = world.GetEntity( mSelectedNodeHandle );
+            SDrawDebugCollisionShapes::DrawCollisionShape( world, selectedEntity );
+
+            // bullet
+            if( world.HasComponent<FxTransform>( selectedEntity ) )
+            {
+                const FxTransform& transform = world.GetComponent<FxTransform>( selectedEntity );
+
+                //sphere collider
+                if( world.HasComponent<FxSphereCollider>( selectedEntity ) )
                 {
-                    const DirectionalLight& directionalLight = world.GetComponent<DirectionalLight>(
-                            selectedEntity );
-                    SDrawDebugDirectionalLights::DrawDirectionalLight( renderDebug,
-                                                                       transform,
-                                                                       directionalLight );
-				} 
-				if( world.HasComponent<PointLight>( selectedEntity ) )
-				{
-					const PointLight& pointLight = world.GetComponent<PointLight>( selectedEntity );
-					SDrawDebugPointLights::DrawPointLight( renderDebug, transform, pointLight );
-				}
-			}
+                    const FxSphereCollider& sphere = world.GetComponent<FxSphereCollider>( selectedEntity );
+                    SDrawDebugFxSphereColliders::Draw( sphere, transform, renderDebug );
+                }
+
+                //sphere collider
+                if( world.HasComponent<FxBoxCollider>( selectedEntity ) )
+                {
+                    const FxBoxCollider& box = world.GetComponent<FxBoxCollider>( selectedEntity );
+                    SDrawDebugFxBoxColliders::Draw( box, transform, renderDebug );
+                }
+            }
+
+            // fixed point
+            if( world.HasComponent<Transform>( selectedEntity ) )
+            {
+                const Transform& transform = world.GetComponent<Transform>( selectedEntity );
+
+                // Directional light
+                if( world.HasComponent<DirectionalLight>( selectedEntity ) )
+                {
+                    const DirectionalLight& directionalLight = world.GetComponent<DirectionalLight>( selectedEntity );
+                    SDrawDebugDirectionalLights::DrawDirectionalLight( renderDebug, transform, directionalLight );
+                }
+
+                // Point light
+                if( world.HasComponent<PointLight>( selectedEntity ) )
+                {
+                    const PointLight& pointLight = world.GetComponent<PointLight>( selectedEntity );
+                    SDrawDebugPointLights::DrawPointLight( renderDebug, transform, pointLight );
+                }
+            }
 		}	
 	}
 

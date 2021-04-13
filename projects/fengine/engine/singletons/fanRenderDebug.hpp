@@ -51,7 +51,7 @@ namespace fan
                              const int _numSubdivisions,
                              const Color _color,
                              const bool _depthTestEnable = false );
-        void DebugSphere( const btTransform _transform,
+        void DebugSphere( const btVector3 _origin,
                           const float _radius,
                           const Color _color,
                           const bool _depthTestEnable = false );

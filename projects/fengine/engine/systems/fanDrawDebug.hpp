@@ -10,6 +10,8 @@
 #include "engine/singletons/fanRenderDebug.hpp"
 #include "engine/singletons/fanScene.hpp"
 #include "engine/fanSceneTags.hpp"
+#include "engine/physics/fanFxSphereCollider.hpp"
+#include "engine/physics/fanFxBoxCollider.hpp"
 
 namespace fan
 {
@@ -188,7 +190,7 @@ namespace fan
 			const float lightRange = PointLight::GetLightRange( _light );
 			if( lightRange > 0 )
 			{
-				_renderDebug.DebugSphere( _transform.mTransform, lightRange, _light.mDiffuse );
+				_renderDebug.DebugSphere( _transform.GetPosition(), lightRange, _light.mDiffuse );
 			}
 		}
 	};
@@ -272,22 +274,75 @@ namespace fan
 			if( _world.HasComponent<BoxShape>( _entity ) )
 			{
 				const BoxShape& shape = _world.GetComponent<BoxShape>( _entity );
-                _world.GetSingleton<RenderDebug>().DebugCube( transform.mTransform,
-                                                              0.5f * shape.GetScaling(),
-                                                              Color::sGreen, false );
-			}
+                _world.GetSingleton<RenderDebug>().DebugCube( transform.mTransform, 0.5f * shape.GetScaling(), Color::sGreen, false );
+            }
 
 			// sphere shape
 			if( _world.HasComponent<SphereShape>( _entity ) )
 			{
-				const SphereShape& shape = _world.GetComponent<SphereShape>( _entity );
-                _world.GetSingleton<RenderDebug>().DebugSphere( transform.mTransform,
-                                                                shape.GetRadius(),
-                                                                Color::sGreen, false );
+                const SphereShape& shape = _world.GetComponent<SphereShape>( _entity );
+                _world.GetSingleton<RenderDebug>().DebugSphere( transform.GetPosition(), shape.GetRadius(), Color::sGreen, false );
             }
 		}
 	};
 
+
+    //========================================================================================================
+    // Draw physics sphere collider in wireframe
+    //========================================================================================================
+    struct SDrawDebugFxSphereColliders : EcsSystem
+    {
+        static EcsSignature GetSignature( const EcsWorld& _world )
+        {
+            return _world.GetSignature<FxTransform>() | _world.GetSignature<FxSphereCollider>();
+        }
+
+        static void Run( EcsWorld& _world, const EcsView& _view )
+        {
+            RenderDebug& renderDebug = _world.GetSingleton<RenderDebug>();
+
+            auto transformIt = _view.begin<FxTransform>();
+            auto sphereIt    = _view.begin<FxSphereCollider>();
+            for( ; transformIt != _view.end<FxTransform>(); ++transformIt, ++sphereIt )
+            {
+                Draw( *sphereIt, *transformIt, renderDebug );
+            }
+        }
+
+        static void Draw( const FxSphereCollider& _sphere, const FxTransform& _transform, RenderDebug& _renderDebug )
+        {
+            _renderDebug.DebugSphere( Math::ToBullet( _transform.mPosition ), _sphere.mRadius.ToFloat(), Color::sGreen, false );
+        }
+    };
+
+    //========================================================================================================
+    // Draw physics box collider in wireframe
+    //========================================================================================================
+    struct SDrawDebugFxBoxColliders : EcsSystem
+    {
+        static EcsSignature GetSignature( const EcsWorld& _world )
+        {
+            return _world.GetSignature<FxTransform>() | _world.GetSignature<FxBoxCollider>();
+        }
+
+        static void Run( EcsWorld& _world, const EcsView& _view )
+        {
+            RenderDebug& renderDebug = _world.GetSingleton<RenderDebug>();
+
+            auto transformIt = _view.begin<FxTransform>();
+            auto boxIt    = _view.begin<FxBoxCollider>();
+            for( ; transformIt != _view.end<FxTransform>(); ++transformIt, ++boxIt )
+            {
+                Draw( *boxIt, *transformIt, renderDebug );
+            }
+        }
+
+        static void Draw( const FxBoxCollider& _box, const FxTransform& _transform, RenderDebug& _renderDebug )
+        {
+            btTransform btTrans( Math::ToBullet(_transform.mRotation), Math::ToBullet(_transform.mPosition));
+            _renderDebug.DebugCube(btTrans, Math::ToBullet(_box.mHalfExtents), Color::sGreen, false );
+        }
+    };
 
     //========================================================================================================
     //========================================================================================================
