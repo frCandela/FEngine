@@ -27,6 +27,8 @@
 
 // fxPhysics
 #include "engine/physics/fanFxRigidbody.hpp"
+#include "engine/physics/fanFxSphereCollider.hpp"
+#include "engine/physics/fanFxBoxCollider.hpp"
 #include "engine/physics/fanFxPhysicsWorld.hpp"
 
 //render 3D
@@ -105,7 +107,8 @@ namespace fan
 
         _world.AddSingletonType<FxPhysicsWorld>();
         _world.AddComponentType<FxRigidbody>();
-
+        _world.AddComponentType<FxSphereCollider>();
+        _world.AddComponentType<FxBoxCollider>();
     }
 
     //========================================================================================================

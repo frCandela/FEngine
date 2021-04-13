@@ -276,6 +276,8 @@ namespace fan
                 world.Run<SUpdateBoundsFromRigidbody>( delta );
                 world.Run<SUpdateBoundsFromModel>();
                 world.Run<SUpdateBoundsFromTransform>();
+                world.Run<SUpdateBoundsFromFxSphereColliders>();
+                world.Run<SUpdateBoundsFromFxBoxColliders>();
 
                 if( isCurrentWorld )
                 {

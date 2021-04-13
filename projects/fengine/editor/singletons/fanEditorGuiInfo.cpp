@@ -65,9 +65,11 @@
 #include "editor/gui/scene/components/fanGuiSphereShape.hpp"
 #include "editor/gui/scene/components/fanGuiTransform.hpp"
 
-// Fx physics
+// FX PHYSICS
 #include "editor/gui/scene/components/fanGuiFxTransform.hpp"
 #include "editor/gui/scene/components/physics/fanGuiFxRigidbody.hpp"
+#include "editor/gui/scene/components/physics/fanGuiFxSphereCollider.hpp"
+#include "editor/gui/scene/components/physics/fanGuiFxBoxCollider.hpp"
 #include "editor/gui/scene/singletons/fanGuiFxPhysicsWorld.hpp"
 
 namespace fan
@@ -152,6 +154,8 @@ namespace fan
         // fx physics
         editorGui.mComponentInfos[ FxRigidbody::Info::sType ]   = GuiFxRigidbody::GetInfo();
         editorGui.mSingletonInfos[ FxPhysicsWorld::Info::sType ] = GuiFxPhysicsWorld::GetInfo();
+        editorGui.mComponentInfos[ FxBoxCollider::Info::sType ]   = GuiFxBoxCollider::GetInfo();
+        editorGui.mComponentInfos[ FxSphereCollider::Info::sType ]   = GuiFxSphereCollider::GetInfo();
 
         editorGui.mComponentInfos[ FxTransform::Info::sType ]   = GuiFxTransform::GetInfo();
     }

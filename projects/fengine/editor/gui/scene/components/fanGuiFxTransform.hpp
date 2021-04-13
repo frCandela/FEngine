@@ -23,17 +23,19 @@ namespace fan
 
         //========================================================================================================
         //========================================================================================================
-        static void OnGui( EcsWorld& /*_world*/, EcsEntity /*_entityID*/, EcsComponent& _component )
+        static void OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component )
         {
             FxTransform& transform = static_cast<FxTransform&>( _component );
             ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() - 16 );
             {
                 ImGui::PushID( "fixed_transform" );
+                SceneNode& sceneNode = _world.GetComponent<SceneNode>( _entityID );
 
                 // Position
                 if( ImGui::Button( "##TransPos" ) )
                 {
                     transform.mPosition = Vector3::sZero;
+                    sceneNode.AddFlag( SceneNode::BoundsOutdated );
                 }
                 ImGui::SameLine();
                 glm::vec3 position = Math::ToGLM( transform.mPosition );
@@ -45,6 +47,7 @@ namespace fan
                             Fixed::IsFuzzyZero( newPosition.y - transform.mPosition.y ) ? transform.mPosition.y : newPosition.y,
                             Fixed::IsFuzzyZero( newPosition.z - transform.mPosition.z ) ? transform.mPosition.z : newPosition.z
                     };
+                    sceneNode.AddFlag( SceneNode::BoundsOutdated );
                 }
 
 
@@ -52,6 +55,7 @@ namespace fan
                 if( ImGui::Button( "##TransRot" ) )
                 {
                     transform.mRotation = Quaternion::sIdentity;
+                    sceneNode.AddFlag( SceneNode::BoundsOutdated );
                 }
                 ImGui::SameLine();
                 Vector3   oldRotation = transform.mRotation.Euler();
@@ -68,6 +72,7 @@ namespace fan
                     if( ( newRotation - oldRotation ).Magnitude() > Fixed::FromFloat(speed) )
                     {
                         transform.mRotation = Quaternion::Euler( newRotation );
+                        sceneNode.AddFlag( SceneNode::BoundsOutdated );
                     }
                 }
 
@@ -75,6 +80,7 @@ namespace fan
                 if( ImGui::Button( "##TransScale" ) )
                 {
                     transform.mScale = Vector3::sOne;
+                    sceneNode.AddFlag( SceneNode::BoundsOutdated );
                 }
                 ImGui::SameLine();
                 glm::vec3 scale = Math::ToGLM( transform.mScale );
@@ -86,6 +92,7 @@ namespace fan
                             Fixed::IsFuzzyZero( newScale.y - transform.mScale.y ) ? transform.mScale.y : newScale.y,
                             Fixed::IsFuzzyZero( newScale.z - transform.mScale.z ) ? transform.mScale.z : newScale.z
                     };
+                    sceneNode.AddFlag( SceneNode::BoundsOutdated );
                 }
 
                 ImGui::PopID();
