@@ -41,6 +41,20 @@ namespace fan
                     sphere.mRadius = Fixed::FromFloat( radius );
                     _world.GetComponent<SceneNode>(_entityID).AddFlag( SceneNode::BoundsOutdated );
                 }
+
+                // offset
+                if( ImGui::Button( "##offset" ) )
+                {
+                    sphere.mOffset = Vector3::sZero;
+                    _world.GetComponent<SceneNode>( _entityID ).AddFlag( SceneNode::BoundsOutdated );
+                }
+                ImGui::SameLine();
+                glm::vec3 offset = Math::ToGLM( sphere.mOffset );
+                if( ImGui::DragFloat3( "offset", &offset.x, 0.01f, -1000.f, 1000.f ) )
+                {
+                    sphere.mOffset = Math::ToFixed( offset );
+                    _world.GetComponent<SceneNode>( _entityID ).AddFlag( SceneNode::BoundsOutdated );
+                }
             }
             ImGui::PopID();
         }

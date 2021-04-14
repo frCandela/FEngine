@@ -311,7 +311,7 @@ namespace fan
 
         static void Draw( const FxSphereCollider& _sphere, const FxTransform& _transform, RenderDebug& _renderDebug )
         {
-            _renderDebug.DebugSphere( Math::ToBullet( _transform.mPosition ), _sphere.mRadius.ToFloat(), Color::sGreen, false );
+            _renderDebug.DebugSphere( Math::ToBullet( _transform.mPosition + _transform.TransformDirection(_sphere.mOffset) ), _sphere.mRadius.ToFloat(), Color::sGreen, false );
         }
     };
 
