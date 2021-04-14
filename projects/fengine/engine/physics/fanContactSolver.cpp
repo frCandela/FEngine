@@ -75,6 +75,12 @@ namespace fan
         Vector3 velocityChange = impulse * contact.rb0->mInverseMass;
         Vector3 impulsiveTorque = Vector3::Cross( impulse, contact.relativeContactPosition0 );
         Vector3 rotationChange = contact.rb0->mInverseInertiaTensorWorld * impulsiveTorque;
+
+
+        //float glmDesired = desiredDeltaVelocity.ToFloat(); (void)glmDesired;
+        glm::vec3 glmcPos = Math::ToGLM(contact.relativeContactPosition0);(void)glmcPos;
+        glm::vec3 glmTorque = Math::ToGLM(impulsiveTorque);(void)glmTorque;
+
         contact.rb0->mVelocity += velocityChange;
         contact.rb0->mRotation += rotationChange;
 

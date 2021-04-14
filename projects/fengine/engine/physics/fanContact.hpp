@@ -24,11 +24,5 @@ namespace fan
         Fixed   restitution;
         Fixed   penetration;
         Matrix3 contactToWorld;
-
-        bool operator<( const Contact& _contact ) const
-        {
-            return penetration < _contact.penetration;
-        }
     };
-
 }

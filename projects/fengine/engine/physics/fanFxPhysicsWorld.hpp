@@ -2,6 +2,7 @@
 
 #include "core/ecs/fanEcsSingleton.hpp"
 #include "engine/physics/fanContactSolver.hpp"
+#include "engine/physics/fanCollisionDetection.hpp"
 
 namespace fan
 {
@@ -23,6 +24,7 @@ namespace fan
         Fixed   mAngularDamping; // [0,1] removes the energy added from numerical instability in the integrator
         Fixed   mRestitution; // [0,1]
 
-        ContactSolver mContactSolver;
+        ContactSolver      mContactSolver;
+        CollisionDetection mCollisionDetection;
     };
 }
