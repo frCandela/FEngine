@@ -28,8 +28,9 @@ namespace fan
         {
             return;
         }
+        if( _contacts.empty()){ return; }
 
-        Contact& contact = _contacts[maxIndex];
+        Contact& contact = _contacts[0];
         ResolveVelocity( contact, _duration );
         ResolveInterpenetration( contact, _duration );
     }
@@ -38,73 +39,75 @@ namespace fan
     //==================================================================================================================================================================================================
     Fixed ContactSolver::CalculateSeparatingVelocity( const Contact& _contact )
     {
-        Vector3 relativeVelocity = _contact.rb0->mVelocity;
-        if( _contact.rb1 ){ relativeVelocity -= _contact.rb1->mVelocity; }
-        return Vector3::Dot( relativeVelocity, _contact.normal );
+        // calculate closing velocity
+        Vector3 closingVelocity = Vector3::Cross( _contact.relativeContactPosition0, _contact.rb0->mRotation );
+        closingVelocity += _contact.rb0->mVelocity;
+        if( _contact.rb1 )
+        {
+            closingVelocity -= Vector3::Cross( _contact.rb1->mRotation, _contact.relativeContactPosition1 );
+            closingVelocity -= _contact.rb1->mVelocity;
+        }
+        closingVelocity = _contact.contactToWorld.Transpose() * closingVelocity;
+        return closingVelocity.x;
     }
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void ContactSolver::ResolveVelocity( const Contact& contact, Fixed _duration )
+    void ContactSolver::ResolveVelocity( const Contact& _contact, Fixed _duration )
     {
         (void)_duration;
 
         // calculate closing velocity
-        Vector3 closingVelocity = Vector3::Cross( contact.rb0->mRotation, contact.relativeContactPosition0 );
-        closingVelocity += contact.rb0->mVelocity;
-        if( contact.rb1 )
+        Vector3 closingVelocity = Vector3::Cross( _contact.relativeContactPosition0, _contact.rb0->mRotation );
+        closingVelocity += _contact.rb0->mVelocity;
+        if( _contact.rb1 )
         {
-            closingVelocity -= Vector3::Cross( contact.rb1->mRotation, contact.relativeContactPosition1 );
-            closingVelocity -= contact.rb1->mVelocity;
+            closingVelocity -= Vector3::Cross( _contact.rb1->mRotation, _contact.relativeContactPosition1 );
+            closingVelocity -= _contact.rb1->mVelocity;
         }
-        closingVelocity = contact.contactToWorld.Transpose() * closingVelocity;
-        Fixed desiredDeltaVelocity = -closingVelocity.x * (1 + contact.restitution);
+        closingVelocity = _contact.contactToWorld.Transpose() * closingVelocity;
+        Fixed desiredDeltaVelocity = -closingVelocity.x * ( 1 + _contact.restitution);
 
         // Build a vector that shows the change in velocity in world space for a unit impulse in the direction of the contact normal.
-        Vector3 deltaVelWorld           = Vector3::Cross( contact.relativeContactPosition0, contact.normal );
-        deltaVelWorld = contact.rb0->mInverseInertiaTensorWorld * deltaVelWorld;
-        deltaVelWorld = Vector3::Cross( deltaVelWorld, contact.relativeContactPosition0 );
-        deltaVelWorld = contact.contactToWorld.Transpose() * deltaVelWorld;
+        Vector3 deltaVelWorld           = Vector3::Cross( _contact.relativeContactPosition0, _contact.normal );
+        deltaVelWorld = _contact.rb0->mInverseInertiaTensorWorld * deltaVelWorld;
+        deltaVelWorld = Vector3::Cross( deltaVelWorld, _contact.relativeContactPosition0 );
+        deltaVelWorld = _contact.contactToWorld.Transpose() * deltaVelWorld;
         Fixed deltaVelocity = deltaVelWorld.x; // angular component
 
-        deltaVelocity += contact.rb0->mInverseMass;  // linear component
+        deltaVelocity += _contact.rb0->mInverseMass;  // linear component
 
         // impulse
         Vector3 impulseContact( desiredDeltaVelocity / deltaVelocity, 0, 0 );
-        Vector3 impulse = contact.contactToWorld * impulseContact;
-        Vector3 velocityChange = impulse * contact.rb0->mInverseMass;
-        Vector3 impulsiveTorque = Vector3::Cross( impulse, contact.relativeContactPosition0 );
-        Vector3 rotationChange = contact.rb0->mInverseInertiaTensorWorld * impulsiveTorque;
+        Vector3 impulse = _contact.contactToWorld * impulseContact;
+        Vector3 velocityChange = impulse * _contact.rb0->mInverseMass;
+        Vector3 impulsiveTorque = Vector3::Cross( impulse, _contact.relativeContactPosition0 );
+        Vector3 rotationChange = _contact.rb0->mInverseInertiaTensorWorld * impulsiveTorque;
 
+        _contact.rb0->mVelocity += velocityChange;
+        _contact.rb0->mRotation += rotationChange;
 
-        //float glmDesired = desiredDeltaVelocity.ToFloat(); (void)glmDesired;
-        glm::vec3 glmcPos = Math::ToGLM(contact.relativeContactPosition0);(void)glmcPos;
-        glm::vec3 glmTorque = Math::ToGLM(impulsiveTorque);(void)glmTorque;
-
-        contact.rb0->mVelocity += velocityChange;
-        contact.rb0->mRotation += rotationChange;
-
-        if (contact.rb1)
+        if (_contact.rb1)
         {
             desiredDeltaVelocity = -desiredDeltaVelocity;
 
             // Build a vector that shows the change in velocity in world space for a unit impulse in the direction of the contact normal.
-            Vector3 deltaVelWorld1          = Vector3::Cross( contact.relativeContactPosition1, contact.normal );
-            deltaVelWorld1 = contact.rb1->mInverseInertiaTensorWorld * deltaVelWorld1;
-            deltaVelWorld1 = Vector3::Cross( deltaVelWorld1, contact.relativeContactPosition1 );
-            deltaVelWorld1 = contact.contactToWorld.Transpose() * deltaVelWorld1;
+            Vector3 deltaVelWorld1          = Vector3::Cross( _contact.relativeContactPosition1, _contact.normal );
+            deltaVelWorld1 = _contact.rb1->mInverseInertiaTensorWorld * deltaVelWorld1;
+            deltaVelWorld1 = Vector3::Cross( deltaVelWorld1, _contact.relativeContactPosition1 );
+            deltaVelWorld1 = _contact.contactToWorld.Transpose() * deltaVelWorld1;
             Fixed deltaVelocity1 = deltaVelWorld1.x; // angular component
 
-            deltaVelocity1 += contact.rb1->mInverseMass;  // linear component
+            deltaVelocity1 += _contact.rb1->mInverseMass;  // linear component
 
             // impulse
             Vector3 impulseContact1( desiredDeltaVelocity / deltaVelocity1, 0, 0 );
-            Vector3 impulse1 = contact.contactToWorld * impulseContact1;
-            Vector3 velocityChange1 = impulse1 * contact.rb1->mInverseMass;
-            Vector3 impulsiveTorque1 = Vector3::Cross( impulse1, contact.relativeContactPosition1 );
-            Vector3 rotationChange1 = contact.rb1->mInverseInertiaTensorWorld * impulsiveTorque1;
-            contact.rb1->mVelocity += velocityChange1;
-            contact.rb1->mRotation += rotationChange1;
+            Vector3 impulse1 = _contact.contactToWorld * impulseContact1;
+            Vector3 velocityChange1 = impulse1 * _contact.rb1->mInverseMass;
+            Vector3 impulsiveTorque1 = Vector3::Cross( impulse1, _contact.relativeContactPosition1 );
+            Vector3 rotationChange1 = _contact.rb1->mInverseInertiaTensorWorld * impulsiveTorque1;
+            _contact.rb1->mVelocity += velocityChange1;
+            _contact.rb1->mRotation += rotationChange1;
         }
     }
 

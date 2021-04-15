@@ -32,6 +32,7 @@ namespace fan
         Serializable::SaveVec3( _json, "gravity", physicsWorld.mGravity );
         Serializable::SaveFixed( _json, "damping", physicsWorld.mLinearDamping );
         Serializable::SaveFixed( _json, "restitution", physicsWorld.mRestitution );
+        Serializable::SaveInt( _json, "iterations", physicsWorld.mContactSolver.mMaxIterations );
     }
 
     //========================================================================================================
@@ -42,5 +43,6 @@ namespace fan
         Serializable::LoadVec3( _json, "gravity", physicsWorld.mGravity );
         Serializable::LoadFixed( _json, "damping", physicsWorld.mLinearDamping );
         Serializable::LoadFixed( _json, "restitution", physicsWorld.mRestitution );
+        Serializable::LoadInt( _json, "iterations", physicsWorld.mContactSolver.mMaxIterations );
     }
 }

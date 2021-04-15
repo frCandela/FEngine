@@ -40,5 +40,7 @@ namespace fan
 
         static bool SphereWithSphere( FxRigidbody&_rb0, FxSphereCollider& _sphere0, FxTransform& _transform0,
                                       FxRigidbody& _rb1, FxSphereCollider& _sphere1, FxTransform& _transform1, FxPhysicsWorld& _physicsWorld );
+        static bool SphereWithPlane( FxRigidbody&_rb0, FxSphereCollider& _sphere0, FxTransform& _transform0,
+                                     Vector3 _normal, Fixed _offset, FxPhysicsWorld& _physicsWorld );
     };
 }

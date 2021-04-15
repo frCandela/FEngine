@@ -13,9 +13,9 @@ namespace fan
     struct Contact
     {
         FxRigidbody* rb0;
-        FxRigidbody* rb1;
+        FxRigidbody* rb1 = nullptr;
         FxTransform* transform0;
-        FxTransform* transform1;
+        FxTransform* transform1 = nullptr;
         Vector3 relativeContactPosition0;
         Vector3 relativeContactPosition1;
         Vector3 tangents[2];

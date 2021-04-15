@@ -80,7 +80,7 @@ namespace fan
     Quaternion Quaternion::Normalized() const
     {
         Fixed m = Magnitude();
-        return Quaternion( mAngle / m, mAxis / m );
+        return m == 0 ? sIdentity : Quaternion( mAngle / m, mAxis / m );
     }
 
     //==========================================================================================================================
