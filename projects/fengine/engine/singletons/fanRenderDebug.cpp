@@ -2,6 +2,7 @@
 #include "core/math/fanMathUtils.hpp"
 #include "core/math/fanBasicModels.hpp"
 #include "core/fanDebug.hpp"
+#include "core/math/fanVector3.hpp"
 #include "editor/fanModals.hpp"
 
 namespace fan
@@ -40,12 +41,16 @@ namespace fan
 		DebugLine( _pos - size * btVector3_Forward, _pos + size * btVector3_Forward, _color, _depthTestEnable );
 	}
 
-	//========================================================================================================
-	//========================================================================================================
-    void RenderDebug::DebugLine( const btVector3 _start,
-                                 const btVector3 _end,
-                                 const Color _color,
-                                 const bool _depthTestEnable )
+    //========================================================================================================
+    //========================================================================================================
+    void RenderDebug::DebugPoint( const Vector3& _pos, const Color _color, const bool _depthTestEnable )
+    {
+        DebugPoint(Math::ToBullet(_pos), _color, _depthTestEnable);
+    }
+
+    //========================================================================================================
+    //========================================================================================================
+    void RenderDebug::DebugLine( const btVector3 _start, const btVector3 _end, const Color _color, const bool _depthTestEnable )
     {
         if( _depthTestEnable )
         {
@@ -54,14 +59,17 @@ namespace fan
         }
         else
         {
-            mDebugLinesNoDepthTest.push_back( DebugVertex( ToGLM( _start ),
-                                                           glm::vec3( 0, 0, 0 ),
-                                                           _color.ToGLM() ) );
-            mDebugLinesNoDepthTest.push_back( DebugVertex( ToGLM( _end ),
-                                                           glm::vec3( 0, 0, 0 ),
-                                                           _color.ToGLM() ) );
-		}
-	}
+            mDebugLinesNoDepthTest.push_back( DebugVertex( ToGLM( _start ), glm::vec3( 0, 0, 0 ), _color.ToGLM() ) );
+            mDebugLinesNoDepthTest.push_back( DebugVertex( ToGLM( _end ), glm::vec3( 0, 0, 0 ), _color.ToGLM() ) );
+        }
+    }
+
+    //========================================================================================================
+    //========================================================================================================
+    void RenderDebug::DebugLine( const Vector3& _start, const Vector3& _end, const Color _color, const bool _depthTestEnable )
+    {
+        DebugLine( Math::ToBullet(_start), Math::ToBullet(_end), _color, _depthTestEnable );
+    }
 
 	//========================================================================================================
 	// takes a list of triangle and a list of colors
