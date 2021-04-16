@@ -20,7 +20,7 @@ namespace fan
         static void Load( EcsComponent& _component, const Json& _json );
 
         Fixed   mInverseMass;
-        Matrix3 mInverseInertiaTensor;
+        Matrix3 mInverseInertiaTensorLocal;
         Vector3 mVelocity;
         Vector3 mRotation;
         Vector3 mAcceleration; // constant forces

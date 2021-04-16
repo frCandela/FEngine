@@ -58,8 +58,9 @@ namespace fan
             RenderDebug& rd = _world.GetSingleton<RenderDebug>();
             for( Contact _contact : physicsWorld.mCollisionDetection.mContacts )
             {
-               // EditorPlayState& ps = _world.GetSingleton<EditorPlayState>();
+                EditorPlayState& ps = _world.GetSingleton<EditorPlayState>();(void)ps;
                 //if( ps.mState == EditorPlayState::PLAYING ){ ps.mState = EditorPlayState::PAUSED; }
+
 
                 // calculate the velocity delta per unit contact impulse
                 Vector3 torquePerUnitImpulse = Vector3::Cross( _contact.relativeContactPosition0, _contact.normal );
@@ -78,10 +79,6 @@ namespace fan
                 Vector3 velocityChange = impulse * _contact.rb0->mInverseMass;
                 Vector3 impulsiveTorque = Vector3::Cross( _contact.relativeContactPosition0, impulse );
                 Vector3 rotationChange = _contact.rb0->mInverseInertiaTensorWorld * impulsiveTorque;
-
-                Vector3 aaa = Vector3::Cross( _contact.rb0->mRotation, _contact.relativeContactPosition0 );
-                rd.DebugLine( _contact.position, _contact.position + aaa, Color::sBlue );
-                rd.DebugLine( _contact.position, _contact.position + rotationChange, Color::sCyan );
 
                 rd.DebugLine( _contact.transform0->mPosition, _contact.transform0->mPosition + _contact.relativeContactPosition0, Color::sGreen );
                 rd.DebugLine( _contact.position, _contact.position + _contact.normal, Color::sOrange );
