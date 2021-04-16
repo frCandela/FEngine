@@ -31,8 +31,8 @@ namespace fan
         contact.restitution = _physicsWorld.mRestitution;
         Vector3::MakeOrthonormalBasis( contact.normal, contact.tangents[0], contact.tangents[1] );
         contact.contactToWorld           = Matrix3( contact.normal, contact.tangents[0], contact.tangents[1] );
-        contact.relativeContactPosition0 = _transform0.mPosition - contact.position;
-        contact.relativeContactPosition1 = _transform1.mPosition - contact.position;
+        contact.relativeContactPosition0 = contact.position - _transform0.mPosition;
+        contact.relativeContactPosition1 = contact.position - _transform1.mPosition;
 
         _physicsWorld.mCollisionDetection.mContacts.push_back( contact );
         return true;
@@ -56,7 +56,7 @@ namespace fan
         contact.restitution = _physicsWorld.mRestitution;
         Vector3::MakeOrthonormalBasis( contact.normal, contact.tangents[0], contact.tangents[1] );
         contact.contactToWorld           = Matrix3( contact.normal, contact.tangents[0], contact.tangents[1] );
-        contact.relativeContactPosition0 = _transform.mPosition - contact.position;
+        contact.relativeContactPosition0 = contact.position - _transform.mPosition;
 
         float pen = contact.penetration.ToFloat(); (void)pen;
         glm::vec3 niorm = Math::ToGLM(contact.normal ); (void)niorm;
