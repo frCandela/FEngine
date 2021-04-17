@@ -24,10 +24,8 @@
 #include "game/components/fanTestComponent.hpp"
 #include "game/singletons/fanTestSingleton.hpp"
 #include "game/systems/fanTestSystem.hpp"
-
 #include "editor/fanRegisterEditorGui.hpp"
-
-
+#include "engine/physics/fanDetectCollisions.hpp"
 #include "engine/singletons/fanScene.hpp"
 #include "engine/singletons/fanRenderResources.hpp"
 
@@ -89,9 +87,8 @@ namespace fan
         {
             FxPhysicsWorld& fxPhysicsWorld = mWorld.GetSingleton<FxPhysicsWorld>();
 
-
             mWorld.Run<SIntegrateFxRigidbodies>( fxDelta, fxPhysicsWorld );
-            mWorld.Run<STestSystem>( fxDelta );
+            mWorld.Run<SDetectCollisions>( fxDelta );
         }
 
         mWorld.Run<SSynchronizeTransformFromMotionState>();

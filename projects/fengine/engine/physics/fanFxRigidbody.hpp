@@ -4,16 +4,18 @@
 #include "core/math/fanVector3.hpp"
 #include "core/math/fanMatrix3.hpp"
 #include "core/math/fanMatrix4.hpp"
+#include "engine/fanSceneResourcePtr.hpp"
 
 namespace fan
 {
     struct FxTransform;
+    struct FxSphereCollider;
 
     //========================================================================================================
     //========================================================================================================
     struct FxRigidbody : public EcsComponent
     {
-    ECS_COMPONENT( FxRigidbody )
+        ECS_COMPONENT( FxRigidbody )
         static void SetInfo( EcsComponentInfo& _info );
         static void Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component );
         static void Save( const EcsComponent& _component, Json& _json );
