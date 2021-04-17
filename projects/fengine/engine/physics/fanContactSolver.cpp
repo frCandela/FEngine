@@ -10,28 +10,28 @@ namespace fan
     //==================================================================================================================================================================================================
     void ContactSolver::ResolveContacts( std::vector<Contact> _contacts, const Fixed _duration )
     {
-        // find the contact with the largest closing velocity
-        Fixed maxSeparatingVelocity = 0;
-        int   maxIndex              = (int)_contacts.size();
-        for( int i = 0; i < (int)_contacts.size(); ++i )
+        while(!_contacts.empty())
         {
-            const Fixed separatingVelocity = CalculateSeparatingVelocity( _contacts[i] );
-            if( separatingVelocity < 0 && separatingVelocity < maxSeparatingVelocity )
+            // find the contact with the largest closing velocity
+            Fixed    maxSeparatingVelocity = 0;
+            int      maxIndex              = (int)_contacts.size();
+            for( int i                     = 0; i < (int)_contacts.size(); ++i )
             {
-                maxSeparatingVelocity = separatingVelocity;
-                maxIndex              = i;
+                const Fixed separatingVelocity = CalculateSeparatingVelocity( _contacts[i] );
+                if( separatingVelocity < 0 && separatingVelocity < maxSeparatingVelocity )
+                {
+                    maxSeparatingVelocity = separatingVelocity;
+                    maxIndex              = i;
+                }
             }
-        }
+            if( maxIndex == (int)_contacts.size() ){ break; }
 
-        if( maxIndex == (int)_contacts.size() )
-        {
-            return;
+            Contact contact = _contacts[maxIndex];
+            _contacts[maxIndex] = _contacts[_contacts.size() - 1];
+            _contacts.pop_back();
+            ResolveVelocity( contact, _duration );
+            ResolveInterpenetration( contact, _duration );
         }
-        if( _contacts.empty()){ return; }
-
-        Contact& contact = _contacts[0];
-        ResolveVelocity( contact, _duration );
-        ResolveInterpenetration( contact, _duration );
     }
 
     //==================================================================================================================================================================================================

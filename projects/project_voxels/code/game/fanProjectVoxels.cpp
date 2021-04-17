@@ -91,10 +91,7 @@ namespace fan
 
 
             mWorld.Run<SIntegrateFxRigidbodies>( fxDelta, fxPhysicsWorld );
-            for( int i = 0; i < fxPhysicsWorld.mContactSolver.mMaxIterations; i++ )
-            {
-                mWorld.Run<STestSystem>( fxDelta );
-            }
+            mWorld.Run<STestSystem>( fxDelta );
         }
 
         mWorld.Run<SSynchronizeTransformFromMotionState>();

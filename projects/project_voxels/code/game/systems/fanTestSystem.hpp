@@ -22,33 +22,34 @@ namespace fan
             if( _delta != 0 )
             {
                 physicsWorld.mCollisionDetection.mContacts.clear();
-                std::unordered_set < CollisionPair > collidingPairs;
+
+                struct RigidbodyData
+                {
+                    FxRigidbody     * rigidbody;
+                    FxSphereCollider* sphere;
+                    FxTransform     * transform;
+                };
+
+                std::vector<RigidbodyData> bodies;
                 auto     rbIt0        = _view.begin<FxRigidbody>();
                 auto     sphereIt0    = _view.begin<FxSphereCollider>();
                 auto     transformIt0 = _view.begin<FxTransform>();
-                for( int i            = 0; rbIt0 != _view.end<FxRigidbody>(); ++rbIt0, ++transformIt0, ++sphereIt0, ++i )
+                for( ; rbIt0 != _view.end<FxRigidbody>(); ++rbIt0, ++transformIt0, ++sphereIt0)
                 {
                     FxRigidbody     & rb0        = *rbIt0;
                     FxSphereCollider& sphere0    = *sphereIt0;
                     FxTransform     & transform0 = *transformIt0;
-                    CollisionDetection::SphereWithPlane( rb0, sphere0, transform0, Vector3::sUp, 0, physicsWorld );
+                    bodies.push_back( { &rb0, &sphere0, &transform0 } );
+                }
 
-                    // contact with other spheres
-                    auto     rbIt1        = _view.begin<FxRigidbody>();
-                    auto     sphereIt1    = _view.begin<FxSphereCollider>();
-                    auto     transformIt1 = _view.begin<FxTransform>();
-                    for( int j            = 0; rbIt1 != _view.end<FxRigidbody>(); ++rbIt1, ++transformIt1, ++sphereIt1, ++j )
+                for( int i = 0; i < bodies.size(); i++ )
+                {
+                    RigidbodyData& rb1 = bodies[i];
+                    CollisionDetection::SphereWithPlane( *rb1.rigidbody, *rb1.sphere, *rb1.transform, Vector3::sUp, 0, physicsWorld );
+                    for( int j = i+1; j < bodies.size(); j++ )
                     {
-                        FxRigidbody     & rb1        = *rbIt1;
-                        FxTransform     & transform1 = *transformIt1;
-                        FxSphereCollider& sphere1    = *sphereIt1;
-                        if( i != j )
-                        {
-                            if( !collidingPairs.contains( { j, i } ) && CollisionDetection::SphereWithSphere( rb0, sphere0, transform0, rb1, sphere1, transform1, physicsWorld ) )
-                            {
-                                collidingPairs.insert( { i, j } );
-                            }
-                        }
+                        RigidbodyData& rb2 = bodies[j];
+                        CollisionDetection::SphereWithSphere( *rb1.rigidbody, *rb1.sphere, *rb1.transform, *rb2.rigidbody, *rb2.sphere, *rb2.transform, physicsWorld );
                     }
                 }
                 physicsWorld.mContactSolver.ResolveContacts( physicsWorld.mCollisionDetection.mContacts, _delta );
