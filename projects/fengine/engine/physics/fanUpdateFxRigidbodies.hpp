@@ -31,8 +31,6 @@ namespace fan
                     continue;
                 }
 
-                rb.CalculateDerivedData( transform );
-
                 // calculates linear/angular accelerations from forces input
                 Vector3 resultingLinearAcceleration = rb.mAcceleration;
                 resultingLinearAcceleration += rb.mInverseMass * rb.mForcesAccumulator;
@@ -48,6 +46,7 @@ namespace fan
                 rb.mVelocity *= _physicsWorld.mLinearDamping;
                 rb.mRotation *= _physicsWorld.mAngularDamping;
 
+                rb.CalculateDerivedData( transform );
                 rb.ClearAccumulators();
             }
         }

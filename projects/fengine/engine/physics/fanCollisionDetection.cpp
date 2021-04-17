@@ -67,14 +67,14 @@ namespace fan
     void CollisionDetection::BoxWithPlane( FxRigidbody& _rigidbody, FxBoxCollider& _box, FxTransform& _transform, const Vector3& _normal, const Fixed _offset, FxPhysicsWorld& _physicsWorld )
     {
         Vector3  vertices[8] = {
-                _transform.TransformPoint( Vector3( _box.mHalfExtents.x, _box.mHalfExtents.y, _box.mHalfExtents.z ) ),
-                _transform.TransformPoint( Vector3( _box.mHalfExtents.x, _box.mHalfExtents.y, -_box.mHalfExtents.z ) ),
-                _transform.TransformPoint( Vector3( _box.mHalfExtents.x, -_box.mHalfExtents.y, _box.mHalfExtents.z ) ),
-                _transform.TransformPoint( Vector3( _box.mHalfExtents.x, -_box.mHalfExtents.y, -_box.mHalfExtents.z ) ),
-                _transform.TransformPoint( Vector3( -_box.mHalfExtents.x, _box.mHalfExtents.y, _box.mHalfExtents.z ) ),
-                _transform.TransformPoint( Vector3( -_box.mHalfExtents.x, _box.mHalfExtents.y, -_box.mHalfExtents.z ) ),
-                _transform.TransformPoint( Vector3( -_box.mHalfExtents.x, -_box.mHalfExtents.y, _box.mHalfExtents.z ) ),
-                _transform.TransformPoint( Vector3( -_box.mHalfExtents.x, -_box.mHalfExtents.y, -_box.mHalfExtents.z ) ),
+                _rigidbody.mTransform * Vector3( _box.mHalfExtents.x, _box.mHalfExtents.y, _box.mHalfExtents.z ),
+                _rigidbody.mTransform * Vector3( _box.mHalfExtents.x, _box.mHalfExtents.y, -_box.mHalfExtents.z ),
+                _rigidbody.mTransform * Vector3( _box.mHalfExtents.x, -_box.mHalfExtents.y, _box.mHalfExtents.z ),
+                _rigidbody.mTransform * Vector3( _box.mHalfExtents.x, -_box.mHalfExtents.y, -_box.mHalfExtents.z ),
+                _rigidbody.mTransform * Vector3( -_box.mHalfExtents.x, _box.mHalfExtents.y, _box.mHalfExtents.z ),
+                _rigidbody.mTransform * Vector3( -_box.mHalfExtents.x, _box.mHalfExtents.y, -_box.mHalfExtents.z ),
+                _rigidbody.mTransform * Vector3( -_box.mHalfExtents.x, -_box.mHalfExtents.y, _box.mHalfExtents.z ),
+                _rigidbody.mTransform * Vector3( -_box.mHalfExtents.x, -_box.mHalfExtents.y, -_box.mHalfExtents.z ),
         };
         for( int i           = 0; i < 8; i++ )
         {
@@ -105,7 +105,7 @@ namespace fan
     {
         // calculates in box space
         Vector3 centerSphere         = _transformSphere.mPosition + _sphere.mOffset;
-        Vector3 relativeCenterSphere = _transformBox.InverseTransformPoint( centerSphere );
+        Vector3 relativeCenterSphere = _rbBox.mTransform.InverseTransform( centerSphere );
 
         // early out bounds
         if( Fixed::Abs( relativeCenterSphere.x ) - _sphere.mRadius > _box.mHalfExtents.x ||
@@ -126,21 +126,21 @@ namespace fan
         if( relativeCenterSphere.z > _box.mHalfExtents.z ){ closestPoint.z = _box.mHalfExtents.z; }
         else if( relativeCenterSphere.z < -_box.mHalfExtents.z ){ closestPoint.z = -_box.mHalfExtents.z; }
 
-        Fixed sqrDistance = ( relativeCenterSphere - closestPoint).SqrMagnitude();
+        Fixed sqrDistance = ( relativeCenterSphere - closestPoint ).SqrMagnitude();
         if( sqrDistance > _sphere.mRadius * _sphere.mRadius )
         {
             return;
         }
 
-        Vector3 closestPointWorld = _transformBox.TransformPoint( closestPoint );
+        Vector3 closestPointWorld = _rbBox.mTransform * closestPoint;
 
         Contact contact;
         contact.rigidbody[0] = &_rbBox;
         contact.rigidbody[1] = &_rbSphere;
         contact.transform[0] = &_transformBox;
         contact.transform[1] = &_transformSphere;
-        contact.normal      = (closestPointWorld - centerSphere).Normalized();
-        contact.penetration = _sphere.mRadius - Fixed::Sqrt(sqrDistance);
+        contact.normal      = ( closestPointWorld - centerSphere ).Normalized();
+        contact.penetration = _sphere.mRadius - Fixed::Sqrt( sqrDistance );
         contact.position    = closestPointWorld;
         contact.restitution = _physicsWorld.mRestitution;
         Vector3 tangent1, tangent2;

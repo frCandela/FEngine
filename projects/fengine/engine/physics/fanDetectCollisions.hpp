@@ -19,6 +19,7 @@ namespace fan
 
         static void Run( EcsWorld& _world, const EcsView& _view, Fixed _delta )
         {
+            RenderDebug   & rd           = _world.GetSingleton<RenderDebug>();
             FxPhysicsWorld& physicsWorld = _world.GetSingleton<FxPhysicsWorld>();
             if( _delta != 0 )
             {
@@ -80,10 +81,10 @@ namespace fan
                 }
                 physicsWorld.mContactSolver.ResolveContacts( physicsWorld.mCollisionDetection.mContacts, _delta );
             }
-            RenderDebug& rd = _world.GetSingleton<RenderDebug>();
+
             for( Contact& contact : physicsWorld.mCollisionDetection.mContacts )
             {
-                rd.DebugPoint( contact.position, Color::sCyan);
+                rd.DebugPoint( contact.position, Color::sCyan );
             }
         }
     };
