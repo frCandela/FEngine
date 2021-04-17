@@ -28,15 +28,17 @@ namespace fan
     //==========================================================================================================================
     Matrix3::Matrix3( const Quaternion& _quat )
     {
-        e11 = 1 - ( 2 * _quat.mAxis.y * _quat.mAxis.y + 2 * _quat.mAxis.z * _quat.mAxis.z );
-        e12 = 2 * _quat.mAxis.x * _quat.mAxis.y + 2 * _quat.mAxis.z * _quat.mAngle;
-        e13 = 2 * _quat.mAxis.x * _quat.mAxis.z - 2 * _quat.mAxis.y * _quat.mAngle;
-        e21 = 2 * _quat.mAxis.x * _quat.mAxis.y - 2 * _quat.mAxis.z * _quat.mAngle;
-        e22 = 1 - ( 2 * _quat.mAxis.x * _quat.mAxis.x + 2 * _quat.mAxis.z * _quat.mAxis.z );
-        e23 = 2 * _quat.mAxis.y * _quat.mAxis.z + 2 * _quat.mAxis.x * _quat.mAngle;
-        e31 = 2 * _quat.mAxis.x * _quat.mAxis.z + 2 * _quat.mAxis.y * _quat.mAngle;
-        e32 = 2 * _quat.mAxis.y * _quat.mAxis.z - 2 * _quat.mAxis.x * _quat.mAngle;
-        e33 = 1 - ( 2 * _quat.mAxis.x * _quat.mAxis.x + 2 * _quat.mAxis.y * _quat.mAxis.y );
+        e11 = 1 -  2 * _quat.mAxis.y * _quat.mAxis.y - 2 * _quat.mAxis.z * _quat.mAxis.z ;
+        e12 = 2 * _quat.mAxis.x * _quat.mAxis.y - 2 * _quat.mAxis.z * _quat.mAngle;
+        e13 = 2 * _quat.mAxis.x * _quat.mAxis.z + 2 * _quat.mAxis.y * _quat.mAngle;
+
+        e21 = 2 * _quat.mAxis.x * _quat.mAxis.y + 2 * _quat.mAxis.z * _quat.mAngle;
+        e22 = 1 - 2 * _quat.mAxis.x * _quat.mAxis.x - 2 * _quat.mAxis.z * _quat.mAxis.z;
+        e23 = 2 * _quat.mAxis.y * _quat.mAxis.z - 2 * _quat.mAxis.x * _quat.mAngle;
+
+        e31 = 2 * _quat.mAxis.x * _quat.mAxis.z - 2 * _quat.mAxis.y * _quat.mAngle;
+        e32 = 2 * _quat.mAxis.y * _quat.mAxis.z + 2 * _quat.mAxis.x * _quat.mAngle;
+        e33 = 1 - 2 * _quat.mAxis.x * _quat.mAxis.x - 2 * _quat.mAxis.y * _quat.mAxis.y;
     }
 
 

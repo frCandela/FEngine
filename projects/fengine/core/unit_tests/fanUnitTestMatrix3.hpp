@@ -64,9 +64,9 @@ namespace fan
             TEST_ASSERT( mat3 == Matrix3::sIdentity );
 
             Quaternion quatRotate180y( 0, 0, 1, 0 );
-            TEST_ASSERT( quatRotate180y * Vector3::sForward == Vector3::sBack );
+            TEST_ASSERT( quatRotate180y * Vector3(0,0,2) == Vector3(0,0,-2) );
             Matrix3 mat3rotate180y = Matrix3( quatRotate180y );
-            TEST_ASSERT( mat3rotate180y * Vector3::sForward == Vector3::sBack );
+            TEST_ASSERT( mat3rotate180y * Vector3(0,0,2) == Vector3(0,0,-2) );
         }
 
         void TestDeterminant()
