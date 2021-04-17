@@ -16,5 +16,6 @@ namespace fan
         static Fixed CalculateSeparatingVelocity( const Contact& _contact );
         static void ResolveVelocity( const Contact& _contact, Fixed _duration );
         static void ResolveInterpenetration( Contact& _contact, Fixed _duration );
+        static Fixed CalculateDeltaVelocityPerUnitImpulse( const Contact& _contact, const int _index );
     };
 }

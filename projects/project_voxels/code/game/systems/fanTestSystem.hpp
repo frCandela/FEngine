@@ -61,28 +61,41 @@ namespace fan
                 EditorPlayState& ps = _world.GetSingleton<EditorPlayState>();(void)ps;
                 //if( ps.mState == EditorPlayState::PLAYING ){ ps.mState = EditorPlayState::PAUSED; }
 
-
-                // calculate the velocity delta per unit contact impulse
-                Vector3 torquePerUnitImpulse = Vector3::Cross( _contact.relativeContactPosition0, _contact.normal );
-                Vector3 rotationPerUnitImpulse = _contact.rb0->mInverseInertiaTensorWorld * torquePerUnitImpulse;
-                Vector3 velocityPerUnitImpulse = Vector3::Cross( rotationPerUnitImpulse, _contact.relativeContactPosition0 );
-                Vector3 velocityPerUnitImpulseContact = _contact.contactToWorld.Transpose() * velocityPerUnitImpulse;
-                Fixed deltaVelocityPerUnitImpulse = velocityPerUnitImpulseContact.x; // > 0
-                deltaVelocityPerUnitImpulse += _contact.rb0->mInverseMass;  // linear component
-
-                // calculates the required impulse
+                Fixed totalInverseMass = _contact.rigidbody[0]->mInverseMass;
+                if( _contact.rigidbody[1] != nullptr ){ totalInverseMass += _contact.rigidbody[1]->mInverseMass; }
                 Fixed separatingVelocity = ContactSolver::CalculateSeparatingVelocity(_contact);
-                Fixed desiredDeltaVelocity = -separatingVelocity * ( 1 + _contact.restitution);
-                Vector3 impulseContact( desiredDeltaVelocity / deltaVelocityPerUnitImpulse, 0, 0 );
+                Fixed desiredTotalDeltaVelocity = -separatingVelocity * ( 1 + _contact.restitution) / totalInverseMass;
 
+
+                Fixed deltaVelocityPerUnitImpulse0 = ContactSolver::CalculateDeltaVelocityPerUnitImpulse(_contact, 0);
+                Fixed desiredDeltaVelocity0 = _contact.rigidbody[0]->mInverseMass * desiredTotalDeltaVelocity;
+                Vector3 impulseContact( desiredDeltaVelocity0 / deltaVelocityPerUnitImpulse0, 0, 0 );
                 Vector3 impulse = _contact.contactToWorld * impulseContact;
-                Vector3 velocityChange = impulse * _contact.rb0->mInverseMass;
-                Vector3 impulsiveTorque = Vector3::Cross( _contact.relativeContactPosition0, impulse );
-                Vector3 rotationChange = _contact.rb0->mInverseInertiaTensorWorld * impulsiveTorque;
+                Vector3 velocityChange = impulse * _contact.rigidbody[0]->mInverseMass;
+                Vector3 impulsiveTorque = Vector3::Cross( _contact.relativeContactPosition[0], impulse );
+                Vector3 rotationChange = _contact.rigidbody[0]->mInverseInertiaTensorWorld * impulsiveTorque;
 
-                rd.DebugLine( _contact.transform0->mPosition, _contact.transform0->mPosition + _contact.relativeContactPosition0, Color::sGreen );
-                rd.DebugLine( _contact.position, _contact.position + _contact.normal, Color::sOrange );
-                rd.DebugPoint( _contact.position, Color::sYellow );
+
+
+                if (_contact.rigidbody[1])
+                {
+                    Fixed desiredDeltaVelocity1 = -_contact.rigidbody[1]->mInverseMass * desiredTotalDeltaVelocity;
+                    Fixed deltaVelocityPerUnitImpulse1 = ContactSolver::CalculateDeltaVelocityPerUnitImpulse(_contact, 1);
+                    Vector3 impulseContact1( desiredDeltaVelocity1 / deltaVelocityPerUnitImpulse1, 0, 0 );
+                    Vector3 impulse1 = _contact.contactToWorld * impulseContact1;
+                    Vector3 velocityChange1 = impulse1 * _contact.rigidbody[1]->mInverseMass;
+                    Vector3 impulsiveTorque1 = Vector3::Cross( _contact.relativeContactPosition[1], impulse1 );
+                    Vector3 rotationChange1 = _contact.rigidbody[1]->mInverseInertiaTensorWorld * impulsiveTorque1;
+
+                    (void)rotationChange1;
+                    rd.DebugLine( _contact.position, _contact.position + _contact.rigidbody[1]->mVelocity, Color::sCyan );
+                    rd.DebugLine( _contact.position, _contact.position + velocityChange1, Color::sBlue );
+
+                }
+
+
+                //rd.DebugLine( _contact.position, _contact.position + _contact.normal, Color::sOrange );
+                //rd.DebugPoint( _contact.position, Color::sYellow );
             }
         }
     };
