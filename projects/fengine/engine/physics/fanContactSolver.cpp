@@ -116,10 +116,10 @@ namespace fan
         if( totalInverseMass <= 0 ){ return; }// infinite mass => immovable
 
         Vector3 movePerInvMass = _contact.normal * _contact.penetration / totalInverseMass;
-        _contact.transform[0]->mPosition = _contact.transform[0]->mPosition + movePerInvMass * _contact.rigidbody[0]->mInverseMass;
+        _contact.rigidbody[0]->mTransform.SetOrigin( _contact.rigidbody[0]->mTransform.GetOrigin() + movePerInvMass * _contact.rigidbody[0]->mInverseMass );
         if( _contact.rigidbody[1] )
         {
-            _contact.transform[1]->mPosition = _contact.transform[1]->mPosition - movePerInvMass * _contact.rigidbody[1]->mInverseMass;
+            _contact.rigidbody[1]->mTransform.SetOrigin( _contact.rigidbody[1]->mTransform.GetOrigin() - movePerInvMass * _contact.rigidbody[1]->mInverseMass );
         }
     }
 }

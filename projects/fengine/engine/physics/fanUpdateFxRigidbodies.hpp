@@ -14,9 +14,11 @@ namespace fan
 			return	_world.GetSignature<FxRigidbody>() | _world.GetSignature<FxTransform>();
 		}
 
-		static void Run( EcsWorld& /*_world*/, const EcsView& _view, const Fixed _delta, FxPhysicsWorld& _physicsWorld )
+		static void Run( EcsWorld& _world, const EcsView& _view, const Fixed _delta )
 		{
 		    if( _delta == 0 ){ return; }
+
+            FxPhysicsWorld& physicsWorld = _world.GetSingleton<FxPhysicsWorld>();
 
             auto transformIt = _view.begin<FxTransform>();
             auto rbIt = _view.begin<FxRigidbody>();
@@ -39,12 +41,12 @@ namespace fan
                 rb.mVelocity += _delta * resultingLinearAcceleration;
                 rb.mRotation += _delta * resultingAngularAcceleration;
 
+                rb.mVelocity *= physicsWorld.mLinearDamping;
+                rb.mRotation *= physicsWorld.mAngularDamping;
+
                 transform.mPosition += _delta * rb.mVelocity;
                 transform.mRotation += FIXED( 0.5 ) * _delta * Quaternion( 0, rb.mRotation ) * transform.mRotation ;
                 transform.mRotation.Normalize();
-
-                rb.mVelocity *= _physicsWorld.mLinearDamping;
-                rb.mRotation *= _physicsWorld.mAngularDamping;
 
                 rb.CalculateDerivedData( transform );
                 rb.ClearAccumulators();

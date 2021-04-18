@@ -25,7 +25,7 @@ namespace fan
 		Time& gameTime = static_cast<Time&>( _component );
 		gameTime.mFrameIndex         = 0;
 		gameTime.mFrameStart         = 0;
-		gameTime.mLogicDelta         = 1.f / 60.f;
+		gameTime.mLogicDelta         = 1.f / 120.f;
 		gameTime.mTimeScaleDelta     = 0.f;
 		// timeScaleIncrement -> it takes 20 frames to time scale one frame ( 5% faster/slower )
 		gameTime.mTimeScaleIncrement = gameTime.mLogicDelta / 20.f;

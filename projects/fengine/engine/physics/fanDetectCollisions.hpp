@@ -33,6 +33,7 @@ namespace fan
                     FxBoxCollider   * box;
                 };
 
+                // Get all bodies
                 std::vector<RigidbodyData> bodies;
                 auto                       rbIt        = _view.begin<FxRigidbody>();
                 auto                       transformIt = _view.begin<FxTransform>();
@@ -46,11 +47,12 @@ namespace fan
                     if( bodyData.box != nullptr || bodyData.sphere != nullptr ){ bodies.push_back( bodyData ); }
                 }
 
+                // Find collisions
                 for( int i = 0; i < bodies.size(); i++ )
                 {
                     RigidbodyData& rb0 = bodies[i];
-                    if( rb0.sphere ){ CollisionDetection::SphereWithPlane( *rb0.rigidbody, *rb0.sphere, *rb0.transform, Vector3::sUp, 0, physicsWorld ); }
-                    if( rb0.box ){ CollisionDetection::BoxWithPlane( *rb0.rigidbody, *rb0.box, *rb0.transform, Vector3::sUp, 0, physicsWorld ); }
+                    if( rb0.sphere ){ CollisionDetection::SphereWithPlane( *rb0.rigidbody, *rb0.sphere, Vector3::sUp, 0, physicsWorld ); }
+                    if( rb0.box ){ CollisionDetection::BoxWithPlane( *rb0.rigidbody, *rb0.box, Vector3::sUp, 0, physicsWorld ); }
 
                     for( int j = i + 1; j < bodies.size(); j++ )
                     {
@@ -59,18 +61,18 @@ namespace fan
                         {
                             if( rb1.sphere )
                             {
-                                CollisionDetection::SphereWithSphere( *rb0.rigidbody, *rb0.sphere, *rb0.transform, *rb1.rigidbody, *rb1.sphere, *rb1.transform, physicsWorld );
+                                CollisionDetection::SphereWithSphere( *rb0.rigidbody, *rb0.sphere, *rb1.rigidbody, *rb1.sphere, physicsWorld );
                             }
                             if( rb1.box )
                             {
-                                CollisionDetection::SphereWithBox( *rb0.rigidbody, *rb0.sphere, *rb0.transform, *rb1.rigidbody, *rb1.box, *rb1.transform, physicsWorld );
+                                CollisionDetection::SphereWithBox( *rb0.rigidbody, *rb0.sphere, *rb1.rigidbody, *rb1.box, physicsWorld );
                             }
                         }
                         if( rb0.box )
                         {
                             if( rb1.sphere )
                             {
-                                CollisionDetection::SphereWithBox( *rb1.rigidbody, *rb1.sphere, *rb1.transform, *rb0.rigidbody, *rb0.box, *rb0.transform, physicsWorld );
+                                CollisionDetection::SphereWithBox( *rb1.rigidbody, *rb1.sphere, *rb0.rigidbody, *rb0.box, physicsWorld );
                             }
                             if( rb1.box )
                             {
@@ -80,6 +82,12 @@ namespace fan
                     }
                 }
                 physicsWorld.mContactSolver.ResolveContacts( physicsWorld.mCollisionDetection.mContacts, _delta );
+
+                for( int i = 0; i < bodies.size(); i++ )
+                {
+                    RigidbodyData& data = bodies[i];
+                    data.transform->mPosition = data.rigidbody->mTransform.GetOrigin();
+                }
             }
 
             for( Contact& contact : physicsWorld.mCollisionDetection.mContacts )

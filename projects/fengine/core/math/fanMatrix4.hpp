@@ -46,6 +46,7 @@ namespace fan
         Vector3 GetY() const;
         Vector3 GetZ() const;
         Vector3 GetOrigin() const;
+        void SetOrigin( const Vector3& _origin );
 
         Vector3 InverseTransform( const Vector3& _vector3 ) const;
         Vector3 TransformDirection( const Vector3& _vector3 ) const;

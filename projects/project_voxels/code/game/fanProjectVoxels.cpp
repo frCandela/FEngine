@@ -85,9 +85,7 @@ namespace fan
         physicsWorld.mDynamicsWorld->stepSimulation( _delta, 10, Time::sPhysicsDelta );
 
         {
-            FxPhysicsWorld& fxPhysicsWorld = mWorld.GetSingleton<FxPhysicsWorld>();
-
-            mWorld.Run<SIntegrateFxRigidbodies>( fxDelta, fxPhysicsWorld );
+            mWorld.Run<SIntegrateFxRigidbodies>( fxDelta );
             mWorld.Run<SDetectCollisions>( fxDelta );
         }
 
