@@ -20,7 +20,7 @@ namespace fan
         static void Run( EcsWorld& _world, const EcsView& _view, Fixed _delta )
         {
             RenderDebug   & rd           = _world.GetSingleton<RenderDebug>();
-            FxPhysicsWorld& physicsWorld = _world.GetSingleton<FxPhysicsWorld>();
+            FxPhysicsWorld& physicsWorld = _world.GetSingleton<FxPhysicsWorld>(); (void)_delta;
             if( _delta != 0 )
             {
                 physicsWorld.mCollisionDetection.mContacts.clear();
@@ -74,7 +74,7 @@ namespace fan
                             }
                             if( rb1.box )
                             {
-                                // meh
+                                CollisionDetection::BoxWithBox( *rb0.rigidbody, *rb0.box, *rb1.rigidbody, *rb1.box, physicsWorld );
                             }
                         }
                     }

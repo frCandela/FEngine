@@ -42,7 +42,11 @@ namespace fan
         Matrix4 operator/( const Fixed& _value ) const;
         Matrix4& operator/=( const Fixed& _value );
 
-        Vector3 Origin() const;
+        Vector3 GetX() const;
+        Vector3 GetY() const;
+        Vector3 GetZ() const;
+        Vector3 GetOrigin() const;
+
         Vector3 InverseTransform( const Vector3& _vector3 ) const;
         Vector3 TransformDirection( const Vector3& _vector3 ) const;
         Vector3 InverseTransformDirection( const Vector3& _vector3 ) const;

@@ -14,10 +14,9 @@ namespace fan
     //========================================================================================================
     // contains all the render data of the world for the renderer
     //========================================================================================================
-    class RenderDebug : public EcsSingleton
+    struct RenderDebug : public EcsSingleton
     {
-    ECS_SINGLETON( RenderDebug )
-    public:
+        ECS_SINGLETON( RenderDebug )
         static void SetInfo( EcsSingletonInfo& _info );
         static void Init( EcsWorld& _world, EcsSingleton& _component );
 

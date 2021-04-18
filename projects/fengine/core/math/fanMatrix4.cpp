@@ -32,7 +32,7 @@ namespace fan
         e24 = _position.y;
         e34 = _position.z;
 
-        e11 = 1 -  2 * _quat.mAxis.y * _quat.mAxis.y - 2 * _quat.mAxis.z * _quat.mAxis.z ;
+        e11 = 1 - 2 * _quat.mAxis.y * _quat.mAxis.y - 2 * _quat.mAxis.z * _quat.mAxis.z;
         e12 = 2 * _quat.mAxis.x * _quat.mAxis.y - 2 * _quat.mAxis.z * _quat.mAngle;
         e13 = 2 * _quat.mAxis.x * _quat.mAxis.z + 2 * _quat.mAxis.y * _quat.mAngle;
 
@@ -209,7 +209,10 @@ namespace fan
 
     //==========================================================================================================================
     //==========================================================================================================================
-    Vector3 Matrix4::Origin() const { return Vector3( e14, e24, e34 ); }
+    Vector3 Matrix4::GetX() const { return Vector3( e11, e21, e31 ); }
+    Vector3 Matrix4::GetY() const { return Vector3( e12, e22, e32 ); }
+    Vector3 Matrix4::GetZ() const { return Vector3( e13, e23, e33 ); }
+    Vector3 Matrix4::GetOrigin() const { return Vector3( e14, e24, e34 ); }
 
     //==========================================================================================================================
     // multiply a vector with the inverse of the matrix
