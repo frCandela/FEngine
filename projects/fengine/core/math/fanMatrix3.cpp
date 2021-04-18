@@ -28,7 +28,7 @@ namespace fan
     //==========================================================================================================================
     Matrix3::Matrix3( const Quaternion& _quat )
     {
-        e11 = 1 -  2 * _quat.mAxis.y * _quat.mAxis.y - 2 * _quat.mAxis.z * _quat.mAxis.z ;
+        e11 = 1 - 2 * _quat.mAxis.y * _quat.mAxis.y - 2 * _quat.mAxis.z * _quat.mAxis.z;
         e12 = 2 * _quat.mAxis.x * _quat.mAxis.y - 2 * _quat.mAxis.z * _quat.mAngle;
         e13 = 2 * _quat.mAxis.x * _quat.mAxis.z + 2 * _quat.mAxis.y * _quat.mAngle;
 
@@ -40,8 +40,6 @@ namespace fan
         e32 = 2 * _quat.mAxis.y * _quat.mAxis.z + 2 * _quat.mAxis.x * _quat.mAngle;
         e33 = 1 - 2 * _quat.mAxis.x * _quat.mAxis.x - 2 * _quat.mAxis.y * _quat.mAxis.y;
     }
-
-
 
     //==========================================================================================================================
     // creates a transform rotation matrix from a set of orthonormal axis
@@ -200,6 +198,19 @@ namespace fan
         return Vector3( e11 * _vec3.x + e12 * _vec3.y + e13 * _vec3.z,
                         e21 * _vec3.x + e22 * _vec3.y + e23 * _vec3.z,
                         e31 * _vec3.x + e32 * _vec3.y + e33 * _vec3.z );
+    }
+
+    //==========================================================================================================================
+    //==========================================================================================================================
+    Quaternion Matrix3::ToQuaternion() const
+    {
+        Quaternion q;
+        q.mAngle = Fixed::Sqrt( 1 + e11 + e22 + e33 ) / 2;
+        Fixed w4 = ( 4 * q.mAngle );
+        q.mAxis.x = ( e32 - e23 ) / w4;
+        q.mAxis.y = ( e13 - e31 ) / w4;
+        q.mAxis.z = ( e21 - e12 ) / w4;
+        return q;
     }
 
     //==========================================================================================================================

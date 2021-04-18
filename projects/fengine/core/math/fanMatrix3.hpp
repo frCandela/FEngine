@@ -40,6 +40,7 @@ namespace fan
         Matrix3 operator/( const Fixed& _value ) const;
         Matrix3& operator/=( const Fixed& _value );
 
+        Quaternion ToQuaternion() const;
         Fixed Determinant() const;
         Matrix3 Transpose() const;
         Matrix3 Inverse() const;

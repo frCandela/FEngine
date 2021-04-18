@@ -48,6 +48,7 @@ namespace fan
         Vector3 GetOrigin() const;
         void SetOrigin( const Vector3& _origin );
 
+        Quaternion ToQuaternion() const;
         Vector3 InverseTransform( const Vector3& _vector3 ) const;
         Vector3 TransformDirection( const Vector3& _vector3 ) const;
         Vector3 InverseTransformDirection( const Vector3& _vector3 ) const;

@@ -23,6 +23,7 @@ namespace fan
                      { &UnitTestMatrix3::TestDeterminant,          "determinant" },
                      { &UnitTestMatrix3::TestTranspose,            "transpose" },
                      { &UnitTestMatrix3::TestInverse,              "inverse" },
+                     { &UnitTestMatrix3::TestToQuaternion,         "to quaternion" },
                      { &UnitTestMatrix3::TestVectorMultiplication, "vector multiplication" },
             };
         }
@@ -64,9 +65,9 @@ namespace fan
             TEST_ASSERT( mat3 == Matrix3::sIdentity );
 
             Quaternion quatRotate180y( 0, 0, 1, 0 );
-            TEST_ASSERT( quatRotate180y * Vector3(0,0,2) == Vector3(0,0,-2) );
+            TEST_ASSERT( quatRotate180y * Vector3( 0, 0, 2 ) == Vector3( 0, 0, -2 ) );
             Matrix3 mat3rotate180y = Matrix3( quatRotate180y );
-            TEST_ASSERT( mat3rotate180y * Vector3(0,0,2) == Vector3(0,0,-2) );
+            TEST_ASSERT( mat3rotate180y * Vector3( 0, 0, 2 ) == Vector3( 0, 0, -2 ) );
         }
 
         void TestDeterminant()
@@ -200,6 +201,19 @@ namespace fan
 
             Matrix3 mat2( 1, 2, 3, 0, 1, 4, 5, 6, 0 );
             TEST_ASSERT( ( mat * mat2 ).Inverse() == mat2.Inverse() * mat.Inverse() )
+        }
+
+        void TestToQuaternion()
+        {
+            Quaternion q  = Quaternion::AngleAxis( 90, Vector3::sUp );
+            Matrix3    m( q );
+            Quaternion q2 = m.ToQuaternion();
+            TEST_ASSERT( Fixed::IsFuzzyZero( ( q - q2 ).Magnitude() ) )
+
+            q  = Quaternion::AngleAxis( 42, Vector3( 4, -7, 3 ).Normalized() );
+            m  = Matrix3( q );
+            q2 = m.ToQuaternion();
+            TEST_ASSERT( Fixed::IsFuzzyZero( ( q - q2 ).Magnitude() ) )
         }
 
         void TestVectorMultiplication()

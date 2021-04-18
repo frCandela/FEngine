@@ -23,7 +23,7 @@ namespace fan
         Quaternion Conjugate() const { return { mAngle, -mAxis }; }
         Quaternion Inverse() const { return Conjugate() / SqrMagnitude(); }
         Quaternion Normalized() const;
-        void Normalize(){ *this = Normalized(); }
+        void Normalize() { *this = Normalized(); }
         Fixed Angle() const { return FIXED( 2 ) * Fixed::ACos( mAngle ); }
         Vector3 Axis() const { return mAxis.Normalized(); }
         Vector3 Euler() const;
@@ -56,7 +56,6 @@ namespace fan
     //=============================================================
     //=============================================================
     inline Quaternion operator*( const Fixed& _value, const Quaternion& _quat ) { return _quat * _value; }
-
 
     //=============================================================
     //=============================================================

@@ -23,6 +23,7 @@ namespace fan
                      { &UnitTestMatrix4::TestDeterminant,          "determinant" },
                      { &UnitTestMatrix4::TestTranspose,            "transpose" },
                      { &UnitTestMatrix4::TestInverse,              "inverse" },
+                     { &UnitTestMatrix4::TestToQuaternion,         "test to quaternion" },
                      { &UnitTestMatrix4::TestVectorMultiplication, "vector multiplication" },
                      { &UnitTestMatrix4::TestTransforms,           "tranforms" },
             };
@@ -75,11 +76,11 @@ namespace fan
             TEST_ASSERT( mat3 == Matrix4::sIdentity );
 
             Quaternion quatRotate180y( 0, 0, 1, 0 );
-            TEST_ASSERT( quatRotate180y * Vector3(0,0,2) == Vector3(0,0,-2) );
+            TEST_ASSERT( quatRotate180y * Vector3( 0, 0, 2 ) == Vector3( 0, 0, -2 ) );
             Matrix4 mat3rotate180y = Matrix4( quatRotate180y, Vector3::sZero );
-            TEST_ASSERT( mat3rotate180y * Vector3(0,0,2) == Vector3(0,0,-2) );
+            TEST_ASSERT( mat3rotate180y * Vector3( 0, 0, 2 ) == Vector3( 0, 0, -2 ) );
             Matrix4 mat3rotate180yTranslateUp = Matrix4( quatRotate180y, Vector3::sUp );
-            TEST_ASSERT( mat3rotate180yTranslateUp * Vector3(0,0,2) == Vector3(0,0,-2)+ Vector3::sUp );
+            TEST_ASSERT( mat3rotate180yTranslateUp * Vector3( 0, 0, 2 ) == Vector3( 0, 0, -2 ) + Vector3::sUp );
         }
 
         void TestDeterminant()
@@ -222,6 +223,19 @@ namespace fan
                           1, 2, 1, 5,
                           1, 1, 1, 6 );
             TEST_ASSERT( ( mat * mat2 ).Inverse() == mat2.Inverse() * mat.Inverse() )
+        }
+
+        void TestToQuaternion()
+        {
+            Quaternion q  = Quaternion::AngleAxis( 90, Vector3::sUp );
+            Matrix4    m( q, Vector3::sZero );
+            Quaternion q2 = m.ToQuaternion();
+            TEST_ASSERT( Fixed::IsFuzzyZero( ( q - q2 ).Magnitude() ) )
+
+            q  = Quaternion::AngleAxis( 42, Vector3( 4, -7, 3 ).Normalized() );
+            m  = Matrix4( q, Vector3::sZero );
+            q2 = m.ToQuaternion();
+            TEST_ASSERT( Fixed::IsFuzzyZero( ( q - q2 ).Magnitude() ) )
         }
 
         void TestVectorMultiplication()
