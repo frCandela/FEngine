@@ -10,6 +10,7 @@
 #include "engine/components/ui/fanUIRenderer.hpp"
 #include "engine/components/fanPointLight.hpp"
 #include "engine/components/fanDirectionalLight.hpp"
+#include "engine/components/fanFxScale.hpp"
 #include "engine/fanSceneTags.hpp"
 
 namespace fan
@@ -68,14 +69,13 @@ namespace fan
                    | _world.GetSignature<Material>();
         }
 
-        static void Run( EcsWorld&, const EcsView& _view, RenderWorld& _renderWorld  )
+        static void Run( EcsWorld& _world, const EcsView& _view, RenderWorld& _renderWorld  )
         {
             auto meshRendererIt = _view.begin<MeshRenderer>();
             auto transformIt    = _view.begin<FxTransform>();
             auto materialIt     = _view.begin<Material>();
             // get all mesh and adds them to the render world
-            for( ; meshRendererIt != _view.end<MeshRenderer>();
-                   ++meshRendererIt, ++transformIt, ++materialIt )
+            for( ; meshRendererIt != _view.end<MeshRenderer>(); ++meshRendererIt, ++transformIt, ++materialIt )
             {
                 MeshRenderer& meshRenderer = *meshRendererIt;
                 FxTransform   & transform    = *transformIt;
@@ -83,11 +83,14 @@ namespace fan
 
                 if( meshRenderer.mMesh.IsValid() )
                 {
+                    const EcsEntity entity = transformIt.GetEntity();
+                    const Vector3 scale = _world.HasComponent<FxScale>(entity) ? _world.GetComponent<FxScale>(entity).mScale : Vector3::sOne;
+
                     // drawMesh data;
                     RenderDataModel data;
                     data.mMesh         = *meshRenderer.mMesh;
-                    data.mModelMatrix  = transform.GetModelMatrix();
-                    data.mNormalMatrix = transform.GetNormalMatrix();
+                    data.mModelMatrix  = transform.GetModelMatrix( scale );
+                    data.mNormalMatrix = transform.GetNormalMatrix( scale );
                     data.mTextureIndex = material.mTexture.IsValid() ? material.mTexture->mIndex : 0;
                     data.mColor        = material.mColor.ToGLM();
                     data.mShininess    = material.mShininess;

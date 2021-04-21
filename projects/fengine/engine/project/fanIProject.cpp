@@ -17,6 +17,7 @@
 
 // fixed point
 #include "engine/components/fanFxTransform.hpp"
+#include "engine/components/fanFxScale.hpp"
 
 // physics
 #include "engine/components/fanRigidbody.hpp"
@@ -85,7 +86,7 @@ namespace fan
         _world.AddComponentType<Bounds>();
 
         _world.AddComponentType<FxTransform>();
-
+        _world.AddComponentType<FxScale>();
 
         _world.AddSingletonType<Scene>();
         _world.AddSingletonType<SceneResources>();

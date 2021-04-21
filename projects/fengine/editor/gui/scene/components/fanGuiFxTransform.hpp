@@ -76,25 +76,6 @@ namespace fan
                     }
                 }
 
-                // Scale
-                if( ImGui::Button( "##TransScale" ) )
-                {
-                    transform.mScale = Vector3::sOne;
-                    sceneNode.AddFlag( SceneNode::BoundsOutdated );
-                }
-                ImGui::SameLine();
-                glm::vec3 scale = Math::ToGLM( transform.mScale );
-                if( ImGui::DragFloat3( "scale", &scale[0], 0.1f ) )
-                {
-                    Vector3 newScale = { Fixed::FromFloat( scale.x ), Fixed::FromFloat( scale.y ), Fixed::FromFloat( scale.z ) };
-                    transform.mScale = {
-                            Fixed::IsFuzzyZero( newScale.x - transform.mScale.x ) ? transform.mScale.x : newScale.x,
-                            Fixed::IsFuzzyZero( newScale.y - transform.mScale.y ) ? transform.mScale.y : newScale.y,
-                            Fixed::IsFuzzyZero( newScale.z - transform.mScale.z ) ? transform.mScale.z : newScale.z
-                    };
-                    sceneNode.AddFlag( SceneNode::BoundsOutdated );
-                }
-
                 ImGui::PopID();
             }
             ImGui::PopItemWidth();

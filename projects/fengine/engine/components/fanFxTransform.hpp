@@ -9,7 +9,8 @@
 namespace fan
 {
     //========================================================================================================
-    // position, rotation and scale
+    // position and rotation only
+    // scale must be handled with a FxScale component
     //========================================================================================================
     struct FxTransform : public EcsComponent
     {
@@ -21,8 +22,8 @@ namespace fan
 
         void LookAt( const Vector3& _point, const Vector3& _up = Vector3::sUp );
 
-        glm::mat4 GetModelMatrix() const;
-        glm::mat4 GetNormalMatrix() const;
+        glm::mat4 GetModelMatrix( const Vector3& _scale ) const;
+        glm::mat4 GetNormalMatrix( const Vector3& _scale ) const;
 
         Vector3 Left() const { return mRotation * Vector3::sLeft; }
         Vector3 Right() const { return mRotation * Vector3::sRight; }
@@ -38,6 +39,5 @@ namespace fan
 
         Quaternion mRotation;
         Vector3    mPosition;
-        Vector3    mScale;
     };
 }

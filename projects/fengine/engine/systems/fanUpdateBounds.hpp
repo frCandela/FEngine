@@ -222,7 +222,6 @@ namespace fan
                 const Vector3 origin = transform.mPosition;
 
                 glm::vec3 position    = Math::ToGLM( transform.mPosition );
-                glm::vec3 glmScale    = Math::ToGLM( transform.mScale );
                 glm::quat rotation    = Math::ToGLM( transform.mRotation );
                 glm::mat4 modelMatrix = glm::translate( glm::mat4( 1.f ), position ) * glm::mat4_cast( rotation );
 

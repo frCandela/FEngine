@@ -87,6 +87,8 @@ namespace fan
     //==========================================================================================================================
     Vector3 Quaternion::Euler() const
     {
+        if( Vector3::IsFuzzyZero( mAxis ) ){ return Vector3::sZero; }
+
         Fixed   r11, r21, r31, r32, r33, r12, r13;
         Fixed   q00, q11, q22, q33;
         Fixed   tmp;

@@ -1,5 +1,4 @@
 #include "engine/components/fanFxTransform.hpp"
-#include "glm/gtc/matrix_transform.hpp"
 #include "core/memory/fanSerializable.hpp"
 #include "core/math/fanMathUtils.hpp"
 
@@ -20,7 +19,6 @@ namespace fan
         FxTransform& transform = static_cast<FxTransform&>( _component );
         transform.mRotation = Quaternion::sIdentity;
         transform.mPosition = Vector3::sZero;
-        transform.mScale    = Vector3::sOne;
     }
 
     //========================================================================================================
@@ -31,7 +29,6 @@ namespace fan
 
         Serializable::SaveVec3( _json, "position", transform.mPosition );
         Serializable::SaveQuat( _json, "rotation", transform.mRotation );
-        Serializable::SaveVec3( _json, "scale", transform.mScale );
     }
 
     //========================================================================================================
@@ -41,15 +38,14 @@ namespace fan
         FxTransform& transform = static_cast<FxTransform&>( _component );
         Serializable::LoadVec3( _json, "position", transform.mPosition );
         Serializable::LoadQuat( _json, "rotation", transform.mRotation );
-        Serializable::LoadVec3( _json, "scale", transform.mScale );
     }
 
     //========================================================================================================
     //========================================================================================================
-    glm::mat4 FxTransform::GetModelMatrix() const
+    glm::mat4 FxTransform::GetModelMatrix( const Vector3& _scale ) const
     {
         glm::vec3 position = Math::ToGLM( mPosition );
-        glm::vec3 glmScale = Math::ToGLM( mScale );
+        glm::vec3 glmScale = Math::ToGLM( _scale );
         glm::quat rotation = Math::ToGLM( mRotation );
 
         return glm::translate( glm::mat4( 1.f ), position ) *
@@ -59,9 +55,9 @@ namespace fan
 
     //========================================================================================================
     //========================================================================================================
-    glm::mat4 FxTransform::GetNormalMatrix() const
+    glm::mat4 FxTransform::GetNormalMatrix( const Vector3& _scale ) const
     {
-        return glm::transpose( glm::inverse( GetModelMatrix() ) );
+        return glm::transpose( glm::inverse( GetModelMatrix( _scale ) ) );
     }
 
     //========================================================================================================
@@ -76,15 +72,14 @@ namespace fan
     //========================================================================================================
     Vector3 FxTransform::TransformPoint( const Vector3 _point ) const
     {
-        return mRotation * (/*mScale **/ _point ) + mPosition;
+        return mRotation * _point + mPosition;
     }
 
     //========================================================================================================
     //========================================================================================================
     Vector3 FxTransform::InverseTransformPoint( const Vector3 _point ) const
     {
-       /* const Vector3 invertScale( Fixed( 1 ) / mScale.x, Fixed( 1 ) / mScale.y, Fixed( 1 ) / mScale.z );*/
-        return /*invertScale **/ ( mRotation.Inverse() * ( _point - mPosition ) );
+        return mRotation.Inverse() * ( _point - mPosition );
     }
 
     //========================================================================================================

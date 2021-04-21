@@ -35,7 +35,6 @@ namespace fan
         {
             TEST_ASSERT( mTransform.mPosition == Vector3::sZero )
             TEST_ASSERT( mTransform.mRotation == Quaternion::sIdentity )
-            TEST_ASSERT( mTransform.mScale == Vector3::sOne )
         }
 
         void TestDirections()
@@ -49,7 +48,6 @@ namespace fan
 
             mTransform.mPosition = Vector3( 1, 2, 3 );
             mTransform.mRotation = Quaternion::Euler( 0, 90, 0 );
-            mTransform.mScale    = { 2, 2, 2 };
 
             TEST_ASSERT( mTransform.Left() == Vector3::sBack )
             TEST_ASSERT( mTransform.Right() == Vector3::sForward )
@@ -70,12 +68,9 @@ namespace fan
             TEST_ASSERT( mTransform.TransformPoint( point ) == point + Vector3::sForward )
             TEST_ASSERT( mTransform.InverseTransformPoint( mTransform.TransformPoint( point ) ) == point )
 
-            mTransform.mScale = Vector3::sOne * 2;
-            TEST_ASSERT( mTransform.TransformPoint( point ) == Vector3( 2, 4, 7 ) )
-            TEST_ASSERT( mTransform.InverseTransformPoint( mTransform.TransformPoint( point ) ) == point )
-
             mTransform.mRotation = Quaternion::Euler( 0, 90, 0 );
-            TEST_ASSERT( mTransform.TransformPoint( point ) == Vector3( 6, 4, -1 ) )
+           Vector3 v = mTransform.TransformPoint( point );
+            TEST_ASSERT( v == Vector3( 3, 2, 0 ) )
             TEST_ASSERT( mTransform.InverseTransformPoint( mTransform.TransformPoint( point ) ) == point )
         }
 
@@ -86,9 +81,6 @@ namespace fan
             TEST_ASSERT( mTransform.TransformDirection( point ) == point )
 
             mTransform.mPosition = Vector3::sForward;
-            TEST_ASSERT( mTransform.TransformDirection( point ) == point )
-
-            mTransform.mScale = Vector3::sOne * 2;
             TEST_ASSERT( mTransform.TransformDirection( point ) == point )
 
             mTransform.mRotation = Quaternion::Euler( 0, 90, 0 );
