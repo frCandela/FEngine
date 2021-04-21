@@ -80,7 +80,7 @@ namespace fan
     Quaternion Quaternion::Normalized() const
     {
         Fixed m = Magnitude();
-        return m == 0 ? sIdentity : Quaternion( mAngle / m, mAxis / m );
+        return Quaternion( mAngle / m, mAxis / m );
     }
 
     //==========================================================================================================================
@@ -101,6 +101,7 @@ namespace fan
         r32 = Fixed( 2 ) * ( mAxis.y * mAxis.z + mAngle * mAxis.x );
         r33 = q00 - q11 - q22 + q33;
         tmp = Fixed::Abs( r31 );
+        tmp = tmp == 0 ? 1 : tmp;
         if( tmp > FIXED( 0.999999 ) )
         {
             r12 = Fixed( 2 ) * ( mAxis.x * mAxis.y - mAngle * mAxis.z );
@@ -120,7 +121,14 @@ namespace fan
     //==========================================================================================================================
     Quaternion Quaternion::AngleAxis( const Fixed _degrees, const Vector3& _axis )
     {
-        const Fixed halfRadians = Fixed::Radians( _degrees ) / 2;
+        return AngleAxisRadians( Fixed::Radians( _degrees ), _axis );
+    }
+
+    //==========================================================================================================================
+    //==========================================================================================================================
+    Quaternion Quaternion::AngleAxisRadians( const Fixed _radians, const Vector3& _axis )
+    {
+        const Fixed halfRadians = _radians / 2;
         Quaternion  q;
         q.mAngle = Fixed::Cos( halfRadians );
         q.mAxis  = Fixed::Sin( halfRadians ) * _axis.Normalized();

@@ -29,13 +29,13 @@ namespace fan
 
         Vector3 mForcesAccumulator;
         Vector3 mTorqueAccumulator;
-        Matrix4 mTransform;
         Matrix3 mInverseInertiaTensorWorld;
+        FxTransform* mTransform; // buffered at the beginning of the frame
 
         void ApplyCentralForce( const Vector3& _force ) { mForcesAccumulator += _force; }
         void ApplyForce( const Vector3& _force, const Vector3& _localPoint );
         void ApplyTorque( const Vector3& _torque ) { mTorqueAccumulator += _torque; }
-        void CalculateDerivedData( const FxTransform& _transform );
+        void CalculateDerivedData( FxTransform& _transform );
         void ClearAccumulators();
     };
 }

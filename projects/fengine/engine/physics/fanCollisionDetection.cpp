@@ -14,8 +14,8 @@ namespace fan
     //==================================================================================================================================================================================================
     void CollisionDetection::SphereWithSphere( FxRigidbody& _rb0, FxSphereCollider& _sphere0, FxRigidbody& _rb1, FxSphereCollider& _sphere1, FxPhysicsWorld& _physicsWorld )
     {
-        Vector3 p0 = _rb0.mTransform.GetOrigin() + _rb0.mTransform.TransformDirection( _sphere0.mOffset );
-        Vector3 p1 = _rb1.mTransform.GetOrigin() + _rb1.mTransform.TransformDirection( _sphere1.mOffset );
+        Vector3 p0 = _rb0.mTransform->mPosition + _rb0.mTransform->TransformDirection( _sphere0.mOffset );
+        Vector3 p1 = _rb1.mTransform->mPosition + _rb1.mTransform->TransformDirection( _sphere1.mOffset );
 
         Vector3 midline  = p0 - p1;
         Fixed   distance = midline.Magnitude();
@@ -31,8 +31,8 @@ namespace fan
         Vector3 tangent1, tangent2;
         Vector3::MakeOrthonormalBasis( contact.normal, tangent1, tangent2 );
         contact.contactToWorld = Matrix3( contact.normal, tangent1, tangent2 );
-        contact.relativeContactPosition[0] = contact.position - _rb0.mTransform.GetOrigin();
-        contact.relativeContactPosition[1] = contact.position - _rb1.mTransform.GetOrigin();
+        contact.relativeContactPosition[0] = contact.position - _rb0.mTransform->mPosition;
+        contact.relativeContactPosition[1] = contact.position - _rb1.mTransform->mPosition;
 
         _physicsWorld.mCollisionDetection.mContacts.push_back( contact );
     }
@@ -41,7 +41,7 @@ namespace fan
     //==================================================================================================================================================================================================
     void CollisionDetection::SphereWithPlane( FxRigidbody& _rigidbody, FxSphereCollider& _sphere, const Vector3& _normal, const Fixed _offset, FxPhysicsWorld& _physicsWorld )
     {
-        Vector3 position    = _rigidbody.mTransform.GetOrigin() + _rigidbody.mTransform.TransformDirection( _sphere.mOffset );
+        Vector3 position    = _rigidbody.mTransform->mPosition + _rigidbody.mTransform->TransformDirection( _sphere.mOffset );
         Fixed   penetration = Vector3::Dot( position, _normal ) - _offset - _sphere.mRadius;
         if( penetration >= 0 ){ return; }
 
@@ -54,7 +54,7 @@ namespace fan
         Vector3 tangent0, tangent1;
         Vector3::MakeOrthonormalBasis( contact.normal, tangent0, tangent1 );
         contact.contactToWorld = Matrix3( contact.normal, tangent0, tangent1 );
-        contact.relativeContactPosition[0] = contact.position - _rigidbody.mTransform.GetOrigin();
+        contact.relativeContactPosition[0] = contact.position - _rigidbody.mTransform->mPosition;
 
         _physicsWorld.mCollisionDetection.mContacts.push_back( contact );
     }
@@ -64,14 +64,14 @@ namespace fan
     void CollisionDetection::BoxWithPlane( FxRigidbody& _rigidbody, FxBoxCollider& _box, const Vector3& _normal, const Fixed _offset, FxPhysicsWorld& _physicsWorld )
     {
         Vector3  vertices[8] = {
-                _rigidbody.mTransform * Vector3( _box.mHalfExtents.x, _box.mHalfExtents.y, _box.mHalfExtents.z ),
-                _rigidbody.mTransform * Vector3( _box.mHalfExtents.x, _box.mHalfExtents.y, -_box.mHalfExtents.z ),
-                _rigidbody.mTransform * Vector3( _box.mHalfExtents.x, -_box.mHalfExtents.y, _box.mHalfExtents.z ),
-                _rigidbody.mTransform * Vector3( _box.mHalfExtents.x, -_box.mHalfExtents.y, -_box.mHalfExtents.z ),
-                _rigidbody.mTransform * Vector3( -_box.mHalfExtents.x, _box.mHalfExtents.y, _box.mHalfExtents.z ),
-                _rigidbody.mTransform * Vector3( -_box.mHalfExtents.x, _box.mHalfExtents.y, -_box.mHalfExtents.z ),
-                _rigidbody.mTransform * Vector3( -_box.mHalfExtents.x, -_box.mHalfExtents.y, _box.mHalfExtents.z ),
-                _rigidbody.mTransform * Vector3( -_box.mHalfExtents.x, -_box.mHalfExtents.y, -_box.mHalfExtents.z ),
+                _rigidbody.mTransform->TransformPoint( Vector3( _box.mHalfExtents.x, _box.mHalfExtents.y, _box.mHalfExtents.z    )),
+                _rigidbody.mTransform->TransformPoint( Vector3( _box.mHalfExtents.x, _box.mHalfExtents.y, -_box.mHalfExtents.z   )),
+                _rigidbody.mTransform->TransformPoint( Vector3( _box.mHalfExtents.x, -_box.mHalfExtents.y, _box.mHalfExtents.z   )),
+                _rigidbody.mTransform->TransformPoint( Vector3( _box.mHalfExtents.x, -_box.mHalfExtents.y, -_box.mHalfExtents.z  )),
+                _rigidbody.mTransform->TransformPoint( Vector3( -_box.mHalfExtents.x, _box.mHalfExtents.y, _box.mHalfExtents.z   )),
+                _rigidbody.mTransform->TransformPoint( Vector3( -_box.mHalfExtents.x, _box.mHalfExtents.y, -_box.mHalfExtents.z  )),
+                _rigidbody.mTransform->TransformPoint( Vector3( -_box.mHalfExtents.x, -_box.mHalfExtents.y, _box.mHalfExtents.z  )),
+                _rigidbody.mTransform->TransformPoint( Vector3( -_box.mHalfExtents.x, -_box.mHalfExtents.y, -_box.mHalfExtents.z )),
         };
         for( int i           = 0; i < 8; i++ )
         {
@@ -88,7 +88,7 @@ namespace fan
                 Vector3 tangent0, tangent1;
                 Vector3::MakeOrthonormalBasis( contact.normal, tangent0, tangent1 );
                 contact.contactToWorld = Matrix3( contact.normal, tangent0, tangent1 );
-                contact.relativeContactPosition[0] = contact.position - _rigidbody.mTransform.GetOrigin();
+                contact.relativeContactPosition[0] = contact.position - _rigidbody.mTransform->mPosition;
                 _physicsWorld.mCollisionDetection.mContacts.push_back( contact );
             }
         }
@@ -100,8 +100,8 @@ namespace fan
                                             FxRigidbody& _rbBox, FxBoxCollider& _box, FxPhysicsWorld& _physicsWorld )
     {
         // calculates in box space
-        Vector3 centerSphere         = _rbSphere.mTransform.GetOrigin() + _sphere.mOffset;
-        Vector3 relativeCenterSphere = _rbBox.mTransform.InverseTransform( centerSphere );
+        Vector3 centerSphere         = _rbSphere.mTransform->mPosition + _sphere.mOffset;
+        Vector3 relativeCenterSphere = _rbBox.mTransform->InverseTransformPoint( centerSphere );
 
         // early out bounds
         if( Fixed::Abs( relativeCenterSphere.x ) - _sphere.mRadius > _box.mHalfExtents.x ||
@@ -128,22 +128,25 @@ namespace fan
             return;
         }
 
-        Vector3 closestPointWorld = _rbBox.mTransform * closestPoint;
+        const Vector3 closestPointWorld = _rbBox.mTransform->TransformPoint( closestPoint );
+        const Vector3 normal = ( closestPointWorld - centerSphere ).Normalized();
+        if( Fixed::IsFuzzyZero( normal.SqrMagnitude() - 1 ) )
+        {
+            Contact contact;
+            contact.rigidbody[0] = &_rbBox;
+            contact.rigidbody[1] = &_rbSphere;
+            contact.normal      = normal;
+            contact.penetration = _sphere.mRadius - Fixed::Sqrt( sqrDistance );
+            contact.position    = closestPointWorld;
+            contact.restitution = _physicsWorld.mRestitution;
+            Vector3 tangent1, tangent2;
+            Vector3::MakeOrthonormalBasis( contact.normal, tangent1, tangent2 );
+            contact.contactToWorld = Matrix3( contact.normal, tangent1, tangent2 );
+            contact.relativeContactPosition[0] = contact.position - _rbBox.mTransform->mPosition;
+            contact.relativeContactPosition[1] = contact.position - _rbSphere.mTransform->mPosition;
 
-        Contact contact;
-        contact.rigidbody[0] = &_rbBox;
-        contact.rigidbody[1] = &_rbSphere;
-        contact.normal      = ( closestPointWorld - centerSphere ).Normalized();
-        contact.penetration = _sphere.mRadius - Fixed::Sqrt( sqrDistance );
-        contact.position    = closestPointWorld;
-        contact.restitution = _physicsWorld.mRestitution;
-        Vector3 tangent1, tangent2;
-        Vector3::MakeOrthonormalBasis( contact.normal, tangent1, tangent2 );
-        contact.contactToWorld = Matrix3( contact.normal, tangent1, tangent2 );
-        contact.relativeContactPosition[0] = contact.position - _rbBox.mTransform.GetOrigin();
-        contact.relativeContactPosition[1] = contact.position - _rbSphere.mTransform.GetOrigin();
-
-        _physicsWorld.mCollisionDetection.mContacts.push_back( contact );
+            _physicsWorld.mCollisionDetection.mContacts.push_back( contact );
+        }
     }
 
     //==================================================================================================================================================================================================
@@ -157,11 +160,11 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    bool BoxesOverlapOnAxis( const Vector3& _axis, const FxRigidbody& _rb0, const FxBoxCollider& _box0, const FxRigidbody& _rb1, const FxBoxCollider& _box1 )
+    bool BoxesOverlapOnAxis( const Vector3& _axis, const Matrix4& _boxTransform, const FxBoxCollider& _box0, const FxRigidbody& _rb1, const FxBoxCollider& _box1 )
     {
-        const Fixed   projection0 = ProjectToAxis( _rb0.mTransform, _box0, _axis );
-        const Fixed   projection1 = ProjectToAxis( _rb1.mTransform, _box1, _axis );
-        const Vector3 toCenter    = _rb1.mTransform.GetOrigin() - _rb0.mTransform.GetOrigin();
+        const Fixed   projection0 = ProjectToAxis( _boxTransform, _box0, _axis );
+        const Fixed   projection1 = ProjectToAxis( _boxTransform, _box1, _axis );
+        const Vector3 toCenter    = _rb1.mTransform->mPosition - _boxTransform.GetOrigin();
         const Fixed   distance    = Fixed::Abs( Vector3::Dot( toCenter, _axis ) );
         return distance < projection0 + projection1;
     }
@@ -170,18 +173,19 @@ namespace fan
     //==================================================================================================================================================================================================
     bool BoxWithPoint( FxRigidbody& _rb0, const FxBoxCollider& _box0, const Vector3& _point, Contact& _outContact )
     {
-        const Vector3 relativePoint = _rb0.mTransform.InverseTransform( _point );
+        Matrix4       transform0( _rb0.mTransform->mRotation, _rb0.mTransform->mPosition );
+        const Vector3 relativePoint = _rb0.mTransform->InverseTransformPoint( _point );
 
         Fixed minDepth = _box0.mHalfExtents.x - Fixed::Abs( relativePoint.x );
         if( minDepth < 0 ){ return false; }
-        Vector3 normal = relativePoint.x > 0 ? _rb0.mTransform.GetX() : -_rb0.mTransform.GetX();
+        Vector3 normal = relativePoint.x > 0 ? transform0.GetX() : -transform0.GetX();
 
         Fixed depth = _box0.mHalfExtents.y - Fixed::Abs( relativePoint.y );
         if( depth < 0 ){ return false; }
         if( depth < minDepth )
         {
             minDepth = depth;
-            normal   = relativePoint.y > 0 ? _rb0.mTransform.GetY() : -_rb0.mTransform.GetY();
+            normal   = relativePoint.y > 0 ? transform0.GetY() : -transform0.GetY();
         }
 
         depth = _box0.mHalfExtents.z - Fixed::Abs( relativePoint.z );
@@ -189,7 +193,7 @@ namespace fan
         if( depth < minDepth )
         {
             minDepth = depth;
-            normal   = relativePoint.z > 0 ? _rb0.mTransform.GetZ() : -_rb0.mTransform.GetZ();
+            normal   = relativePoint.z > 0 ? transform0.GetZ() : -transform0.GetZ();
         }
 
         _outContact.rigidbody[0] = &_rb0;
@@ -200,7 +204,7 @@ namespace fan
         Vector3 tangent0, tangent1;
         Vector3::MakeOrthonormalBasis( _outContact.normal, tangent0, tangent1 );
         _outContact.contactToWorld = Matrix3( _outContact.normal, tangent0, tangent1 );
-        _outContact.relativeContactPosition[0] = _outContact.position - _rb0.mTransform.GetOrigin();
+        _outContact.relativeContactPosition[0] = _outContact.position - _rb0.mTransform->mPosition;
         return true;
     }
 
@@ -209,14 +213,14 @@ namespace fan
     void BoxVerticesWithBox( FxRigidbody& _rb0, FxBoxCollider& _box0, FxRigidbody& _rb1, FxBoxCollider& _box1, FxPhysicsWorld& _physicsWorld )
     {
         Vector3  vertices0[8] = {
-                _rb0.mTransform * Vector3( _box0.mHalfExtents.x, _box0.mHalfExtents.y, _box0.mHalfExtents.z ),
-                _rb0.mTransform * Vector3( _box0.mHalfExtents.x, _box0.mHalfExtents.y, -_box0.mHalfExtents.z ),
-                _rb0.mTransform * Vector3( _box0.mHalfExtents.x, -_box0.mHalfExtents.y, _box0.mHalfExtents.z ),
-                _rb0.mTransform * Vector3( _box0.mHalfExtents.x, -_box0.mHalfExtents.y, -_box0.mHalfExtents.z ),
-                _rb0.mTransform * Vector3( -_box0.mHalfExtents.x, _box0.mHalfExtents.y, _box0.mHalfExtents.z ),
-                _rb0.mTransform * Vector3( -_box0.mHalfExtents.x, _box0.mHalfExtents.y, -_box0.mHalfExtents.z ),
-                _rb0.mTransform * Vector3( -_box0.mHalfExtents.x, -_box0.mHalfExtents.y, _box0.mHalfExtents.z ),
-                _rb0.mTransform * Vector3( -_box0.mHalfExtents.x, -_box0.mHalfExtents.y, -_box0.mHalfExtents.z ),
+                _rb0.mTransform->TransformPoint( Vector3( _box0.mHalfExtents.x, _box0.mHalfExtents.y, _box0.mHalfExtents.z )),
+                _rb0.mTransform->TransformPoint( Vector3( _box0.mHalfExtents.x, _box0.mHalfExtents.y, -_box0.mHalfExtents.z )),
+                _rb0.mTransform->TransformPoint( Vector3( _box0.mHalfExtents.x, -_box0.mHalfExtents.y, _box0.mHalfExtents.z )),
+                _rb0.mTransform->TransformPoint( Vector3( _box0.mHalfExtents.x, -_box0.mHalfExtents.y, -_box0.mHalfExtents.z )),
+                _rb0.mTransform->TransformPoint( Vector3( -_box0.mHalfExtents.x, _box0.mHalfExtents.y, _box0.mHalfExtents.z )),
+                _rb0.mTransform->TransformPoint( Vector3( -_box0.mHalfExtents.x, _box0.mHalfExtents.y, -_box0.mHalfExtents.z )),
+                _rb0.mTransform->TransformPoint( Vector3( -_box0.mHalfExtents.x, -_box0.mHalfExtents.y, _box0.mHalfExtents.z )),
+                _rb0.mTransform->TransformPoint( Vector3( -_box0.mHalfExtents.x, -_box0.mHalfExtents.y, -_box0.mHalfExtents.z )),
         };
         for( int i            = 0; i < 8; ++i )
         {
@@ -233,26 +237,28 @@ namespace fan
     void CollisionDetection::BoxWithBox( FxRigidbody& _rb0, FxBoxCollider& _box0, FxRigidbody& _rb1, FxBoxCollider& _box1, FxPhysicsWorld& _physicsWorld )
     {
         // early out test
+        Matrix4 transform0( _rb0.mTransform->mRotation, _rb0.mTransform->mPosition );
+        Matrix4 transform1( _rb1.mTransform->mRotation, _rb1.mTransform->mPosition );
         Vector3  axisList[15] = {
-                _rb0.mTransform.GetX(),
-                _rb0.mTransform.GetY(),
-                _rb0.mTransform.GetZ(),
-                _rb1.mTransform.GetX(),
-                _rb1.mTransform.GetY(),
-                _rb1.mTransform.GetZ(),
-                Vector3::Cross( _rb0.mTransform.GetX(), _rb1.mTransform.GetX() ),
-                Vector3::Cross( _rb0.mTransform.GetX(), _rb1.mTransform.GetY() ),
-                Vector3::Cross( _rb0.mTransform.GetX(), _rb1.mTransform.GetZ() ),
-                Vector3::Cross( _rb0.mTransform.GetY(), _rb1.mTransform.GetX() ),
-                Vector3::Cross( _rb0.mTransform.GetY(), _rb1.mTransform.GetY() ),
-                Vector3::Cross( _rb0.mTransform.GetY(), _rb1.mTransform.GetZ() ),
-                Vector3::Cross( _rb0.mTransform.GetZ(), _rb1.mTransform.GetX() ),
-                Vector3::Cross( _rb0.mTransform.GetZ(), _rb1.mTransform.GetY() ),
-                Vector3::Cross( _rb0.mTransform.GetZ(), _rb1.mTransform.GetZ() ),
+                transform0.GetX(),
+                transform0.GetY(),
+                transform0.GetZ(),
+                transform1.GetX(),
+                transform1.GetY(),
+                transform1.GetZ(),
+                Vector3::Cross( transform0.GetX(), transform1.GetX() ),
+                Vector3::Cross( transform0.GetX(), transform1.GetY() ),
+                Vector3::Cross( transform0.GetX(), transform1.GetZ() ),
+                Vector3::Cross( transform0.GetY(), transform1.GetX() ),
+                Vector3::Cross( transform0.GetY(), transform1.GetY() ),
+                Vector3::Cross( transform0.GetY(), transform1.GetZ() ),
+                Vector3::Cross( transform0.GetZ(), transform1.GetX() ),
+                Vector3::Cross( transform0.GetZ(), transform1.GetY() ),
+                Vector3::Cross( transform0.GetZ(), transform1.GetZ() ),
         };
         for( int i            = 0; i < 15; ++i )
         {
-            if( !Vector3::IsFuzzyZero( axisList[i] ) && !BoxesOverlapOnAxis( axisList[i], _rb0, _box0, _rb1, _box1 ) )
+            if( !Vector3::IsFuzzyZero( axisList[i] ) && !BoxesOverlapOnAxis( axisList[i], transform0, _box0, _rb1, _box1 ) )
             {
                 return;
             }

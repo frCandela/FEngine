@@ -33,6 +33,7 @@ namespace fan
         Serializable::SaveFixed( _json, "damping", physicsWorld.mLinearDamping );
         Serializable::SaveFixed( _json, "restitution", physicsWorld.mRestitution );
         Serializable::SaveInt( _json, "iterations", physicsWorld.mContactSolver.mMaxIterations );
+        Serializable::SaveFixed( _json, "alnlp", physicsWorld.mContactSolver.mAngularLimitNonLinearProjection );
     }
 
     //========================================================================================================
@@ -44,5 +45,6 @@ namespace fan
         Serializable::LoadFixed( _json, "damping", physicsWorld.mLinearDamping );
         Serializable::LoadFixed( _json, "restitution", physicsWorld.mRestitution );
         Serializable::LoadInt( _json, "iterations", physicsWorld.mContactSolver.mMaxIterations );
+        Serializable::LoadFixed( _json, "alnlp", physicsWorld.mContactSolver.mAngularLimitNonLinearProjection );
     }
 }

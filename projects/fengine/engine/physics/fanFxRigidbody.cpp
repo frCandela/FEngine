@@ -28,7 +28,7 @@ namespace fan
         rb.mAcceleration              = _world.GetSingleton<FxPhysicsWorld>().mGravity;
         rb.mForcesAccumulator         = Vector3::sZero;
         rb.mTorqueAccumulator         = Vector3::sZero;
-        rb.mTransform                 = Matrix4::sIdentity;
+        rb.mTransform                 = nullptr;
     }
 
     //========================================================================================================
@@ -66,10 +66,11 @@ namespace fan
 
     //========================================================================================================
     //========================================================================================================
-    void FxRigidbody::CalculateDerivedData( const FxTransform& _transform )
+    void FxRigidbody::CalculateDerivedData( FxTransform& _transform )
     {
-        mTransform = Matrix4( _transform.mRotation, _transform.mPosition );
-        TransformInertiaTensor( mInverseInertiaTensorLocal, mTransform, mInverseInertiaTensorWorld );
+        Matrix4 transform( _transform.mRotation, _transform.mPosition );
+        TransformInertiaTensor( mInverseInertiaTensorLocal, transform, mInverseInertiaTensorWorld );
+        mTransform = &_transform;
     }
 
     //========================================================================================================

@@ -29,6 +29,7 @@ namespace fan
         Vector3 Euler() const;
 
         static Quaternion AngleAxis( const Fixed _degrees, const Vector3& _axis );
+        static Quaternion AngleAxisRadians( const Fixed _radians, const Vector3& _axis );
         static Quaternion Euler( const Vector3& _degrees );
         static Quaternion Euler( const Fixed _x, const Fixed _y, const Fixed _z ) { return Euler( Vector3( _x, _y, _z ) ); }
         static Quaternion LookRotation( const Vector3& _direction, const Vector3 _up = Vector3::sUp );

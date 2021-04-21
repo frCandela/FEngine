@@ -44,7 +44,11 @@ namespace fan
                                                &( *rbIt ),
                                                _world.HasComponent<FxSphereCollider>( entity ) ? &_world.GetComponent<FxSphereCollider>( entity ) : nullptr,
                                                _world.HasComponent<FxBoxCollider>( entity ) ? &_world.GetComponent<FxBoxCollider>( entity ) : nullptr };
-                    if( bodyData.box != nullptr || bodyData.sphere != nullptr ){ bodies.push_back( bodyData ); }
+                    if( bodyData.box != nullptr || bodyData.sphere != nullptr )
+                    {
+                        bodies.push_back( bodyData );
+                        bodyData.rigidbody->CalculateDerivedData( *bodyData.transform );
+                    }
                 }
 
                 // Find collisions
@@ -81,18 +85,93 @@ namespace fan
                         }
                     }
                 }
-                physicsWorld.mContactSolver.ResolveContacts( physicsWorld.mCollisionDetection.mContacts, _delta );
-
-                for( int i = 0; i < bodies.size(); i++ )
-                {
-                    RigidbodyData& data = bodies[i];
-                    data.transform->mPosition = data.rigidbody->mTransform.GetOrigin();
-                }
+                physicsWorld.mContactSolver.ResolveContacts( physicsWorld.mCollisionDetection.mContacts );
             }
 
-            for( Contact& contact : physicsWorld.mCollisionDetection.mContacts )
+            for( Contact& _contact : physicsWorld.mCollisionDetection.mContacts )
             {
-                rd.DebugPoint( contact.position, Color::sCyan );
+               // if( _delta > 0)                _world.GetSingleton<EditorPlayState>().mState = EditorPlayState::PAUSED;
+
+                //rd.DebugPoint( _contact.position, Color::sCyan );
+               // rd.DebugLine( _contact.position, _contact.position + _contact.penetration * _contact.normal, Color::sCyan );
+
+                Fixed       angularInertia[2];
+                Fixed       linearInertia[2];
+                Fixed       totalInertia = 0;
+                for( int    i                   = 0; i < 2; i++ )
+                {
+                    if( _contact.rigidbody[i] )
+                    {
+                        const FxRigidbody& rb = *_contact.rigidbody[i];
+                        const Vector3 torquePerUnitImpulse   = Vector3::Cross( _contact.relativeContactPosition[i], _contact.normal );
+                        const Vector3 rotationPerUnitImpulse = rb.mInverseInertiaTensorWorld * torquePerUnitImpulse;
+                        const Vector3 velocityPerUnitImpulse = Vector3::Cross( rotationPerUnitImpulse, _contact.relativeContactPosition[i]);
+                        angularInertia[i] = Vector3::Dot( velocityPerUnitImpulse, _contact.normal );
+                        linearInertia[i]  = rb.mInverseMass;
+                        totalInertia += linearInertia[i] + angularInertia[i];
+                    }
+                }
+
+                const Fixed inverseTotalInertia = 1 / totalInertia;
+                Fixed       linearMove[2]       = {
+                        _contact.penetration * linearInertia[0] * inverseTotalInertia,
+                        -_contact.penetration * linearInertia[1] * inverseTotalInertia
+                };
+                Fixed       angularMove[2]      = {
+                        _contact.penetration * angularInertia[0] * inverseTotalInertia,
+                        -_contact.penetration * angularInertia[1] * inverseTotalInertia
+                };
+
+                for( int i = 0; i < 2; i++ )
+                {
+                    // clamp the maximum rotation
+                    Fixed angularLimit = physicsWorld.mContactSolver.mAngularLimitNonLinearProjection * _contact.relativeContactPosition->Magnitude();
+                    if( Fixed::Abs( angularMove[i] ) > angularLimit )
+                    {
+                        Fixed total = angularMove[i] + linearMove[i];
+                        angularMove[i] = angularMove[i] > 0 ? angularLimit : -angularLimit;
+                        linearMove[i]  = total - angularMove[i];
+                    }
+                }
+
+                for( int    i                   = 0; i < 2; i++ )
+                {
+                    if( _contact.rigidbody[i] )
+                    {
+                        const  FxRigidbody& rb = *_contact.rigidbody[i];
+                        //rb.mTransform->mPosition += _contact.normal * linearMove[i];
+
+                        // get the amount of rotation for a unit move
+                        if( angularInertia[i] != 0)
+                        {
+                            const Vector3 torquePerMove   = Vector3::Cross( _contact.relativeContactPosition[i], _contact.normal );
+                            const Vector3 impulsePerMove  = rb.mInverseInertiaTensorWorld * torquePerMove;
+                            Vector3       rotationPerMove = impulsePerMove / angularInertia[i];
+                            Vector3       rotation        = angularMove[i] * rotationPerMove;
+
+                            const Vector3 aMove = Vector3::Cross( rotation, _contact.relativeContactPosition[i]);
+                            rd.DebugLine( _contact.position, _contact.position +  aMove, Color::sRed );
+                            const Vector3 lMove = _contact.normal * linearMove[i];
+                            rd.DebugLine( _contact.position + aMove, _contact.position + aMove + lMove, Color::sOrange );
+
+                            Fixed magnitude = rotation.Magnitude();
+                            if( !Fixed::IsFuzzyZero( magnitude ) )
+                            {
+                                // Quaternion rotQ = Quaternion::AngleAxisRadians( magnitude, rotation / magnitude );s
+                                Vector3 origin = rb.mTransform->mRotation.Inverse() * _contact.relativeContactPosition[i];
+                                Vector3 oldRotation =  rb.mTransform->mRotation *  origin;
+
+                               Quaternion newRot =  rb.mTransform->mRotation + FIXED( 0.5 ) * Quaternion( 0, rotation ) *  rb.mTransform->mRotation;
+                                newRot.Normalize();
+
+                                Vector3 newRotation =  newRot *  origin;
+
+                                rd.DebugLine( rb.mTransform->mPosition, rb.mTransform->mPosition + oldRotation, Color::sBlue );
+                                rd.DebugLine( rb.mTransform->mPosition, rb.mTransform->mPosition + newRotation, Color::sCyan );
+                            }
+                        }
+                    }
+                }
             }
         }
     };

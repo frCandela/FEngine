@@ -76,15 +76,15 @@ namespace fan
     //========================================================================================================
     Vector3 FxTransform::TransformPoint( const Vector3 _point ) const
     {
-        return mRotation * ( mScale * _point ) + mPosition;
+        return mRotation * (/*mScale **/ _point ) + mPosition;
     }
 
     //========================================================================================================
     //========================================================================================================
     Vector3 FxTransform::InverseTransformPoint( const Vector3 _point ) const
     {
-        const Vector3 invertScale( Fixed( 1 ) / mScale.x, Fixed( 1 ) / mScale.y, Fixed( 1 ) / mScale.z );
-        return invertScale * ( mRotation.Inverse() * ( _point - mPosition ) );
+       /* const Vector3 invertScale( Fixed( 1 ) / mScale.x, Fixed( 1 ) / mScale.y, Fixed( 1 ) / mScale.z );*/
+        return /*invertScale **/ ( mRotation.Inverse() * ( _point - mPosition ) );
     }
 
     //========================================================================================================
@@ -97,7 +97,7 @@ namespace fan
 
     //========================================================================================================
     // No translation applied
-    //========================================================================================================
+    //========================================================================================================*
     Vector3 FxTransform::InverseTransformDirection( const Vector3 _point ) const
     {
         return mRotation.Inverse() * _point;

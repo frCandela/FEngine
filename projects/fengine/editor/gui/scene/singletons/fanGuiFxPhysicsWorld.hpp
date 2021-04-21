@@ -59,6 +59,13 @@ namespace fan
             if( ImGui::DragInt( "contact solver max iterations", &physicsWorld.mContactSolver.mMaxIterations ) )
             {
             }
+
+            // restitution
+            float angularLimitNonLinearProjection = physicsWorld.mContactSolver.mAngularLimitNonLinearProjection.ToFloat();
+            if( ImGui::DragFloat( "angular limit non linear projection", &angularLimitNonLinearProjection, 0.01f, 0.f, 10.f ) )
+            {
+                physicsWorld.mContactSolver.mAngularLimitNonLinearProjection = Fixed::FromFloat( angularLimitNonLinearProjection );
+            }
         }
     };
 }
