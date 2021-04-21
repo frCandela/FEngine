@@ -68,7 +68,7 @@ namespace fan
         {
             for ( Font * font : renderResources.mFontManager->GetFonts() )
             {
-                ImGui::Text( font->GetPath().c_str() );
+                ImGui::Text( font->mPath.c_str() );
                 ImGui::FanBeginDragDropSourceFont( font, ImGuiDragDropFlags_SourceAllowNullID );
             }
         }

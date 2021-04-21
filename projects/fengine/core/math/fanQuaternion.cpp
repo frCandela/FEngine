@@ -103,7 +103,6 @@ namespace fan
         r32 = Fixed( 2 ) * ( mAxis.y * mAxis.z + mAngle * mAxis.x );
         r33 = q00 - q11 - q22 + q33;
         tmp = Fixed::Abs( r31 );
-        tmp = tmp == 0 ? 1 : tmp;
         if( tmp > FIXED( 0.999999 ) )
         {
             r12 = Fixed( 2 ) * ( mAxis.x * mAxis.y - mAngle * mAxis.z );

@@ -82,7 +82,7 @@ namespace ImGui
             {
                 ImGui::SetDragDropPayload( "dragndrop_font", &_font, sizeof( fan::Font** ) );
                 ImGui::Icon( ImGui::IconType::Font16, { 16, 16 } ); ImGui::SameLine();
-                ImGui::Text( _font->GetPath().c_str() );
+                ImGui::Text( _font->mPath.c_str() );
                 ImGui::EndDragDropSource();
             }
         }

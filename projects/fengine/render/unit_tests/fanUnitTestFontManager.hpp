@@ -30,7 +30,7 @@ namespace fan
         {
             TEST_ASSERT( mFontManager.Empty() );
             Font * font = mFontManager.Load( RenderGlobal::sDefaultGameFont );
-            TEST_ASSERT( font->GetPath() == RenderGlobal::sDefaultGameFont );
+            TEST_ASSERT( font->mPath == RenderGlobal::sDefaultGameFont );
             TEST_ASSERT( ! mFontManager.Empty() );
             TEST_ASSERT( mFontManager.Count() == 1 );
         }

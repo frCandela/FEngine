@@ -1,5 +1,6 @@
 #include "render/fanRenderSerializable.hpp"
 
+#include "core/fanPath.hpp"
 #include "render/fanRenderResourcePtr.hpp"
 
 namespace fan
@@ -11,21 +12,21 @@ namespace fan
 	//========================================================================================================
 	void Serializable::SaveTexturePtr( Json& _json, const char* _name, const TexturePtr& _ptr )
 	{
-		_json[ _name ] = *_ptr != nullptr ? _ptr->mPath : "";
+		_json[ _name ] = *_ptr != nullptr ? Path::MakeRelative( _ptr->mPath ) : "";
 	}
 
 	//========================================================================================================
 	//========================================================================================================
 	void Serializable::SaveMeshPtr( Json& _json, const char* _name, const MeshPtr& _ptr )
 	{
-		_json[ _name ] = *_ptr != nullptr ? _ptr->mPath : "";
+		_json[ _name ] = *_ptr != nullptr ? Path::MakeRelative( _ptr->mPath ) : "";
 	}
 
     //========================================================================================================
     //========================================================================================================
     void Serializable::SaveFontPtr( Json& _json, const char* _name, const FontPtr& _ptr )
     {
-        _json[ _name ] = *_ptr != nullptr ? _ptr->GetPath() : "";
+        _json[ _name ] = *_ptr != nullptr ? Path::MakeRelative( _ptr->mPath ) : "";
     }
 
 	//========================================================================================================

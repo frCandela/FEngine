@@ -178,7 +178,7 @@ namespace ImGui
         bool returnValue = false;
 
         fan::Font* font = *_ptr;
-        const std::string name = ( font == nullptr ) ? "null" : fan::Path::FileName( font->GetPath() );
+        const std::string name = ( font == nullptr ) ? "null" : fan::Path::FileName( font->mPath );
 
         // Set button icon & modal
         const std::string            modalName = std::string( "Find font (" ) + _label + ")";
@@ -210,7 +210,7 @@ namespace ImGui
         // tooltip
         if ( font != nullptr )
         {
-            ImGui::FanToolTip( font->GetPath().c_str() );
+            ImGui::FanToolTip( font->mPath.c_str() );
         }
 
         // dragndrop

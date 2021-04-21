@@ -2,10 +2,11 @@
 
 #include <stack>
 #include <fstream>
+#include "core/fanPath.hpp"
 #include "core/fanDebug.hpp"
-#include "network/singletons/fanTime.hpp"
 #include "core/time/fanScopedTimer.hpp"
 #include "core/time/fanProfiler.hpp"
+#include "network/singletons/fanTime.hpp"
 #include "engine/components/fanBounds.hpp"
 #include "engine/components/fanSceneNode.hpp"
 #include "engine/components/fanTransform.hpp"
@@ -144,7 +145,7 @@ namespace fan
 			// scene global parameters
 			Json& jScene = json["scene"];
 			{
-				Serializable::SaveString( jScene, "path", mPath );
+				Serializable::SaveString( jScene, "path", Path::MakeRelative(mPath) );
 			}
 
 			// save singleton components
@@ -172,7 +173,7 @@ namespace fan
             GenerateRemapTable( jRoot, remapTable );
             RemapHandlesRecursively( jScene, remapTable );
 
-			outStream << json; // write to disk			
+			outStream << json; // write to disk
 			outStream.close();
 		}
 	}
@@ -180,7 +181,7 @@ namespace fan
 	//========================================================================================================
 	//========================================================================================================
 	void Scene::RSaveToJson( const SceneNode& _node, Json& _json )
-	{	
+	{
 		EcsWorld& world = *_node.mScene->mWorld;
 		Serializable::SaveString( _json, "name", _node.mName );
 		Serializable::SaveUInt( _json, "handle", _node.mHandle );
@@ -202,7 +203,7 @@ namespace fan
 					Serializable::SaveUInt( jComponent_i, "component_type", info.mType);
 					Serializable::SaveString( jComponent_i, "type_name", info.mName );
 					info.save( component, jComponent_i );
-				}				
+				}
 			}
 		}
 
@@ -219,7 +220,7 @@ namespace fan
                 RSaveToJson( childNode, jchild );
 				++childIndex;
 			}
-		}		
+		}
 	}
 
     //========================================================================================================
@@ -332,11 +333,11 @@ namespace fan
                                         << staticIndex << Debug::Endl();
 					}
 				}
-			}			
+			}
 
 			// loads all nodes recursively
 			const Json& jRoot = jScene["root"];
-			const EcsHandle handleOffset = 0; 
+			const EcsHandle handleOffset = 0;
 			SceneNode&  rootNode = RLoadFromJson( jRoot, *this, nullptr, handleOffset );
             mRootNodeHandle = rootNode.mHandle;
 
@@ -376,7 +377,7 @@ namespace fan
 		SceneNode& node = _scene.CreateSceneNode( "tmp", _parent, nodeHandle + _handleOffset );
 		Serializable::LoadString( _json, "name", node.mName );
 
-		// append id		
+		// append id
 		_scene.mNodes.insert( node.mHandle);
 
 		// components
@@ -385,7 +386,7 @@ namespace fan
 			const EcsEntity	entity = world.GetEntity( node.mHandle );
 			for( int childIndex = 0; childIndex < (int)jComponents.size(); childIndex++ )
 			{
-				const Json& jComponent_i = jComponents[childIndex];				
+				const Json& jComponent_i = jComponents[childIndex];
 				unsigned staticIndex = 0;
 				Serializable::LoadUInt( jComponent_i, "component_type", staticIndex );
                 const EcsComponentInfo* info		= world.SafeGetComponentInfo( staticIndex );

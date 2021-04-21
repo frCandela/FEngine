@@ -40,11 +40,10 @@ namespace fan
         ~Font(){ if( IsValid() ) { FT_Done_Face( mFace ); } }
         const Atlas* GenerateAtlas( TextureManager& _textureManager,  int _height );
         const Atlas* FindAtlas( const int _height );
-        const std::string& GetPath() const { return mPath; }
         bool IsValid() const { return ! mPath.empty(); }
 
         static void ToUTF8( const std::string& _str, std::vector<uint32_t >& _outUnicode );
-    private:
+
         FT_Face             mFace;
         std::vector<Atlas>  mAtlases;
         std::string         mPath;

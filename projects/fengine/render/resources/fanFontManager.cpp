@@ -50,7 +50,7 @@ namespace fan
         for( int i = 0; i < (int)mFonts.size(); i++ )
         {
             Font* font = mFonts[i];
-            if( font->GetPath() == _path )
+            if( font->mPath == _path )
             {
                 mFonts[i] = * mFonts.rbegin();
                 mFonts.pop_back();
@@ -66,7 +66,7 @@ namespace fan
     {
         for( Font* font : mFonts )
         {
-            if( font->GetPath() == _path )
+            if( font->mPath == _path )
             {
                 return font;
             }
