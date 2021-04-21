@@ -91,6 +91,21 @@ namespace fan
     }
 
     //==========================================================================================================================
+    //==========================================================================================================================
+    std::string Path::MakeRelative( const std::string& _path )
+    {
+        const std::string normalizedPath = Normalize( _path );
+        if( normalizedPath.empty() ){ return ""; }
+
+        const std::string absoluteRoot = sProjectPath + "content/";
+        if( normalizedPath.starts_with( absoluteRoot ) )
+        {
+            return std::string( normalizedPath.begin() + absoluteRoot.size(), normalizedPath.end() );
+        }
+        return normalizedPath;
+    }
+
+    //==========================================================================================================================
     // removes backward slashes a
     // removes double slashes
     // makes absolute

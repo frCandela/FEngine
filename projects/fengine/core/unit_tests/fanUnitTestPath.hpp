@@ -13,6 +13,7 @@ namespace fan
         static std::vector<TestMethod> GetTests()
         {
             return { { &UnitTestPath::TestNormalize,         "Normalize" },
+                     { &UnitTestPath::TestMakeRelative,      "Make relative" },
                      { &UnitTestPath::TestIsAbsolute,        "Is absolute" },
                      { &UnitTestPath::TestSetProjectPath,    "Set project path" },
                      { &UnitTestPath::TestNormalizeAbsolute, "Normalize absolute" },
@@ -54,6 +55,17 @@ namespace fan
             // ends slashes
             TEST_ASSERT( Path::Normalize( "/models/patate" ) == "content/models/patate" );
             TEST_ASSERT( Path::Normalize( "\\models\\patate\\" ) == "content/models/patate/" );
+        }
+
+        void  TestMakeRelative()
+        {
+            Path::SetProjectPath( "C:/blob" );
+            TEST_ASSERT( Path::Normalize("textures/hello.png") == "C:/blob/content/textures/hello.png" )
+            TEST_ASSERT( Path::MakeRelative("C:/blob/content/textures/hello.png") == "textures/hello.png" )
+            TEST_ASSERT( Path::MakeRelative(Path::Normalize("textures/hello.png")) == "textures/hello.png" )
+
+            TEST_ASSERT( Path::MakeRelative("textures/hello.png") == "textures/hello.png" )
+            TEST_ASSERT( Path::MakeRelative("") == "" )
         }
 
         void TestSetProjectPath()
