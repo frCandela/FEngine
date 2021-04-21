@@ -19,6 +19,7 @@ namespace fan
         {
             mLivePP = lpp::lppLoadAndRegister( FAN_LIVEPP_PATH, _appName.c_str() );
             lpp::lppEnableAllCallingModulesSync( mLivePP );
+            lpp::lppInstallExceptionHandler(mLivePP);
         }
 
         ~LPPLauncher(){  ::FreeLibrary( mLivePP );}
@@ -36,5 +37,4 @@ namespace fan
         HMODULE            mLivePP;
     };
 }
-
 #endif
