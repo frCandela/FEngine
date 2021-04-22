@@ -20,7 +20,6 @@ namespace fan
         physicsWorld.mGravity        = Vector3( 0, -10, 0 );
         physicsWorld.mLinearDamping  = FIXED( 0.995 );
         physicsWorld.mAngularDamping = FIXED( 0.995 );
-        physicsWorld.mRestitution    = FIXED( 0.3 );
         physicsWorld.mContactSolver  = ContactSolver();
     }
 
@@ -31,7 +30,7 @@ namespace fan
         const FxPhysicsWorld& physicsWorld = static_cast<const FxPhysicsWorld&>( _component );
         Serializable::SaveVec3( _json, "gravity", physicsWorld.mGravity );
         Serializable::SaveFixed( _json, "damping", physicsWorld.mLinearDamping );
-        Serializable::SaveFixed( _json, "restitution", physicsWorld.mRestitution );
+        Serializable::SaveFixed( _json, "restitution", physicsWorld.mContactSolver.mRestitution );
         Serializable::SaveInt( _json, "iterations", physicsWorld.mContactSolver.mMaxIterations );
         Serializable::SaveFixed( _json, "alnlp", physicsWorld.mContactSolver.mAngularLimitNonLinearProjection );
     }
@@ -43,7 +42,7 @@ namespace fan
         FxPhysicsWorld& physicsWorld = static_cast<FxPhysicsWorld&>( _component );
         Serializable::LoadVec3( _json, "gravity", physicsWorld.mGravity );
         Serializable::LoadFixed( _json, "damping", physicsWorld.mLinearDamping );
-        Serializable::LoadFixed( _json, "restitution", physicsWorld.mRestitution );
+        Serializable::LoadFixed( _json, "restitution", physicsWorld.mContactSolver.mRestitution );
         Serializable::LoadInt( _json, "iterations", physicsWorld.mContactSolver.mMaxIterations );
         Serializable::LoadFixed( _json, "alnlp", physicsWorld.mContactSolver.mAngularLimitNonLinearProjection );
     }

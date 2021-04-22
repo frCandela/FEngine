@@ -23,8 +23,6 @@ namespace fan
             FxPhysicsWorld& physicsWorld = _world.GetSingleton<FxPhysicsWorld>(); (void)_delta;
             if( _delta != 0 )
             {
-                physicsWorld.mCollisionDetection.mContacts.clear();
-
                 struct RigidbodyData
                 {
                     FxTransform     * transform;
@@ -52,11 +50,13 @@ namespace fan
                 }
 
                 // Find collisions
+                std::vector<Contact>& contacts = physicsWorld.mCollisionDetection.mContacts;
+                contacts.clear();
                 for( int i = 0; i < bodies.size(); i++ )
                 {
                     RigidbodyData& rb0 = bodies[i];
-                    if( rb0.sphere ){ CollisionDetection::SphereWithPlane( *rb0.rigidbody, *rb0.sphere, Vector3::sUp, 0, physicsWorld ); }
-                    if( rb0.box ){ CollisionDetection::BoxWithPlane( *rb0.rigidbody, *rb0.box, Vector3::sUp, 0, physicsWorld ); }
+                    if( rb0.sphere ){ CollisionDetection::SphereWithPlane( *rb0.rigidbody, *rb0.sphere, Vector3::sUp, 0, contacts ); }
+                    if( rb0.box ){ CollisionDetection::BoxWithPlane( *rb0.rigidbody, *rb0.box, Vector3::sUp, 0, contacts ); }
 
                     for( int j = i + 1; j < bodies.size(); j++ )
                     {
@@ -65,22 +65,22 @@ namespace fan
                         {
                             if( rb1.sphere )
                             {
-                                CollisionDetection::SphereWithSphere( *rb0.rigidbody, *rb0.sphere, *rb1.rigidbody, *rb1.sphere, physicsWorld );
+                                CollisionDetection::SphereWithSphere( *rb0.rigidbody, *rb0.sphere, *rb1.rigidbody, *rb1.sphere, contacts );
                             }
                             if( rb1.box )
                             {
-                                CollisionDetection::SphereWithBox( *rb0.rigidbody, *rb0.sphere, *rb1.rigidbody, *rb1.box, physicsWorld );
+                                CollisionDetection::SphereWithBox( *rb0.rigidbody, *rb0.sphere, *rb1.rigidbody, *rb1.box, contacts );
                             }
                         }
                         if( rb0.box )
                         {
                             if( rb1.sphere )
                             {
-                                CollisionDetection::SphereWithBox( *rb1.rigidbody, *rb1.sphere, *rb0.rigidbody, *rb0.box, physicsWorld );
+                                CollisionDetection::SphereWithBox( *rb1.rigidbody, *rb1.sphere, *rb0.rigidbody, *rb0.box, contacts );
                             }
                             if( rb1.box )
                             {
-                                CollisionDetection::BoxWithBox( *rb0.rigidbody, *rb0.box, *rb1.rigidbody, *rb1.box, physicsWorld );
+                                CollisionDetection::BoxWithBox( *rb0.rigidbody, *rb0.box, *rb1.rigidbody, *rb1.box, contacts );
                             }
                         }
                     }

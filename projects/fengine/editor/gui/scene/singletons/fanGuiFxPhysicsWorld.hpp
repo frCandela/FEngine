@@ -49,10 +49,10 @@ namespace fan
             }
 
             // restitution
-            float restitution = physicsWorld.mRestitution.ToFloat();
+            float restitution = physicsWorld.mContactSolver.mRestitution.ToFloat();
             if( ImGui::DragFloat( "restitution", &restitution, 0.01f, 0.f, 1.f ) )
             {
-                physicsWorld.mRestitution = Fixed::FromFloat( restitution );
+                physicsWorld.mContactSolver.mRestitution = Fixed::FromFloat( restitution );
             }
 
             // damping
