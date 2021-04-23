@@ -26,7 +26,6 @@ namespace fan
         {
             FxPhysicsWorld& physicsWorld = static_cast<FxPhysicsWorld&>( _component );
 
-
             // gravity
             glm::vec3 gravity = Math::ToGLM( physicsWorld.mGravity );
             if( ImGui::DragFloat3( "gravity", &gravity.x ) )
@@ -55,16 +54,23 @@ namespace fan
                 physicsWorld.mContactSolver.mRestitution = Fixed::FromFloat( restitution );
             }
 
-            // iterations
-            if( ImGui::DragInt( "num position iterations", &physicsWorld.mContactSolver.mMaxPositionsIterations ) ){}
-            if( ImGui::DragInt( "num contact  iterations", &physicsWorld.mContactSolver.mMaxIterations ) ){}
-
             // restitution
             float angularLimitNonLinearProjection = physicsWorld.mContactSolver.mAngularLimitNonLinearProjection.ToFloat();
             if( ImGui::DragFloat( "angular limit non linear projection", &angularLimitNonLinearProjection, 0.01f, 0.f, 10.f ) )
             {
                 physicsWorld.mContactSolver.mAngularLimitNonLinearProjection = Fixed::FromFloat( angularLimitNonLinearProjection );
             }
+
+            // iterations
+            if( ImGui::DragInt( "num position iterations", &physicsWorld.mContactSolver.mMaxPositionsIterations ) ){}
+            if( ImGui::DragInt( "num contact  iterations", &physicsWorld.mContactSolver.mMaxVelocityIterations ) ){}
+
+            ImGui::PushReadOnly();
+            if( ImGui::DragInt( "used position iterations", &physicsWorld.mContactSolver.mPositionIterationsUsed ) ){}
+            if( ImGui::DragInt( "used contact  iterations", &physicsWorld.mContactSolver.mVelocityIterationsUsed ) ){}
+            ImGui::PopReadOnly();
+
+
         }
     };
 }

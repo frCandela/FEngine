@@ -16,34 +16,8 @@ namespace fan
         if( _contacts.empty() ){ return; }
 
         PrepareContacts( _contacts );
-        AdjustPositions( _contacts );
-        //ResolveVelocity( _contacts );
-
-
-
-        /*while( !_contacts.empty() )
-        {
-            // find the contact with the largest closing velocity
-            Fixed    maxSeparatingVelocity = 0;
-            int      maxIndex              = (int)_contacts.size();
-            for( int i                     = 0; i < (int)_contacts.size(); ++i )
-            {
-                const Fixed separatingVelocity = _contacts[i].relativeVelocity.x;
-                if( separatingVelocity < 0 && separatingVelocity < maxSeparatingVelocity )
-                {
-                    maxSeparatingVelocity = separatingVelocity;
-                    maxIndex              = i;
-                }
-            }
-            if( maxIndex == (int)_contacts.size() ){ break; }
-
-            Contact contact = _contacts[maxIndex];
-            _contacts[maxIndex] = _contacts[_contacts.size() - 1];
-            _contacts.pop_back();
-
-            ResolveInterpenetration( contact );
-            ResolveVelocity( contact );
-        }*/
+        ResolvePositions( _contacts );
+        ResolveVelocities( _contacts );
     }
 
     //==================================================================================================================================================================================================
@@ -85,7 +59,7 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void ContactSolver::AdjustPositions( std::vector<Contact>& _contacts )
+    void ContactSolver::ResolvePositions( std::vector<Contact>& _contacts )
     {
         for( mPositionIterationsUsed = 0; mPositionIterationsUsed < mMaxPositionsIterations; mPositionIterationsUsed++ )
         {
@@ -103,30 +77,30 @@ namespace fan
             if( !worstContact ){ break; }
 
             Vector3 rotationChange[2], velocityChange[2];
-            ResolveInterpenetration( *worstContact, mAngularLimitNonLinearProjection, rotationChange, velocityChange );
+            ResolvePosition( *worstContact, mAngularLimitNonLinearProjection, rotationChange, velocityChange );
 
             // update penetration for all contacts
             for( Contact& contact : _contacts )
             {
                 if( contact.rigidbody[0] == worstContact->rigidbody[0] )
                 {
-                    const Vector3 deltaPosition = velocityChange[0];
-                    const Vector3 deltaRotation = Vector3::Cross( rotationChange[0], contact.relativeContactPosition[0] );
+                    const Vector3 deltaPosition    = velocityChange[0];
+                    const Vector3 deltaRotation    = Vector3::Cross( rotationChange[0], contact.relativeContactPosition[0] );
                     const Fixed   deltaPenetration = Vector3::Dot( deltaRotation + deltaPosition, contact.normal );
                     contact.penetration -= deltaPenetration;
 
-                    tmpRd->DebugLine( contact.position, contact.position +  deltaRotation, Color::sBlue );
+                    tmpRd->DebugLine( contact.position, contact.position + deltaRotation, Color::sBlue );
                     tmpRd->DebugLine( contact.position + deltaRotation, contact.position + deltaRotation + deltaPosition, Color::sCyan );
                     tmpRd->DebugLine( contact.position, contact.position + deltaRotation + deltaPosition, Color::sPurple );
                 }
                 else if( contact.rigidbody[0] == worstContact->rigidbody[1] )
                 {
-                    const Vector3 deltaPosition = velocityChange[1];
-                    const Vector3 deltaRotation = Vector3::Cross( rotationChange[1], contact.relativeContactPosition[0] );
+                    const Vector3 deltaPosition    = velocityChange[1];
+                    const Vector3 deltaRotation    = Vector3::Cross( rotationChange[1], contact.relativeContactPosition[0] );
                     const Fixed   deltaPenetration = Vector3::Dot( deltaRotation + deltaPosition, contact.normal );
                     contact.penetration -= deltaPenetration;
 
-                    tmpRd->DebugLine( contact.position, contact.position +  deltaRotation, Color::sBlue );
+                    tmpRd->DebugLine( contact.position, contact.position + deltaRotation, Color::sBlue );
                     tmpRd->DebugLine( contact.position + deltaRotation, contact.position + deltaRotation + deltaPosition, Color::sCyan );
                     tmpRd->DebugLine( contact.position, contact.position + deltaRotation + deltaPosition, Color::sPurple );
                 }
@@ -134,23 +108,23 @@ namespace fan
                 {
                     if( contact.rigidbody[1] == worstContact->rigidbody[0] )
                     {
-                        const Vector3 deltaPosition = velocityChange[0];
-                        const Vector3 deltaRotation = Vector3::Cross( rotationChange[0], contact.relativeContactPosition[1] );
+                        const Vector3 deltaPosition    = velocityChange[0];
+                        const Vector3 deltaRotation    = Vector3::Cross( rotationChange[0], contact.relativeContactPosition[1] );
                         const Fixed   deltaPenetration = Vector3::Dot( deltaRotation + deltaPosition, contact.normal );
                         contact.penetration += deltaPenetration;
 
-                        tmpRd->DebugLine( contact.position, contact.position +  deltaRotation, Color::sBlue );
+                        tmpRd->DebugLine( contact.position, contact.position + deltaRotation, Color::sBlue );
                         tmpRd->DebugLine( contact.position + deltaRotation, contact.position + deltaRotation + deltaPosition, Color::sCyan );
                         tmpRd->DebugLine( contact.position, contact.position + deltaRotation + deltaPosition, Color::sPurple );
                     }
                     else if( contact.rigidbody[1] == worstContact->rigidbody[1] )
                     {
-                        const Vector3 deltaPosition = velocityChange[1];
-                        const Vector3 deltaRotation = Vector3::Cross( rotationChange[1], contact.relativeContactPosition[1] );
+                        const Vector3 deltaPosition    = velocityChange[1];
+                        const Vector3 deltaRotation    = Vector3::Cross( rotationChange[1], contact.relativeContactPosition[1] );
                         const Fixed   deltaPenetration = Vector3::Dot( deltaRotation + deltaPosition, contact.normal );
                         contact.penetration += deltaPenetration;
 
-                        tmpRd->DebugLine( contact.position, contact.position +  deltaRotation, Color::sBlue );
+                        tmpRd->DebugLine( contact.position, contact.position + deltaRotation, Color::sBlue );
                         tmpRd->DebugLine( contact.position + deltaRotation, contact.position + deltaRotation + deltaPosition, Color::sCyan );
                         tmpRd->DebugLine( contact.position, contact.position + deltaRotation + deltaPosition, Color::sPurple );
                     }
@@ -160,9 +134,49 @@ namespace fan
     }
 
     //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    void ContactSolver::ResolveVelocities( std::vector<Contact>& _contacts )
+    {
+        for( mVelocityIterationsUsed = 0; mVelocityIterationsUsed < mMaxVelocityIterations; mVelocityIterationsUsed++ )
+        {
+            Contact* worstContact = nullptr;
+            Fixed maxSeparatingVelocity = 0;
+            for( Contact& contact : _contacts )
+            {
+                const Fixed separatingVelocity = contact.relativeVelocity.x;
+                if( separatingVelocity < 0 && separatingVelocity < maxSeparatingVelocity )
+                {
+                    maxSeparatingVelocity = separatingVelocity;
+                    worstContact              = &contact;
+                }
+            }
+            if( worstContact == nullptr ){ break; }
+
+            ResolveVelocity( *worstContact );
+
+            // updates contacts
+            for( Contact& contact : _contacts )
+            {
+                // relative contact velocity
+                contact.relativeVelocity = Vector3::Cross( contact.rigidbody[0]->mRotation, contact.relativeContactPosition[0] );
+                contact.relativeVelocity += contact.rigidbody[0]->mVelocity;
+                if( contact.rigidbody[1] )
+                {
+                    contact.relativeVelocity -= Vector3::Cross( contact.rigidbody[1]->mRotation, contact.relativeContactPosition[1] );
+                    contact.relativeVelocity -= contact.rigidbody[1]->mVelocity;
+                }
+                contact.relativeVelocity = contact.contactToWorld.Transpose() * contact.relativeVelocity;
+
+                // desired delta velocity
+                contact.desiredTotalDeltaVelocity = -contact.relativeVelocity.x * ( 1 + contact.restitution ) / contact.totalInverseMass;
+            }
+        }
+    }
+
+    //==================================================================================================================================================================================================
     // non linear projection
     //==================================================================================================================================================================================================
-    void ContactSolver::ResolveInterpenetration( Contact& _contact, const Fixed _angularLimitNonLinearProjection, Vector3 _outRotationChange[2], Vector3 _outVelocityChange[2] )
+    void ContactSolver::ResolvePosition( Contact& _contact, const Fixed _angularLimitNonLinearProjection, Vector3* _outRotationChange, Vector3* _outVelocityChange )
     {
         Fixed    angularInertia[2];
         Fixed    linearInertia[2];
@@ -212,7 +226,7 @@ namespace fan
             {
                 FxRigidbody& rb = *_contact.rigidbody[i];
                 const Vector3 velocityChange = _contact.normal * linearMove[i];
-                //rb.mTransform->mPosition += velocityChange; // translate to solve interpenetration
+                rb.mTransform->mPosition += velocityChange; // translate to solve interpenetration
                 _outVelocityChange[i] = velocityChange;
 
                 if( angularInertia[i] != 0 )
@@ -228,8 +242,8 @@ namespace fan
                     if( !Fixed::IsFuzzyZero( magnitude ) )
                     {
                         _outRotationChange[i] = rotationChange;
-                        //rb.mTransform->mRotation = rb.mTransform->mRotation + FIXED( 0.5 ) * Quaternion( 0, rotationChange ) * rb.mTransform->mRotation;
-                        //rb.mTransform->mRotation.Normalize();
+                        rb.mTransform->mRotation = rb.mTransform->mRotation + FIXED( 0.5 ) * Quaternion( 0, rotationChange ) * rb.mTransform->mRotation;
+                        rb.mTransform->mRotation.Normalize();
                     }
                 }
             }
@@ -253,16 +267,18 @@ namespace fan
     //==================================================================================================================================================================================================
     void ContactSolver::ResolveVelocity( const Contact& _contact )
     {
-        const Fixed   deltaVelocityPerUnitImpulse0 = ContactSolver::CalculateDeltaVelocityPerUnitImpulse( _contact, 0 );
-        const Fixed   desiredDeltaVelocity0        = _contact.rigidbody[0]->mInverseMass * _contact.desiredTotalDeltaVelocity;
-        const Vector3 impulseContact( desiredDeltaVelocity0 / deltaVelocityPerUnitImpulse0, 0, 0 );
-        const Vector3 impulse                      = _contact.contactToWorld * impulseContact;
-        const Vector3 velocityChange               = impulse * _contact.rigidbody[0]->mInverseMass;
-        const Vector3 impulsiveTorque              = Vector3::Cross( _contact.relativeContactPosition[0], impulse );
-        const Vector3 rotationChange               = _contact.rigidbody[0]->mInverseInertiaTensorWorld * impulsiveTorque;
+        {
+            const Fixed   deltaVelocityPerUnitImpulse0 = ContactSolver::CalculateDeltaVelocityPerUnitImpulse( _contact, 0 );
+            const Fixed   desiredDeltaVelocity0        = _contact.rigidbody[0]->mInverseMass * _contact.desiredTotalDeltaVelocity;
+            const Vector3 impulseContact( desiredDeltaVelocity0 / deltaVelocityPerUnitImpulse0, 0, 0 );
+            const Vector3 impulse                      = _contact.contactToWorld * impulseContact;
+            const Vector3 velocityChange               = impulse * _contact.rigidbody[0]->mInverseMass;
+            const Vector3 impulsiveTorque              = Vector3::Cross( _contact.relativeContactPosition[0], impulse );
+            const Vector3 rotationChange               = _contact.rigidbody[0]->mInverseInertiaTensorWorld * impulsiveTorque;
 
-        _contact.rigidbody[0]->mVelocity += velocityChange;
-        _contact.rigidbody[0]->mRotation += rotationChange;
+            _contact.rigidbody[0]->mVelocity += velocityChange;
+            _contact.rigidbody[0]->mRotation += rotationChange;
+        }
 
         if( _contact.rigidbody[1] )
         {
