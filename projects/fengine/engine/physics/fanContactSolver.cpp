@@ -5,6 +5,8 @@
 #include "engine/physics/fanFxRigidbody.hpp"
 #include "engine/components/fanFxTransform.hpp"
 
+#include "engine/singletons/fanRenderDebug.hpp"
+
 namespace fan
 {
     //==================================================================================================================================================================================================
@@ -14,12 +16,12 @@ namespace fan
         if( _contacts.empty() ){ return; }
 
         PrepareContacts( _contacts );
-        //ResolveInterpenetration( _contacts );
+        AdjustPositions( _contacts );
         //ResolveVelocity( _contacts );
 
 
 
-        while( !_contacts.empty() )
+        /*while( !_contacts.empty() )
         {
             // find the contact with the largest closing velocity
             Fixed    maxSeparatingVelocity = 0;
@@ -41,7 +43,7 @@ namespace fan
 
             ResolveInterpenetration( contact );
             ResolveVelocity( contact );
-        }
+        }*/
     }
 
     //==================================================================================================================================================================================================
@@ -78,6 +80,159 @@ namespace fan
 
             // desired delta velocity
             contact.desiredTotalDeltaVelocity = -contact.relativeVelocity.x * ( 1 + contact.restitution ) / contact.totalInverseMass;
+        }
+    }
+
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    void ContactSolver::AdjustPositions( std::vector<Contact>& _contacts )
+    {
+        for( mPositionIterationsUsed = 0; mPositionIterationsUsed < mMaxPositionsIterations; mPositionIterationsUsed++ )
+        {
+            Contact* worstContact = nullptr;
+            Fixed worstPenetration = 0;
+            for( Contact& contact : _contacts )
+            {
+                if( contact.penetration > worstPenetration )
+                {
+                    worstContact     = &contact;
+                    worstPenetration = contact.penetration;
+                }
+            }
+
+            if( !worstContact ){ break; }
+
+            Vector3 rotationChange[2], velocityChange[2];
+            ResolveInterpenetration( *worstContact, mAngularLimitNonLinearProjection, rotationChange, velocityChange );
+
+            // update penetration for all contacts
+            for( Contact& contact : _contacts )
+            {
+                if( contact.rigidbody[0] == worstContact->rigidbody[0] )
+                {
+                    const Vector3 deltaPosition = velocityChange[0];
+                    const Vector3 deltaRotation = Vector3::Cross( rotationChange[0], contact.relativeContactPosition[0] );
+                    const Fixed   deltaPenetration = Vector3::Dot( deltaRotation + deltaPosition, contact.normal );
+                    contact.penetration -= deltaPenetration;
+
+                    tmpRd->DebugLine( contact.position, contact.position +  deltaRotation, Color::sBlue );
+                    tmpRd->DebugLine( contact.position + deltaRotation, contact.position + deltaRotation + deltaPosition, Color::sCyan );
+                    tmpRd->DebugLine( contact.position, contact.position + deltaRotation + deltaPosition, Color::sPurple );
+                }
+                else if( contact.rigidbody[0] == worstContact->rigidbody[1] )
+                {
+                    const Vector3 deltaPosition = velocityChange[1];
+                    const Vector3 deltaRotation = Vector3::Cross( rotationChange[1], contact.relativeContactPosition[0] );
+                    const Fixed   deltaPenetration = Vector3::Dot( deltaRotation + deltaPosition, contact.normal );
+                    contact.penetration -= deltaPenetration;
+
+                    tmpRd->DebugLine( contact.position, contact.position +  deltaRotation, Color::sBlue );
+                    tmpRd->DebugLine( contact.position + deltaRotation, contact.position + deltaRotation + deltaPosition, Color::sCyan );
+                    tmpRd->DebugLine( contact.position, contact.position + deltaRotation + deltaPosition, Color::sPurple );
+                }
+                if( contact.rigidbody[1] )
+                {
+                    if( contact.rigidbody[1] == worstContact->rigidbody[0] )
+                    {
+                        const Vector3 deltaPosition = velocityChange[0];
+                        const Vector3 deltaRotation = Vector3::Cross( rotationChange[0], contact.relativeContactPosition[1] );
+                        const Fixed   deltaPenetration = Vector3::Dot( deltaRotation + deltaPosition, contact.normal );
+                        contact.penetration += deltaPenetration;
+
+                        tmpRd->DebugLine( contact.position, contact.position +  deltaRotation, Color::sBlue );
+                        tmpRd->DebugLine( contact.position + deltaRotation, contact.position + deltaRotation + deltaPosition, Color::sCyan );
+                        tmpRd->DebugLine( contact.position, contact.position + deltaRotation + deltaPosition, Color::sPurple );
+                    }
+                    else if( contact.rigidbody[1] == worstContact->rigidbody[1] )
+                    {
+                        const Vector3 deltaPosition = velocityChange[1];
+                        const Vector3 deltaRotation = Vector3::Cross( rotationChange[1], contact.relativeContactPosition[1] );
+                        const Fixed   deltaPenetration = Vector3::Dot( deltaRotation + deltaPosition, contact.normal );
+                        contact.penetration += deltaPenetration;
+
+                        tmpRd->DebugLine( contact.position, contact.position +  deltaRotation, Color::sBlue );
+                        tmpRd->DebugLine( contact.position + deltaRotation, contact.position + deltaRotation + deltaPosition, Color::sCyan );
+                        tmpRd->DebugLine( contact.position, contact.position + deltaRotation + deltaPosition, Color::sPurple );
+                    }
+                }
+            }
+        }
+    }
+
+    //==================================================================================================================================================================================================
+    // non linear projection
+    //==================================================================================================================================================================================================
+    void ContactSolver::ResolveInterpenetration( Contact& _contact, const Fixed _angularLimitNonLinearProjection, Vector3 _outRotationChange[2], Vector3 _outVelocityChange[2] )
+    {
+        Fixed    angularInertia[2];
+        Fixed    linearInertia[2];
+        Fixed    totalInertia = 0;
+        for( int i            = 0; i < 2; i++ )
+        {
+            // calculates the angular/linear inertia of each objects to determine the ratio of rotation/translation used for solving interpenetration
+            if( _contact.rigidbody[i] )
+            {
+                const FxRigidbody& rb = *_contact.rigidbody[i];
+                const Vector3 torquePerUnitImpulse   = Vector3::Cross( _contact.relativeContactPosition[i], _contact.normal );
+                const Vector3 rotationPerUnitImpulse = rb.mInverseInertiaTensorWorld * torquePerUnitImpulse;
+                const Vector3 velocityPerUnitImpulse = Vector3::Cross( rotationPerUnitImpulse, _contact.relativeContactPosition[i] );
+                angularInertia[i] = Vector3::Dot( velocityPerUnitImpulse, _contact.normal );
+                linearInertia[i]  = rb.mInverseMass;
+                totalInertia += linearInertia[i] + angularInertia[i];
+            }
+        }
+
+        // calculate the lenght of rotation/translation needed
+        const Fixed inverseTotalInertia = 1 / totalInertia;
+        Fixed       linearMove[2]       = {
+                _contact.penetration * linearInertia[0] * inverseTotalInertia,
+                -_contact.penetration * linearInertia[1] * inverseTotalInertia
+        };
+        Fixed       angularMove[2]      = {
+                _contact.penetration * angularInertia[0] * inverseTotalInertia,
+                -_contact.penetration * angularInertia[1] * inverseTotalInertia
+        };
+
+        // clamp the maximum rotation possible depending on the size of the object
+        for( int i = 0; i < 2; i++ )
+        {
+            const Fixed objectSize   = _contact.relativeContactPosition->Magnitude();
+            const Fixed angularLimit = _angularLimitNonLinearProjection * objectSize;
+            if( Fixed::Abs( angularMove[i] ) > angularLimit )
+            {
+                Fixed total = angularMove[i] + linearMove[i];
+                angularMove[i] = angularMove[i] > 0 ? angularLimit : -angularLimit;
+                linearMove[i]  = total - angularMove[i];
+            }
+        }
+
+        for( int i = 0; i < 2; i++ )
+        {
+            if( _contact.rigidbody[i] )
+            {
+                FxRigidbody& rb = *_contact.rigidbody[i];
+                const Vector3 velocityChange = _contact.normal * linearMove[i];
+                //rb.mTransform->mPosition += velocityChange; // translate to solve interpenetration
+                _outVelocityChange[i] = velocityChange;
+
+                if( angularInertia[i] != 0 )
+                {
+                    // get the amount of rotation for a unit move
+                    const Vector3 torquePerMove   = Vector3::Cross( _contact.relativeContactPosition[i], _contact.normal );
+                    const Vector3 impulsePerMove  = rb.mInverseInertiaTensorWorld * torquePerMove;
+                    Vector3       rotationPerMove = impulsePerMove / angularInertia[i];
+                    Vector3       rotationChange  = angularMove[i] * rotationPerMove;
+
+                    // rotate to solve interpenetration
+                    Fixed magnitude = rotationChange.Magnitude();
+                    if( !Fixed::IsFuzzyZero( magnitude ) )
+                    {
+                        _outRotationChange[i] = rotationChange;
+                        //rb.mTransform->mRotation = rb.mTransform->mRotation + FIXED( 0.5 ) * Quaternion( 0, rotationChange ) * rb.mTransform->mRotation;
+                        //rb.mTransform->mRotation.Normalize();
+                    }
+                }
+            }
         }
     }
 
@@ -121,80 +276,6 @@ namespace fan
 
             _contact.rigidbody[1]->mVelocity += velocityChange1;
             _contact.rigidbody[1]->mRotation += rotationChange1;
-        }
-    }
-
-    //==================================================================================================================================================================================================
-    // non linear projection
-    //==================================================================================================================================================================================================
-    void ContactSolver::ResolveInterpenetration( Contact& _contact ) const
-    {
-        Fixed    angularInertia[2];
-        Fixed    linearInertia[2];
-        Fixed    totalInertia = 0;
-        for( int i            = 0; i < 2; i++ )
-        {
-            // calculates the angular/linear inertia of each objects to determine the ratio of rotation/translation used for solving interpenetration
-            if( _contact.rigidbody[i] )
-            {
-                const FxRigidbody& rb = *_contact.rigidbody[i];
-                const Vector3 torquePerUnitImpulse   = Vector3::Cross( _contact.relativeContactPosition[i], _contact.normal );
-                const Vector3 rotationPerUnitImpulse = rb.mInverseInertiaTensorWorld * torquePerUnitImpulse;
-                const Vector3 velocityPerUnitImpulse = Vector3::Cross( rotationPerUnitImpulse, _contact.relativeContactPosition[i] );
-                angularInertia[i] = Vector3::Dot( velocityPerUnitImpulse, _contact.normal );
-                linearInertia[i]  = rb.mInverseMass;
-                totalInertia += linearInertia[i] + angularInertia[i];
-            }
-        }
-
-        // calculate the lenght of rotation/translation needed
-        const Fixed inverseTotalInertia = 1 / totalInertia;
-        Fixed       linearMove[2]       = {
-                _contact.penetration * linearInertia[0] * inverseTotalInertia,
-                -_contact.penetration * linearInertia[1] * inverseTotalInertia
-        };
-        Fixed       angularMove[2]      = {
-                _contact.penetration * angularInertia[0] * inverseTotalInertia,
-                -_contact.penetration * angularInertia[1] * inverseTotalInertia
-        };
-
-        // clamp the maximum rotation possible depending on the size of the object
-        for( int i = 0; i < 2; i++ )
-        {
-            const Fixed objectSize   = _contact.relativeContactPosition->Magnitude();
-            const Fixed angularLimit = mAngularLimitNonLinearProjection * objectSize;
-            if( Fixed::Abs( angularMove[i] ) > angularLimit )
-            {
-                Fixed total = angularMove[i] + linearMove[i];
-                angularMove[i] = angularMove[i] > 0 ? angularLimit : -angularLimit;
-                linearMove[i]  = total - angularMove[i];
-            }
-        }
-
-        for( int i = 0; i < 2; i++ )
-        {
-            if( _contact.rigidbody[i] )
-            {
-                FxRigidbody& rb = *_contact.rigidbody[i];
-                rb.mTransform->mPosition += _contact.normal * linearMove[i]; // translate to solve interpenetration
-
-                if( angularInertia[i] != 0 )
-                {
-                    // get the amount of rotation for a unit move
-                    const Vector3 torquePerMove   = Vector3::Cross( _contact.relativeContactPosition[i], _contact.normal );
-                    const Vector3 impulsePerMove  = rb.mInverseInertiaTensorWorld * torquePerMove;
-                    Vector3       rotationPerMove = impulsePerMove / angularInertia[i];
-                    Vector3       rotation        = angularMove[i] * rotationPerMove;
-
-                    // rotate to solve interpenetration
-                    Fixed magnitude = rotation.Magnitude();
-                    if( !Fixed::IsFuzzyZero( magnitude ) )
-                    {
-                        rb.mTransform->mRotation = rb.mTransform->mRotation + FIXED( 0.5 ) * Quaternion( 0, rotation ) * rb.mTransform->mRotation;
-                        rb.mTransform->mRotation.Normalize();
-                    }
-                }
-            }
         }
     }
 }

@@ -21,7 +21,7 @@ namespace fan
         {
             RenderDebug   & rd           = _world.GetSingleton<RenderDebug>();
             FxPhysicsWorld& physicsWorld = _world.GetSingleton<FxPhysicsWorld>(); (void)_delta;
-            if( _delta != 0 )
+            //if( _delta != 0 )
             {
                 struct RigidbodyData
                 {
@@ -85,10 +85,11 @@ namespace fan
                         }
                     }
                 }
+                physicsWorld.mContactSolver.tmpRd = &rd;
                 physicsWorld.mContactSolver.ResolveContacts( physicsWorld.mCollisionDetection.mContacts );
             }
 
-            for( Contact& _contact : physicsWorld.mCollisionDetection.mContacts )
+            /*for( Contact& _contact : physicsWorld.mCollisionDetection.mContacts )
             {
                // if( _delta > 0)                _world.GetSingleton<EditorPlayState>().mState = EditorPlayState::PAUSED;
 
@@ -172,7 +173,7 @@ namespace fan
                         }
                     }
                 }
-            }
+            }*/
         }
     };
 }

@@ -55,10 +55,9 @@ namespace fan
                 physicsWorld.mContactSolver.mRestitution = Fixed::FromFloat( restitution );
             }
 
-            // damping
-            if( ImGui::DragInt( "contact solver max iterations", &physicsWorld.mContactSolver.mMaxIterations ) )
-            {
-            }
+            // iterations
+            if( ImGui::DragInt( "num position iterations", &physicsWorld.mContactSolver.mMaxPositionsIterations ) ){}
+            if( ImGui::DragInt( "num contact  iterations", &physicsWorld.mContactSolver.mMaxIterations ) ){}
 
             // restitution
             float angularLimitNonLinearProjection = physicsWorld.mContactSolver.mAngularLimitNonLinearProjection.ToFloat();

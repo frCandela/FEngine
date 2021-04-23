@@ -31,7 +31,8 @@ namespace fan
         Serializable::SaveVec3( _json, "gravity", physicsWorld.mGravity );
         Serializable::SaveFixed( _json, "damping", physicsWorld.mLinearDamping );
         Serializable::SaveFixed( _json, "restitution", physicsWorld.mContactSolver.mRestitution );
-        Serializable::SaveInt( _json, "iterations", physicsWorld.mContactSolver.mMaxIterations );
+        Serializable::SaveInt( _json, "vel iterations", physicsWorld.mContactSolver.mMaxIterations );
+        Serializable::SaveInt( _json, "pos iterations", physicsWorld.mContactSolver.mMaxPositionsIterations );
         Serializable::SaveFixed( _json, "alnlp", physicsWorld.mContactSolver.mAngularLimitNonLinearProjection );
     }
 
@@ -43,7 +44,8 @@ namespace fan
         Serializable::LoadVec3( _json, "gravity", physicsWorld.mGravity );
         Serializable::LoadFixed( _json, "damping", physicsWorld.mLinearDamping );
         Serializable::LoadFixed( _json, "restitution", physicsWorld.mContactSolver.mRestitution );
-        Serializable::LoadInt( _json, "iterations", physicsWorld.mContactSolver.mMaxIterations );
+        Serializable::LoadInt( _json, "vel iterations", physicsWorld.mContactSolver.mMaxIterations );
+        Serializable::LoadInt( _json, "pos iterations", physicsWorld.mContactSolver.mMaxPositionsIterations );
         Serializable::LoadFixed( _json, "alnlp", physicsWorld.mContactSolver.mAngularLimitNonLinearProjection );
     }
 }

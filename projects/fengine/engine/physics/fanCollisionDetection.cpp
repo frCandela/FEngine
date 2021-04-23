@@ -143,10 +143,10 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    bool BoxWithPoint( FxRigidbody& _rb0, const FxBoxCollider& _box0, const Vector3& _point, Contact& _outContact )
+    bool BoxWithPoint( FxRigidbody& _rb0, const FxBoxCollider& _box0, FxRigidbody& _rb1, const Vector3& _point1, Contact& _outContact )
     {
         Matrix4       transform0( _rb0.mTransform->mRotation, _rb0.mTransform->mPosition );
-        const Vector3 relativePoint = _rb0.mTransform->InverseTransformPoint( _point );
+        const Vector3 relativePoint = _rb0.mTransform->InverseTransformPoint( _point1 );
 
         Fixed minDepth = _box0.mHalfExtents.x - Fixed::Abs( relativePoint.x );
         if( minDepth < 0 ){ return false; }
@@ -169,9 +169,10 @@ namespace fan
         }
 
         _outContact.rigidbody[0] = &_rb0;
+        _outContact.rigidbody[1] = &_rb1;
         _outContact.normal      = normal;
         _outContact.penetration = depth;
-        _outContact.position    = _point;
+        _outContact.position    = _point1;
 
         return true;
     }
@@ -193,7 +194,7 @@ namespace fan
         for( int i            = 0; i < 8; ++i )
         {
             Contact contact;
-            if( BoxWithPoint( _rb1, _box1, vertices0[i], contact ) )
+            if( BoxWithPoint( _rb1, _box1, _rb0, vertices0[i], contact ) )
             {
                 _outContacts.push_back( contact );
             }
