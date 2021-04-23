@@ -28,14 +28,14 @@ namespace fan
         static Vector3 Cross( const Vector3& _v1, const Vector3& _v2 );
         static bool IsFuzzyZero( const Vector3& _vec3 ) { return Fixed::IsFuzzyZero( _vec3.x ) && Fixed::IsFuzzyZero( _vec3.y ) && Fixed::IsFuzzyZero( _vec3.z ); }
         static void MakeOrthonormalBasis( const Vector3& _x, Vector3& _y, Vector3& _z );
+        static Vector3 Mult( const Vector3& _vec1, const Vector3& _vec2 ) { return Vector3( _vec1.x * _vec2.x, _vec1.y * _vec2.y, _vec1.z * _vec2.z ); }
 
         bool operator==( const Vector3& _vec3 ) const { return _vec3.x == x && _vec3.y == y && _vec3.z == z; }
-        bool operator!=( const Vector3& _vec3 ) const { return !( *this == _vec3 ); }
 
+        bool operator!=( const Vector3& _vec3 ) const { return !( *this == _vec3 ); }
         Vector3 operator*( const Fixed& _value ) const { return Vector3( _value * x, _value * y, _value * z ); }
+
         Vector3& operator*=( const Fixed& _value ) { return ( *this = *this * _value ); }
-        Vector3 operator*( const Vector3& _vec3 ) const { return Vector3( _vec3.x * x, _vec3.y * y, _vec3.z * z ); }
-        Vector3& operator*=( const Vector3& _vec3 ) { return ( *this = *this * _vec3 ); }
 
         Vector3 operator/( const Fixed& _value ) const { return Vector3( x / _value, y / _value, z / _value ); }
         Vector3& operator/=( const Fixed& _value ) { return ( *this = *this / _value ); }
