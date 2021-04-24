@@ -9,7 +9,6 @@
 namespace fan
 {
     struct FxTransform;
-    struct FxSphereCollider;
 
     //========================================================================================================
     //========================================================================================================
@@ -37,5 +36,8 @@ namespace fan
         void ApplyTorque( const Vector3& _torque ) { mTorqueAccumulator += _torque; }
         void CalculateDerivedData( FxTransform& _transform );
         void ClearAccumulators();
+
+        static Matrix3 SphereInertiaTensor( const Fixed _inverseMass, const Fixed _radius );
+        static Matrix3 BoxInertiaTensor( const Fixed _inverseMass, const Vector3 _halfExtents );
     };
 }

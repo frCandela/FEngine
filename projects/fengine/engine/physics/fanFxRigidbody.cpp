@@ -1,9 +1,7 @@
+#include <core/fanDebug.hpp>
 #include "engine/physics/fanFxRigidbody.hpp"
-#include "core/memory/fanSerializable.hpp"
-
 #include "engine/components/fanFxTransform.hpp"
 #include "engine/physics/fanFxPhysicsWorld.hpp"
-#include "core/ecs/fanEcsWorld.hpp"
 
 namespace fan
 {
@@ -22,7 +20,7 @@ namespace fan
         // clear
         FxRigidbody& rb = static_cast<FxRigidbody&>( _component );
         rb.mInverseMass               = 1;
-        rb.mInverseInertiaTensorLocal = ( 2 / FIXED( 5 ) / rb.mInverseMass * FIXED( 0.25 ) * Matrix3::sIdentity ).Inverse(); // sphere Inertia = (2/3)*m*r^2
+        rb.mInverseInertiaTensorLocal = Matrix3::sZero;
         rb.mVelocity                  = Vector3::sZero;
         rb.mRotation                  = Vector3::sZero;
         rb.mAcceleration              = _world.GetSingleton<FxPhysicsWorld>().mGravity;
@@ -82,6 +80,27 @@ namespace fan
 
     //========================================================================================================
     //========================================================================================================
+    Matrix3 FxRigidbody::SphereInertiaTensor( const Fixed _inverseMass, const Fixed _radius )
+    {
+        const Fixed value = Fixed( 2 ) / 5 * _radius * _radius / _inverseMass;
+        return value * Matrix3::sIdentity;
+    }
+
+    //========================================================================================================
+    //========================================================================================================
+    Matrix3 FxRigidbody::BoxInertiaTensor( const Fixed _inverseMass, const Vector3 _halfExtents )
+    {
+        const Vector3 e      = _halfExtents * 2;
+        const Fixed   valueX = Fixed( 1 ) / 12 * ( e.y * e.y + e.z + e.z ) / _inverseMass;
+        const Fixed   valueY = Fixed( 1 ) / 12 * ( e.x * e.x + e.z + e.z ) / _inverseMass;
+        const Fixed   valueZ = Fixed( 1 ) / 12 * ( e.x * e.x + e.y + e.y ) / _inverseMass;
+        return Matrix3( valueX, 0, 0,
+                        0, valueY, 0,
+                        0, 0, valueZ );
+    }
+
+    //========================================================================================================
+    //========================================================================================================
     void FxRigidbody::Save( const EcsComponent& _component, Json& _json )
     {
         const FxRigidbody& rb = static_cast<const FxRigidbody&>( _component );
@@ -89,6 +108,7 @@ namespace fan
         Serializable::SaveVec3( _json, "velocity", rb.mVelocity );
         Serializable::SaveVec3( _json, "rotation", rb.mRotation );
         Serializable::SaveVec3( _json, "acceleration", rb.mAcceleration );
+        Serializable::SaveVec3( _json, "inv_inertia_tensor", Vector3( rb.mInverseInertiaTensorLocal.e11, rb.mInverseInertiaTensorLocal.e22, rb.mInverseInertiaTensorLocal.e33 ) );
     }
 
     //========================================================================================================
@@ -100,6 +120,12 @@ namespace fan
         Serializable::LoadVec3( _json, "velocity", rb.mVelocity );
         Serializable::LoadVec3( _json, "rotation", rb.mRotation );
         Serializable::LoadVec3( _json, "acceleration", rb.mAcceleration );
+
+        Vector3 invInertiaTensor;
+        Serializable::LoadVec3( _json, "inv_inertia_tensor", invInertiaTensor );
+        rb.mInverseInertiaTensorLocal = Matrix3( invInertiaTensor.x, 0, 0,
+                                                 0, invInertiaTensor.y, 0,
+                                                 0, 0, invInertiaTensor.z );
     }
 }
 

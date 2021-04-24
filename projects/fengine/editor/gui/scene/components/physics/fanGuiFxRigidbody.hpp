@@ -2,6 +2,8 @@
 
 #include "engine/physics/fanFxRigidbody.hpp"
 #include "editor/singletons/fanEditorGuiInfo.hpp"
+#include "engine/physics/fanFxBoxCollider.hpp"
+#include "engine/physics/fanFxSphereCollider.hpp"
 
 namespace fan
 {
@@ -22,7 +24,7 @@ namespace fan
 
         //========================================================================================================
         //========================================================================================================
-        static void OnGui( EcsWorld& /*_world*/, EcsEntity /*_entityID*/, EcsComponent& _component )
+        static void OnGui( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
         {
             FxRigidbody& rb = static_cast<FxRigidbody&>( _component );
             ImGui::PushID( "FxRigidbody" );
@@ -32,6 +34,7 @@ namespace fan
                 if( ImGui::Button( "##Mass" ) )
                 {
                     rb.mInverseMass = 1;
+                    TryUpdateInvInertiaTensorLocal(  _world, _entity );
                 }
                 ImGui::SameLine();
                 float invMass = rb.mInverseMass.ToFloat();
@@ -46,8 +49,20 @@ namespace fan
                     {
                         rb.mInverseMass = 1 / Fixed::FromFloat( mass );
                     }
+                    TryUpdateInvInertiaTensorLocal(  _world, _entity );
                 }
-                ImGui::PopItemWidth();
+
+                {
+                    if( ImGui::Button( "##reload_tensor" ) )
+                    {
+                        TryUpdateInvInertiaTensorLocal(  _world, _entity );
+                    }
+                    ImGui::SameLine();
+                    ImGui::PushReadOnly();
+                    glm::vec3 invInertiaTensor = Math::ToGLM({ rb.mInverseInertiaTensorLocal.e11, rb.mInverseInertiaTensorLocal.e22, rb.mInverseInertiaTensorLocal.e33 });
+                    ImGui::DragFloat3( "inverse inertia tensor", &invInertiaTensor.x, 1.f, -1000.f, 1000.f );
+                    ImGui::PopReadOnly();
+                }
 
                 // Velocity
                 if( ImGui::Button( "##Velocity" ) )
@@ -84,8 +99,33 @@ namespace fan
                 {
                     rb.mAcceleration = Math::ToFixed( acceleration );
                 }
+
+                ImGui::PopItemWidth();
             }
             ImGui::PopID();
+        }
+
+        //========================================================================================================
+        //========================================================================================================
+        static void TryUpdateInvInertiaTensorLocal( EcsWorld& _world, EcsEntity _entity )
+        {
+            if( !_world.HasComponent<FxRigidbody>( _entity ) ){ return; }
+            FxRigidbody& rb = _world.GetComponent<FxRigidbody>( _entity );
+
+            if( _world.HasComponent<FxSphereCollider>( _entity ) )
+            {
+                const FxSphereCollider& sphereCollider = _world.GetComponent<FxSphereCollider>( _entity );
+                rb.mInverseInertiaTensorLocal = FxRigidbody::SphereInertiaTensor( rb.mInverseMass, sphereCollider.mRadius ).Inverse();
+            }
+            else if( _world.HasComponent<FxBoxCollider>( _entity ) )
+            {
+                const FxBoxCollider& boxCollider = _world.GetComponent<FxBoxCollider>( _entity );
+                rb.mInverseInertiaTensorLocal = FxRigidbody::BoxInertiaTensor( rb.mInverseMass, boxCollider.mHalfExtents ).Inverse();
+            }
+            else
+            {
+                rb.mInverseInertiaTensorLocal = Matrix3::sZero;
+            }
         }
     };
 }
