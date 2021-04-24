@@ -40,7 +40,7 @@ namespace fan
                 physicsWorld.mLinearDamping = Fixed::FromFloat( damping );
             }
 
-            // anglar damping
+            // angular damping
             float angularDamping = physicsWorld.mAngularDamping.ToFloat();
             if( ImGui::DragFloat( "angular damping", &angularDamping ) )
             {
@@ -54,7 +54,14 @@ namespace fan
                 physicsWorld.mContactSolver.mRestitution = Fixed::FromFloat( restitution );
             }
 
-            // restitution
+            // resting velocity limit
+            float restingVelocityLimit = physicsWorld.mContactSolver.mRestingVelocityLimit.ToFloat();
+            if( ImGui::DragFloat( "resting velocity limit", &restingVelocityLimit, 0.01f, 0.f, 1.f ) )
+            {
+                physicsWorld.mContactSolver.mRestingVelocityLimit = Fixed::FromFloat( restingVelocityLimit );
+            }
+
+            // angular limit non linear projection
             float angularLimitNonLinearProjection = physicsWorld.mContactSolver.mAngularLimitNonLinearProjection.ToFloat();
             if( ImGui::DragFloat( "angular limit non linear projection", &angularLimitNonLinearProjection, 0.01f, 0.f, 10.f ) )
             {

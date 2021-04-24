@@ -85,7 +85,7 @@ namespace fan
                     }
                 }
                 physicsWorld.mContactSolver.tmpRd = &_world.GetSingleton<RenderDebug>();;
-                physicsWorld.mContactSolver.ResolveContacts( physicsWorld.mCollisionDetection.mContacts );
+                physicsWorld.mContactSolver.ResolveContacts( physicsWorld.mCollisionDetection.mContacts, _delta );
             }
         }
     };

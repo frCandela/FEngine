@@ -18,8 +18,8 @@ namespace fan
     {
         FxPhysicsWorld& physicsWorld = static_cast<FxPhysicsWorld&>( _component );
         physicsWorld.mGravity        = Vector3( 0, -10, 0 );
-        physicsWorld.mLinearDamping  = FIXED( 0.995 );
-        physicsWorld.mAngularDamping = FIXED( 0.995 );
+        physicsWorld.mLinearDamping  = FIXED( 0.996 );
+        physicsWorld.mAngularDamping = FIXED( 0.996 );
         physicsWorld.mContactSolver  = ContactSolver();
     }
 
@@ -29,8 +29,10 @@ namespace fan
     {
         const FxPhysicsWorld& physicsWorld = static_cast<const FxPhysicsWorld&>( _component );
         Serializable::SaveVec3( _json, "gravity", physicsWorld.mGravity );
-        Serializable::SaveFixed( _json, "damping", physicsWorld.mLinearDamping );
+        Serializable::SaveFixed( _json, "linear_damping", physicsWorld.mLinearDamping );
+        Serializable::SaveFixed( _json, "angular_damping", physicsWorld.mAngularDamping );
         Serializable::SaveFixed( _json, "restitution", physicsWorld.mContactSolver.mRestitution );
+        Serializable::SaveFixed( _json, "resting_velocity", physicsWorld.mContactSolver.mRestingVelocityLimit );
         Serializable::SaveInt( _json, "vel iterations", physicsWorld.mContactSolver.mMaxVelocityIterations );
         Serializable::SaveInt( _json, "pos iterations", physicsWorld.mContactSolver.mMaxPositionsIterations );
         Serializable::SaveFixed( _json, "alnlp", physicsWorld.mContactSolver.mAngularLimitNonLinearProjection );
@@ -42,8 +44,10 @@ namespace fan
     {
         FxPhysicsWorld& physicsWorld = static_cast<FxPhysicsWorld&>( _component );
         Serializable::LoadVec3( _json, "gravity", physicsWorld.mGravity );
-        Serializable::LoadFixed( _json, "damping", physicsWorld.mLinearDamping );
+        Serializable::LoadFixed( _json, "linear_damping", physicsWorld.mLinearDamping );
+        Serializable::LoadFixed( _json, "angular_damping", physicsWorld.mAngularDamping );
         Serializable::LoadFixed( _json, "restitution", physicsWorld.mContactSolver.mRestitution );
+        Serializable::LoadFixed( _json, "resting_velocity", physicsWorld.mContactSolver.mRestingVelocityLimit );
         Serializable::LoadInt( _json, "vel iterations", physicsWorld.mContactSolver.mMaxVelocityIterations );
         Serializable::LoadInt( _json, "pos iterations", physicsWorld.mContactSolver.mMaxPositionsIterations );
         Serializable::LoadFixed( _json, "alnlp", physicsWorld.mContactSolver.mAngularLimitNonLinearProjection );
