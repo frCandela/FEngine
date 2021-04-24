@@ -237,9 +237,10 @@ namespace fan
     //==================================================================================================================================================================================================
     void ContactSolver::ResolveVelocity( const Contact& _contact )
     {
+        if( _contact.rigidbody[0]->mInverseMass != 0 )
         {
             const Fixed   deltaVelocityPerUnitImpulse0 = ContactSolver::CalculateDeltaVelocityPerUnitImpulse( _contact, 0 );
-            const Fixed desiredDeltaVelocity0 = _contact.rigidbody[0]->mInverseMass * _contact.desiredTotalDeltaVelocity / _contact.totalInverseMass ;
+            const Fixed   desiredDeltaVelocity0        = _contact.rigidbody[0]->mInverseMass * _contact.desiredTotalDeltaVelocity / _contact.totalInverseMass;
             const Vector3 impulseContact( desiredDeltaVelocity0 / deltaVelocityPerUnitImpulse0, 0, 0 );
             const Vector3 impulse                      = _contact.contactToWorld * impulseContact;
             const Vector3 velocityChange               = impulse * _contact.rigidbody[0]->mInverseMass;
@@ -250,10 +251,10 @@ namespace fan
             _contact.rigidbody[0]->mRotation += rotationChange;
         }
 
-        if( _contact.rigidbody[1] )
+        if( _contact.rigidbody[1] && _contact.rigidbody[1]->mInverseMass != 0 )
         {
             const Fixed   deltaVelocityPerUnitImpulse1 = ContactSolver::CalculateDeltaVelocityPerUnitImpulse( _contact, 1 );
-            const Fixed desiredDeltaVelocity1 = _contact.rigidbody[1]->mInverseMass * _contact.desiredTotalDeltaVelocity / _contact.totalInverseMass ;
+            const Fixed   desiredDeltaVelocity1        = _contact.rigidbody[1]->mInverseMass * _contact.desiredTotalDeltaVelocity / _contact.totalInverseMass;
             const Vector3 impulseContact1( desiredDeltaVelocity1 / deltaVelocityPerUnitImpulse1, 0, 0 );
             const Vector3 impulse1                     = _contact.contactToWorld * impulseContact1;
             const Vector3 velocityChange1              = impulse1 * _contact.rigidbody[1]->mInverseMass;
@@ -289,13 +290,13 @@ namespace fan
             relativeVelocity -= Vector3::Cross( _contact.rigidbody[1]->mRotation, _contact.relativeContactPosition[1] );
             relativeVelocity -= _contact.rigidbody[1]->mVelocity;
         }
-        relativeVelocity = _contact.contactToWorld.Transpose() * relativeVelocity;
+        relativeVelocity         = _contact.contactToWorld.Transpose() * relativeVelocity;
         return relativeVelocity;
     }
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    Fixed ContactSolver::CalculateDesiredTotalDeltaVelocity( const Contact& _contact, const Fixed _deltaTime,  Fixed _restingVelocityLimit )
+    Fixed ContactSolver::CalculateDesiredTotalDeltaVelocity( const Contact& _contact, const Fixed _deltaTime, Fixed _restingVelocityLimit )
     {
         // Velocity from constant acceleration is removed to prevent vibration
         Fixed velocityFromAcceleration = Vector3::Dot( _contact.rigidbody[0]->mAcceleration, _contact.normal );
@@ -306,8 +307,8 @@ namespace fan
         velocityFromAcceleration *= _deltaTime;
 
         // restitution is set to zero below a threshold to prevent vibration
-        const Fixed restitution = Fixed::Abs(_contact.relativeVelocity.x ) < _restingVelocityLimit ? 0 : _contact.restitution;
+        const Fixed restitution = Fixed::Abs( _contact.relativeVelocity.x ) < _restingVelocityLimit ? 0 : _contact.restitution;
 
-        return ( -_contact.relativeVelocity.x - restitution * (_contact.relativeVelocity.x - velocityFromAcceleration ) );
+        return ( -_contact.relativeVelocity.x - restitution * ( _contact.relativeVelocity.x - velocityFromAcceleration ) );
     }
 }

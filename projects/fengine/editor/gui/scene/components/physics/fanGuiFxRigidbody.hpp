@@ -34,7 +34,7 @@ namespace fan
                 if( ImGui::Button( "##Mass" ) )
                 {
                     rb.mInverseMass = 1;
-                    TryUpdateInvInertiaTensorLocal(  _world, _entity );
+                    TryUpdateInvInertiaTensorLocal( _world, _entity );
                 }
                 ImGui::SameLine();
                 float invMass = rb.mInverseMass.ToFloat();
@@ -49,17 +49,17 @@ namespace fan
                     {
                         rb.mInverseMass = 1 / Fixed::FromFloat( mass );
                     }
-                    TryUpdateInvInertiaTensorLocal(  _world, _entity );
+                    TryUpdateInvInertiaTensorLocal( _world, _entity );
                 }
 
                 {
                     if( ImGui::Button( "##reload_tensor" ) )
                     {
-                        TryUpdateInvInertiaTensorLocal(  _world, _entity );
+                        TryUpdateInvInertiaTensorLocal( _world, _entity );
                     }
                     ImGui::SameLine();
                     ImGui::PushReadOnly();
-                    glm::vec3 invInertiaTensor = Math::ToGLM({ rb.mInverseInertiaTensorLocal.e11, rb.mInverseInertiaTensorLocal.e22, rb.mInverseInertiaTensorLocal.e33 });
+                    glm::vec3 invInertiaTensor = Math::ToGLM( { rb.mInverseInertiaTensorLocal.e11, rb.mInverseInertiaTensorLocal.e22, rb.mInverseInertiaTensorLocal.e33 } );
                     ImGui::DragFloat3( "inverse inertia tensor", &invInertiaTensor.x, 1.f, -1000.f, 1000.f );
                     ImGui::PopReadOnly();
                 }
@@ -112,7 +112,11 @@ namespace fan
             if( !_world.HasComponent<FxRigidbody>( _entity ) ){ return; }
             FxRigidbody& rb = _world.GetComponent<FxRigidbody>( _entity );
 
-            if( _world.HasComponent<FxSphereCollider>( _entity ) )
+            if( rb.mInverseMass == 0 )
+            {
+                rb.mInverseInertiaTensorLocal = Matrix3::sZero;
+            }
+            else if( _world.HasComponent<FxSphereCollider>( _entity ) )
             {
                 const FxSphereCollider& sphereCollider = _world.GetComponent<FxSphereCollider>( _entity );
                 rb.mInverseInertiaTensorLocal = FxRigidbody::SphereInertiaTensor( rb.mInverseMass, sphereCollider.mRadius ).Inverse();
