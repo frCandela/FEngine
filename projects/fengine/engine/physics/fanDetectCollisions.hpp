@@ -20,7 +20,7 @@ namespace fan
         static void Run( EcsWorld& _world, const EcsView& _view, Fixed _delta )
         {
             FxPhysicsWorld& physicsWorld = _world.GetSingleton<FxPhysicsWorld>(); (void)_delta;
-            if( _delta != 0 )
+           // if( _delta != 0 )
             {
                 struct RigidbodyData
                 {

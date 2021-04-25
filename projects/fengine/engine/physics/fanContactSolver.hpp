@@ -27,8 +27,8 @@ namespace fan
         void ResolvePositions( std::vector<Contact>& _contacts );
         void ResolveVelocities( std::vector<Contact>& _contacts, const Fixed _deltaTime );
 
-        static void ResolveVelocity( const Contact& _contact );
-        static void ResolvePosition( const Contact& _contact, const Fixed _angularLimitNonLinearProjection, Vector3* _outRotationChange, Vector3* _outVelocityChange );
+        /*static*/ void ResolveVelocity( const Contact& _contact, const Fixed _deltaTime );
+        /*static*/ void ResolvePosition( const Contact& _contact, const Fixed _angularLimitNonLinearProjection, Vector3* _outRotationChange, Vector3* _outVelocityChange );
 
         static Vector3 CalculateRelativeVelocity( const Contact& _contact );
         static Fixed CalculateDesiredTotalDeltaVelocity( const Contact& _contact, const Fixed _deltaTime, const Fixed _restingVelocityLimit );

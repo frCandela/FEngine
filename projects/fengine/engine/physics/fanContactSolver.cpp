@@ -141,7 +141,7 @@ namespace fan
             }
             if( worstContact == nullptr ){ break; }
 
-            ResolveVelocity( *worstContact );
+            ResolveVelocity( *worstContact, _deltaTime );
 
             // updates contacts
             for( Contact& contact : _contacts )
@@ -235,34 +235,70 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void ContactSolver::ResolveVelocity( const Contact& _contact )
+    void ContactSolver::ResolveVelocity( const Contact& _contact, const Fixed _deltaTime )
     {
+        tmpRd->DebugPoint( _contact.position, Color::sRed );
+
+        // build a matrix to convert contact impulse into velocity change
+        const Matrix3 impulseToTorque        = Matrix3::SkewSymmetric( _contact.relativeContactPosition[0] );
+        const Matrix3 torquePerUnitImpulse   = impulseToTorque;
+        const Matrix3 rotationPerUnitImpulse = _contact.rigidbody[0]->mInverseInertiaTensorWorld * torquePerUnitImpulse;
+        Matrix3       velocityPerUnitImpulse = -rotationPerUnitImpulse * impulseToTorque;
+
+        if( _contact.rigidbody[1] )
+        {
+            const Matrix3 impulseToTorque1        = Matrix3::SkewSymmetric( _contact.relativeContactPosition[1] );
+            const Matrix3 torquePerUnitImpulse1   = impulseToTorque1;
+            const Matrix3 rotationPerUnitImpulse1 = _contact.rigidbody[1]->mInverseInertiaTensorWorld * torquePerUnitImpulse1;
+            Matrix3       velocityPerUnitImpulse1 = -rotationPerUnitImpulse1 * impulseToTorque1;
+
+            velocityPerUnitImpulse += velocityPerUnitImpulse1;
+        }
+
+        // add linear velocity change
+        velocityPerUnitImpulse.e11 += _contact.totalInverseMass;
+        velocityPerUnitImpulse.e22 += _contact.totalInverseMass;
+        velocityPerUnitImpulse.e33 += _contact.totalInverseMass;
+
+        const Matrix3 velocityPerUnitImpulseContact = _contact.contactToWorld.Transpose() * velocityPerUnitImpulse * _contact.contactToWorld;
+        const Matrix3 impulsePerUnitVelocityContact = velocityPerUnitImpulseContact.Inverse();
+
+        // const Fixed planarImpulse0 = Fixed::Sqrt( impulseContact0.y * impulseContact0.y + impulseContact0.z * impulseContact0.z );
+
+        // apply impulse to first body
         if( _contact.rigidbody[0]->mInverseMass != 0 )
         {
             const Fixed   deltaVelocityPerUnitImpulse0 = ContactSolver::CalculateDeltaVelocityPerUnitImpulse( _contact, 0 );
             const Fixed   desiredDeltaVelocity0        = _contact.rigidbody[0]->mInverseMass * _contact.desiredTotalDeltaVelocity / _contact.totalInverseMass;
-            const Vector3 impulseContact( desiredDeltaVelocity0 / deltaVelocityPerUnitImpulse0, 0, 0 );
+            const Vector3 impulseFriction0             = impulsePerUnitVelocityContact * Vector3( 0, -_contact.relativeVelocity.y, -_contact.relativeVelocity.z );
+            const Vector3 impulseContact               = Vector3( desiredDeltaVelocity0 / deltaVelocityPerUnitImpulse0, 0, 0 ) + impulseFriction0;
             const Vector3 impulse                      = _contact.contactToWorld * impulseContact;
             const Vector3 velocityChange               = impulse * _contact.rigidbody[0]->mInverseMass;
             const Vector3 impulsiveTorque              = Vector3::Cross( _contact.relativeContactPosition[0], impulse );
             const Vector3 rotationChange               = _contact.rigidbody[0]->mInverseInertiaTensorWorld * impulsiveTorque;
-
-            _contact.rigidbody[0]->mVelocity += velocityChange;
-            _contact.rigidbody[0]->mRotation += rotationChange;
+            if( _deltaTime != 0 )
+            {
+                _contact.rigidbody[0]->mVelocity += velocityChange;
+                _contact.rigidbody[0]->mRotation += rotationChange;
+            }
         }
 
+        // apply impulse to second body
         if( _contact.rigidbody[1] && _contact.rigidbody[1]->mInverseMass != 0 )
         {
             const Fixed   deltaVelocityPerUnitImpulse1 = ContactSolver::CalculateDeltaVelocityPerUnitImpulse( _contact, 1 );
             const Fixed   desiredDeltaVelocity1        = _contact.rigidbody[1]->mInverseMass * _contact.desiredTotalDeltaVelocity / _contact.totalInverseMass;
-            const Vector3 impulseContact1( desiredDeltaVelocity1 / deltaVelocityPerUnitImpulse1, 0, 0 );
+            const Vector3 impulseFriction1             = impulsePerUnitVelocityContact * Vector3( 0, -_contact.relativeVelocity.y, -_contact.relativeVelocity.z );
+            const Vector3 impulseContact1              = Vector3( desiredDeltaVelocity1 / deltaVelocityPerUnitImpulse1, 0, 0 ) + impulseFriction1;
             const Vector3 impulse1                     = _contact.contactToWorld * impulseContact1;
             const Vector3 velocityChange1              = impulse1 * _contact.rigidbody[1]->mInverseMass;
             const Vector3 impulsiveTorque1             = Vector3::Cross( _contact.relativeContactPosition[1], impulse1 );
             const Vector3 rotationChange1              = _contact.rigidbody[1]->mInverseInertiaTensorWorld * impulsiveTorque1;
-
-            _contact.rigidbody[1]->mVelocity -= velocityChange1;
-            _contact.rigidbody[1]->mRotation -= rotationChange1;
+            if( _deltaTime != 0 )
+            {
+                _contact.rigidbody[1]->mVelocity -= velocityChange1;
+                _contact.rigidbody[1]->mRotation -= rotationChange1;
+            }
         }
     }
 
