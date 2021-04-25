@@ -56,7 +56,7 @@ namespace fan
             Fixed worstPenetration = 0;
             for( Contact& contact : _contacts )
             {
-                if( contact.penetration > worstPenetration )
+                if( contact.penetration > worstPenetration && contact.totalInverseMass != 0 )
                 {
                     worstContact     = &contact;
                     worstPenetration = contact.penetration;
@@ -133,7 +133,7 @@ namespace fan
             for( Contact& contact : _contacts )
             {
                 const Fixed separatingVelocity = contact.relativeVelocity.x;
-                if( separatingVelocity < 0 && separatingVelocity < maxSeparatingVelocity )
+                if( separatingVelocity < 0 && separatingVelocity < maxSeparatingVelocity && contact.totalInverseMass != 0 )
                 {
                     maxSeparatingVelocity = separatingVelocity;
                     worstContact          = &contact;
