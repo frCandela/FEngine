@@ -25,6 +25,7 @@ namespace fan
 
         static const Matrix3 sZero;
         static const Matrix3 sIdentity;
+        static Matrix3 SkewSymmetric( const Vector3& _vector );
 
         bool operator==( const Matrix3& _mat3 ) const;
         bool operator!=( const Matrix3& _mat3 ) const { return !( *this == _mat3 ); }
@@ -38,8 +39,8 @@ namespace fan
         Matrix3 operator*( const Matrix3& _mat3 ) const;
         Vector3 operator*( const Vector3& _vec3 ) const;
         Matrix3 operator/( const Fixed& _value ) const;
-        Matrix3& operator/=( const Fixed& _value );
 
+        Matrix3& operator/=( const Fixed& _value );
         Quaternion ToQuaternion() const;
         Fixed Determinant() const;
         Matrix3 Transpose() const;

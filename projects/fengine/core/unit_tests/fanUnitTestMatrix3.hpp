@@ -25,6 +25,7 @@ namespace fan
                      { &UnitTestMatrix3::TestInverse,              "inverse" },
                      { &UnitTestMatrix3::TestToQuaternion,         "to quaternion" },
                      { &UnitTestMatrix3::TestVectorMultiplication, "vector multiplication" },
+                     { &UnitTestMatrix3::TestSkewSymmetric,        "skew symmetric" },
             };
         }
 
@@ -222,6 +223,19 @@ namespace fan
             Vector3 vec( 4, 5, 6 );
             TEST_ASSERT( mat * vec == Vector3( 32, 29, 50 ) )
             TEST_ASSERT( mat.Inverse() * ( mat * vec ) == vec )
+        }
+
+        void TestSkewSymmetric()
+        {
+            Vector3 v1( 1, 2, 3 );
+            Vector3 v2( 4, 5, 6 );
+            Matrix3 m = Matrix3::SkewSymmetric( v1 );
+            TEST_ASSERT( Vector3::Cross( v1, v2 ) == m * v2 );
+
+            v1 = Vector3( -4, 5, -9 );
+            v2 = Vector3( 2, -7, 41 );
+            m  = Matrix3::SkewSymmetric( v1 );
+            TEST_ASSERT( Vector3::Cross( v1, v2 ) == m * v2 );
         }
     };
 }
