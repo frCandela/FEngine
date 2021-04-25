@@ -61,6 +61,12 @@ namespace fan
                     ImGui::PushReadOnly();
                     glm::vec3 invInertiaTensor = Math::ToGLM( { rb.mInverseInertiaTensorLocal.e11, rb.mInverseInertiaTensorLocal.e22, rb.mInverseInertiaTensorLocal.e33 } );
                     ImGui::DragFloat3( "inverse inertia tensor", &invInertiaTensor.x, 1.f, -1000.f, 1000.f );
+                    /*glm::vec3 w0 = Math::ToGLM( { rb.mInverseInertiaTensorWorld.e11, rb.mInverseInertiaTensorWorld.e12, rb.mInverseInertiaTensorWorld.e13 } );
+                    glm::vec3 w1 = Math::ToGLM( { rb.mInverseInertiaTensorWorld.e21, rb.mInverseInertiaTensorWorld.e22, rb.mInverseInertiaTensorWorld.e23 } );
+                    glm::vec3 w2 = Math::ToGLM( { rb.mInverseInertiaTensorWorld.e31, rb.mInverseInertiaTensorWorld.e32, rb.mInverseInertiaTensorWorld.e33 } );
+                    ImGui::DragFloat3( "w0", &w0.x, 1.f, -1000.f, 1000.f );
+                    ImGui::DragFloat3( "w1", &w1.x, 1.f, -1000.f, 1000.f );
+                    ImGui::DragFloat3( "w2", &w2.x, 1.f, -1000.f, 1000.f );*/
                     ImGui::PopReadOnly();
                 }
 

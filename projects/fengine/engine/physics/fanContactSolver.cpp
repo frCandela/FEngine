@@ -8,6 +8,8 @@
 
 namespace fan
 {
+    RenderDebug* ContactSolver::tmpRd;
+
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
     void ContactSolver::ResolveContacts( std::vector<Contact> _contacts, const Fixed _deltaTime )
@@ -15,7 +17,7 @@ namespace fan
         if( _contacts.empty() ){ return; }
 
         PrepareContacts( _contacts, _deltaTime );
-        ResolvePositions( _contacts );
+        ResolvePositions( _contacts, _deltaTime );
         ResolveVelocities( _contacts, _deltaTime );
     }
 
@@ -48,8 +50,10 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void ContactSolver::ResolvePositions( std::vector<Contact>& _contacts )
+    void ContactSolver::ResolvePositions( std::vector<Contact>& _contacts, const Fixed _deltaTime )
     {
+        if( _deltaTime == 0 ){ return; }
+
         for( mPositionIterationsUsed = 0; mPositionIterationsUsed < mMaxPositionsIterations; mPositionIterationsUsed++ )
         {
             Contact* worstContact = nullptr;
@@ -243,14 +247,13 @@ namespace fan
         const Matrix3 impulseToTorque        = Matrix3::SkewSymmetric( _contact.relativeContactPosition[0] );
         const Matrix3 torquePerUnitImpulse   = impulseToTorque;
         const Matrix3 rotationPerUnitImpulse = _contact.rigidbody[0]->mInverseInertiaTensorWorld * torquePerUnitImpulse;
-        Matrix3       velocityPerUnitImpulse = -rotationPerUnitImpulse * impulseToTorque;
-
+        Matrix3       velocityPerUnitImpulse = -impulseToTorque * rotationPerUnitImpulse;
         if( _contact.rigidbody[1] )
         {
             const Matrix3 impulseToTorque1        = Matrix3::SkewSymmetric( _contact.relativeContactPosition[1] );
             const Matrix3 torquePerUnitImpulse1   = impulseToTorque1;
             const Matrix3 rotationPerUnitImpulse1 = _contact.rigidbody[1]->mInverseInertiaTensorWorld * torquePerUnitImpulse1;
-            Matrix3       velocityPerUnitImpulse1 = -rotationPerUnitImpulse1 * impulseToTorque1;
+            Matrix3       velocityPerUnitImpulse1 = -impulseToTorque1 * rotationPerUnitImpulse1;
 
             velocityPerUnitImpulse += velocityPerUnitImpulse1;
         }

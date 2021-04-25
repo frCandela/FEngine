@@ -91,9 +91,9 @@ namespace fan
     Matrix3 FxRigidbody::BoxInertiaTensor( const Fixed _inverseMass, const Vector3 _halfExtents )
     {
         const Vector3 e      = _halfExtents * 2;
-        const Fixed   valueX = Fixed( 1 ) / 12 * ( e.y * e.y + e.z + e.z ) / _inverseMass;
-        const Fixed   valueY = Fixed( 1 ) / 12 * ( e.x * e.x + e.z + e.z ) / _inverseMass;
-        const Fixed   valueZ = Fixed( 1 ) / 12 * ( e.x * e.x + e.y + e.y ) / _inverseMass;
+        const Fixed   valueX = Fixed( 1 ) / 12 * ( e.y * e.y + e.z * e.z ) / _inverseMass;
+        const Fixed   valueY = Fixed( 1 ) / 12 * ( e.x * e.x + e.z * e.z ) / _inverseMass;
+        const Fixed   valueZ = Fixed( 1 ) / 12 * ( e.x * e.x + e.y * e.y ) / _inverseMass;
         return Matrix3( valueX, 0, 0,
                         0, valueY, 0,
                         0, 0, valueZ );
