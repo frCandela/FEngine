@@ -54,6 +54,13 @@ namespace fan
                 physicsWorld.mContactSolver.mRestitution = Fixed::FromFloat( restitution );
             }
 
+            // friction
+            float friction = physicsWorld.mContactSolver.mFriction.ToFloat();
+            if( ImGui::DragFloat( "friction", &friction, 0.01f, 0.f, 1.f ) )
+            {
+                physicsWorld.mContactSolver.mFriction = Fixed::FromFloat( friction );
+            }
+
             // resting velocity limit
             float restingVelocityLimit = physicsWorld.mContactSolver.mRestingVelocityLimit.ToFloat();
             if( ImGui::DragFloat( "resting velocity limit", &restingVelocityLimit, 0.01f, 0.f, 1.f ) )

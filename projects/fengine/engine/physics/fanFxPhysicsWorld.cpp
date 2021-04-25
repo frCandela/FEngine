@@ -32,6 +32,7 @@ namespace fan
         Serializable::SaveFixed( _json, "linear_damping", physicsWorld.mLinearDamping );
         Serializable::SaveFixed( _json, "angular_damping", physicsWorld.mAngularDamping );
         Serializable::SaveFixed( _json, "restitution", physicsWorld.mContactSolver.mRestitution );
+        Serializable::SaveFixed( _json, "friction", physicsWorld.mContactSolver.mFriction );
         Serializable::SaveFixed( _json, "resting_velocity", physicsWorld.mContactSolver.mRestingVelocityLimit );
         Serializable::SaveInt( _json, "vel iterations", physicsWorld.mContactSolver.mMaxVelocityIterations );
         Serializable::SaveInt( _json, "pos iterations", physicsWorld.mContactSolver.mMaxPositionsIterations );
@@ -47,6 +48,7 @@ namespace fan
         Serializable::LoadFixed( _json, "linear_damping", physicsWorld.mLinearDamping );
         Serializable::LoadFixed( _json, "angular_damping", physicsWorld.mAngularDamping );
         Serializable::LoadFixed( _json, "restitution", physicsWorld.mContactSolver.mRestitution );
+        Serializable::LoadFixed( _json, "friction", physicsWorld.mContactSolver.mFriction );
         Serializable::LoadFixed( _json, "resting_velocity", physicsWorld.mContactSolver.mRestingVelocityLimit );
         Serializable::LoadInt( _json, "vel iterations", physicsWorld.mContactSolver.mMaxVelocityIterations );
         Serializable::LoadInt( _json, "pos iterations", physicsWorld.mContactSolver.mMaxPositionsIterations );
