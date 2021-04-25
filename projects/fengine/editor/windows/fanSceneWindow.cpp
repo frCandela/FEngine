@@ -235,7 +235,7 @@ namespace fan
 		// export to prefab modal
 		if( exportToPrefabPopup )
 		{
-            mPathBuffer = "new_prefab";
+            mPathBuffer = Path::Normalize("new_prefab");
 			ImGui::OpenPopup( "export_prefab" );
 		}
 		ExportPrefabModal( _world);
@@ -434,7 +434,7 @@ namespace fan
 			{
 				// Try to update the existing prefab if it exists
                 SceneResources& sceneResources = _world.GetSingleton<SceneResources>();
-				Prefab* prefab = sceneResources.mPrefabManager->Get( mPathBuffer );
+				Prefab* prefab = sceneResources.mPrefabManager->Get( Path::MakeRelative(mPathBuffer) );
 				if( prefab != nullptr )
 				{
 					prefab->CreateFromSceneNode( *mLastSceneNodeRightClicked );
@@ -446,8 +446,6 @@ namespace fan
 					newprefab.CreateFromSceneNode( *mLastSceneNodeRightClicked );
 					outStream << newprefab.mJson;
 				}
-
-				
 				outStream.close();
 			}
 			else
