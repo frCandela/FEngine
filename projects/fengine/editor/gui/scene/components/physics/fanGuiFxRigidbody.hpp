@@ -52,23 +52,22 @@ namespace fan
                     TryUpdateInvInertiaTensorLocal( _world, _entity );
                 }
 
+                // inertia tensor
+                if( ImGui::Button( "##reload_tensor" ) )
                 {
-                    if( ImGui::Button( "##reload_tensor" ) )
-                    {
-                        TryUpdateInvInertiaTensorLocal( _world, _entity );
-                    }
-                    ImGui::SameLine();
-                    ImGui::PushReadOnly();
-                    glm::vec3 invInertiaTensor = Math::ToGLM( { rb.mInverseInertiaTensorLocal.e11, rb.mInverseInertiaTensorLocal.e22, rb.mInverseInertiaTensorLocal.e33 } );
-                    ImGui::DragFloat3( "inverse inertia tensor", &invInertiaTensor.x, 1.f, -1000.f, 1000.f );
-                    /*glm::vec3 w0 = Math::ToGLM( { rb.mInverseInertiaTensorWorld.e11, rb.mInverseInertiaTensorWorld.e12, rb.mInverseInertiaTensorWorld.e13 } );
-                    glm::vec3 w1 = Math::ToGLM( { rb.mInverseInertiaTensorWorld.e21, rb.mInverseInertiaTensorWorld.e22, rb.mInverseInertiaTensorWorld.e23 } );
-                    glm::vec3 w2 = Math::ToGLM( { rb.mInverseInertiaTensorWorld.e31, rb.mInverseInertiaTensorWorld.e32, rb.mInverseInertiaTensorWorld.e33 } );
-                    ImGui::DragFloat3( "w0", &w0.x, 1.f, -1000.f, 1000.f );
-                    ImGui::DragFloat3( "w1", &w1.x, 1.f, -1000.f, 1000.f );
-                    ImGui::DragFloat3( "w2", &w2.x, 1.f, -1000.f, 1000.f );*/
-                    ImGui::PopReadOnly();
+                    TryUpdateInvInertiaTensorLocal( _world, _entity );
                 }
+                ImGui::SameLine();
+                ImGui::PushReadOnly();
+                glm::vec3 invInertiaTensor = Math::ToGLM( { rb.mInverseInertiaTensorLocal.e11, rb.mInverseInertiaTensorLocal.e22, rb.mInverseInertiaTensorLocal.e33 } );
+                ImGui::DragFloat3( "inverse inertia tensor", &invInertiaTensor.x, 1.f, -1000.f, 1000.f );
+                /*glm::vec3 w0 = Math::ToGLM( { rb.mInverseInertiaTensorWorld.e11, rb.mInverseInertiaTensorWorld.e12, rb.mInverseInertiaTensorWorld.e13 } );
+                glm::vec3 w1 = Math::ToGLM( { rb.mInverseInertiaTensorWorld.e21, rb.mInverseInertiaTensorWorld.e22, rb.mInverseInertiaTensorWorld.e23 } );
+                glm::vec3 w2 = Math::ToGLM( { rb.mInverseInertiaTensorWorld.e31, rb.mInverseInertiaTensorWorld.e32, rb.mInverseInertiaTensorWorld.e33 } );
+                ImGui::DragFloat3( "w0", &w0.x, 1.f, -1000.f, 1000.f );
+                ImGui::DragFloat3( "w1", &w1.x, 1.f, -1000.f, 1000.f );
+                ImGui::DragFloat3( "w2", &w2.x, 1.f, -1000.f, 1000.f );*/
+                ImGui::PopReadOnly();
 
                 // Velocity
                 if( ImGui::Button( "##Velocity" ) )
@@ -80,6 +79,7 @@ namespace fan
                 if( ImGui::DragFloat3( "velocity", &velocity[0], 1.f, -1000.f, 1000.f ) )
                 {
                     rb.mVelocity = Math::ToFixed( velocity );
+                    rb.SetSleeping( false );
                 }
 
                 // Rotation
@@ -92,9 +92,10 @@ namespace fan
                 if( ImGui::DragFloat3( "rotation", &rotation[0], 1.f, -1000.f, 1000.f ) )
                 {
                     rb.mRotation = Math::ToFixed( rotation );
+                    rb.SetSleeping( false );
                 }
 
-                // Velocity
+                // acceleration
                 if( ImGui::Button( "##Acceleration" ) )
                 {
                     rb.mAcceleration = Vector3( 0, 0, 0 );
@@ -105,6 +106,18 @@ namespace fan
                 {
                     rb.mAcceleration = Math::ToFixed( acceleration );
                 }
+
+                // sleep
+                if( ImGui::Checkbox( "can sleep", &rb.mCanSleep ) )
+                {
+                    if( rb.mIsSleeping ){ rb.SetSleeping( false ); }
+                }
+                ImGui::PushReadOnly();
+                ImGui::Checkbox( "sleeping", &rb.mIsSleeping );
+                ImGui::SameLine();
+                float motion = rb.mMotion.ToFloat();
+                ImGui::DragFloat( "motion", &motion );
+                ImGui::PopReadOnly();
 
                 ImGui::PopItemWidth();
             }

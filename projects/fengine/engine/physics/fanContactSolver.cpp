@@ -50,6 +50,15 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
+    void MatchSleepState( Contact& _contact )
+    {
+        if( !_contact.rigidbody[1] ){ return; }
+        if( _contact.rigidbody[0]->mIsSleeping ){ _contact.rigidbody[0]->SetSleeping( false ); }
+        if( _contact.rigidbody[1]->mIsSleeping ){ _contact.rigidbody[1]->SetSleeping( false ); }
+    }
+
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
     void ContactSolver::ResolvePositions( std::vector<Contact>& _contacts, const Fixed _deltaTime )
     {
         if( _deltaTime == 0 ){ return; }
@@ -68,6 +77,8 @@ namespace fan
             }
 
             if( !worstContact ){ break; }
+
+            MatchSleepState( *worstContact );
 
             Vector3 rotationChange[2], velocityChange[2];
             ResolvePosition( *worstContact, mAngularLimitNonLinearProjection, rotationChange, velocityChange );

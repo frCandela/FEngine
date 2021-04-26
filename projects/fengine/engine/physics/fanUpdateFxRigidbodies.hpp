@@ -27,9 +27,8 @@ namespace fan
                 FxTransform& transform = *transformIt;
                 FxRigidbody& rb = *rbIt;
 
-                if( rb.mInverseMass == 0 )
+                if( rb.mInverseMass == 0 || rb.mIsSleeping )
                 {
-                    rb.mVelocity = rb.mRotation = Vector3::sZero;
                     continue;
                 }
 
@@ -49,6 +48,7 @@ namespace fan
                 transform.mRotation.Normalize();
 
                 rb.CalculateDerivedData( transform );
+                rb.UpdateMotion();
                 rb.ClearAccumulators();
             }
         }

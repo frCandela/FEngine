@@ -18,15 +18,19 @@ namespace fan
     void FxRigidbody::Init( EcsWorld& _world, EcsEntity, EcsComponent& _component )
     {
         // clear
-        FxRigidbody& rb = static_cast<FxRigidbody&>( _component );
+        const FxPhysicsWorld& physicsWorld = _world.GetSingleton<FxPhysicsWorld>();
+        FxRigidbody         & rb           = static_cast<FxRigidbody&>( _component );
         rb.mInverseMass               = 1;
         rb.mInverseInertiaTensorLocal = Matrix3::sZero;
         rb.mVelocity                  = Vector3::sZero;
         rb.mRotation                  = Vector3::sZero;
-        rb.mAcceleration              = _world.GetSingleton<FxPhysicsWorld>().mGravity;
+        rb.mAcceleration              = physicsWorld.mGravity;
         rb.mForcesAccumulator         = Vector3::sZero;
         rb.mTorqueAccumulator         = Vector3::sZero;
         rb.mTransform                 = nullptr;
+        rb.mCanSleep                  = true;
+        rb.mIsSleeping                = false;
+        rb.mMotion                    = 2 * sSleepEpsilon;
     }
 
     //========================================================================================================
@@ -80,6 +84,42 @@ namespace fan
 
     //========================================================================================================
     //========================================================================================================
+    void FxRigidbody::SetSleeping( const bool _isSleeping )
+    {
+        if( _isSleeping == mIsSleeping ){ return; }
+        if( _isSleeping )
+        {
+            if( mCanSleep )
+            {
+                mIsSleeping = true;
+                mVelocity   = Vector3::sZero;
+                mRotation   = Vector3::sZero;
+            }
+        }
+        else
+        {
+            mIsSleeping = false;
+            mMotion     = 2 * sSleepEpsilon;;
+        }
+    }
+
+    //========================================================================================================
+    //========================================================================================================
+    void FxRigidbody::UpdateMotion()
+    {
+        Fixed                 newMotion = Vector3::Dot( mVelocity, mVelocity ) + Vector3::Dot( mRotation, mRotation );
+        constexpr const Fixed bias      = FIXED( 0.5 );
+        mMotion = bias * mMotion + ( 1 - bias ) * newMotion; // recency weighted average
+        mMotion = Fixed::Min( mMotion, 10 * sSleepEpsilon );
+
+        if( mMotion < sSleepEpsilon && mCanSleep )
+        {
+            SetSleeping( true );
+        }
+    }
+
+    //========================================================================================================
+    //========================================================================================================
     Matrix3 FxRigidbody::SphereInertiaTensor( const Fixed _inverseMass, const Fixed _radius )
     {
         const Fixed value = Fixed( 2 ) / 5 * _radius * _radius / _inverseMass;
@@ -108,6 +148,7 @@ namespace fan
         Serializable::SaveVec3( _json, "velocity", rb.mVelocity );
         Serializable::SaveVec3( _json, "rotation", rb.mRotation );
         Serializable::SaveVec3( _json, "acceleration", rb.mAcceleration );
+        Serializable::SaveBool( _json, "can_sleep", rb.mCanSleep );
         Serializable::SaveVec3( _json, "inv_inertia_tensor", Vector3( rb.mInverseInertiaTensorLocal.e11, rb.mInverseInertiaTensorLocal.e22, rb.mInverseInertiaTensorLocal.e33 ) );
     }
 
@@ -120,7 +161,7 @@ namespace fan
         Serializable::LoadVec3( _json, "velocity", rb.mVelocity );
         Serializable::LoadVec3( _json, "rotation", rb.mRotation );
         Serializable::LoadVec3( _json, "acceleration", rb.mAcceleration );
-
+        Serializable::LoadBool( _json, "can_sleep", rb.mCanSleep );
         Vector3 invInertiaTensor;
         Serializable::LoadVec3( _json, "inv_inertia_tensor", invInertiaTensor );
         rb.mInverseInertiaTensorLocal = Matrix3( invInertiaTensor.x, 0, 0,

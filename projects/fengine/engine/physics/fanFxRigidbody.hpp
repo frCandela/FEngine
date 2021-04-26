@@ -14,7 +14,7 @@ namespace fan
     //========================================================================================================
     struct FxRigidbody : public EcsComponent
     {
-        ECS_COMPONENT( FxRigidbody )
+    ECS_COMPONENT( FxRigidbody )
         static void SetInfo( EcsComponentInfo& _info );
         static void Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component );
         static void Save( const EcsComponent& _component, Json& _json );
@@ -25,7 +25,11 @@ namespace fan
         Vector3 mVelocity;
         Vector3 mRotation;
         Vector3 mAcceleration; // constant forces
+        bool    mCanSleep;
 
+        static const constexpr Fixed sSleepEpsilon = FIXED( 0.05 );
+        bool    mIsSleeping;
+        Fixed   mMotion;
         Vector3 mForcesAccumulator;
         Vector3 mTorqueAccumulator;
         Matrix3 mInverseInertiaTensorWorld;
@@ -36,6 +40,8 @@ namespace fan
         void ApplyTorque( const Vector3& _torque ) { mTorqueAccumulator += _torque; }
         void CalculateDerivedData( FxTransform& _transform );
         void ClearAccumulators();
+        void SetSleeping( const bool _isSleeping );
+        void UpdateMotion();
 
         static Matrix3 SphereInertiaTensor( const Fixed _inverseMass, const Fixed _radius );
         static Matrix3 BoxInertiaTensor( const Fixed _inverseMass, const Vector3 _halfExtents );
