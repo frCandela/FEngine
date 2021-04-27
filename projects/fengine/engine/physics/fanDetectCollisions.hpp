@@ -20,7 +20,7 @@ namespace fan
         static void Run( EcsWorld& _world, const EcsView& _view, Fixed _delta )
         {
             FxPhysicsWorld& physicsWorld = _world.GetSingleton<FxPhysicsWorld>(); (void)_delta;
-           // if( _delta != 0 )
+            //if( _delta != 0 )
             {
                 struct RigidbodyData
                 {
@@ -79,6 +79,7 @@ namespace fan
                             }
                             if( rb1.box )
                             {
+                                CollisionDetection::tmpRd = &_world.GetSingleton<RenderDebug>();;
                                 CollisionDetection::BoxWithBox( *rb0.rigidbody, *rb0.box, *rb1.rigidbody, *rb1.box, contacts );
                             }
                         }

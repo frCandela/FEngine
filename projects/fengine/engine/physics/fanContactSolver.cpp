@@ -252,8 +252,6 @@ namespace fan
     //==================================================================================================================================================================================================
     void ContactSolver::ResolveVelocity( const Contact& _contact, const Fixed _deltaTime, const Fixed _friction )
     {
-        tmpRd->DebugPoint( _contact.position, Color::sRed );
-
         // build a matrix to convert contact impulse into velocity change
         const Matrix3 impulseToTorque        = Matrix3::SkewSymmetric( _contact.relativeContactPosition[0] );
         const Matrix3 rotationPerUnitImpulse = _contact.rigidbody[0]->mInverseInertiaTensorWorld * impulseToTorque;

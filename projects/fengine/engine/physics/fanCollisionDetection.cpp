@@ -5,6 +5,8 @@
 #include "engine/physics/fanFxSphereCollider.hpp"
 #include "engine/physics/fanFxBoxCollider.hpp"
 
+#include "engine/singletons/fanRenderDebug.hpp"
+
 namespace fan
 {
     //==================================================================================================================================================================================================
@@ -140,7 +142,7 @@ namespace fan
         const Fixed   distance    = Fixed::Abs( Vector3::Dot( toCenter, _axis ) );
         return distance < projection0 + projection1;
     }
-
+    RenderDebug * tmprd;
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
     bool BoxWithPoint( FxRigidbody& _rb0, const FxBoxCollider& _box0, FxRigidbody& _rb1, const Vector3& _point1, Contact& _outContact )
@@ -170,9 +172,15 @@ namespace fan
 
         _outContact.rigidbody[0] = &_rb0;
         _outContact.rigidbody[1] = &_rb1;
-        _outContact.normal      = normal;
-        _outContact.penetration = depth;
+        _outContact.normal      = -normal;
+        _outContact.penetration = minDepth;
         _outContact.position    = _point1;
+
+
+
+        tmprd->DebugPoint( _outContact.position, Color::sRed );
+        //tmprd->DebugLine( _outContact.position, _outContact.position + _outContact.relativeContactPosition[0], Color::sGreen );
+        tmprd->DebugLine( _outContact.position, _outContact.position + _outContact.penetration * _outContact.normal, Color::sRed );
 
         return true;
     }
@@ -201,12 +209,17 @@ namespace fan
         }
     }
 
+
+    RenderDebug* CollisionDetection::tmpRd;
+
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
     void CollisionDetection::BoxWithBox( FxRigidbody& _rb0, FxBoxCollider& _box0, FxRigidbody& _rb1, FxBoxCollider& _box1, std::vector<Contact>& _outContacts )
     {
+        tmprd = tmpRd;
+
         // early out test
-        Matrix4  transform0( _rb0.mTransform->mRotation, _rb0.mTransform->mPosition );
+        /*Matrix4  transform0( _rb0.mTransform->mRotation, _rb0.mTransform->mPosition );
         Matrix4  transform1( _rb1.mTransform->mRotation, _rb1.mTransform->mPosition );
         Vector3  axisList[15] = {
                 transform0.GetX(),
@@ -231,7 +244,7 @@ namespace fan
             {
                 return;
             }
-        }
+        }*/
         BoxVerticesWithBox( _rb0, _box0, _rb1, _box1, _outContacts );
         BoxVerticesWithBox( _rb1, _box1, _rb0, _box0, _outContacts );
     }

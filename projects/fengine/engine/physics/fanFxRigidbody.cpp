@@ -30,7 +30,7 @@ namespace fan
         rb.mTransform                 = nullptr;
         rb.mCanSleep                  = true;
         rb.mIsSleeping                = false;
-        rb.mMotion                    = 2 * sSleepEpsilon;
+        rb.mMotion                    = 4 * sSleepEpsilon;
     }
 
     //========================================================================================================
@@ -99,7 +99,7 @@ namespace fan
         else
         {
             mIsSleeping = false;
-            mMotion     = 2 * sSleepEpsilon;;
+            mMotion     = 4 * sSleepEpsilon;;
         }
     }
 

@@ -15,6 +15,7 @@ namespace fan
     //==================================================================================================================================================================================================
     struct CollisionDetection
     {
+        static RenderDebug* tmpRd;
         std::vector<Contact> mContacts;
 
         static void SphereWithSphere( FxRigidbody& _rb0, FxSphereCollider& _sphere0, FxRigidbody& _rb1, FxSphereCollider& _sphere1, std::vector<Contact>& _outContacts );
