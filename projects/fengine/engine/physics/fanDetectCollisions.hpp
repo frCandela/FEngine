@@ -60,6 +60,9 @@ namespace fan
                     for( int j = i + 1; j < bodies.size(); j++ )
                     {
                         RigidbodyData& rb1 = bodies[j];
+
+                        if( rb0.rigidbody->mIsSleeping && rb1.rigidbody->mIsSleeping){ continue; }
+
                         if( rb0.sphere )
                         {
                             if( rb1.sphere )

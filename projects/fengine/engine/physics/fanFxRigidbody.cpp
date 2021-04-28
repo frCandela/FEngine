@@ -108,7 +108,7 @@ namespace fan
     void FxRigidbody::UpdateMotion()
     {
         Fixed                 newMotion = Vector3::Dot( mVelocity, mVelocity ) + Vector3::Dot( mRotation, mRotation );
-        constexpr const Fixed bias      = FIXED( 0.5 );
+        constexpr const Fixed bias      = FIXED( 0.8 );
         mMotion = bias * mMotion + ( 1 - bias ) * newMotion; // recency weighted average
         mMotion = Fixed::Min( mMotion, 10 * sSleepEpsilon );
 

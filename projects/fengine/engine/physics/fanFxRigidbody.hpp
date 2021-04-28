@@ -27,7 +27,7 @@ namespace fan
         Vector3 mAcceleration; // constant forces
         bool    mCanSleep;
 
-        static const constexpr Fixed sSleepEpsilon = FIXED( 0.05 );
+        static const constexpr Fixed sSleepEpsilon = FIXED( 0.031 );
         bool    mIsSleeping;
         Fixed   mMotion;
         Vector3 mForcesAccumulator;

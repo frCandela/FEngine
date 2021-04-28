@@ -142,7 +142,7 @@ namespace fan
         const Fixed   distance    = Fixed::Abs( Vector3::Dot( toCenter, _axis ) );
         return distance < projection0 + projection1;
     }
-    RenderDebug * tmprd;
+    RenderDebug* tmprd;
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
     bool BoxWithPoint( FxRigidbody& _rb0, const FxBoxCollider& _box0, FxRigidbody& _rb1, const Vector3& _point1, Contact& _outContact )
@@ -176,11 +176,9 @@ namespace fan
         _outContact.penetration = minDepth;
         _outContact.position    = _point1;
 
-
-
-        tmprd->DebugPoint( _outContact.position, Color::sRed );
+        // tmprd->DebugPoint( _outContact.position, Color::sRed );
         //tmprd->DebugLine( _outContact.position, _outContact.position + _outContact.relativeContactPosition[0], Color::sGreen );
-        tmprd->DebugLine( _outContact.position, _outContact.position + _outContact.penetration * _outContact.normal, Color::sRed );
+        //tmprd->DebugLine( _outContact.position, _outContact.position + _outContact.penetration * _outContact.normal, Color::sRed );
 
         return true;
     }
@@ -208,7 +206,6 @@ namespace fan
             }
         }
     }
-
 
     RenderDebug* CollisionDetection::tmpRd;
 
@@ -247,5 +244,90 @@ namespace fan
         }*/
         BoxVerticesWithBox( _rb0, _box0, _rb1, _box1, _outContacts );
         BoxVerticesWithBox( _rb1, _box1, _rb0, _box0, _outContacts );
+
+        struct Edge
+        {
+            Vector3 point;
+            Vector3 dir;
+            Fixed   lenght;
+        };
+
+        Edge edges0[12] = {
+                { Vector3( _box0.mHalfExtents.x, _box0.mHalfExtents.y, _box0.mHalfExtents.z ),    Vector3( -1, 0, 0 ), 2 * _box0.mHalfExtents.x },
+                { Vector3( _box0.mHalfExtents.x, _box0.mHalfExtents.y, _box0.mHalfExtents.z ),    Vector3( 0, -1, 0 ), 2 * _box0.mHalfExtents.y },
+                { Vector3( _box0.mHalfExtents.x, _box0.mHalfExtents.y, _box0.mHalfExtents.z ),    Vector3( 0, 0, -1 ), 2 * _box0.mHalfExtents.z },
+                { Vector3( -_box0.mHalfExtents.x, -_box0.mHalfExtents.y, -_box0.mHalfExtents.z ), Vector3( 1, 0, 0 ),  2 * _box0.mHalfExtents.x },
+                { Vector3( -_box0.mHalfExtents.x, -_box0.mHalfExtents.y, -_box0.mHalfExtents.z ), Vector3( 0, 1, 0 ),  2 * _box0.mHalfExtents.y },
+                { Vector3( -_box0.mHalfExtents.x, -_box0.mHalfExtents.y, -_box0.mHalfExtents.z ), Vector3( 0, 0, 1 ),  2 * _box0.mHalfExtents.z },
+                { Vector3( -_box0.mHalfExtents.x, _box0.mHalfExtents.y, _box0.mHalfExtents.z ),   Vector3( 0, 0, -1 ), 2 * _box0.mHalfExtents.z },
+                { Vector3( -_box0.mHalfExtents.x, -_box0.mHalfExtents.y, _box0.mHalfExtents.z ),  Vector3( 0, 1, 0 ),  2 * _box0.mHalfExtents.y },
+                { Vector3( -_box0.mHalfExtents.x, -_box0.mHalfExtents.y, _box0.mHalfExtents.z ),  Vector3( 1, 0, 0 ),  2 * _box0.mHalfExtents.x },
+                { Vector3( _box0.mHalfExtents.x, -_box0.mHalfExtents.y, _box0.mHalfExtents.z ),   Vector3( 0, 0, -1 ), 2 * _box0.mHalfExtents.z },
+                { Vector3( _box0.mHalfExtents.x, _box0.mHalfExtents.y, -_box0.mHalfExtents.z ),   Vector3( -1, 0, 0 ), 2 * _box0.mHalfExtents.x },
+                { Vector3( _box0.mHalfExtents.x, _box0.mHalfExtents.y, -_box0.mHalfExtents.z ),   Vector3( 0, -1, 0 ), 2 * _box0.mHalfExtents.y },
+        };
+
+        Edge edges1[12] = {
+                { Vector3( _box1.mHalfExtents.x, _box1.mHalfExtents.y, _box1.mHalfExtents.z ),    Vector3( -1, 0, 0 ), 2 * _box1.mHalfExtents.x },
+                { Vector3( _box1.mHalfExtents.x, _box1.mHalfExtents.y, _box1.mHalfExtents.z ),    Vector3( 0, -1, 0 ), 2 * _box1.mHalfExtents.y },
+                { Vector3( _box1.mHalfExtents.x, _box1.mHalfExtents.y, _box1.mHalfExtents.z ),    Vector3( 0, 0, -1 ), 2 * _box1.mHalfExtents.z },
+                { Vector3( -_box1.mHalfExtents.x, -_box1.mHalfExtents.y, -_box1.mHalfExtents.z ), Vector3( 1, 0, 0 ),  2 * _box1.mHalfExtents.x },
+                { Vector3( -_box1.mHalfExtents.x, -_box1.mHalfExtents.y, -_box1.mHalfExtents.z ), Vector3( 0, 1, 0 ),  2 * _box1.mHalfExtents.y },
+                { Vector3( -_box1.mHalfExtents.x, -_box1.mHalfExtents.y, -_box1.mHalfExtents.z ), Vector3( 0, 0, 1 ),  2 * _box1.mHalfExtents.z },
+                { Vector3( -_box1.mHalfExtents.x, _box1.mHalfExtents.y, _box1.mHalfExtents.z ),   Vector3( 0, 0, -1 ), 2 * _box1.mHalfExtents.z },
+                { Vector3( -_box1.mHalfExtents.x, -_box1.mHalfExtents.y, _box1.mHalfExtents.z ),  Vector3( 0, 1, 0 ),  2 * _box1.mHalfExtents.y },
+                { Vector3( -_box1.mHalfExtents.x, -_box1.mHalfExtents.y, _box1.mHalfExtents.z ),  Vector3( 1, 0, 0 ),  2 * _box1.mHalfExtents.x },
+                { Vector3( _box1.mHalfExtents.x, -_box1.mHalfExtents.y, _box1.mHalfExtents.z ),   Vector3( 0, 0, -1 ), 2 * _box1.mHalfExtents.z },
+                { Vector3( _box1.mHalfExtents.x, _box1.mHalfExtents.y, -_box1.mHalfExtents.z ),   Vector3( -1, 0, 0 ), 2 * _box1.mHalfExtents.x },
+                { Vector3( _box1.mHalfExtents.x, _box1.mHalfExtents.y, -_box1.mHalfExtents.z ),   Vector3( 0, -1, 0 ), 2 * _box1.mHalfExtents.y },
+        };
+
+        for( int i = 0; i < 12; i++ )
+        {
+            edges0[i].point = _rb0.mTransform->TransformPoint( edges0[i].point );
+            edges0[i].dir   = _rb0.mTransform->TransformDirection( edges0[i].dir );
+            edges1[i].point = _rb1.mTransform->TransformPoint( edges1[i].point );
+            edges1[i].dir   = _rb1.mTransform->TransformDirection( edges1[i].dir );
+        }
+
+        for( int i = 0; i < 12; i++ )
+        {
+            Edge    e0 = edges0[i];
+            Contact deepestContact;
+            deepestContact.penetration = -1;
+            for( int j = 0; j < 12; j++ )
+            {
+                Edge e1 = edges1[j];
+                e0.dir.Normalize();
+                e1.dir.Normalize();
+
+                const Vector3 n  = Vector3::Cross( e0.dir, e1.dir );
+                //const Vector3 n2 = Vector3::Cross( e1.dir, n);
+                //const Vector3 c1 = e0.point + Vector3::Dot( ( e1.point - e0.point), n2) / Vector3::Dot( e0.dir, n2) * e0.dir;
+                const Vector3 n1 = Vector3::Cross( e0.dir, n );
+
+                const Fixed tmpDot = Vector3::Dot( e1.dir, n1 );
+                if( tmpDot == 0 ){ continue; }
+
+                const Vector3 c2 = e1.point + Vector3::Dot( ( e0.point - e1.point ), n1 ) / tmpDot * e1.dir;
+
+                Fixed projection = Vector3::Dot( c2 - e1.point, e1.dir );
+                if( projection > 0 && projection < e1.lenght )
+                {
+                    Contact contact;
+                    if( BoxWithPoint( _rb0, _box0, _rb1, c2, contact ) )
+                    {
+                        if( contact.penetration > deepestContact.penetration )
+                        {
+                            deepestContact = contact;
+                        }
+                    }
+                }
+            }
+            if( deepestContact.penetration > 0 )
+            {
+                _outContacts.push_back( deepestContact );
+            }
+        }
     }
 }
