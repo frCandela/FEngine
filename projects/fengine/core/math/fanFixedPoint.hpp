@@ -140,9 +140,14 @@ namespace fan
             return *this;
         }
 
+        constexpr bool IsFuzzyZero() const
+        {
+            return Abs( *this ) < FX_FUZZY_ZERO;
+        }
+
         static constexpr bool IsFuzzyZero( const Fixed& _value )
         {
-            return Abs( _value ) < FX_FUZZY_ZERO;
+            return _value.IsFuzzyZero();
         }
 
         static constexpr Fixed Degrees( const Fixed& _radians )

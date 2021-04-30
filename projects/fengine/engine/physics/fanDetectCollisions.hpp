@@ -1,4 +1,5 @@
 #include "core/ecs/fanEcsSystem.hpp"
+#include "core/time/fanProfiler.hpp"
 #include "engine/physics/fanFxPhysicsWorld.hpp"
 #include "engine/physics/fanFxRigidbody.hpp"
 #include "engine/physics/fanFxBoxCollider.hpp"
@@ -19,9 +20,11 @@ namespace fan
 
         static void Run( EcsWorld& _world, const EcsView& _view, Fixed _delta )
         {
-            FxPhysicsWorld& physicsWorld = _world.GetSingleton<FxPhysicsWorld>(); (void)_delta;
+            FxPhysicsWorld& physicsWorld = _world.GetSingleton<FxPhysicsWorld>();
+            (void)_delta;
             //if( _delta != 0 )
             {
+                SCOPED_PROFILE( detect_collisions )
                 struct RigidbodyData
                 {
                     FxTransform     * transform;
@@ -61,7 +64,7 @@ namespace fan
                     {
                         RigidbodyData& rb1 = bodies[j];
 
-                        if( rb0.rigidbody->mIsSleeping && rb1.rigidbody->mIsSleeping){ continue; }
+                        if( rb0.rigidbody->mIsSleeping && rb1.rigidbody->mIsSleeping ){ continue; }
 
                         if( rb0.sphere )
                         {

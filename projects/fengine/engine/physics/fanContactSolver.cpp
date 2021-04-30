@@ -1,7 +1,7 @@
-#include <core/math/fanMathUtils.hpp>
-#include <core/fanDebug.hpp>
+#include "core/math/fanMathUtils.hpp"
+#include "core/fanDebug.hpp"
+#include "core/time/fanProfiler.hpp"
 #include "engine/physics/fanContactSolver.hpp"
-
 #include "engine/physics/fanFxRigidbody.hpp"
 #include "engine/components/fanFxTransform.hpp"
 #include "engine/singletons/fanRenderDebug.hpp"
@@ -16,6 +16,8 @@ namespace fan
     {
         if( _contacts.empty() ){ return; }
 
+        SCOPED_PROFILE( resolve_contacts )
+
         PrepareContacts( _contacts, _deltaTime );
         ResolvePositions( _contacts, _deltaTime );
         ResolveVelocities( _contacts, _deltaTime );
@@ -25,8 +27,22 @@ namespace fan
     //==============================================================================f====================================================================================================================
     void ContactSolver::PrepareContacts( std::vector<Contact>& _contacts, const Fixed _deltaTime )
     {
-        for( Contact& contact : _contacts )
+        SCOPED_PROFILE( prepare_contacts )
+        for( int i = (int)_contacts.size() - 1; i >= 0; --i )
         {
+            Contact& contact = _contacts[i];
+
+            // remove sleeping contacts
+            if( contact.rigidbody[0]->mIsSleeping )
+            {
+                if( contact.rigidbody[1] == nullptr || contact.rigidbody[1]->mIsSleeping )
+                {
+                    _contacts[i] = _contacts[_contacts.size() - 1];
+                    _contacts.pop_back();
+                    continue;
+                }
+            }
+
             contact.restitution = mRestitution;
             contact.relativeContactPosition[0] = contact.position - contact.rigidbody[0]->mTransform->mPosition;
             if( contact.rigidbody[1] )
@@ -63,7 +79,9 @@ namespace fan
     {
         if( _deltaTime == 0 ){ return; }
 
-        for( mPositionIterationsUsed = 0; mPositionIterationsUsed < mMaxPositionsIterations; mPositionIterationsUsed++ )
+        SCOPED_PROFILE( resolve_positions )
+
+        for( mPositionIterationsUsed = 0; mPositionIterationsUsed < mMaxPositionsIterations * _contacts.size(); mPositionIterationsUsed++ )
         {
             Contact* worstContact = nullptr;
             Fixed worstPenetration = 0;
@@ -92,10 +110,6 @@ namespace fan
                     const Vector3 deltaRotation    = Vector3::Cross( rotationChange[0], contact.relativeContactPosition[0] );
                     const Fixed   deltaPenetration = Vector3::Dot( deltaRotation + deltaPosition, contact.normal );
                     contact.penetration -= deltaPenetration;
-
-                    tmpRd->DebugLine( contact.position, contact.position + deltaRotation, Color::sBlue );
-                    tmpRd->DebugLine( contact.position + deltaRotation, contact.position + deltaRotation + deltaPosition, Color::sCyan );
-                    tmpRd->DebugLine( contact.position, contact.position + deltaRotation + deltaPosition, Color::sPurple );
                 }
                 else if( contact.rigidbody[0] == worstContact->rigidbody[1] )
                 {
@@ -103,10 +117,6 @@ namespace fan
                     const Vector3 deltaRotation    = Vector3::Cross( rotationChange[1], contact.relativeContactPosition[0] );
                     const Fixed   deltaPenetration = Vector3::Dot( deltaRotation + deltaPosition, contact.normal );
                     contact.penetration -= deltaPenetration;
-
-                    tmpRd->DebugLine( contact.position, contact.position + deltaRotation, Color::sBlue );
-                    tmpRd->DebugLine( contact.position + deltaRotation, contact.position + deltaRotation + deltaPosition, Color::sCyan );
-                    tmpRd->DebugLine( contact.position, contact.position + deltaRotation + deltaPosition, Color::sPurple );
                 }
                 if( contact.rigidbody[1] )
                 {
@@ -116,10 +126,6 @@ namespace fan
                         const Vector3 deltaRotation    = Vector3::Cross( rotationChange[0], contact.relativeContactPosition[1] );
                         const Fixed   deltaPenetration = Vector3::Dot( deltaRotation + deltaPosition, contact.normal );
                         contact.penetration += deltaPenetration;
-
-                        tmpRd->DebugLine( contact.position, contact.position + deltaRotation, Color::sBlue );
-                        tmpRd->DebugLine( contact.position + deltaRotation, contact.position + deltaRotation + deltaPosition, Color::sCyan );
-                        tmpRd->DebugLine( contact.position, contact.position + deltaRotation + deltaPosition, Color::sPurple );
                     }
                     else if( contact.rigidbody[1] == worstContact->rigidbody[1] )
                     {
@@ -127,10 +133,6 @@ namespace fan
                         const Vector3 deltaRotation    = Vector3::Cross( rotationChange[1], contact.relativeContactPosition[1] );
                         const Fixed   deltaPenetration = Vector3::Dot( deltaRotation + deltaPosition, contact.normal );
                         contact.penetration += deltaPenetration;
-
-                        tmpRd->DebugLine( contact.position, contact.position + deltaRotation, Color::sBlue );
-                        tmpRd->DebugLine( contact.position + deltaRotation, contact.position + deltaRotation + deltaPosition, Color::sCyan );
-                        tmpRd->DebugLine( contact.position, contact.position + deltaRotation + deltaPosition, Color::sPurple );
                     }
                 }
             }
@@ -141,7 +143,9 @@ namespace fan
     //==================================================================================================================================================================================================
     void ContactSolver::ResolveVelocities( std::vector<Contact>& _contacts, const Fixed _deltaTime )
     {
-        for( mVelocityIterationsUsed = 0; mVelocityIterationsUsed < mMaxVelocityIterations; mVelocityIterationsUsed++ )
+        SCOPED_PROFILE( resolve_velocities )
+
+        for( mVelocityIterationsUsed = 0; mVelocityIterationsUsed < mMaxVelocityIterations * _contacts.size(); mVelocityIterationsUsed++ )
         {
             Contact* worstContact = nullptr;
             Fixed maxSeparatingVelocity = 0;
@@ -176,6 +180,8 @@ namespace fan
     //==================================================================================================================================================================================================
     void ContactSolver::ResolvePosition( const Contact& _contact, const Fixed _angularLimitNonLinearProjection, Vector3* _outRotationChange, Vector3* _outVelocityChange )
     {
+        //SCOPED_PROFILE(resolve_position)
+
         Fixed    angularInertia[2];
         Fixed    linearInertia[2];
         Fixed    totalInertia = 0;
@@ -252,6 +258,8 @@ namespace fan
     //==================================================================================================================================================================================================
     void ContactSolver::ResolveVelocity( const Contact& _contact, const Fixed _deltaTime, const Fixed _friction )
     {
+        //SCOPED_PROFILE(resolve_velocity)
+
         // build a matrix to convert contact impulse into velocity change
         const Matrix3 impulseToTorque        = Matrix3::SkewSymmetric( _contact.relativeContactPosition[0] );
         const Matrix3 rotationPerUnitImpulse = _contact.rigidbody[0]->mInverseInertiaTensorWorld * impulseToTorque;

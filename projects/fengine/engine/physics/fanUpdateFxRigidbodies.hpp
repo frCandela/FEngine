@@ -45,6 +45,13 @@ namespace fan
 
                 transform.mPosition += _delta * rb.mVelocity;
                 transform.mRotation += FIXED( 0.5 ) * _delta * Quaternion( 0, rb.mRotation ) * transform.mRotation ;
+
+                const Fixed magnitude = transform.mRotation.Magnitude();
+                if( !magnitude.IsFuzzyZero() && !Fixed::IsFuzzyZero( magnitude - 1 ) )
+                {
+                    transform.mRotation /= magnitude;
+                }
+
                 transform.mRotation.Normalize();
 
                 rb.CalculateDerivedData( transform );

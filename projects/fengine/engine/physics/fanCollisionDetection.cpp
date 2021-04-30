@@ -1,11 +1,12 @@
 #include "engine/physics/fanCollisionDetection.hpp"
 
+#include "core/time/fanProfiler.hpp"
 #include "engine/physics/fanFxRigidbody.hpp"
 #include "engine/components/fanFxTransform.hpp"
 #include "engine/physics/fanFxSphereCollider.hpp"
 #include "engine/physics/fanFxBoxCollider.hpp"
-
 #include "engine/singletons/fanRenderDebug.hpp"
+
 
 namespace fan
 {
@@ -122,7 +123,7 @@ namespace fan
             _outContacts.push_back( contact );
         }
     }
-
+    RenderDebug* tmprd;
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
     Fixed ProjectToAxis( const Matrix4& _transform, const FxBoxCollider& _box, const Vector3& _axis )
@@ -134,32 +135,31 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    bool BoxesOverlapOnAxis( const Vector3& _axis, const Matrix4& _boxTransform, const FxBoxCollider& _box0, const FxRigidbody& _rb1, const FxBoxCollider& _box1 )
+    bool BoxesOverlapOnAxis( const Vector3& _axis, const Matrix4& _boxTransform0, const FxBoxCollider& _box0, const Matrix4& _boxTransform1, const FxBoxCollider& _box1 )
     {
-        const Fixed   projection0 = ProjectToAxis( _boxTransform, _box0, _axis );
-        const Fixed   projection1 = ProjectToAxis( _boxTransform, _box1, _axis );
-        const Vector3 toCenter    = _rb1.mTransform->mPosition - _boxTransform.GetOrigin();
+        const Fixed   projection0 = ProjectToAxis( _boxTransform0, _box0, _axis );
+        const Fixed   projection1 = ProjectToAxis( _boxTransform1, _box1, _axis );
+        const Vector3 toCenter    = _boxTransform1.GetOrigin() - _boxTransform0.GetOrigin();
         const Fixed   distance    = Fixed::Abs( Vector3::Dot( toCenter, _axis ) );
         return distance < projection0 + projection1;
     }
-    RenderDebug* tmprd;
+
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    bool BoxWithPoint( FxRigidbody& _rb0, const FxBoxCollider& _box0, FxRigidbody& _rb1, const Vector3& _point1, Contact& _outContact )
+    bool BoxWithPoint( FxRigidbody& _rb0, const FxBoxCollider& _box0, Matrix4& _transform0, FxRigidbody& _rb1, const Vector3& _point1, Contact& _outContact )
     {
-        Matrix4       transform0( _rb0.mTransform->mRotation, _rb0.mTransform->mPosition );
         const Vector3 relativePoint = _rb0.mTransform->InverseTransformPoint( _point1 );
 
         Fixed minDepth = _box0.mHalfExtents.x - Fixed::Abs( relativePoint.x );
         if( minDepth < 0 ){ return false; }
-        Vector3 normal = relativePoint.x > 0 ? transform0.GetX() : -transform0.GetX();
+        Vector3 normal = relativePoint.x > 0 ? _transform0.GetX() : -_transform0.GetX();
 
         Fixed depth = _box0.mHalfExtents.y - Fixed::Abs( relativePoint.y );
         if( depth < 0 ){ return false; }
         if( depth < minDepth )
         {
             minDepth = depth;
-            normal   = relativePoint.y > 0 ? transform0.GetY() : -transform0.GetY();
+            normal   = relativePoint.y > 0 ? _transform0.GetY() : -_transform0.GetY();
         }
 
         depth = _box0.mHalfExtents.z - Fixed::Abs( relativePoint.z );
@@ -167,7 +167,7 @@ namespace fan
         if( depth < minDepth )
         {
             minDepth = depth;
-            normal   = relativePoint.z > 0 ? transform0.GetZ() : -transform0.GetZ();
+            normal   = relativePoint.z > 0 ? _transform0.GetZ() : -_transform0.GetZ();
         }
 
         _outContact.rigidbody[0] = &_rb0;
@@ -185,22 +185,22 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void BoxVerticesWithBox( FxRigidbody& _rb0, FxBoxCollider& _box0, FxRigidbody& _rb1, FxBoxCollider& _box1, std::vector<Contact>& _outContacts )
+    void BoxVerticesWithBox( FxRigidbody& _rb0, FxBoxCollider& _box0, Matrix4& _transform0, FxRigidbody& _rb1, FxBoxCollider& _box1, Matrix4& _transform1, std::vector<Contact>& _outContacts )
     {
-        Vector3  vertices0[8] = {
-                _rb0.mTransform->TransformPoint( Vector3( _box0.mHalfExtents.x, _box0.mHalfExtents.y, _box0.mHalfExtents.z ) ),
-                _rb0.mTransform->TransformPoint( Vector3( _box0.mHalfExtents.x, _box0.mHalfExtents.y, -_box0.mHalfExtents.z ) ),
-                _rb0.mTransform->TransformPoint( Vector3( _box0.mHalfExtents.x, -_box0.mHalfExtents.y, _box0.mHalfExtents.z ) ),
-                _rb0.mTransform->TransformPoint( Vector3( _box0.mHalfExtents.x, -_box0.mHalfExtents.y, -_box0.mHalfExtents.z ) ),
-                _rb0.mTransform->TransformPoint( Vector3( -_box0.mHalfExtents.x, _box0.mHalfExtents.y, _box0.mHalfExtents.z ) ),
-                _rb0.mTransform->TransformPoint( Vector3( -_box0.mHalfExtents.x, _box0.mHalfExtents.y, -_box0.mHalfExtents.z ) ),
-                _rb0.mTransform->TransformPoint( Vector3( -_box0.mHalfExtents.x, -_box0.mHalfExtents.y, _box0.mHalfExtents.z ) ),
-                _rb0.mTransform->TransformPoint( Vector3( -_box0.mHalfExtents.x, -_box0.mHalfExtents.y, -_box0.mHalfExtents.z ) ),
+        Vector3 vertices0[8] = {
+                _transform0 * Vector3( _box0.mHalfExtents.x, _box0.mHalfExtents.y, _box0.mHalfExtents.z ),
+                _transform0 * Vector3( _box0.mHalfExtents.x, _box0.mHalfExtents.y, -_box0.mHalfExtents.z ),
+                _transform0 * Vector3( _box0.mHalfExtents.x, -_box0.mHalfExtents.y, _box0.mHalfExtents.z ),
+                _transform0 * Vector3( _box0.mHalfExtents.x, -_box0.mHalfExtents.y, -_box0.mHalfExtents.z ),
+                _transform0 * Vector3( -_box0.mHalfExtents.x, _box0.mHalfExtents.y, _box0.mHalfExtents.z ),
+                _transform0 * Vector3( -_box0.mHalfExtents.x, _box0.mHalfExtents.y, -_box0.mHalfExtents.z ),
+                _transform0 * Vector3( -_box0.mHalfExtents.x, -_box0.mHalfExtents.y, _box0.mHalfExtents.z ),
+                _transform0 * Vector3( -_box0.mHalfExtents.x, -_box0.mHalfExtents.y, -_box0.mHalfExtents.z ),
         };
         for( int i            = 0; i < 8; ++i )
         {
             Contact contact;
-            if( BoxWithPoint( _rb1, _box1, _rb0, vertices0[i], contact ) )
+            if( BoxWithPoint( _rb1, _box1, _transform1, _rb0, vertices0[i], contact ) )
             {
                 _outContacts.push_back( contact );
             }
@@ -213,10 +213,12 @@ namespace fan
     //==================================================================================================================================================================================================
     void CollisionDetection::BoxWithBox( FxRigidbody& _rb0, FxBoxCollider& _box0, FxRigidbody& _rb1, FxBoxCollider& _box1, std::vector<Contact>& _outContacts )
     {
+        SCOPED_PROFILE(box_with_box)
+
         tmprd = tmpRd;
 
         // early out test
-        /*Matrix4  transform0( _rb0.mTransform->mRotation, _rb0.mTransform->mPosition );
+        Matrix4  transform0( _rb0.mTransform->mRotation, _rb0.mTransform->mPosition );
         Matrix4  transform1( _rb1.mTransform->mRotation, _rb1.mTransform->mPosition );
         Vector3  axisList[15] = {
                 transform0.GetX(),
@@ -237,13 +239,15 @@ namespace fan
         };
         for( int i            = 0; i < 15; ++i )
         {
-            if( !Vector3::IsFuzzyZero( axisList[i] ) && !BoxesOverlapOnAxis( axisList[i], transform0, _box0, _rb1, _box1 ) )
+            if( !Vector3::IsFuzzyZero( axisList[i] ) && !BoxesOverlapOnAxis( axisList[i], transform0, _box0, transform1, _box1 ) )
             {
                 return;
             }
-        }*/
-        BoxVerticesWithBox( _rb0, _box0, _rb1, _box1, _outContacts );
-        BoxVerticesWithBox( _rb1, _box1, _rb0, _box0, _outContacts );
+        }
+
+
+        BoxVerticesWithBox( _rb0, _box0, transform0, _rb1, _box1, transform1, _outContacts );
+        BoxVerticesWithBox( _rb1, _box1, transform0, _rb0, _box0, transform1, _outContacts );
 
         struct Edge
         {
@@ -305,19 +309,33 @@ namespace fan
                 //const Vector3 n2 = Vector3::Cross( e1.dir, n);
                 //const Vector3 c1 = e0.point + Vector3::Dot( ( e1.point - e0.point), n2) / Vector3::Dot( e0.dir, n2) * e0.dir;
                 const Vector3 n1 = Vector3::Cross( e0.dir, n );
-
-                const Fixed tmpDot = Vector3::Dot( e1.dir, n1 );
-                if( tmpDot == 0 ){ continue; }
-
-                const Vector3 c2 = e1.point + Vector3::Dot( ( e0.point - e1.point ), n1 ) / tmpDot * e1.dir;
-
-                Fixed projection = Vector3::Dot( c2 - e1.point, e1.dir );
-                if( projection > 0 && projection < e1.lenght )
+                Vector3 contactPoint;
+                if( Vector3::IsFuzzyZero(n1))
                 {
+                    // edge case parallel lines
                     Contact contact;
-                    if( BoxWithPoint( _rb0, _box0, _rb1, c2, contact ) )
+                    if( BoxWithPoint( _rb0, _box0, transform0, _rb1, e1.point, contact ) && contact.penetration > deepestContact.penetration )
                     {
-                        if( contact.penetration > deepestContact.penetration )
+                        deepestContact = contact;
+                    }
+                    if( BoxWithPoint( _rb0, _box0, transform0, _rb1, e1.point + e1.lenght*e1.dir, contact ) && contact.penetration > deepestContact.penetration )
+                    {
+                        deepestContact = contact;
+                    }
+                }
+                else
+                {
+                    Fixed dot = Vector3::Dot( e1.dir, n1 );
+                    if( dot == 0 )
+                    {
+                        continue;
+                    }
+                    contactPoint = e1.point + Vector3::Dot( ( e0.point - e1.point ), n1 ) / dot * e1.dir;
+                    Fixed projection = Vector3::Dot( contactPoint - e1.point, e1.dir );
+                    if( projection > 0 && projection < e1.lenght )
+                    {
+                        Contact contact;
+                        if( BoxWithPoint( _rb0, _box0, transform0, _rb1, contactPoint, contact ) && contact.penetration > deepestContact.penetration )
                         {
                             deepestContact = contact;
                         }
@@ -327,6 +345,7 @@ namespace fan
             if( deepestContact.penetration > 0 )
             {
                 _outContacts.push_back( deepestContact );
+               // tmpRd->DebugPoint(deepestContact.position , Color::sRed);
             }
         }
     }

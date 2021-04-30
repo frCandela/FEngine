@@ -110,7 +110,7 @@ namespace ImGui
         if ( openModal )
         {
             ImGui::OpenPopup( modalName.c_str() );
-            m_pathBuffer = "content/prefab";
+            m_pathBuffer = fan::Path::Normalize("/");
         }
         ImGui::SameLine();
 

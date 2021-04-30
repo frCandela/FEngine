@@ -1,6 +1,6 @@
 #include "game/fanProjectVoxels.hpp"
-
 #include "core/math/fanFixedPoint.hpp"
+
 #include "core/math/fanQuaternion.hpp"
 #include "core/time/fanScopedTimer.hpp"
 #include "network/singletons/fanTime.hpp"
@@ -20,16 +20,14 @@
 #include "engine/systems/fanGenerateParticles.hpp"
 #include "engine/systems/fanRegisterPhysics.hpp"
 #include "engine/systems/fanUpdateRenderWorld.hpp"
-
 #include "game/components/fanTestComponent.hpp"
+
 #include "game/singletons/fanTestSingleton.hpp"
 #include "game/systems/fanTestSystem.hpp"
-#include "editor/fanRegisterEditorGui.hpp"
 #include "engine/physics/fanDetectCollisions.hpp"
 #include "engine/singletons/fanScene.hpp"
-#include "engine/singletons/fanRenderResources.hpp"
-#include "engine/singletons/fanSceneResources.hpp"
-#include "engine/fanPrefabManager.hpp"
+#include "editor/gui/fanGuiSceneResourcePtr.hpp"
+#include "editor/fanRegisterEditorGui.hpp"
 
 namespace fan
 {
@@ -136,21 +134,19 @@ namespace fan
     {
         if( ImGui::Begin( "testoss" ) )
         {
+            static PrefabPtr prefabPtr;
 
             static glm::vec3 force = { 1, 0, 0 };
             static glm::vec3 point = { 0, 1, 0 };
             ImGui::DragFloat3( "force", &force.x );
             ImGui::DragFloat3( "point", &point.x );
 
-            if( ImGui::Button( "instantiate" ) )
+            ImGui::FanPrefab( "prefab", prefabPtr );
+
+            if( ImGui::Button( "instantiate" ) && prefabPtr.IsValid() )
             {
-                SceneResources          & sceneResources     = mWorld.GetSingleton<SceneResources>();
-                Prefab* prefab =  sceneResources.mPrefabManager->Load("ball.prefab" );
-                if( prefab )
-                {
-                    Scene          & scene     = mWorld.GetSingleton<Scene>();
-                    prefab->Instantiate( scene.GetRootNode());
-                }
+                Scene          & scene     = mWorld.GetSingleton<Scene>();
+                prefabPtr->Instantiate( scene.GetRootNode());
             }
 
             ImGui::End();
