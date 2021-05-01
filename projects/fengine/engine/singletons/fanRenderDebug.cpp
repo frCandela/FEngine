@@ -33,9 +33,8 @@ namespace fan
 
 	//========================================================================================================
 	//========================================================================================================
-	void RenderDebug::DebugPoint( const btVector3 _pos, const Color _color, const bool _depthTestEnable )
+	void RenderDebug::DebugPoint( const btVector3 _pos, const float size, const Color _color, const bool _depthTestEnable )
 	{
-		const float size = 0.2f;
 		DebugLine( _pos - size * btVector3_Up, _pos + size * btVector3_Up, _color, _depthTestEnable );
 		DebugLine( _pos - size * btVector3_Left, _pos + size * btVector3_Left, _color, _depthTestEnable );
 		DebugLine( _pos - size * btVector3_Forward, _pos + size * btVector3_Forward, _color, _depthTestEnable );
@@ -43,9 +42,9 @@ namespace fan
 
     //========================================================================================================
     //========================================================================================================
-    void RenderDebug::DebugPoint( const Vector3& _pos, const Color _color, const bool _depthTestEnable )
+    void RenderDebug::DebugPoint( const Vector3& _pos, const float size, const Color _color, const bool _depthTestEnable )
     {
-        DebugPoint(Math::ToBullet(_pos), _color, _depthTestEnable);
+        DebugPoint(Math::ToBullet(_pos), size, _color, _depthTestEnable);
     }
 
     //========================================================================================================
@@ -141,6 +140,16 @@ namespace fan
         mDebugTriangles.push_back( DebugVertex( ToGLM( _v0 ), normal, _color.ToGLM() ) );
         mDebugTriangles.push_back( DebugVertex( ToGLM( _v1 ), normal, _color.ToGLM() ) );
         mDebugTriangles.push_back( DebugVertex( ToGLM( _v2 ), normal, _color.ToGLM() ) );
+    }
+
+    //========================================================================================================
+    //========================================================================================================
+    void RenderDebug::DebugTriangle( const Vector3 _v0, const Vector3 _v1, const Vector3 _v2, const Color _color )
+    {
+        const glm::vec3 normal = glm::normalize( Math::ToGLM( Vector3::Cross( ( _v1 - _v2 ), ( _v0 - _v2 ) ) ) );
+        mDebugTriangles.push_back( DebugVertex( Math::ToGLM( _v0 ), normal, _color.ToGLM() ) );
+        mDebugTriangles.push_back( DebugVertex( Math::ToGLM( _v1 ), normal, _color.ToGLM() ) );
+        mDebugTriangles.push_back( DebugVertex( Math::ToGLM( _v2 ), normal, _color.ToGLM() ) );
     }
 
     //========================================================================================================

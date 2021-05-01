@@ -110,7 +110,7 @@ namespace fan
 		config.bindingDescription                    = DebugVertex::GetBindingDescription();
 		config.attributeDescriptions                 = DebugVertex::GetAttributeDescriptions();
 		config.inputAssemblyStateInfo.topology       = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
-		config.depthStencilStateInfo.depthTestEnable = VK_FALSE;
+		config.depthStencilStateInfo.depthTestEnable = VK_TRUE;
 		config.descriptorSetLayouts                  = { mDescriptorMVPColor.mDescriptorSetLayout };
 		config.rasterizationStateInfo.cullMode       = VK_CULL_MODE_NONE;
 
