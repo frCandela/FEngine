@@ -47,5 +47,6 @@ namespace fan
         UnitTestResult mMatrix4Result;
         UnitTestResult mQuaternionResult;
         UnitTestResult mFxTransformResult;
+        UnitTestResult mBitsResult;
     };
 }

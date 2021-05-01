@@ -17,6 +17,7 @@
 #include "core/unit_tests/fanUnitTestMatrix3.hpp"
 #include "core/unit_tests/fanUnitTestMatrix4.hpp"
 #include "core/unit_tests/fanUnitTestQuaternion.hpp"
+#include "core/unit_tests/fanUnitTestBits.hpp"
 #include "engine/unit_tests/fanUnitTestFxTransform.hpp"
 
 namespace fan
@@ -48,6 +49,7 @@ namespace fan
                 { "Matrix4", &UnitTestMatrix4::RunTests, mMatrix4Result },
                 { "Quaternion", &UnitTestQuaternion::RunTests, mQuaternionResult },
                 { "FxTransform", &UnitTestFxTransform::RunTests, mFxTransformResult },
+                { "Bits", &UnitTestBits::RunTests, mBitsResult },
         };
     }
 
