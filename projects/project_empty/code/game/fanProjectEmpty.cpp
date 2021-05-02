@@ -1,6 +1,5 @@
 #include "game/fanProjectEmpty.hpp"
 
-#include "core/math/fanFixedPoint.hpp"
 #include "core/time/fanScopedTimer.hpp"
 #include "network/singletons/fanTime.hpp"
 #include "engine/systems/fanUpdateBounds.hpp"
@@ -21,7 +20,11 @@
 #include "game/components/fanTestComponent.hpp"
 #include "game/singletons/fanTestSingleton.hpp"
 
-#include "editor/fanRegisterEditorGui.hpp"
+#ifdef FAN_EDITOR
+#include "editor/singletons/fanEditorGuiInfo.hpp"
+#include "editor/singletons/fanGuiTestSingleton.hpp"
+#include "editor/components/fanGuiTestComponent.hpp"
+#endif
 
 namespace fan
 {
@@ -36,16 +39,13 @@ namespace fan
     //==========================================================================================================================
     void ProjectEmpty::Init()
     {
-        EcsIncludeEngine( mWorld );
-        EcsIncludePhysics(mWorld);
-        EcsIncludeRender3D(mWorld);
-        EcsIncludeRenderUI(mWorld);
-
         mWorld.AddComponentType<TestComponent>();
         mWorld.AddSingletonType<TestSingleton>();
 
 #ifdef FAN_EDITOR
-        RegisterEditorGuiInfos( mWorld.GetSingleton<EditorGuiInfo>() );
+        EditorGuiInfo& editorGui = mWorld.GetSingleton<EditorGuiInfo>();
+        editorGui.mSingletonInfos[TestSingleton::Info::sType] = GuiTestSingleton::GetInfo();
+        editorGui.mComponentInfos[TestComponent::Info::sType] = GuiTestComponent::GetInfo();
 #endif
     }
 

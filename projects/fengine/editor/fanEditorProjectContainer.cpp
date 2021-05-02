@@ -114,8 +114,12 @@ namespace fan
             IProject& project = *mProjects[i];
             EcsWorld& world   = project.mWorld;
 
+            IProject::EcsIncludeEngine( world );
+            IProject::EcsIncludePhysics( world );
+            IProject::EcsIncludeRender3D( world );
+            IProject::EcsIncludeRenderUI( world );
+
             world.AddSingletonType<EditorGuiInfo>();
-            project.Init();
             world.AddSingletonType<EditorPlayState>();
             world.AddSingletonType<EditorCamera>();
             world.AddSingletonType<EditorGrid>();
@@ -150,6 +154,8 @@ namespace fan
                     Start( project );
                 }
             }
+
+            project.Init();
         }
     }
 

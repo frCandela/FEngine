@@ -39,6 +39,7 @@
 #include "editor/gui/scene/singletons/fanGuiScene.hpp"
 #include "editor/gui/scene/singletons/fanGuiScenePointers.hpp"
 #include "editor/gui/scene/singletons/fanGuiSceneResources.hpp"
+#include "editor/gui/scene/singletons/fanGuiVoxelTerrain.hpp"
 
 #include "editor/gui/scene/components/ui/fanGuiUIAlign.hpp"
 #include "editor/gui/scene/components/ui/fanGuiUIButton.hpp"
@@ -64,6 +65,7 @@
 #include "editor/gui/scene/components/fanGuiSceneNode.hpp"
 #include "editor/gui/scene/components/fanGuiSphereShape.hpp"
 #include "editor/gui/scene/components/fanGuiTransform.hpp"
+
 
 // FX PHYSICS
 #include "editor/gui/scene/components/fanGuiFxTransform.hpp"
@@ -126,6 +128,7 @@ namespace fan
         editorGui.mSingletonInfos[ Scene::Info::sType ]             = GuiScene::GetInfo();
         editorGui.mSingletonInfos[ ScenePointers::Info::sType ]     = GuiScenePointers::GetInfo();
         editorGui.mSingletonInfos[ SceneResources::Info::sType ]    = GuiSceneResources::GetInfo();
+        editorGui.mSingletonInfos[ VoxelTerrain::Info::sType ]      = GuiVoxelTerrain::GetInfo();
 
         editorGui.mComponentInfos[ UIAlign::Info::sType ]       = GuiUIAlign::GetInfo();
         editorGui.mComponentInfos[ UIButton::Info::sType ]      = GuiUIButton::GetInfo();

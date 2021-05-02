@@ -21,13 +21,16 @@ namespace fan
             IProjectContainer( AdaptSettings( _settings ) ),
             mProject( _project )
     {
-        _project.Init();
+        IProject::EcsIncludeEngine( mProject.mWorld );
+        IProject::EcsIncludePhysics( mProject.mWorld );
+        IProject::EcsIncludeRender3D( mProject.mWorld );
+        IProject::EcsIncludeRenderUI( mProject.mWorld );
 
 		SerializedValues::Get().LoadKeyBindings();
 
-		InitWorld( _project.mWorld );
+		InitWorld( mProject.mWorld );
 
-        Application& app = _project.mWorld.GetSingleton<Application>();
+        Application& app = mProject.mWorld.GetSingleton<Application>();
         app.mOnQuit.Connect( &IProjectContainer::Exit, (IProjectContainer*)this );
 
 		// load scene
@@ -37,6 +40,8 @@ namespace fan
 		{
 			scene.LoadFrom( _settings.mLoadScene );
         }
+
+        mProject.Init();
         mProject.Start();
 	}
 

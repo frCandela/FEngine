@@ -12,7 +12,7 @@ namespace fan
     //==================================================================================================================================================================================================
     struct SimplexNoise
     {
-        SimplexNoise( int seed );
+        SimplexNoise( const int _seed = 42 );
         Fixed Noise( const Fixed _x, const Fixed _y ) const;
         Fixed Noise( const Vector3& _pos ) const;
         Fixed Noise( const Fixed _x, const Fixed _y, const Fixed _z, const Fixed _w ) const;

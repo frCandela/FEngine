@@ -184,9 +184,9 @@ namespace fan
         const Json* token = FindToken( _json, _name );
         if( token != nullptr )
         {
-            _outVec3.x = Fixed::FromData( ( *token )["x"] );
-            _outVec3.y = Fixed::FromData( ( *token )["y"] );
-            _outVec3.z = Fixed::FromData( ( *token )["z"] );
+            _outVec3.x.SetData( ( *token )["x"] );
+            _outVec3.y.SetData( ( *token )["y"] );
+            _outVec3.z.SetData( ( *token )["z"] );
             return true;
         }
         return false;
@@ -231,10 +231,10 @@ namespace fan
         const Json* token = FindToken( _json, _name );
         if( token != nullptr )
         {
-            _outQuat.mAngle  = Fixed::FromData( ( *token )["n"] );
-            _outQuat.mAxis.x = Fixed::FromData( ( *token )["x"] );
-            _outQuat.mAxis.y = Fixed::FromData( ( *token )["y"] );
-            _outQuat.mAxis.z = Fixed::FromData( ( *token )["z"] );
+            _outQuat.mAngle .SetData( ( *token )["n"] );
+            _outQuat.mAxis.x.SetData( ( *token )["x"] );
+            _outQuat.mAxis.y.SetData( ( *token )["y"] );
+            _outQuat.mAxis.z.SetData( ( *token )["z"] );
             return true;
         }
         return false;
@@ -276,7 +276,7 @@ namespace fan
         const Json* token = FindToken( _json, _name );
         if( token != nullptr )
         {
-            _outFixed = Fixed::FromData( static_cast<Fixed::DataType>(*token ) );
+            _outFixed.SetData( static_cast<Fixed::DataType>(*token ) );
             return true;
         }
         return false;
