@@ -1,5 +1,6 @@
 #pragma once
 
+#include <core/time/fanScopedTimer.hpp>
 #include "core/fanAssert.hpp"
 #include "core/unit_tests/fanUnitTest.hpp"
 #include "core/math/fanFixedPoint.hpp"
@@ -38,6 +39,7 @@ namespace fan
                      { &UnitTestFixedPoint::TestACos,           "ACos" },
                      { &UnitTestFixedPoint::TestATan2,          "ATan2" },
                      { &UnitTestFixedPoint::TestSqrt,           "Sqrt" },
+                     { &UnitTestFixedPoint::TestInvSqrt,    "InvSqrt" },
             };
         }
 
@@ -445,6 +447,25 @@ namespace fan
             TEST_ASSERT( error < 0.0005 ) // [0,1]
             error = MaxErrorFixedVsDouble( fxSqrt, doubleSqrt, 1., Fixed::sMaxInteger, 0.1 );
             TEST_ASSERT( error < 0.0005 )// [1,max]
+        }
+
+        static double sqrtRef( double d ) { return 1. / std::sqrt( d ); }
+        void TestInvSqrt()
+        {
+            {
+                //ScopedTimer timer( "fast" );
+                double      error = MaxErrorFixedVsDouble( &Fixed::InvSqrt, &sqrtRef, 0.05, 1, 0.001 );
+                TEST_ASSERT( error < 0.01 )// [1,max]
+                error = MaxErrorFixedVsDouble( &Fixed::InvSqrt, &sqrtRef, 1, 1000, 0.1 );
+                TEST_ASSERT( error < 0.01 )// [1,max]
+            }
+           /* {
+               // ScopedTimer timer( "slow" );
+                double      error = MaxErrorFixedVsDouble( &SlowInvSqrt, &sqrtRef, 0.05, 1, 0.001 );
+                TEST_ASSERT( error < 0.01 )// [1,max]
+                error             = MaxErrorFixedVsDouble( &SlowInvSqrt, &sqrtRef, 1, 1000, 0.01 );
+                TEST_ASSERT( error < 0.01 )// [1,max]
+            }*/
         }
     };
 }

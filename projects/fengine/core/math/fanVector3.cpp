@@ -38,6 +38,31 @@ namespace fan
     }
 
     //==========================================================================================================================
+    //==========================================================================================================================
+    void Vector3::FastNormalize()
+    {
+        const Fixed invMagnitude = Fixed::InvSqrt(SqrMagnitude());
+        if( invMagnitude > FX_BIAS ) // don't divide by zero
+        {
+            x *= invMagnitude;
+            y *= invMagnitude;
+            z *= invMagnitude;
+        }
+        if( Fixed::Abs( x ) < FX_BIAS ){ x = 0; }
+        if( Fixed::Abs( y ) < FX_BIAS ){ y = 0; }
+        if( Fixed::Abs( z ) < FX_BIAS ){ z = 0; }
+    }
+
+    //==========================================================================================================================
+    //==========================================================================================================================
+    Vector3 Vector3::FastNormalized() const
+    {
+        Vector3 cpy( *this );
+        cpy.FastNormalize();
+        return cpy;
+    }
+
+    //==========================================================================================================================
     // Makes vectors normalized and orthogonal to each other.
     // Normalizes normal. Normalizes tangent and makes sure it is orthogonal to normal.
     // Uses Gram–Schmidt process

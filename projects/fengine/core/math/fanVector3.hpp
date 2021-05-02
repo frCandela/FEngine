@@ -20,6 +20,9 @@ namespace fan
         Fixed Magnitude() const { return Fixed::Sqrt( SqrMagnitude() ); }
         void Normalize();
         Vector3 Normalized() const;
+        void FastNormalize(); // faster, lower precision
+        Vector3 FastNormalized() const;// faster, lower precision
+
         bool IsNormalized() const { return Fixed::IsFuzzyZero( SqrMagnitude() - 1 ); }
 
         static void OrthoNormalize( Vector3& _normal, Vector3& _tangent );

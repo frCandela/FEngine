@@ -36,27 +36,34 @@ namespace fan
         #define FX_BIAS         FIXED(0.0001)
         #define FX_FUZZY_ZERO   FIXED(0.0005)
 
-        constexpr Fixed() : mData( 0 ) {}
+        constexpr Fixed() {}
         constexpr Fixed( const int _integer ) : mData( static_cast<DataType>(_integer << sFractionalSize) ) {}
         constexpr explicit Fixed( const char* _str ) : mData( impl::StringToFixed( _str,
                                                                                    sFractionalSize,
                                                                                    sFractionalMask,
                                                                                    sFixed_One ) ) {}
 
-        static constexpr Fixed FromFloat( const float _float ) { return FromData( DataType( _float * sFixed_One ) ); }
-        static constexpr Fixed FromDouble( const double _double ) { return FromData( DataType( _double * sFixed_One ) ); }
-        static constexpr Fixed FromData( const DataType _data )
+        constexpr void SetData( const DataType _data ) { mData = _data; }
+
+        static constexpr Fixed FromFloat( const float _float )
         {
             Fixed f;
-            f.mData = _data;
+            f.mData = DataType( _float * sFixed_One );
+            return f;
+        }
+
+        static constexpr Fixed FromDouble( const double _double )
+        {
+            Fixed f;
+            f.mData = DataType( _double * sFixed_One );
             return f;
         }
 
         DataType GetData() const { return mData; }
 
-        constexpr int ToInt() const { return DataType( mData >> sFractionalSize ); }
-        constexpr float ToFloat() const { return float( mData ) / sFixed_One; }
-        constexpr double ToDouble() const { return double( mData ) / sFixed_One; }
+        constexpr inline int ToInt() const { return DataType( mData >> sFractionalSize ); }
+        constexpr inline float ToFloat() const { return float( mData ) / sFixed_One; }
+        constexpr inline double ToDouble() const { return double( mData ) / sFixed_One; }
 
         constexpr bool operator==( const Fixed& _value ) const { return mData == _value.mData; }
         constexpr bool operator!=( const Fixed& _value ) const { return mData != _value.mData; }
@@ -65,7 +72,12 @@ namespace fan
         constexpr bool operator>( const Fixed& _value ) const { return mData > _value.mData; }
         constexpr bool operator>=( const Fixed& _value ) const { return mData >= _value.mData; }
 
-        constexpr Fixed operator+( const Fixed& _value ) const { return FromData( mData + _value.mData ); }
+        constexpr Fixed operator+( const Fixed& _value ) const
+        {
+            Fixed f;
+            f.mData = mData + _value.mData;
+            return f;;
+        }
         constexpr Fixed& operator+=( const Fixed& _value )
         {
             mData += _value.mData;
@@ -83,13 +95,24 @@ namespace fan
             return result;
         }// postfix (++)
 
-        constexpr Fixed operator-( const Fixed& _value ) const { return FromData( mData - _value.mData ); }
+        constexpr Fixed operator-( const Fixed& _value ) const
+        {
+            Fixed f;
+            f.mData = mData - _value.mData;
+            return f;
+        }
         constexpr Fixed& operator-=( const Fixed& _value )
         {
             mData -= _value.mData;
             return *this;
         }
-        constexpr Fixed operator-() const { return FromData( -mData ); } // unary (-)
+        constexpr Fixed operator-() const
+        {
+            Fixed f;
+            f.mData = -mData;
+            return f;
+        }
+        // unary (-)
         constexpr Fixed& operator--()
         {
             mData -= sFixed_One;
@@ -353,6 +376,36 @@ namespace fan
                 }
             }
             return result;
+        }
+        static Fixed InvSqrt( const Fixed& _value ) // faster but with less precision
+        {
+            Fixed pow    = FIXED( 0 );
+            Fixed a      = _value;
+            if( _value < Fixed( 1 ) )
+            {
+                a *= FIXED( 100 );
+                pow = FIXED( 0.1 );
+            }
+            else
+            {
+                int                   n              = 0;
+                constexpr const Fixed divideLookup[] = { 1, 100, 10000, 1000000 };
+                while( a >= divideLookup[n + 1] )
+                {
+                    n += 1;
+                }
+                a /= divideLookup[n];
+                constexpr const Fixed powLookup[] = { 1, 10, 100, 1000, 10000, 100000 };
+                pow = powLookup[n];
+            }
+            Fixed approx = a < Fixed( 10 )
+                    ? ( FIXED( 0.28 ) * a + FIXED( 0.89 ) ) * pow
+                    : ( FIXED( 0.089 ) * a + FIXED( 2.8 ) ) * pow;
+
+            a = FIXED( 1 ) / approx;
+            a = a * ( FIXED( 1.5 ) - FIXED( 0.5 ) * _value * a * a );
+            a = a * ( FIXED( 1.5 ) - FIXED( 0.5 ) * _value * a * a );
+            return a;
         }
     private:
         DataType mData;
