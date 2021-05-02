@@ -1,4 +1,4 @@
-#include "core/fanRandom.hpp"
+#include "core/random/fanRandom.hpp"
 
 namespace fan
 {
