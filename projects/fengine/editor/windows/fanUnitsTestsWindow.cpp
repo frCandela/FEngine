@@ -19,6 +19,7 @@
 #include "core/unit_tests/fanUnitTestQuaternion.hpp"
 #include "core/unit_tests/fanUnitTestBits.hpp"
 #include "engine/unit_tests/fanUnitTestFxTransform.hpp"
+#include "core/unit_tests/fanUnitTestQueue.hpp"
 
 namespace fan
 {
@@ -50,6 +51,7 @@ namespace fan
                 { "Quaternion", &UnitTestQuaternion::RunTests, mQuaternionResult },
                 { "FxTransform", &UnitTestFxTransform::RunTests, mFxTransformResult },
                 { "Bits", &UnitTestBits::RunTests, mBitsResult },
+                { "Queue", &UnitTestQueue::RunTests, mQueueResult },
         };
     }
 
