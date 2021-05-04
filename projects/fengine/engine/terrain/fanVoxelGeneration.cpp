@@ -1,73 +1,48 @@
-#include "engine/singletons/fanVoxelTerrain.hpp"
-#include "core/time/fanScopedTimer.hpp"
-#include "core/memory/fanSerializable.hpp"
+#include "engine/terrain/fanVoxelGeneration.hpp"
+#include "engine/terrain/fanVoxelTerrain.hpp"
 #include "core/math/fanMathUtils.hpp"
-#include "fanRenderResources.hpp"
 
 namespace fan
 {
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void VoxelTerrain::SetInfo( EcsSingletonInfo& _info )
+    void VoxelGenerator::Initialize()
     {
-        _info.save = &VoxelTerrain::Save;
-        _info.load = &VoxelTerrain::Load;
+        mSimplexNoise = SimplexNoise( mSeed );
     }
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void VoxelTerrain::Init( EcsWorld& /*_world*/, EcsSingleton& _component )
-    {
-        VoxelTerrain& voxelTerrain = static_cast<VoxelTerrain&>( _component );
-        voxelTerrain.mVertices.clear();
-        voxelTerrain.mVertices.reserve( 10000 );
-        voxelTerrain.mSeed         = 42;
-        voxelTerrain.mSimplexNoise = SimplexNoise( voxelTerrain.mSeed );
-        voxelTerrain.mAmplitude    = FIXED( 0.572 );
-        voxelTerrain.mFrequency    = FIXED( 0.041 );
-    }
-
-    //==================================================================================================================================================================================================
-    //==================================================================================================================================================================================================
-    void VoxelTerrain::InitializeTerrainMesh( VoxelTerrain& _terrain, RenderResources& _renderResources )
-    {
-        static const std::string name = "generated_voxels";
-        if( !_renderResources.mMeshManager->Get( name ) )
-        {
-            _terrain.mMesh = new Mesh;
-            _terrain.mMesh->mOptimizeVertices = false;
-            _terrain.mMesh->mAutoUpdateHull   = false;
-            _terrain.mMesh->mHostVisible      = true;
-            _renderResources.mMeshManager->Add( _terrain.mMesh, name );
-        }
-    }
-
-    //==================================================================================================================================================================================================
-    //==================================================================================================================================================================================================
-    void VoxelTerrain::GenerateTerrain( VoxelTerrain& _terrain )
-    {
-       // ScopedTimer timerTotal( "terrain generation" );
-        GenerateBlocks( _terrain );
-        GenerateMesh( _terrain );
-    }
-
-    //==================================================================================================================================================================================================
-    //==================================================================================================================================================================================================
-    void VoxelTerrain::GenerateBlocks( VoxelTerrain& _terrain )
+    void VoxelGenerator::GenerateBlocks( const VoxelTerrain& _terrain, VoxelChunk& _chunk )
     {
         //ScopedTimer timerTotal( "terrain blocks generation" );
-        for( int x = 0; x < sChunkSize; ++x )
+
+        _chunk.mIsGenerated = true;
+
+        const VoxelGenerator& generator = _terrain.mGenerator;
+        const glm::ivec3 maxPosition = VoxelChunk::sSize * _terrain.mSize - glm::ivec3 { 1, 1, 1 };
+        const Vector3    center      = Math::ToFixed( maxPosition ) / 2;
+        for( int         x           = 0; x < VoxelChunk::sSize; ++x )
         {
-            for( int y = 0; y < sChunkSize; ++y )
+            for( int y = 0; y < VoxelChunk::sSize; ++y )
             {
-                for( int z = 0; z < sChunkSize; ++z )
+                for( int z = 0; z < VoxelChunk::sSize; ++z )
                 {
-                    Vector3 position   = _terrain.mFrequency * Vector3( x, y, z );
-                    Fixed   simplexVal = ( _terrain.mSimplexNoise.Noise( position ) + 1 ) / 2; // [-1;1]
-                    _terrain.mGrid[x][y][z] = simplexVal > _terrain.mAmplitude;
-                    if( x == 0 || y == 0 || z == 0 || x == _terrain.sChunkSize - 1 || y == _terrain.sChunkSize - 1 || z == _terrain.sChunkSize - 1 )
+                    const Vector3 chunkOffset    = VoxelChunk::sSize * Vector3( _chunk.mPosition.x, _chunk.mPosition.y, _chunk.mPosition.z );
+                    const Vector3 globalPosition = chunkOffset + Vector3( x, y, z );
+                    Fixed   simplexVal     = generator.mAmplitude * FIXED( 0.5 ) * ( 1 + generator.mSimplexNoise.Noise( generator.mFrequency * globalPosition ) ); // [-1;1]
+
+                    //simplexVal += FIXED(0.5) * (1 - globalPosition.y / maxPosition.y);
+
+                    _chunk.mVoxels[x][y][z] = simplexVal > FIXED( 0.5 );
+
+                    //_chunk.mVoxels[x][y][z] &= globalPosition.y < maxPosition.y/2;
+                    //_chunk.mVoxels[x][y][z] &= ( center - globalPosition ).Magnitude() < maxPosition.y/2;
+
+                    const glm::ivec3 gPos = VoxelChunk::sSize * glm::ivec3( _chunk.mPosition.x, _chunk.mPosition.y, _chunk.mPosition.z ) + glm::ivec3( x, y, z );
+                    if( gPos.x == 0 || gPos.y == 0 || gPos.z == 0 || gPos.x == maxPosition.x || gPos.y == maxPosition.y || gPos.z == maxPosition.z )
                     {
-                        _terrain.mGrid[x][y][z] = false;
+                        _chunk.mVoxels[x][y][z] = false;
                     }
                 }
             }
@@ -76,70 +51,231 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void VoxelTerrain::GenerateMesh( VoxelTerrain& _terrain )
+    void VoxelGenerator::GenerateVertices( const int _caseID, const Vector3 offset, std::vector<Vertex>& _vertices )
     {
-        //ScopedTimer timerTotal( "terrain mesh generation" );
-        _terrain.mVertices.clear();
-        _terrain.mVertices.resize( 30000 );
-
-        // ScopedTimer         timerMesh( "gen vertices" );
-        glm::vec3 color = Color::sWhite.ToGLM();
-        for( int  x     = 0; x < _terrain.sChunkSize - 1; ++x )
+        const int numPolys = sCaseToNumPolys[_caseID];
+        for( int  i        = 0; i < numPolys; ++i )
         {
-            for( int y = 0; y < _terrain.sChunkSize - 1; ++y )
-            {
-                for( int z = 0; z < _terrain.sChunkSize - 1; ++z )
-                {
-                    const int     caseID   = _terrain.mGrid[x + 1][y + 0][z + 0] << 0 |
-                                             _terrain.mGrid[x + 1][y + 1][z + 0] << 1 |
-                                             _terrain.mGrid[x + 0][y + 1][z + 0] << 2 |
-                                             _terrain.mGrid[x + 0][y + 0][z + 0] << 3 |
-                                             _terrain.mGrid[x + 1][y + 0][z + 1] << 4 |
-                                             _terrain.mGrid[x + 1][y + 1][z + 1] << 5 |
-                                             _terrain.mGrid[x + 0][y + 1][z + 1] << 6 |
-                                             _terrain.mGrid[x + 0][y + 0][z + 1] << 7;
-                    const int     numPolys = sCaseToNumPolys[caseID];
-                    const Vector3 offset   = Vector3( x, y, z );
-                    for( int      i        = 0; i < numPolys; ++i )
-                    {
-                        const int8_t* triangleIndices = sEdgeConnectList[caseID][i];
-                        Vector3   v0       = offset + sEdges[triangleIndices[0]];
-                        Vector3   v1       = offset + sEdges[triangleIndices[1]];
-                        Vector3   v2       = offset + sEdges[triangleIndices[2]];
-                        Vector3   fxNormal = Vector3::Cross( ( v1 - v2 ), ( v0 - v2 ) ).FastNormalized();
-                        glm::vec3 normal   = Math::ToGLM( fxNormal );
+            const int8_t* triangleIndices = sEdgeConnectList[_caseID][i];
+            Vector3   v0       = offset + sEdges[triangleIndices[0]];
+            Vector3   v1       = offset + sEdges[triangleIndices[1]];
+            Vector3   v2       = offset + sEdges[triangleIndices[2]];
+            Vector3   fxNormal = Vector3::Cross( ( v1 - v2 ), ( v0 - v2 ) ).FastNormalized();
+            glm::vec3 normal   = Math::ToGLM( fxNormal );
 
-                        _terrain.mVertices.push_back( { Math::ToGLM( v0 ), normal, color, { 0, 0 } } );
-                        _terrain.mVertices.push_back( { Math::ToGLM( v2 ), normal, color, { 0, 0 } } );
-                        _terrain.mVertices.push_back( { Math::ToGLM( v1 ), normal, color, { 0, 0 } } );
-                    }
+            _vertices.push_back( { Math::ToGLM( v0 ), normal, Color::sWhite.ToGLM(), { 0, 0 } } );
+            _vertices.push_back( { Math::ToGLM( v2 ), normal, Color::sWhite.ToGLM(), { 0, 0 } } );
+            _vertices.push_back( { Math::ToGLM( v1 ), normal, Color::sWhite.ToGLM(), { 0, 0 } } );
+        }
+    }
+
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    void GenerateLocalVoxels( VoxelChunk& _chunk, Mesh& _mesh )
+    {
+        for( int x = 0; x < VoxelChunk::sSize - 1; ++x )
+        {
+            for( int y = 0; y < VoxelChunk::sSize - 1; ++y )
+            {
+                for( int z = 0; z < VoxelChunk::sSize - 1; ++z )
+                {
+                    const int caseID = _chunk.mVoxels[x + 1][y + 0][z + 0] << 0 |
+                                       _chunk.mVoxels[x + 1][y + 1][z + 0] << 1 |
+                                       _chunk.mVoxels[x + 0][y + 1][z + 0] << 2 |
+                                       _chunk.mVoxels[x + 0][y + 0][z + 0] << 3 |
+                                       _chunk.mVoxels[x + 1][y + 0][z + 1] << 4 |
+                                       _chunk.mVoxels[x + 1][y + 1][z + 1] << 5 |
+                                       _chunk.mVoxels[x + 0][y + 1][z + 1] << 6 |
+                                       _chunk.mVoxels[x + 0][y + 0][z + 1] << 7;
+                    VoxelGenerator::GenerateVertices( caseID, Vector3( x, y, z ), _mesh.mVertices );
                 }
             }
         }
-
-        fanAssert(_terrain.mMesh != nullptr );
-        _terrain.mMesh->LoadFromVertices( _terrain.mVertices );
     }
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void VoxelTerrain::Save( const EcsSingleton& _component, Json& _json )
+    void GenerateLeftVoxels( const VoxelChunk& _leftChunk, VoxelChunk& _chunk, Mesh& _mesh )
     {
-        const VoxelTerrain& voxelTerrain = static_cast<const VoxelTerrain&>( _component );
-        Serializable::SaveInt( _json, "seed", voxelTerrain.mSeed );
+        for( int y = 0; y < VoxelChunk::sSize - 1; ++y )
+        {
+            for( int z = 0; z < VoxelChunk::sSize - 1; ++z )
+            {
+                const int x      = VoxelChunk::sSize - 1;
+                const int caseID = _leftChunk.mVoxels[0][y + 0][z + 0] << 0 |
+                                   _leftChunk.mVoxels[0][y + 1][z + 0] << 1 |
+                                   _chunk.mVoxels[x][y + 1][z + 0] << 2 |
+                                   _chunk.mVoxels[x][y + 0][z + 0] << 3 |
+                                   _leftChunk.mVoxels[0][y + 0][z + 1] << 4 |
+                                   _leftChunk.mVoxels[0][y + 1][z + 1] << 5 |
+                                   _chunk.mVoxels[x][y + 1][z + 1] << 6 |
+                                   _chunk.mVoxels[x][y + 0][z + 1] << 7;
+                VoxelGenerator::GenerateVertices( caseID, Vector3( x, y, z ), _mesh.mVertices );
+            }
+        }
     }
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void VoxelTerrain::Load( EcsSingleton& _component, const Json& _json )
+    void GenerateTopVoxels( const VoxelChunk& _topChunk, VoxelChunk& _chunk, Mesh& _mesh )
     {
-        VoxelTerrain& voxelTerrain = static_cast<VoxelTerrain&>( _component );
-        Serializable::LoadInt( _json, "seed", voxelTerrain.mSeed );
+        for( int x = 0; x < VoxelChunk::sSize - 1; ++x )
+        {
+            for( int z = 0; z < VoxelChunk::sSize - 1; ++z )
+            {
+                const int y      = VoxelChunk::sSize - 1;
+                const int caseID = _chunk.mVoxels[x + 1][y][z + 0] << 0 |
+                                   _topChunk.mVoxels[x + 1][0][z + 0] << 1 |
+                                   _topChunk.mVoxels[x + 0][0][z + 0] << 2 |
+                                   _chunk.mVoxels[x + 0][y][z + 0] << 3 |
+                                   _chunk.mVoxels[x + 1][y][z + 1] << 4 |
+                                   _topChunk.mVoxels[x + 1][0][z + 1] << 5 |
+                                   _topChunk.mVoxels[x + 0][0][z + 1] << 6 |
+                                   _chunk.mVoxels[x + 0][y][z + 1] << 7;
+                VoxelGenerator::GenerateVertices( caseID, Vector3( x, y, z ), _mesh.mVertices );
+            }
+        }
     }
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    const Vector3 VoxelTerrain::sEdges[12] = {
+    void GenerateForwardVoxels( const VoxelChunk& _forwardChunk, VoxelChunk& _chunk, Mesh& _mesh )
+    {
+        for( int x = 0; x < VoxelChunk::sSize - 1; ++x )
+        {
+            for( int y = 0; y < VoxelChunk::sSize - 1; ++y )
+            {
+                const int z      = VoxelChunk::sSize - 1;
+                const int caseID = _chunk.mVoxels[x + 1][y + 0][z] << 0 |
+                                   _chunk.mVoxels[x + 1][y + 1][z] << 1 |
+                                   _chunk.mVoxels[x + 0][y + 1][z] << 2 |
+                                   _chunk.mVoxels[x + 0][y + 0][z] << 3 |
+                                   _forwardChunk.mVoxels[x + 1][y + 0][0] << 4 |
+                                   _forwardChunk.mVoxels[x + 1][y + 1][0] << 5 |
+                                   _forwardChunk.mVoxels[x + 0][y + 1][0] << 6 |
+                                   _forwardChunk.mVoxels[x + 0][y + 0][0] << 7;
+                VoxelGenerator::GenerateVertices( caseID, Vector3( x, y, z ), _mesh.mVertices );
+            }
+        }
+    }
+
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    void GenerateLeftTopVoxels( const VoxelChunk& _leftChunk, const VoxelChunk& _topChunk, const VoxelChunk& _leftTopChunk, VoxelChunk& _chunk, Mesh& _mesh )
+    {
+
+        for( int z = 0; z < VoxelChunk::sSize - 1; ++z )
+        {
+            const int xy     = VoxelChunk::sSize - 1;
+            const int caseID = _leftChunk.mVoxels[0][xy + 0][z + 0] << 0 |
+                               _leftTopChunk.mVoxels[0][0][z + 0] << 1 |
+                               _topChunk.mVoxels[xy][0][z + 0] << 2 |
+                               _chunk.mVoxels[xy][xy][z + 0] << 3 |
+                               _leftChunk.mVoxels[0][xy][z + 1] << 4 |
+                               _leftTopChunk.mVoxels[0][0][z + 1] << 5 |
+                               _topChunk.mVoxels[xy][0][z + 1] << 6 |
+                               _chunk.mVoxels[xy][xy][z + 1] << 7;
+            VoxelGenerator::GenerateVertices( caseID, Vector3( xy, xy, z ), _mesh.mVertices );
+        }
+    }
+
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    void GenerateLeftForwardVoxels( const VoxelChunk& _leftChunk, const VoxelChunk& _forwardChunk, const VoxelChunk& _leftForwardChunk, VoxelChunk& _chunk, Mesh& _mesh )
+    {
+        for( int y = 0; y < VoxelChunk::sSize - 1; ++y )
+        {
+            const int xz     = VoxelChunk::sSize - 1;
+            const int caseID = _leftChunk.mVoxels[0][y + 0][xz] << 0 |
+                               _leftChunk.mVoxels[0][y + 1][xz] << 1 |
+                               _chunk.mVoxels[xz][y + 1][xz] << 2 |
+                               _chunk.mVoxels[xz][y + 0][xz] << 3 |
+                               _leftForwardChunk.mVoxels[0][y + 0][0] << 4 |
+                               _leftForwardChunk.mVoxels[0][y + 1][0] << 5 |
+                               _forwardChunk.mVoxels[xz][y + 1][0] << 6 |
+                               _forwardChunk.mVoxels[xz][y + 0][0] << 7;
+            VoxelGenerator::GenerateVertices( caseID, Vector3( xz, y, xz ), _mesh.mVertices );
+        }
+    }
+
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    void GenerateTopForwardVoxels( const VoxelChunk& _topChunk, const VoxelChunk& _forwardChunk, const VoxelChunk& _topForwardChunk, VoxelChunk& _chunk, Mesh& _mesh )
+    {
+        for( int x = 0; x < VoxelChunk::sSize - 1; ++x )
+        {
+            const int yz     = VoxelChunk::sSize - 1;
+            const int caseID = _chunk.mVoxels[x + 1][yz][yz] << 0 |
+                               _topChunk.mVoxels[x + 1][0][yz] << 1 |
+                               _topChunk.mVoxels[x + 0][0][yz] << 2 |
+                               _chunk.mVoxels[x + 0][yz][yz] << 3 |
+                               _forwardChunk.mVoxels[x + 1][yz][0] << 4 |
+                               _topForwardChunk.mVoxels[x + 1][0][0] << 5 |
+                               _topForwardChunk.mVoxels[x + 0][0][0] << 6 |
+                               _forwardChunk.mVoxels[x + 0][yz][0] << 7;
+            VoxelGenerator::GenerateVertices( caseID, Vector3( x, yz, yz ), _mesh.mVertices );
+        }
+    }
+
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    void VoxelGenerator::GenerateMesh( const VoxelTerrain& _terrain, VoxelChunk& _chunk, Mesh& _mesh )
+    {
+        // ScopedTimer         timerMesh( "gen voxel mesh" );
+        _chunk.mIsMeshOutdated = false;
+
+        _mesh.mVertices.resize( 0 );
+        _mesh.mVertices.reserve( 30000 );
+
+        const int leftChunkX    = _chunk.mPosition.x + 1;
+        const int topChunkY     = _chunk.mPosition.y + 1;
+        const int forwardChunkZ = _chunk.mPosition.z + 1;
+
+        const VoxelChunk* leftChunk           = leftChunkX < _terrain.mSize.x ? &_terrain.GetChunk( { leftChunkX, _chunk.mPosition.y, _chunk.mPosition.z } ) : nullptr;
+        const VoxelChunk* topChunk            = topChunkY < _terrain.mSize.y ? &_terrain.GetChunk( { _chunk.mPosition.x, topChunkY, _chunk.mPosition.z } ) : nullptr;
+        const VoxelChunk* forwardChunk        = forwardChunkZ < _terrain.mSize.z ? &_terrain.GetChunk( { _chunk.mPosition.x, _chunk.mPosition.y, forwardChunkZ } ) : nullptr;
+        const VoxelChunk* leftTopChunk        = leftChunk && topChunk ? &_terrain.GetChunk( { leftChunkX, topChunkY, _chunk.mPosition.z } ) : nullptr;
+        const VoxelChunk* leftForwardChunk    = leftChunk && forwardChunk ? &_terrain.GetChunk( { leftChunkX, _chunk.mPosition.y, forwardChunkZ } ) : nullptr;
+        const VoxelChunk* topForwardChunk     = topChunk && forwardChunk ? &_terrain.GetChunk( { _chunk.mPosition.x, topChunkY, forwardChunkZ } ) : nullptr;
+        const VoxelChunk* topLeftForwardChunk = leftChunk && topChunk && forwardChunk ? &_terrain.GetChunk( { leftChunkX, topChunkY, forwardChunkZ } ) : nullptr;
+
+        GenerateLocalVoxels( _chunk, _mesh );
+
+        if( leftChunk ){ GenerateLeftVoxels( *leftChunk, _chunk, _mesh ); }
+        if( topChunk ){ GenerateTopVoxels( *topChunk, _chunk, _mesh ); }
+        if( forwardChunk ){ GenerateForwardVoxels( *forwardChunk, _chunk, _mesh ); }
+        if( leftChunk && topChunk ){ GenerateLeftTopVoxels( *leftChunk, *topChunk, *leftTopChunk, _chunk, _mesh ); }
+        if( leftChunk && forwardChunk ){ GenerateLeftForwardVoxels( *leftChunk, *forwardChunk, *leftForwardChunk, _chunk, _mesh ); }
+        if( topChunk && forwardChunk ){ GenerateTopForwardVoxels( *topChunk, *forwardChunk, *topForwardChunk, _chunk, _mesh ); }
+        if( leftChunk && topChunk && forwardChunk )
+        {
+            const int xyz    = VoxelChunk::sSize - 1;
+            const int caseID =
+                              ( *leftChunk ).mVoxels[0][xyz][xyz] << 0 |
+                              ( *leftTopChunk ).mVoxels[0][0][xyz] << 1 |
+                              ( *topChunk ).mVoxels[xyz][0][xyz] << 2 |
+                              ( _chunk ).mVoxels[xyz][xyz][xyz] << 3 |
+                              ( *leftForwardChunk ).mVoxels[0][xyz][0] << 4 |
+                              ( *topLeftForwardChunk ).mVoxels[0][0][0] << 5 |
+                              ( *topForwardChunk ).mVoxels[xyz][0][0] << 6 |
+                              ( *forwardChunk ).mVoxels[xyz][xyz][0] << 7;
+            VoxelGenerator::GenerateVertices( caseID, Vector3( xyz, xyz, xyz ), _mesh.mVertices );
+        }
+
+        glm::vec3 chunkOffset = VoxelChunk::sSize * _chunk.mPosition;
+        glm::vec3 totalSize   = VoxelChunk::sSize * _terrain.mSize;
+        for( Vertex& vertex : _mesh.mVertices )
+        {
+            glm::vec3 gPos = chunkOffset + vertex.mPos;
+            vertex.mColor = gPos / totalSize;
+        }
+
+        _mesh.LoadFromVertices();
+    }
+
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    const Vector3 VoxelGenerator::sEdges[12] = {
             FIXED( 0.5 ) * Vector3( 2, 1, 0 ),
             FIXED( 0.5 ) * Vector3( 1, 2, 0 ),
             FIXED( 0.5 ) * Vector3( 0, 1, 0 ),
@@ -156,19 +292,19 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    const Vector3 VoxelTerrain::sCorners[8] = { Vector3( 1, 0, 0 ),
-                                                Vector3( 1, 1, 0 ),
-                                                Vector3( 0, 1, 0 ),
-                                                Vector3( 0, 0, 0 ),
-                                                Vector3( 1, 0, 1 ),
-                                                Vector3( 1, 1, 1 ),
-                                                Vector3( 0, 1, 1 ),
-                                                Vector3( 0, 0, 1 ),
+    const Vector3 VoxelGenerator::sCorners[8] = { Vector3( 1, 0, 0 ),
+                                                  Vector3( 1, 1, 0 ),
+                                                  Vector3( 0, 1, 0 ),
+                                                  Vector3( 0, 0, 0 ),
+                                                  Vector3( 1, 0, 1 ),
+                                                  Vector3( 1, 1, 1 ),
+                                                  Vector3( 0, 1, 1 ),
+                                                  Vector3( 0, 0, 1 ),
     };
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    const int8_t VoxelTerrain::sCaseToNumPolys[256] = {
+    const int8_t VoxelGenerator::sCaseToNumPolys[256] = {
             0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 2, 1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 3,
             1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 3, 2, 3, 3, 2, 3, 4, 4, 3, 3, 4, 4, 3, 4, 5, 5, 2,
             1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 3, 2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 4,
@@ -180,7 +316,7 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    const int8_t  VoxelTerrain::sEdgeConnectList[256][5][3] = {
+    const int8_t  VoxelGenerator::sEdgeConnectList[256][5][3] = {
             { { -1, -1, -1 }, { -1, -1, -1 }, { -1, -1, -1 }, { -1, -1, -1 }, { -1, -1, -1 } },
             { { 0,  8,  3 },  { -1, -1, -1 }, { -1, -1, -1 }, { -1, -1, -1 }, { -1, -1, -1 } },
             { { 0,  1,  9 },  { -1, -1, -1 }, { -1, -1, -1 }, { -1, -1, -1 }, { -1, -1, -1 } },

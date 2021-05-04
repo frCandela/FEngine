@@ -20,7 +20,6 @@ namespace fan
             mApplicationShouldExit( false ),
             mWindow( _settings.mWindowName, _settings.mWindow_position, _settings.mWindow_size ),
             mRenderer( mWindow, _settings.mLaunchEditor ? Renderer::ViewType::Editor : Renderer::ViewType::Game )
-
     {
         Mouse::SetCallbacks( mWindow.mWindow );
         mFullScreen.SavePreviousPositionAndSize( mWindow );
@@ -45,10 +44,10 @@ namespace fan
     void IProjectContainer::InitWorld( EcsWorld& _world )
     {
         RenderResources& renderResources = _world.GetSingleton<RenderResources>();
-        renderResources.SetPointers(&mRenderer.mMeshManager,
-                                    &mRenderer.mMesh2DManager,
-                                    &mRenderer.mTextureManager,
-                                    &mRenderer.mFontManager );
+        renderResources.SetPointers( &mRenderer.mMeshManager,
+                                     &mRenderer.mMesh2DManager,
+                                     &mRenderer.mTextureManager,
+                                     &mRenderer.mFontManager );
         SceneResources& sceneResources = _world.GetSingleton<SceneResources>();
         sceneResources.SetPointers( &mPrefabManager );
     }
@@ -67,14 +66,17 @@ namespace fan
         _project.UpdateRenderWorld();
 
         // particles mesh
-        RenderDataModel particlesDrawData;
-        particlesDrawData.mMesh         = renderWorld.mParticlesMesh;
-        particlesDrawData.mModelMatrix  = glm::mat4( 1.f );
-        particlesDrawData.mNormalMatrix = glm::mat4( 1.f );
-        particlesDrawData.mColor        = glm::vec4( 1.f, 1.f, 1.f, 1.f );
-        particlesDrawData.mShininess    = 1;
-        particlesDrawData.mTextureIndex = 1;
-        renderWorld.drawData.push_back( particlesDrawData );
+        if( !renderWorld.mParticlesMesh->mIndices.empty() )
+        {
+            RenderDataModel particlesDrawData;
+            particlesDrawData.mMesh         = renderWorld.mParticlesMesh;
+            particlesDrawData.mModelMatrix  = glm::mat4( 1.f );
+            particlesDrawData.mNormalMatrix = glm::mat4( 1.f );
+            particlesDrawData.mColor        = glm::vec4( 1.f, 1.f, 1.f, 1.f );
+            particlesDrawData.mShininess    = 1;
+            particlesDrawData.mTextureIndex = 1;
+            renderWorld.drawData.push_back( particlesDrawData );
+        }
 
         {
             SCOPED_PROFILE( set_render_data );

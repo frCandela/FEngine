@@ -1,5 +1,6 @@
 #pragma once
 
+#include "fanGlm.hpp"
 #include "engine/project/fanIProject.hpp"
 
 namespace fan
@@ -16,5 +17,7 @@ namespace fan
         void Step( const float _delta ) override;
         void UpdateRenderWorld() override;
         void OnGui() override;
+
+        void StepLoadTerrain();
 	};
 }

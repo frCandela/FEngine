@@ -21,7 +21,7 @@
 #include "engine/systems/fanRegisterPhysics.hpp"
 #include "engine/systems/fanUpdateRenderWorld.hpp"
 #include "engine/physics/fanDetectCollisions.hpp"
-#include "engine/singletons/fanVoxelTerrain.hpp"
+#include "engine/terrain/fanVoxelTerrain.hpp"
 
 #include "game/components/fanTestComponent.hpp"
 #include "game/singletons/fanTestSingleton.hpp"
@@ -52,10 +52,7 @@ namespace fan
         mWorld.AddSingletonType<TestSingleton>();
         mWorld.AddSingletonType<VoxelTerrain>();
 
-        RenderResources& renderResources = mWorld.GetSingleton<RenderResources>();
-        VoxelTerrain   & terrain         = mWorld.GetSingleton<VoxelTerrain>();
-        VoxelTerrain::InitializeTerrainMesh( terrain, renderResources );
-        VoxelTerrain::GenerateTerrain( terrain );
+        VoxelTerrain::InitializeTerrain( mWorld );
 
 #ifdef FAN_EDITOR
         EditorGuiInfo& guiInfos = mWorld.GetSingleton<EditorGuiInfo>();
@@ -81,6 +78,54 @@ namespace fan
     {
     }
 
+    int max;
+    int completionVoxelsGeneration;
+    int completionMeshGeneration;
+    int chunksPerFrame = 2;
+
+    //============================================================================================================================
+    //============================================================================================================================
+    void ProjectVoxels::StepLoadTerrain()
+    {
+        VoxelTerrain terrain = mWorld.GetSingleton<VoxelTerrain>();
+        if( !terrain.mIsInitialized ){ return; }
+
+        for( int iteration = 0; iteration < chunksPerFrame; ++iteration )
+        {
+            max = terrain.mSize.x * terrain.mSize.y * terrain.mSize.z;
+
+            // load/generate blocks
+            bool generatedBlocks = false;
+            for( int i = 0; i < terrain.mSize.x * terrain.mSize.y * terrain.mSize.z; i++ )
+            {
+                VoxelChunk& chunk = terrain.mChunks[i];
+                if( !chunk.mIsGenerated )
+                {
+                    VoxelGenerator::GenerateBlocks( terrain, chunk );
+                    completionVoxelsGeneration = i;
+                    completionMeshGeneration   = 0;
+                    generatedBlocks = true;
+                    break;
+                }
+            }
+            if( generatedBlocks ){ continue;}
+
+            // generate mesh
+            for( int i = 0; i < terrain.mSize.x * terrain.mSize.y * terrain.mSize.z; i++ )
+            {
+                VoxelChunk& chunk = terrain.mChunks[i];
+                if( chunk.mIsMeshOutdated )
+                {
+                    EcsEntity entity = mWorld.GetEntity( chunk.mHandle );
+                    MeshRenderer& meshRenderer = mWorld.GetComponent<MeshRenderer>( entity );
+                    VoxelGenerator::GenerateMesh( terrain, chunk, **( meshRenderer.mMesh ) );
+                    completionMeshGeneration = i;
+                    break;
+                }
+            }
+        }
+    }
+
     //============================================================================================================================
     //============================================================================================================================
     void ProjectVoxels::Step( const float _delta )
@@ -89,11 +134,12 @@ namespace fan
 
         const Fixed fxDelta = Fixed::FromFloat( _delta );
 
+        StepLoadTerrain();
+
         // physics & transforms
         PhysicsWorld& physicsWorld = mWorld.GetSingleton<PhysicsWorld>();
         mWorld.Run<SSynchronizeMotionStateFromTransform>();
         physicsWorld.mDynamicsWorld->stepSimulation( _delta, 10, Time::sPhysicsDelta );
-
         {
             mWorld.Run<SIntegrateFxRigidbodies>( fxDelta );
             mWorld.Run<SDetectCollisions>( fxDelta );
@@ -137,8 +183,14 @@ namespace fan
     //==========================================================================================================================
     void ProjectVoxels::OnGui()
     {
+
         if( ImGui::Begin( "testoss" ) )
         {
+            ImGui::DragInt( "chunks per frame", &chunksPerFrame, 1, 1, 100 );
+            int completionVoxelsGenerationCpy = completionVoxelsGeneration;
+            ImGui::SliderInt( "voxels generation", &completionVoxelsGenerationCpy, 0, max );
+            int completionMeshGenerationCpy = completionMeshGeneration;
+            ImGui::SliderInt( "mesh generation", &completionMeshGenerationCpy, 0, max );
             ImGui::End();
         }
     }
