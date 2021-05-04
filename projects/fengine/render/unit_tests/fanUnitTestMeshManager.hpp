@@ -108,7 +108,8 @@ namespace fan
             mMeshManager.Add( mesh1, "mesh1" );
             mMeshManager.Add( mesh2, "mesh2" );
 
-            mesh1->LoadFromVertices({});
+            mesh1->mVertices = {};
+            mesh1->LoadFromVertices();
             mesh2->LoadFromFile( RenderGlobal::sMeshCube );
             mesh2->mVertices.clear();
 

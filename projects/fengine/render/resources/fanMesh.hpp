@@ -20,7 +20,7 @@ namespace fan
     {
         bool RayCast( const btVector3 _origin, const btVector3 _dir, btVector3& _outIntersection ) const;
         bool LoadFromFile( const std::string& _path );
-        bool LoadFromVertices( const std::vector<Vertex>& _vertices );
+        bool LoadFromVertices();
         void OptimizeVertices();
         void GenerateConvexHull();
         void Create( Device& _device );

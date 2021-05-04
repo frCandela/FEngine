@@ -196,7 +196,7 @@ namespace fan
                 Mesh    & mesh     = *drawData.mMesh;
 
                 Buffer& buffer = mesh.mVertexBuffer[mesh.mCurrentBuffer];
-                if( buffer.mBuffer == VK_NULL_HANDLE ) { continue; }
+                if( buffer.mBuffer == VK_NULL_HANDLE ){ continue; }
 
                 BindTexture( commandBuffer,
                              drawData.mTextureIndex,
@@ -255,19 +255,19 @@ namespace fan
         {
             const RenderDataModel& data = _drawData[dataIndex];
 
-            if( data.mMesh != nullptr && !data.mMesh->mIndices.empty() )
-            {
-                // Transform
-                mUniforms.mDynamicUniformsMatrices[dataIndex].mModelMat  = data.mModelMatrix;
-                mUniforms.mDynamicUniformsMatrices[dataIndex].mNormalMat = data.mNormalMatrix;
+            fanAssert( data.mMesh != nullptr );
+            fanAssert( !data.mMesh->mIndices.empty() );
 
-                // material
-                mUniforms.mDynamicUniformsMaterial[dataIndex].mColor     = data.mColor;
-                mUniforms.mDynamicUniformsMaterial[dataIndex].mShininess = data.mShininess;
+            // Transform
+            mUniforms.mDynamicUniformsMatrices[dataIndex].mModelMat  = data.mModelMatrix;
+            mUniforms.mDynamicUniformsMatrices[dataIndex].mNormalMat = data.mNormalMatrix;
 
-                // Mesh
-                mDrawData.push_back( { data.mMesh, data.mTextureIndex } );
-            }
+            // material
+            mUniforms.mDynamicUniformsMaterial[dataIndex].mColor     = data.mColor;
+            mUniforms.mDynamicUniformsMaterial[dataIndex].mShininess = data.mShininess;
+
+            // Mesh
+            mDrawData.push_back( { data.mMesh, data.mTextureIndex } );
         }
     }
 

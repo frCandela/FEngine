@@ -38,7 +38,7 @@ namespace fan
 		{
 			for ( Mesh * mesh : renderResources.mMeshManager->GetMeshes() )
 			{
-				ImGui::Text("ref: %d name: %s", mesh->GetRefCount(), mesh->mPath.c_str() );
+				ImGui::Text("index: %d name: %s", mesh->mIndex, mesh->mPath.c_str() );
                 ImGui::FanBeginDragDropSourceMesh( mesh, ImGuiDragDropFlags_SourceAllowNullID );
 			}
 		}

@@ -81,7 +81,8 @@ namespace fan
                 FxTransform   & transform    = *transformIt;
                 Material    & material     = *materialIt;
 
-                if( meshRenderer.mMesh.IsValid() )
+
+                if( meshRenderer.mMesh.IsValid() && ! meshRenderer.mMesh->mIndices.empty() )
                 {
                     const EcsEntity entity = transformIt.GetEntity();
                     const Vector3 scale = _world.HasComponent<FxScale>(entity) ? _world.GetComponent<FxScale>(entity).mScale : Vector3::sOne;

@@ -40,14 +40,12 @@ namespace fan
 
 	//========================================================================================================
 	//========================================================================================================
-	bool Mesh::LoadFromVertices( const std::vector<Vertex>& _vertices )
+	bool Mesh::LoadFromVertices()
 	{
-		mVertices = _vertices;
-
 		// Generate fake indices
         mIndices.clear();
-        mIndices.reserve( _vertices.size() );
-		for ( int vertIndex = 0; vertIndex < (int)_vertices.size(); vertIndex++ )
+        mIndices.reserve( mVertices.size() );
+		for ( int vertIndex = 0; vertIndex < (int)mVertices.size(); vertIndex++ )
 		{
             mIndices.push_back( vertIndex );
 		}
