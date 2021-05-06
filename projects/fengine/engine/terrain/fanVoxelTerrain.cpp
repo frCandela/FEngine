@@ -8,6 +8,7 @@
 #include "engine/singletons/fanScene.hpp"
 #include "engine/terrain/fanVoxelTerrain.hpp"
 #include "render/resources/fanTextureManager.hpp"
+#include "core/memory/fanBase64.hpp"
 
 namespace fan
 {
@@ -55,8 +56,6 @@ namespace fan
     {
         if( _terrain.mSize.x <= 0 && _terrain.mSize.y <= 0 && _terrain.mSize.z <= 0 ){ return; }
 
-        _terrain.mChunks = new VoxelChunk[_terrain.mSize.x * _terrain.mSize.y * _terrain.mSize.z] {};
-
         RenderResources& renderResources = _world.GetSingleton<RenderResources>();
         Texture        * texture         = renderResources.mTextureManager->GetOrLoad( "_default/texture/white.png" );
 
@@ -64,6 +63,11 @@ namespace fan
         SceneNode& terrainRoot = scene.CreateSceneNode( "terrain", &scene.GetRootNode() );
         terrainRoot.AddFlag( SceneNode::NoSave );
         _terrain.mTerrainHandle = terrainRoot.mHandle;
+
+        if( _terrain.mChunks == nullptr )
+        {
+            _terrain.mChunks = new VoxelChunk[_terrain.mSize.x * _terrain.mSize.y * _terrain.mSize.z] {};
+        }
 
         glm::ivec3 position;
         for( position.x         = 0; position.x < _terrain.mSize.x; position.x++ )
@@ -135,27 +139,51 @@ namespace fan
     //==================================================================================================================================================================================================
     void VoxelTerrain::Save( const EcsSingleton& _component, Json& _json )
     {
-        const VoxelTerrain& voxelTerrain = static_cast<const VoxelTerrain&>( _component );
-        Serializable::SaveInt3( _json, "size", voxelTerrain.mSize );
-        Serializable::SaveInt( _json, "seed", voxelTerrain.mGenerator.mSeed );
-        Serializable::SaveFixed( _json, "threshold", voxelTerrain.mGenerator.mThreshold );
-        Serializable::SaveBool( _json, "clear_sides", voxelTerrain.mGenerator.mClearSides );
-        NoiseOctave::Save( _json, "3d_octave_0", voxelTerrain.mGenerator.m3DOctaves[0] );
-        NoiseOctave::Save( _json, "3d_octave_1", voxelTerrain.mGenerator.m3DOctaves[1] );
-        NoiseOctave::Save( _json, "2d_octave", voxelTerrain.mGenerator.m2DOctave );
+        const VoxelTerrain& terrain = static_cast<const VoxelTerrain&>( _component );
+        Serializable::SaveInt3( _json, "size", terrain.mSize );
+        Serializable::SaveInt( _json, "seed", terrain.mGenerator.mSeed );
+        Serializable::SaveFixed( _json, "threshold", terrain.mGenerator.mThreshold );
+        Serializable::SaveBool( _json, "clear_sides", terrain.mGenerator.mClearSides );
+        NoiseOctave::Save( _json, "3d_octave_0", terrain.mGenerator.m3DOctaves[0] );
+        NoiseOctave::Save( _json, "3d_octave_1", terrain.mGenerator.m3DOctaves[1] );
+        NoiseOctave::Save( _json, "2d_octave", terrain.mGenerator.m2DOctave );
+
+        Json& chunksJson = _json["chunks"];
+        for( int i = 0; i < terrain.mSize.x * terrain.mSize.y * terrain.mSize.z; ++i )
+        {
+            VoxelChunk& chunk = terrain.mChunks[i];
+            chunksJson[i] = Base64::Encode( (unsigned char*)chunk.mVoxels, VoxelChunk::sSize * VoxelChunk::sSize * VoxelChunk::sSize );
+        }
     }
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
     void VoxelTerrain::Load( EcsSingleton& _component, const Json& _json )
     {
-        VoxelTerrain& voxelTerrain = static_cast<VoxelTerrain&>( _component );
-        Serializable::LoadInt3( _json, "size", voxelTerrain.mSize );
-        Serializable::LoadInt( _json, "seed", voxelTerrain.mGenerator.mSeed );
-        Serializable::LoadFixed( _json, "threshold", voxelTerrain.mGenerator.mThreshold );
-        Serializable::LoadBool( _json, "clear_sides", voxelTerrain.mGenerator.mClearSides );
-        NoiseOctave::Load( _json, "3d_octave_0", voxelTerrain.mGenerator.m3DOctaves[0] );
-        NoiseOctave::Load( _json, "3d_octave_1", voxelTerrain.mGenerator.m3DOctaves[1] );
-        NoiseOctave::Load( _json, "2d_octave", voxelTerrain.mGenerator.m2DOctave );
+        VoxelTerrain& terrain = static_cast<VoxelTerrain&>( _component );
+        Serializable::LoadInt3( _json, "size", terrain.mSize );
+        Serializable::LoadInt( _json, "seed", terrain.mGenerator.mSeed );
+        Serializable::LoadFixed( _json, "threshold", terrain.mGenerator.mThreshold );
+        Serializable::LoadBool( _json, "clear_sides", terrain.mGenerator.mClearSides );
+        NoiseOctave::Load( _json, "3d_octave_0", terrain.mGenerator.m3DOctaves[0] );
+        NoiseOctave::Load( _json, "3d_octave_1", terrain.mGenerator.m3DOctaves[1] );
+        NoiseOctave::Load( _json, "2d_octave", terrain.mGenerator.m2DOctave );
+
+        fanAssert(terrain.mChunks == nullptr);
+        terrain.mChunks = new VoxelChunk[terrain.mSize.x * terrain.mSize.y * terrain.mSize.z] {};
+
+        const Json* chunksJson = Serializable::FindToken(_json, "chunks");
+
+        if( chunksJson != nullptr )
+        {
+            for( int i = 0; i < terrain.mSize.x * terrain.mSize.y * terrain.mSize.z; ++i )
+            {
+                VoxelChunk& chunk = terrain.mChunks[i];
+                std::string data = Base64::Decode( (*chunksJson)[i] );
+                fanAssert(data.length() == VoxelChunk::sSize * VoxelChunk::sSize * VoxelChunk::sSize);
+                memcpy( chunk.mVoxels,data.data(), data.length() );
+                chunk.mIsGenerated = true;
+            }
+        }
     }
 }
