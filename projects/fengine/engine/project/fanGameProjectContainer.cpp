@@ -42,6 +42,7 @@ namespace fan
         }
 
         mProject.Init();
+        mProject.mWorld.PostInitSingletons();
         mProject.Start();
 	}
 

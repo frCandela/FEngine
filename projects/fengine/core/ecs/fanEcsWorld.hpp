@@ -52,6 +52,8 @@ namespace fan
 		// Global
 		void ApplyTransitions();
 		void Clear();
+		void InitSingletons();
+        void PostInitSingletons();
 		int  NumComponents() const	{ return int( mComponentsInfo.size() ); }
         int  NumTags() const	    { return ecsSignatureLength - mNextTagIndex - 1; }
         int  GetFistTagIndex() const{ return mNextTagIndex + 1; }

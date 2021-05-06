@@ -69,7 +69,8 @@ namespace fan
             mWorld.AddComponentType<TestEcsComponent>();
             mWorld.AddSingletonType<TestEcsSingleton>();
             mWorld.AddTagType<TagTest>();
-
+            mWorld.InitSingletons();
+            mWorld.PostInitSingletons();
         }
         void Destroy() override {}
 

@@ -127,10 +127,12 @@ namespace fan
 	void Scene::New()
 	{
 		Clear( );
+		mWorld->InitSingletons();
 		SceneNode& rootNode = CreateSceneNode( "root", nullptr );
         mRootNodeHandle = rootNode.mHandle;
 		mOnLoad.Emmit( *this );
 		mWorld->ApplyTransitions();
+        mWorld->PostInitSingletons();
 	}
 
 	//========================================================================================================
@@ -313,6 +315,7 @@ namespace fan
 			}
 
 			// load singleton components
+            mWorld->InitSingletons();
 			if( jScene.find( "singletons" ) != jScene.end() )
 			{
 				const Json& jSingletons = jScene["singletons"];
@@ -328,14 +331,13 @@ namespace fan
 						info->load( singleton, jSingleton_i );
 					}
 					else
-					{
-                        Debug::Error()  << "corrupted singleton component with id "
-                                        << staticIndex << Debug::Endl();
+                    {
+                        Debug::Error() << "corrupted singleton component with id " << staticIndex << Debug::Endl();
 					}
 				}
 			}
 
-			// loads all nodes recursively
+            // loads all nodes recursively
 			const Json& jRoot = jScene["root"];
 			const EcsHandle handleOffset = 0;
 			SceneNode&  rootNode = RLoadFromJson( jRoot, *this, nullptr, handleOffset );
@@ -351,6 +353,7 @@ namespace fan
 
 			mOnLoad.Emmit( *this );
 			mWorld->ApplyTransitions();
+            mWorld->PostInitSingletons();
 			return true;
 		}
 		else
@@ -362,54 +365,51 @@ namespace fan
 		return false;
 	}
 
-	//========================================================================================================
-	//========================================================================================================
-    SceneNode& Scene::RLoadFromJson( const Json& _json,
-                                     Scene& _scene,
-                                     SceneNode* _parent,
-                                     const uint32_t _handleOffset )
-	{
-		//ScopedTimer timer("load scene");
-		EcsWorld& world = *_scene.mWorld;
+    //========================================================================================================
+    //========================================================================================================
+    SceneNode& Scene::RLoadFromJson( const Json& _json, Scene& _scene, SceneNode* _parent, const uint32_t _handleOffset )
+    {
+        //ScopedTimer timer("load scene");
+        EcsWorld& world = *_scene.mWorld;
 
-		EcsHandle nodeHandle;
-		Serializable::LoadUInt( _json, "handle", nodeHandle );
-		SceneNode& node = _scene.CreateSceneNode( "tmp", _parent, nodeHandle + _handleOffset );
-		Serializable::LoadString( _json, "name", node.mName );
+        EcsHandle nodeHandle;
+        Serializable::LoadUInt( _json, "handle", nodeHandle );
+        SceneNode& node = _scene.CreateSceneNode( "tmp", _parent, nodeHandle + _handleOffset );
+        Serializable::LoadString( _json, "name", node.mName );
 
-		// append id
-		_scene.mNodes.insert( node.mHandle);
+        // append id
+        _scene.mNodes.insert( node.mHandle );
 
-		// components
-		const Json& jComponents = _json["components"];
-		{
-			const EcsEntity	entity = world.GetEntity( node.mHandle );
-			for( int childIndex = 0; childIndex < (int)jComponents.size(); childIndex++ )
-			{
-				const Json& jComponent_i = jComponents[childIndex];
-				unsigned staticIndex = 0;
-				Serializable::LoadUInt( jComponent_i, "component_type", staticIndex );
-                const EcsComponentInfo* info		= world.SafeGetComponentInfo( staticIndex );
+        // components
+        const Json& jComponents = _json["components"];
+        {
+            const EcsEntity entity     = world.GetEntity( node.mHandle );
+            for( int        childIndex = 0; childIndex < (int)jComponents.size(); childIndex++ )
+            {
+                const Json& jComponent_i = jComponents[childIndex];
+                unsigned staticIndex = 0;
+                Serializable::LoadUInt( jComponent_i, "component_type", staticIndex );
+                const EcsComponentInfo* info = world.SafeGetComponentInfo( staticIndex );
                 if( info != nullptr )
                 {
                     EcsComponent& component = world.AddComponent( entity, staticIndex );
                     info->load( component, jComponent_i );
                 }
-			}
-		}
+            }
+        }
 
-		// Load childs
-		const Json& jchilds = _json["childs"];
-		{
-			for( int childIndex = 0; childIndex < (int)jchilds.size(); childIndex++ )
-			{
-				const Json& jchild_i = jchilds[childIndex];
-				{
+        // Load childs
+        const Json& jchilds = _json["childs"];
+        {
+            for( int childIndex = 0; childIndex < (int)jchilds.size(); childIndex++ )
+            {
+                const Json& jchild_i = jchilds[childIndex];
+                {
                     RLoadFromJson( jchild_i, _scene, &node, _handleOffset );
-				}
-			}
-		}
+                }
+            }
+        }
 
-		return node;
-	}
+        return node;
+    }
 }

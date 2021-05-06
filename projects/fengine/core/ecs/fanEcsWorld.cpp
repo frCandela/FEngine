@@ -195,6 +195,16 @@ namespace fan
 	//========================================================================================================
 	void EcsWorld::Clear()
 	{
+        // clears singleton components
+        for( std::pair< uint32_t, EcsSingleton*> pair : mSingletons )
+        {
+            const EcsSingletonInfo& info = GetSingletonInfo( pair.first );
+            if( info.destroy )
+            {
+                info.destroy( *this, *pair.second );
+            }
+        }
+
 		ApplyTransitions();
 		// Remove all entities
 		for( auto it = mArchetypes.begin(); it != mArchetypes.end(); ++it )
@@ -205,15 +215,34 @@ namespace fan
 
 		mHandles.clear();
         mNextHandle = 1;
-
-		// clears singleton components
-		for( std::pair< uint32_t, EcsSingleton*> pair : mSingletons )
-		{
-			const EcsSingletonInfo& info = GetSingletonInfo( pair.first );
-			info.init( *this, *pair.second );
-		}
-
 	}
+
+    //========================================================================================================
+    //========================================================================================================
+    void EcsWorld::InitSingletons()
+    {
+        // clears singleton components
+        for( std::pair< uint32_t, EcsSingleton*> pair : mSingletons )
+        {
+            const EcsSingletonInfo& info = GetSingletonInfo( pair.first );
+            info.init( *this, *pair.second );
+        }
+    }
+
+    //========================================================================================================
+    //========================================================================================================
+    void EcsWorld::PostInitSingletons()
+    {
+        // clears singleton components
+        for( std::pair< uint32_t, EcsSingleton*> pair : mSingletons )
+        {
+            const EcsSingletonInfo& info = GetSingletonInfo( pair.first );
+            if( info.postInit != nullptr )
+            {
+                info.postInit( *this, *pair.second );
+            }
+        }
+    }
 
     //========================================================================================================
     //========================================================================================================

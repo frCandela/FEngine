@@ -31,13 +31,9 @@ namespace fan
 		void Clear();
 		void SetMainCamera( const EcsHandle _cameraHandle );
 
-		static EcsHandle	RFindMaximumHandle( SceneNode& _node );
-		static void			RSaveToJson( const SceneNode& _node, Json& _json );
-        static SceneNode&   RLoadFromJson( const Json& _json,
-                                           Scene& _scene,
-                                           SceneNode* _parent,
-                                           const uint32_t _handleOffset );
-
+		static EcsHandle  RFindMaximumHandle( SceneNode& _node );
+		static void		  RSaveToJson( const SceneNode& _node, Json& _json );
+        static SceneNode& RLoadFromJson( const Json& _json, Scene& _scene, SceneNode* _parent, const uint32_t _handleOffset );
 
         using RemapTable = std::map< EcsHandle , EcsHandle >;
         static void GenerateRemapTable( Json& _jsonRootSceneNode, RemapTable& _outRemapTable );

@@ -156,6 +156,7 @@ namespace fan
             }
 
             project.Init();
+            world.PostInitSingletons();
         }
     }
 

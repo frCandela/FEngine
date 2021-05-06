@@ -22,7 +22,12 @@ namespace fan
 
     //========================================================================================================
     //========================================================================================================
-    struct EcsSingleton {};
+    struct EcsSingleton
+    {
+        EcsSingleton(const EcsSingleton&) = delete;
+        EcsSingleton& operator=(EcsSingleton const&);
+        EcsSingleton(){}
+    };
 
 	class EcsWorld;
     struct SlotBase;
@@ -44,7 +49,9 @@ namespace fan
 		uint32_t               mType;
         std::vector<SlotBase*> mSlots;                         // callable methods
 
-		void ( *init ) ( EcsWorld&, EcsSingleton& ) = nullptr;
+		void ( *init ) ( EcsWorld&, EcsSingleton& ) = nullptr; // called at creation and rebuild
+        void ( *postInit ) ( EcsWorld&, EcsSingleton& ) = nullptr;  // call after all singletons have been initialized
+        void ( *destroy )( EcsWorld&, EcsSingleton& ) = nullptr;
         void ( *setInfo ) ( EcsSingletonInfo& ) = nullptr;
 		void ( *save ) ( const EcsSingleton&, Json& ) = nullptr;
 		void ( *load ) ( EcsSingleton&, const Json& ) = nullptr;

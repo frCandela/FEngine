@@ -89,6 +89,8 @@ namespace fan
             using namespace test;
             mWorld.AddComponentType<TestComponent>();
             mWorld.AddSingletonType<TestSingleton>();
+            mWorld.InitSingletons();
+            mWorld.PostInitSingletons();
         }
 
         void Destroy() override {}

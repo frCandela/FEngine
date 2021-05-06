@@ -33,6 +33,7 @@ namespace fan
 		void SaveFloat(Json& _json, const char* _name, const float& _float);
         void SaveFixed(Json& _json, const char* _name, const Fixed& _fixed);
 		void SaveInt(Json& _json, const char* _name, const int& _int);
+        void SaveInt3(Json& _json, const char* _name, const glm::ivec3 & _int3);
 		void SaveUInt(Json& _json, const char* _name, const unsigned& _int);
 		void SaveUInt64(Json& _json, const char* _name, const uint64_t& _uint64);
 		void SaveBool(Json& _json, const char* _name, const bool& _bool);
@@ -48,7 +49,8 @@ namespace fan
 		bool LoadColor(const Json& _json, const char* _name, Color& _outColor);
 		bool LoadFloat(const Json& _json, const char* _name, float& _outFloat);
 		bool LoadFixed(const Json& _json, const char* _name, Fixed& _outFixed);
-		bool LoadInt(const Json& _json, const char* _name, int& _outInt);
+		bool LoadInt(  const Json& _json, const char* _name, int& _outInt);
+        bool LoadInt3( const Json& _json, const char* _name, glm::ivec3& _outInt3 );
 		bool LoadUInt(const Json& _json, const char* _name, unsigned& _outUInt);
 		bool LoadUInt64(const Json& _json, const char* _name, uint64_t& _outUInt64);
 		bool LoadBool(const Json& _json, const char* _name, bool& _outBool);

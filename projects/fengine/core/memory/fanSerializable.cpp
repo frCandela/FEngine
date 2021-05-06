@@ -105,6 +105,15 @@ namespace fan
 
     //========================================================================================================
     //========================================================================================================
+    void Serializable::SaveInt3(Json& _json, const char* _name, const glm::ivec3 & _int3)
+    {
+        _json[_name]["x"] = _int3.x;
+        _json[_name]["y"] = _int3.y;
+        _json[_name]["z"] = _int3.z;
+    }
+
+    //========================================================================================================
+    //========================================================================================================
     void Serializable::SaveUInt( Json& _json, const char* _name, const unsigned& _int )
     {
         _json[_name] = _int;
@@ -290,6 +299,21 @@ namespace fan
         if( token != nullptr )
         {
             _outInt = ( *token );
+            return true;
+        }
+        return false;
+    }
+
+    //========================================================================================================
+    //========================================================================================================
+    bool Serializable::LoadInt3( const Json& _json, const char* _name, glm::ivec3& _outInt3 )
+    {
+        const Json* token = FindToken( _json, _name );
+        if( token != nullptr )
+        {
+            _outInt3.x = ( *token )["x"];
+            _outInt3.y = ( *token )["y"];
+            _outInt3.z = ( *token )["z"];
             return true;
         }
         return false;
