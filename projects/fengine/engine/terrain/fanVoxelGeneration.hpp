@@ -3,6 +3,8 @@
 #include "core/random/fanSimplexNoise.hpp"
 #include "engine/terrain/fanVoxelChunk.hpp"
 
+#include "engine/terrain/fanNoiseOctave.hpp"
+
 namespace fan
 {
     struct VoxelTerrain;
@@ -19,8 +21,10 @@ namespace fan
 
         int          mSeed;
         SimplexNoise mSimplexNoise;
-        Fixed        mAmplitude;
-        Fixed        mFrequency;
+        Fixed        mThreshold;
+        bool         mClearSides;
+        NoiseOctave  m2DOctave;
+        NoiseOctave  m3DOctaves[2];
 
         static const int8_t  sCaseToNumPolys[256];
         static const int8_t  sEdgeConnectList[256][5][3];

@@ -92,6 +92,20 @@ namespace fan
 
     //==========================================================================================================================
     //==========================================================================================================================
+    System::BuildType System::GetBuildType()
+    {
+        #ifdef  FAN_DEBUG
+        return BuildType::Debug;
+        #elif  FAN_RELEASE
+        return BuildType::Release;
+        #else
+        fanAssert(false);
+        return BuildType::Error;
+        #endif
+    }
+
+    //==========================================================================================================================
+    //==========================================================================================================================
     bool System::StartProcessAndWait( const std::string& _path, const std::string& _args, const std::string& _logsPath )
     {
         #ifdef  FAN_WIN32

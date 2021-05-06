@@ -52,8 +52,6 @@ namespace fan
         mWorld.AddSingletonType<TestSingleton>();
         mWorld.AddSingletonType<VoxelTerrain>();
 
-        VoxelTerrain::InitializeTerrain( mWorld );
-
 #ifdef FAN_EDITOR
         EditorGuiInfo& guiInfos = mWorld.GetSingleton<EditorGuiInfo>();
         guiInfos.mSingletonInfos[TestSingleton::Info::sType] = GuiVoxelTerrain::GetInfo();
@@ -81,13 +79,13 @@ namespace fan
     int max;
     int completionVoxelsGeneration;
     int completionMeshGeneration;
-    int chunksPerFrame = 2;
+    int chunksPerFrame = System::GetBuildType() == System::BuildType::Release ? 32 : 4;
 
     //============================================================================================================================
     //============================================================================================================================
     void ProjectVoxels::StepLoadTerrain()
     {
-        VoxelTerrain terrain = mWorld.GetSingleton<VoxelTerrain>();
+        VoxelTerrain& terrain = mWorld.GetSingleton<VoxelTerrain>();
         if( !terrain.mIsInitialized ){ return; }
 
         for( int iteration = 0; iteration < chunksPerFrame; ++iteration )

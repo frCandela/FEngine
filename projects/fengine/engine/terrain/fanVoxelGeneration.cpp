@@ -8,7 +8,11 @@ namespace fan
     //==================================================================================================================================================================================================
     void VoxelGenerator::Initialize()
     {
+        mSeed         = 42;
         mSimplexNoise = SimplexNoise( mSeed );
+        mThreshold    = FIXED( 0.5 );
+        m3DOctaves[0] = m3DOctaves[1] = m2DOctave = {};
+        mClearSides = false;
     }
 
     //==================================================================================================================================================================================================
@@ -21,6 +25,7 @@ namespace fan
 
         const VoxelGenerator& generator = _terrain.mGenerator;
         const glm::ivec3 maxPosition = VoxelChunk::sSize * _terrain.mSize - glm::ivec3 { 1, 1, 1 };
+        const Vector3    maxSize     = Math::ToFixed( maxPosition );
         const Vector3    center      = Math::ToFixed( maxPosition ) / 2;
         for( int         x           = 0; x < VoxelChunk::sSize; ++x )
         {
@@ -30,19 +35,36 @@ namespace fan
                 {
                     const Vector3 chunkOffset    = VoxelChunk::sSize * Vector3( _chunk.mPosition.x, _chunk.mPosition.y, _chunk.mPosition.z );
                     const Vector3 globalPosition = chunkOffset + Vector3( x, y, z );
-                    Fixed   simplexVal     = generator.mAmplitude * FIXED( 0.5 ) * ( 1 + generator.mSimplexNoise.Noise( generator.mFrequency * globalPosition ) ); // [-1;1]
 
-                    //simplexVal += FIXED(0.5) * (1 - globalPosition.y / maxPosition.y);
+                    Fixed         simplexVal3D0  = 1 + FIXED( 0.5 ) * generator.mSimplexNoise.Noise( generator.m3DOctaves[0].mFrequency * globalPosition );
+                    Fixed         simplexVal3D1  = 1 + FIXED( 0.5 ) * generator.mSimplexNoise.Noise( generator.m3DOctaves[1].mFrequency * globalPosition );
+                    Fixed         simplexVal2D   = 1 + FIXED( 0.5 ) * generator.mSimplexNoise.Noise( globalPosition.x * generator.m2DOctave.mFrequency, globalPosition.z * generator.m2DOctave.mFrequency  );
 
-                    _chunk.mVoxels[x][y][z] = simplexVal > FIXED( 0.5 );
+                    simplexVal3D0 *= generator.m3DOctaves[0].mAmplitude;
+                    simplexVal3D1 *= generator.m3DOctaves[1].mAmplitude;
+                    simplexVal2D *= generator.m2DOctave.mAmplitude;
 
-                    //_chunk.mVoxels[x][y][z] &= globalPosition.y < maxPosition.y/2;
-                    //_chunk.mVoxels[x][y][z] &= ( center - globalPosition ).Magnitude() < maxPosition.y/2;
+                    Fixed         heightRatio    = globalPosition.y / maxPosition.y;
+                    simplexVal3D0 *= 1 - generator.m3DOctaves[0].mHeightWeight * heightRatio;
+                    simplexVal3D1 *= 1 - generator.m3DOctaves[0].mHeightWeight * heightRatio;
 
-                    const glm::ivec3 gPos = VoxelChunk::sSize * glm::ivec3( _chunk.mPosition.x, _chunk.mPosition.y, _chunk.mPosition.z ) + glm::ivec3( x, y, z );
-                    if( gPos.x == 0 || gPos.y == 0 || gPos.z == 0 || gPos.x == maxPosition.x || gPos.y == maxPosition.y || gPos.z == maxPosition.z )
+                    simplexVal3D0 += generator.m3DOctaves[0].mHeightOffset;
+                    simplexVal3D1 += generator.m3DOctaves[1].mHeightOffset;
+                    simplexVal2D  += generator.m2DOctave.mHeightOffset;
+
+                    Fixed simplexVal = generator.m2DOctave.mWeight * ( 1 + FIXED(0.5) * simplexVal2D - globalPosition.y / maxSize.y + generator.m2DOctave.mHeightOffset)
+                                       + generator.m3DOctaves[0].mWeight * simplexVal3D0
+                                       + generator.m3DOctaves[1].mWeight * simplexVal3D1;
+
+                    _chunk.mVoxels[x][y][z] = simplexVal > generator.mThreshold;
+
+                    if( !generator.mClearSides )
                     {
-                        _chunk.mVoxels[x][y][z] = false;
+                        const glm::ivec3 gPos = VoxelChunk::sSize * glm::ivec3( _chunk.mPosition.x, _chunk.mPosition.y, _chunk.mPosition.z ) + glm::ivec3( x, y, z );
+                        if( gPos.x == 0 || gPos.y == 0 || gPos.z == 0 || gPos.x == maxPosition.x || gPos.y == maxPosition.y || gPos.z == maxPosition.z )
+                        {
+                            _chunk.mVoxels[x][y][z] = false;
+                        }
                     }
                 }
             }

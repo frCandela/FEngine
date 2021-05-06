@@ -84,7 +84,7 @@ namespace fan
 		const std::string extension = Path::Extension(_path);
 		if ( extension != "gltf" )
 		{
-			Debug::Warning() << "Loading failed, file is not a gltf: " << _path << Debug::Endl();
+		    Debug::Warning() << "Loading failed, file is not a gltf: " << _path << Debug::Endl();
 			return false;
 		}
 

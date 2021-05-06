@@ -1,7 +1,6 @@
 #include "fanMeshManager.hpp"
 
-#include "core/fanDebug.hpp"
-#include "core/fanAssert.hpp"
+#include "core/fanPath.hpp"
 #include "render/resources/fanMesh.hpp"
 #include "render/fanRenderResourcePtr.hpp"
 #include "render/core/fanDevice.hpp"
@@ -126,7 +125,8 @@ namespace fan
         fanAssert( !_resourcePtr.IsValid() );
 
         MeshPtr& meshPtr = static_cast< MeshPtr& >( _resourcePtr );
-        if( !meshPtr.GetPath().empty() )
+        const std::string& path = meshPtr.GetPath();
+        if( !path.empty() && !Path::Extension( path ).empty() )
         {
             Mesh* mesh = GetOrLoad( meshPtr.GetPath() );
             if( mesh != nullptr )
