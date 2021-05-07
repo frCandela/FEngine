@@ -36,34 +36,34 @@ namespace fan
                     const Vector3 chunkOffset    = VoxelChunk::sSize * Vector3( _chunk.mPosition.x, _chunk.mPosition.y, _chunk.mPosition.z );
                     const Vector3 globalPosition = chunkOffset + Vector3( x, y, z );
 
-                    Fixed         simplexVal3D0  = 1 + FIXED( 0.5 ) * generator.mSimplexNoise.Noise( generator.m3DOctaves[0].mFrequency * globalPosition );
-                    Fixed         simplexVal3D1  = 1 + FIXED( 0.5 ) * generator.mSimplexNoise.Noise( generator.m3DOctaves[1].mFrequency * globalPosition );
-                    Fixed         simplexVal2D   = 1 + FIXED( 0.5 ) * generator.mSimplexNoise.Noise( globalPosition.x * generator.m2DOctave.mFrequency, globalPosition.z * generator.m2DOctave.mFrequency  );
+                    Fixed simplexVal3D0 = 1 + FIXED( 0.5 ) * generator.mSimplexNoise.Noise( generator.m3DOctaves[0].mFrequency * globalPosition );
+                    Fixed simplexVal3D1 = 1 + FIXED( 0.5 ) * generator.mSimplexNoise.Noise( generator.m3DOctaves[1].mFrequency * globalPosition );
+                    Fixed simplexVal2D  = 1 + FIXED( 0.5 ) * generator.mSimplexNoise.Noise( globalPosition.x * generator.m2DOctave.mFrequency, globalPosition.z * generator.m2DOctave.mFrequency );
 
                     simplexVal3D0 *= generator.m3DOctaves[0].mAmplitude;
                     simplexVal3D1 *= generator.m3DOctaves[1].mAmplitude;
                     simplexVal2D *= generator.m2DOctave.mAmplitude;
 
-                    Fixed         heightRatio    = globalPosition.y / maxPosition.y;
+                    Fixed heightRatio = globalPosition.y / maxPosition.y;
                     simplexVal3D0 *= 1 - generator.m3DOctaves[0].mHeightWeight * heightRatio;
                     simplexVal3D1 *= 1 - generator.m3DOctaves[0].mHeightWeight * heightRatio;
 
                     simplexVal3D0 += generator.m3DOctaves[0].mHeightOffset;
                     simplexVal3D1 += generator.m3DOctaves[1].mHeightOffset;
-                    simplexVal2D  += generator.m2DOctave.mHeightOffset;
+                    simplexVal2D += generator.m2DOctave.mHeightOffset;
 
-                    Fixed simplexVal = generator.m2DOctave.mWeight * ( 1 + FIXED(0.5) * simplexVal2D - globalPosition.y / maxSize.y + generator.m2DOctave.mHeightOffset)
+                    Fixed simplexVal = generator.m2DOctave.mWeight * ( 1 + FIXED( 0.5 ) * simplexVal2D - globalPosition.y / maxSize.y + generator.m2DOctave.mHeightOffset )
                                        + generator.m3DOctaves[0].mWeight * simplexVal3D0
                                        + generator.m3DOctaves[1].mWeight * simplexVal3D1;
 
-                    _chunk(x,y,z) = simplexVal > generator.mThreshold;
+                    _chunk( x, y, z ) = simplexVal > generator.mThreshold;
 
                     if( !generator.mClearSides )
                     {
                         const glm::ivec3 gPos = VoxelChunk::sSize * glm::ivec3( _chunk.mPosition.x, _chunk.mPosition.y, _chunk.mPosition.z ) + glm::ivec3( x, y, z );
                         if( gPos.x == 0 || gPos.y == 0 || gPos.z == 0 || gPos.x == maxPosition.x || gPos.y == maxPosition.y || gPos.z == maxPosition.z )
                         {
-                            _chunk(x,y,z) = false;
+                            _chunk( x, y, z ) = false;
                         }
                     }
                 }
@@ -73,15 +73,15 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void VoxelGenerator::GenerateVertices( const int _caseID, const Vector3 offset, std::vector<Vertex>& _vertices )
+    void VoxelGenerator::GenerateVertices( const int _caseID, const Vector3 _offset, std::vector<Vertex>& _vertices )
     {
         const int numPolys = sCaseToNumPolys[_caseID];
         for( int  i        = 0; i < numPolys; ++i )
         {
             const int8_t* triangleIndices = sEdgeConnectList[_caseID][i];
-            Vector3   v0       = offset + sEdges[triangleIndices[0]];
-            Vector3   v1       = offset + sEdges[triangleIndices[1]];
-            Vector3   v2       = offset + sEdges[triangleIndices[2]];
+            Vector3   v0       = _offset + sEdges[triangleIndices[0]];
+            Vector3   v1       = _offset + sEdges[triangleIndices[1]];
+            Vector3   v2       = _offset + sEdges[triangleIndices[2]];
             Vector3   fxNormal = Vector3::Cross( ( v1 - v2 ), ( v0 - v2 ) ).FastNormalized();
             glm::vec3 normal   = Math::ToGLM( fxNormal );
 
@@ -101,14 +101,14 @@ namespace fan
             {
                 for( int z = 0; z < VoxelChunk::sSize - 1; ++z )
                 {
-                    const int caseID = _chunk(x + 1,y + 0,z + 0) << 0 |
-                                       _chunk(x + 1,y + 1,z + 0) << 1 |
-                                       _chunk(x + 0,y + 1,z + 0) << 2 |
-                                       _chunk(x + 0,y + 0,z + 0) << 3 |
-                                       _chunk(x + 1,y + 0,z + 1) << 4 |
-                                       _chunk(x + 1,y + 1,z + 1) << 5 |
-                                       _chunk(x + 0,y + 1,z + 1) << 6 |
-                                       _chunk(x + 0,y + 0,z + 1) << 7;
+                    const int caseID = _chunk( x + 1, y + 0, z + 0 ) << 0 |
+                                       _chunk( x + 1, y + 1, z + 0 ) << 1 |
+                                       _chunk( x + 0, y + 1, z + 0 ) << 2 |
+                                       _chunk( x + 0, y + 0, z + 0 ) << 3 |
+                                       _chunk( x + 1, y + 0, z + 1 ) << 4 |
+                                       _chunk( x + 1, y + 1, z + 1 ) << 5 |
+                                       _chunk( x + 0, y + 1, z + 1 ) << 6 |
+                                       _chunk( x + 0, y + 0, z + 1 ) << 7;
                     VoxelGenerator::GenerateVertices( caseID, Vector3( x, y, z ), _mesh.mVertices );
                 }
             }
@@ -124,14 +124,14 @@ namespace fan
             for( int z = 0; z < VoxelChunk::sSize - 1; ++z )
             {
                 const int x      = VoxelChunk::sSize - 1;
-                const int caseID = _leftChunk       (0,y + 0,z + 0) << 0 |
-                                   _leftChunk       (0,y + 1,z + 0) << 1 |
-                                   _chunk           (x,y + 1,z + 0) << 2 |
-                                   _chunk           (x,y + 0,z + 0) << 3 |
-                                   _leftChunk       (0,y + 0,z + 1) << 4 |
-                                   _leftChunk       (0,y + 1,z + 1) << 5 |
-                                   _chunk           (x,y + 1,z + 1) << 6 |
-                                   _chunk           (x,y + 0,z + 1) << 7;
+                const int caseID = _leftChunk( 0, y + 0, z + 0 ) << 0 |
+                                   _leftChunk( 0, y + 1, z + 0 ) << 1 |
+                                   _chunk( x, y + 1, z + 0 ) << 2 |
+                                   _chunk( x, y + 0, z + 0 ) << 3 |
+                                   _leftChunk( 0, y + 0, z + 1 ) << 4 |
+                                   _leftChunk( 0, y + 1, z + 1 ) << 5 |
+                                   _chunk( x, y + 1, z + 1 ) << 6 |
+                                   _chunk( x, y + 0, z + 1 ) << 7;
                 VoxelGenerator::GenerateVertices( caseID, Vector3( x, y, z ), _mesh.mVertices );
             }
         }
@@ -146,14 +146,14 @@ namespace fan
             for( int z = 0; z < VoxelChunk::sSize - 1; ++z )
             {
                 const int y      = VoxelChunk::sSize - 1;
-                const int caseID = _chunk           (x + 1,y,z + 0) << 0 |
-                                   _topChunk        (x + 1,0,z + 0) << 1 |
-                                   _topChunk        (x + 0,0,z + 0) << 2 |
-                                   _chunk           (x + 0,y,z + 0) << 3 |
-                                   _chunk           (x + 1,y,z + 1) << 4 |
-                                   _topChunk        (x + 1,0,z + 1) << 5 |
-                                   _topChunk        (x + 0,0,z + 1) << 6 |
-                                   _chunk           (x + 0,y,z + 1) << 7;
+                const int caseID = _chunk( x + 1, y, z + 0 ) << 0 |
+                                   _topChunk( x + 1, 0, z + 0 ) << 1 |
+                                   _topChunk( x + 0, 0, z + 0 ) << 2 |
+                                   _chunk( x + 0, y, z + 0 ) << 3 |
+                                   _chunk( x + 1, y, z + 1 ) << 4 |
+                                   _topChunk( x + 1, 0, z + 1 ) << 5 |
+                                   _topChunk( x + 0, 0, z + 1 ) << 6 |
+                                   _chunk( x + 0, y, z + 1 ) << 7;
                 VoxelGenerator::GenerateVertices( caseID, Vector3( x, y, z ), _mesh.mVertices );
             }
         }
@@ -168,14 +168,14 @@ namespace fan
             for( int y = 0; y < VoxelChunk::sSize - 1; ++y )
             {
                 const int z      = VoxelChunk::sSize - 1;
-                const int caseID = _chunk       (x + 1,y + 0,z) << 0 |
-                                   _chunk       (x + 1,y + 1,z) << 1 |
-                                   _chunk       (x + 0,y + 1,z) << 2 |
-                                   _chunk       (x + 0,y + 0,z) << 3 |
-                                   _forwardChunk(x + 1,y + 0,0) << 4 |
-                                   _forwardChunk(x + 1,y + 1,0) << 5 |
-                                   _forwardChunk(x + 0,y + 1,0) << 6 |
-                                   _forwardChunk(x + 0,y + 0,0) << 7;
+                const int caseID = _chunk( x + 1, y + 0, z ) << 0 |
+                                   _chunk( x + 1, y + 1, z ) << 1 |
+                                   _chunk( x + 0, y + 1, z ) << 2 |
+                                   _chunk( x + 0, y + 0, z ) << 3 |
+                                   _forwardChunk( x + 1, y + 0, 0 ) << 4 |
+                                   _forwardChunk( x + 1, y + 1, 0 ) << 5 |
+                                   _forwardChunk( x + 0, y + 1, 0 ) << 6 |
+                                   _forwardChunk( x + 0, y + 0, 0 ) << 7;
                 VoxelGenerator::GenerateVertices( caseID, Vector3( x, y, z ), _mesh.mVertices );
             }
         }
@@ -208,14 +208,14 @@ namespace fan
         for( int y = 0; y < VoxelChunk::sSize - 1; ++y )
         {
             const int xz     = VoxelChunk::sSize - 1;
-            const int caseID = _leftChunk       (0 ,y + 0,xz) << 0 |
-                               _leftChunk       (0 ,y + 1,xz) << 1 |
-                               _chunk           (xz,y + 1,xz) << 2 |
-                               _chunk           (xz,y + 0,xz) << 3 |
-                               _leftForwardChunk(0 ,y + 0,0 ) << 4 |
-                               _leftForwardChunk(0 ,y + 1,0 ) << 5 |
-                               _forwardChunk    (xz,y + 1,0 ) << 6 |
-                               _forwardChunk    (xz,y + 0,0 ) << 7;
+            const int caseID = _leftChunk( 0, y + 0, xz ) << 0 |
+                               _leftChunk( 0, y + 1, xz ) << 1 |
+                               _chunk( xz, y + 1, xz ) << 2 |
+                               _chunk( xz, y + 0, xz ) << 3 |
+                               _leftForwardChunk( 0, y + 0, 0 ) << 4 |
+                               _leftForwardChunk( 0, y + 1, 0 ) << 5 |
+                               _forwardChunk( xz, y + 1, 0 ) << 6 |
+                               _forwardChunk( xz, y + 0, 0 ) << 7;
             VoxelGenerator::GenerateVertices( caseID, Vector3( xz, y, xz ), _mesh.mVertices );
         }
     }
@@ -227,14 +227,14 @@ namespace fan
         for( int x = 0; x < VoxelChunk::sSize - 1; ++x )
         {
             const int yz     = VoxelChunk::sSize - 1;
-            const int caseID = _chunk           (x + 1,yz,yz) << 0 |
-                               _topChunk        (x + 1,0 ,yz) << 1 |
-                               _topChunk        (x + 0,0 ,yz) << 2 |
-                               _chunk           (x + 0,yz,yz) << 3 |
-                               _forwardChunk    (x + 1,yz,0 ) << 4 |
-                               _topForwardChunk (x + 1,0 ,0 ) << 5 |
-                               _topForwardChunk (x + 0,0 ,0 ) << 6 |
-                               _forwardChunk    (x + 0,yz,0 ) << 7;
+            const int caseID = _chunk( x + 1, yz, yz ) << 0 |
+                               _topChunk( x + 1, 0, yz ) << 1 |
+                               _topChunk( x + 0, 0, yz ) << 2 |
+                               _chunk( x + 0, yz, yz ) << 3 |
+                               _forwardChunk( x + 1, yz, 0 ) << 4 |
+                               _topForwardChunk( x + 1, 0, 0 ) << 5 |
+                               _topForwardChunk( x + 0, 0, 0 ) << 6 |
+                               _forwardChunk( x + 0, yz, 0 ) << 7;
             VoxelGenerator::GenerateVertices( caseID, Vector3( x, yz, yz ), _mesh.mVertices );
         }
     }
@@ -273,14 +273,14 @@ namespace fan
         {
             const int xyz    = VoxelChunk::sSize - 1;
             const int caseID =
-                              ( *leftChunk )            (0  ,xyz,xyz) << 0 |
-                              ( *leftTopChunk )         (0  ,0  ,xyz) << 1 |
-                              ( *topChunk )             (xyz,0  ,xyz) << 2 |
-                              ( _chunk )                (xyz,xyz,xyz) << 3 |
-                              ( *leftForwardChunk )     (0  ,xyz,0  ) << 4 |
-                              ( *topLeftForwardChunk )  (0  ,0  ,0  ) << 5 |
-                              ( *topForwardChunk )      (xyz,0  ,0  ) << 6 |
-                              ( *forwardChunk )         (xyz,xyz,0  ) << 7;
+                              ( *leftChunk )( 0, xyz, xyz ) << 0 |
+                              ( *leftTopChunk )( 0, 0, xyz ) << 1 |
+                              ( *topChunk )( xyz, 0, xyz ) << 2 |
+                              ( _chunk )( xyz, xyz, xyz ) << 3 |
+                              ( *leftForwardChunk )( 0, xyz, 0 ) << 4 |
+                              ( *topLeftForwardChunk )( 0, 0, 0 ) << 5 |
+                              ( *topForwardChunk )( xyz, 0, 0 ) << 6 |
+                              ( *forwardChunk )( xyz, xyz, 0 ) << 7;
             VoxelGenerator::GenerateVertices( caseID, Vector3( xyz, xyz, xyz ), _mesh.mVertices );
         }
 

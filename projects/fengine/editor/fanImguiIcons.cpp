@@ -33,6 +33,8 @@ namespace ImGui
 		,DECL_ICON( 16.f, 7, 4 )  // PROFILER16,
 		,DECL_ICON( 16.f, 8, 4 )  // PREFERENCES16,
 		,DECL_ICON( 16.f, 9, 4 )  // SINGLETON16,
+		,DECL_ICON( 16.f, 10, 4 )  // Terrain16
+		,DECL_ICON( 16.f, 11, 4 )  // UnitTests16,
 
 		// special
 		,DECL_ICON( 16.f, 0, 6 )  // GAMEOBJECT16,

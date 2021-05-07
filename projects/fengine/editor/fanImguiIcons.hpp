@@ -21,6 +21,8 @@ namespace ImGui
         Profiler16,
         Preferences16,
         Singleton16,
+        Terrain16,
+        UnitTests16,
 
 		// special
 		Gameobject16,

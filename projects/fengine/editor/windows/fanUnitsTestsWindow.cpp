@@ -25,7 +25,7 @@ namespace fan
 {
     //========================================================================================================
     //========================================================================================================
-    UnitTestsWindow::UnitTestsWindow() : EditorWindow( "unit tests", ImGui::IconType::None16 ) {}
+    UnitTestsWindow::UnitTestsWindow() : EditorWindow( "unit tests", ImGui::IconType::UnitTests16 ) {}
 
     //========================================================================================================
     //========================================================================================================
@@ -64,6 +64,8 @@ namespace fan
 
         const std::vector<TestArgument> tests = GetTests();
 
+        ImGui::Icon( mIconType, {16,16} );
+        ImGui::SameLine();
         if( ImGui::Button( "Test all" ) )
         {
             bool oldValueAssertBreakEnabled = AssertUtils::sFanAssertBreakEnabled;

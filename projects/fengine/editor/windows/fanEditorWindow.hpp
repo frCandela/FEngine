@@ -29,7 +29,6 @@ namespace fan
 	protected:
 		virtual void OnGui( EcsWorld& _world ) = 0;
 
-	private:
 		bool mIsVisible;
 
 		ImGuiWindowFlags mFlags = ImGuiWindowFlags_None;

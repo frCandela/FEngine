@@ -30,8 +30,8 @@ namespace fan
 
         glm::ivec3 mSize;
         VoxelChunk* mChunks; // 3D array
-        bool mIsInitialized = false;
+        bool           mIsInitialized = false;
         VoxelGenerator mGenerator;
-        EcsHandle mTerrainHandle;
+        EcsHandle      mTerrainHandle;
     };
 }

@@ -21,6 +21,8 @@
 #include "editor/windows/fanRenderWindow.hpp"
 #include "editor/windows/fanSceneWindow.hpp"
 #include "editor/windows/fanEcsWindow.hpp"
+#include "editor/windows/fanTerrainWindow.hpp"
+
 #include "editor/fanMainMenuBar.hpp"
 #include "editor/fanEditorProjectContainer.hpp"
 #include "editor/singletons/fanEditorSelection.hpp"
@@ -76,7 +78,8 @@ namespace fan
                                           new ProfilerWindow(),
                                           new PreferencesWindow( mRenderer, mFullScreen ),
                                           new SingletonsWindow(),
-                                          new UnitTestsWindow()
+                                          new UnitTestsWindow(),
+                                          new TerrainWindow()
         } );
 
         // Instance messages
