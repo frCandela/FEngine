@@ -51,7 +51,7 @@ add_compile_definitions(GLM_FORCE_DEPTH_ZERO_TO_ONE)
 add_compile_definitions(GLM_ENABLE_EXPERIMENTAL)
 
 include_directories(
-        ${CMAKE_CURRENT_SOURCE_DIR}/fengine
+        ${CMAKE_CURRENT_SOURCE_DIR}/fanEngine
         ${CMAKE_SOURCE_DIR}/submodules/SFML/extlibs/headers/freetype2
         ${CMAKE_SOURCE_DIR}/submodules/SFML/include
         ${CMAKE_SOURCE_DIR}/submodules/glfw/include
@@ -63,6 +63,6 @@ include_directories(
         ${VULKAN_DIR}/Include
 )
 
-add_subdirectory(fengine)
+add_subdirectory(fanEngine)
 add_subdirectory(project_empty)
 add_subdirectory(project_voxels)
