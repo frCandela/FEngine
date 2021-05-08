@@ -39,8 +39,9 @@ namespace fan
     //========================================================================================================
     //========================================================================================================
     EditorProjectContainer::EditorProjectContainer( LaunchSettings& _settings, const std::vector<IProject*>& _projects ) :
-            IProjectContainer( AdaptSettings( _settings) ),
-            mProjects( _projects )
+            IProjectContainer( AdaptSettings( _settings ) ),
+            mProjects( _projects ),
+            mLastLogicFrameRendered( 0 )
     {
         // Creates keyboard events
         Input::Get().Manager().CreateKeyboardEvent( "delete", Keyboard::DELETE );
@@ -80,7 +81,7 @@ namespace fan
                                           new SingletonsWindow(),
                                           new UnitTestsWindow(),
                                           new TerrainWindow()
-        } );
+                                  } );
 
         // Instance messages
         mMainMenuBar->mOnReloadShaders.Connect( &Renderer::ReloadShaders, &mRenderer );
@@ -93,7 +94,7 @@ namespace fan
         manager.FindEvent( "play_pause" )->Connect( &EditorProjectContainer::OnSwitchPlayStop, this );
         manager.FindEvent( "copy" )->Connect( &EditorProjectContainer::OnCopy, this );
         manager.FindEvent( "paste" )->Connect( &EditorProjectContainer::OnPaste, this );
-        manager.FindEvent( "show_ui" )->Connect( &EditorProjectContainer::OnToogleShowUI, this );
+        manager.FindEvent( "show_ui" )->Connect( &EditorProjectContainer::OnToggleShowUI, this );
         manager.FindEvent( "toogle_camera" )->Connect( &EditorProjectContainer::OnToogleCamera, this );
         manager.FindEvent( "open_scene" )->Connect( &EditorProjectContainer::OnOpen, this );
         manager.FindEvent( "save_scene" )->Connect( &EditorProjectContainer::OnSave, this );
@@ -167,7 +168,7 @@ namespace fan
     //========================================================================================================
     LaunchSettings& EditorProjectContainer::AdaptSettings( LaunchSettings& _settings )
     {
-        if( ! _settings.mForceWindowDimensions )
+        if( !_settings.mForceWindowDimensions )
         {
             SerializedValues::LoadWindowPosition( _settings.mWindow_position );
             SerializedValues::LoadWindowSize( _settings.mWindow_size );
@@ -183,7 +184,7 @@ namespace fan
     {
         // Deletes ui
         delete mMainMenuBar;
-        if( ! mLaunchSettings.mForceWindowDimensions )
+        if( !mLaunchSettings.mForceWindowDimensions )
         {
             SerializedValues::SaveWindowPosition( mWindow.GetPosition() );
             SerializedValues::SaveWindowSize( mWindow.GetSize() );
@@ -195,22 +196,11 @@ namespace fan
     //========================================================================================================
     void EditorProjectContainer::Run()
     {
-        // initializes timers
-        mLastRenderTime = Time::ElapsedSinceStartup();
-        for( IProject* project : mProjects )
-        {
-            Time& time = project->mWorld.GetSingleton<Time>();
-            time.mLastLogicTime = Time::ElapsedSinceStartup();
-        }
         Profiler::Get().Begin();
-
-        // main loop
-        while( mApplicationShouldExit == false && mWindow.IsOpen() == true )
+        while( mApplicationShouldExit == false && mWindow.IsOpen() == true )        // main loop
         {
             Step();
         }
-
-        // Exit sequence
         Debug::Log( "Exit application" );
     }
 
@@ -218,152 +208,102 @@ namespace fan
     //========================================================================================================
     void EditorProjectContainer::Step()
     {
-        const double currentTime       = Time::ElapsedSinceStartup();
-        const bool   renderIsThisFrame = currentTime > mLastRenderTime + Time::sRenderDelta;
-        const Time& currentWorldTime = GetCurrentProject().mWorld.GetSingleton<Time>();
-        const bool logicIsThisFrame = currentTime >
-                                      currentWorldTime.mLastLogicTime + currentWorldTime.mLogicDelta;
+        const double elapsedTime = Time::ElapsedSinceStartup();
+        IProject& currentProject = GetCurrentProject();
+        EcsWorld& currentWorld   = currentProject.mWorld;
+        Time    & currentTime    = currentWorld.GetSingleton<Time>();
 
-        // Update all worlds
         for( int i = 0; i < (int)mProjects.size(); i++ )
         {
             IProject& project = *mProjects[i];
             EcsWorld& world   = project.mWorld;
-            const bool isCurrentWorld = ( &project == &GetCurrentProject() );
 
             // runs logic, renders ui
             Time& time = world.GetSingleton<Time>();
-            while( currentTime > time.mLastLogicTime + time.mLogicDelta )
+            while( elapsedTime > time.mLastLogicTime + time.mLogicDelta.ToDouble() )
             {
+                time.mLastLogicTime += time.mLogicDelta.ToDouble();
+                time.mFrameIndex++;
+
                 world.GetSingleton<RenderDebug>().Clear();
 
-                if( isCurrentWorld )
-                {
-                    // Update input
-                    ImGui::GetIO().DeltaTime = time.mLogicDelta;
-                    const glm::vec2 viewPosition = mProjectViewWindow->GetPosition();
-                    const glm::vec2 viewSize     = mProjectViewWindow->GetSize();
-                    //todo mGameViewWindow->IsHovered()
-                    Mouse::NextFrame( mWindow.mWindow, viewPosition, viewSize );
-                    Input::Get().NewFrame();
-                    Input::Get().Manager().PullEvents();
-                    world.GetSingleton<Mouse>().UpdateData( mWindow.mWindow );
-                }
-
-                // checking the loop timing is not late
-                const double loopDelayMilliseconds = 1000. *
-                                                     ( currentTime -
-                                                       ( time.mLastLogicTime + time.mLogicDelta ) );
-                if( loopDelayMilliseconds > 30 )
-                {
-                    //Debug::Warning() << "logic is late of " << loopDelayMilliseconds
-                    //                 << "ms" << Debug::Endl();
-                    // if we are really really late, resets the timer
-                    if( loopDelayMilliseconds > 100 )
-                    {
-                        time.mLastLogicTime = currentTime - time.mLogicDelta;
-                        //Debug::Warning() << "reset logic timer " << Debug::Endl();
-                    }
-                }
-
-                // increase the logic time of a timeScaleDelta with n timeScaleIncrements
-                if( std::abs( time.mTimeScaleDelta ) >= time.mTimeScaleIncrement )
-                {
-                    const float increment = time.mTimeScaleDelta > 0.f
-                            ? time.mTimeScaleIncrement
-                            : -time.mTimeScaleIncrement;
-                    time.mLastLogicTime -= increment;
-                    time.mTimeScaleDelta -= increment;
-                }
-
-                time.mLastLogicTime += time.mLogicDelta;
-
                 const EditorPlayState& playState = world.GetSingleton<EditorPlayState>();
-                const float delta = playState.mState == EditorPlayState::PLAYING ? time.mLogicDelta : 0.f;
+                const Fixed delta = playState.mState == EditorPlayState::PLAYING ? time.mLogicDelta : 0;
                 project.Step( delta );
 
                 // bounds
-                world.Run<SUpdateBoundsFromRigidbody>( delta );
+                world.Run<SMoveFollowTransforms>();
+                world.Run<SUpdateBoundsFromRigidbody>( delta.ToFloat() );
                 world.Run<SUpdateBoundsFromModel>();
                 world.Run<SUpdateBoundsFromTransform>();
                 world.Run<SUpdateBoundsFromFxSphereColliders>();
                 world.Run<SUpdateBoundsFromFxBoxColliders>();
 
-                if( isCurrentWorld )
-                {
-                    fanAssert( logicIsThisFrame );
-                    EditorCamera& editorCamera = world.GetSingleton<EditorCamera>();
-                    Scene       & scene        = world.GetSingleton<Scene>();
-                    // only update the editor camera when we are using it
-                    if( scene.mMainCameraHandle == editorCamera.mCameraHandle )
-                    {
-                        EditorCamera::Update( world, time.mLogicDelta );
-                    }
-                    world.GetSingleton<EditorSelection>().Update( mProjectViewWindow->IsHovered() );
-
-                    if( renderIsThisFrame )
-                    {
-                        SCOPED_PROFILE( debug_draw );
-                        // Debug Draw
-                        if( mMainMenuBar->ShowWireframe() ){ world.Run<SDrawDebugWireframe>(); }
-                        if( mMainMenuBar->ShowNormals() ){ world.Run<SDrawDebugNormals>(); }
-                        if( mMainMenuBar->ShowAABB() ){ world.Run<SDrawDebugBounds>(); }
-                        if( mMainMenuBar->ShowHull() ){ world.Run<SDrawDebugHull>(); }
-                        if( mMainMenuBar->ShowUiBounds() ){ world.Run<SDrawDebugUiBounds>(); }
-                        if( mMainMenuBar->ShowLights() )
-                        {
-                            world.Run<SDrawDebugPointLights>();
-                            world.Run<SDrawDebugDirectionalLights>();
-                        }
-                        EditorGrid::Draw( GetCurrentProject().mWorld );
-
-                        // ImGui render
-                        {
-                            SCOPED_PROFILE( ImGui_render );
-                            ImGui::NewFrame();
-                            mMainMenuBar->Draw( project.mWorld );
-                            GetCurrentProject().OnGui();
-                            ImGui::Render();
-                        }
-                    }
-                }
-                {
-                    SCOPED_PROFILE( apply_transitions );
-                    world.ApplyTransitions();
-                }
+                world.ApplyTransitions();
             }
         }
 
         mOnLPPSynch.Emmit();
 
         // Render world
-        if( renderIsThisFrame && logicIsThisFrame )
+        const double deltaTime = elapsedTime - currentTime.mLastRenderTime;
+        if( deltaTime > currentTime.mRenderDelta.ToDouble() )
         {
-            mLastRenderTime = currentTime;
+            ImGui::GetIO().DeltaTime    = float( deltaTime );
+            currentTime.mLastRenderTime = elapsedTime;
 
-            Time::RegisterFrameDrawn();    // used for stats
+            // don't draw if logic has not executed/cleared the debug buffers
+            if( mLastLogicFrameRendered != currentTime.mFrameIndex )
+            {
+                mLastLogicFrameRendered = currentTime.mFrameIndex;
 
+                SCOPED_PROFILE( debug_draw );
+                if( mMainMenuBar->ShowWireframe() ){ currentWorld.Run<SDrawDebugWireframe>(); }
+                if( mMainMenuBar->ShowNormals() ){ currentWorld.Run<SDrawDebugNormals>(); }
+                if( mMainMenuBar->ShowAABB() ){ currentWorld.Run<SDrawDebugBounds>(); }
+                if( mMainMenuBar->ShowHull() ){ currentWorld.Run<SDrawDebugHull>(); }
+                if( mMainMenuBar->ShowUiBounds() ){ currentWorld.Run<SDrawDebugUiBounds>(); }
+                if( mMainMenuBar->ShowLights() )
+                {
+                    currentWorld.Run<SDrawDebugPointLights>();
+                    currentWorld.Run<SDrawDebugDirectionalLights>();
+                }
+                EditorGrid::Draw( currentWorld );
 
-            UpdateRenderWorld( mRenderer, GetCurrentProject(), mProjectViewWindow->GetSize() );
+                EditorCamera& editorCamera = currentWorld.GetSingleton<EditorCamera>();
+                Scene       & scene        = currentWorld.GetSingleton<Scene>();
+                // only update the editor camera when we are using it
+                if( scene.mMainCameraHandle == editorCamera.mCameraHandle )
+                {
+                    EditorCamera::Update( currentWorld, float(deltaTime) );
+                }
+                currentWorld.GetSingleton<EditorSelection>().Update( mProjectViewWindow->IsHovered() );
+
+                currentProject.Render();
+
+                // Update input
+                const glm::vec2 viewPosition = mProjectViewWindow->GetPosition();
+                const glm::vec2 viewSize     = mProjectViewWindow->GetSize();
+                Mouse::NextFrame( mWindow.mWindow, viewPosition, viewSize );
+                Input::Get().NewFrame();
+                Input::Get().Manager().PullEvents();
+                currentWorld.GetSingleton<Mouse>().UpdateData( mWindow.mWindow );
+            }
+
+            // ImGui render
+            ImGui::NewFrame();
+            mMainMenuBar->Draw( currentWorld );
+            currentProject.OnGui();
+            ImGui::Render();
+
+            Time::RegisterFrameDrawn( currentTime, deltaTime );
+
+            UpdateRenderWorld( mRenderer, currentProject, mProjectViewWindow->GetSize() );
 
             mRenderer.DrawFrame();
+
             Profiler::Get().End();
             Profiler::Get().Begin();
-        }
-
-        // sleep for the rest of the frame
-        if( mLaunchSettings.mMainLoopSleep )
-        {
-            // @todo repair this to work with multiple worlds running
-// 			const double minSleepTime = 1;
-// 			const double endFrameTime = Time::ElapsedSinceStartup();
-// 			const double timeBeforeNextLogic = lastLogicTime + time.logicDelta - endFrameTime;
-// 			const double timeBeforeNextRender = lastRenderTime + Time::s_renderDelta - endFrameTime;
-// 			const double sleepTimeMiliseconds = 1000. * std::min( timeBeforeNextLogic, timeBeforeNextRender );
-// 			if( sleepTimeMiliseconds > minSleepTime )
-// 			{
-// 				std::this_thread::sleep_for( std::chrono::milliseconds( int( sleepTimeMiliseconds / 2 ) ) );
-// 			}
         }
     }
 

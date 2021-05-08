@@ -50,7 +50,7 @@ namespace fan
 
 	//========================================================================================================
 	//========================================================================================================
-	PhysicsWorld::PhysicsWorld()
+	PhysicsWorld::PhysicsWorld( const float _physicsDelta )
 	{
         mCollisionConfiguration = new btDefaultCollisionConfiguration();
         mDispatcher             = new btCollisionDispatcher( mCollisionConfiguration );
@@ -72,7 +72,7 @@ namespace fan
 
 		// Bullet physics is broken when its internal clock is zero,
 		// this prevents it from happening when the timestep is exactly equal to the fixed timestep
-		mDynamicsWorld->stepSimulation( 0.015f, 1, Time::sPhysicsDelta );
+		mDynamicsWorld->stepSimulation( 0.015f, 1, _physicsDelta );
 	}
 
 	//========================================================================================================

@@ -23,7 +23,7 @@ namespace fan
 		static void Save( const EcsSingleton& _component, Json& _json );
 		static void Load( EcsSingleton& _component, const Json& _json );
 
-		PhysicsWorld();
+		PhysicsWorld(const float _physicsDelta = 0 );
 		~PhysicsWorld();
 
 		btDefaultCollisionConfiguration*	 mCollisionConfiguration;

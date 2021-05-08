@@ -69,12 +69,12 @@ namespace fan
 
     //========================================================================================================
     //========================================================================================================
-    void Mouse::NextFrame( GLFWwindow* _window, const glm::vec2 _position, const glm::vec2 _size  )
+    void Mouse::NextFrame( GLFWwindow* _window, const glm::vec2 _viewPosition, const glm::vec2 _viewSize  )
     {
         Window::InputData& inputData = Window::GetInputData( _window );
         Mouse            & mouse     = inputData.mMouse;
-        mouse.mScreenPosition = _position;
-        mouse.mScreenSize = _size;
+        mouse.mScreenPosition = _viewPosition;
+        mouse.mScreenSize = _viewSize;
         mouse.mScrollDelta = glm::vec2( 0.f, 0.f );
         mouse.mPositionDelta = glm::vec2( 0.f, 0.f );
         for( int i=0 ; i < Mouse::count; i++ )

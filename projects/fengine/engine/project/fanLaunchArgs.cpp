@@ -7,25 +7,10 @@ namespace fan
     //========================================================================================================
     LaunchArgs::LaunchArgs()
     {
-        RegisterCommand( { &LaunchArgs::CMD_EnableLivePP,
-                           "-livepp",
-                           "usage: -livepp <0-1>" } );
-
-        RegisterCommand( { &LaunchArgs::CMD_OpenScene,
-                           "-scene",
-                           "usage: -scene \"scene/path.scene\"" } );
-
-        RegisterCommand( { &LaunchArgs::CMD_SetWindow,
-                           "-window",
-                           "usage: -window <x> <y> <width> <height>" } );
-
-        RegisterCommand( { &LaunchArgs::CMD_AutoPlay,
-                           "-autoplay",
-                           "usage: -autoplay <0-1>" } );
-
-        RegisterCommand( { &LaunchArgs::CMD_MainLoopSleep,
-                           "-main_loop_sleep",
-                           "usage: -main_loop_sleep <0-1>" } );
+        RegisterCommand( { &LaunchArgs::CMD_EnableLivePP, "-livepp", "usage: -livepp <0-1>" } );
+        RegisterCommand( { &LaunchArgs::CMD_OpenScene, "-scene", "usage: -scene \"scene/path.scene\"" } );
+        RegisterCommand( { &LaunchArgs::CMD_SetWindow, "-window", "usage: -window <x> <y> <width> <height>" } );
+        RegisterCommand( { &LaunchArgs::CMD_AutoPlay, "-autoplay", "usage: -autoplay <0-1>" } );
     }
 
     //========================================================================================================
@@ -125,7 +110,7 @@ namespace fan
     {
         if( _args.size() != 4 ){ return false; }
 
-        _settings.mWindow_position.x = std::atoi( _args[0].c_str() );
+        _settings.mWindow_position.x     = std::atoi( _args[0].c_str() );
         _settings.mWindow_position.y     = std::atoi( _args[1].c_str() );
         _settings.mWindow_size.x         = std::atoi( _args[2].c_str() );
         _settings.mWindow_size.y         = std::atoi( _args[3].c_str() );
@@ -153,24 +138,6 @@ namespace fan
         _settings.mAutoPlay = value == 1 ? true : false;
 
         std::cout << "cmd : autoplay " << ( value == 1 ? "enabled" : "disabled" ) << std::endl;
-        return true;
-    }
-
-    //========================================================================================================
-    // command: -main_loop_sleep"
-    // makes the main loop sleep et the end of the frame
-    //========================================================================================================
-    bool LaunchArgs::CMD_MainLoopSleep( const std::vector<std::string>& _args,
-                                        LaunchSettings& _settings )
-    {
-        if( _args.size() != 1 ){ return false; }
-
-        const int value = std::atoi( _args[0].c_str() );
-        if( value != 1 && value != 0 ){ return false; }
-
-        _settings.mMainLoopSleep = value == 1 ? true : false;
-
-        std::cout << "cmd : main loop sleep " << ( value == 1 ? "enabled" : "disabled" ) << std::endl;
         return true;
     }
 }

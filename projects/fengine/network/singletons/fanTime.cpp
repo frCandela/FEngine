@@ -1,67 +1,54 @@
 #include "network/singletons/fanTime.hpp"
-
-#include <sstream>
+#include "engine/fanEngineSerializable.hpp"
 
 namespace fan
 {
-	//========================================================================================================
-	//========================================================================================================
-	float		Time::sRenderDelta            = 1.f / 60.f;
-	float		Time::sLogicDelta             = 1.f / 60.f;
-	float		Time::sPhysicsDelta           = 1.f / 60.f;
-	uint32_t	Time::sFramesCounter           = 0;
-	uint32_t	Time::sRealFramerateLastSecond = 0;
-	double		Time::sLastLogFrameTime      = 0.f;
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    void Time::SetInfo( EcsSingletonInfo& _info )
+    {
+        _info.save = Time::Save;
+        _info.load = Time::Load;
+    }
 
-	//========================================================================================================
-	//========================================================================================================
-	void Time::SetInfo( EcsSingletonInfo& /*_info*/ )
-	{
-	}
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    void Time::Init( EcsWorld& /*_world*/, EcsSingleton& _component )
+    {
+        Time& time = static_cast<Time&>( _component );
+        time.mFrameIndex  = 0;
+        time.mLogicDelta  = FIXED( 1 ) / 120;
+        time.mRenderDelta = FIXED( 1 ) / 144;
 
-	//========================================================================================================
-	//========================================================================================================
-	void Time::Init( EcsWorld& /*_world*/, EcsSingleton& _component ){
-		Time& gameTime = static_cast<Time&>( _component );
-		gameTime.mFrameIndex         = 0;
-		gameTime.mFrameStart         = 0;
-		gameTime.mLogicDelta         = 1.f / 120.f;
-		gameTime.mTimeScaleDelta     = 0.f;
-		// timeScaleIncrement -> it takes 20 frames to time scale one frame ( 5% faster/slower )
-		gameTime.mTimeScaleIncrement = gameTime.mLogicDelta / 20.f;
-		gameTime.mLastLogicTime      = 0.;
-	}
+        time.mLastLogicTime    = ElapsedSinceStartup();
+        time.mLastRenderTime   = ElapsedSinceStartup();
+        time.mAverageFrameTime = 0;
+    }
 
-	//========================================================================================================
-	// Counts the frames during the last second to calculate the framerate
-	//========================================================================================================
-	void Time::RegisterFrameDrawn()
-	{
-		++sFramesCounter;
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    void Time::Save( const EcsSingleton& _component, Json& _json )
+    {
+        const Time& time = static_cast<const Time&>( _component );
+        Serializable::SaveFixed( _json, "logic_delta", time.mLogicDelta );
+        Serializable::SaveFixed( _json, "render_delta", time.mRenderDelta );
+    }
 
-		const double time = ElapsedSinceStartup();
-		if( time - sLastLogFrameTime > 1.f )
-		{
-            sRealFramerateLastSecond = sFramesCounter;
-            sFramesCounter           = 0;
-            sLastLogFrameTime        = time;
-		}
-	}
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    void Time::Load( EcsSingleton& _component, const Json& _json )
+    {
+        Time& time = static_cast<Time&>( _component );
+        Serializable::LoadFixed( _json, "logic_delta", time.mLogicDelta );
+        Serializable::LoadFixed( _json, "render_delta", time.mRenderDelta );
+    }
 
-	//========================================================================================================
-	// Client must adjust it frame index to be in sync with the server
-	// if the delta is small enough, use timescale
-	// if it's too big, offsets the frame index directly
-	//========================================================================================================
-	void Time::OnShiftFrameIndex( const int _framesDelta )
-	{
-		if( std::abs( _framesDelta ) > Time::sMaxFrameDeltaBeforeShift )
-		{
-            mFrameIndex += _framesDelta;
-		}
-		else
-		{
-            mTimeScaleDelta = _framesDelta * mLogicDelta;
-		}
-	}
+    //==================================================================================================================================================================================================
+    // Counts the frames during the last second to calculate the framerate
+    //==================================================================================================================================================================================================
+    void Time::RegisterFrameDrawn( Time& _time, double _frameTime )
+    {
+        static const double ratio = 0.95f;
+        _time.mAverageFrameTime = ratio * _time.mAverageFrameTime + ( 1 - ratio ) * _frameTime;
+    }
 }

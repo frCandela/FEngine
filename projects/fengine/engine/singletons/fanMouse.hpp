@@ -49,7 +49,7 @@ namespace fan
         void UpdateData( GLFWwindow* _window );
         glm::vec2 LocalScreenSpacePosition() const;
 
-        static void NextFrame( GLFWwindow* _window, const glm::vec2 _position, const glm::vec2 _size );
+        static void NextFrame( GLFWwindow* _window, const glm::vec2 _viewPosition, const glm::vec2 _viewSize );
         static void SetCallbacks( GLFWwindow* _window );
         static void MouseCallback( GLFWwindow* _window, double _x, double _y );
         static void MouseButtonCallback( GLFWwindow* _window, int _button, int _action, int _mods );

@@ -20,7 +20,7 @@ namespace fan
 	//========================================================================================================
 	void EcsWorld::ApplyTransitions() 
 	{
-		SCOPED_PROFILE( transitions );
+		SCOPED_PROFILE( apply_transitions );
 	
 		// calls destructors
 		while( !mDestroyedComponents.empty() )

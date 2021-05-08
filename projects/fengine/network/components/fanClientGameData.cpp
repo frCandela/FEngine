@@ -149,15 +149,16 @@ namespace fan
 
 	//========================================================================================================
 	//========================================================================================================
-	void ClientGameData::OnShiftFrameIndex( const int _framesDelta )
+	void ClientGameData::OnShiftFrameIndex( const int /*_framesDelta*/ )
 	{
-        mPreviousLocalStates = std::queue<PacketPlayerGameState >(); // clear
+	    fanAssert(false);
+       /* mPreviousLocalStates = std::queue<PacketPlayerGameState >(); // clear
 		mFrameSynced         = true;
 
 		if( std::abs( _framesDelta ) > Time::sMaxFrameDeltaBeforeShift )
 		{
 			Debug::Log() << "Shifted client frame index : " << _framesDelta << Debug::Endl();
             mPreviousLocalStates = std::queue<PacketPlayerGameState >(); // clear
-		}
+		}*/
 	}
 }

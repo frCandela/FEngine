@@ -34,7 +34,6 @@ namespace fan
         Renderer             mRenderer;
         PrefabManager        mPrefabManager;
         FullScreen           mFullScreen;
-        double               mLastRenderTime = 0.;
 
         void InitWorld( EcsWorld& _world );
         static void UpdateRenderWorld( Renderer& _renderer, IProject& _project, const glm::vec2 _size );

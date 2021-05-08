@@ -1,5 +1,6 @@
 #pragma once
 
+#include "network/fanNetConfig.hpp"
 #include "core/memory/fanSerializedValues.hpp"
 #include "core/ecs/fanEcsWorld.hpp"
 #include "engine/project/fanIProjectContainer.hpp"
@@ -30,7 +31,7 @@ namespace fan
         bool                    mShowUi         = true;
         MainMenuBar      *      mMainMenuBar;
         ProjectViewWindow*      mProjectViewWindow;
-
+        FrameIndex              mLastLogicFrameRendered;
 		IProject& GetCurrentProject() { return *mProjects[ mCurrentProject ]; }
         LaunchSettings& AdaptSettings( LaunchSettings& _settings );
 		static void UseEditorCamera( EcsWorld& _world );
@@ -58,6 +59,6 @@ namespace fan
 		static void Resume( IProject& _project );
 
 		void OnSceneLoad( Scene& _scene );
-		void OnToogleShowUI() { mShowUi = !mShowUi; }
+		void OnToggleShowUI() { mShowUi = !mShowUi; }
 	};
 }

@@ -1,37 +1,31 @@
 #pragma once
 
-#include "glfw/glfw3.h"
+#include <glfw/glfw3.h>
 #include "core/ecs/fanEcsSingleton.hpp"
 #include "network/fanNetConfig.hpp"
+#include "core/math/fanFixedPoint.hpp"
 
 namespace fan
 {
-	//========================================================================================================
-	//========================================================================================================
-	struct Time : public EcsSingleton
-	{
-		ECS_SINGLETON( Time )
-		static void SetInfo( EcsSingletonInfo& _info );
-		static void Init( EcsWorld& _world, EcsSingleton& _component );
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    struct Time : public EcsSingleton
+    {
+        ECS_SINGLETON( Time )
+        static void SetInfo( EcsSingletonInfo& _info );
+        static void Init( EcsWorld& _world, EcsSingleton& _component );
+        static void Save( const EcsSingleton& _component, Json& _json );
+        static void Load( EcsSingleton& _component, const Json& _json );
 
-		FrameIndex mFrameIndex;			// the index of the current frame
-		FrameIndex mFrameStart;			// the index of the first frame of the game
-		float      mLogicDelta;			// time between two frames in seconds
-		float      mTimeScaleDelta;		// (seconds) accelerate, decelerates the logic frame rate to resync frame index with server
-		float      mTimeScaleIncrement; // the maximum amount that can be added to each frame
-		double     mLastLogicTime;		// last time the logic step was called
+        Fixed      mLogicDelta;     // duration of a logic frame in seconds
+        Fixed      mRenderDelta;    // duration of a physics step in seconds
 
-		static const int sMaxFrameDeltaBeforeShift = 20; // if the server/client frame delta > this, shift frameIndex. Otherwise use timescale
-		static float     sRenderDelta;
-		static float     sLogicDelta;
-		static float     sPhysicsDelta;
-		static uint32_t  sFramesCounter;
-		static uint32_t  sRealFramerateLastSecond;
-		static double    sLastLogFrameTime;
+        FrameIndex mFrameIndex;     // the index of the current logic frame
+        double mLastLogicTime;      // last time the logic was run
+        double mLastRenderTime;     // last time the frame was drawn
+        double mAverageFrameTime;
 
-		static double		ElapsedSinceStartup() { return glfwGetTime(); }
-		static void			RegisterFrameDrawn();
-
-		void OnShiftFrameIndex( const int _framesDelta );
-	};
+        static double ElapsedSinceStartup() { return glfwGetTime(); }
+        static void RegisterFrameDrawn( Time& _time, double _frameTime );
+    };
 }

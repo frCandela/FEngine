@@ -14,7 +14,7 @@ namespace fan
         void Start() override;
         void Stop() override;
         void Step( const float _delta ) override;
-        void UpdateRenderWorld() override;
+        void Render() override;
         void OnGui() override;
 	};
 }

@@ -1,3 +1,4 @@
+#include <engine/components/fanFxTransform.hpp>
 #include "fanIProjectContainer.hpp"
 #include "core/time/fanProfiler.hpp"
 #include "core/math/fanMathUtils.hpp"
@@ -63,8 +64,6 @@ namespace fan
         const RenderDebug& renderDebug = world.GetSingleton<RenderDebug>();
         renderWorld.mTargetSize = _size;
 
-        _project.UpdateRenderWorld();
-
         // particles mesh
         if( !renderWorld.mParticlesMesh->mIndices.empty() )
         {
@@ -97,12 +96,21 @@ namespace fan
             EcsEntity cameraID = world.GetEntity( scene.mMainCameraHandle );
             Camera& camera = world.GetComponent<Camera>( cameraID );
             camera.mAspectRatio = _size[0] / _size[1];
-            Transform& cameraTransform = world.GetComponent<Transform>( cameraID );
-            _renderer.SetMainCamera(
-                    camera.GetProjection(),
-                    camera.GetView( cameraTransform ),
-                    ToGLM( cameraTransform.GetPosition() )
-            );
+
+            if( world.HasComponent<Transform>(cameraID))
+            {
+                Transform& cameraTransform = world.GetComponent<Transform>( cameraID );
+                _renderer.SetMainCamera( camera.GetProjection(), camera.GetView( cameraTransform ), ToGLM( cameraTransform.GetPosition() ) );
+            }
+            else if( world.HasComponent<FxTransform>(cameraID))
+            {
+                FxTransform& cameraTransform = world.GetComponent<FxTransform>( cameraID );
+                glm::mat4 view = glm::lookAt(
+                        Math::ToGLM( cameraTransform.mPosition),
+                        Math::ToGLM( cameraTransform.mPosition+ cameraTransform.Forward()),
+                        Math::ToGLM( cameraTransform.Up() ) );
+                _renderer.SetMainCamera( camera.GetProjection(), view, Math::ToGLM( cameraTransform.mPosition ) );
+            }
         }
     }
 }

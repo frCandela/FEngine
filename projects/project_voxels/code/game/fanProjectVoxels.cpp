@@ -14,6 +14,7 @@
 #include "engine/systems/fanUpdateTransforms.hpp"
 #include "engine/systems/fanSynchronizeMotionStates.hpp"
 #include "engine/singletons/fanPhysicsWorld.hpp"
+#include "engine/singletons/fanScene.hpp"
 #include "engine/systems/fanUpdateTimers.hpp"
 #include "engine/systems/fanUpdateParticles.hpp"
 #include "engine/systems/fanEmitParticles.hpp"
@@ -22,6 +23,7 @@
 #include "engine/systems/fanUpdateRenderWorld.hpp"
 #include "engine/physics/fanDetectCollisions.hpp"
 #include "engine/terrain/fanVoxelTerrain.hpp"
+#include "engine/components/fanCamera.hpp"
 
 #include "game/components/fanTestComponent.hpp"
 #include "game/singletons/fanTestSingleton.hpp"
@@ -68,6 +70,13 @@ namespace fan
         MeshManager& meshManager = *mWorld.GetSingleton<RenderResources>().mMeshManager;
         RenderWorld& renderWorld = mWorld.GetSingleton<RenderWorld>();
         meshManager.Add( renderWorld.mParticlesMesh, "particles_mesh_" + mName );
+
+        Scene& scene = mWorld.GetSingleton<Scene>();
+        SceneNode cameraNode = scene.CreateSceneNode( "game_camera", &scene.GetRootNode() );
+        scene.SetMainCamera( cameraNode.mHandle );
+        EcsEntity cameraEntity = mWorld.GetEntity( cameraNode.mHandle );
+        mWorld.AddComponent<FxTransform>( cameraEntity );
+        mWorld.AddComponent<Camera>( cameraEntity );
     }
 
     //==========================================================================================================================
@@ -93,8 +102,8 @@ namespace fan
             max = terrain.mSize.x * terrain.mSize.y * terrain.mSize.z;
 
             // load/generate blocks
-            bool generatedBlocks = false;
-            for( int i = 0; i < terrain.mSize.x * terrain.mSize.y * terrain.mSize.z; i++ )
+            bool     generatedBlocks = false;
+            for( int i               = 0; i < terrain.mSize.x * terrain.mSize.y * terrain.mSize.z; i++ )
             {
                 VoxelChunk& chunk = terrain.mChunks[i];
                 if( !chunk.mIsGenerated )
@@ -102,11 +111,11 @@ namespace fan
                     VoxelGenerator::GenerateBlocks( terrain, chunk );
                     completionVoxelsGeneration = i;
                     completionMeshGeneration   = 0;
-                    generatedBlocks = true;
+                    generatedBlocks            = true;
                     break;
                 }
             }
-            if( generatedBlocks ){ continue;}
+            if( generatedBlocks ){ continue; }
 
             // generate mesh
             for( int i = 0; i < terrain.mSize.x * terrain.mSize.y * terrain.mSize.z; i++ )
@@ -126,22 +135,17 @@ namespace fan
 
     //============================================================================================================================
     //============================================================================================================================
-    void ProjectVoxels::Step( const float _delta )
+    void ProjectVoxels::Step( const Fixed _delta )
     {
         SCOPED_PROFILE( step );
 
-        const Fixed fxDelta = Fixed::FromFloat( _delta );
-
         StepLoadTerrain();
 
+        //const Time& time = mWorld.GetSingleton<Time>();
+
         // physics & transforms
-        PhysicsWorld& physicsWorld = mWorld.GetSingleton<PhysicsWorld>();
-        mWorld.Run<SSynchronizeMotionStateFromTransform>();
-        physicsWorld.mDynamicsWorld->stepSimulation( _delta, 10, Time::sPhysicsDelta );
-        {
-            mWorld.Run<SIntegrateFxRigidbodies>( fxDelta );
-            mWorld.Run<SDetectCollisions>( fxDelta );
-        }
+        mWorld.Run<SIntegrateFxRigidbodies>( _delta );
+        mWorld.Run<SDetectCollisions>( _delta );
 
         mWorld.Run<SSynchronizeTransformFromMotionState>();
         mWorld.Run<SMoveFollowTransforms>();
@@ -154,16 +158,15 @@ namespace fan
         mWorld.Run<SHighlightButtons>();
 
         // gameplay
-        mWorld.Run<SUpdateExpirationTimes>( _delta );
-
-        mWorld.Run<SUpdateParticles>( _delta );
-        mWorld.Run<SEmitParticles>( _delta );
-        mWorld.Run<SGenerateParticles>( _delta );
+        mWorld.Run<SUpdateExpirationTimes>( _delta.ToFloat() );
+        mWorld.Run<SUpdateParticles>( _delta.ToFloat() );
+        mWorld.Run<SEmitParticles>( _delta.ToFloat() );
+        mWorld.Run<SGenerateParticles>( _delta.ToFloat() );
     }
 
     //==========================================================================================================================
     //==========================================================================================================================
-    void ProjectVoxels::UpdateRenderWorld()
+    void ProjectVoxels::Render()
     {
         SCOPED_PROFILE( update_render_world );
 

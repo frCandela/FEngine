@@ -148,16 +148,17 @@ namespace fan
 	// returns the perfect frame index timing for something to spawn immediately when sent from the server
 	// to the client
 	//========================================================================================================
-	FrameIndex HostConnection::CalculatePerfectSpawnTiming( const HostConnection& _connection,
-	                                                        const Time& _time )
+    FrameIndex HostConnection::CalculatePerfectSpawnTiming( const HostConnection& /*_connection*/, const Time& /*_time*/ )
 	{
-		int averageFrameDelta = 0;
+	    fanAssert(false);
+	    return 0;
+		/*int averageFrameDelta = 0;
 		for( int delta : _connection.mFramesDelta )
 		{
 			averageFrameDelta += delta;
 		}
 		averageFrameDelta /= (int)_connection.mFramesDelta.size();
 
-		return FrameIndex( -averageFrameDelta ) + FrameIndex( _connection.mRtt / _time.mLogicDelta ) + 3;
+		return FrameIndex( -averageFrameDelta ) + FrameIndex( _connection.mRtt / _time.mLogicDelta ) + 3;*/
 	}
 }

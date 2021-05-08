@@ -3,6 +3,7 @@
 #include "core/memory/fanSerializedValues.hpp"
 #include "core/ecs/fanEcsWorld.hpp"
 #include "engine/project/fanIProjectContainer.hpp"
+#include "network/fanNetConfig.hpp"
 
 namespace fan
 {
@@ -24,7 +25,8 @@ namespace fan
 		void Step();
 
 	private:
-        IProject& mProject;
+        IProject&   mProject;
+        FrameIndex  mLastLogicFrameRendered;
 
         LaunchSettings& AdaptSettings( LaunchSettings& _settings );
 	};
