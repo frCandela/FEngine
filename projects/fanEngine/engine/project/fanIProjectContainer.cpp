@@ -8,7 +8,7 @@
 #include "engine/singletons/fanScene.hpp"
 #include "engine/singletons/fanApplication.hpp"
 #include "engine/components/fanCamera.hpp"
-#include "engine/components/fanTransform.hpp"
+#include "engine/components/fanFxTransform.hpp"
 #include "engine/singletons/fanRenderResources.hpp"
 #include "engine/singletons/fanSceneResources.hpp"
 
@@ -95,22 +95,10 @@ namespace fan
             Scene& scene = world.GetSingleton<Scene>();
             EcsEntity cameraID = world.GetEntity( scene.mMainCameraHandle );
             Camera& camera = world.GetComponent<Camera>( cameraID );
-            camera.mAspectRatio = _size[0] / _size[1];
+            camera.mAspectRatio = Fixed::FromFloat(_size[0] / _size[1]);
 
-            if( world.HasComponent<Transform>(cameraID))
-            {
-                Transform& cameraTransform = world.GetComponent<Transform>( cameraID );
-                _renderer.SetMainCamera( camera.GetProjection(), camera.GetView( cameraTransform ), ToGLM( cameraTransform.GetPosition() ) );
-            }
-            else if( world.HasComponent<FxTransform>(cameraID))
-            {
-                FxTransform& cameraTransform = world.GetComponent<FxTransform>( cameraID );
-                glm::mat4 view = glm::lookAt(
-                        Math::ToGLM( cameraTransform.mPosition),
-                        Math::ToGLM( cameraTransform.mPosition+ cameraTransform.Forward()),
-                        Math::ToGLM( cameraTransform.Up() ) );
-                _renderer.SetMainCamera( camera.GetProjection(), view, Math::ToGLM( cameraTransform.mPosition ) );
-            }
+            FxTransform& cameraTransform = world.GetComponent<FxTransform>( cameraID );
+            _renderer.SetMainCamera( camera.GetProjection(), camera.GetView( cameraTransform ), Math::ToGLM( cameraTransform.mPosition ) );
         }
     }
 }

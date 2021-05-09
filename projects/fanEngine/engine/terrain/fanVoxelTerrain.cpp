@@ -8,6 +8,7 @@
 #include "engine/singletons/fanScene.hpp"
 #include "engine/terrain/fanVoxelTerrain.hpp"
 #include "render/resources/fanTextureManager.hpp"
+#include "render/resources/fanMeshManager.hpp"
 #include "core/memory/fanBase64.hpp"
 
 namespace fan

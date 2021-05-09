@@ -4,8 +4,8 @@
 #include "core/resources/fanResource.hpp"
 #include "core/resources/fanResource.hpp"
 #include "render/fanVertex.hpp"
-#include "fanMeshManager.hpp"
 #include "render/core/fanBuffer.hpp"
+#include "render/core/fanSwapChain.hpp"
 #include "core/resources/fanResourcePtr.hpp"
 
 struct Device;
@@ -18,7 +18,7 @@ namespace fan
     //========================================================================================================
     struct Mesh : public Resource
     {
-        bool RayCast( const btVector3 _origin, const btVector3 _dir, btVector3& _outIntersection ) const;
+        bool RayCast( const Vector3 _origin, const Vector3 _dir, Vector3& _outIntersection ) const;
         bool LoadFromFile( const std::string& _path );
         bool LoadFromVertices();
         void OptimizeVertices();

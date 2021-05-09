@@ -232,10 +232,7 @@ namespace fan
 
 	//========================================================================================================
 	//========================================================================================================
-    void RenderDebug::DebugSphere( const btVector3 _origin,
-                                   const float _radius,
-                                   const Color _color,
-                                   const bool _depthTestEnable )
+    void RenderDebug::DebugSphere( const btVector3 _origin, const float _radius, const Color _color, const bool _depthTestEnable )
 	{
 		DebugCircle( _origin, _radius, btVector3_Up, 32, _color, _depthTestEnable );
 		DebugCircle( _origin, _radius, btVector3_Left, 32, _color, _depthTestEnable );
@@ -244,11 +241,7 @@ namespace fan
 
 	//========================================================================================================
 	//========================================================================================================
-    void RenderDebug::DebugCone( const btTransform _transform,
-                                 const float _radius,
-                                 const float _height,
-                                 const int _numSubdivisions,
-                                 const Color _color )
+    void RenderDebug::DebugCone( const btTransform _transform, const float _radius, const float _height, const int _numSubdivisions, const Color _color )
     {
         std::vector<btVector3> cone = GetCone( _radius, _height, _numSubdivisions );
 
@@ -270,7 +263,7 @@ namespace fan
 	//========================================================================================================
 	void RenderDebug::DebugAABB( const AABB& _aabb, const Color _color )
 	{
-		std::vector< btVector3 > corners = _aabb.GetCorners();
+		std::vector< Vector3 > corners = _aabb.GetCorners();
 		// Top
 		DebugLine( corners[0], corners[1], _color );
 		DebugLine( corners[1], corners[2], _color );

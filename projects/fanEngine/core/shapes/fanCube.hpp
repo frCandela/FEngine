@@ -5,30 +5,26 @@
 
 namespace fan
 {
-	//========================================================================================================
-	// @todo remake this properly without using triangles and name it "Box"
-	//========================================================================================================
-	struct Cube : public Shape
-	{
-		Cube( const btVector3 _position, const float _halfSize );
+    //========================================================================================================
+    // @todo remake this properly without using triangles and name it "Box"
+    //========================================================================================================
+    struct Cube
+    {
+        Cube( const Vector3 _position, const Fixed _halfSize );
 
-		void SetPosition( const btVector3 _pos );
+        void SetPosition( const Vector3 _pos );
 
-		const		std::array< Triangle, 12 >& GetTriangles() const { return mTriangles; }
-		float		GetHalfSize() const { return mHalfSize; }
-		btVector3	GetPosition() const { return mPosition; }
+        const std::array<Triangle, 12>& GetTriangles() const { return mTriangles; }
+        Fixed GetHalfSize() const { return mHalfSize; }
+        Vector3 GetPosition() const { return mPosition; }
 
-        virtual bool RayCast( const btVector3 _origin,
-                              const btVector3 _direction,
-                              btVector3& outIntersection ) const override;
+        bool RayCast( const Vector3 _origin, const Vector3 _direction, Vector3& outIntersection ) const;
 
-        std::array< Triangle, 12 > mTriangles;
-        btVector3                  mPosition;
-        float                      mHalfSize;
+        std::array<Triangle, 12> mTriangles;
+        Vector3                  mPosition;
+        Fixed                    mHalfSize;
 
-	private:
-		void InitCube();
-
-
-	};
+    private:
+        void InitCube();
+    };
 }

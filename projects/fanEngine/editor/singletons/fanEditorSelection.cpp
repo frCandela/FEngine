@@ -7,7 +7,7 @@
 #include "core/shapes/fanRay.hpp"
 #include "core/fanDebug.hpp"
 #include "engine/components/fanSceneNode.hpp"
-#include "engine/components/fanTransform.hpp"
+#include "engine/components/fanFxTransform.hpp"
 #include "engine/components/fanCamera.hpp"
 #include "engine/components/fanPointLight.hpp"
 #include "engine/components/fanDirectionalLight.hpp"
@@ -84,28 +84,14 @@ namespace fan
         EcsEntity entity = world.GetEntity( _sceneNode.mHandle );
 
         // Transform
-        if( world.HasComponent<Transform>( entity ) )
-        {
-            Transform& transform = world.GetComponent< Transform >( entity );
-            btVector3 newPosition;
-            EditorGizmos& gizmos = world.GetSingleton<EditorGizmos>();
-            if( gizmos.DrawMoveGizmo( btTransform( btQuaternion( 0, 0, 0 ), transform.GetPosition() ), (size_t)&transform, newPosition ) )
-            {
-                transform.SetPosition( newPosition );
-                _sceneNode.AddFlag( SceneNode::BoundsOutdated );
-                return true;
-            }
-        }
-
-        // FxTransform
         if( world.HasComponent<FxTransform>( entity ) )
         {
-            FxTransform& transform = world.GetComponent<FxTransform>( entity );
-            btVector3 newPosition;
+            FxTransform& transform = world.GetComponent< FxTransform >( entity );
+            Vector3 newPosition;
             EditorGizmos& gizmos = world.GetSingleton<EditorGizmos>();
-            if( gizmos.DrawMoveGizmo( btTransform( btQuaternion( 0, 0, 0 ), Math::ToBullet( transform.mPosition ) ), (size_t)&transform, newPosition ) )
+            if( gizmos.DrawMoveGizmo( FxTransform::Make( Quaternion::sIdentity, transform.mPosition ), SSID("MoveGizmo"), newPosition ) )
             {
-                transform.mPosition = Math::ToFixed( newPosition );
+                transform.mPosition = newPosition;
                 _sceneNode.AddFlag( SceneNode::BoundsOutdated );
                 return true;
             }
@@ -134,7 +120,7 @@ namespace fan
         if( !mouseCaptured && _gameWindowHovered && mouse.mPressed[ Mouse::buttonLeft ] )
  		{
 			EcsEntity cameraID = world.GetEntity( mCurrentScene->mMainCameraHandle );
-			const Transform& cameraTransform = world.GetComponent<Transform>( cameraID );
+			const FxTransform& cameraTransform = world.GetComponent<FxTransform>( cameraID );
 			const Camera& camera = world.GetComponent<Camera>( cameraID );
 
             const Ray ray = camera.ScreenPosToRay( cameraTransform, mouse.LocalScreenSpacePosition() );
@@ -168,7 +154,6 @@ namespace fan
             RenderDebug& renderDebug = world.GetSingleton<RenderDebug>();
 
             const EcsEntity selectedEntity = world.GetEntity( mSelectedNodeHandle );
-            SDrawDebugCollisionShapes::DrawCollisionShape( world, selectedEntity );
 
             // bullet
             if( world.HasComponent<FxTransform>( selectedEntity ) )
@@ -191,9 +176,9 @@ namespace fan
             }
 
             // fixed point
-            if( world.HasComponent<Transform>( selectedEntity ) )
+            if( world.HasComponent<FxTransform>( selectedEntity ) )
             {
-                const Transform& transform = world.GetComponent<Transform>( selectedEntity );
+                const FxTransform& transform = world.GetComponent<FxTransform>( selectedEntity );
 
                 // Directional light
                 if( world.HasComponent<DirectionalLight>( selectedEntity ) )
@@ -252,7 +237,7 @@ namespace fan
 				FollowTransform& followTransform = world.GetComponent<FollowTransform>( entity );
                 followTransform.mLocked = !followTransform.mLocked;
 
-                Transform * transform = world.SafeGetComponent<Transform>( entity );
+                FxTransform * transform = world.SafeGetComponent<FxTransform>( entity );
                 SceneNode * sceneNode = world.SafeGetComponent<SceneNode>( entity );
                 if( transform != nullptr && sceneNode != nullptr )
                 {

@@ -4,6 +4,7 @@
 #include "render/resources/fanMesh2D.hpp"
 #include "render/resources/fanTextureManager.hpp"
 #include "render/resources/fanMesh2DManager.hpp"
+#include "render/resources/fanMeshManager.hpp"
 #include "render/resources/fanFontManager.hpp"
 #include "render/resources/fanFont.hpp"
 

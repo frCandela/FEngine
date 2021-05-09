@@ -1,37 +1,28 @@
 #include "core/shapes/fanRay.hpp"
-#include "core/math/fanMathUtils.hpp"
 
 namespace fan
 {
-	//========================================================================================================
-	//========================================================================================================
-	Ray::Ray() :
-		origin( btVector3_Zero ),
-		direction( btVector3_Forward )
-	{}
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    Ray::Ray() : origin( Vector3::sZero ), direction( Vector3::sForward ) {}
 
-	//========================================================================================================
-	//========================================================================================================
-	Ray::Ray( const btVector3 _origin, const btVector3 _direction ) :
-		origin( _origin ),
-		direction( _direction )
-	{}
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    Ray::Ray( const Vector3& _origin, const Vector3& _direction ) : origin( _origin ), direction( _direction ) {}
 
-	//========================================================================================================
-	//========================================================================================================
-    void Ray::RayClosestPoints( const Ray _ray,
-                                btVector3& _outIntersectionRay,
-                                btVector3& _outIntersectionOtherRay ) const
-	{
-		const btVector3 w0 = origin - _ray.origin;
-		const float a = direction.dot( direction );
-		const float b = direction.dot( _ray.direction );
-		const float c = _ray.direction.dot( _ray.direction );
-		const float d = direction.dot( w0 );
-		const float e = _ray.direction.dot( w0 );
-		const float s = ( b * e - c * d ) / ( a * c - b * b );
-		const float t = ( a * e - b * d ) / ( a * c - b * b );
-		_outIntersectionRay = origin + s * direction;
-		_outIntersectionOtherRay = _ray.origin + t * _ray.direction;
-	}
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    void Ray::RayClosestPoints( const Ray _ray, Vector3& _outIntersectionRay, Vector3& _outIntersectionOtherRay ) const
+    {
+        const Vector3 w0 = origin - _ray.origin;
+        const Fixed   a  = Vector3::Dot( direction, direction );
+        const Fixed   b  = Vector3::Dot( direction, _ray.direction );
+        const Fixed   c  = Vector3::Dot( _ray.direction, _ray.direction );
+        const Fixed   d  = Vector3::Dot( direction, w0 );
+        const Fixed   e  = Vector3::Dot( _ray.direction, w0 );
+        const Fixed   s  = ( b * e - c * d ) / ( a * c - b * b );
+        const Fixed   t  = ( a * e - b * d ) / ( a * c - b * b );
+        _outIntersectionRay      = origin + s * direction;
+        _outIntersectionOtherRay = _ray.origin + t * _ray.direction;
+    }
 }

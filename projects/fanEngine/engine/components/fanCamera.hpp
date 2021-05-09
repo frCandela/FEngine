@@ -1,11 +1,13 @@
 #pragma  once
 
 #include "core/ecs/fanEcsComponent.hpp"
+#include "core/math/fanFixedPoint.hpp"
 #include "render/fanRenderResourcePtr.hpp"
 
 namespace fan
 {
-	struct Transform;
+	struct FxTransform;
+	struct Vector3;
 	struct Ray;
 
 	//========================================================================================================
@@ -20,16 +22,16 @@ namespace fan
 		static void Load( EcsComponent& _component, const Json& _json );
 
 		enum Type { Perspective, Orthogonal };
-		float mFov;
-		float mOrthoSize;
-		float mAspectRatio;
-		float mNearDistance;
-		float mFarDistance;
+		Fixed mFov;
+		Fixed mOrthoSize;
+		Fixed mAspectRatio;
+		Fixed mNearDistance;
+		Fixed mFarDistance;
 		Type  mType;
 
-		glm::mat4 GetView( const Transform& _cameraTransform ) const;
+		glm::mat4 GetView( const FxTransform& _cameraTransform ) const;
 		glm::mat4 GetProjection() const;
-        Ray ScreenPosToRay( const Transform& _cameraTransform, const glm::vec2& _screenSpacePosition ) const;
-		glm::vec2 WorldPosToScreen( const Transform& _cameraTransform, const btVector3& worldPosition ) const;
-	};
+        Ray ScreenPosToRay( const FxTransform& _cameraTransform, const glm::vec2& _screenSpacePosition ) const;
+        glm::vec2 WorldPosToScreen( const FxTransform& _cameraTransform, const Vector3& _worldPosition ) const;
+    };
 }

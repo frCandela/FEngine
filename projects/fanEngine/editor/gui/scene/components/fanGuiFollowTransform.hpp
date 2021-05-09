@@ -33,7 +33,7 @@ namespace fan
             {
                 followTransform.mLocked = !followTransform.mLocked;
 
-                Transform* transform = _world.SafeGetComponent<Transform>( _entityID );
+                FxTransform* transform = _world.SafeGetComponent<FxTransform>( _entityID );
                 SceneNode* sceneNode = _world.SafeGetComponent<SceneNode>( _entityID );
                 if( transform != nullptr && sceneNode != nullptr )
                 {

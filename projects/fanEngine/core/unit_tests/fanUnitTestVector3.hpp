@@ -16,6 +16,7 @@ namespace fan
         {
             return { { &UnitTestVector3::TestConstructors,     "constructors" },
                      { &UnitTestVector3::TestMagnitude,        "magnitude" },
+                     { &UnitTestVector3::TestDistance,         "distance" },
                      { &UnitTestVector3::TestNormalize,        "normalize" },
                      { &UnitTestVector3::TestComparison,       "comparison" },
                      { &UnitTestVector3::TestMultiplication,   "multiplication" },
@@ -24,8 +25,10 @@ namespace fan
                      { &UnitTestVector3::TestDot,              "dot" },
                      { &UnitTestVector3::TestCross,            "cross" },
                      { &UnitTestVector3::TestOrthoNormalize,   "ortho normalize" },
+                     { &UnitTestVector3::TestAngle,            "angle" },
                      { &UnitTestVector3::TestSignedAngle,      "signed angle" },
                      { &UnitTestVector3::TestOrthonormalBasis, "orthonormal basis" },
+                     { &UnitTestVector3::TestArrayOperator,    "array operator" },
             };
         }
 
@@ -64,6 +67,19 @@ namespace fan
             TEST_ASSERT( Vector3( -4, 0, 0 ).Magnitude() == 4 )
             TEST_ASSERT( Vector3( 1, -1, 0 ).Magnitude() == Fixed::Sqrt( 2 ) )
             TEST_ASSERT( Vector3( -1, 2, -3 ).Magnitude() == Fixed::Sqrt( 14 ) )
+        }
+
+        void TestDistance()
+        {
+            // sqrDistance
+            TEST_ASSERT( Vector3::SqrDistance( { -4, 0, 0 }, { 1, 0, 0 } ) == 25 )
+            TEST_ASSERT( Vector3::SqrDistance( { 1, 2, 0 }, { 3, 4, 0 } ) == 8 )
+            TEST_ASSERT( Vector3::SqrDistance( { 1, 2, 3 }, { 4, 5, 6 } ) == 27 )
+
+            // distance
+            TEST_ASSERT( Vector3::Distance( { -4, 0, 0 }, { 1, 0, 0 } ) == 5 )
+            TEST_ASSERT( Vector3::Distance( { 1, 2, 0 }, { 3, 4, 0 } ) == Fixed::Sqrt( 8 ) )
+            TEST_ASSERT( Vector3::Distance( { 1, 2, 3 }, { 4, 5, 6 } ) == Fixed::Sqrt( 27 ) )
         }
 
         void TestNormalize()
@@ -194,6 +210,26 @@ namespace fan
             TEST_ASSERT( Fixed::IsFuzzyZero( Vector3::Dot( v1, v1 ) - v1.SqrMagnitude() ) )
         }
 
+        void TestAngle()
+        {
+            const Fixed angularTolerance = FIXED( 0.005 );
+
+            Fixed angle = Vector3::Angle( Vector3::sForward, Vector3::sForward );
+            TEST_ASSERT( Fixed::Abs( angle ) < angularTolerance )
+
+            angle = Vector3::Angle( Vector3::sForward, Vector3::sForward );
+            TEST_ASSERT( Fixed::Abs( angle ) < angularTolerance )
+
+            angle = Vector3::Angle( Vector3::sForward, Vector3::sUp );
+            TEST_ASSERT( Fixed::Abs( angle ) - 90 < angularTolerance )
+
+            angle = Vector3::Angle( Vector3::sForward, Vector3::sUp );
+            TEST_ASSERT( Fixed::Abs( angle ) - 90 < angularTolerance )
+
+            angle = Vector3::Angle( Vector3::sForward, Vector3::sBack );
+            TEST_ASSERT( Fixed::Abs( angle ) - 180 < angularTolerance )
+        }
+
         void TestSignedAngle()
         {
             const Fixed angularTolerance = FIXED( 0.005 );
@@ -219,40 +255,48 @@ namespace fan
             Vector3 v1, v2, v3;
 
             v1 = Vector3::sLeft;
-            Vector3::MakeOrthonormalBasis(v1,v2,v3 );
+            Vector3::MakeOrthonormalBasis( v1, v2, v3 );
             TEST_ASSERT( v2.IsNormalized() && v3.IsNormalized() )
-            TEST_ASSERT( Vector3::IsFuzzyZero(Vector3::Cross(v1,v2) - v3) )
-            TEST_ASSERT( Vector3::IsFuzzyZero(Vector3::Cross(v2,v3) - v1) )
+            TEST_ASSERT( Vector3::IsFuzzyZero( Vector3::Cross( v1, v2 ) - v3 ) )
+            TEST_ASSERT( Vector3::IsFuzzyZero( Vector3::Cross( v2, v3 ) - v1 ) )
 
             v1 = Vector3::sRight;
-            Vector3::MakeOrthonormalBasis(v1,v2,v3 );
+            Vector3::MakeOrthonormalBasis( v1, v2, v3 );
             TEST_ASSERT( v2.IsNormalized() && v3.IsNormalized() )
-            TEST_ASSERT( Vector3::IsFuzzyZero(Vector3::Cross(v1,v2) - v3) )
-            TEST_ASSERT( Vector3::IsFuzzyZero(Vector3::Cross(v2,v3) - v1) )
+            TEST_ASSERT( Vector3::IsFuzzyZero( Vector3::Cross( v1, v2 ) - v3 ) )
+            TEST_ASSERT( Vector3::IsFuzzyZero( Vector3::Cross( v2, v3 ) - v1 ) )
 
             v1 = Vector3::sUp;
-            Vector3::MakeOrthonormalBasis(v1,v2,v3 );
+            Vector3::MakeOrthonormalBasis( v1, v2, v3 );
             TEST_ASSERT( v2.IsNormalized() && v3.IsNormalized() )
-            TEST_ASSERT( Vector3::IsFuzzyZero(Vector3::Cross(v1,v2) - v3) )
-            TEST_ASSERT( Vector3::IsFuzzyZero(Vector3::Cross(v2,v3) - v1) )
+            TEST_ASSERT( Vector3::IsFuzzyZero( Vector3::Cross( v1, v2 ) - v3 ) )
+            TEST_ASSERT( Vector3::IsFuzzyZero( Vector3::Cross( v2, v3 ) - v1 ) )
 
             v1 = Vector3::sDown;
-            Vector3::MakeOrthonormalBasis(v1,v2,v3 );
+            Vector3::MakeOrthonormalBasis( v1, v2, v3 );
             TEST_ASSERT( v2.IsNormalized() && v3.IsNormalized() )
-            TEST_ASSERT( Vector3::IsFuzzyZero(Vector3::Cross(v1,v2) - v3) )
-            TEST_ASSERT( Vector3::IsFuzzyZero(Vector3::Cross(v2,v3) - v1) )
+            TEST_ASSERT( Vector3::IsFuzzyZero( Vector3::Cross( v1, v2 ) - v3 ) )
+            TEST_ASSERT( Vector3::IsFuzzyZero( Vector3::Cross( v2, v3 ) - v1 ) )
 
             v1 = Vector3::sForward;
-            Vector3::MakeOrthonormalBasis(v1,v2,v3 );
+            Vector3::MakeOrthonormalBasis( v1, v2, v3 );
             TEST_ASSERT( v2.IsNormalized() && v3.IsNormalized() )
-            TEST_ASSERT( Vector3::IsFuzzyZero(Vector3::Cross(v1,v2) - v3) )
-            TEST_ASSERT( Vector3::IsFuzzyZero(Vector3::Cross(v2,v3) - v1) )
+            TEST_ASSERT( Vector3::IsFuzzyZero( Vector3::Cross( v1, v2 ) - v3 ) )
+            TEST_ASSERT( Vector3::IsFuzzyZero( Vector3::Cross( v2, v3 ) - v1 ) )
 
             v1 = Vector3::sBack;
-            Vector3::MakeOrthonormalBasis(v1,v2,v3 );
+            Vector3::MakeOrthonormalBasis( v1, v2, v3 );
             TEST_ASSERT( v2.IsNormalized() && v3.IsNormalized() )
-            TEST_ASSERT( Vector3::IsFuzzyZero(Vector3::Cross(v1,v2) - v3) )
-            TEST_ASSERT( Vector3::IsFuzzyZero(Vector3::Cross(v2,v3) - v1) )
+            TEST_ASSERT( Vector3::IsFuzzyZero( Vector3::Cross( v1, v2 ) - v3 ) )
+            TEST_ASSERT( Vector3::IsFuzzyZero( Vector3::Cross( v2, v3 ) - v1 ) )
+        }
+
+        void TestArrayOperator()
+        {
+            Vector3 v( 1, 2, 3 );
+            TEST_ASSERT( v[0] == 1 );
+            TEST_ASSERT( v[1] == 2 );
+            TEST_ASSERT( v[2] == 3 );
         }
     };
 }

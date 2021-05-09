@@ -29,6 +29,10 @@ namespace fan
         static constexpr double  sMax           = sMaxInteger + sMaxFractional;
         static constexpr double  sMin           = sMinInteger;
 
+        static const Fixed sMaxValue;
+        static const Fixed sMinValue;
+        static const Fixed sMinFractionalValue;
+
         #define FIXED( str ) ([]() { constexpr Fixed x = Fixed(#str); return x; }())
         #define FX_TWO_PI       FIXED(6.283185307)
         #define FX_PI           FIXED(3.141592654)
@@ -38,13 +42,16 @@ namespace fan
 
         constexpr Fixed() {}
         constexpr Fixed( const int _integer ) : mData( static_cast<DataType>(_integer << sFractionalSize) ) {}
-        constexpr explicit Fixed( const char* _str ) : mData( impl::StringToFixed( _str,
-                                                                                   sFractionalSize,
-                                                                                   sFractionalMask,
-                                                                                   sFixed_One ) ) {}
+        constexpr explicit Fixed( const char* _str ) : mData( impl::StringToFixed( _str, sFractionalSize, sFractionalMask, sFixed_One ) ) {}
 
         constexpr void SetData( const DataType _data ) { mData = _data; }
 
+        static constexpr Fixed FromData( const DataType _data )
+        {
+            Fixed f;
+            f.mData = _data;
+            return f;
+        }
         static constexpr Fixed FromFloat( const float _float )
         {
             Fixed f;
@@ -316,6 +323,10 @@ namespace fan
             Fixed tmp8 = PowI( clampedValue, 8 ) / Fixed( impl::Factorial( 7 ) );
             tmp8 /= Fixed( 8 ); // calculate in two parts to avoid overflow
             return Fixed( 1 ) - tmp2 + tmp4 - tmp6 + tmp8;
+        }
+        static constexpr Fixed Tan( const Fixed& _value )
+        {
+            return Sin( _value ) / Cos( _value );
         }
         static constexpr Fixed ACos( const Fixed& _value )
         {

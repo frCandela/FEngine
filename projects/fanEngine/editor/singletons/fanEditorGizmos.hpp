@@ -5,10 +5,12 @@
 #include "LinearMath/btTransform.h"
 
 #include "core/ecs/fanEcsSingleton.hpp"
+#include "core/math/fanVector3.hpp"
 
 namespace fan
 {
 	class EcsWorld;
+	struct FxTransform;
 
 	//========================================================================================================
 	// allows displaying of the translation manipulator
@@ -26,9 +28,9 @@ namespace fan
 		{
 			int axisIndex;
 			bool pressed = false;
-			btVector3 offset;
+			Vector3 offset;
 		};
-		bool DrawMoveGizmo( const btTransform _transform, const size_t _uniqueID, btVector3& _newPosition );
+		bool DrawMoveGizmo( const FxTransform& _transform, const size_t _uniqueID, Vector3& _newPosition );
 
 		std::map< size_t, GizmoCacheData >  mGizmoCacheData;
 		EcsWorld*                           mWorld;

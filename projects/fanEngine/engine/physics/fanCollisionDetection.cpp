@@ -7,7 +7,6 @@
 #include "engine/physics/fanFxBoxCollider.hpp"
 #include "engine/singletons/fanRenderDebug.hpp"
 
-
 namespace fan
 {
     //==================================================================================================================================================================================================
@@ -51,14 +50,14 @@ namespace fan
     void CollisionDetection::BoxWithPlane( FxRigidbody& _rigidbody, FxBoxCollider& _box, const Vector3& _normal, const Fixed _offset, std::vector<Contact>& _outContacts )
     {
         Vector3  vertices[8] = {
-                _rigidbody.mTransform->TransformPoint( Vector3( _box.mHalfExtents.x, _box.mHalfExtents.y, _box.mHalfExtents.z ) ),
-                _rigidbody.mTransform->TransformPoint( Vector3( _box.mHalfExtents.x, _box.mHalfExtents.y, -_box.mHalfExtents.z ) ),
-                _rigidbody.mTransform->TransformPoint( Vector3( _box.mHalfExtents.x, -_box.mHalfExtents.y, _box.mHalfExtents.z ) ),
-                _rigidbody.mTransform->TransformPoint( Vector3( _box.mHalfExtents.x, -_box.mHalfExtents.y, -_box.mHalfExtents.z ) ),
-                _rigidbody.mTransform->TransformPoint( Vector3( -_box.mHalfExtents.x, _box.mHalfExtents.y, _box.mHalfExtents.z ) ),
-                _rigidbody.mTransform->TransformPoint( Vector3( -_box.mHalfExtents.x, _box.mHalfExtents.y, -_box.mHalfExtents.z ) ),
-                _rigidbody.mTransform->TransformPoint( Vector3( -_box.mHalfExtents.x, -_box.mHalfExtents.y, _box.mHalfExtents.z ) ),
-                _rigidbody.mTransform->TransformPoint( Vector3( -_box.mHalfExtents.x, -_box.mHalfExtents.y, -_box.mHalfExtents.z ) ),
+                (*_rigidbody.mTransform) * Vector3( _box.mHalfExtents.x, _box.mHalfExtents.y, _box.mHalfExtents.z ),
+                (*_rigidbody.mTransform) * Vector3( _box.mHalfExtents.x, _box.mHalfExtents.y, -_box.mHalfExtents.z ),
+                (*_rigidbody.mTransform) * Vector3( _box.mHalfExtents.x, -_box.mHalfExtents.y, _box.mHalfExtents.z ),
+                (*_rigidbody.mTransform) * Vector3( _box.mHalfExtents.x, -_box.mHalfExtents.y, -_box.mHalfExtents.z ),
+                (*_rigidbody.mTransform) * Vector3( -_box.mHalfExtents.x, _box.mHalfExtents.y, _box.mHalfExtents.z ),
+                (*_rigidbody.mTransform) * Vector3( -_box.mHalfExtents.x, _box.mHalfExtents.y, -_box.mHalfExtents.z ),
+                (*_rigidbody.mTransform) * Vector3( -_box.mHalfExtents.x, -_box.mHalfExtents.y, _box.mHalfExtents.z ),
+                (*_rigidbody.mTransform) * Vector3( -_box.mHalfExtents.x, -_box.mHalfExtents.y, -_box.mHalfExtents.z ),
         };
         for( int i           = 0; i < 8; i++ )
         {
@@ -110,7 +109,7 @@ namespace fan
             return;
         }
 
-        const Vector3 closestPointWorld = _rbBox.mTransform->TransformPoint( closestPoint );
+        const Vector3 closestPointWorld = (*_rbBox.mTransform) *  closestPoint;
         const Vector3 normal            = ( closestPointWorld - centerSphere ).Normalized();
         if( Fixed::IsFuzzyZero( normal.SqrMagnitude() - 1 ) )
         {
@@ -187,7 +186,7 @@ namespace fan
     //==================================================================================================================================================================================================
     void BoxVerticesWithBox( FxRigidbody& _rb0, FxBoxCollider& _box0, Matrix4& _transform0, FxRigidbody& _rb1, FxBoxCollider& _box1, Matrix4& _transform1, std::vector<Contact>& _outContacts )
     {
-        Vector3 vertices0[8] = {
+        Vector3  vertices0[8] = {
                 _transform0 * Vector3( _box0.mHalfExtents.x, _box0.mHalfExtents.y, _box0.mHalfExtents.z ),
                 _transform0 * Vector3( _box0.mHalfExtents.x, _box0.mHalfExtents.y, -_box0.mHalfExtents.z ),
                 _transform0 * Vector3( _box0.mHalfExtents.x, -_box0.mHalfExtents.y, _box0.mHalfExtents.z ),
@@ -213,9 +212,9 @@ namespace fan
     //==================================================================================================================================================================================================
     void CollisionDetection::BoxWithBox( FxRigidbody& _rb0, FxBoxCollider& _box0, FxRigidbody& _rb1, FxBoxCollider& _box1, std::vector<Contact>& _outContacts )
     {
-        SCOPED_PROFILE(box_with_box)
+        SCOPED_PROFILE( box_with_box )
 
-        tmprd = tmpRd;
+        tmprd                 = tmpRd;
 
         // early out test
         Matrix4  transform0( _rb0.mTransform->mRotation, _rb0.mTransform->mPosition );
@@ -244,7 +243,6 @@ namespace fan
                 return;
             }
         }
-
 
         BoxVerticesWithBox( _rb0, _box0, transform0, _rb1, _box1, transform1, _outContacts );
         BoxVerticesWithBox( _rb1, _box1, transform0, _rb0, _box0, transform1, _outContacts );
@@ -309,8 +307,8 @@ namespace fan
                 //const Vector3 n2 = Vector3::Cross( e1.dir, n);
                 //const Vector3 c1 = e0.point + Vector3::Dot( ( e1.point - e0.point), n2) / Vector3::Dot( e0.dir, n2) * e0.dir;
                 const Vector3 n1 = Vector3::Cross( e0.dir, n );
-                Vector3 contactPoint;
-                if( Vector3::IsFuzzyZero(n1))
+                Vector3       contactPoint;
+                if( Vector3::IsFuzzyZero( n1 ) )
                 {
                     // edge case parallel lines
                     Contact contact;
@@ -318,7 +316,7 @@ namespace fan
                     {
                         deepestContact = contact;
                     }
-                    if( BoxWithPoint( _rb0, _box0, transform0, _rb1, e1.point + e1.lenght*e1.dir, contact ) && contact.penetration > deepestContact.penetration )
+                    if( BoxWithPoint( _rb0, _box0, transform0, _rb1, e1.point + e1.lenght * e1.dir, contact ) && contact.penetration > deepestContact.penetration )
                     {
                         deepestContact = contact;
                     }
@@ -345,7 +343,7 @@ namespace fan
             if( deepestContact.penetration > 0 )
             {
                 _outContacts.push_back( deepestContact );
-               // tmpRd->DebugPoint(deepestContact.position , Color::sRed);
+                // tmpRd->DebugPoint(deepestContact.position , Color::sRed);
             }
         }
     }

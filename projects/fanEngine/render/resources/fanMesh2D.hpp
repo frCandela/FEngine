@@ -1,7 +1,6 @@
 #pragma once
 
 #include "core/resources/fanResource.hpp"
-#include "core/shapes/fanConvexHull.hpp"
 #include "render/fanVertex.hpp"
 #include "render/core/fanBuffer.hpp"
 #include "render/core/fanSwapChain.hpp"

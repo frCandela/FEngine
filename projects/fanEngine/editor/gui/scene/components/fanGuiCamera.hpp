@@ -40,38 +40,44 @@ namespace fan
                     // fov
                     if( ImGui::Button( "##fov" ) )
                     {
-                        camera.mFov = 110.f;
+                        camera.mFov = 110;
                     }
                     ImGui::SameLine();
-                    ImGui::DragFloat( "fov", &camera.mFov, 1.f, 1.f, 179.f );
+                    float fov = camera.mFov.ToFloat();
+                    if( ImGui::DragFloat( "fov", &fov, 1.f, 1.f, 179.f ) ){ camera.mFov = Fixed::FromFloat(fov);}
                 }
                 else if( camera.mType == Camera::Type::Orthogonal )
                 {
                     // fov
                     if( ImGui::Button( "##size" ) )
                     {
-                        camera.mOrthoSize = 10.f;
+                        camera.mOrthoSize = 10;
                     }
                     ImGui::SameLine();
-                    ImGui::DragFloat( "size", &camera.mOrthoSize, 1.f, 0.f, 100.f );
+
+                    float orthoSize = camera.mOrthoSize.ToFloat();
+                    if( ImGui::DragFloat( "orthoSize", &orthoSize, 1.f, 0.f, 100.f ) ){ camera.mOrthoSize = Fixed::FromFloat(orthoSize);}
                 }
 
                 // nearDistance
                 if( ImGui::Button( "##nearDistance" ) )
                 {
-                    camera.mNearDistance = 0.01f;
+                    camera.mNearDistance = FIXED(0.01);
                 }
                 ImGui::SameLine();
-                ImGui::DragFloat( "near distance", &camera.mNearDistance, 0.001f, 0.01f, 10.f );
 
+                float nearDistance = camera.mNearDistance.ToFloat();
+                if( ImGui::DragFloat( "near distance", &nearDistance, 0.001f, 0.01f, 10.f ) ){ camera.mNearDistance = Fixed::FromFloat(nearDistance);}
 
                 // far distance
                 if( ImGui::Button( "##fardistance" ) )
                 {
-                    camera.mFarDistance = 1000.f;
+                    camera.mFarDistance = 1000;
                 }
                 ImGui::SameLine();
-                ImGui::DragFloat( "far distance", &camera.mFarDistance, 10.f, 0.05f, 10000.f );
+
+                float farDistance = camera.mFarDistance.ToFloat();
+                if( ImGui::DragFloat( "far distance", &farDistance, 10.f, 0.05f, 10000.f ) ){ camera.mFarDistance = Fixed::FromFloat(farDistance);}
             }
             ImGui::PopItemWidth();
         }

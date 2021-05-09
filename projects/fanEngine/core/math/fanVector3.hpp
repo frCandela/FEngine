@@ -25,9 +25,13 @@ namespace fan
 
         bool IsNormalized() const { return Fixed::IsFuzzyZero( SqrMagnitude() - 1 ); }
 
+        static Fixed Distance(    const Vector3& _vec1,  const Vector3& _vec2 ) { return ( _vec1 - _vec2 ).Magnitude(); }
+        static Fixed SqrDistance( const Vector3& _vec1,  const Vector3& _vec2 ) { return ( _vec1 - _vec2 ).SqrMagnitude(); }
         static void OrthoNormalize( Vector3& _normal, Vector3& _tangent );
         static Fixed Dot( const Vector3& _v1, const Vector3& _v2 ) { return _v1.x * _v2.x + _v1.y * _v2.y + _v1.z * _v2.z; }
         static Fixed SignedAngle( const Vector3& _v1, const Vector3& _v2, const Vector3& _normal );
+        static Fixed Angle( const Vector3& _v1, const Vector3& _v2 );
+
         static Vector3 Cross( const Vector3& _v1, const Vector3& _v2 );
         static bool IsFuzzyZero( const Vector3& _vec3 ) { return Fixed::IsFuzzyZero( _vec3.x ) && Fixed::IsFuzzyZero( _vec3.y ) && Fixed::IsFuzzyZero( _vec3.z ); }
         static void MakeOrthonormalBasis( const Vector3& _x, Vector3& _y, Vector3& _z );
@@ -37,6 +41,9 @@ namespace fan
 
         bool operator!=( const Vector3& _vec3 ) const { return !( *this == _vec3 ); }
         Vector3 operator*( const Fixed& _value ) const { return Vector3( _value * x, _value * y, _value * z ); }
+
+        Fixed& operator[]( const int _index ) { return ( &x )[_index]; }
+        const Fixed& operator[]( const int _index ) const { return ( &x )[_index]; }
 
         Vector3& operator*=( const Fixed& _value ) { return ( *this = *this * _value ); }
 

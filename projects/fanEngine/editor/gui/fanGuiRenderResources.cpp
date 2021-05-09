@@ -2,6 +2,7 @@
 #include <sstream>
 #include "core/fanPath.hpp"
 #include "render/fanRenderResourcePtr.hpp"
+#include "render/fanRenderGlobal.hpp"
 #include "editor/fanRenderDragnDrop.hpp"
 #include "editor/fanModals.hpp"
 #include "editor/fanImguiIcons.hpp"

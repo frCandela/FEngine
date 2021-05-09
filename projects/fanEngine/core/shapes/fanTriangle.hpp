@@ -1,27 +1,25 @@
 #pragma once
 
-#include "core/shapes/fanShape.hpp"
+#include "core/math/fanVector3.hpp"
 
 namespace fan
 {
 	//========================================================================================================
 	// Triangle shape used for ray casting
 	//========================================================================================================
-	struct Triangle : public Shape
+	struct Triangle
 	{
 
 		Triangle() : mV0( 0, 0, 0 ), mV1( 0, 0, 0 ), mV2( 0, 0, 0 ) {}
-		Triangle( const btVector3 _v0, const btVector3 _v1, const btVector3 _v2 );
+		Triangle( const Vector3 _v0, const Vector3 _v1, const Vector3 _v2 );
 
-		btVector3 GetCenter() const;
-		btVector3 GetNormal() const;
+		Vector3 GetCenter() const;
+		Vector3 GetNormal() const;
 
-        virtual bool RayCast( const btVector3 _origin,
-                              const btVector3 _dir,
-                              btVector3& _outIntersection ) const override;
+        bool RayCast( const Vector3 _origin, const Vector3 _dir, Vector3& _outIntersection ) const;
 
-		btVector3 mV0;
-		btVector3 mV1;
-		btVector3 mV2;
+		Vector3 mV0;
+		Vector3 mV1;
+		Vector3 mV2;
 	};
 }

@@ -19,6 +19,7 @@ namespace fan
                      { &UnitTestFixedPoint::TestDoubles,        "Double constructor" },
                      { &UnitTestFixedPoint::TestStrings,        "String constructor" },
                      { &UnitTestFixedPoint::TestComparisons,    "Comparisons" },
+                     { &UnitTestFixedPoint::TestSpecialValues,    "Special values" },
                      { &UnitTestFixedPoint::TestAddition,       "Addition" },
                      { &UnitTestFixedPoint::TestSubtraction,    "Subtraction" },
                      { &UnitTestFixedPoint::TestMultiplication, "Addition" },
@@ -37,6 +38,7 @@ namespace fan
                      { &UnitTestFixedPoint::TestASin,           "ASin" },
                      { &UnitTestFixedPoint::TestCos,            "Cos" },
                      { &UnitTestFixedPoint::TestACos,           "ACos" },
+                     { &UnitTestFixedPoint::TestTan,            "Tan" },
                      { &UnitTestFixedPoint::TestATan2,          "ATan2" },
                      { &UnitTestFixedPoint::TestSqrt,           "Sqrt" },
                      { &UnitTestFixedPoint::TestInvSqrt,    "InvSqrt" },
@@ -141,6 +143,15 @@ namespace fan
             TEST_ASSERT( !( FIXED( -2.5 ) == FIXED( -2.6 ) ) )
             TEST_ASSERT( FIXED( -2.5 ) != FIXED( -2.6 ) )
             TEST_ASSERT( !( FIXED( -2.5 ) != FIXED( -2.5 ) ) )
+        }
+
+        void TestSpecialValues()
+        {
+            Fixed maxPlusOne = Fixed::FromData( Fixed::sMaxValue.GetData() + 1 );
+            TEST_ASSERT( maxPlusOne < 0 )
+            TEST_ASSERT( Fixed::sMinFractionalValue / 2 == 0 )
+            TEST_ASSERT( Fixed::sMaxValue + Fixed::sMinFractionalValue < 0 )
+            TEST_ASSERT( Fixed::sMinValue - Fixed::sMinFractionalValue > 0 )
         }
 
         void TestAddition()
@@ -395,11 +406,7 @@ namespace fan
 
             FixedFunction  fxCos     = &Fixed::Cos;
             DoubleFunction doubleCos = &std::cos;
-            double         error     = MaxErrorFixedVsDouble( fxCos,
-                                                              doubleCos,
-                                                              ( -FX_TWO_PI ).ToDouble(),
-                                                              ( FX_TWO_PI ).ToDouble(),
-                                                              0.0001 );
+            double error = MaxErrorFixedVsDouble( fxCos, doubleCos, ( -FX_TWO_PI ).ToDouble(), ( FX_TWO_PI ).ToDouble(), 0.0001 );
             TEST_ASSERT( error < 0.0005 ) // [0,1]
         }
 
@@ -411,6 +418,17 @@ namespace fan
             DoubleFunction doubleACos = &std::acos;
             double         error      = MaxErrorFixedVsDouble( fxACos, doubleACos, -0.99, 0.99, 0.0001 );
             TEST_ASSERT( error < 0.0005 ) // [-1,1]
+        }
+
+        void TestTan()
+        {
+            static_assert( Fixed::Tan( 0 ) == 0 );
+
+            FixedFunction  fxTan     = &Fixed::Tan;
+            DoubleFunction doubleTan= &std::tan;
+            const double step = 0.001;
+            double         error      = MaxErrorFixedVsDouble( fxTan, doubleTan, ( -FX_HALF_PI ).ToDouble() + 0.1, ( FX_HALF_PI ).ToDouble() - 0.1, step);
+            TEST_ASSERT( error < 0.01 )
         }
 
         void TestATan2()

@@ -7,20 +7,20 @@
 #include "engine/singletons/fanRenderResources.hpp"
 #include "engine/fanDragnDrop.hpp"
 #include "render/resources/fanTextureManager.hpp"
+#include "render/resources/fanMeshManager.hpp"
 #include "engine/fanPrefabManager.hpp"
 #include "engine/singletons/fanSceneResources.hpp"
 #include "engine/singletons/fanScene.hpp"
 #include "engine/fanPrefab.hpp"
 #include "engine/components/fanMeshRenderer.hpp"
 #include "engine/components/fanSceneNode.hpp"
-#include "engine/components/fanTransform.hpp"
+#include "engine/components/fanFxTransform.hpp"
 #include "engine/components/fanMaterial.hpp"
 #include "engine/components/fanPointLight.hpp"
 #include "engine/components/fanDirectionalLight.hpp"
-#include "engine/components/fanRigidbody.hpp"
-#include "engine/components/fanMotionState.hpp"
-#include "engine/components/fanBoxShape.hpp"
 #include "engine/components/fanParticleEmitter.hpp"
+#include "engine/physics/fanFxBoxCollider.hpp"
+#include "engine/physics/fanFxRigidbody.hpp"
 #include "editor/fanModals.hpp"
 #include "editor/singletons/fanEditorSelection.hpp"
 
@@ -82,11 +82,11 @@ namespace fan
                 fanAssert( mLastSceneNodeRightClicked != nullptr );
 				Scene& scene = *mLastSceneNodeRightClicked->mScene;
 				EcsWorld& world = *scene.mWorld;
-				btVector3 origin = btVector3_Zero;
+				Vector3 origin = Vector3::sZero;
 				const EcsEntity parentID = world.GetEntity( mLastSceneNodeRightClicked->mHandle );
-				if( world.HasComponent<Transform>( parentID ) )
+				if( world.HasComponent<FxTransform>( parentID ) )
 				{
-					origin = world.GetComponent<Transform>( parentID ).GetPosition();
+					origin = world.GetComponent<FxTransform>( parentID ).mPosition;
 				}
 
 				// Entities templates
@@ -99,8 +99,8 @@ namespace fan
 					const EcsEntity entity = world.GetEntity( node.mHandle );
                     RenderResources& renderResources = _world.GetSingleton<RenderResources>();
 
-					Transform& transform = world.AddComponent<Transform>( entity );
-					transform.SetPosition( origin );
+                    FxTransform& transform = world.AddComponent<FxTransform>( entity );
+					transform.mPosition = origin;
 
 					MeshRenderer& meshRenderer = world.AddComponent<MeshRenderer>( entity );
 					meshRenderer.mMesh = renderResources.mMeshManager->GetOrLoad( RenderGlobal::sMeshSphere );
@@ -119,20 +119,19 @@ namespace fan
 					const EcsEntity entity = world.GetEntity( node.mHandle );
                     RenderResources& renderResources = _world.GetSingleton<RenderResources>();
 
-					Transform& transform = world.AddComponent<Transform>( entity );
-					transform.SetPosition( origin );
+                    FxTransform& transform = world.AddComponent<FxTransform>( entity );
+					transform.mPosition = origin;
 
 					MeshRenderer& meshRenderer = world.AddComponent<MeshRenderer>( entity );
 					meshRenderer.mMesh = renderResources.mMeshManager->GetOrLoad( RenderGlobal::sMeshCube );
 					Material& material = world.AddComponent<Material>( entity );
 					material.mTexture = renderResources.mTextureManager->Get( RenderGlobal::sTextureWhite );
 					onSelectSceneNode.Emmit( &node );
-					
-					Rigidbody& rigidbody = world.AddComponent<Rigidbody>( entity );
-					MotionState& motionState = world.AddComponent<MotionState>( entity );
-					BoxShape& shape = world.AddComponent<BoxShape>( entity );
-					rigidbody.SetMotionState( motionState.mMotionState );
-					rigidbody.SetCollisionShape( shape.mBoxShape );
+
+                    FxRigidbody rb = world.AddComponent<FxRigidbody>( entity );
+                    FxBoxCollider box = world.AddComponent<FxBoxCollider>( entity );
+
+                    rb.mInverseInertiaTensorLocal = FxRigidbody::BoxInertiaTensor( rb.mInverseMass, box.mHalfExtents ).Inverse();
 				}
 
 				// point light
@@ -142,9 +141,9 @@ namespace fan
 				{
 					SceneNode& node = scene.CreateSceneNode( "point_light", mLastSceneNodeRightClicked );
 					const EcsEntity entity = world.GetEntity( node.mHandle );
-					
-					Transform& transform = world.AddComponent<Transform>( entity );
-					transform.SetPosition( origin );					
+
+                    FxTransform& transform = world.AddComponent<FxTransform>( entity );
+					transform.mPosition = origin;
 					world.AddComponent<PointLight>( entity );
 					onSelectSceneNode.Emmit( &node );
 				}
@@ -156,12 +155,12 @@ namespace fan
                     SceneNode& node = scene.CreateSceneNode( "directional_light",
 															 mLastSceneNodeRightClicked );
                     const EcsEntity entity = world.GetEntity( node.mHandle );
-					
-					Transform& transform = world.AddComponent<Transform>( entity );
-					transform.SetPosition( origin  );
+
+                    FxTransform& transform = world.AddComponent<FxTransform>( entity );
+					transform.mPosition = origin ;
 					
 					world.AddComponent<DirectionalLight>( entity );
-					transform.SetRotationEuler( btVector3(30.f,10.f,0.f) );
+					transform.mRotation = Quaternion::Euler( Vector3(30,10,0) );
 					onSelectSceneNode.Emmit( &node );
 				}
 
@@ -171,12 +170,12 @@ namespace fan
 				{
 					SceneNode& node = scene.CreateSceneNode( "particle_system", mLastSceneNodeRightClicked );
 					const EcsEntity entity = world.GetEntity( node.mHandle );
-					
-					Transform& transform = world.AddComponent<Transform>( entity );
-					transform.SetPosition( origin );
+
+                    FxTransform& transform = world.AddComponent<FxTransform>( entity );
+					transform.mPosition = origin;
 
 					world.AddComponent<ParticleEmitter>( entity );
-					transform.SetPosition( origin );
+					transform.mPosition = origin;
 				}
 
 				ImGui::EndMenu();

@@ -2,7 +2,7 @@
 #include "core/math/fanMathUtils.hpp"
 #include "engine/singletons/fanRenderWorld.hpp"
 #include "engine/components/fanMeshRenderer.hpp"
-#include "engine/components/fanTransform.hpp"
+#include "engine/components/fanFxTransform.hpp"
 #include "engine/components/fanFxTransform.hpp"
 #include "engine/components/fanSceneNode.hpp"
 #include "engine/components/fanMaterial.hpp"
@@ -23,21 +23,21 @@ namespace fan
 		static EcsSignature GetSignature( const EcsWorld& _world )
 		{
 			return	 _world.GetSignature<MeshRenderer>()
-				| _world.GetSignature<Transform>()
+				| _world.GetSignature<FxTransform>()
 				| _world.GetSignature<Material>();
 		}
 
 		static void Run( EcsWorld&, const EcsView& _view, RenderWorld& _renderWorld )
 		{
 			auto meshRendererIt = _view.begin<MeshRenderer>();
-			auto transformIt = _view.begin<Transform>();
+			auto transformIt = _view.begin<FxTransform>();
 			auto materialIt = _view.begin<Material>();
 			// get all mesh and adds them to the render world
             for( ; meshRendererIt != _view.end<MeshRenderer>();
                    ++meshRendererIt, ++transformIt, ++materialIt )
 			{
 				MeshRenderer& meshRenderer = *meshRendererIt;
-				Transform& transform = *transformIt;
+                FxTransform& transform = *transformIt;
 				Material& material = *materialIt;
 
 				if( meshRenderer.mMesh.IsValid() )
@@ -159,7 +159,7 @@ namespace fan
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world )
 		{
-			return	_world.GetSignature<Transform>()
+			return	_world.GetSignature<FxTransform>()
 				| _world.GetSignature<PointLight>();
 		}
 
@@ -168,15 +168,15 @@ namespace fan
 			RenderWorld& renderWorld = _world.GetSingleton<RenderWorld>();
 			renderWorld.pointLights.clear();
 
-			auto transformIt = _view.begin<Transform>();
+			auto transformIt = _view.begin<FxTransform>();
 			auto lightIt = _view.begin<PointLight>();
-			for( ; transformIt != _view.end<Transform>(); ++transformIt, ++lightIt )
+			for( ; transformIt != _view.end<FxTransform>(); ++transformIt, ++lightIt )
 			{
-				const Transform& transform = *transformIt;
+				const FxTransform& transform = *transformIt;
 				PointLight& light = *lightIt;
 
 				RenderDataPointLight pointLight;
-				pointLight.mPosition  = glm::vec4( ToGLM( transform.GetPosition() ), 1.f );
+				pointLight.mPosition  = glm::vec4( Math::ToGLM( transform.mPosition ), 1.f );
 				pointLight.mDiffuse   = light.mDiffuse.ToGLM();
 				pointLight.mSpecular  = light.mSpecular.ToGLM();
 				pointLight.mAmbiant   = light.mAmbiant.ToGLM();
@@ -196,7 +196,7 @@ namespace fan
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world )
 		{
-			return	_world.GetSignature<Transform>()
+			return	_world.GetSignature<FxTransform>()
 				| _world.GetSignature<DirectionalLight>();
 		}
 
@@ -205,15 +205,15 @@ namespace fan
 			RenderWorld& renderWorld = _world.GetSingleton<RenderWorld>();
 			renderWorld.directionalLights.clear();
 
-			auto transformIt = _view.begin<Transform>();
+			auto transformIt = _view.begin<FxTransform>();
 			auto lightIt = _view.begin<DirectionalLight>();
-			for( ; transformIt != _view.end<Transform>(); ++transformIt, ++lightIt )
+			for( ; transformIt != _view.end<FxTransform>(); ++transformIt, ++lightIt )
 			{
-				const Transform& transform = *transformIt;
+				const FxTransform& transform = *transformIt;
 				DirectionalLight& directionalLight = *lightIt;
 
 				RenderDataDirectionalLight light;
-				light.mDirection = glm::vec4( ToGLM( transform.Forward() ), 1 );
+				light.mDirection = glm::vec4( Math::ToGLM( transform.Forward() ), 1 );
 				light.mAmbiant   = directionalLight.mAmbiant.ToGLM();
 				light.mDiffuse   = directionalLight.mDiffuse.ToGLM();
 				light.mSpecular  = directionalLight.mSpecular.ToGLM();

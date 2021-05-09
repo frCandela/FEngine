@@ -24,8 +24,13 @@ namespace fan
         static void OnGui( EcsWorld&, EcsSingleton& _component )
         {
             EditorCamera& editorCamera = static_cast<EditorCamera&>( _component );
-            ImGui::DragFloat( "speed", &editorCamera.mSpeed, 1.f, 0.f, 10000.f );
-            ImGui::DragFloat( "speed multiplier", &editorCamera.mSpeedMultiplier, 1.f, 0.f, 10000.f );
+
+            float speed = editorCamera.mSpeed.ToFloat();
+            if( ImGui::DragFloat( "speed", &speed, 1.f, 0.f, 10000.f ) ){ editorCamera.mSpeed = Fixed::FromFloat( speed ); }
+
+            float speedMultiplier = editorCamera.mSpeedMultiplier.ToFloat();
+            if( ImGui::DragFloat( "speed multiplier", &speedMultiplier, 1.f, 0.f, 10000.f ) ){ editorCamera.mSpeedMultiplier = Fixed::FromFloat( speed ); }
+
             ImGui::DragFloat2( "xy sensitivity", &editorCamera.mXYSensitivity[0], 1.f, 0.f, 1.f );
         }
     };

@@ -233,11 +233,10 @@ namespace fan
 
                 // bounds
                 world.Run<SMoveFollowTransforms>();
-                world.Run<SUpdateBoundsFromRigidbody>( delta.ToFloat() );
+                world.Run<SUpdateBoundsFromFxBoxColliders>();
+                world.Run<SUpdateBoundsFromFxSphereColliders>();
                 world.Run<SUpdateBoundsFromModel>();
                 world.Run<SUpdateBoundsFromTransform>();
-                world.Run<SUpdateBoundsFromFxSphereColliders>();
-                world.Run<SUpdateBoundsFromFxBoxColliders>();
 
                 world.ApplyTransitions();
             }
@@ -275,7 +274,7 @@ namespace fan
                 // only update the editor camera when we are using it
                 if( scene.mMainCameraHandle == editorCamera.mCameraHandle )
                 {
-                    EditorCamera::Update( currentWorld, float(deltaTime) );
+                    EditorCamera::Update( currentWorld, currentTime.mLogicDelta );
                 }
                 currentWorld.GetSingleton<EditorSelection>().Update( mProjectViewWindow->IsHovered() );
 
@@ -340,7 +339,7 @@ namespace fan
 
             // Saves the camera position for restoring it later
             const EcsEntity oldCameraID = world.GetEntity( mScene.mMainCameraHandle );
-            mPrevCameraTransform = world.GetComponent<Transform>( oldCameraID ).mTransform;
+            mPrevCameraTransform = world.GetComponent<FxTransform>( oldCameraID );
             // save old selection
             SceneNode* prevSelectionNode = world.GetSingleton<EditorSelection>().GetSelectedSceneNode();
             mPrevSelectionHandle = prevSelectionNode != nullptr ? prevSelectionNode->mHandle : 0;
@@ -352,7 +351,7 @@ namespace fan
 
             // restore camera transform
             const EcsEntity newCameraID = world.GetEntity( mScene.mMainCameraHandle );
-            world.GetComponent<Transform>( newCameraID ).mTransform = mPrevCameraTransform;
+            world.GetComponent<FxTransform>( newCameraID ) = mPrevCameraTransform;
 
             // restore selection
             if( mPrevSelectionHandle != 0 &&
@@ -367,7 +366,7 @@ namespace fan
 
         Scene& mScene;
         EcsHandle   mPrevSelectionHandle = 0;
-        btTransform mPrevCameraTransform;
+        FxTransform mPrevCameraTransform;
     };
 
     //========================================================================================================

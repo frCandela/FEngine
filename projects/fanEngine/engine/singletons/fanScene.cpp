@@ -4,14 +4,9 @@
 #include <fstream>
 #include "core/fanPath.hpp"
 #include "core/fanDebug.hpp"
-#include "core/time/fanScopedTimer.hpp"
-#include "core/time/fanProfiler.hpp"
 #include "network/singletons/fanTime.hpp"
 #include "engine/components/fanBounds.hpp"
 #include "engine/components/fanSceneNode.hpp"
-#include "engine/components/fanTransform.hpp"
-#include "engine/components/fanMaterial.hpp"
-#include "engine/singletons/fanRenderWorld.hpp"
 #include "engine/singletons/fanScenePointers.hpp"
 #include "engine/systems/fanUpdateTransforms.hpp"
 

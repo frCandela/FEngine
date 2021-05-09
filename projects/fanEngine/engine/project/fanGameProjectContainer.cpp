@@ -90,11 +90,10 @@ namespace fan
             mProject.Step( time.mLogicDelta );
 
             mProject.mWorld.Run<SMoveFollowTransforms>();
-            mProject.mWorld.Run<SUpdateBoundsFromRigidbody>( time.mLogicDelta.ToFloat() );
-            mProject.mWorld.Run<SUpdateBoundsFromModel>();
-            mProject.mWorld.Run<SUpdateBoundsFromTransform>();
             mProject.mWorld.Run<SUpdateBoundsFromFxSphereColliders>();
             mProject.mWorld.Run<SUpdateBoundsFromFxBoxColliders>();
+            mProject.mWorld.Run<SUpdateBoundsFromModel>();
+            mProject.mWorld.Run<SUpdateBoundsFromTransform>();
 
             mProject.mWorld.ApplyTransitions();
         }

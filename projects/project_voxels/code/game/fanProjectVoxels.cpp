@@ -12,14 +12,11 @@
 #include "engine/systems/fanUpdateUILayouts.hpp"
 #include "engine/systems/fanUpdateUIAlign.hpp"
 #include "engine/systems/fanUpdateTransforms.hpp"
-#include "engine/systems/fanSynchronizeMotionStates.hpp"
-#include "engine/singletons/fanPhysicsWorld.hpp"
 #include "engine/singletons/fanScene.hpp"
 #include "engine/systems/fanUpdateTimers.hpp"
 #include "engine/systems/fanUpdateParticles.hpp"
 #include "engine/systems/fanEmitParticles.hpp"
 #include "engine/systems/fanGenerateParticles.hpp"
-#include "engine/systems/fanRegisterPhysics.hpp"
 #include "engine/systems/fanUpdateRenderWorld.hpp"
 #include "engine/physics/fanDetectCollisions.hpp"
 #include "engine/terrain/fanVoxelTerrain.hpp"
@@ -66,7 +63,6 @@ namespace fan
     //==========================================================================================================================
     void ProjectVoxels::Start()
     {
-        mWorld.Run<SRegisterAllRigidbodies>();
         MeshManager& meshManager = *mWorld.GetSingleton<RenderResources>().mMeshManager;
         RenderWorld& renderWorld = mWorld.GetSingleton<RenderWorld>();
         meshManager.Add( renderWorld.mParticlesMesh, "particles_mesh_" + mName );
@@ -147,7 +143,6 @@ namespace fan
         mWorld.Run<SIntegrateFxRigidbodies>( _delta );
         mWorld.Run<SDetectCollisions>( _delta );
 
-        mWorld.Run<SSynchronizeTransformFromMotionState>();
         mWorld.Run<SMoveFollowTransforms>();
 
         // ui

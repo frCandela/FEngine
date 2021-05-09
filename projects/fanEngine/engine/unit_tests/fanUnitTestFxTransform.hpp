@@ -19,6 +19,8 @@ namespace fan
                      { &UnitTestFxTransform::TestTransformPoint,     "transform point" },
                      { &UnitTestFxTransform::TestTransformDirection, "transform direction" },
                      { &UnitTestFxTransform::TestLookAt,             "look at" },
+                     { &UnitTestFxTransform::TestInverse,             "inverse" },
+                     { &UnitTestFxTransform::TestMultiply,             "multiply" },
             };
         }
 
@@ -113,6 +115,44 @@ namespace fan
             mTransform.mPosition = Vector3::sForward;
             mTransform.LookAt( Vector3::sZero );
             TEST_ASSERT( Vector3::IsFuzzyZero( mTransform.TransformDirection( Vector3::sForward ) - Vector3::sBack ) )
+        }
+
+        void TestInverse()
+        {
+            FxTransform inverse = mTransform.Inverse();
+            TEST_ASSERT(  inverse.mPosition == mTransform.mPosition )
+            TEST_ASSERT(  inverse.mRotation == mTransform.mRotation )
+
+            mTransform.mPosition = Vector3::sForward;
+            inverse = mTransform.Inverse();
+
+            TEST_ASSERT( inverse.TransformDirection( mTransform.TransformDirection( Vector3::sRight ) ) == Vector3::sRight )
+            TEST_ASSERT( inverse.TransformPoint( mTransform.TransformPoint( Vector3::sRight ) ) == Vector3::sRight )
+
+            mTransform.mPosition = Vector3::sForward;
+            mTransform.mRotation = Quaternion::AngleAxis( 90, Vector3::sUp);
+            inverse = mTransform.Inverse();
+            TEST_ASSERT( inverse.TransformDirection( mTransform.TransformDirection( Vector3::sRight ) ) == Vector3::sRight )
+            TEST_ASSERT( inverse.TransformPoint( mTransform.TransformPoint( Vector3::sRight ) ) == Vector3::sRight )
+        }
+
+        void TestMultiply()
+        {
+            FxTransform inverse = mTransform.Inverse();
+            TEST_ASSERT(  inverse.mPosition == mTransform.mPosition )
+            TEST_ASSERT(  inverse.mRotation == mTransform.mRotation )
+
+            mTransform.mPosition = Vector3::sForward;
+            inverse = mTransform.Inverse();
+
+            TEST_ASSERT( (inverse*mTransform).TransformDirection( Vector3::sRight ) == Vector3::sRight )
+            TEST_ASSERT( (inverse*mTransform).TransformPoint( Vector3::sRight ) == Vector3::sRight )
+
+            mTransform.mPosition = Vector3::sForward;
+            mTransform.mRotation = Quaternion::AngleAxis( 90, Vector3::sUp);
+            inverse = mTransform.Inverse();
+            TEST_ASSERT( (inverse*mTransform).TransformDirection( Vector3::sRight ) == Vector3::sRight )
+            TEST_ASSERT( (inverse*mTransform).TransformPoint( Vector3::sRight ) == Vector3::sRight )
         }
     };
 }

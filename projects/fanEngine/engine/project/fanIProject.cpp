@@ -3,7 +3,6 @@
 // base
 #include "engine/fanSceneTags.hpp"
 #include "engine/components/fanSceneNode.hpp"
-#include "engine/components/fanTransform.hpp"
 #include "engine/components/fanCamera.hpp"
 #include "engine/components/fanExpirationTime.hpp"
 #include "engine/components/fanFollowTransform.hpp"
@@ -15,18 +14,9 @@
 #include "engine/singletons/fanApplication.hpp"
 #include "network/singletons/fanTime.hpp"
 
-// fixed point
+// physics
 #include "engine/components/fanFxTransform.hpp"
 #include "engine/components/fanFxScale.hpp"
-
-// physics
-#include "engine/components/fanRigidbody.hpp"
-#include "engine/components/fanMotionState.hpp"
-#include "engine/components/fanBoxShape.hpp"
-#include "engine/components/fanSphereShape.hpp"
-#include "engine/singletons/fanPhysicsWorld.hpp"
-
-// fxPhysics
 #include "engine/physics/fanFxRigidbody.hpp"
 #include "engine/physics/fanFxSphereCollider.hpp"
 #include "engine/physics/fanFxBoxCollider.hpp"
@@ -79,7 +69,6 @@ namespace fan
     void IProject::EcsIncludeEngine    ( EcsWorld& _world )
     {
         _world.AddComponentType<SceneNode>();
-        _world.AddComponentType<Transform>();
         _world.AddComponentType<Camera>();
         _world.AddComponentType<ExpirationTime>();
         _world.AddComponentType<FollowTransform>();
@@ -100,12 +89,6 @@ namespace fan
     //========================================================================================================
     void IProject::EcsIncludePhysics ( EcsWorld& _world )
     {
-        _world.AddSingletonType<PhysicsWorld>();
-        _world.AddComponentType<Rigidbody>();
-        _world.AddComponentType<MotionState>();
-        _world.AddComponentType<BoxShape>();
-        _world.AddComponentType<SphereShape>();
-
         _world.AddSingletonType<FxPhysicsWorld>();
         _world.AddComponentType<FxRigidbody>();
         _world.AddComponentType<FxSphereCollider>();

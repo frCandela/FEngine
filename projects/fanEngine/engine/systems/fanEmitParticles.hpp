@@ -1,7 +1,7 @@
 #include "core/ecs/fanEcsSystem.hpp"
 #include "core/math/fanMathUtils.hpp"
 #include "core/random/fanRandom.hpp"
-#include "engine/components/fanTransform.hpp"
+#include "engine/components/fanFxTransform.hpp"
 #include "engine/components/fanParticleEmitter.hpp"
 #include "engine/components/fanParticle.hpp"
 
@@ -14,7 +14,7 @@ namespace fan
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world )
 		{
-			return	_world.GetSignature<Transform>() | _world.GetSignature<ParticleEmitter>();
+			return	_world.GetSignature<FxTransform>() | _world.GetSignature<ParticleEmitter>();
 		}
 
 		static void Run( EcsWorld& _world, const EcsView& _view, const float _delta )
@@ -23,11 +23,11 @@ namespace fan
 
 			if( _delta == 0.f ) { return; }
 
-			auto transformIt = _view.begin<Transform>();
+			auto transformIt = _view.begin<FxTransform>();
 			auto particleEmitterIt = _view.begin<ParticleEmitter>();
-			for( ; transformIt != _view.end<Transform>(); ++transformIt, ++particleEmitterIt )
+			for( ; transformIt != _view.end<FxTransform>(); ++transformIt, ++particleEmitterIt )
 			{
-				const Transform& emitterTransform = *transformIt;
+				const FxTransform& emitterTransform = *transformIt;
 				ParticleEmitter& emitter = *particleEmitterIt;
 
 				if( emitter.mParticlesPerSecond > 0.f && emitter.mEnabled )
@@ -35,7 +35,7 @@ namespace fan
 					emitter.mTimeAccumulator += _delta;
 					float particleSpawnDelta = 1.f / emitter.mParticlesPerSecond;
 
-					const glm::vec3 origin = ToGLM( emitterTransform.GetPosition() );
+					const glm::vec3 origin = Math::ToGLM( emitterTransform.mPosition );
 
 					// Spawn particles
 					while( emitter.mTimeAccumulator > particleSpawnDelta )

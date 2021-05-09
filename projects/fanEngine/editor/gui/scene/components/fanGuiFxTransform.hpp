@@ -69,9 +69,12 @@ namespace fan
                 if( ImGui::DragFloat3( "rotation", &rotation[0], speed ) )
                 {
                     Vector3 newRotation = { Fixed::FromFloat( rotation.x ), Fixed::FromFloat( rotation.y ), Fixed::FromFloat( rotation.z ) };
-                    if( ( newRotation - oldRotation ).Magnitude() > Fixed::FromFloat(speed) )
+                    const Vector3 axis = newRotation - oldRotation;
+                    const Fixed angle = axis.Magnitude();
+                    if( angle > Fixed::FromFloat(speed) )
                     {
-                        transform.mRotation = Quaternion::Euler( newRotation );
+                        const Quaternion rotationChange = Quaternion::AngleAxis(angle, axis );
+                        transform.mRotation = rotationChange * transform.mRotation;
                         sceneNode.AddFlag( SceneNode::BoundsOutdated );
                     }
                 }

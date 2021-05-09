@@ -2,6 +2,7 @@
 #include "core/fanPath.hpp"
 #include "render/fanRenderResourcePtr.hpp"
 #include "render/core/fanDevice.hpp"
+#include "render/fanRenderGlobal.hpp"
 
 namespace fan
 {

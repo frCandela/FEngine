@@ -9,7 +9,7 @@
 #include "render/fanRenderGlobal.hpp"
 #include "engine/singletons/fanScene.hpp"
 #include "engine/components/fanSceneNode.hpp"
-#include "engine/components/fanTransform.hpp"
+#include "engine/components/fanFxTransform.hpp"
 #include "editor/singletons/fanEditorGrid.hpp"
 #include "editor/windows/fanEditorWindow.hpp"
 #include "editor/singletons/fanEditorSelection.hpp"
@@ -329,7 +329,7 @@ namespace fan
 
             // save old camera transform
             const EcsEntity oldCameraID        = _world.GetEntity( scene.mMainCameraHandle );
-            btTransform     oldCameraTransform = _world.GetComponent<Transform>( oldCameraID ).mTransform;
+            FxTransform     oldCameraTransform = _world.GetComponent<FxTransform>( oldCameraID );
 
             // save old selection
             SceneNode* prevSelectionNode = editorSelection.GetSelectedSceneNode();
@@ -342,7 +342,7 @@ namespace fan
 
             // restore camera
             const EcsEntity newCameraID = _world.GetEntity( scene.mMainCameraHandle );
-            _world.GetComponent<Transform>( newCameraID ).mTransform = oldCameraTransform;
+            _world.GetComponent<FxTransform>( newCameraID ) = oldCameraTransform;
 
             // restore selection
             if( prevSelectionHandle != 0 && scene.mNodes.find( prevSelectionHandle ) != scene.mNodes.end() )

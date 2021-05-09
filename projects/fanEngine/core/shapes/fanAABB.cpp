@@ -1,168 +1,156 @@
 #include "core/shapes/fanAABB.hpp"
 #include "core/fanAssert.hpp"
+#include "core/math/fanMatrix4.hpp"
 
 namespace fan
 {
     //========================================================================================================
     //========================================================================================================
     AABB::AABB() :
-        mLow ( ),
-		mHigh( )
-	{}
+            mLow(),
+            mHigh() {}
 
-	//========================================================================================================
-	//========================================================================================================
-	AABB::AABB( const btVector3 _low, const btVector3 _high ) :
+    //========================================================================================================
+    //========================================================================================================
+    AABB::AABB( const Vector3 _low, const Vector3 _high ) :
             mLow( _low ),
             mHigh( _high )
-	{
-        fanAssert( _low[ 0 ] <= _high[ 0 ] && _low[ 1 ] <= _high[ 1 ] && _low[ 2 ] <= _high[ 2 ] );
-	}
+    {
+        fanAssert( _low.x <= _high.x && _low.y <= _high.y && _low.z <= _high.z );
+    }
 
-	//========================================================================================================
-	// Computes the AABB of a a transformed points cloud
-	//========================================================================================================
-	AABB::AABB( const std::vector<btVector3> _pointCloud, const glm::mat4 _modelMatrix )
-	{
-		if( _pointCloud.empty() )
-		{
-            mLow  = -0.5f * btVector3_One;
-            mHigh = 0.5f * btVector3_One;
-			return;
-		}
+    //========================================================================================================
+    // Computes the AABB of a a transformed points cloud
+    //========================================================================================================
+    AABB::AABB( const std::vector<Vector3>& _pointCloud, const Matrix4& _tranform )
+    {
+        if( _pointCloud.empty() )
+        {
+            mLow  = FIXED( -0.5 ) * Vector3::sOne;
+            mHigh = FIXED( 0.5 ) * Vector3::sOne;
+            return;
+        }
 
-        glm::vec3 high( std::numeric_limits<float>::lowest(),
-                        std::numeric_limits<float>::lowest(),
-                        std::numeric_limits<float>::lowest() );
-        glm::vec3 low( std::numeric_limits<float>::max(),
-                       std::numeric_limits<float>::max(),
-                       std::numeric_limits<float>::max() );
-
+        mLow = Vector3( Fixed::sMaxValue, Fixed::sMaxValue, Fixed::sMaxValue );
+        mHigh = Vector3( Fixed::sMinValue, Fixed::sMinValue, Fixed::sMinValue );
         for( int index = 0; index < (int)_pointCloud.size(); index++ )
         {
-            const glm::vec4 vertex = _modelMatrix *
-                                     glm::vec4( _pointCloud[index][0],
-                                                _pointCloud[index][1],
-                                                _pointCloud[index][2],
-                                                1.f );
-			if ( vertex.x < low.x ) { low.x = vertex.x; }
-			if ( vertex.y < low.y ) { low.y = vertex.y; }
-			if ( vertex.z < low.z ) { low.z = vertex.z; }
-			if ( vertex.x > high.x ) { high.x = vertex.x; }
-			if ( vertex.y > high.y ) { high.y = vertex.y; }
-			if ( vertex.z > high.z ) { high.z = vertex.z; }
-		}
-        mLow  = ToBullet( low );
-        mHigh = ToBullet( high );
-        fanAssert( mLow[ 0 ] <= mHigh[ 0 ] && mLow[ 1 ] <= mHigh[ 1 ] && mLow[ 2 ] <= mHigh[ 2 ] );
-	}
+            const Vector3 vertex = _tranform * _pointCloud[index];
+            if( vertex.x < mLow.x ){ mLow.x = vertex.x; }
+            if( vertex.y < mLow.y ){ mLow.y = vertex.y; }
+            if( vertex.z < mLow.z ){ mLow.z = vertex.z; }
+            if( vertex.x > mHigh.x ){ mHigh.x = vertex.x; }
+            if( vertex.y > mHigh.y ){ mHigh.y = vertex.y; }
+            if( vertex.z > mHigh.z ){ mHigh.z = vertex.z; }
+        }
+        fanAssert( mLow.x <= mHigh.x && mLow.y <= mHigh.y && mLow.z <= mHigh.z );
+    }
 
-	//========================================================================================================
-	//========================================================================================================
-	std::vector< btVector3 > AABB::GetCorners() const
-	{
-		return {
-			// Top face
-			mHigh
-			, btVector3( mLow[ 0 ], mHigh[ 1 ], mHigh[ 2 ] )
-			, btVector3( mLow[ 0 ], mHigh[ 1 ], mLow[ 2 ] )
-			, btVector3( mHigh[ 0 ], mHigh[ 1 ], mLow[ 2 ] )
-			//Bot face
-			, btVector3( mHigh[ 0 ], mLow[ 1 ], mHigh[ 2 ] )
-			, btVector3( mLow[ 0 ], mLow[ 1 ], mHigh[ 2 ] )
-			, mLow
-			, btVector3( mHigh[ 0 ], mLow[ 1 ], mLow[ 2 ] )
-		};
-	}
+    //========================================================================================================
+    //========================================================================================================
+    std::vector<Vector3> AABB::GetCorners() const
+    {
+        return {
+                mHigh, Vector3( mLow.x, mHigh.y, mHigh.z )// Top face
+                , Vector3( mLow.x, mHigh.y, mLow.z ), Vector3( mHigh.x, mHigh.y, mLow.z ), Vector3( mHigh.x, mLow.y, mHigh.z )//Bot face
+                , Vector3( mLow.x, mLow.y, mHigh.z ), mLow, Vector3( mHigh.x, mLow.y, mLow.z )
+        };
+    }
 
-	//========================================================================================================
-	// Fast Ray - Box Intersection
-	// by Andrew Woo
-	// from "Graphics Gems", Academic Press, 1990
-	// Original code : https://github.com/erich666/GraphicsGems/blob/master/gems/RayBox.c
-	//========================================================================================================
-    bool AABB::RayCast( const btVector3 _origin,
-                        const btVector3 _direction,
-                        btVector3& _outIntersection ) const
-	{
-		const int RIGHT = 0;
-		const int LEFT = 1;
-		const int MIDDLE = 2;
+    //========================================================================================================
+    // Fast Ray - Box Intersection
+    // by Andrew Woo
+    // from "Graphics Gems", Academic Press, 1990
+    // Original code : https://github.com/erich666/GraphicsGems/blob/master/gems/RayBox.c
+    //========================================================================================================
+    bool AABB::RayCast( const Vector3& _origin, const Vector3& _direction, Vector3& _outIntersection ) const
+    {
+        const int RIGHT  = 0;
+        const int LEFT   = 1;
+        const int MIDDLE = 2;
 
-		bool inside = true;
-		btVector3 quadrant( 0, 0, 0 );
-		int i;
-		int whichPlane;
-		btVector3 maxT;
-		btVector3 candidatePlane;
+        bool      inside = true;
+        Vector3 quadrant( 0, 0, 0 );
+        int       i;
+        int       whichPlane;
+        Vector3 maxT;
+        Vector3 candidatePlane;
 
-		// Find candidate planes; this loop can be avoided if
-		// rays cast all from the eye(assume perpsective view) 
-		for ( i = 0; i < 3; i++ )
-		{
-			if ( _origin[ i ] < mLow[ i ] )
-			{
-				quadrant[ i ] = LEFT;
-				candidatePlane[ i ] = mLow[ i ];
-				inside = false;
-			}
-			else if ( _origin[ i ] > mHigh[ i ] )
-			{
-				quadrant[ i ] = RIGHT;
-				candidatePlane[ i ] = mHigh[ i ];
-				inside = false;
-			}
-			else
-			{
-				quadrant[ i ] = MIDDLE;
-			}
-		}
+        // Find candidate planes; this loop can be avoided if
+        // rays cast all from the eye(assume perpsective view)
+        for( i = 0; i < 3; i++ )
+        {
+            if( _origin[i] < mLow[i] )
+            {
+                quadrant[i]       = LEFT;
+                candidatePlane[i] = mLow[i];
+                inside = false;
+            }
+            else if( _origin[i] > mHigh[i] )
+            {
+                quadrant[i]       = RIGHT;
+                candidatePlane[i] = mHigh[i];
+                inside = false;
+            }
+            else
+            {
+                quadrant[i] = MIDDLE;
+            }
+        }
 
-		// Ray origin inside bounding box 
-		if ( inside )
-		{
-			_outIntersection = _origin;
-			return true;
-		}
+        // Ray origin inside bounding box
+        if( inside )
+        {
+            _outIntersection = _origin;
+            return true;
+        }
 
 
-		// Calculate T distances to candidate planes 
-		for ( i = 0; i < 3; i++ )
-		{
-			if ( quadrant[ i ] != MIDDLE && _direction[ i ] != 0. )
-				maxT[ i ] = ( candidatePlane[ i ] - _origin[ i ] ) / _direction[ i ];
-			else
-				maxT[ i ] = -1.f;
-		}
+        // Calculate T distances to candidate planes
+        for( i = 0; i < 3; i++ )
+        {
+            if( quadrant[i] != MIDDLE && _direction[i] != 0 )
+            {
+                maxT[i] = ( candidatePlane[i] - _origin[i] ) / _direction[i];
+            }
+            else
+            {
+                maxT[i] = -1;
+            }
+        }
 
-		// Get largest of the maxT's for final choice of intersection 
-		whichPlane = 0;
-		for ( i = 1; i < 3; i++ )
-		{
-			if ( maxT[ whichPlane ] < maxT[ i ] )
-				whichPlane = i;
-		}
+        // Get largest of the maxT's for final choice of intersection
+        whichPlane = 0;
+        for( i     = 1; i < 3; i++ )
+        {
+            if( maxT[whichPlane] < maxT[i] )
+            {
+                whichPlane = i;
+            }
+        }
 
-		// Check final candidate actually inside box 
-		if ( maxT[ whichPlane ] < 0.f )
-		{
-			return false;
-		}
+        // Check final candidate actually inside box
+        if( maxT[whichPlane] < 0 )
+        {
+            return false;
+        }
 
-		for ( i = 0; i < 3; i++ )
-		{
-			if ( whichPlane != i )
-			{
-				_outIntersection[ i ] = _origin[ i ] + maxT[ whichPlane ] * _direction[ i ];
-				if ( _outIntersection[ i ] < mLow[ i ] || _outIntersection[ i ] > mHigh[ i ] )
-					return false;
-			}
-			else
-			{
-				_outIntersection[ i ] = candidatePlane[ i ];
-			}
-		}
+        for( i = 0; i < 3; i++ )
+        {
+            if( whichPlane != i )
+            {
+                _outIntersection[i] = _origin[i] + maxT[whichPlane] * _direction[i];
+                if( _outIntersection[i] < mLow[i] || _outIntersection[i] > mHigh[i] )
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                _outIntersection[i] = candidatePlane[i];
+            }
+        }
 
-		return true;
-	}
+        return true;
+    }
 }

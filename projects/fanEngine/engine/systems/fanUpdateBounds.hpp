@@ -1,62 +1,16 @@
 #include "core/ecs/fanEcsSystem.hpp"
+#include "core/math/fanMatrix4.hpp"
 #include "engine/fanSceneTags.hpp"
 #include "engine/components/fanBounds.hpp"
 #include "engine/components/fanMeshRenderer.hpp"
-#include "engine/components/fanTransform.hpp"
-#include "engine/components/fanMotionState.hpp"
-#include "engine/components/fanRigidbody.hpp"
 #include "engine/components/fanSceneNode.hpp"
 #include "engine/components/fanFxTransform.hpp"
+#include "engine/components/fanFxScale.hpp"
 #include "engine/physics/fanFxSphereCollider.hpp"
 #include "engine/physics/fanFxBoxCollider.hpp"
 
 namespace fan
 {
-	//========================================================================================================
-	// Uses the rigidbody bounds to set the entity bounds
-	//========================================================================================================
-	struct SUpdateBoundsFromRigidbody : EcsSystem
-	{
-		static EcsSignature GetSignature( const EcsWorld& _world )
-		{
-			return
-				_world.GetSignature<SceneNode>() |
-				_world.GetSignature<Transform>() |
-				_world.GetSignature<MotionState>() |
-				_world.GetSignature<Rigidbody>() |
-				_world.GetSignature<Bounds>();
-		}
-
-		static void Run( EcsWorld& /*_world*/, const EcsView& _view, const float _delta )
-		{
-			if( _delta == 0.f ) { return; }
-
-			auto rigidbodyIt = _view.begin<Rigidbody>();
-			auto boundsIt = _view.begin<Bounds>();
-			auto sceneNodeIt = _view.begin<SceneNode>();
-			for( ; rigidbodyIt != _view.end<Rigidbody>(); ++rigidbodyIt, ++boundsIt, ++sceneNodeIt )
-			{
-				SceneNode& sceneNode = *sceneNodeIt;
-				if( !sceneNode.HasFlag( SceneNode::BoundsOutdated ) )
-				{
-					continue;
-				}
-
-				const Rigidbody& rb = *rigidbodyIt;
-				Bounds& bounds = *boundsIt;
-
-				if( !rb.mRigidbody->isInWorld() ) { continue; }
-
-				// gets bounds from rigidbody
-				btVector3 low, high;
-				rb.mRigidbody->getAabb( low, high );
-				bounds.mAabb = AABB( low, high );
-
-				sceneNode.RemoveFlag( SceneNode::BoundsOutdated );
-			}
-		}
-	};
-
 	//========================================================================================================
 	// Uses the convex hull in the mesh renderer mesh to generate new bounds
 	//========================================================================================================
@@ -67,18 +21,17 @@ namespace fan
 			return
 				_world.GetSignature<SceneNode>() |
 				_world.GetSignature<MeshRenderer>() |
-				_world.GetSignature<Transform>() |
+				_world.GetSignature<FxTransform>() |
 				_world.GetSignature<Bounds>();
 		}
 
-		static void Run( EcsWorld& /*_world*/, const EcsView& _view )
+		static void Run( EcsWorld& _world, const EcsView& _view )
 		{
 			auto meshRendererIt = _view.begin<MeshRenderer>();
-			auto transformIt = _view.begin<Transform>();
+			auto transformIt = _view.begin<FxTransform>();
 			auto boundsIt = _view.begin<Bounds>();
 			auto sceneNodeIt = _view.begin<SceneNode>();
-            for( ; meshRendererIt != _view.end<MeshRenderer>();
-                   ++meshRendererIt, ++transformIt, ++boundsIt, ++sceneNodeIt )
+            for( ; meshRendererIt != _view.end<MeshRenderer>();                   ++meshRendererIt, ++transformIt, ++boundsIt, ++sceneNodeIt )
 			{
 				SceneNode& sceneNode = *sceneNodeIt;
 				if( !sceneNode.HasFlag( SceneNode::BoundsOutdated ) )
@@ -86,23 +39,22 @@ namespace fan
 					continue;
 				}
 				const MeshRenderer& renderer = *meshRendererIt;
-				const Transform& transform = *transformIt;
+				const FxTransform& transform = *transformIt;
 				Bounds& bounds = *boundsIt;
+
+				FxScale* scaling = _world.SafeGetComponent<FxScale>( boundsIt.GetEntity() );
 
 				if( *renderer.mMesh != nullptr )
 				{
-					// Calculates model matrix
-					const glm::vec3 position = ToGLM( transform.GetPosition() );
-					const glm::vec3 scale = ToGLM( transform.mScale );
-					const glm::quat rotation = ToGLM( transform.GetRotationQuat() );
-					glm::mat4 modelMatrix =
-					        glm::translate( glm::mat4( 1.f ), position ) *
-					        glm::mat4_cast( rotation ) *
-					        glm::scale( glm::mat4( 1.f ), scale );
+					const Vector3 scale = scaling != nullptr ? scaling->mScale : Vector3{1,1,1};
 
-					// Set the bounds
-					bounds.mAabb = AABB( renderer.mMesh->mConvexHull.mVertices, modelMatrix );
+                    Matrix4 model( transform.mRotation, transform.mPosition );
+                    Matrix4 scaleMatrix = Matrix4::sIdentity;
+                    scaleMatrix.e11 *= scale.x;
+                    scaleMatrix.e22 *= scale.y;
+                    scaleMatrix.e33 *= scale.z;
 
+					bounds.mAabb = AABB( renderer.mMesh->mConvexHull.mVertices, model*scaleMatrix );
 					sceneNode.RemoveFlag( SceneNode::BoundsOutdated );
 				}
 			}
@@ -118,16 +70,16 @@ namespace fan
 		{
 			return
 				_world.GetSignature<SceneNode>() |
-				_world.GetSignature<Transform>() |
+				_world.GetSignature<FxTransform>() |
 				_world.GetSignature<Bounds>();
 		}
 
 		static void Run( EcsWorld& /*_world*/, const EcsView& _view )
 		{
-			auto transformIt = _view.begin<Transform>();
+			auto transformIt = _view.begin<FxTransform>();
 			auto boundsIt = _view.begin<Bounds>();
 			auto sceneNodeIt = _view.begin<SceneNode>();
-			for( ; transformIt != _view.end<Transform>(); ++transformIt, ++boundsIt, ++sceneNodeIt )
+			for( ; transformIt != _view.end<FxTransform>(); ++transformIt, ++boundsIt, ++sceneNodeIt )
 			{
 				SceneNode& sceneNode = *sceneNodeIt;
 				if( !sceneNode.HasFlag( SceneNode::BoundsOutdated ) )
@@ -135,13 +87,12 @@ namespace fan
 					continue;
 				}
 
-				const Transform& transform = *transformIt;
+				const FxTransform& transform = *transformIt;
 				Bounds& bounds = *boundsIt;
 
-				const btVector3 origin = transform.GetPosition();
-				const float sizeBounds = 0.2f;
-                bounds.mAabb = AABB( origin - sizeBounds * btVector3_One,
-                                     origin + sizeBounds * btVector3_One );
+				const Fixed sizeBounds = FIXED(0.2);
+                bounds.mAabb = AABB( transform.mPosition - sizeBounds * Vector3::sOne,
+                                     transform.mPosition + sizeBounds * Vector3::sOne );
 				sceneNode.RemoveFlag( SceneNode::BoundsOutdated );
 			}
 		}
@@ -180,8 +131,8 @@ namespace fan
                 FxSphereCollider& sphere = *sphereIt;
 
                 const Vector3 origin = transform.mPosition;
-                bounds.mAabb = AABB( Math::ToBullet( transform.mPosition - sphere.mRadius * Vector3::sOne ),
-                                     Math::ToBullet( transform.mPosition + sphere.mRadius * Vector3::sOne ) );
+                bounds.mAabb = AABB( transform.mPosition - sphere.mRadius * Vector3::sOne,
+                                     transform.mPosition + sphere.mRadius * Vector3::sOne );
                 sceneNode.RemoveFlag( SceneNode::BoundsOutdated );
             }
         }
@@ -219,26 +170,20 @@ namespace fan
                 Bounds& bounds = *boundsIt;
                 FxBoxCollider& box = *boxIt;
 
-                const Vector3 origin = transform.mPosition;
-
-                glm::vec3 position    = Math::ToGLM( transform.mPosition );
-                glm::quat rotation    = Math::ToGLM( transform.mRotation );
-                glm::mat4 modelMatrix = glm::translate( glm::mat4( 1.f ), position ) * glm::mat4_cast( rotation );
-
-                std::vector<btVector3> pointCloud = {
-                        Math::ToBullet( Vector3( box.mHalfExtents.x, box.mHalfExtents.y, box.mHalfExtents.z ) ),
-                        Math::ToBullet( Vector3( box.mHalfExtents.x, box.mHalfExtents.y, -box.mHalfExtents.z ) ),
-                        Math::ToBullet( Vector3( box.mHalfExtents.x, -box.mHalfExtents.y, box.mHalfExtents.z ) ),
-                        Math::ToBullet( Vector3( box.mHalfExtents.x, -box.mHalfExtents.y, -box.mHalfExtents.z ) ),
-                        Math::ToBullet( Vector3( -box.mHalfExtents.x, box.mHalfExtents.y, box.mHalfExtents.z ) ),
-                        Math::ToBullet( Vector3( -box.mHalfExtents.x, box.mHalfExtents.y, -box.mHalfExtents.z ) ),
-                        Math::ToBullet( Vector3( -box.mHalfExtents.x, -box.mHalfExtents.y, box.mHalfExtents.z ) ),
-                        Math::ToBullet( Vector3( -box.mHalfExtents.x, -box.mHalfExtents.y, -box.mHalfExtents.z ) )
+                std::vector<Vector3> pointCloud = {
+                        Vector3( box.mHalfExtents.x, box.mHalfExtents.y, box.mHalfExtents.z ),
+                        Vector3( box.mHalfExtents.x, box.mHalfExtents.y, -box.mHalfExtents.z ),
+                        Vector3( box.mHalfExtents.x, -box.mHalfExtents.y, box.mHalfExtents.z ),
+                        Vector3( box.mHalfExtents.x, -box.mHalfExtents.y, -box.mHalfExtents.z ),
+                        Vector3( -box.mHalfExtents.x, box.mHalfExtents.y, box.mHalfExtents.z ),
+                        Vector3( -box.mHalfExtents.x, box.mHalfExtents.y, -box.mHalfExtents.z ),
+                        Vector3( -box.mHalfExtents.x, -box.mHalfExtents.y, box.mHalfExtents.z ),
+                        Vector3( -box.mHalfExtents.x, -box.mHalfExtents.y, -box.mHalfExtents.z )
                 };
 
-
                 // Set the bounds
-                bounds.mAabb = AABB( pointCloud, modelMatrix );
+                Matrix4 model( transform.mRotation, transform.mPosition );
+                bounds.mAabb = AABB( pointCloud, model );
                 sceneNode.RemoveFlag( SceneNode::BoundsOutdated );
             }
         }

@@ -32,7 +32,6 @@
 // SCENE
 #include "editor/gui/scene/singletons/fanGuiApplication.hpp"
 #include "editor/gui/scene/singletons/fanGuiMouse.hpp"
-#include "editor/gui/scene/singletons/fanGuiPhysicsWorld.hpp"
 #include "editor/gui/scene/singletons/fanGuiRenderDebug.hpp"
 #include "editor/gui/scene/singletons/fanGuiRenderResources.hpp"
 #include "editor/gui/scene/singletons/fanGuiRenderWorld.hpp"
@@ -50,22 +49,16 @@
 #include "editor/gui/scene/components/ui/fanGuiUITransform.hpp"
 
 #include "editor/gui/scene/components/fanGuiBounds.hpp"
-#include "editor/gui/scene/components/fanGuiBoxShape.hpp"
 #include "editor/gui/scene/components/fanGuiCamera.hpp"
 #include "editor/gui/scene/components/fanGuiDirectionalLight.hpp"
 #include "editor/gui/scene/components/fanGuiExpirationTime.hpp"
 #include "editor/gui/scene/components/fanGuiFollowTransform.hpp"
 #include "editor/gui/scene/components/fanGuiMaterial.hpp"
 #include "editor/gui/scene/components/fanGuiMeshRenderer.hpp"
-#include "editor/gui/scene/components/fanGuiMotionState.hpp"
 #include "editor/gui/scene/components/fanGuiParticle.hpp"
 #include "editor/gui/scene/components/fanGuiParticleEmitter.hpp"
 #include "editor/gui/scene/components/fanGuiPointLight.hpp"
-#include "editor/gui/scene/components/fanGuiRigidbody.hpp"
 #include "editor/gui/scene/components/fanGuiSceneNode.hpp"
-#include "editor/gui/scene/components/fanGuiSphereShape.hpp"
-#include "editor/gui/scene/components/fanGuiTransform.hpp"
-
 
 // FX PHYSICS
 #include "editor/gui/scene/components/fanGuiFxTransform.hpp"
@@ -121,7 +114,6 @@ namespace fan
         // scene
         editorGui.mSingletonInfos[ Application::Info::sType ]       = GuiApplication::GetInfo();
         editorGui.mSingletonInfos[ Mouse::Info::sType ]             = GuiMouse::GetInfo();
-        editorGui.mSingletonInfos[ PhysicsWorld::Info::sType ]      = GuiPhysicsWorld::GetInfo();
         editorGui.mSingletonInfos[ RenderDebug::Info::sType ]       = GuiRenderDebug::GetInfo();
         editorGui.mSingletonInfos[ RenderResources::Info::sType ]   = GuiRenderResources::GetInfo();
         editorGui.mSingletonInfos[ RenderWorld::Info::sType ]       = GuiRenderWorld::GetInfo();
@@ -139,21 +131,16 @@ namespace fan
         editorGui.mComponentInfos[ UITransform::Info::sType ]   = GuiUITransform::GetInfo();
 
         editorGui.mComponentInfos[ Bounds::Info::sType ]   = GuiBounds::GetInfo();
-        editorGui.mComponentInfos[ BoxShape::Info::sType ]   = GuiBoxShape::GetInfo();
         editorGui.mComponentInfos[ Camera::Info::sType ]   = GuiCamera::GetInfo();
         editorGui.mComponentInfos[ DirectionalLight::Info::sType ]   = GuiDirectionalLight::GetInfo();
         editorGui.mComponentInfos[ ExpirationTime::Info::sType ]   = GuiExpirationTime::GetInfo();
         editorGui.mComponentInfos[ FollowTransform::Info::sType ]   = GuiFollowTransform::GetInfo();
         editorGui.mComponentInfos[ Material::Info::sType ]   = GuiMaterial::GetInfo();
         editorGui.mComponentInfos[ MeshRenderer::Info::sType ]   = GuiMeshRenderer::GetInfo();
-        editorGui.mComponentInfos[ MotionState::Info::sType ]   = GuiMotionState::GetInfo();
         editorGui.mComponentInfos[ Particle::Info::sType ]   = GuiParticle::GetInfo();
         editorGui.mComponentInfos[ ParticleEmitter::Info::sType ]   = GuiParticleEmitter::GetInfo();
         editorGui.mComponentInfos[ PointLight::Info::sType ]   = GuiPointLight::GetInfo();
-        editorGui.mComponentInfos[ Rigidbody::Info::sType ]   = GuiRigidbody::GetInfo();
         editorGui.mComponentInfos[ SceneNode::Info::sType ]   = GuiSceneNode::GetInfo();
-        editorGui.mComponentInfos[ SphereShape::Info::sType ]   = GuiSphereShape::GetInfo();
-        editorGui.mComponentInfos[ Transform::Info::sType ]   = GuiTransform::GetInfo();
 
         // fx physics
         editorGui.mComponentInfos[ FxRigidbody::Info::sType ]   = GuiFxRigidbody::GetInfo();
@@ -179,3 +166,4 @@ namespace fan
         return mSingletonInfos.at( _type );
     }
 }
+  

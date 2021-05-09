@@ -1,20 +1,18 @@
 #pragma once
 
-#include "core/shapes/fanShape.hpp"
+#include <LinearMath/btVector3.h>
 
 namespace fan
 {
 	//========================================================================================================
 	// 3D plane
-	// @todo we don't need the m_point, only the distance to the plane when following the normal
+	// @todo better use point+distance
 	//========================================================================================================
-	struct Plane : public Shape
+	struct Plane
 	{
 	public:
 		Plane( const btVector3 _point, const btVector3 _normal );
-        bool RayCast( const btVector3 _origin,
-                      const btVector3 _dir,
-                      btVector3& _outIntersection ) const override;
+        bool RayCast( const btVector3 _origin, const btVector3 _dir, btVector3& _outIntersection ) const;
 
 		btVector3 mPoint;
 		btVector3 mNormal;

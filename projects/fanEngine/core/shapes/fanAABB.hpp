@@ -8,25 +8,29 @@
 
 namespace fan
 {
-	//========================================================================================================
-	// axis aligned bounding box
-	//========================================================================================================
-	struct AABB : public Shape
-	{
-		AABB();
-		AABB( const btVector3 _low, const btVector3 _high );
-		AABB( const std::vector<btVector3> _pointCloud, const glm::mat4 _modelMatrix );
+    struct Matrix4;
 
-		void					    Clear() { mLow = btVector3_Zero; mHigh = btVector3_Zero; }
-		btVector3					GetLow() const { return mLow; }
-		btVector3					GetHigh() const { return mHigh; }
-		std::vector< btVector3 >	GetCorners() const;
+    //========================================================================================================
+    // axis aligned bounding box
+    //========================================================================================================
+    struct AABB
+    {
+        AABB();
+        AABB( const Vector3 _low, const Vector3 _high );
+        AABB( const std::vector<Vector3>& _pointCloud, const Matrix4& _tranform );
 
-        virtual bool RayCast( const btVector3 _origin,
-                              const btVector3 _direction,
-                              btVector3& outIntersection ) const override;
+        void Clear()
+        {
+            mLow = Vector3::sZero;
+            mHigh = Vector3::sZero;
+        }
+        Vector3 GetLow() const { return mLow; }
+        Vector3 GetHigh() const { return mHigh; }
+        std::vector<Vector3> GetCorners() const;
 
-		btVector3 mLow;
-		btVector3 mHigh;
-	};
+        bool RayCast( const Vector3& _origin, const Vector3& _direction, Vector3& outIntersection ) const;
+
+        Vector3 mLow;
+        Vector3 mHigh;
+    };
 }

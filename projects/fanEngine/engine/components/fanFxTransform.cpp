@@ -4,6 +4,8 @@
 
 namespace fan
 {
+    const FxTransform FxTransform::sIdentity = FxTransform::Make( Quaternion::sIdentity, Vector3::sZero );
+
     //========================================================================================================
     //========================================================================================================
     void FxTransform::SetInfo( EcsComponentInfo& _info )
@@ -42,6 +44,16 @@ namespace fan
 
     //========================================================================================================
     //========================================================================================================
+    FxTransform FxTransform::Make( const Quaternion& _rotation, const Vector3& _position )
+    {
+        FxTransform transform;
+        transform.mRotation = _rotation;
+        transform.mPosition = _position;
+        return transform;
+    }
+
+    //========================================================================================================
+    //========================================================================================================
     glm::mat4 FxTransform::GetModelMatrix( const Vector3& _scale ) const
     {
         glm::vec3 position = Math::ToGLM( mPosition );
@@ -66,6 +78,16 @@ namespace fan
     {
         const Vector3 forward = ( _point - mPosition ).Normalized();
         mRotation = Quaternion::LookRotation( forward, _up );
+    }
+
+    //========================================================================================================
+    //========================================================================================================
+    FxTransform FxTransform::Inverse() const
+    {
+        FxTransform inverse;
+        inverse.mRotation = mRotation.Inverse();
+        inverse.mPosition = -( inverse.mRotation * mPosition );
+        return inverse;
     }
 
     //========================================================================================================

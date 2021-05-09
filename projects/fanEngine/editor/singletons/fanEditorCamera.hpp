@@ -3,6 +3,7 @@
 #include "core/ecs/fanEcsSingleton.hpp"
 #include "fanDisableWarnings.hpp"
 #include "fanGlm.hpp"
+#include "core/math/fanFixedPoint.hpp"
 
 namespace fan
 {
@@ -18,11 +19,11 @@ namespace fan
 		static void Init( EcsWorld& _world, EcsSingleton& _component );
 
 		EcsHandle mCameraHandle;
-		float     mSpeed           = 10.f;
-		float     mSpeedMultiplier = 3.f;
-		glm::vec2 mXYSensitivity   = glm::vec2( 0.005f, 0.005f );
+		Fixed     mSpeed;
+		Fixed     mSpeedMultiplier;
+		glm::vec2 mXYSensitivity ;
 
-		static void Update( EcsWorld& _world, const float _delta );
+		static void Update( EcsWorld& _world, const Fixed _delta );
 		static void CreateEditorCamera( EcsWorld& _world );
 	};
 }
