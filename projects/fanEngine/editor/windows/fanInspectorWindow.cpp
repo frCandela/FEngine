@@ -2,7 +2,7 @@
 
 #include <sstream>
 #include <core/fanPath.hpp>
-#include "engine/fanDragnDrop.hpp"
+#include "editor/fanDragnDrop.hpp"
 #include "engine/singletons/fanScene.hpp"
 #include "engine/components/fanSceneNode.hpp"
 #include "core/time/fanProfiler.hpp"

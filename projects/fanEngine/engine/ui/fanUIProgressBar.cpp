@@ -1,4 +1,4 @@
-#include "engine/components/ui/fanUIProgressBar.hpp"
+#include "fanUIProgressBar.hpp"
 
 namespace fan
 {

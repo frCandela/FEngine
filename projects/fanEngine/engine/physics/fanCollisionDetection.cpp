@@ -2,7 +2,7 @@
 
 #include "core/time/fanProfiler.hpp"
 #include "engine/physics/fanFxRigidbody.hpp"
-#include "engine/components/fanFxTransform.hpp"
+#include "fanFxTransform.hpp"
 #include "engine/physics/fanFxSphereCollider.hpp"
 #include "engine/physics/fanFxBoxCollider.hpp"
 #include "engine/singletons/fanRenderDebug.hpp"
@@ -109,7 +109,7 @@ namespace fan
             return;
         }
 
-        const Vector3 closestPointWorld = (*_rbBox.mTransform) *  closestPoint;
+        const Vector3 closestPointWorld = (*_rbBox.mTransform) * closestPoint;
         const Vector3 normal            = ( closestPointWorld - centerSphere ).Normalized();
         if( Fixed::IsFuzzyZero( normal.SqrMagnitude() - 1 ) )
         {

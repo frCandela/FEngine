@@ -1,6 +1,6 @@
 #pragma once
 
-#include "engine/components/ui/fanUIButton.hpp"
+#include "engine/ui/fanUIButton.hpp"
 #include "engine/fanSceneTags.hpp"
 #include "editor/singletons/fanEditorGuiInfo.hpp"
 #include "editor/gui/fanGuiSlot.hpp"

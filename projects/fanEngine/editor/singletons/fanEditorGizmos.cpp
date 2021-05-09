@@ -5,7 +5,7 @@
 #include "core/math/fanBasicModels.hpp"
 #include "core/ecs/fanEcsWorld.hpp"
 #include "engine/components/fanSceneNode.hpp"
-#include "engine/components/fanFxTransform.hpp"
+#include "engine/physics/fanFxTransform.hpp"
 #include "engine/components/fanCamera.hpp"
 #include "engine/singletons/fanRenderDebug.hpp"
 #include "engine/singletons/fanMouse.hpp"

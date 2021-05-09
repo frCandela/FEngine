@@ -1,6 +1,6 @@
 #pragma once
 
-#include "engine/components/ui/fanUIAlign.hpp"
+#include "engine/ui/fanUIAlign.hpp"
 #include "editor/singletons/fanEditorGuiInfo.hpp"
 
 namespace fan

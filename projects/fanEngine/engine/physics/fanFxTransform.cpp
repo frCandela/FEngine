@@ -1,4 +1,4 @@
-#include "engine/components/fanFxTransform.hpp"
+#include "fanFxTransform.hpp"
 #include "core/memory/fanSerializable.hpp"
 #include "core/math/fanMathUtils.hpp"
 

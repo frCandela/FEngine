@@ -2,7 +2,7 @@
 
 #include "core/ecs/fanEcsComponent.hpp"
 #include "core/ecs/fanSlot.hpp"
-#include "engine/components/ui/fanUITransform.hpp"
+#include "fanUITransform.hpp"
 #include "engine/fanSceneResourcePtr.hpp"
 #include "core/fanColor.hpp"
 #include "render/fanRenderResourcePtr.hpp"

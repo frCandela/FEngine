@@ -1,7 +1,7 @@
 #include "core/ecs/fanEcsSystem.hpp"
 #include "core/math/fanMathUtils.hpp"
 #include "core/random/fanRandom.hpp"
-#include "engine/components/fanFxTransform.hpp"
+#include "engine/physics/fanFxTransform.hpp"
 #include "engine/components/fanParticleEmitter.hpp"
 #include "engine/components/fanParticle.hpp"
 

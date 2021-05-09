@@ -4,7 +4,7 @@
 #include "engine/physics/fanFxRigidbody.hpp"
 #include "engine/physics/fanFxBoxCollider.hpp"
 #include "engine/physics/fanFxSphereCollider.hpp"
-#include "engine/components/fanFxTransform.hpp"
+#include "fanFxTransform.hpp"
 
 namespace fan
 {

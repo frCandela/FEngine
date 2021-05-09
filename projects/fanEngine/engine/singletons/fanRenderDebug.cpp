@@ -3,7 +3,7 @@
 #include "core/math/fanBasicModels.hpp"
 #include "core/fanDebug.hpp"
 #include "core/math/fanVector3.hpp"
-#include "engine/components/fanFxTransform.hpp"
+#include "engine/physics/fanFxTransform.hpp"
 #include "editor/fanModals.hpp"
 
 namespace fan

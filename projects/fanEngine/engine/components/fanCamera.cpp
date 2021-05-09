@@ -2,7 +2,7 @@
 
 #include "glm/gtc/matrix_transform.hpp"
 #include "core/math/fanMathUtils.hpp"
-#include "engine/components/fanFxTransform.hpp"
+#include "engine/physics/fanFxTransform.hpp"
 #include "render/fanRenderSerializable.hpp"
 #include "core/shapes/fanRay.hpp"
 

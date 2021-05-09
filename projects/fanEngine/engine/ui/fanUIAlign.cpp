@@ -1,5 +1,5 @@
-#include "engine/components/ui/fanUIAlign.hpp"
-#include "engine/components/ui/fanUITransform.hpp"
+#include "fanUIAlign.hpp"
+#include "fanUITransform.hpp"
 #include "engine/fanEngineSerializable.hpp"
 
 namespace fan

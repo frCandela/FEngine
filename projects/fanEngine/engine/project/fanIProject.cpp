@@ -15,7 +15,7 @@
 #include "network/singletons/fanTime.hpp"
 
 // physics
-#include "engine/components/fanFxTransform.hpp"
+#include "engine/physics/fanFxTransform.hpp"
 #include "engine/components/fanFxScale.hpp"
 #include "engine/physics/fanFxRigidbody.hpp"
 #include "engine/physics/fanFxSphereCollider.hpp"
@@ -34,13 +34,13 @@
 #include "engine/singletons/fanRenderDebug.hpp"
 
 // render ui
-#include "engine/components/ui/fanUITransform.hpp"
-#include "engine/components/ui/fanUIRenderer.hpp"
-#include "engine/components/ui/fanUIProgressBar.hpp"
-#include "engine/components/ui/fanUIButton.hpp"
-#include "engine/components/ui/fanUILayout.hpp"
-#include "engine/components/ui/fanUIAlign.hpp"
-#include "engine/components/ui/fanUIText.hpp"
+#include "engine/ui/fanUITransform.hpp"
+#include "engine/ui/fanUIRenderer.hpp"
+#include "engine/ui/fanUIProgressBar.hpp"
+#include "engine/ui/fanUIButton.hpp"
+#include "engine/ui/fanUILayout.hpp"
+#include "engine/ui/fanUIAlign.hpp"
+#include "engine/ui/fanUIText.hpp"
 
 // network client
 #include "network/components/fanReliabilityLayer.hpp"

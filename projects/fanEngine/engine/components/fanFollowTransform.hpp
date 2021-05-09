@@ -1,7 +1,7 @@
 #pragma  once
 
 #include "core/ecs/fanEcsComponent.hpp"
-#include "engine/components/fanFxTransform.hpp"
+#include "engine/physics/fanFxTransform.hpp"
 
 namespace fan
 {

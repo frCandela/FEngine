@@ -1,4 +1,4 @@
-#include "engine/components/ui/fanUIRenderer.hpp"
+#include "fanUIRenderer.hpp"
 #include "render/fanRenderSerializable.hpp"
 #include "render/resources/fanMesh2DManager.hpp"
 #include "render/fanRenderGlobal.hpp"

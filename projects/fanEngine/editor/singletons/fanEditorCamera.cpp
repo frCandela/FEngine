@@ -4,7 +4,7 @@
 #include "core/input/fanInputManager.hpp"
 #include "core/shapes/fanRay.hpp"
 #include "core/math/fanMathUtils.hpp"
-#include "engine/components/fanFxTransform.hpp"
+#include "engine/physics/fanFxTransform.hpp"
 #include "engine/components/fanCamera.hpp"
 #include "engine/components/fanSceneNode.hpp"
 #include "engine/singletons/fanMouse.hpp"

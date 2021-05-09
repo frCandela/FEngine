@@ -8,7 +8,7 @@
 #include "render/fanRenderer.hpp"
 #include "render/resources/fanMesh.hpp"
 #include "render/resources/fanMesh2D.hpp"
-#include "editor/fanRenderDragnDrop.hpp"
+#include "editor/fanDragnDrop.hpp"
 #include "engine/singletons/fanSceneResources.hpp"
 #include "engine/singletons/fanRenderResources.hpp"
 #include "engine/fanPrefabManager.hpp"

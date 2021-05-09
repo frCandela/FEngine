@@ -2,7 +2,7 @@
 #include "core/memory/fanSerializable.hpp"
 #include "engine/singletons/fanRenderResources.hpp"
 #include "engine/components/fanSceneNode.hpp"
-#include "engine/components/fanFxTransform.hpp"
+#include "engine/physics/fanFxTransform.hpp"
 #include "engine/components/fanMeshRenderer.hpp"
 #include "engine/components/fanMaterial.hpp"
 #include "engine/singletons/fanScene.hpp"

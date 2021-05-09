@@ -9,7 +9,7 @@
 #include "render/fanRenderGlobal.hpp"
 #include "engine/singletons/fanScene.hpp"
 #include "engine/components/fanSceneNode.hpp"
-#include "engine/components/fanFxTransform.hpp"
+#include "engine/physics/fanFxTransform.hpp"
 #include "editor/singletons/fanEditorGrid.hpp"
 #include "editor/windows/fanEditorWindow.hpp"
 #include "editor/singletons/fanEditorSelection.hpp"

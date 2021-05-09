@@ -1,4 +1,4 @@
-#include <engine/components/fanFxTransform.hpp>
+#include <engine/physics/fanFxTransform.hpp>
 #include "fanIProjectContainer.hpp"
 #include "core/time/fanProfiler.hpp"
 #include "core/math/fanMathUtils.hpp"
@@ -8,7 +8,7 @@
 #include "engine/singletons/fanScene.hpp"
 #include "engine/singletons/fanApplication.hpp"
 #include "engine/components/fanCamera.hpp"
-#include "engine/components/fanFxTransform.hpp"
+#include "engine/physics/fanFxTransform.hpp"
 #include "engine/singletons/fanRenderResources.hpp"
 #include "engine/singletons/fanSceneResources.hpp"
 

@@ -1,4 +1,4 @@
-#include "engine/components/ui/fanUIButton.hpp"
+#include "fanUIButton.hpp"
 #include "editor/fanModals.hpp"
 #include "render/fanRenderSerializable.hpp"
 #include "engine/fanSceneTags.hpp"

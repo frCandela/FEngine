@@ -3,7 +3,7 @@
 #include "core/unit_tests/fanUnitTest.hpp"
 #include "core/math/fanMathUtils.hpp"
 #include "render/fanWindow.hpp"
-#include "engine/components/fanFxTransform.hpp"
+#include "engine/physics/fanFxTransform.hpp"
 
 namespace fan
 {

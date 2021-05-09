@@ -2,7 +2,7 @@
 
 #include "core/fanPath.hpp"
 #include "engine/components/fanSceneNode.hpp"
-#include "engine/fanDragnDrop.hpp"
+#include "editor/fanDragnDrop.hpp"
 #include "render/fanRenderGlobal.hpp"
 #include "editor/singletons/fanEditorGuiInfo.hpp"
 #include "editor/fanModals.hpp"

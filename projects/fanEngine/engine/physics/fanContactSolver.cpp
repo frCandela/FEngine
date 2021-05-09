@@ -3,7 +3,7 @@
 #include "core/time/fanProfiler.hpp"
 #include "engine/physics/fanContactSolver.hpp"
 #include "engine/physics/fanFxRigidbody.hpp"
-#include "engine/components/fanFxTransform.hpp"
+#include "fanFxTransform.hpp"
 #include "engine/singletons/fanRenderDebug.hpp"
 
 namespace fan

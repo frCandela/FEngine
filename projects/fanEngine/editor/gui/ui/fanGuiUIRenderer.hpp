@@ -1,6 +1,6 @@
 #pragma once
 
-#include "engine/components/ui/fanUIRenderer.hpp"
+#include "engine/ui/fanUIRenderer.hpp"
 #include "engine/fanSceneTags.hpp"
 #include "editor/singletons/fanEditorGuiInfo.hpp"
 #include "editor/fanModals.hpp"

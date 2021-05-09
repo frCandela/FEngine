@@ -4,7 +4,7 @@
 #include "engine/components/fanBounds.hpp"
 #include "engine/components/fanMeshRenderer.hpp"
 #include "engine/components/fanSceneNode.hpp"
-#include "engine/components/fanFxTransform.hpp"
+#include "engine/physics/fanFxTransform.hpp"
 #include "engine/components/fanFxScale.hpp"
 #include "engine/physics/fanFxSphereCollider.hpp"
 #include "engine/physics/fanFxBoxCollider.hpp"

@@ -1,6 +1,6 @@
 #include <core/fanDebug.hpp>
 #include "engine/physics/fanFxRigidbody.hpp"
-#include "engine/components/fanFxTransform.hpp"
+#include "fanFxTransform.hpp"
 #include "engine/physics/fanFxPhysicsWorld.hpp"
 
 namespace fan

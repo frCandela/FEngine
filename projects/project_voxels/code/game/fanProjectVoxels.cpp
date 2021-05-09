@@ -30,7 +30,7 @@
 #include "editor/fanModals.hpp"
 #include "editor/singletons/fanGuiTestSingleton.hpp"
 #include "editor/components/fanGuiTestComponent.hpp"
-#include "editor/gui/scene/singletons/fanGuiVoxelTerrain.hpp"
+#include "editor/gui/singletons/fanGuiVoxelTerrain.hpp"
 
 #endif
 

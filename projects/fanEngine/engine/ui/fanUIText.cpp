@@ -1,7 +1,7 @@
 #include "core/ecs/fanEcsWorld.hpp"
 #include "render/resources/fanMesh2D.hpp"
 #include "render/resources/fanMesh2DManager.hpp"
-#include "engine/components/ui/fanUIText.hpp"
+#include "fanUIText.hpp"
 #include "engine/fanEngineSerializable.hpp"
 #include "engine/singletons/fanRenderResources.hpp"
 #include "engine/fanSceneTags.hpp"

@@ -1,6 +1,6 @@
 #include "core/ecs/fanEcsSystem.hpp"
-#include "engine/components/ui/fanUITransform.hpp"
-#include "engine/components/ui/fanUIAlign.hpp"
+#include "engine/ui/fanUITransform.hpp"
+#include "engine/ui/fanUIAlign.hpp"
 #include "engine/singletons/fanRenderWorld.hpp"
 
 namespace fan
