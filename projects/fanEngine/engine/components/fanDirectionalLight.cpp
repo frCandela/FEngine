@@ -19,7 +19,7 @@ namespace fan
 		DirectionalLight& light = static_cast<DirectionalLight&>( _component );
 		light.mAmbiant  = Color( 0.1f, 0.1f, 0.1f );
 		light.mDiffuse  = Color::sWhite;
-		light.mSpecular = Color::sWhite;
+		light.mSpecular = Color::sDarkGrey;
 	}
 
 	//========================================================================================================

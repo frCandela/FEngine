@@ -55,7 +55,7 @@ namespace fan
                     const SpawnInfo spawnInfo = spawn::SpawnShip::GenerateInfo( hostHandle,
                                                                                 spawnFrame,
                                                                                 hostData.mSpaceshipID,
-                                                                                btVector3_Zero );
+                                                                                Vector3_Zero );
 					hostData.mNextPlayerStateFrame = spawnFrame + 60; // timing of the first state snapshot
 					spawnManager.spawns.push_back( spawnInfo );		  // triggers spaceship spawn on server
 					
@@ -82,7 +82,7 @@ namespace fan
                                     otherHostHandle,
                                     spawnFrame,
                                     otherHostData.mSpaceshipID,
-                                    btVector3_Zero );
+                                    Vector3_Zero );
 							hostReplication.Replicate(
 								ClientRPC::RPCSpawn( otherHostspawnInfo )
 								, HostReplication::ResendUntilReplicated
@@ -264,7 +264,7 @@ namespace fan
 
 							const EcsEntity shipEntityID = _world.GetEntity( hostData.mSpaceshipHandle );
 							PlayerInput& input = _world.GetComponent<PlayerInput>( shipEntityID );
-                            input.mOrientation = btVector3( inputData.mOrientation.x,
+                            input.mOrientation = Vector3( inputData.mOrientation.x,
                                                             0.f,
                                                             inputData.mOrientation.y );
 							input.mLeft        = inputData.mLeft ? 1.f : ( inputData.mRight ? -1.f : 0.f );

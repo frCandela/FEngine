@@ -44,17 +44,17 @@ namespace fan
 
 
 // 			const Transform& transform = m_gameobject->GetTransform();
-// 			const btVector3 pos = transform.GetPosition();
-// 			const btVector3 dir = transform.Forward();
-// 			const btVector3 up = transform.Up();
-// 			const btVector3 left = transform.Left();
+// 			const Vector3 pos = transform.GetPosition();
+// 			const Vector3 dir = transform.Forward();
+// 			const Vector3 up = transform.Up();
+// 			const Vector3 left = transform.Left();
 // 			const float length = 2.f;
 // 			const float radius = 0.5f;
 // 			const Color color = Color::Yellow;
-// 			btVector3 offsets[5] = { btVector3_Zero, radius * up ,-radius * up, radius * left ,-radius * left };
+// 			Vector3 offsets[5] = { Vector3_Zero, radius * up ,-radius * up, radius * left ,-radius * left };
 // 			for( int offsetIndex = 0; offsetIndex < 5; offsetIndex++ )
 // 			{
-// 				const btVector3 offset = offsets[offsetIndex];
+// 				const Vector3 offset = offsets[offsetIndex];
 // 				_world.GetSingleton<RenderDebug>().DebugLine( pos + offset, pos + offset + length * dir, color );
 // 			}
 // 			_world.GetSingleton<RenderDebug>().DebugSphere( transform.GetBtTransform(), radius, 0, color );

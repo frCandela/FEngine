@@ -1,9 +1,6 @@
 #pragma once
 
 #include <map>
-#include "LinearMath/btVector3.h"
-#include "LinearMath/btTransform.h"
-
 #include "core/ecs/fanEcsSingleton.hpp"
 #include "core/math/fanVector3.hpp"
 
@@ -14,7 +11,6 @@ namespace fan
 
 	//========================================================================================================
 	// allows displaying of the translation manipulator
-	// @todo make this a singleton component in the editor ecs world
 	//========================================================================================================
 	struct EditorGizmos : EcsSingleton
 	{

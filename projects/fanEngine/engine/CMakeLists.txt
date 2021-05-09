@@ -2,9 +2,6 @@
 file(GLOB_RECURSE FAN_ENGINE_H *.hpp)
 
 set( FAN_ENGINE_LIBS
-    BulletDynamics
-    BulletCollision
-    LinearMath
     sfml-system
     sfml-network
     fanCore		

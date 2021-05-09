@@ -56,34 +56,23 @@ namespace fan
                         "(d=distance)" );
                 if( ImGui::Button( "##constant attenuation" ) )
                 {
-                    pointLight.mAttenuation[PointLight::Attenuation::Constant] = 0.f;
+                    pointLight.mAttenuation[PointLight::Attenuation::Constant] = 0;
                 }
                 ImGui::SameLine();
-                ImGui::DragFloat( "constant",
-                                  &pointLight.mAttenuation[PointLight::Attenuation::Constant],
-                                  0.01f,
-                                  0.f,
-                                  100.f );
+
+                ImGui::DragFixed( "constant", &pointLight.mAttenuation[PointLight::Attenuation::Constant], 0.01f, 0.f, 100.f );
                 if( ImGui::Button( "##linear attenuation" ) )
                 {
-                    pointLight.mAttenuation[PointLight::Attenuation::Linear] = 0.f;
+                    pointLight.mAttenuation[PointLight::Attenuation::Linear] = 0;
                 }
                 ImGui::SameLine();
-                ImGui::DragFloat( "linear",
-                                  &pointLight.mAttenuation[PointLight::Attenuation::Linear],
-                                  0.001f,
-                                  0.f,
-                                  100.f );
+                ImGui::DragFixed( "linear", &pointLight.mAttenuation[PointLight::Attenuation::Linear], 0.001f, 0.f, 100.f );
                 if( ImGui::Button( "##quadratic attenuation" ) )
                 {
-                    pointLight.mAttenuation[PointLight::Attenuation::Quadratic] = 0.f;
+                    pointLight.mAttenuation[PointLight::Attenuation::Quadratic] = 0;
                 }
                 ImGui::SameLine();
-                ImGui::DragFloat( "quadratic",
-                                  &pointLight.mAttenuation[PointLight::Attenuation::Quadratic],
-                                  0.0001f,
-                                  0.f,
-                                  100.f );
+                ImGui::DragFixed( "quadratic", &pointLight.mAttenuation[PointLight::Attenuation::Quadratic], 0.0001f, 0.f, 100.f );
             }
             ImGui::PopItemWidth();
         }

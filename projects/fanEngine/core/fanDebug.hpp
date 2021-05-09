@@ -3,6 +3,7 @@
 #include <sstream>
 #include "core/fanSingleton.hpp"
 #include "core/ecs/fanSignal.hpp"
+#include "core/math/fanFixedPoint.hpp"
 
 namespace fan
 {
@@ -66,6 +67,12 @@ namespace fan
 			mCurrentType = _type;
 			return *this;
 		}
+
+        Debug& operator<<( Fixed _fixed )
+        {	// Appends a value to the current log
+            mStringstream << _fixed.ToFloat();
+            return *this;
+        }
 
 		//====================================================================================================
 		template <typename T>

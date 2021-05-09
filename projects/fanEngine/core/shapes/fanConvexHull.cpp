@@ -1,7 +1,6 @@
 #include "core/shapes/fanConvexHull.hpp"
 
 #include "quickhull/QuickHull.hpp"
-#include "LinearMath/btConvexHull.h"
 #include "core/fanDebug.hpp"
 #include "core/shapes/fanTriangle.hpp"
 

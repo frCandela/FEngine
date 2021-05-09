@@ -1,6 +1,6 @@
 #pragma once
 
-#include <LinearMath/btVector3.h>
+#include "core/math/fanVector3.hpp"
 
 namespace fan
 {
@@ -11,10 +11,10 @@ namespace fan
 	struct Plane
 	{
 	public:
-		Plane( const btVector3 _point, const btVector3 _normal );
-        bool RayCast( const btVector3 _origin, const btVector3 _dir, btVector3& _outIntersection ) const;
+		Plane( const Vector3 _point, const Vector3 _normal );
+        bool RayCast( const Vector3& _origin, const Vector3& _dir, Vector3& _outIntersection ) const;
 
-		btVector3 mPoint;
-		btVector3 mNormal;
+		Vector3 mPoint;
+		Vector3 mNormal;
 	};
 }

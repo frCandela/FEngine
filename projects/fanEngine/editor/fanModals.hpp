@@ -3,12 +3,17 @@
 #include <set>
 #include <string>
 #include "imgui/imgui.h"
+#include "core/math/fanFixedPoint.hpp"
 
 namespace ImGui
 {
     const int fanColorEditFlags = ImGuiColorEditFlags_PickerHueWheel |
                                   ImGuiColorEditFlags_AlphaBar |
                                   ImGuiColorEditFlags_Float;
+
+    bool          DragFixed( const char* label, fan::Fixed* v, float v_speed = 1.0f, float v_min = 0.0f, float v_max = 0.0f, const char* format = "%.3f", ImGuiSliderFlags flags = 0);
+    bool          DragFixed2(const char* label, fan::Fixed v[2], float v_speed = 1.0f, float v_min = 0.0f, float v_max = 0.0f, const char* format = "%.3f", ImGuiSliderFlags flags = 0);
+    bool          DragFixed3(const char* label, fan::Fixed v[3], float v_speed = 1.0f, float v_min = 0.0f, float v_max = 0.0f, const char* format = "%.3f", ImGuiSliderFlags flags = 0);
 
 	void FanShowHelpMarker( const char* _desc );
 	void FanToolTip( const char* _desc );

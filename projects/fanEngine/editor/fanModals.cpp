@@ -15,6 +15,48 @@ namespace ImGui
 {
     //==========================================================================================================================
     //==========================================================================================================================
+    bool DragFixed( const char* label, fan::Fixed* v, float v_speed, float v_min, float v_max, const char* format, ImGuiSliderFlags flags )
+    {
+        float tmpV = v->ToFloat();
+        if( ImGui::DragFloat( label, &tmpV, v_speed, v_min, v_max, format, flags ) )
+        {
+            *v = fan::Fixed::FromFloat( tmpV );
+            return true;
+        }
+        return false;
+    }
+
+    //==========================================================================================================================
+    //==========================================================================================================================
+    bool DragFixed2( const char* label, fan::Fixed v[2], float v_speed, float v_min, float v_max, const char* format, ImGuiSliderFlags flags )
+    {
+        float tmpV[2] = { v[0].ToFloat(), v[1].ToFloat() };
+        if( ImGui::DragFloat2( label, tmpV, v_speed, v_min, v_max, format, flags ) )
+        {
+            v[0] = fan::Fixed::FromFloat( tmpV[0] );
+            v[1] = fan::Fixed::FromFloat( tmpV[1] );
+            return true;
+        }
+        return false;
+    }
+
+    //==========================================================================================================================
+    //==========================================================================================================================
+    bool DragFixed3( const char* label, fan::Fixed v[3], float v_speed, float v_min, float v_max, const char* format, ImGuiSliderFlags flags )
+    {
+        float tmpV[3] = { v[0].ToFloat(), v[1].ToFloat(), v[2].ToFloat() };
+        if( ImGui::DragFloat3( label, tmpV, v_speed, v_min, v_max, format, flags ) )
+        {
+            v[0] = fan::Fixed::FromFloat( tmpV[0] );
+            v[1] = fan::Fixed::FromFloat( tmpV[1] );
+            v[2] = fan::Fixed::FromFloat( tmpV[2] );
+            return true;
+        }
+        return false;
+    }
+
+    //==========================================================================================================================
+    //==========================================================================================================================
     void FanShowHelpMarker( const char* _desc )
     {
         ImGui::TextDisabled( "(?)" );
@@ -77,7 +119,7 @@ namespace ImGui
                                            ImGuiSelectableFlags_DontClosePopups |
                                            ImGuiSelectableFlags_AllowDoubleClick ) )
                     {
-                        _path = childPath ;
+                        _path = childPath;
                         if( ImGui::IsMouseDoubleClicked( 0 ) && isFile )
                         {
                             returnValue = true;

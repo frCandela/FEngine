@@ -2,6 +2,7 @@
 
 #include "core/ecs/fanEcsComponent.hpp"
 #include "core/fanColor.hpp"
+#include "core/math/fanFixedPoint.hpp"
 
 namespace fan
 {
@@ -21,8 +22,8 @@ namespace fan
 		Color mAmbiant        = Color::sWhite;
 		Color mDiffuse        = Color::sWhite;
 		Color mSpecular       = Color::sWhite;
-		float mAttenuation[3] = { 0.f, 0.f, 0.1f };
+        Fixed mAttenuation[3] = { 0, 0, FIXED(0.1) };
 
-		static float GetLightRange( const PointLight& _light );
+		static Fixed GetLightRange( const PointLight& _light );
 	};
 }

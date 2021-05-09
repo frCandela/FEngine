@@ -1,13 +1,12 @@
 #include "fanSerializedValues.hpp"
 
 #include <fstream>
-#include "LinearMath/btQuaternion.h"
 #include "core/memory/fanSerializable.hpp"
 #include "core/input/fanInputManager.hpp"
 #include "core/input/fanInput.hpp"
 #include "core/fanDebug.hpp"
 #include "core/fanColor.hpp"
-
+#include "core/math/fanVector3.hpp"
 
 namespace fan
 {
@@ -78,11 +77,15 @@ namespace fan
         SerializedValues::Get().GetInt( "renderer_position_x", _outPosition.x );
         SerializedValues::Get().GetInt( "renderer_position_y", _outPosition.y );
     }
-    void SerializedValues::SetVec3( const char* _name, const btVector3& _vec3 )
+    void SerializedValues::SetVec3( const char* _name, const Vector3& _vec3 )
     {
         Serializable::SaveVec3( mJson[mValuesName], _name, _vec3 );
     }
-    void SerializedValues::SetQuat( const char* _name, const btQuaternion& _quat )
+    void SerializedValues::SetVec3( const char* _name, const glm::vec3 & _vec3 )
+    {
+        Serializable::SaveVec3( mJson[mValuesName], _name, _vec3 );
+    }
+    void SerializedValues::SetQuat( const char* _name, const Quaternion& _quat )
     {
         Serializable::SaveQuat( mJson[mValuesName], _name, _quat );
     }
@@ -110,11 +113,11 @@ namespace fan
     {
         Serializable::SaveString( mJson[mValuesName], _name, _string );
     }
-    bool SerializedValues::GetVec3( const char* _name, btVector3& _outVec3 )
+    bool SerializedValues::GetVec3( const char* _name, Vector3& _outVec3 )
     {
         return Serializable::LoadVec3( mJson[mValuesName], _name, _outVec3 );
     }
-    bool SerializedValues::GetQuat( const char* _name, btQuaternion& _outQuat )
+    bool SerializedValues::GetQuat( const char* _name, Quaternion& _outQuat )
     {
         return Serializable::LoadQuat( mJson[mValuesName], _name, _outQuat );
     }

@@ -1,8 +1,8 @@
 #pragma once
 
-#include "LinearMath/btVector3.h"
 #include "core/ecs/fanEcsSingleton.hpp"
 #include "core/fanColor.hpp"
+#include "core/math/fanVector3.hpp"
 
 namespace fan
 {
@@ -17,9 +17,9 @@ namespace fan
 		static void Save( const EcsSingleton& _component, Json& _json );
 		static void Load( EcsSingleton& _component, const Json& _json );
 
-		btVector3 mOffset;
+		Vector3   mOffset;
 		Color     mColor;
-		float     mSpacing;
+		Fixed     mSpacing;
 		int       mLinesCount;
 		bool      mIsVisible;
 

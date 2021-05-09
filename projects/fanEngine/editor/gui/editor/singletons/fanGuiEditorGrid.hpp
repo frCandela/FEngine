@@ -1,8 +1,8 @@
 #pragma once
 
-#include "editor/singletons/fanEditorGrid.hpp"
 #include "editor/singletons/fanEditorGuiInfo.hpp"
-
+#include "editor/singletons/fanEditorGrid.hpp"
+#include "core/math/fanMathUtils.hpp"
 #include "editor/fanModals.hpp"
 
 namespace fan
@@ -14,10 +14,10 @@ namespace fan
         static GuiSingletonInfo GetInfo()
         {
             GuiSingletonInfo info;
-            info.mEditorName  = "editor grid";
-            info.mIcon  = ImGui::Grid16;
-            info.mGroup = EngineGroups::Editor;
-            info.onGui  = GuiEditorGrid::OnGui;
+            info.mEditorName = "editor grid";
+            info.mIcon       = ImGui::Grid16;
+            info.mGroup      = EngineGroups::Editor;
+            info.onGui       = GuiEditorGrid::OnGui;
             return info;
         }
 
@@ -27,10 +27,12 @@ namespace fan
         {
             EditorGrid& grid = static_cast<EditorGrid&>( _component );
             ImGui::MenuItem( "visible", nullptr, &grid.mIsVisible );
-            ImGui::DragFloat( "spacing", &grid.mSpacing, 0.25f, 0.f, 100.f );
+            ImGui::DragFixed( "spacing", &grid.mSpacing, 0.25f, 0.f, 100.f );
             ImGui::DragInt( "lines count", &grid.mLinesCount, 1.f, 0, 1000 );
             ImGui::ColorEdit4( "color", &grid.mColor[0], ImGui::fanColorEditFlags );
-            ImGui::DragFloat3( "offset", &grid.mOffset[0] );
+
+            glm::vec3 offset = Math::ToGLM( grid.mOffset );
+            if( ImGui::DragFloat3( "offset", &offset.x ) ){ grid.mOffset = Math::ToFixed( offset ); }
         }
     };
 }

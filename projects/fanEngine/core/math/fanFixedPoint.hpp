@@ -66,7 +66,8 @@ namespace fan
             return f;
         }
 
-        DataType GetData() const { return mData; }
+        DataType& GetData() { return mData; }
+        const DataType& GetData() const { return mData; }
 
         constexpr inline int ToInt() const { return DataType( mData >> sFractionalSize ); }
         constexpr inline float ToFloat() const { return float( mData ) / sFixed_One; }
@@ -113,24 +114,28 @@ namespace fan
             mData -= _value.mData;
             return *this;
         }
-        constexpr Fixed operator-() const
+        constexpr Fixed operator-() const// unary (-)
         {
             Fixed f;
             f.mData = -mData;
             return f;
         }
-        // unary (-)
-        constexpr Fixed& operator--()
+        constexpr Fixed operator+() const// unary (+)
+        {
+            return *this;
+        }
+        constexpr Fixed& operator--() // prefix (--)
         {
             mData -= sFixed_One;
             return *this;
-        } // prefix (--)
-        constexpr Fixed operator--( int )
+        }
+
+        constexpr Fixed operator--( int )// postfix (--)
         {
             Fixed result = *this;
             --( *this );
             return result;
-        }// postfix (--)
+        }
 
         constexpr Fixed operator*( const Fixed& _value ) const
         {

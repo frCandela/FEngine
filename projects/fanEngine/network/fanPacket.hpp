@@ -3,10 +3,10 @@
 #include <iostream>
 #include <limits>
 #include <type_traits>
-#include "LinearMath/btVector3.h"
 #include "core/ecs/fanSignal.hpp"
 #include "core/fanDebug.hpp"
 #include "network/fanNetConfig.hpp"
+#include "core/math/fanVector3.hpp"
 
 namespace fan
 {
@@ -244,37 +244,37 @@ namespace fan
 		void Read( Packet& _packet )
 		{
 			_packet >> mFrameIndex;
-			_packet >> mPosition[0]			>> mPosition[1]			>> mPosition[2];
-			_packet >> mOrientation[0]		>> mOrientation[1]		>> mOrientation[2];
-			_packet >> mVelocity[0]			>> mVelocity[1]			>> mVelocity[2];
-			_packet >> mAngularVelocity[0]	>> mAngularVelocity[1]	>> mAngularVelocity[2];
+			_packet >> mPosition[0].GetData()			>> mPosition[1].GetData()			>> mPosition[2].GetData();
+			_packet >> mOrientation[0].GetData()		>> mOrientation[1].GetData()		>> mOrientation[2].GetData();
+			_packet >> mVelocity[0].GetData()			>> mVelocity[1].GetData()			>> mVelocity[2].GetData();
+			_packet >> mAngularVelocity[0].GetData()	>> mAngularVelocity[1].GetData()	>> mAngularVelocity[2].GetData();
 		}
 
 		void Write( Packet& _packet ) const
 		{
 			_packet << PacketTypeInt( PacketType::PlayerGameState );
 			_packet << mFrameIndex;
-			_packet << mPosition[0]			<< mPosition[1]			<< mPosition[2];
-			_packet << mOrientation[0]		<< mOrientation[1]		<< mOrientation[2];
-			_packet << mVelocity[0]			<< mVelocity[1]			<< mVelocity[2];
-			_packet << mAngularVelocity[0]	<< mAngularVelocity[1]	<< mAngularVelocity[2];
+			_packet << mPosition[0].GetData()			<< mPosition[1].GetData()			<< mPosition[2].GetData();
+			_packet << mOrientation[0].GetData()		<< mOrientation[1].GetData()		<< mOrientation[2].GetData();
+			_packet << mVelocity[0].GetData()			<< mVelocity[1].GetData()			<< mVelocity[2].GetData();
+			_packet << mAngularVelocity[0].GetData()	<< mAngularVelocity[1].GetData()	<< mAngularVelocity[2].GetData();
 		}
 
 		bool operator==( const PacketPlayerGameState& _other ) const
 		{
 			return mFrameIndex == _other.mFrameIndex &&
-                   ( mPosition - _other.mPosition			).fuzzyZero() &&
-                   ( mOrientation - _other.mOrientation		).fuzzyZero() &&
-                   ( mVelocity - _other.mVelocity			).fuzzyZero() &&
-                   ( mAngularVelocity - _other.mAngularVelocity	).fuzzyZero();
+                   Vector3::IsFuzzyZero( mPosition - _other.mPosition			) &&
+                   Vector3::IsFuzzyZero( mOrientation - _other.mOrientation		) &&
+                   Vector3::IsFuzzyZero( mVelocity - _other.mVelocity			) &&
+                   Vector3::IsFuzzyZero( mAngularVelocity - _other.mAngularVelocity	);
 		}
 		bool operator!=( const PacketPlayerGameState& _other ) const { return !( *this == _other ); }
 
 		FrameIndex mFrameIndex = 0;			// the  frame index when creating state
-		btVector3  mPosition;
-		btVector3  mOrientation;
-		btVector3  mVelocity;
-		btVector3  mAngularVelocity;
+		Vector3  mPosition;
+		Vector3  mOrientation;
+		Vector3  mVelocity;
+		Vector3  mAngularVelocity;
 	};
 	
 }

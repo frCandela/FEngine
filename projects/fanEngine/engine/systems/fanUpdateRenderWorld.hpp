@@ -180,9 +180,9 @@ namespace fan
 				pointLight.mDiffuse   = light.mDiffuse.ToGLM();
 				pointLight.mSpecular  = light.mSpecular.ToGLM();
 				pointLight.mAmbiant   = light.mAmbiant.ToGLM();
-				pointLight.mConstant  = light.mAttenuation[PointLight::Constant];
-				pointLight.mLinear    = light.mAttenuation[PointLight::Linear];
-				pointLight.mQuadratic = light.mAttenuation[PointLight::Quadratic];
+				pointLight.mConstant  = light.mAttenuation[PointLight::Constant].ToFloat();
+				pointLight.mLinear    = light.mAttenuation[PointLight::Linear].ToFloat();
+				pointLight.mQuadratic = light.mAttenuation[PointLight::Quadratic].ToFloat();
 
 				renderWorld.pointLights.push_back( pointLight );
 			}

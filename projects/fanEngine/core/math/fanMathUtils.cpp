@@ -41,25 +41,4 @@ namespace fan
         rotation.mAngle  = Fixed::FromFloat( _quat.w );
         return rotation;
     }
-
-    //========================================================================================================
-    //========================================================================================================
-    btVector3 Math::ToBullet( const Vector3& _vec )
-    {
-        return btVector3( _vec.x.ToFloat(), _vec.y.ToFloat(), _vec.z.ToFloat() );
-    }
-
-    //========================================================================================================
-    //========================================================================================================
-    Vector3 Math::ToFixed( const btVector3& _vec )
-    {
-        return Vector3( Fixed::FromFloat( _vec.x() ), Fixed::FromFloat( _vec.y() ), Fixed::FromFloat( _vec.z() ) );
-    }
-
-    //========================================================================================================
-    //========================================================================================================
-    btQuaternion Math::ToBullet( const Quaternion& _quat )
-    {
-        return btQuaternion( _quat.mAxis.x.ToFloat(), _quat.mAxis.y.ToFloat(), _quat.mAxis.z.ToFloat(), _quat.mAngle.ToFloat() );
-    }
 }

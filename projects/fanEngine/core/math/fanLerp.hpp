@@ -1,7 +1,5 @@
 #pragma once
 
-#include "LinearMath/btVector3.h"
-
 namespace fan
 {
 	//========================================================================================================
@@ -10,7 +8,7 @@ namespace fan
 	//========================================================================================================
 	namespace Math
 	{
-		inline btVector3 Lerp( const btVector3 _begin, const btVector3 _end, float _delta )
+		inline Vector3 Lerp( const Vector3 _begin, const Vector3 _end, float _delta )
 		{
 			return _begin + _delta * ( _end - _begin );
 		}

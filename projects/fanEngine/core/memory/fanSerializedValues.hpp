@@ -5,13 +5,11 @@
 #include "fanDisableWarnings.hpp"
 #include "fanGlm.hpp"
 
-class btQuaternion;
-class btVector3;
-class btVector4;
-
 namespace fan
 {
 	class Color;
+    struct Quaternion;
+    struct Vector3;
 
 	//========================================================================================================
 	// holds global editor value that are saved/restored
@@ -24,8 +22,9 @@ namespace fan
 		void SaveValuesToDisk();
 		void LoadKeyBindings();
 
-		void SetVec3	( const char * _name, const btVector3&		_vec3 );
-		void SetQuat	( const char * _name, const btQuaternion&	_quat );
+		void SetVec3	( const char * _name, const Vector3&		_vec3 );
+        void SetVec3	( const char * _name, const glm::vec3 &		_vec3 );
+		void SetQuat	( const char * _name, const Quaternion&	_quat );
 		void SetColor	( const char * _name, const Color&			_color );
 		void SetFloat	( const char * _name, const float&			_float );
 		void SetInt		( const char * _name, const int&			_int );
@@ -33,8 +32,9 @@ namespace fan
 		void SetBool	( const char * _name, const bool&			_bool );
 		void SetString	( const char * _name, const std::string&	_string );
 
-		bool GetVec3	( const char * _name, btVector3&		_outVec3 );
-		bool GetQuat	( const char * _name, btQuaternion&		_outQuat );
+		bool GetVec3	( const char * _name, Vector3&		    _outVec3 );
+        bool GetVec3	( const char * _name, glm::vec3&		_outVec3 );
+		bool GetQuat	( const char * _name, Quaternion&		_outQuat );
 		bool GetColor	( const char * _name, Color&			_outColor );
 		bool GetFloat	( const char * _name, float&			_outFloat );
 		bool GetInt		( const char * _name, int&				_outInt );

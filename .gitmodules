@@ -19,6 +19,3 @@
 [submodule "submodules/stb"]
 	path = submodules/stb
 	url = https://github.com/nothings/stb.git
-[submodule "submodules/bullet3"]
-	path = submodules/bullet3
-	url = https://github.com/bulletphysics/bullet3.git

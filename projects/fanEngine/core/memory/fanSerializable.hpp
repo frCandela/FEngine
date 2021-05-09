@@ -6,10 +6,6 @@
 #include "fanJson.hpp"
 
 class Color;
-class btQuaternion;
-class btVector3;
-class btVector4;
-
 
 namespace fan
 {
@@ -24,10 +20,8 @@ namespace fan
 	namespace Serializable {
 		void SaveIVec2( Json& _json, const char* _name, const glm::ivec2& _vec2 );
 		void SaveVec2( Json& _json, const char* _name, const glm::vec2& _vec2 );
-		void SaveVec3(Json& _json, const char* _name, const btVector3& _vec3);
         void SaveVec3(Json& _json, const char* _name, const Vector3& _vec3);
-		void SaveVec4(Json& _json, const char* _name, const btVector4& _vec4);
-		void SaveQuat(Json& _json, const char* _name, const btQuaternion& _quat);
+        void SaveVec3(Json& _json, const char* _name, const glm::vec3& _vec3);
         void SaveQuat(Json& _json, const char* _name, const Quaternion& _quat);
 		void SaveColor(Json& _json, const char* _name, const Color& _color);
 		void SaveFloat(Json& _json, const char* _name, const float& _float);
@@ -41,10 +35,8 @@ namespace fan
 
 		bool LoadIVec2( const Json& _json, const char* _name, glm::ivec2& _outVec2 );
 		bool LoadVec2( const Json& _json, const char* _name, glm::vec2& _outVec2 );
-		bool LoadVec3(const Json& _json, const char* _name, btVector3& _outVec3);
         bool LoadVec3(const Json& _json, const char* _name, Vector3& _outVec3);
-		bool LoadVec4(const Json& _json, const char* _name, btVector4& _outVec4);
-		bool LoadQuat(const Json& _json, const char* _name, btQuaternion& _outQuat);
+        bool LoadVec3(const Json& _json, const char* _name, glm::vec3& _outVec3);
         bool LoadQuat(const Json& _json, const char* _name, Quaternion& _outQuat);
 		bool LoadColor(const Json& _json, const char* _name, Color& _outColor);
 		bool LoadFloat(const Json& _json, const char* _name, float& _outFloat);

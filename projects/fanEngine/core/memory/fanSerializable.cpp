@@ -1,6 +1,4 @@
 #include "core/memory/fanSerializable.hpp"
-#include "LinearMath/btVector3.h"
-#include "LinearMath/btQuaternion.h"
 #include "core/fanDebug.hpp"
 #include "core/fanColor.hpp"
 #include "core/math/fanVector3.hpp"
@@ -26,11 +24,11 @@ namespace fan
 
     //========================================================================================================
     //========================================================================================================
-    void Serializable::SaveVec3( Json& _json, const char* _name, const btVector3& _vec3 )
+    void Serializable::SaveVec3( Json& _json, const char* _name, const glm::vec3& _vec3 )
     {
-        _json[_name]["x"] = _vec3[0];
-        _json[_name]["y"] = _vec3[1];
-        _json[_name]["z"] = _vec3[2];
+        _json[_name]["x"] = _vec3.x;
+        _json[_name]["y"] = _vec3.y;
+        _json[_name]["z"] = _vec3.z;
     }
 
     //========================================================================================================
@@ -40,26 +38,6 @@ namespace fan
         _json[_name]["x"] = _vec3.x.GetData();
         _json[_name]["y"] = _vec3.y.GetData();
         _json[_name]["z"] = _vec3.z.GetData();
-    }
-
-    //========================================================================================================
-    //========================================================================================================
-    void Serializable::SaveVec4( Json& _json, const char* _name, const btVector4& _vec4 )
-    {
-        _json[_name]["x"] = _vec4[0];
-        _json[_name]["y"] = _vec4[1];
-        _json[_name]["z"] = _vec4[2];
-        _json[_name]["w"] = _vec4[3];
-    }
-
-    //========================================================================================================
-    //========================================================================================================
-    void Serializable::SaveQuat( Json& _json, const char* _name, const btQuaternion& _quat )
-    {
-        _json[_name]["x"] = _quat[0];
-        _json[_name]["y"] = _quat[1];
-        _json[_name]["z"] = _quat[2];
-        _json[_name]["w"] = _quat[3];
     }
 
     //========================================================================================================
@@ -173,14 +151,14 @@ namespace fan
 
     //========================================================================================================
     //========================================================================================================
-    bool Serializable::LoadVec3( const Json& _json, const char* _name, btVector3& _outVec3 )
+    bool Serializable::LoadVec3( const Json& _json, const char* _name, glm::vec3& _outVec3 )
     {
         const Json* token = FindToken( _json, _name );
         if( token != nullptr )
         {
-            _outVec3[0] = ( *token )["x"];
-            _outVec3[1] = ( *token )["y"];
-            _outVec3[2] = ( *token )["z"];
+            _outVec3.x = ( *token )["x"];
+            _outVec3.y = ( *token )["y"];
+            _outVec3.z = ( *token )["z"];
             return true;
         }
         return false;
@@ -196,38 +174,6 @@ namespace fan
             _outVec3.x.SetData( ( *token )["x"] );
             _outVec3.y.SetData( ( *token )["y"] );
             _outVec3.z.SetData( ( *token )["z"] );
-            return true;
-        }
-        return false;
-    }
-
-    //========================================================================================================
-    //========================================================================================================
-    bool Serializable::LoadVec4( const Json& _json, const char* _name, btVector4& _outVec4 )
-    {
-        const Json* token = FindToken( _json, _name );
-        if( token != nullptr )
-        {
-            _outVec4[0] = ( *token )["x"];
-            _outVec4[1] = ( *token )["y"];
-            _outVec4[2] = ( *token )["z"];
-            _outVec4[3] = ( *token )["w"];
-            return true;
-        }
-        return false;
-    }
-
-    //========================================================================================================
-    //========================================================================================================
-    bool Serializable::LoadQuat( const Json& _json, const char* _name, btQuaternion& _outQuat )
-    {
-        const Json* token = FindToken( _json, _name );
-        if( token != nullptr )
-        {
-            _outQuat[0] = ( *token )["x"];
-            _outQuat[1] = ( *token )["y"];
-            _outQuat[2] = ( *token )["z"];
-            _outQuat[3] = ( *token )["w"];
             return true;
         }
         return false;
