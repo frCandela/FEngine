@@ -36,7 +36,7 @@ namespace fan
                     sceneNode.AddFlag( SceneNode::BoundsOutdated );
                 }
                 ImGui::SameLine();
-                glm::vec3 position = Math::ToGLM( transform.mPosition );
+                glm::vec3 position = transform.mPosition.ToGlm();
                 if( ImGui::DragFloat3( "position", &position[0], 0.1f ) )
                 {
                     Vector3 newPosition = { Fixed::FromFloat( position.x ), Fixed::FromFloat( position.y ), Fixed::FromFloat( position.z ) };
@@ -57,7 +57,7 @@ namespace fan
                 }
                 ImGui::SameLine();
                 Vector3   oldRotation = transform.mRotation.Euler();
-                glm::vec3 rotation    = Math::ToGLM( oldRotation );
+                glm::vec3 rotation    = oldRotation.ToGlm();
                 rotation = {
                         std::abs( rotation.x ) < 0.01 ? 0.f : rotation.x,
                         std::abs( rotation.y ) < 0.01 ? 0.f : rotation.y,

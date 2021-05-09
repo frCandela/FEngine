@@ -3,7 +3,6 @@
 #include <fstream>
 #include "core/fanPath.hpp"
 #include "core/fanDebug.hpp"
-#include "core/math/fanMathUtils.hpp"
 #include "engine/singletons/fanRenderResources.hpp"
 #include "editor/fanDragnDrop.hpp"
 #include "render/resources/fanTextureManager.hpp"

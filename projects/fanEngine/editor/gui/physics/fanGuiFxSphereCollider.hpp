@@ -49,10 +49,10 @@ namespace fan
                     _world.GetComponent<SceneNode>( _entity ).AddFlag( SceneNode::BoundsOutdated );
                 }
                 ImGui::SameLine();
-                glm::vec3 offset = Math::ToGLM( sphere.mOffset );
+                glm::vec3 offset = sphere.mOffset.ToGlm();
                 if( ImGui::DragFloat3( "offset", &offset.x, 0.01f, -1000.f, 1000.f ) )
                 {
-                    sphere.mOffset = Math::ToFixed( offset );
+                    sphere.mOffset = Vector3( offset );
                     _world.GetComponent<SceneNode>( _entity ).AddFlag( SceneNode::BoundsOutdated );
                 }
             }

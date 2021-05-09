@@ -1,6 +1,7 @@
 #pragma once
 
 #include "core/math/fanVector3.hpp"
+#include "fanGlm.hpp"
 
 namespace fan
 {
@@ -15,8 +16,9 @@ namespace fan
 
         Quaternion() : mAngle( 1 ), mAxis() {} // identity
         Quaternion( Fixed _angle, Fixed _x, Fixed _y, Fixed _z ) : mAngle( _angle ), mAxis( _x, _y, _z ) {}
-
         Quaternion( Fixed _n, Vector3 _v ) : mAngle( _n ), mAxis( _v ) {}
+        explicit Quaternion( const glm::quat& _quat ) : mAngle( Fixed::FromFloat( _quat.w ) ), mAxis( Vector3( glm::vec3( _quat.x, _quat.y, _quat.z ) ) ) {}
+        glm::quat ToGlm() const { return glm::quat( mAngle.ToFloat(), mAxis.ToGlm() ); }
 
         Fixed SqrMagnitude() const { return mAngle * mAngle + mAxis.x * mAxis.x + mAxis.y * mAxis.y + mAxis.z * mAxis.z; }
         Fixed Magnitude() const { return Fixed::Sqrt( SqrMagnitude() ); }

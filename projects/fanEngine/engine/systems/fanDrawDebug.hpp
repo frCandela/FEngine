@@ -1,5 +1,4 @@
 #include "core/ecs/fanEcsSystem.hpp"
-#include "core/math/fanMathUtils.hpp"
 #include "engine/components/fanBounds.hpp"
 #include "engine/components/fanMeshRenderer.hpp"
 #include "engine/ui/fanUITransform.hpp"
@@ -65,8 +64,8 @@ namespace fan
                     for( int index = 0; index < (int)indices.size(); index++ )
                     {
                         const Vertex& vertex = vertices[indices[index]];
-                        const Vector3 position = Math::ToFixed( modelMat * glm::vec4( vertex.mPos, 1.f ) );
-                        const Vector3 normal   = Math::ToFixed( normalMat * glm::vec4( vertex.mNormal, 1.f ) );
+                        const Vector3 position = Vector3( modelMat * glm::vec4( vertex.mPos, 1.f ) );
+                        const Vector3 normal   = Vector3( normalMat * glm::vec4( vertex.mNormal, 1.f ) );
                         RenderDebug& renderDebug = _world.GetSingleton<RenderDebug>();
                         renderDebug.DebugLine( position, position + FIXED( 0.1 ) * normal, Color::sGreen );
                     }
@@ -100,9 +99,9 @@ namespace fan
 
                 for( int index = 0; index < (int)indices.size() / 3; index++ )
                 {
-                    const Vector3 v0 = Math::ToFixed( modelMat * glm::vec4( vertices[indices[3 * index + 0]].mPos, 1.f ) );
-                    const Vector3 v1 = Math::ToFixed( modelMat * glm::vec4( vertices[indices[3 * index + 1]].mPos, 1.f ) );
-                    const Vector3 v2 = Math::ToFixed( modelMat * glm::vec4( vertices[indices[3 * index + 2]].mPos, 1.f ) );
+                    const Vector3 v0 = Vector3( modelMat * glm::vec4( vertices[indices[3 * index + 0]].mPos, 1.f ) );
+                    const Vector3 v1 = Vector3( modelMat * glm::vec4( vertices[indices[3 * index + 1]].mPos, 1.f ) );
+                    const Vector3 v2 = Vector3( modelMat * glm::vec4( vertices[indices[3 * index + 2]].mPos, 1.f ) );
                     _world.GetSingleton<RenderDebug>().DebugLine( v0, v1, Color::sYellow );
                     _world.GetSingleton<RenderDebug>().DebugLine( v1, v2, Color::sYellow );
                     _world.GetSingleton<RenderDebug>().DebugLine( v2, v0, Color::sYellow );
@@ -146,9 +145,9 @@ namespace fan
                     const Vector3 vec0      = hull.mVertices[index0];
                     const Vector3 vec1      = hull.mVertices[index1];
                     const Vector3 vec2      = hull.mVertices[index2];
-                    const Vector3 worldVec0 = Math::ToFixed( modelMat * glm::vec4( Math::ToGLM( vec0 ), 1.f ) );
-                    const Vector3 worldVec1 = Math::ToFixed( modelMat * glm::vec4( Math::ToGLM( vec1 ), 1.f ) );
-                    const Vector3 worldVec2 = Math::ToFixed( modelMat * glm::vec4( Math::ToGLM( vec2 ), 1.f ) );
+                    const Vector3 worldVec0 = Vector3( modelMat * glm::vec4( vec0.ToGlm(), 1.f ) );
+                    const Vector3 worldVec1 = Vector3( modelMat * glm::vec4( vec1.ToGlm(), 1.f ) );
+                    const Vector3 worldVec2 = Vector3( modelMat * glm::vec4( vec2.ToGlm(), 1.f ) );
 
                     _world.GetSingleton<RenderDebug>().DebugLine( worldVec0, worldVec1, color );
                     _world.GetSingleton<RenderDebug>().DebugLine( worldVec1, worldVec2, color );

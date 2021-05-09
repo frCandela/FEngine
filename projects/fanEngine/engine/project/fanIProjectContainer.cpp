@@ -1,14 +1,12 @@
 #include <engine/physics/fanFxTransform.hpp>
 #include "fanIProjectContainer.hpp"
 #include "core/time/fanProfiler.hpp"
-#include "core/math/fanMathUtils.hpp"
 #include "engine/project/fanIProject.hpp"
 #include "engine/singletons/fanRenderWorld.hpp"
 #include "engine/singletons/fanRenderDebug.hpp"
 #include "engine/singletons/fanScene.hpp"
 #include "engine/singletons/fanApplication.hpp"
 #include "engine/components/fanCamera.hpp"
-#include "engine/physics/fanFxTransform.hpp"
 #include "engine/singletons/fanRenderResources.hpp"
 #include "engine/singletons/fanSceneResources.hpp"
 
@@ -26,10 +24,7 @@ namespace fan
         mFullScreen.SavePreviousPositionAndSize( mWindow );
 
         SceneResources::SetupResources( mPrefabManager );
-        RenderResources::SetupResources( mRenderer.mMeshManager,
-                                         mRenderer.mMesh2DManager,
-                                         mRenderer.mTextureManager,
-                                         mRenderer.mFontManager );
+        RenderResources::SetupResources( mRenderer.mMeshManager, mRenderer.mMesh2DManager, mRenderer.mTextureManager, mRenderer.mFontManager );
         mWindow.SetIcon( _settings.mIconPath );
     }
 
@@ -98,7 +93,7 @@ namespace fan
             camera.mAspectRatio = Fixed::FromFloat( _size[0] / _size[1] );
 
             FxTransform& cameraTransform = world.GetComponent<FxTransform>( cameraID );
-            _renderer.SetMainCamera( camera.GetProjection(), camera.GetView( cameraTransform ), Math::ToGLM( cameraTransform.mPosition ) );
+            _renderer.SetMainCamera( camera.GetProjection(), camera.GetView( cameraTransform ), cameraTransform.mPosition.ToGlm() );
         }
     }
 }

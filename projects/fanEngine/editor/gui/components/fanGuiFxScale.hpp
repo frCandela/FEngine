@@ -36,7 +36,7 @@ namespace fan
                     sceneNode.AddFlag( SceneNode::BoundsOutdated );
                 }
                 ImGui::SameLine();
-                glm::vec3 glmScale = Math::ToGLM( scale.mScale );
+                glm::vec3 glmScale =scale.mScale.ToGlm();
                 if( ImGui::DragFloat3( "scale", &glmScale[0], 0.1f ) )
                 {
                     Vector3 newScale = { Fixed::FromFloat( glmScale.x ), Fixed::FromFloat( glmScale.y ), Fixed::FromFloat( glmScale.z ) };

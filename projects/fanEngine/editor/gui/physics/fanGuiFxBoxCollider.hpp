@@ -34,10 +34,10 @@ namespace fan
                     GuiFxRigidbody::TryUpdateInvInertiaTensorLocal( _world, _entity );
                 }
                 ImGui::SameLine();
-                glm::vec3 halfExtents = Math::ToGLM( box.mHalfExtents );
+                glm::vec3 halfExtents = box.mHalfExtents.ToGlm();
                 if( ImGui::DragFloat3( "half extents", &halfExtents[0], 0.01f, -1000.f, 1000.f ) )
                 {
-                    box.mHalfExtents = Math::ToFixed( halfExtents );
+                    box.mHalfExtents = Vector3( halfExtents );
                     _world.GetComponent<SceneNode>( _entity ).AddFlag( SceneNode::BoundsOutdated );
                     GuiFxRigidbody::TryUpdateInvInertiaTensorLocal( _world, _entity );
                 }

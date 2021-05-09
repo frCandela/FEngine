@@ -1,6 +1,7 @@
 #pragma once
 
 #include "core/math/fanFixedPoint.hpp"
+#include "fanGlm.hpp"
 
 namespace fan
 {
@@ -15,6 +16,9 @@ namespace fan
         constexpr Vector3() : x( 0 ), y( 0 ), z( 0 ) {}
         constexpr Vector3( const Fixed& _x, const Fixed& _y, const Fixed& _z ) : x( _x ), y( _y ), z( _z ) {}
         constexpr Vector3( const Vector3& _other ) : x( _other.x ), y( _other.y ), z( _other.z ) {}
+
+        explicit Vector3( const glm::vec3& _vec3 ) : x( Fixed::FromFloat( _vec3.x ) ), y( Fixed::FromFloat( _vec3.y ) ), z( Fixed::FromFloat( _vec3.z ) ) {}
+        glm::vec3 ToGlm() const { return glm::vec3( x.ToFloat(), y.ToFloat(), z.ToFloat() ); }
 
         Fixed SqrMagnitude() const { return x * x + y * y + z * z; }
         Fixed Magnitude() const { return Fixed::Sqrt( SqrMagnitude() ); }

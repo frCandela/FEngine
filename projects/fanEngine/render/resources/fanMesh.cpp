@@ -3,7 +3,6 @@
 #include "render/fanGLTFImporter.hpp"
 #include "render/core/fanDevice.hpp"
 #include "core/fanDebug.hpp"
-#include "core/math/fanMathUtils.hpp"
 #include "core/shapes/fanTriangle.hpp"
 
 namespace fan
@@ -103,7 +102,7 @@ namespace fan
         for( int point = 0; point < (int)mVertices.size(); point++ )
         {
             Vertex& vertex = mVertices[point];
-            pointCloud.push_back( Math::ToFixed( vertex.mPos ) );
+            pointCloud.push_back( Vector3( vertex.mPos ) );
         }
         mConvexHull.ComputeQuickHull( pointCloud );
     }
@@ -117,9 +116,9 @@ namespace fan
         Fixed    closestDistance = Fixed::sMaxValue;
         for( int triIndex        = 0; triIndex < (int)mIndices.size() / 3; triIndex++ )
         {
-            const Vector3  v0 = Math::ToFixed( mVertices[mIndices[3 * triIndex + 0]].mPos );
-            const Vector3  v1 = Math::ToFixed( mVertices[mIndices[3 * triIndex + 1]].mPos );
-            const Vector3  v2 = Math::ToFixed( mVertices[mIndices[3 * triIndex + 2]].mPos );
+            const Vector3  v0 = Vector3( mVertices[mIndices[3 * triIndex + 0]].mPos );
+            const Vector3  v1 = Vector3( mVertices[mIndices[3 * triIndex + 1]].mPos );
+            const Vector3  v2 = Vector3( mVertices[mIndices[3 * triIndex + 2]].mPos );
             const Triangle triangle( v0, v1, v2 );
 
             if( triangle.RayCast( _origin, _direction, intersection ) )

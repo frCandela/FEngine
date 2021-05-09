@@ -3,7 +3,6 @@
 #include "core/fanAssert.hpp"
 #include "core/unit_tests/fanUnitTest.hpp"
 #include "core/math/fanQuaternion.hpp"
-#include "core/math/fanMathUtils.hpp"
 
 namespace fan
 {
@@ -255,7 +254,7 @@ namespace fan
             TEST_ASSERT( Vector3::IsFuzzyZero( lookRotation * Vector3::sForward - Vector3( -FIXED( 0.5 ), -FIXED( 0.3 ), FIXED( 0.7 ) ).Normalized() ) )
 
             lookRotation = Quaternion::LookRotation( Vector3::sBack );
-            glm::vec3 glq = Math::ToGLM( lookRotation * Vector3::sForward );
+            glm::vec3 glq = ( lookRotation * Vector3::sForward ).ToGlm();
             TEST_ASSERT( Vector3::IsFuzzyZero( lookRotation * Vector3::sForward - Vector3::sBack ) )
         }
     };

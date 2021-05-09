@@ -2,7 +2,6 @@
 
 #include "editor/singletons/fanEditorGuiInfo.hpp"
 #include "editor/singletons/fanEditorGrid.hpp"
-#include "core/math/fanMathUtils.hpp"
 #include "editor/fanModals.hpp"
 
 namespace fan
@@ -29,8 +28,8 @@ namespace fan
             ImGui::DragInt( "lines count", &grid.mLinesCount, 1.f, 0, 1000 );
             ImGui::ColorEdit4( "color", &grid.mColor[0], ImGui::fanColorEditFlags );
 
-            glm::vec3 offset = Math::ToGLM( grid.mOffset );
-            if( ImGui::DragFloat3( "offset", &offset.x ) ){ grid.mOffset = Math::ToFixed( offset ); }
+            glm::vec3 offset = grid.mOffset.ToGlm();
+            if( ImGui::DragFloat3( "offset", &offset.x ) ){ grid.mOffset = Vector3( offset ); }
         }
     };
 }

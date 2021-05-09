@@ -1,6 +1,5 @@
 #include "engine/components/fanCamera.hpp"
 
-#include "core/math/fanMathUtils.hpp"
 #include "engine/physics/fanFxTransform.hpp"
 #include "render/fanRenderSerializable.hpp"
 #include "core/shapes/fanRay.hpp"
@@ -62,9 +61,7 @@ namespace fan
     //==================================================================================================================================================================================================
     glm::mat4 Camera::GetView( const FxTransform& _cameraTransform ) const
     {
-        return glm::lookAt( Math::ToGLM( _cameraTransform.mPosition ),
-                            Math::ToGLM( _cameraTransform.mPosition + _cameraTransform.Forward() ),
-                            Math::ToGLM( _cameraTransform.Up() ) );
+        return glm::lookAt( _cameraTransform.mPosition.ToGlm(), ( _cameraTransform.mPosition + _cameraTransform.Forward() ).ToGlm(), _cameraTransform.Up().ToGlm() );
     }
 
     //==================================================================================================================================================================================================
@@ -137,14 +134,14 @@ namespace fan
     {
         if( mType == Type::Perspective )
         {
-            const glm::vec4 pos( Math::ToGLM( _worldPosition ), 1.f );
+            const glm::vec4 pos( _worldPosition.ToGlm(), 1.f );
             glm::vec4       proj = GetProjection() * GetView( _cameraTransform ) * pos;
             proj /= proj.z;
             return glm::vec2( proj.x, proj.y );
         }
         else
         {
-            const glm::vec4 pos( Math::ToGLM( _worldPosition ), 1.f );
+            const glm::vec4 pos( _worldPosition.ToGlm(), 1.f );
             glm::vec4       proj = GetProjection() * GetView( _cameraTransform ) * pos;
             return glm::vec2( proj.x, -proj.y );
         }

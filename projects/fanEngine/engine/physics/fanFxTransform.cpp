@@ -1,6 +1,5 @@
 #include "fanFxTransform.hpp"
 #include "core/memory/fanSerializable.hpp"
-#include "core/math/fanMathUtils.hpp"
 
 namespace fan
 {
@@ -56,9 +55,9 @@ namespace fan
     //==================================================================================================================================================================================================
     glm::mat4 FxTransform::GetModelMatrix( const Vector3& _scale ) const
     {
-        glm::vec3 position = Math::ToGLM( mPosition );
-        glm::vec3 glmScale = Math::ToGLM( _scale );
-        glm::quat rotation = Math::ToGLM( mRotation );
+        glm::vec3 position = mPosition.ToGlm();
+        glm::vec3 glmScale = _scale.ToGlm();
+        glm::quat rotation = mRotation.ToGlm();
 
         return glm::translate( glm::mat4( 1.f ), position ) *
                glm::mat4_cast( rotation ) *

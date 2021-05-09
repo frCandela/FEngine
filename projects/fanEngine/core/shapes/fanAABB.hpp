@@ -2,9 +2,7 @@
 
 #include <vector>
 #include "fanDisableWarnings.hpp"
-#include "fanGlm.hpp"
 #include "core/shapes/fanTriangle.hpp"
-#include "core/math/fanMathUtils.hpp"
 
 namespace fan
 {

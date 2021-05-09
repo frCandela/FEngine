@@ -3,7 +3,6 @@
 #include "core/fanAssert.hpp"
 #include "core/unit_tests/fanUnitTest.hpp"
 #include "core/math/fanVector3.hpp"
-#include "core/math/fanMathUtils.hpp"
 
 namespace fan
 {

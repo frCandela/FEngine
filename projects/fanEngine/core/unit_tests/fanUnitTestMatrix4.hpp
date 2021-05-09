@@ -261,7 +261,6 @@ namespace fan
             Matrix4   rotationX90Y90Z90translate( 0, 0, 1, 4,
                                                   0, -1, 0, 5,
                                                   1, 0, 0, 9 );
-            glm::vec3 v = Math::ToGLM( rotationX90Y90Z90translate * vec );
             TEST_ASSERT( rotationX90Y90Z90translate * vec == Vector3( 25, 19, 17 ) )
             TEST_ASSERT( rotationX90Y90Z90translate.InverseTransform( rotationX90Y90Z90translate * vec ) == vec )
 

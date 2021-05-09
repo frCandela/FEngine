@@ -1,5 +1,4 @@
 #include "core/ecs/fanEcsSystem.hpp"
-#include "core/math/fanMathUtils.hpp"
 #include "engine/singletons/fanRenderWorld.hpp"
 #include "engine/components/fanMeshRenderer.hpp"
 #include "engine/physics/fanFxTransform.hpp"
@@ -176,7 +175,7 @@ namespace fan
                 PointLight       & light     = *lightIt;
 
                 RenderDataPointLight pointLight;
-                pointLight.mPosition  = glm::vec4( Math::ToGLM( transform.mPosition ), 1.f );
+                pointLight.mPosition  = glm::vec4( transform.mPosition.ToGlm(), 1.f );
                 pointLight.mDiffuse   = light.mDiffuse.ToGLM();
                 pointLight.mSpecular  = light.mSpecular.ToGLM();
                 pointLight.mAmbiant   = light.mAmbiant.ToGLM();
@@ -213,7 +212,7 @@ namespace fan
                 DirectionalLight & directionalLight = *lightIt;
 
                 RenderDataDirectionalLight light;
-                light.mDirection = glm::vec4( Math::ToGLM( transform.Forward() ), 1 );
+                light.mDirection = glm::vec4( transform.Forward().ToGlm(), 1 );
                 light.mAmbiant   = directionalLight.mAmbiant.ToGLM();
                 light.mDiffuse   = directionalLight.mDiffuse.ToGLM();
                 light.mSpecular  = directionalLight.mSpecular.ToGLM();

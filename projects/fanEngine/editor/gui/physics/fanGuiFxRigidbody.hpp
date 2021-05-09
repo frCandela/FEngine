@@ -57,14 +57,8 @@ namespace fan
                 }
                 ImGui::SameLine();
                 ImGui::PushReadOnly();
-                glm::vec3 invInertiaTensor = Math::ToGLM( { rb.mInverseInertiaTensorLocal.e11, rb.mInverseInertiaTensorLocal.e22, rb.mInverseInertiaTensorLocal.e33 } );
+                glm::vec3 invInertiaTensor = Vector3 { rb.mInverseInertiaTensorLocal.e11, rb.mInverseInertiaTensorLocal.e22, rb.mInverseInertiaTensorLocal.e33 }.ToGlm();
                 ImGui::DragFloat3( "inverse inertia tensor", &invInertiaTensor.x, 1.f, -1000.f, 1000.f );
-                /*glm::vec3 w0 = Math::ToGLM( { rb.mInverseInertiaTensorWorld.e11, rb.mInverseInertiaTensorWorld.e12, rb.mInverseInertiaTensorWorld.e13 } );
-                glm::vec3 w1 = Math::ToGLM( { rb.mInverseInertiaTensorWorld.e21, rb.mInverseInertiaTensorWorld.e22, rb.mInverseInertiaTensorWorld.e23 } );
-                glm::vec3 w2 = Math::ToGLM( { rb.mInverseInertiaTensorWorld.e31, rb.mInverseInertiaTensorWorld.e32, rb.mInverseInertiaTensorWorld.e33 } );
-                ImGui::DragFloat3( "w0", &w0.x, 1.f, -1000.f, 1000.f );
-                ImGui::DragFloat3( "w1", &w1.x, 1.f, -1000.f, 1000.f );
-                ImGui::DragFloat3( "w2", &w2.x, 1.f, -1000.f, 1000.f );*/
                 ImGui::PopReadOnly();
 
                 // Velocity
@@ -73,10 +67,10 @@ namespace fan
                     rb.mVelocity = Vector3( 0, 0, 0 );
                 }
                 ImGui::SameLine();
-                glm::vec3 velocity = Math::ToGLM( rb.mVelocity );
+                glm::vec3 velocity = rb.mVelocity.ToGlm();
                 if( ImGui::DragFloat3( "velocity", &velocity[0], 1.f, -1000.f, 1000.f ) )
                 {
-                    rb.mVelocity = Math::ToFixed( velocity );
+                    rb.mVelocity = Vector3( velocity );
                     rb.SetSleeping( false );
                 }
 
@@ -86,10 +80,10 @@ namespace fan
                     rb.mRotation = Vector3( 0, 0, 0 );
                 }
                 ImGui::SameLine();
-                glm::vec3 rotation = Math::ToGLM( rb.mRotation );
+                glm::vec3 rotation = rb.mRotation.ToGlm();
                 if( ImGui::DragFloat3( "rotation", &rotation[0], 1.f, -1000.f, 1000.f ) )
                 {
-                    rb.mRotation = Math::ToFixed( rotation );
+                    rb.mRotation = Vector3( rotation );
                     rb.SetSleeping( false );
                 }
 
@@ -99,10 +93,10 @@ namespace fan
                     rb.mAcceleration = Vector3( 0, 0, 0 );
                 }
                 ImGui::SameLine();
-                glm::vec3 acceleration = Math::ToGLM( rb.mAcceleration );
+                glm::vec3 acceleration = rb.mAcceleration.ToGlm();
                 if( ImGui::DragFloat3( "acceleration", &acceleration[0], 0.1f, -1000.f, 1000.f ) )
                 {
-                    rb.mAcceleration = Math::ToFixed( acceleration );
+                    rb.mAcceleration = Vector3( acceleration );
                 }
 
                 // sleep

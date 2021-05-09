@@ -1,5 +1,4 @@
 #include "core/ecs/fanEcsSystem.hpp"
-#include "core/math/fanMathUtils.hpp"
 #include "core/random/fanRandom.hpp"
 #include "engine/physics/fanFxTransform.hpp"
 #include "engine/components/fanParticleEmitter.hpp"
@@ -35,7 +34,7 @@ namespace fan
                     emitter.mTimeAccumulator += _delta;
                     float particleSpawnDelta = 1.f / emitter.mParticlesPerSecond;
 
-                    const glm::vec3 origin = Math::ToGLM( emitterTransform.mPosition );
+                    const glm::vec3 origin = emitterTransform.mPosition.ToGlm();
 
                     // Spawn particles
                     while( emitter.mTimeAccumulator > particleSpawnDelta )

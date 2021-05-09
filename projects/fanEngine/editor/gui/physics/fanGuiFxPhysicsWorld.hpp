@@ -2,7 +2,6 @@
 
 #include "engine/physics/fanFxPhysicsWorld.hpp"
 #include "editor/singletons/fanEditorGuiInfo.hpp"
-#include "core/math/fanMathUtils.hpp"
 
 namespace fan
 {
@@ -25,10 +24,10 @@ namespace fan
             FxPhysicsWorld& physicsWorld = static_cast<FxPhysicsWorld&>( _component );
 
             // gravity
-            glm::vec3 gravity = Math::ToGLM( physicsWorld.mGravity );
+            glm::vec3 gravity = physicsWorld.mGravity.ToGlm();
             if( ImGui::DragFloat3( "gravity", &gravity.x ) )
             {
-                physicsWorld.mGravity = Math::ToFixed( gravity );
+                physicsWorld.mGravity = Vector3( gravity );
             }
 
             // damping
