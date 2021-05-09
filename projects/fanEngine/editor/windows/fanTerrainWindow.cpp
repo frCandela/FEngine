@@ -36,7 +36,7 @@ namespace fan
 
         // chunk size
         glm::ivec3 terrainSize = terrain.mSize;
-        if( ImGui::DragInt3( "terrain size", &terrainSize.x ) )
+        if( ImGui::DragInt3( "terrain size", &terrainSize.x, 1, 0, 1024 ) )
         {
             if( terrain.mIsInitialized )
             {

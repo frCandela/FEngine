@@ -278,8 +278,6 @@ namespace fan
                 }
                 currentWorld.GetSingleton<EditorSelection>().Update( mProjectViewWindow->IsHovered() );
 
-                currentProject.Render();
-
                 // Update input
                 const glm::vec2 viewPosition = mProjectViewWindow->GetPosition();
                 const glm::vec2 viewSize     = mProjectViewWindow->GetSize();
@@ -294,6 +292,7 @@ namespace fan
             mMainMenuBar->Draw( currentWorld );
             currentProject.OnGui();
             ImGui::Render();
+            currentProject.Render();
 
             Time::RegisterFrameDrawn( currentTime, deltaTime );
 

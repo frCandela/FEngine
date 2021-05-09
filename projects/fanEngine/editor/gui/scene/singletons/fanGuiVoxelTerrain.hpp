@@ -32,7 +32,7 @@ namespace fan
                 ImGui::SameLine();
                 ImGui::PushReadOnly();
                 glm::ivec3 terrainSize = terrain.mSize;
-                ImGui::DragInt3( "terrain size", &terrainSize.x );
+                ImGui::DragInt3( "terrain sizea", &terrainSize.x);
                 ImGui::PopReadOnly();
             }
             ImGui::Unindent();

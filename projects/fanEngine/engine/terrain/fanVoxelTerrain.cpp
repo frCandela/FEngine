@@ -55,7 +55,7 @@ namespace fan
     //==================================================================================================================================================================================================
     void VoxelTerrain::InitializeTerrain( EcsWorld& _world, VoxelTerrain& _terrain )
     {
-        if( _terrain.mSize.x <= 0 && _terrain.mSize.y <= 0 && _terrain.mSize.z <= 0 ){ return; }
+        if( _terrain.mSize.x <= 0 || _terrain.mSize.y <= 0 || _terrain.mSize.z <= 0 ){ return; }
 
         RenderResources& renderResources = _world.GetSingleton<RenderResources>();
         Texture        * texture         = renderResources.mTextureManager->GetOrLoad( "_default/texture/white.png" );
@@ -114,7 +114,6 @@ namespace fan
             return;
         }
 
-        RenderResources& renderResources = _world.GetSingleton<RenderResources>();
         for( int i = 0; i < _terrain.mSize.x * _terrain.mSize.y * _terrain.mSize.z; i++ )
         {
             VoxelChunk& chunk = _terrain.mChunks[i];
@@ -122,9 +121,7 @@ namespace fan
             {
                 EcsEntity entity = _world.GetEntity( chunk.mHandle );
                 MeshRenderer& renderer = _world.AddComponent<MeshRenderer>( entity );
-                Mesh        * mesh     = *renderer.mMesh;
-                renderResources.mMeshManager->Remove( mesh->mPath );
-                mesh->mPath = "";
+                renderer.mMesh = nullptr;
                 _world.Kill( entity );
             }
         }

@@ -40,7 +40,7 @@ namespace fan
                 FxTransform& transform = *transformIt;
 				Material& material = *materialIt;
 
-				if( meshRenderer.mMesh.IsValid() )
+				if( meshRenderer.mMesh.IsValid() && ! meshRenderer.mMesh->mIndices.empty() )
 				{
 					// drawMesh data;
 					RenderDataModel data;
