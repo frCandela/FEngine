@@ -11,8 +11,8 @@ namespace fan
         Fixed mAmplitude    = FIXED( 0.8 );
         Fixed mFrequency    = FIXED( 0.06 );
         Fixed mHeightWeight = FIXED( 0.5 );
-        Fixed mHeightOffset= FIXED( 0 );
-        Fixed mWeight= FIXED( 1 );
+        Fixed mHeightOffset = FIXED( 0 );
+        Fixed mWeight       = FIXED( 1 );
 
         static void Save( Json& _json, const char* _name, const NoiseOctave& _octave )
         {

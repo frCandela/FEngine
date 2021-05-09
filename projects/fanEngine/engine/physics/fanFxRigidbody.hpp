@@ -10,8 +10,8 @@ namespace fan
 {
     struct FxTransform;
 
-    //========================================================================================================
-    //========================================================================================================
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
     struct FxRigidbody : public EcsComponent
     {
     ECS_COMPONENT( FxRigidbody )
@@ -28,11 +28,11 @@ namespace fan
         bool    mCanSleep;
 
         static const constexpr Fixed sSleepEpsilon = FIXED( 0.031 );
-        bool    mIsSleeping;
-        Fixed   mMotion;
-        Vector3 mForcesAccumulator;
-        Vector3 mTorqueAccumulator;
-        Matrix3 mInverseInertiaTensorWorld;
+        bool                         mIsSleeping;
+        Fixed                        mMotion;
+        Vector3                      mForcesAccumulator;
+        Vector3                      mTorqueAccumulator;
+        Matrix3                      mInverseInertiaTensorWorld;
         FxTransform* mTransform; // buffered at the beginning of the frame
 
         void ApplyCentralForce( const Vector3& _force ) { mForcesAccumulator += _force; }

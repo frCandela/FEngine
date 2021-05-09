@@ -7,20 +7,20 @@
 
 namespace fan
 {
-	//========================================================================================================
-	// Links net ID's to entities handles
-	//========================================================================================================
-	struct LinkingContext : public EcsSingleton
-	{
-		ECS_SINGLETON( LinkingContext )
-		static void SetInfo( EcsSingletonInfo& _info );
-		static void Init( EcsWorld& _world, EcsSingleton& _component );
+    //==================================================================================================================================================================================================
+    // Links net ID's to entities handles
+    //==================================================================================================================================================================================================
+    struct LinkingContext : public EcsSingleton
+    {
+    ECS_SINGLETON( LinkingContext )
+        static void SetInfo( EcsSingletonInfo& _info );
+        static void Init( EcsWorld& _world, EcsSingleton& _component );
 
-		std::unordered_map<NetID, EcsHandle > mNetIDToEcsHandle;
-		std::unordered_map<EcsHandle, NetID > mEcsHandleToNetID;
-		NetID                                 mNextNetID;
+        std::unordered_map<NetID, EcsHandle> mNetIDToEcsHandle;
+        std::unordered_map<EcsHandle, NetID> mEcsHandleToNetID;
+        NetID                                mNextNetID;
 
-		void AddEntity( const EcsHandle _handle, const NetID _netID );
-		void RemoveEntity( const EcsHandle _handle );
-	};
+        void AddEntity( const EcsHandle _handle, const NetID _netID );
+        void RemoveEntity( const EcsHandle _handle );
+    };
 }

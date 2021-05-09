@@ -10,11 +10,11 @@ namespace fan
     class TextureManager;
     class FontManager;
 
-    //========================================================================================================
-    //========================================================================================================
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
     struct RenderResources : public EcsSingleton
     {
-        ECS_SINGLETON( RenderResources )
+    ECS_SINGLETON( RenderResources )
         static void SetInfo( EcsSingletonInfo& _info );
         static void Init( EcsWorld& _world, EcsSingleton& _singleton );
 
@@ -33,8 +33,7 @@ namespace fan
         MeshManager   * mMeshManager    = nullptr;
         Mesh2DManager * mMesh2DManager  = nullptr;
         TextureManager* mTextureManager = nullptr;
-        FontManager *   mFontManager    = nullptr;
-
+        FontManager   * mFontManager    = nullptr;
     };
 }
 

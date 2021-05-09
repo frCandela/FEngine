@@ -20,64 +20,64 @@
 
 namespace fan
 {
-	//========================================================================================================
-	//========================================================================================================
-	void EditorSelection::SetInfo( EcsSingletonInfo& /*_info*/ )
-	{
-	}
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    void EditorSelection::SetInfo( EcsSingletonInfo& /*_info*/ )
+    {
+    }
 
-	//========================================================================================================
-	//========================================================================================================
-	void EditorSelection::Init( EcsWorld& _world, EcsSingleton& _component )
-	{
-		EditorSelection& editorSelection = static_cast<EditorSelection&>( _component );
-		editorSelection.mCurrentScene = &_world.GetSingleton<Scene>();
-	}
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    void EditorSelection::Init( EcsWorld& _world, EcsSingleton& _component )
+    {
+        EditorSelection& editorSelection = static_cast<EditorSelection&>( _component );
+        editorSelection.mCurrentScene = &_world.GetSingleton<Scene>();
+    }
 
-	//========================================================================================================
-	//========================================================================================================
-	void EditorSelection::ConnectCallbacks( Scene& _scene )
-	{
- 		_scene.mOnDeleteSceneNode.Connect( &EditorSelection::OnSceneNodeDeleted, this );
-	}
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    void EditorSelection::ConnectCallbacks( Scene& _scene )
+    {
+        _scene.mOnDeleteSceneNode.Connect( &EditorSelection::OnSceneNodeDeleted, this );
+    }
 
-	//========================================================================================================
-	//========================================================================================================
-	SceneNode* EditorSelection::GetSelectedSceneNode() const 
-	{ 
-		if( mSelectedNodeHandle == 0 )
-		{
-			return nullptr;
-		}
-		else
-		{
-			EcsWorld& world = *mCurrentScene->mWorld;
-			return &world.GetComponent<SceneNode>( world.GetEntity( mSelectedNodeHandle ) );
-		}
-	}
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    SceneNode* EditorSelection::GetSelectedSceneNode() const
+    {
+        if( mSelectedNodeHandle == 0 )
+        {
+            return nullptr;
+        }
+        else
+        {
+            EcsWorld& world = *mCurrentScene->mWorld;
+            return &world.GetComponent<SceneNode>( world.GetEntity( mSelectedNodeHandle ) );
+        }
+    }
 
-	//========================================================================================================
-	//========================================================================================================
-	void EditorSelection::DeleteSelection()
-	{
-		SceneNode* selectedSceneNode = GetSelectedSceneNode();
-		if ( selectedSceneNode != nullptr )
-		{
-			if( selectedSceneNode->HasFlag( SceneNode::NoDelete ) )
-			{
-				Debug::Warning() << "You cannot delete this node !" << Debug::Endl();
-			}
-			else
-			{
-				EcsWorld& world = *selectedSceneNode->mScene->mWorld;
-				world.Kill( world.GetEntity( selectedSceneNode->mHandle ) );
-				Deselect();
-			}
-		}
-	}
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    void EditorSelection::DeleteSelection()
+    {
+        SceneNode* selectedSceneNode = GetSelectedSceneNode();
+        if( selectedSceneNode != nullptr )
+        {
+            if( selectedSceneNode->HasFlag( SceneNode::NoDelete ) )
+            {
+                Debug::Warning() << "You cannot delete this node !" << Debug::Endl();
+            }
+            else
+            {
+                EcsWorld& world = *selectedSceneNode->mScene->mWorld;
+                world.Kill( world.GetEntity( selectedSceneNode->mHandle ) );
+                Deselect();
+            }
+        }
+    }
 
-    //========================================================================================================
-    //========================================================================================================
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
     bool DrawMoveGizmo( SceneNode& _sceneNode )
     {
         EcsWorld& world = *_sceneNode.mScene->mWorld;
@@ -86,10 +86,10 @@ namespace fan
         // Transform
         if( world.HasComponent<FxTransform>( entity ) )
         {
-            FxTransform& transform = world.GetComponent< FxTransform >( entity );
+            FxTransform& transform = world.GetComponent<FxTransform>( entity );
             Vector3 newPosition;
             EditorGizmos& gizmos = world.GetSingleton<EditorGizmos>();
-            if( gizmos.DrawMoveGizmo( FxTransform::Make( Quaternion::sIdentity, transform.mPosition ), SSID("MoveGizmo"), newPosition ) )
+            if( gizmos.DrawMoveGizmo( FxTransform::Make( Quaternion::sIdentity, transform.mPosition ), SSID( "MoveGizmo" ), newPosition ) )
             {
                 transform.mPosition = newPosition;
                 _sceneNode.AddFlag( SceneNode::BoundsOutdated );
@@ -99,29 +99,29 @@ namespace fan
         return false;
     }
 
-	//========================================================================================================
-	//========================================================================================================
-	void EditorSelection::Update( const bool _gameWindowHovered )
-	{
-		SCOPED_PROFILE( selection );
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    void EditorSelection::Update( const bool _gameWindowHovered )
+    {
+        SCOPED_PROFILE( selection );
 
-		bool mouseCaptured = false;		
+        bool mouseCaptured = false;
 
-		// translation gizmo on selected scene node
-		SceneNode* selectedSceneNode = GetSelectedSceneNode();
-		if ( selectedSceneNode != nullptr && selectedSceneNode->mHandle != mCurrentScene->mMainCameraHandle )
-		{
+        // translation gizmo on selected scene node
+        SceneNode* selectedSceneNode = GetSelectedSceneNode();
+        if( selectedSceneNode != nullptr && selectedSceneNode->mHandle != mCurrentScene->mMainCameraHandle )
+        {
             mouseCaptured = DrawMoveGizmo( *selectedSceneNode );
-		}
+        }
 
-		// mouse selection
+        // mouse selection
         EcsWorld& world = *mCurrentScene->mWorld;
         Mouse   & mouse = world.GetSingleton<Mouse>();
-        if( !mouseCaptured && _gameWindowHovered && mouse.mPressed[ Mouse::buttonLeft ] )
- 		{
-			EcsEntity cameraID = world.GetEntity( mCurrentScene->mMainCameraHandle );
-			const FxTransform& cameraTransform = world.GetComponent<FxTransform>( cameraID );
-			const Camera& camera = world.GetComponent<Camera>( cameraID );
+        if( !mouseCaptured && _gameWindowHovered && mouse.mPressed[Mouse::buttonLeft] )
+        {
+            EcsEntity cameraID = world.GetEntity( mCurrentScene->mMainCameraHandle );
+            const FxTransform& cameraTransform = world.GetComponent<FxTransform>( cameraID );
+            const Camera     & camera          = world.GetComponent<Camera>( cameraID );
 
             const Ray ray = camera.ScreenPosToRay( cameraTransform, mouse.LocalScreenSpacePosition() );
 
@@ -148,8 +148,8 @@ namespace fan
             }
         }
 
-		// draw collision shapes, lights
-		if( mSelectedNodeHandle != 0 )
+        // draw collision shapes, lights
+        if( mSelectedNodeHandle != 0 )
         {
             RenderDebug& renderDebug = world.GetSingleton<RenderDebug>();
 
@@ -194,56 +194,56 @@ namespace fan
                     SDrawDebugPointLights::DrawPointLight( renderDebug, transform, pointLight );
                 }
             }
-		}	
-	}
+        }
+    }
 
-	//========================================================================================================
-	//========================================================================================================
-	void EditorSelection::SetSelectedSceneNode( SceneNode* _node )
-	{
-		mSelectedNodeHandle = _node != nullptr ? _node->mHandle : 0;
-	}
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    void EditorSelection::SetSelectedSceneNode( SceneNode* _node )
+    {
+        mSelectedNodeHandle = _node != nullptr ? _node->mHandle : 0;
+    }
 
-	//========================================================================================================
-	//========================================================================================================
-	void EditorSelection::Deselect()
-	{
-		mSelectedNodeHandle = 0;
-	}
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    void EditorSelection::Deselect()
+    {
+        mSelectedNodeHandle = 0;
+    }
 
-	//========================================================================================================
-	//========================================================================================================
-	void EditorSelection::OnSceneNodeDeleted( SceneNode* _node )
-	{
-		if ( _node == GetSelectedSceneNode() )
-		{
-			Deselect();
-		}
-	}
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    void EditorSelection::OnSceneNodeDeleted( SceneNode* _node )
+    {
+        if( _node == GetSelectedSceneNode() )
+        {
+            Deselect();
+        }
+    }
 
-	//========================================================================================================
-	//========================================================================================================
-	void EditorSelection::OnToogleTransformLock()
-	{
-		SceneNode* selectedSceneNode = GetSelectedSceneNode();
-		if( selectedSceneNode != nullptr )
-		{
-			EcsWorld& world = *selectedSceneNode->mScene->mWorld;
-			EcsEntity entity = world.GetEntity( selectedSceneNode->mHandle );
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    void EditorSelection::OnToogleTransformLock()
+    {
+        SceneNode* selectedSceneNode = GetSelectedSceneNode();
+        if( selectedSceneNode != nullptr )
+        {
+            EcsWorld& world = *selectedSceneNode->mScene->mWorld;
+            EcsEntity entity = world.GetEntity( selectedSceneNode->mHandle );
 
-			// FollowTransform
-			if( world.HasComponent<FollowTransform>( entity ) )
-			{
-				FollowTransform& followTransform = world.GetComponent<FollowTransform>( entity );
+            // FollowTransform
+            if( world.HasComponent<FollowTransform>( entity ) )
+            {
+                FollowTransform& followTransform = world.GetComponent<FollowTransform>( entity );
                 followTransform.mLocked = !followTransform.mLocked;
 
-                FxTransform * transform = world.SafeGetComponent<FxTransform>( entity );
-                SceneNode * sceneNode = world.SafeGetComponent<SceneNode>( entity );
+                FxTransform* transform = world.SafeGetComponent<FxTransform>( entity );
+                SceneNode  * sceneNode = world.SafeGetComponent<SceneNode>( entity );
                 if( transform != nullptr && sceneNode != nullptr )
                 {
-                    FollowTransform::UpdateLocalTransform( followTransform , *transform, *sceneNode );
+                    FollowTransform::UpdateLocalTransform( followTransform, *transform, *sceneNode );
                 }
-			}
-		}
-	}
+            }
+        }
+    }
 }

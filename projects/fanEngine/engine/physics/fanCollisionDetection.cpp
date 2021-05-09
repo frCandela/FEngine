@@ -50,14 +50,14 @@ namespace fan
     void CollisionDetection::BoxWithPlane( FxRigidbody& _rigidbody, FxBoxCollider& _box, const Vector3& _normal, const Fixed _offset, std::vector<Contact>& _outContacts )
     {
         Vector3  vertices[8] = {
-                (*_rigidbody.mTransform) * Vector3( _box.mHalfExtents.x, _box.mHalfExtents.y, _box.mHalfExtents.z ),
-                (*_rigidbody.mTransform) * Vector3( _box.mHalfExtents.x, _box.mHalfExtents.y, -_box.mHalfExtents.z ),
-                (*_rigidbody.mTransform) * Vector3( _box.mHalfExtents.x, -_box.mHalfExtents.y, _box.mHalfExtents.z ),
-                (*_rigidbody.mTransform) * Vector3( _box.mHalfExtents.x, -_box.mHalfExtents.y, -_box.mHalfExtents.z ),
-                (*_rigidbody.mTransform) * Vector3( -_box.mHalfExtents.x, _box.mHalfExtents.y, _box.mHalfExtents.z ),
-                (*_rigidbody.mTransform) * Vector3( -_box.mHalfExtents.x, _box.mHalfExtents.y, -_box.mHalfExtents.z ),
-                (*_rigidbody.mTransform) * Vector3( -_box.mHalfExtents.x, -_box.mHalfExtents.y, _box.mHalfExtents.z ),
-                (*_rigidbody.mTransform) * Vector3( -_box.mHalfExtents.x, -_box.mHalfExtents.y, -_box.mHalfExtents.z ),
+                ( *_rigidbody.mTransform ) * Vector3( _box.mHalfExtents.x, _box.mHalfExtents.y, _box.mHalfExtents.z ),
+                ( *_rigidbody.mTransform ) * Vector3( _box.mHalfExtents.x, _box.mHalfExtents.y, -_box.mHalfExtents.z ),
+                ( *_rigidbody.mTransform ) * Vector3( _box.mHalfExtents.x, -_box.mHalfExtents.y, _box.mHalfExtents.z ),
+                ( *_rigidbody.mTransform ) * Vector3( _box.mHalfExtents.x, -_box.mHalfExtents.y, -_box.mHalfExtents.z ),
+                ( *_rigidbody.mTransform ) * Vector3( -_box.mHalfExtents.x, _box.mHalfExtents.y, _box.mHalfExtents.z ),
+                ( *_rigidbody.mTransform ) * Vector3( -_box.mHalfExtents.x, _box.mHalfExtents.y, -_box.mHalfExtents.z ),
+                ( *_rigidbody.mTransform ) * Vector3( -_box.mHalfExtents.x, -_box.mHalfExtents.y, _box.mHalfExtents.z ),
+                ( *_rigidbody.mTransform ) * Vector3( -_box.mHalfExtents.x, -_box.mHalfExtents.y, -_box.mHalfExtents.z ),
         };
         for( int i           = 0; i < 8; i++ )
         {
@@ -109,7 +109,7 @@ namespace fan
             return;
         }
 
-        const Vector3 closestPointWorld = (*_rbBox.mTransform) * closestPoint;
+        const Vector3 closestPointWorld = ( *_rbBox.mTransform ) * closestPoint;
         const Vector3 normal            = ( closestPointWorld - centerSphere ).Normalized();
         if( Fixed::IsFuzzyZero( normal.SqrMagnitude() - 1 ) )
         {

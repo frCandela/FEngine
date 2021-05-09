@@ -6,10 +6,10 @@
 
 namespace fan
 {
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
     struct GuiFxTransform
     {
-        //====================================================================================================
-        //====================================================================================================
         static GuiComponentInfo GetInfo()
         {
             GuiComponentInfo info;
@@ -21,8 +21,6 @@ namespace fan
             return info;
         }
 
-        //========================================================================================================
-        //========================================================================================================
         static void OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component )
         {
             FxTransform& transform = static_cast<FxTransform&>( _component );
@@ -68,12 +66,12 @@ namespace fan
                 const float speed = 0.1f;
                 if( ImGui::DragFloat3( "rotation", &rotation[0], speed ) )
                 {
-                    Vector3 newRotation = { Fixed::FromFloat( rotation.x ), Fixed::FromFloat( rotation.y ), Fixed::FromFloat( rotation.z ) };
-                    const Vector3 axis = newRotation - oldRotation;
-                    const Fixed angle = axis.Magnitude();
-                    if( angle > Fixed::FromFloat(speed) )
+                    Vector3       newRotation = { Fixed::FromFloat( rotation.x ), Fixed::FromFloat( rotation.y ), Fixed::FromFloat( rotation.z ) };
+                    const Vector3 axis        = newRotation - oldRotation;
+                    const Fixed   angle       = axis.Magnitude();
+                    if( angle > Fixed::FromFloat( speed ) )
                     {
-                        const Quaternion rotationChange = Quaternion::AngleAxis(angle, axis );
+                        const Quaternion rotationChange = Quaternion::AngleAxis( angle, axis );
                         transform.mRotation = rotationChange * transform.mRotation;
                         sceneNode.AddFlag( SceneNode::BoundsOutdated );
                     }

@@ -5,10 +5,10 @@
 
 namespace fan
 {
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
     struct GuiFxBoxCollider
     {
-        //====================================================================================================
-        //====================================================================================================
         static GuiComponentInfo GetInfo()
         {
             GuiComponentInfo info;
@@ -20,8 +20,6 @@ namespace fan
             return info;
         }
 
-        //========================================================================================================
-        //========================================================================================================
         static void OnGui( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
         {
             FxBoxCollider& box = static_cast<FxBoxCollider&>( _component );
@@ -31,17 +29,17 @@ namespace fan
                 // Half extents
                 if( ImGui::Button( "##half_extents" ) )
                 {
-                    box.mHalfExtents = FIXED(0.5) * Vector3::sOne;
-                    _world.GetComponent<SceneNode>(_entity).AddFlag( SceneNode::BoundsOutdated );
-                    GuiFxRigidbody::TryUpdateInvInertiaTensorLocal(  _world, _entity );
+                    box.mHalfExtents = FIXED( 0.5 ) * Vector3::sOne;
+                    _world.GetComponent<SceneNode>( _entity ).AddFlag( SceneNode::BoundsOutdated );
+                    GuiFxRigidbody::TryUpdateInvInertiaTensorLocal( _world, _entity );
                 }
                 ImGui::SameLine();
                 glm::vec3 halfExtents = Math::ToGLM( box.mHalfExtents );
                 if( ImGui::DragFloat3( "half extents", &halfExtents[0], 0.01f, -1000.f, 1000.f ) )
                 {
                     box.mHalfExtents = Math::ToFixed( halfExtents );
-                    _world.GetComponent<SceneNode>(_entity).AddFlag( SceneNode::BoundsOutdated );
-                    GuiFxRigidbody::TryUpdateInvInertiaTensorLocal(  _world, _entity );
+                    _world.GetComponent<SceneNode>( _entity ).AddFlag( SceneNode::BoundsOutdated );
+                    GuiFxRigidbody::TryUpdateInvInertiaTensorLocal( _world, _entity );
                 }
             }
             ImGui::PopID();

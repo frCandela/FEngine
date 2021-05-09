@@ -21,8 +21,8 @@ namespace fan
         Vector3 relativeContactPosition[2];
         Matrix3 contactToWorld;
         Vector3 relativeVelocity; // in contact coordinates
-        Fixed restitution;
-        Fixed desiredTotalDeltaVelocity;
-        Fixed totalInverseMass;
+        Fixed   restitution;
+        Fixed   desiredTotalDeltaVelocity;
+        Fixed   totalInverseMass;
     };
 }

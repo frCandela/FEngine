@@ -4,8 +4,8 @@
 
 namespace fan
 {
-    //==========================================================================================================================
-    //==========================================================================================================================
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
     struct Vector3
     {
         Fixed x;
@@ -25,8 +25,8 @@ namespace fan
 
         bool IsNormalized() const { return Fixed::IsFuzzyZero( SqrMagnitude() - 1 ); }
 
-        static Fixed Distance(    const Vector3& _vec1,  const Vector3& _vec2 ) { return ( _vec1 - _vec2 ).Magnitude(); }
-        static Fixed SqrDistance( const Vector3& _vec1,  const Vector3& _vec2 ) { return ( _vec1 - _vec2 ).SqrMagnitude(); }
+        static Fixed Distance( const Vector3& _vec1, const Vector3& _vec2 ) { return ( _vec1 - _vec2 ).Magnitude(); }
+        static Fixed SqrDistance( const Vector3& _vec1, const Vector3& _vec2 ) { return ( _vec1 - _vec2 ).SqrMagnitude(); }
         static void OrthoNormalize( Vector3& _normal, Vector3& _tangent );
         static Fixed Dot( const Vector3& _v1, const Vector3& _v2 ) { return _v1.x * _v2.x + _v1.y * _v2.y + _v1.z * _v2.z; }
         static Fixed SignedAngle( const Vector3& _v1, const Vector3& _v2, const Vector3& _normal );

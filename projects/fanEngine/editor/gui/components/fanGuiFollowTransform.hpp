@@ -5,10 +5,10 @@
 
 namespace fan
 {
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
     struct GuiFollowTransform
     {
-        //====================================================================================================
-        //====================================================================================================
         static GuiComponentInfo GetInfo()
         {
             GuiComponentInfo info;
@@ -17,12 +17,10 @@ namespace fan
             info.mGroup      = EngineGroups::Scene;
             info.onGui       = &GuiFollowTransform::OnGui;
             info.mEditorPath = "/";
-            info.mEditorName       = "follow transform";
+            info.mEditorName = "follow transform";
             return info;
         }
 
-        //========================================================================================================
-        //========================================================================================================
         static void OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component )
         {
             FollowTransform& followTransform = static_cast<FollowTransform&>( _component );
@@ -34,7 +32,7 @@ namespace fan
                 followTransform.mLocked = !followTransform.mLocked;
 
                 FxTransform* transform = _world.SafeGetComponent<FxTransform>( _entityID );
-                SceneNode* sceneNode = _world.SafeGetComponent<SceneNode>( _entityID );
+                SceneNode  * sceneNode = _world.SafeGetComponent<SceneNode>( _entityID );
                 if( transform != nullptr && sceneNode != nullptr )
                 {
                     FollowTransform::UpdateLocalTransform( followTransform, *transform, *sceneNode );

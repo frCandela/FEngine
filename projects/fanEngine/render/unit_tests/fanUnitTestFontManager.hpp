@@ -6,8 +6,8 @@
 
 namespace fan
 {
-    //========================================================================================================
-    //========================================================================================================
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
     class UnitTestFontManager : public UnitTest<UnitTestFontManager>
     {
     public:
@@ -29,41 +29,42 @@ namespace fan
         void TestAdd()
         {
             TEST_ASSERT( mFontManager.Empty() );
-            Font * font = mFontManager.Load( RenderGlobal::sDefaultGameFont );
+            Font* font = mFontManager.Load( RenderGlobal::sDefaultGameFont );
             TEST_ASSERT( font->mPath == RenderGlobal::sDefaultGameFont );
-            TEST_ASSERT( ! mFontManager.Empty() );
+            TEST_ASSERT( !mFontManager.Empty() );
             TEST_ASSERT( mFontManager.Count() == 1 );
         }
 
         void TestRemove()
         {
             const std::string fontPath = "fonts/VeraBd.ttf";
-            Font * font = mFontManager.Load( RenderGlobal::sDefaultGameFont );
-            Font * font2 = mFontManager.Load( fontPath );
+            Font* font  = mFontManager.Load( RenderGlobal::sDefaultGameFont );
+            Font* font2 = mFontManager.Load( fontPath );
             TEST_ASSERT( mFontManager.Find( RenderGlobal::sDefaultGameFont ) == font );
             TEST_ASSERT( mFontManager.Find( fontPath ) == font2 );
             TEST_ASSERT( mFontManager.Count() == 2 );
-            TEST_ASSERT( ! mFontManager.Empty() );
+            TEST_ASSERT( !mFontManager.Empty() );
             mFontManager.Remove( RenderGlobal::sDefaultGameFont );
             TEST_ASSERT( mFontManager.Count() == 1 );
-            TEST_ASSERT( ! mFontManager.Empty() );
+            TEST_ASSERT( !mFontManager.Empty() );
             TEST_ASSERT( mFontManager.Find( RenderGlobal::sDefaultGameFont ) == nullptr );
             mFontManager.Remove( fontPath );
             TEST_ASSERT( mFontManager.Find( fontPath ) == nullptr );
             TEST_ASSERT( mFontManager.Empty() );
         }
 
-        void TestClear() {
+        void TestClear()
+        {
             mFontManager.Load( RenderGlobal::sDefaultGameFont );
-            TEST_ASSERT( ! mFontManager.Empty() );
+            TEST_ASSERT( !mFontManager.Empty() );
             mFontManager.Clear();
             TEST_ASSERT( mFontManager.Empty() );
         }
 
         void TestDuplicates()
         {
-            Font * font1 = mFontManager.Load(  RenderGlobal::sDefaultGameFont );
-            Font * font2 = mFontManager.Load(  RenderGlobal::sDefaultGameFont );
+            Font* font1 = mFontManager.Load( RenderGlobal::sDefaultGameFont );
+            Font* font2 = mFontManager.Load( RenderGlobal::sDefaultGameFont );
 
             TEST_ASSERT( font1 != nullptr );
             TEST_ASSERT( font2 != nullptr );
@@ -72,7 +73,7 @@ namespace fan
 
         void TestLoadInvalidFont()
         {
-            Font * font1 = mFontManager.Load( "qsdfsdfsdfsdf" );
+            Font* font1 = mFontManager.Load( "qsdfsdfsdfsdf" );
             TEST_ASSERT( font1 == nullptr );
         }
     };

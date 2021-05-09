@@ -5,27 +5,27 @@
 
 namespace fan
 {
-	//========================================================================================================
-	//========================================================================================================
-	struct SIntegrateFxRigidbodies : EcsSystem
-	{
-		static EcsSignature GetSignature( const EcsWorld& _world )
-		{
-			return	_world.GetSignature<FxRigidbody>() | _world.GetSignature<FxTransform>();
-		}
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    struct SIntegrateFxRigidbodies : EcsSystem
+    {
+        static EcsSignature GetSignature( const EcsWorld& _world )
+        {
+            return _world.GetSignature<FxRigidbody>() | _world.GetSignature<FxTransform>();
+        }
 
-		static void Run( EcsWorld& _world, const EcsView& _view, const Fixed _delta )
-		{
-		    if( _delta == 0 ){ return; }
+        static void Run( EcsWorld& _world, const EcsView& _view, const Fixed _delta )
+        {
+            if( _delta == 0 ){ return; }
 
             FxPhysicsWorld& physicsWorld = _world.GetSingleton<FxPhysicsWorld>();
 
             auto transformIt = _view.begin<FxTransform>();
-            auto rbIt = _view.begin<FxRigidbody>();
+            auto rbIt        = _view.begin<FxRigidbody>();
             for( ; transformIt != _view.end<FxTransform>(); ++transformIt, ++rbIt )
             {
                 FxTransform& transform = *transformIt;
-                FxRigidbody& rb = *rbIt;
+                FxRigidbody& rb        = *rbIt;
 
                 if( rb.mInverseMass == 0 || rb.mIsSleeping )
                 {
@@ -44,7 +44,7 @@ namespace fan
                 rb.mRotation *= physicsWorld.mAngularDamping;
 
                 transform.mPosition += _delta * rb.mVelocity;
-                transform.mRotation += FIXED( 0.5 ) * _delta * Quaternion( 0, rb.mRotation ) * transform.mRotation ;
+                transform.mRotation += FIXED( 0.5 ) * _delta * Quaternion( 0, rb.mRotation ) * transform.mRotation;
 
                 const Fixed magnitude = transform.mRotation.Magnitude();
                 if( !magnitude.IsFuzzyZero() && !Fixed::IsFuzzyZero( magnitude - 1 ) )
@@ -59,5 +59,5 @@ namespace fan
                 rb.ClearAccumulators();
             }
         }
-	};
+    };
 }

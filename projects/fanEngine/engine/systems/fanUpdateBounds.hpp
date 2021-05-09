@@ -11,42 +11,42 @@
 
 namespace fan
 {
-	//========================================================================================================
-	// Uses the convex hull in the mesh renderer mesh to generate new bounds
-	//========================================================================================================
-	struct SUpdateBoundsFromModel : EcsSystem
-	{
-		static EcsSignature GetSignature( const EcsWorld& _world )
-		{
-			return
-				_world.GetSignature<SceneNode>() |
-				_world.GetSignature<MeshRenderer>() |
-				_world.GetSignature<FxTransform>() |
-				_world.GetSignature<Bounds>();
-		}
+    //==================================================================================================================================================================================================
+    // Uses the convex hull in the mesh renderer mesh to generate new bounds
+    //==================================================================================================================================================================================================
+    struct SUpdateBoundsFromModel : EcsSystem
+    {
+        static EcsSignature GetSignature( const EcsWorld& _world )
+        {
+            return
+                    _world.GetSignature<SceneNode>() |
+                    _world.GetSignature<MeshRenderer>() |
+                    _world.GetSignature<FxTransform>() |
+                    _world.GetSignature<Bounds>();
+        }
 
-		static void Run( EcsWorld& _world, const EcsView& _view )
-		{
-			auto meshRendererIt = _view.begin<MeshRenderer>();
-			auto transformIt = _view.begin<FxTransform>();
-			auto boundsIt = _view.begin<Bounds>();
-			auto sceneNodeIt = _view.begin<SceneNode>();
-            for( ; meshRendererIt != _view.end<MeshRenderer>();                   ++meshRendererIt, ++transformIt, ++boundsIt, ++sceneNodeIt )
-			{
-				SceneNode& sceneNode = *sceneNodeIt;
-				if( !sceneNode.HasFlag( SceneNode::BoundsOutdated ) )
-				{
-					continue;
-				}
-				const MeshRenderer& renderer = *meshRendererIt;
-				const FxTransform& transform = *transformIt;
-				Bounds& bounds = *boundsIt;
+        static void Run( EcsWorld& _world, const EcsView& _view )
+        {
+            auto meshRendererIt = _view.begin<MeshRenderer>();
+            auto transformIt    = _view.begin<FxTransform>();
+            auto boundsIt       = _view.begin<Bounds>();
+            auto sceneNodeIt    = _view.begin<SceneNode>();
+            for( ; meshRendererIt != _view.end<MeshRenderer>(); ++meshRendererIt, ++transformIt, ++boundsIt, ++sceneNodeIt )
+            {
+                SceneNode& sceneNode = *sceneNodeIt;
+                if( !sceneNode.HasFlag( SceneNode::BoundsOutdated ) )
+                {
+                    continue;
+                }
+                const MeshRenderer& renderer  = *meshRendererIt;
+                const FxTransform & transform = *transformIt;
+                Bounds            & bounds    = *boundsIt;
 
-				FxScale* scaling = _world.SafeGetComponent<FxScale>( boundsIt.GetEntity() );
+                FxScale* scaling = _world.SafeGetComponent<FxScale>( boundsIt.GetEntity() );
 
-				if( *renderer.mMesh != nullptr )
-				{
-					const Vector3 scale = scaling != nullptr ? scaling->mScale : Vector3{1,1,1};
+                if( *renderer.mMesh != nullptr )
+                {
+                    const Vector3 scale = scaling != nullptr ? scaling->mScale : Vector3 { 1, 1, 1 };
 
                     Matrix4 model( transform.mRotation, transform.mPosition );
                     Matrix4 scaleMatrix = Matrix4::sIdentity;
@@ -54,53 +54,53 @@ namespace fan
                     scaleMatrix.e22 *= scale.y;
                     scaleMatrix.e33 *= scale.z;
 
-					bounds.mAabb = AABB( renderer.mMesh->mConvexHull.mVertices, model*scaleMatrix );
-					sceneNode.RemoveFlag( SceneNode::BoundsOutdated );
-				}
-			}
-		}
-	};
+                    bounds.mAabb = AABB( renderer.mMesh->mConvexHull.mVertices, model * scaleMatrix );
+                    sceneNode.RemoveFlag( SceneNode::BoundsOutdated );
+                }
+            }
+        }
+    };
 
-	//========================================================================================================
-	// Uses a transform bounds to set the entity bounds
-	//========================================================================================================
-	struct SUpdateBoundsFromTransform : EcsSystem
-	{
-		static EcsSignature GetSignature( const EcsWorld& _world )
-		{
-			return
-				_world.GetSignature<SceneNode>() |
-				_world.GetSignature<FxTransform>() |
-				_world.GetSignature<Bounds>();
-		}
+    //==================================================================================================================================================================================================
+    // Uses a transform bounds to set the entity bounds
+    //==================================================================================================================================================================================================
+    struct SUpdateBoundsFromTransform : EcsSystem
+    {
+        static EcsSignature GetSignature( const EcsWorld& _world )
+        {
+            return
+                    _world.GetSignature<SceneNode>() |
+                    _world.GetSignature<FxTransform>() |
+                    _world.GetSignature<Bounds>();
+        }
 
-		static void Run( EcsWorld& /*_world*/, const EcsView& _view )
-		{
-			auto transformIt = _view.begin<FxTransform>();
-			auto boundsIt = _view.begin<Bounds>();
-			auto sceneNodeIt = _view.begin<SceneNode>();
-			for( ; transformIt != _view.end<FxTransform>(); ++transformIt, ++boundsIt, ++sceneNodeIt )
-			{
-				SceneNode& sceneNode = *sceneNodeIt;
-				if( !sceneNode.HasFlag( SceneNode::BoundsOutdated ) )
-				{
-					continue;
-				}
+        static void Run( EcsWorld& /*_world*/, const EcsView& _view )
+        {
+            auto transformIt = _view.begin<FxTransform>();
+            auto boundsIt    = _view.begin<Bounds>();
+            auto sceneNodeIt = _view.begin<SceneNode>();
+            for( ; transformIt != _view.end<FxTransform>(); ++transformIt, ++boundsIt, ++sceneNodeIt )
+            {
+                SceneNode& sceneNode = *sceneNodeIt;
+                if( !sceneNode.HasFlag( SceneNode::BoundsOutdated ) )
+                {
+                    continue;
+                }
 
-				const FxTransform& transform = *transformIt;
-				Bounds& bounds = *boundsIt;
+                const FxTransform& transform = *transformIt;
+                Bounds           & bounds    = *boundsIt;
 
-				const Fixed sizeBounds = FIXED(0.2);
+                const Fixed sizeBounds = FIXED( 0.2 );
                 bounds.mAabb = AABB( transform.mPosition - sizeBounds * Vector3::sOne,
                                      transform.mPosition + sizeBounds * Vector3::sOne );
-				sceneNode.RemoveFlag( SceneNode::BoundsOutdated );
-			}
-		}
-	};
+                sceneNode.RemoveFlag( SceneNode::BoundsOutdated );
+            }
+        }
+    };
 
-    //========================================================================================================
+    //==================================================================================================================================================================================================
     // Uses a fixed point sphere collider set the entity bounds
-    //========================================================================================================
+    //==================================================================================================================================================================================================
     struct SUpdateBoundsFromFxSphereColliders : EcsSystem
     {
         static EcsSignature GetSignature( const EcsWorld& _world )
@@ -115,9 +115,9 @@ namespace fan
         static void Run( EcsWorld& /*_world*/, const EcsView& _view )
         {
             auto transformIt = _view.begin<FxTransform>();
-            auto boundsIt = _view.begin<Bounds>();
+            auto boundsIt    = _view.begin<Bounds>();
             auto sceneNodeIt = _view.begin<SceneNode>();
-            auto sphereIt = _view.begin<FxSphereCollider>();
+            auto sphereIt    = _view.begin<FxSphereCollider>();
             for( ; transformIt != _view.end<FxTransform>(); ++transformIt, ++boundsIt, ++sceneNodeIt, ++sphereIt )
             {
                 SceneNode& sceneNode = *sceneNodeIt;
@@ -127,8 +127,8 @@ namespace fan
                 }
 
                 const FxTransform& transform = *transformIt;
-                Bounds& bounds = *boundsIt;
-                FxSphereCollider& sphere = *sphereIt;
+                Bounds           & bounds    = *boundsIt;
+                FxSphereCollider & sphere    = *sphereIt;
 
                 const Vector3 origin = transform.mPosition;
                 bounds.mAabb = AABB( transform.mPosition - sphere.mRadius * Vector3::sOne,
@@ -138,9 +138,9 @@ namespace fan
         }
     };
 
-    //========================================================================================================
+    //==================================================================================================================================================================================================
     // Uses a fixed point sphere collider set the entity bounds
-    //========================================================================================================
+    //==================================================================================================================================================================================================
     struct SUpdateBoundsFromFxBoxColliders : EcsSystem
     {
         static EcsSignature GetSignature( const EcsWorld& _world )
@@ -155,9 +155,9 @@ namespace fan
         static void Run( EcsWorld& /*_world*/, const EcsView& _view )
         {
             auto transformIt = _view.begin<FxTransform>();
-            auto boundsIt = _view.begin<Bounds>();
+            auto boundsIt    = _view.begin<Bounds>();
             auto sceneNodeIt = _view.begin<SceneNode>();
-            auto boxIt = _view.begin<FxBoxCollider>();
+            auto boxIt       = _view.begin<FxBoxCollider>();
             for( ; transformIt != _view.end<FxTransform>(); ++transformIt, ++boundsIt, ++sceneNodeIt, ++boxIt )
             {
                 SceneNode& sceneNode = *sceneNodeIt;
@@ -167,8 +167,8 @@ namespace fan
                 }
 
                 const FxTransform& transform = *transformIt;
-                Bounds& bounds = *boundsIt;
-                FxBoxCollider& box = *boxIt;
+                Bounds           & bounds    = *boundsIt;
+                FxBoxCollider    & box       = *boxIt;
 
                 std::vector<Vector3> pointCloud = {
                         Vector3( box.mHalfExtents.x, box.mHalfExtents.y, box.mHalfExtents.z ),

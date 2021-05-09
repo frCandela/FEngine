@@ -5,8 +5,8 @@
 
 namespace fan
 {
-    //========================================================================================================
-    //========================================================================================================
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
     class UnitTestPath : public UnitTest<UnitTestPath>
     {
     public:
@@ -57,15 +57,15 @@ namespace fan
             TEST_ASSERT( Path::Normalize( "\\models\\patate\\" ) == "content/models/patate/" );
         }
 
-        void  TestMakeRelative()
+        void TestMakeRelative()
         {
             Path::SetProjectPath( "C:/blob" );
-            TEST_ASSERT( Path::Normalize("textures/hello.png") == "C:/blob/content/textures/hello.png" )
-            TEST_ASSERT( Path::MakeRelative("C:/blob/content/textures/hello.png") == "textures/hello.png" )
-            TEST_ASSERT( Path::MakeRelative(Path::Normalize("textures/hello.png")) == "textures/hello.png" )
+            TEST_ASSERT( Path::Normalize( "textures/hello.png" ) == "C:/blob/content/textures/hello.png" )
+            TEST_ASSERT( Path::MakeRelative( "C:/blob/content/textures/hello.png" ) == "textures/hello.png" )
+            TEST_ASSERT( Path::MakeRelative( Path::Normalize( "textures/hello.png" ) ) == "textures/hello.png" )
 
-            TEST_ASSERT( Path::MakeRelative("textures/hello.png") == "textures/hello.png" )
-            TEST_ASSERT( Path::MakeRelative("") == "" )
+            TEST_ASSERT( Path::MakeRelative( "textures/hello.png" ) == "textures/hello.png" )
+            TEST_ASSERT( Path::MakeRelative( "" ) == "" )
         }
 
         void TestSetProjectPath()
@@ -107,19 +107,19 @@ namespace fan
 
             TEST_ASSERT( Path::Directory( "file.png" ) == "/" );
             TEST_ASSERT( Path::Directory( "/" ) == "/" );
-            TEST_ASSERT( Path::Directory( "lol/file.png") == "lol/" );
+            TEST_ASSERT( Path::Directory( "lol/file.png" ) == "lol/" );
             TEST_ASSERT( Path::Directory( "D:/lol/file.png" ) == "D:/lol/" );
-            TEST_ASSERT( Path::Directory("D:/lol/filewithoutextension") == "D:/lol/" );
+            TEST_ASSERT( Path::Directory( "D:/lol/filewithoutextension" ) == "D:/lol/" );
         }
 
         void TestFilename()
         {
             TEST_ASSERT( Path::FileName( "file.png" ) == "file" );
             TEST_ASSERT( Path::FileName( "file.tar.gz" ) == "file.tar" );
-            TEST_ASSERT( Path::FileName( "lol/file.png") == "file" );
+            TEST_ASSERT( Path::FileName( "lol/file.png" ) == "file" );
             TEST_ASSERT( Path::FileName( "D:/lol/file.png" ) == "file" );
-            TEST_ASSERT( Path::FileName("D:/lol/filewithoutextension") == "filewithoutextension" );
-            TEST_ASSERT( Path::FileName("D:/lol/") == "lol/" );
+            TEST_ASSERT( Path::FileName( "D:/lol/filewithoutextension" ) == "filewithoutextension" );
+            TEST_ASSERT( Path::FileName( "D:/lol/" ) == "lol/" );
         }
 
         void TestExtension()
@@ -133,11 +133,11 @@ namespace fan
 
         void TestParent()
         {
-            TEST_ASSERT( !Path::IsRootDrive("") );
-            TEST_ASSERT( !Path::IsRootDrive("/") );
-            TEST_ASSERT( !Path::IsRootDrive("d/") );
-            TEST_ASSERT( !Path::IsRootDrive("d:/a") );
-            TEST_ASSERT( Path::IsRootDrive("d:/") );
+            TEST_ASSERT( !Path::IsRootDrive( "" ) );
+            TEST_ASSERT( !Path::IsRootDrive( "/" ) );
+            TEST_ASSERT( !Path::IsRootDrive( "d/" ) );
+            TEST_ASSERT( !Path::IsRootDrive( "d:/a" ) );
+            TEST_ASSERT( Path::IsRootDrive( "d:/" ) );
 
             TEST_ASSERT( Path::Parent( "D:/parent/son/" ) == "D:/parent/" );
             TEST_ASSERT( Path::Parent( "D:/parent/son/file" ) == "D:/parent/son/" );
@@ -151,11 +151,11 @@ namespace fan
         void TestList()
         {
             Path::SetProjectPath( mOldProjectPath );
-            std::vector files = Path::ListDirectory( Path::Normalize("/") );
-            TEST_ASSERT( ! files.empty() );
+            std::vector files = Path::ListDirectory( Path::Normalize( "/" ) );
+            TEST_ASSERT( !files.empty() );
             for( std::string path : files )
             {
-                TEST_ASSERT( Path::Normalize(path) == path );
+                TEST_ASSERT( Path::Normalize( path ) == path );
             }
         }
     };

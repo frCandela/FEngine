@@ -167,19 +167,19 @@ namespace fan
         NoiseOctave::Load( _json, "3d_octave_1", terrain.mGenerator.m3DOctaves[1] );
         NoiseOctave::Load( _json, "2d_octave", terrain.mGenerator.m2DOctave );
 
-        fanAssert(terrain.mChunks == nullptr);
+        fanAssert( terrain.mChunks == nullptr );
         terrain.mChunks = new VoxelChunk[terrain.mSize.x * terrain.mSize.y * terrain.mSize.z] {};
 
-        const Json* chunksJson = Serializable::FindToken(_json, "chunks");
+        const Json* chunksJson = Serializable::FindToken( _json, "chunks" );
 
         if( chunksJson != nullptr )
         {
             for( int i = 0; i < terrain.mSize.x * terrain.mSize.y * terrain.mSize.z; ++i )
             {
                 VoxelChunk& chunk = terrain.mChunks[i];
-                std::string data = Base64::Decode( (*chunksJson)[i] );
-                fanAssert(data.length() == VoxelChunk::sSize * VoxelChunk::sSize * VoxelChunk::sSize);
-                memcpy( chunk.mVoxels,data.data(), data.length() );
+                std::string data = Base64::Decode( ( *chunksJson )[i] );
+                fanAssert( data.length() == VoxelChunk::sSize * VoxelChunk::sSize * VoxelChunk::sSize );
+                memcpy( chunk.mVoxels, data.data(), data.length() );
                 chunk.mIsGenerated = true;
             }
         }

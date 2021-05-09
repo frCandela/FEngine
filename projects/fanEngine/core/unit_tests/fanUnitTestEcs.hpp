@@ -8,16 +8,16 @@
 
 namespace fan
 {
-    //========================================================================================================
-    //========================================================================================================
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
     struct TestEcsSingleton : public EcsSingleton
     {
 
-        ECS_SINGLETON( TestEcsSingleton )
+    ECS_SINGLETON( TestEcsSingleton )
         static void SetInfo( EcsSingletonInfo& /*_info*/ )
         {
         }
-        static void	Init( EcsWorld& /*_world*/, EcsSingleton& _singleton )
+        static void Init( EcsWorld& /*_world*/, EcsSingleton& _singleton )
         {
             using namespace test;
             TestSingleton& testSingleton = static_cast<TestSingleton&>(_singleton);
@@ -27,41 +27,47 @@ namespace fan
         {
             using namespace test;
             TestSingleton& testSingleton = static_cast<TestSingleton&>(_singleton);
-            testSingleton.mValueInt = _value;
+            testSingleton.mValueInt      = _value;
         }
-        int     mValueInt = 0;
+        int mValueInt = 0;
     };
 
-    //========================================================================================================
-    //========================================================================================================
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
     struct TestEcsComponent : public EcsComponent
     {
-        ECS_COMPONENT( TestEcsComponent )
+    ECS_COMPONENT( TestEcsComponent )
         static void SetInfo( EcsComponentInfo& /*_info*/ )
         {
         }
-        static void	Init( EcsWorld& /*_world*/, EcsEntity /*_entity*/, EcsComponent& _component )
+        static void Init( EcsWorld& /*_world*/, EcsEntity /*_entity*/, EcsComponent& _component )
         {
             using namespace test;
             TestComponent& testComponent = static_cast<TestComponent&>(_component);
             testComponent.mValueInt = 0;
         }
-        int     mValueInt = 0;
+        int mValueInt = 0;
     };
 
-    struct TagTest  : EcsTag  { ECS_TAG( TagTest )  };
-    struct TagTest2  : EcsTag  { ECS_TAG( TagTest2 )  };
+    struct TagTest : EcsTag
+    {
+    ECS_TAG( TagTest )
+    };
+    struct TagTest2 : EcsTag
+    {
+    ECS_TAG( TagTest2 )
+    };
 
-    //========================================================================================================
-    //========================================================================================================
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
     class UnitTestEcs : public UnitTest<UnitTestEcs>
     {
     public:
         static std::vector<TestMethod> GetTests()
         {
-            return { { &UnitTestEcs::TestAddTagType,             "tag add types " },
-                     { &UnitTestEcs::TestAddRemoveTags,          "tag add/remove " },
-                     { &UnitTestEcs::TestFaultyAddRemoveTags,    "tag multiple add/remove" },
+            return { { &UnitTestEcs::TestAddTagType,          "tag add types " },
+                     { &UnitTestEcs::TestAddRemoveTags,       "tag add/remove " },
+                     { &UnitTestEcs::TestFaultyAddRemoveTags, "tag multiple add/remove" },
             };
         }
         void Create() override
@@ -84,11 +90,11 @@ namespace fan
             world.AddTagType<TagTest>();
             TEST_ASSERT( world.NumTags() == 1 );
             TEST_ASSERT( world.GetFistTagIndex() == ecsSignatureLength - 1 );
-            TEST_ASSERT( world.IndexedGetTagInfo(world.GetFistTagIndex() ).mName == "TagTest" );
+            TEST_ASSERT( world.IndexedGetTagInfo( world.GetFistTagIndex() ).mName == "TagTest" );
             world.AddTagType<TagTest2>();
             TEST_ASSERT( world.NumTags() == 2 );
             TEST_ASSERT( world.GetFistTagIndex() == ecsSignatureLength - 2 );
-            TEST_ASSERT( world.IndexedGetTagInfo(world.GetFistTagIndex() ).mName == "TagTest2" );
+            TEST_ASSERT( world.IndexedGetTagInfo( world.GetFistTagIndex() ).mName == "TagTest2" );
         }
 
         void TestAddRemoveTags()
@@ -111,7 +117,7 @@ namespace fan
             mWorld.ApplyTransitions();
             entity = mWorld.GetEntity( handle );
 
-            TEST_ASSERT( ! mWorld.HasTag<TagTest>( entity ) );
+            TEST_ASSERT( !mWorld.HasTag<TagTest>( entity ) );
         }
 
         void TestFaultyAddRemoveTags()
@@ -132,7 +138,7 @@ namespace fan
 
             mWorld.AddTag<TagTest>( entity );
             mWorld.RemoveTag<TagTest>( entity );
-            TEST_ASSERT( ! mWorld.HasTag<TagTest>( entity ) );
+            TEST_ASSERT( !mWorld.HasTag<TagTest>( entity ) );
 
             // fresh entity
             entity = mWorld.CreateEntity();
@@ -141,12 +147,12 @@ namespace fan
             TEST_ASSERT( !mWorld.HasTag<TagTest>( entity ) );
             mWorld.AddTag<TagTest>( entity );
             mWorld.RemoveTag<TagTest>( entity );
-            TEST_ASSERT( ! mWorld.HasTag<TagTest>( entity ) );
+            TEST_ASSERT( !mWorld.HasTag<TagTest>( entity ) );
 
             mWorld.ApplyTransitions();
             entity = mWorld.GetEntity( handle );
 
-            TEST_ASSERT( ! mWorld.HasTag<TagTest>( entity ) );
+            TEST_ASSERT( !mWorld.HasTag<TagTest>( entity ) );
 
             // fresh entity
             entity = mWorld.CreateEntity();

@@ -8,37 +8,36 @@
 
 namespace fan
 {
-	struct Instance;
+    struct Instance;
 
-	//========================================================================================================
-	// Vulkan device
-	//========================================================================================================
-	struct Device
-	{
-		Device(){}
-		void Create( Instance& _instance, VkSurfaceKHR _surface );
-		void Destroy();
+    //==================================================================================================================================================================================================
+    // Vulkan device
+    //==================================================================================================================================================================================================
+    struct Device
+    {
+        Device() {}
+        void Create( Instance& _instance, VkSurfaceKHR _surface );
+        void Destroy();
 
-		VkPhysicalDevice	mPhysicalDevice	= VK_NULL_HANDLE;
-		VkDevice			mDevice			= VK_NULL_HANDLE;
-		VkCommandPool		mCommandPool	= VK_NULL_HANDLE;
-		VkQueue				mGraphicsQueue	= VK_NULL_HANDLE;
+        VkPhysicalDevice mPhysicalDevice = VK_NULL_HANDLE;
+        VkDevice         mDevice         = VK_NULL_HANDLE;
+        VkCommandPool    mCommandPool    = VK_NULL_HANDLE;
+        VkQueue          mGraphicsQueue  = VK_NULL_HANDLE;
 
-		VkPhysicalDeviceProperties			mDeviceProperties;
-		VkPhysicalDeviceMemoryProperties	mMemoryProperties;
-		std::map< uint64_t, std::string >	mDebugNames;
-		
+        VkPhysicalDeviceProperties       mDeviceProperties;
+        VkPhysicalDeviceMemoryProperties mMemoryProperties;
+        std::map<uint64_t, std::string>  mDebugNames;
 
-		uint32_t		FindMemoryType( uint32_t _typeFilter, VkMemoryPropertyFlags _properties );
-		VkFormat		FindDepthFormat();
-		VkCommandBuffer BeginSingleTimeCommands();
-		void			EndSingleTimeCommands( VkCommandBuffer _commandBuffer );
-		void				AddDebugName( const uint64_t _object, const std::string& _name );
-		void				RemoveDebugName( const uint64_t _object );
-		const std::string	GetDebugName( const uint64_t _object ) const;
-	private:
-		Device( Device const& ) = delete;
-		Device& operator=( Device const& ) = delete;
+        uint32_t FindMemoryType( uint32_t _typeFilter, VkMemoryPropertyFlags _properties );
+        VkFormat FindDepthFormat();
+        VkCommandBuffer BeginSingleTimeCommands();
+        void EndSingleTimeCommands( VkCommandBuffer _commandBuffer );
+        void AddDebugName( const uint64_t _object, const std::string& _name );
+        void RemoveDebugName( const uint64_t _object );
+        const std::string GetDebugName( const uint64_t _object ) const;
+    private:
+        Device( Device const& ) = delete;
+        Device& operator=( Device const& ) = delete;
 
         bool SelectPhysicalDevice( Instance& _instance,
                                    VkPhysicalDeviceFeatures& _outAvailableFeatures,
@@ -53,5 +52,5 @@ namespace fan
                                       uint32_t& _outCompute,
                                       uint32_t& _outPresent );
         bool ResetCommandPool();
-	};
+    };
 }

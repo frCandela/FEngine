@@ -7,216 +7,225 @@
 
 namespace fan
 {
-	//========================================================================================================
-	// Sends packet for each client connection
-	//========================================================================================================
-	struct SClientSend : EcsSystem
-	{
-		static EcsSignature GetSignature( const EcsWorld& _world )
-		{
-			return
-				_world.GetSignature<ReliabilityLayer>() |
-				_world.GetSignature<ClientConnection>() |
-				_world.GetSignature<ClientGameData>();
-		}
+    //==================================================================================================================================================================================================
+    // Sends packet for each client connection
+    //==================================================================================================================================================================================================
+    struct SClientSend : EcsSystem
+    {
+        static EcsSignature GetSignature( const EcsWorld& _world )
+        {
+            return
+                    _world.GetSignature<ReliabilityLayer>() |
+                    _world.GetSignature<ClientConnection>() |
+                    _world.GetSignature<ClientGameData>();
+        }
 
-		static void Run( EcsWorld& _world, const EcsView& _view, const float _delta )
-		{
-			if( _delta == 0.f ) { return; }
+        static void Run( EcsWorld& _world, const EcsView& _view, const float _delta )
+        {
+            if( _delta == 0.f ){ return; }
 
-			Time& time = _world.GetSingleton<Time>();
+            Time& time = _world.GetSingleton<Time>();
 
-			auto reliabilityLayerIt = _view.begin<ReliabilityLayer>();
-			auto connectionIt = _view.begin<ClientConnection>();
-			auto gameDataIt = _view.begin<ClientGameData>();
+            auto reliabilityLayerIt = _view.begin<ReliabilityLayer>();
+            auto connectionIt       = _view.begin<ClientConnection>();
+            auto gameDataIt         = _view.begin<ClientGameData>();
             for( ; reliabilityLayerIt != _view.end<ReliabilityLayer>();
                    ++reliabilityLayerIt, ++connectionIt, ++gameDataIt )
-			{
-				ReliabilityLayer& reliabilityLayer = *reliabilityLayerIt;
-				ClientConnection& connection = *connectionIt;
-				ClientGameData& gameData = *gameDataIt;
+            {
+                ReliabilityLayer& reliabilityLayer = *reliabilityLayerIt;
+                ClientConnection& connection       = *connectionIt;
+                ClientGameData  & gameData         = *gameDataIt;
 
-				// create packet
-				Packet packet( reliabilityLayer.GetNextPacketTag() );
+                // create packet
+                Packet packet( reliabilityLayer.GetNextPacketTag() );
 
-				// write packet
-				const EcsEntity entity = gameDataIt.GetEntity();
-				connection.Write( _world, entity, packet );
-				gameData.Write( _world, entity, packet );
+                // write packet
+                const EcsEntity entity = gameDataIt.GetEntity();
+                connection.Write( _world, entity, packet );
+                gameData.Write( _world, entity, packet );
 
-				if( packet.GetSize() == sizeof( PacketTag ) ) { packet.mOnlyContainsAck = true; }
+                if( packet.GetSize() == sizeof( PacketTag ) ){ packet.mOnlyContainsAck = true; }
 
-				reliabilityLayer.Write( packet );
+                reliabilityLayer.Write( packet );
 
-				// send packet, don't send empty packets
-				if( packet.GetSize() > sizeof( PacketTag ) )
-				{
-					reliabilityLayer.RegisterPacket( packet );
+                // send packet, don't send empty packets
+                if( packet.GetSize() > sizeof( PacketTag ) )
+                {
+                    reliabilityLayer.RegisterPacket( packet );
                     connection.mBandwidth = 1.f /
                                             time.mLogicDelta *
                                             float( packet.GetSize() )
                                             / 1000.f; // in Ko/s
-					connection.mSocket->Send( packet, connection.mServerIP, connection.mServerPort );
-				}
-				else
-				{
-					reliabilityLayer.mNextPacketTag--;
-				}
-			}
-		}
-	};
+                    connection.mSocket->Send( packet, connection.mServerIP, connection.mServerPort );
+                }
+                else
+                {
+                    reliabilityLayer.mNextPacketTag--;
+                }
+            }
+        }
+    };
 
-	//========================================================================================================
-	// Receives packets for each client connection
-	//========================================================================================================
-	struct SClientReceive : EcsSystem
-	{
-		static EcsSignature GetSignature( const EcsWorld& _world )
-		{
-			return
-				_world.GetSignature<ReliabilityLayer>() |
-				_world.GetSignature<ClientConnection>() |
-				_world.GetSignature<ClientReplication>() |
-				_world.GetSignature<ClientGameData>();
-		}
+    //==================================================================================================================================================================================================
+    // Receives packets for each client connection
+    //==================================================================================================================================================================================================
+    struct SClientReceive : EcsSystem
+    {
+        static EcsSignature GetSignature( const EcsWorld& _world )
+        {
+            return
+                    _world.GetSignature<ReliabilityLayer>() |
+                    _world.GetSignature<ClientConnection>() |
+                    _world.GetSignature<ClientReplication>() |
+                    _world.GetSignature<ClientGameData>();
+        }
 
-		static void Run( EcsWorld& _world, const EcsView& _view, const float _delta )
-		{
-			if( _delta == 0.f ) { return; }
+        static void Run( EcsWorld& _world, const EcsView& _view, const float _delta )
+        {
+            if( _delta == 0.f ){ return; }
 
-			const Time& time = _world.GetSingleton<Time>();
+            const Time& time = _world.GetSingleton<Time>();
 
-			auto reliabilityLayerIt = _view.begin<ReliabilityLayer>();
-			auto connectionIt = _view.begin<ClientConnection>();
-			auto replicationIt = _view.begin<ClientReplication>();
-			auto gameDataIt = _view.begin<ClientGameData>();
+            auto reliabilityLayerIt = _view.begin<ReliabilityLayer>();
+            auto connectionIt       = _view.begin<ClientConnection>();
+            auto replicationIt      = _view.begin<ClientReplication>();
+            auto gameDataIt         = _view.begin<ClientGameData>();
             for( ; reliabilityLayerIt != _view.end<ReliabilityLayer>();
                    ++reliabilityLayerIt, ++connectionIt, ++replicationIt, ++gameDataIt )
-			{
-				ReliabilityLayer& reliabilityLayer = *reliabilityLayerIt;
-				ClientConnection& connection = *connectionIt;
-				ClientReplication& replication = *replicationIt;
-				ClientGameData& gameData = *gameDataIt;
+            {
+                ReliabilityLayer & reliabilityLayer = *reliabilityLayerIt;
+                ClientConnection & connection       = *connectionIt;
+                ClientReplication& replication      = *replicationIt;
+                ClientGameData   & gameData         = *gameDataIt;
 
-				// receive
-				Packet			packet;
-				sf::IpAddress	receiveIP;
-				unsigned short	receivePort;
+                // receive
+                Packet         packet;
+                sf::IpAddress  receiveIP;
+                unsigned short receivePort;
 
-				sf::Socket::Status socketStatus;
-				do
-				{
-					packet.Clear();
-					socketStatus = connection.mSocket->Receive( packet, receiveIP, receivePort );
+                sf::Socket::Status socketStatus;
+                do
+                {
+                    packet.Clear();
+                    socketStatus = connection.mSocket->Receive( packet, receiveIP, receivePort );
 
-					// only receive from the server
-					if( receiveIP != connection.mServerIP || receivePort != connection.mServerPort )
-					{
-						continue;
-					}
+                    // only receive from the server
+                    if( receiveIP != connection.mServerIP || receivePort != connection.mServerPort )
+                    {
+                        continue;
+                    }
 
-					switch( socketStatus )
-					{
-					case sf::UdpSocket::Done:
-					{
-						connection.mServerLastResponse = Time::ElapsedSinceStartup();
+                    switch( socketStatus )
+                    {
+                        case sf::UdpSocket::Done:
+                        {
+                            connection.mServerLastResponse = Time::ElapsedSinceStartup();
 
-						// read the first packet type separately
-						PacketType packetType = packet.ReadType();
-						if( packetType == PacketType::Ack )
-						{
-							packet.mOnlyContainsAck = true;
-						}
-						else if( packetType == PacketType::Disconnect )
-						{
-							// disconnection can cause the reliability layer tags to be off
-							reliabilityLayer.mExpectedPacketTag = packet.mTag;
-						}
+                            // read the first packet type separately
+                            PacketType packetType = packet.ReadType();
+                            if( packetType == PacketType::Ack )
+                            {
+                                packet.mOnlyContainsAck = true;
+                            }
+                            else if( packetType == PacketType::Disconnect )
+                            {
+                                // disconnection can cause the reliability layer tags to be off
+                                reliabilityLayer.mExpectedPacketTag = packet.mTag;
+                            }
 
-						if( !reliabilityLayer.ValidatePacket( packet ) )
-						{
-							continue;
-						}
+                            if( !reliabilityLayer.ValidatePacket( packet ) )
+                            {
+                                continue;
+                            }
 
-						// process packet
-						bool packetValid = true;
-						while( packetValid )
-						{
-							switch( packetType )
-							{
-							case PacketType::Ack:
-							{
-								PacketAck packetAck;
-								packetAck.Read( packet );
-								reliabilityLayer.ProcessPacket( packetAck );
-							}break;
-							case PacketType::Ping:
-							{
-								PacketPing packetPing;
-								packetPing.Read( packet );
-								connection.ProcessPacket( packetPing, time.mFrameIndex );
-							} break;
-							case PacketType::LoggedIn:
-							{
-								PacketLoginSuccess packetLogin;
-								packetLogin.Read( packet );
-								connection.ProcessPacket( packetLogin );
-							} break;
-							case PacketType::Disconnect:
-							{
-								PacketDisconnect packetDisconnect;
-								packetDisconnect.Read( packet );
-								connection.ProcessPacket( packetDisconnect );
-							} break;
+                            // process packet
+                            bool packetValid = true;
+                            while( packetValid )
+                            {
+                                switch( packetType )
+                                {
+                                    case PacketType::Ack:
+                                    {
+                                        PacketAck packetAck;
+                                        packetAck.Read( packet );
+                                        reliabilityLayer.ProcessPacket( packetAck );
+                                    }
+                                        break;
+                                    case PacketType::Ping:
+                                    {
+                                        PacketPing packetPing;
+                                        packetPing.Read( packet );
+                                        connection.ProcessPacket( packetPing, time.mFrameIndex );
+                                    }
+                                        break;
+                                    case PacketType::LoggedIn:
+                                    {
+                                        PacketLoginSuccess packetLogin;
+                                        packetLogin.Read( packet );
+                                        connection.ProcessPacket( packetLogin );
+                                    }
+                                        break;
+                                    case PacketType::Disconnect:
+                                    {
+                                        PacketDisconnect packetDisconnect;
+                                        packetDisconnect.Read( packet );
+                                        connection.ProcessPacket( packetDisconnect );
+                                    }
+                                        break;
 
-							case PacketType::Replication:
-							{
-								PacketReplication packetReplication;
-								packetReplication.Read( packet );
-								replication.ProcessPacket( packetReplication );
-							} break;
-							case PacketType::PlayerGameState:
-							{
-								PacketPlayerGameState packetPlayerGameState;
-								packetPlayerGameState.Read( packet );
-								gameData.ProcessPacket( packetPlayerGameState );
-							} break;
-							default:
-								Debug::Warning() << "Invalid packet " << int( packetType )
-								                 << " received. Reading canceled." << Debug::Endl();
-								packetValid = false;
-								break;
-							}
+                                    case PacketType::Replication:
+                                    {
+                                        PacketReplication packetReplication;
+                                        packetReplication.Read( packet );
+                                        replication.ProcessPacket( packetReplication );
+                                    }
+                                        break;
+                                    case PacketType::PlayerGameState:
+                                    {
+                                        PacketPlayerGameState packetPlayerGameState;
+                                        packetPlayerGameState.Read( packet );
+                                        gameData.ProcessPacket( packetPlayerGameState );
+                                    }
+                                        break;
+                                    default:
+                                        Debug::Warning() << "Invalid packet " << int( packetType )
+                                                << " received. Reading canceled." << Debug::Endl();
+                                        packetValid = false;
+                                        break;
+                                }
 
-							// stop if we reach the end or reads the next packet type
-							if( packet.EndOfPacket() )
-							{
-								break;
-							}
-							else
-							{
-								packetType = packet.ReadType();
-							}
-						}
-					} break;
-					case sf::UdpSocket::Error:
-						Debug::Warning() << "socket.receive: an unexpected error happened " << Debug::Endl();
-						break;
-					case sf::UdpSocket::Partial:
-					case sf::UdpSocket::NotReady:
-					{
-						// do nothing
-					}break;
-					case sf::UdpSocket::Disconnected:
-					{
-						// disconnect
-					} break;
-					default:
-                        fanAssert( false );
-						break;
-					}
-				} while( socketStatus == sf::UdpSocket::Done );
-			}
-		}
-	};
+                                // stop if we reach the end or reads the next packet type
+                                if( packet.EndOfPacket() )
+                                {
+                                    break;
+                                }
+                                else
+                                {
+                                    packetType = packet.ReadType();
+                                }
+                            }
+                        }
+                            break;
+                        case sf::UdpSocket::Error:
+                            Debug::Warning() << "socket.receive: an unexpected error happened " << Debug::Endl();
+                            break;
+                        case sf::UdpSocket::Partial:
+                        case sf::UdpSocket::NotReady:
+                        {
+                            // do nothing
+                        }
+                            break;
+                        case sf::UdpSocket::Disconnected:
+                        {
+                            // disconnect
+                        }
+                            break;
+                        default:
+                            fanAssert( false );
+                            break;
+                    }
+                } while( socketStatus == sf::UdpSocket::Done );
+            }
+        }
+    };
 }

@@ -10,10 +10,10 @@
 namespace ImGui
 {
 
-    //========================================================================================================
+    //==================================================================================================================================================================================================
     // Draws a ImGui widget for displaying a TexturePtr
     // Returns true if the value (TexturePtr) was edited
-    //========================================================================================================
+    //==================================================================================================================================================================================================
     bool FanTexturePtr( const char* _label, fan::TexturePtr& _ptr )
     {
         bool returnValue = false;
@@ -22,13 +22,13 @@ namespace ImGui
         const std::string name = texture == nullptr ? "null" : fan::Path::FileName( texture->mPath );
 
         // Set button icon & modal
-        const std::string            modalName = std::string( "Find texture (" ) + _label + ")";
+        const std::string  modalName   = std::string( "Find texture (" ) + _label + ")";
         static std::string sPathBuffer = fan::Path::Normalize( "/" );
         ImGui::PushID( _label );
         {
-            if ( ImGui::ButtonIcon( ImGui::IconType::Image16, { 16, 16 } ) )
+            if( ImGui::ButtonIcon( ImGui::IconType::Image16, { 16, 16 } ) )
             {
-                _ptr = nullptr;
+                _ptr        = nullptr;
                 returnValue = true;
             }
         }
@@ -48,9 +48,9 @@ namespace ImGui
         ImGui::FanBeginDragDropSourceTexture( texture );
 
         // tooltip
-        if ( texture != nullptr )
+        if( texture != nullptr )
         {
-            if ( ImGui::IsItemHovered() )
+            if( ImGui::IsItemHovered() )
             {
                 ImGui::BeginTooltip();
 
@@ -69,16 +69,16 @@ namespace ImGui
 
         // dragndrop
         fan::Texture* textureDrop = ImGui::FanBeginDragDropTargetTexture();
-        if ( textureDrop )
+        if( textureDrop )
         {
-            _ptr = textureDrop ;
+            _ptr        = textureDrop;
             returnValue = true;
         }
 
         // Right click = clear
-        if ( ImGui::IsItemClicked( 1 ) )
+        if( ImGui::IsItemClicked( 1 ) )
         {
-            _ptr = nullptr;
+            _ptr        = nullptr;
             returnValue = true;
         }
 
@@ -97,10 +97,10 @@ namespace ImGui
         return returnValue;
     }
 
-    //========================================================================================================
+    //==================================================================================================================================================================================================
     // Draws a ImGui widget for displaying a MeshPtr
     // Returns true if the value (MeshPtr) was edited
-    //========================================================================================================
+    //==================================================================================================================================================================================================
     bool FanMeshPtr( const char* _label, fan::MeshPtr& _ptr )
     {
         bool returnValue = false;
@@ -113,9 +113,9 @@ namespace ImGui
         static std::string sPathBuffer;
         ImGui::PushID( _label );
         {
-            if ( ImGui::ButtonIcon( ImGui::IconType::Mesh16, { 16, 16 } ) )
+            if( ImGui::ButtonIcon( ImGui::IconType::Mesh16, { 16, 16 } ) )
             {
-                _ptr = nullptr;
+                _ptr        = nullptr;
                 returnValue = true;
             }
         }
@@ -136,7 +136,7 @@ namespace ImGui
         ImGui::FanBeginDragDropSourceMesh( mesh );
 
         // tooltip
-        if ( mesh != nullptr && ImGui::IsItemHovered() )
+        if( mesh != nullptr && ImGui::IsItemHovered() )
         {
             ImGui::BeginTooltip();
             ImGui::Text( mesh->mPath.c_str() );
@@ -146,20 +146,20 @@ namespace ImGui
 
         // dragndrop
         fan::Mesh* meshDrop = ImGui::FanBeginDragDropTargetMesh();
-        if ( meshDrop )
+        if( meshDrop )
         {
-            _ptr = meshDrop;
+            _ptr        = meshDrop;
             returnValue = true;
         }
 
         // Right click = clear
-        if ( ImGui::IsItemClicked( 1 ) )
+        if( ImGui::IsItemClicked( 1 ) )
         {
-            _ptr = nullptr;
+            _ptr        = nullptr;
             returnValue = true;
         }
 
-        if ( ImGui::FanLoadFileModal( modalName.c_str(), fan::RenderGlobal::sMeshExtensions, sPathBuffer ) )
+        if( ImGui::FanLoadFileModal( modalName.c_str(), fan::RenderGlobal::sMeshExtensions, sPathBuffer ) )
         {
             _ptr.Init( sPathBuffer );
             _ptr.Resolve();
@@ -172,8 +172,8 @@ namespace ImGui
         return returnValue;
     }
 
-    //========================================================================================================
-    //========================================================================================================
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
     bool FanFontPtr( const char* _label, fan::FontPtr& _ptr )
     {
         bool returnValue = false;
@@ -182,13 +182,13 @@ namespace ImGui
         const std::string name = ( font == nullptr ) ? "null" : fan::Path::FileName( font->mPath );
 
         // Set button icon & modal
-        const std::string            modalName = std::string( "Find font (" ) + _label + ")";
+        const std::string  modalName = std::string( "Find font (" ) + _label + ")";
         static std::string sPathBuffer;
         ImGui::PushID( _label );
         {
-            if ( ImGui::ButtonIcon( ImGui::IconType::Font16, { 16, 16 } ) )
+            if( ImGui::ButtonIcon( ImGui::IconType::Font16, { 16, 16 } ) )
             {
-                _ptr = nullptr;
+                _ptr        = nullptr;
                 returnValue = true;
             }
         }
@@ -209,27 +209,27 @@ namespace ImGui
         ImGui::FanBeginDragDropSourceFont( font );
 
         // tooltip
-        if ( font != nullptr )
+        if( font != nullptr )
         {
             ImGui::FanToolTip( font->mPath.c_str() );
         }
 
         // dragndrop
         fan::Font* fontDrop = ImGui::FanBeginDragDropTargetFont();
-        if ( fontDrop )
+        if( fontDrop )
         {
-            _ptr = fontDrop;
+            _ptr        = fontDrop;
             returnValue = true;
         }
 
         // Right click = clear
-        if ( ImGui::IsItemClicked( 1 ) )
+        if( ImGui::IsItemClicked( 1 ) )
         {
-            _ptr = nullptr;
+            _ptr        = nullptr;
             returnValue = true;
         }
 
-        if ( ImGui::FanLoadFileModal( modalName.c_str(), fan::RenderGlobal::sFontsExtensions, sPathBuffer ) )
+        if( ImGui::FanLoadFileModal( modalName.c_str(), fan::RenderGlobal::sFontsExtensions, sPathBuffer ) )
         {
             _ptr.Init( sPathBuffer );
             _ptr.Resolve();

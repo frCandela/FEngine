@@ -14,12 +14,12 @@ namespace fan
         //====================================================================================================
         struct TestSingleton : public EcsSingleton
         {
-            ECS_SINGLETON( TestSingleton )
+        ECS_SINGLETON( TestSingleton )
             static void SetInfo( EcsSingletonInfo& _info )
             {
                 _info.mSlots.push_back( new Slot<int>( "test int", &TestSingleton::SetValueInt ) );
             }
-            static void	Init( EcsWorld& /*_world*/, EcsSingleton& _singleton )
+            static void Init( EcsWorld& /*_world*/, EcsSingleton& _singleton )
             {
                 TestSingleton& testSingleton = static_cast<TestSingleton&>(_singleton);
                 testSingleton.mValueInt = 0;
@@ -27,9 +27,9 @@ namespace fan
             static void SetValueInt( EcsSingleton& _singleton, int _value )
             {
                 TestSingleton& testSingleton = static_cast<TestSingleton&>(_singleton);
-                testSingleton.mValueInt = _value;
+                testSingleton.mValueInt      = _value;
             }
-            int     mValueInt = 0;
+            int mValueInt = 0;
         };
 
         //====================================================================================================
@@ -42,46 +42,45 @@ namespace fan
                 _info.mSlots.push_back( new Slot<int>( "test int", &TestComponent::SetValueInt ) );
                 _info.mSlots.push_back( new Slot<float>( "test float", &TestComponent::SetValueFloat ) );
             }
-            static void	Init( EcsWorld& /*_world*/, EcsEntity /*_entity*/, EcsComponent& _component )
+            static void Init( EcsWorld& /*_world*/, EcsEntity /*_entity*/, EcsComponent& _component )
             {
                 TestComponent& testComponent = static_cast<TestComponent&>(_component);
-                testComponent.mValueInt = 0;
+                testComponent.mValueInt   = 0;
                 testComponent.mValueFloat = 0;
             }
             static void SetValueInt( EcsComponent& _component, int _value )
             {
                 TestComponent& testComponent = static_cast<TestComponent&>(_component);
-                testComponent.mValueInt = _value;
+                testComponent.mValueInt      = _value;
             }
-            static void SetValueFloat( EcsComponent& _component,float _value )
+            static void SetValueFloat( EcsComponent& _component, float _value )
             {
                 TestComponent& testComponent = static_cast<TestComponent&>(_component);
-                testComponent.mValueFloat = _value;
+                testComponent.mValueFloat    = _value;
             }
             static void DoNothing( EcsComponent& _component )
             {
                 (void)_component;
             }
 
-
-            int     mValueInt = 0;
-            float   mValueFloat = 0;
+            int   mValueInt   = 0;
+            float mValueFloat = 0;
         };
     }
 
-    //========================================================================================================
-    //========================================================================================================
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
     class UnitTestSignal : public UnitTest<UnitTestSignal>
     {
     public:
 
         static std::vector<TestMethod> GetTests()
         {
-            return { { &UnitTestSignal::TestConnect,            "Connect " },
-                     { &UnitTestSignal::TestSlotPtrComponent,   "Slot ptr component" },
-                     { &UnitTestSignal::TestSlotPtrSingleton,   "Slot ptr singleton" },
-                     { &UnitTestSignal::TestSignalSlotComponent,"Signal slot component" },
-                     { &UnitTestSignal::TestSignalSlotSingleton,"Signal slot singleton" },
+            return { { &UnitTestSignal::TestConnect,             "Connect " },
+                     { &UnitTestSignal::TestSlotPtrComponent,    "Slot ptr component" },
+                     { &UnitTestSignal::TestSlotPtrSingleton,    "Slot ptr singleton" },
+                     { &UnitTestSignal::TestSignalSlotComponent, "Signal slot component" },
+                     { &UnitTestSignal::TestSignalSlotSingleton, "Signal slot singleton" },
             };
         }
         void Create() override
@@ -128,19 +127,19 @@ namespace fan
         {
             using namespace test;
             EcsHandle handle = 1;
-            Slot<> slot("null", &TestComponent::DoNothing );
-            SlotPtr slotPtr;
-            TEST_ASSERT( ! slotPtr.IsValid() );
-            Signal<int>     signalInt;
+            Slot<>    slot( "null", &TestComponent::DoNothing );
+            SlotPtr   slotPtr;
+            TEST_ASSERT( !slotPtr.IsValid() );
+            Signal<int> signalInt;
             slotPtr.Init( mWorld, signalInt.GetType() );
-            TEST_ASSERT( ! slotPtr.IsValid() );
+            TEST_ASSERT( !slotPtr.IsValid() );
             TEST_ASSERT( slotPtr.GetArgsType() == signalInt.GetType() );
             slotPtr.SetComponentSlot( handle, TestComponent::Info::sType, &slot );
             TEST_ASSERT( slotPtr.IsValid() );
 
             // the data should move when the component is moved around in memory
-            uint8_t data[ sizeof(SlotPtr) ];
-            std::memcpy( data, &slotPtr, sizeof(SlotPtr) );
+            uint8_t data[sizeof( SlotPtr )];
+            std::memcpy( data, &slotPtr, sizeof( SlotPtr ) );
             SlotPtr* slotPtrCpy = (SlotPtr*)data;
             TEST_ASSERT( &slotPtrCpy->Data() == &slotPtr.Data() );
         }
@@ -148,12 +147,12 @@ namespace fan
         void TestSlotPtrSingleton()
         {
             using namespace test;
-            Slot< int > slot("null", &TestSingleton::SetValueInt );
-            SlotPtr slotPtr;
-            TEST_ASSERT( ! slotPtr.IsValid() );
-            Signal<int>     signalInt;
+            Slot<int> slot( "null", &TestSingleton::SetValueInt );
+            SlotPtr   slotPtr;
+            TEST_ASSERT( !slotPtr.IsValid() );
+            Signal<int> signalInt;
             slotPtr.Init( mWorld, signalInt.GetType() );
-            TEST_ASSERT( ! slotPtr.IsValid() );
+            TEST_ASSERT( !slotPtr.IsValid() );
             TEST_ASSERT( slotPtr.GetArgsType() == signalInt.GetType() );
             slotPtr.SetSingletonSlot( TestSingleton::Info::sType, &slot );
             TEST_ASSERT( slotPtr.IsValid() );
@@ -164,39 +163,39 @@ namespace fan
             using namespace test;
             EcsEntity entity = mWorld.CreateEntity();
             EcsHandle handle = mWorld.AddHandle( entity );
-            TestComponent& testComponent = mWorld.AddComponent<TestComponent>(entity);
+            TestComponent& testComponent = mWorld.AddComponent<TestComponent>( entity );
 
             // get slots
             const EcsComponentInfo componentInfo = mWorld.GetComponentInfo( TestComponent::Info::sType );
             TEST_ASSERT( componentInfo.mSlots[0]->GetArgsType() == TemplateType<int>::Type() );
-            Slot<int>& slotInt = * ( (Slot<int>*)componentInfo.mSlots[0] );
+            Slot<int>& slotInt = *( (Slot<int>*)componentInfo.mSlots[0] );
             TEST_ASSERT( componentInfo.mSlots[1]->GetArgsType() == TemplateType<float>::Type() );
-            Slot<float>& slotFloat = * ( (Slot<float>*)componentInfo.mSlots[1] );
+            Slot<float>& slotFloat = *( (Slot<float>*)componentInfo.mSlots[1] );
 
-            Signal<int>     signalInt;
-            SlotPtr slotPtrInt;
+            Signal<int> signalInt;
+            SlotPtr     slotPtrInt;
             slotPtrInt.Init( mWorld, signalInt.GetType() );
             slotPtrInt.SetComponentSlot( handle, TestComponent::Info::sType, &slotInt );
 
             signalInt.Connect( mWorld, slotPtrInt );
             TEST_ASSERT( testComponent.mValueInt == 0 );
-            signalInt.Emmit(12);
+            signalInt.Emmit( 12 );
             TEST_ASSERT( testComponent.mValueInt == 12 );
             signalInt.Disconnect( (size_t)&slotPtrInt.Data() );
-            signalInt.Emmit(25);
+            signalInt.Emmit( 25 );
             TEST_ASSERT( testComponent.mValueInt == 12 );
 
-            Signal<float>   signalFloat;
-            SlotPtr slotPtrFloat;
+            Signal<float> signalFloat;
+            SlotPtr       slotPtrFloat;
             slotPtrFloat.Init( mWorld, signalFloat.GetType() );
             slotPtrFloat.SetComponentSlot( handle, TestComponent::Info::sType, &slotFloat );
             signalFloat.Connect( mWorld, slotPtrFloat );
             TEST_ASSERT( testComponent.mValueFloat == 0 );
-            signalFloat.Emmit(13.f);
+            signalFloat.Emmit( 13.f );
             TEST_ASSERT( testComponent.mValueFloat == 13.f );
 
             signalFloat.Clear();
-            signalFloat.Emmit(14.f);
+            signalFloat.Emmit( 14.f );
             TEST_ASSERT( testComponent.mValueFloat == 13.f );
         }
 
@@ -208,26 +207,26 @@ namespace fan
             // get slot
             const EcsSingletonInfo& singletonInfo = mWorld.GetSingletonInfo( TestSingleton::Info::sType );
             TEST_ASSERT( singletonInfo.mSlots[0]->GetArgsType() == TemplateType<int>::Type() );
-            Slot<int>& slotInt = * ( (Slot<int>*)singletonInfo.mSlots[0] );
+            Slot<int>& slotInt = *( (Slot<int>*)singletonInfo.mSlots[0] );
 
-            Signal<int>     signalInt;
-            SlotPtr slotPtrInt;
+            Signal<int> signalInt;
+            SlotPtr     slotPtrInt;
             slotPtrInt.Init( mWorld, signalInt.GetType() );
             slotPtrInt.SetSingletonSlot( TestSingleton::Info::sType, &slotInt );
 
             signalInt.Connect( mWorld, slotPtrInt );
             TEST_ASSERT( testSingleton.mValueInt == 0 );
-            signalInt.Emmit(12);
+            signalInt.Emmit( 12 );
             TEST_ASSERT( testSingleton.mValueInt == 12 );
             signalInt.Disconnect( (size_t)&slotPtrInt.Data() );
-            signalInt.Emmit(25);
+            signalInt.Emmit( 25 );
             TEST_ASSERT( testSingleton.mValueInt == 12 );
 
             signalInt.Connect( mWorld, slotPtrInt );
-            signalInt.Emmit(42);
+            signalInt.Emmit( 42 );
             TEST_ASSERT( testSingleton.mValueInt == 42 );
             signalInt.Clear();
-            signalInt.Emmit(64);
+            signalInt.Emmit( 64 );
             TEST_ASSERT( testSingleton.mValueInt == 42 );
         }
     };

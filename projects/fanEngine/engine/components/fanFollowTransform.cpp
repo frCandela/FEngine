@@ -24,7 +24,7 @@ namespace fan
         FollowTransform& followTransform = static_cast<FollowTransform&>( _component );
         followTransform.mLocalTransform.mRotation = Quaternion::sIdentity;
         followTransform.mLocalTransform.mPosition = Vector3::sZero;
-        followTransform.mLocked         = false;
+        followTransform.mLocked                   = false;
     }
 
     //==================================================================================================================================================================================================

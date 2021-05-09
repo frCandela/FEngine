@@ -12,39 +12,36 @@
 
 namespace fan
 {
-    //========================================================================================================
-    //========================================================================================================
-	struct UniformsPostprocess
-	{
-		glm::vec4 mColor = glm::vec4( 1, 1, 1, 1 );
-	};
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    struct UniformsPostprocess
+    {
+        glm::vec4 mColor = glm::vec4( 1, 1, 1, 1 );
+    };
 
-	struct RenderPass;
-	struct FrameBuffer;
+    struct RenderPass;
+    struct FrameBuffer;
 
-	//========================================================================================================
-	//========================================================================================================
-	struct DrawPostprocess
-	{
-		Pipeline			mPipeline;
-		Shader				mFragmentShader;
-		Shader				mVertexShader;
-		DescriptorImages	mDescriptorImage;
-		DescriptorUniforms	mDescriptorUniform;
-		Sampler				mSampler;
-		UniformsPostprocess	mUniforms;
-		CommandBuffer		mCommandBuffers;
-		Buffer				mVertexBufferQuad;
- 		
-		void Create( Device& _device, uint32_t _imagesCount, ImageView& _inputImageView );
-		void Destroy( Device& _device );
-		void BindDescriptors( VkCommandBuffer _commandBuffer, const size_t _index );
-		void UpdateUniformBuffers( Device& _device, const size_t _index );
-		void CreateQuadVertexBuffer( Device& _device );
-        void RecordCommandBuffer( const size_t _index,
-                                  RenderPass& _renderPass,
-                                  FrameBuffer& _framebuffer,
-                                  VkExtent2D _extent );
-		PipelineConfig	GetPipelineConfig() const;
-	};
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    struct DrawPostprocess
+    {
+        Pipeline            mPipeline;
+        Shader              mFragmentShader;
+        Shader              mVertexShader;
+        DescriptorImages    mDescriptorImage;
+        DescriptorUniforms  mDescriptorUniform;
+        Sampler             mSampler;
+        UniformsPostprocess mUniforms;
+        CommandBuffer       mCommandBuffers;
+        Buffer              mVertexBufferQuad;
+
+        void Create( Device& _device, uint32_t _imagesCount, ImageView& _inputImageView );
+        void Destroy( Device& _device );
+        void BindDescriptors( VkCommandBuffer _commandBuffer, const size_t _index );
+        void UpdateUniformBuffers( Device& _device, const size_t _index );
+        void CreateQuadVertexBuffer( Device& _device );
+        void RecordCommandBuffer( const size_t _index, RenderPass& _renderPass, FrameBuffer& _framebuffer, VkExtent2D _extent );
+        PipelineConfig GetPipelineConfig() const;
+    };
 }	

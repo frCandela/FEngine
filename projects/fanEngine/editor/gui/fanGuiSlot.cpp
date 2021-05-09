@@ -6,16 +6,14 @@
 #include "editor/fanModals.hpp"
 #include "editor/gui/fanGroupsColors.hpp"
 
-
-
 namespace ImGui
 {
 
-    //========================================================================================================
-    //========================================================================================================
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
     bool HasCompatibleSlots( const std::vector<fan::SlotBase*>& _slots, const int _argsType )
     {
-        for( fan::SlotBase * slot : _slots )
+        for( fan::SlotBase* slot : _slots )
         {
             if( slot->GetArgsType() == _argsType )
             {
@@ -25,16 +23,16 @@ namespace ImGui
         return false;
     }
 
-    //========================================================================================================
-    //========================================================================================================
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
     void FanPopupSetSingletonSlot::Open()
     {
         ImGui::OpenPopup( sName );
     }
 
-    //========================================================================================================
-    //========================================================================================================
-    void FanPopupSetSingletonSlot::Draw( fan::EcsWorld& _world , fan::SlotPtr& _slotPtr )
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    void FanPopupSetSingletonSlot::Draw( fan::EcsWorld& _world, fan::SlotPtr& _slotPtr )
     {
         const fan::EditorGuiInfo& gui = _world.GetSingleton<fan::EditorGuiInfo>();
 
@@ -45,8 +43,8 @@ namespace ImGui
         {
             if( ImGui::BeginChild( "child_area", { 370, 330 }, true ) )
             {
-                bool didNotDrawAnything = true;
-                std::vector<fan::EcsSingletonInfo> infos = _world.GetVectorSingletonInfo();
+                bool                               didNotDrawAnything = true;
+                std::vector<fan::EcsSingletonInfo> infos              = _world.GetVectorSingletonInfo();
                 for( fan::EcsSingletonInfo& info : infos )
                 {
                     if( !HasCompatibleSlots( info.mSlots, _slotPtr.GetArgsType() ) ){ continue; }
@@ -74,7 +72,7 @@ namespace ImGui
                 }
                 if( didNotDrawAnything )
                 {
-                    ImGui::Text("no compatible slot available");
+                    ImGui::Text( "no compatible slot available" );
                 }
                 ImGui::EndChild();
             }
@@ -86,23 +84,23 @@ namespace ImGui
         }
     }
 
-    //========================================================================================================
-    //========================================================================================================
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
     void FanPopupSetComponentSlot::Open()
     {
         ImGui::OpenPopup( sName );
     }
 
-    //========================================================================================================
-    //========================================================================================================
-    void FanPopupSetComponentSlot::Draw( fan::EcsWorld& _world , fan::SlotPtr& _slotPtr )
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    void FanPopupSetComponentSlot::Draw( fan::EcsWorld& _world, fan::SlotPtr& _slotPtr )
     {
         ImGui::SetNextWindowSize( { 400, 400 } );
         if( ImGui::BeginPopupModal( sName,
                                     NULL,
                                     ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove ) )
         {
-            if( ! _slotPtr.IsComponentSlot() )
+            if( !_slotPtr.IsComponentSlot() )
             {
                 ImGui::CloseCurrentPopup();
                 ImGui::EndPopup();
@@ -113,9 +111,9 @@ namespace ImGui
             {
                 std::vector<fan::EcsComponentInfo*> infos;
 
-                fan::EcsEntity entity = _world.GetEntity( _slotPtr.Data().mHandle );
-                bool didNotDrawAnything = true;
-                for( int componentIndex = 0; componentIndex < _world.NumComponents(); ++componentIndex )
+                fan::EcsEntity entity             = _world.GetEntity( _slotPtr.Data().mHandle );
+                bool           didNotDrawAnything = true;
+                for( int       componentIndex     = 0; componentIndex < _world.NumComponents(); ++componentIndex )
                 {
                     if( !_world.IndexedHasComponent( entity, componentIndex ) ){ continue; }
                     const fan::EcsComponentInfo& info = _world.IndexedGetComponentInfo( componentIndex );
@@ -123,7 +121,7 @@ namespace ImGui
 
                     didNotDrawAnything = false;
 
-                    const fan::EditorGuiInfo& gui = _world.GetSingleton<fan::EditorGuiInfo>();
+                    const fan::EditorGuiInfo   & gui     = _world.GetSingleton<fan::EditorGuiInfo>();
                     const fan::GuiComponentInfo& guiInfo = gui.GetComponentInfo( info.mType );
                     ImGui::Icon( guiInfo.mIcon, { 16, 16 }, fan::GroupsColors::GetColor( guiInfo.mGroup ) );
                     ImGui::SameLine();
@@ -146,7 +144,7 @@ namespace ImGui
                 }
                 if( didNotDrawAnything )
                 {
-                    ImGui::Text("no compatible slot available");
+                    ImGui::Text( "no compatible slot available" );
                 }
                 ImGui::EndChild();
             }
@@ -158,8 +156,8 @@ namespace ImGui
         }
     }
 
-    //========================================================================================================
-    //========================================================================================================
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
     void DrawTooltipSingleton( fan::EcsWorld& _world, fan::SlotPtr& _ptr )
     {
         const fan::EditorGuiInfo& guiInfo = _world.GetSingleton<fan::EditorGuiInfo>();
@@ -180,8 +178,8 @@ namespace ImGui
         ImGui::EndTooltip();
     }
 
-    //========================================================================================================
-    //========================================================================================================
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
     void DrawTooltipComponent( fan::EcsWorld& _world, fan::SlotPtr& _ptr )
     {
         const fan::EditorGuiInfo& guiInfo = _world.GetSingleton<fan::EditorGuiInfo>();
@@ -211,8 +209,8 @@ namespace ImGui
         ImGui::EndTooltip();
     }
 
-    //========================================================================================================
-    //========================================================================================================
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
     void FanSlotPtr( const char* _label, fan::EcsWorld& _world, fan::SlotPtr& _ptr )
     {
         if( ImGui::ButtonIcon( ImGui::IconType::SignalSlot16, { 16, 16 } ) )
@@ -225,19 +223,19 @@ namespace ImGui
         const float width = 0.6f * ImGui::GetWindowWidth() - 16;
 
         std::string text = "null";
-        if(_ptr.IsValid() )
+        if( _ptr.IsValid() )
         {
             if( _ptr.IsSingletonSlot() )
             {
-                fan::EcsSingletonInfo info = _world.GetSingletonInfo( _ptr.Data().mType );
-                const std::string slotName = _ptr.Data().mSlot == nullptr ? "null" : _ptr.Data().mSlot->mName;
+                fan::EcsSingletonInfo info     = _world.GetSingletonInfo( _ptr.Data().mType );
+                const std::string     slotName = _ptr.Data().mSlot == nullptr ? "null" : _ptr.Data().mSlot->mName;
                 text = info.mName + "::" + slotName;
             }
             else
             {
                 fanAssert( _ptr.IsComponentSlot() );
-                fan::EcsComponentInfo info = _world.GetComponentInfo( _ptr.Data().mType );
-                const std::string slotName = _ptr.Data().mSlot == nullptr ? "null" : _ptr.Data().mSlot->mName;
+                fan::EcsComponentInfo info     = _world.GetComponentInfo( _ptr.Data().mType );
+                const std::string     slotName = _ptr.Data().mSlot == nullptr ? "null" : _ptr.Data().mSlot->mName;
 
                 text = info.mName + "::" + slotName;
             }
@@ -246,13 +244,13 @@ namespace ImGui
         if( ImGui::Button( text.c_str(), ImVec2( width, 0.f ) ) )
         {
             if( _ptr.IsComponentSlot() ){ FanPopupSetComponentSlot::Open(); }
-            else                        { FanPopupSetSingletonSlot::Open(); }
+            else{ FanPopupSetSingletonSlot::Open(); }
         }
         if( ImGui::IsItemClicked( ImGuiMouseButton_Right ) ){ _ptr.Clear(); }
         if( ImGui::IsItemHovered() )
         {
-            if( _ptr.IsSingletonSlot() )        { DrawTooltipSingleton( _world, _ptr ); }
-            else if( _ptr.IsComponentSlot() )   { DrawTooltipComponent( _world, _ptr ); }
+            if( _ptr.IsSingletonSlot() ){ DrawTooltipSingleton( _world, _ptr ); }
+            else if( _ptr.IsComponentSlot() ){ DrawTooltipComponent( _world, _ptr ); }
         }
 
         ComponentPayload payload = ImGui::FanBeginDragDropTargetComponent<fan::SceneNode>( _world );
@@ -265,7 +263,7 @@ namespace ImGui
         ImGui::SameLine();
         ImGui::Text( _label );
         ImGui::SameLine();
-        ImGui::FanShowHelpMarker("drag a scene node to add a component slot");
+        ImGui::FanShowHelpMarker( "drag a scene node to add a component slot" );
 
         FanPopupSetSingletonSlot::Draw( _world, _ptr );
         FanPopupSetComponentSlot::Draw( _world, _ptr );

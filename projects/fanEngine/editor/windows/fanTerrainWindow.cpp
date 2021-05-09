@@ -19,7 +19,7 @@ namespace fan
 
         bool generateTerrain = false;
 
-        ImGui::Icon( ImGui::IconType::Terrain16, {16,16});
+        ImGui::Icon( ImGui::IconType::Terrain16, { 16, 16 } );
         ImGui::SameLine();
 
         if( ImGui::Button( "generate" ) )

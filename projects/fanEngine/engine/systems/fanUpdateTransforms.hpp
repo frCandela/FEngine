@@ -7,9 +7,9 @@
 namespace fan
 {
 
-    //========================================================================================================
+    //==================================================================================================================================================================================================
     // setups the FollowTransforms offsets @todo remove this ( useless ? )
-    //========================================================================================================
+    //==================================================================================================================================================================================================
     struct SInitFollowTransforms : EcsSystem
     {
         static EcsSignature GetSignature( const EcsWorld& _world )
@@ -35,15 +35,15 @@ namespace fan
                 FxTransform* parentTransform = _world.SafeGetComponent<FxTransform>( parentEntity );
                 if( parentTransform != nullptr )
                 {
-                    followTransform.mLocalTransform =  parentTransform->Inverse() * follow;
+                    followTransform.mLocalTransform = parentTransform->Inverse() * follow;
                 }
             }
         }
     };
 
-    //========================================================================================================
+    //==================================================================================================================================================================================================
     // moves the 3D FollowTransforms after their targets
-    //========================================================================================================
+    //==================================================================================================================================================================================================
     struct SMoveFollowTransforms : EcsSystem
     {
         static EcsSignature GetSignature( const EcsWorld& _world )
@@ -69,7 +69,7 @@ namespace fan
                 FxTransform* parentTransform = _world.SafeGetComponent<FxTransform>( parentEntity );
                 if( followTransform.mLocked && parentTransform != nullptr )
                 {
-                    follow = (*parentTransform) * followTransform.mLocalTransform;
+                    follow = ( *parentTransform ) * followTransform.mLocalTransform;
                 }
             }
         }

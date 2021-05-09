@@ -5,22 +5,20 @@
 
 namespace fan
 {
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
     struct GuiEditorCamera
     {
-        //====================================================================================================
-        //====================================================================================================
         static GuiSingletonInfo GetInfo()
         {
             GuiSingletonInfo info;
-            info.mEditorName  = "editor camera";
-            info.mIcon  = ImGui::Camera16;
-            info.mGroup = EngineGroups::Editor;
-            info.onGui  = &GuiEditorCamera::OnGui;
+            info.mEditorName = "editor camera";
+            info.mIcon       = ImGui::Camera16;
+            info.mGroup      = EngineGroups::Editor;
+            info.onGui       = &GuiEditorCamera::OnGui;
             return info;
         }
 
-        //====================================================================================================
-        //====================================================================================================
         static void OnGui( EcsWorld&, EcsSingleton& _component )
         {
             EditorCamera& editorCamera = static_cast<EditorCamera&>( _component );

@@ -6,18 +6,17 @@
 
 namespace fan
 {
-    //========================================================================================================
-    //========================================================================================================
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
     class UnitTestFanAssert : public UnitTest<UnitTestFanAssert>
     {
     public:
         static std::vector<TestMethod> GetTests()
         {
-            return { { &UnitTestFanAssert::TestAssertTrue,                "Assert true"                  },
-                     { &UnitTestFanAssert::TestAssertFalseErrorType,      "Assert false error type"      },
+            return { { &UnitTestFanAssert::TestAssertTrue,                "Assert true" },
+                     { &UnitTestFanAssert::TestAssertFalseErrorType,      "Assert false error type" },
                      { &UnitTestFanAssert::TestAssertFalseDisplayMessage, "Assert false display message" },
-                     { &UnitTestFanAssert::TestAssertMessage,             "Assert message"               },
-
+                     { &UnitTestFanAssert::TestAssertMessage,             "Assert message" },
             };
         }
 
@@ -27,9 +26,8 @@ namespace fan
         }
         void Destroy() override
         {
-            Debug::Get().onNewLog.Disconnect( (size_t) this );
+            Debug::Get().onNewLog.Disconnect( (size_t)this );
         }
-
 
         void OnNewLog( const Debug::LogItem _logItem )
         {
@@ -38,7 +36,7 @@ namespace fan
         }
 
         Debug::LogItem mlastLog;
-        int logCounter = 0;
+        int            logCounter = 0;
 
         void TestAssertTrue()
         {
@@ -50,27 +48,27 @@ namespace fan
         void TestAssertFalseDisplayMessage()
         {
             logCounter = 0;
-            fanAssert( false  );
+            fanAssert( false );
             TEST_ASSERT( logCounter == 1 );
         }
 
         void TestAssertFalseErrorType()
         {
             logCounter = 0;
-            fanAssert( false  );
+            fanAssert( false );
             TEST_ASSERT( logCounter == 1 );
             TEST_ASSERT( mlastLog.severity == Debug::Severity::error );
         }
 
         void TestAssertMessage()
         {
-            logCounter = 0;
-            fanAssertMsg( false , "message" );
+            logCounter                  = 0;
+            fanAssertMsg( false, "message" );
             TEST_ASSERT( logCounter == 1 );
             const std::string targetLog = "Assert:message func:TestAssertMessage line:68 file:";
             TEST_ASSERT( mlastLog.message.size() > targetLog.size() );
             // we don't test the file path
-            const std::string subString = mlastLog.message.substr(0 , targetLog.size() );
+            const std::string subString = mlastLog.message.substr( 0, targetLog.size() );
             TEST_ASSERT( subString == targetLog );
         }
     };

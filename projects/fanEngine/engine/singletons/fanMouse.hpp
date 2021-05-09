@@ -9,11 +9,11 @@ struct GLFWwindow;
 
 namespace fan
 {
-    //========================================================================================================
-    //========================================================================================================
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
     struct Mouse : public EcsSingleton
     {
-        ECS_SINGLETON( Mouse )
+    ECS_SINGLETON( Mouse )
         static void SetInfo( EcsSingletonInfo& _info );
         static void Init( EcsWorld& _world, EcsSingleton& _singleton );
 
@@ -27,23 +27,23 @@ namespace fan
         enum Button
         {
             button1, button2, button3, button4, button5, button6, button7, button8, count,
-            buttonLeft = button1,
-            buttonRight = button2,
+            buttonLeft   = button1,
+            buttonRight  = button2,
             buttonMiddle = button3
         };
 
-        glm::vec2   mLocalPosition;
-        glm::vec2   mPosition;
-        glm::vec2   mScrollDelta;
-        glm::vec2   mPositionDelta;
-        glm::vec2   mScreenPosition;
-        glm::vec2   mScreenSize;
-        bool        mWindowHovered;
-        static bool sLocked;
+        glm::vec2                  mLocalPosition;
+        glm::vec2                  mPosition;
+        glm::vec2                  mScrollDelta;
+        glm::vec2                  mPositionDelta;
+        glm::vec2                  mScreenPosition;
+        glm::vec2                  mScreenSize;
+        bool                       mWindowHovered;
+        static bool                sLocked;
         static const constexpr int sButtonsCount = Button::count;
-        bool        mPressed [ sButtonsCount ];
-        bool        mReleased[ sButtonsCount ];
-        bool        mDown    [ sButtonsCount ];
+        bool                       mPressed[sButtonsCount];
+        bool                       mReleased[sButtonsCount];
+        bool                       mDown[sButtonsCount];
 
         void Clear();
         void UpdateData( GLFWwindow* _window );

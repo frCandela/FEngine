@@ -8,22 +8,22 @@
 
 namespace fan
 {
-    //========================================================================================================
-    //========================================================================================================
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
     struct SHoverButtons : EcsSystem
     {
         static EcsSignature GetSignature( const EcsWorld& _world )
         {
             return _world.GetSignature<UIButton>() |
-                    _world.GetSignature<UITransform>() |
-                    _world.GetSignature<TagUIEnabled>();
+                   _world.GetSignature<UITransform>() |
+                   _world.GetSignature<TagUIEnabled>();
         }
 
         static void Run( EcsWorld& _world, const EcsView& _view )
         {
             Mouse& mouse = _world.GetSingleton<Mouse>();
 
-            auto buttonIt = _view.begin<UIButton>();
+            auto buttonIt      = _view.begin<UIButton>();
             auto transformUIIt = _view.begin<UITransform>();
             for( ; buttonIt != _view.end<UIButton>(); ++buttonIt, ++transformUIIt )
             {
@@ -39,7 +39,6 @@ namespace fan
                     ImGui::GetIO().WantCaptureMouse = true;
                 }
 
-
                 if( button.mIsHovered && mouse.mPressed[Mouse::buttonLeft] )
                 {
                     button.mIsPressed = true;
@@ -50,8 +49,8 @@ namespace fan
         }
     };
 
-    //========================================================================================================
-    //========================================================================================================
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
     struct SHighlightButtons : EcsSystem
     {
         static EcsSignature GetSignature( const EcsWorld& _world )
@@ -61,7 +60,7 @@ namespace fan
 
         static void Run( EcsWorld& /*_world*/, const EcsView& _view )
         {
-            auto buttonIt = _view.begin<UIButton>();
+            auto buttonIt     = _view.begin<UIButton>();
             auto uiRendererIt = _view.begin<UIRenderer>();
             for( ; buttonIt != _view.end<UIButton>(); ++buttonIt, ++uiRendererIt )
             {
@@ -69,17 +68,17 @@ namespace fan
                 UIRenderer& uiRenderer = *uiRendererIt;
                 if( button.mIsPressed )
                 {
-                    uiRenderer.mColor = button.mColorHovered;
+                    uiRenderer.mColor   = button.mColorHovered;
                     uiRenderer.mTexture = button.mImagePressed;
                 }
                 else if( button.mIsHovered )
                 {
-                    uiRenderer.mColor = button.mColorHovered;
+                    uiRenderer.mColor   = button.mColorHovered;
                     uiRenderer.mTexture = button.mImageNormal;
                 }
                 else
                 {
-                    uiRenderer.mColor = button.mColorNormal;
+                    uiRenderer.mColor   = button.mColorNormal;
                     uiRenderer.mTexture = button.mImageNormal;
                 }
             }

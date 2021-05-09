@@ -8,27 +8,27 @@
 
 namespace fan
 {
-    //========================================================================================================
-    //========================================================================================================
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
     class UnitTestMeshManager : public UnitTest<UnitTestMeshManager>
     {
     public:
         static std::vector<TestMethod> GetTests()
         {
             return {
-                    { &UnitTestMeshManager::TestLoadMesh,           "Load" },
-                    { &UnitTestMeshManager::TestMeshDelete,         "Delete" },
-                    { &UnitTestMeshManager::TestMeshIndexing,       "Indexing" },
-                    { &UnitTestMeshManager::TestClear,              "Clear" },
-                    { &UnitTestMeshManager::TestResolveRscPtr,      "Resolve rsc ptr" },
-                    { &UnitTestMeshManager::TestCreate,             "Create" },
-                    { &UnitTestMeshManager::TestDestroy,            "Destroy" },
+                    { &UnitTestMeshManager::TestLoadMesh,      "Load" },
+                    { &UnitTestMeshManager::TestMeshDelete,    "Delete" },
+                    { &UnitTestMeshManager::TestMeshIndexing,  "Indexing" },
+                    { &UnitTestMeshManager::TestClear,         "Clear" },
+                    { &UnitTestMeshManager::TestResolveRscPtr, "Resolve rsc ptr" },
+                    { &UnitTestMeshManager::TestCreate,        "Create" },
+                    { &UnitTestMeshManager::TestDestroy,       "Destroy" },
             };
         }
         void Create() override {}
         void Destroy() override
         {
-            Device * device = nullptr;  // when testing we dont generate gpu buffers
+            Device* device = nullptr;  // when testing we dont generate gpu buffers
             mMeshManager.Clear( *device );
         }
 
@@ -78,10 +78,11 @@ namespace fan
             TEST_ASSERT( mMeshManager.Get( RenderGlobal::sMeshCube ) == nullptr );
         }
 
-        void TestClear() {
+        void TestClear()
+        {
             mMeshManager.Load( RenderGlobal::sMeshCube );
-            Device * device = nullptr;
-            TEST_ASSERT( ! mMeshManager.Empty() );
+            Device* device = nullptr;
+            TEST_ASSERT( !mMeshManager.Empty() );
             mMeshManager.Clear( *device );
             TEST_ASSERT( mMeshManager.Empty() );
         }
@@ -90,8 +91,8 @@ namespace fan
         {
             Mesh* meshCube = mMeshManager.Load( RenderGlobal::sMeshCube );
             MeshPtr rscPtr;
-            TEST_ASSERT( ! rscPtr.IsValid() );
-            rscPtr.Init( RenderGlobal::sMeshCube);
+            TEST_ASSERT( !rscPtr.IsValid() );
+            rscPtr.Init( RenderGlobal::sMeshCube );
             mMeshManager.ResolvePtr( rscPtr );
             TEST_ASSERT( rscPtr.IsValid() );
             TEST_ASSERT( meshCube == rscPtr.GetResource() );
@@ -102,8 +103,8 @@ namespace fan
             Mesh* mesh1 = new Mesh();
             Mesh* mesh2 = new Mesh();
 
-            TEST_ASSERT( ! mesh1->mBuffersOutdated  );
-            TEST_ASSERT( ! mesh2->mBuffersOutdated  );
+            TEST_ASSERT( !mesh1->mBuffersOutdated );
+            TEST_ASSERT( !mesh2->mBuffersOutdated );
 
             mMeshManager.Add( mesh1, "mesh1" );
             mMeshManager.Add( mesh2, "mesh2" );
@@ -116,11 +117,11 @@ namespace fan
             TEST_ASSERT( mesh1->mBuffersOutdated );
             TEST_ASSERT( mesh2->mBuffersOutdated );
 
-            Device * device = nullptr;
+            Device* device = nullptr;
             mMeshManager.CreateNewMeshes( *device );
 
-            TEST_ASSERT( ! mesh1->mBuffersOutdated  );
-            TEST_ASSERT( ! mesh2->mBuffersOutdated  );
+            TEST_ASSERT( !mesh1->mBuffersOutdated );
+            TEST_ASSERT( !mesh2->mBuffersOutdated );
         }
 
         void TestDestroy()
@@ -128,8 +129,8 @@ namespace fan
             mMeshManager.Load( RenderGlobal::sMeshCube );
             mMeshManager.Remove( RenderGlobal::sMeshCube );
             TEST_ASSERT( mMeshManager.DestroyListSize() == 1 );
-            Device * device = nullptr;
-            mMeshManager.Clear( * device );
+            Device* device = nullptr;
+            mMeshManager.Clear( *device );
             TEST_ASSERT( mMeshManager.DestroyListSize() == 0 );
         }
     };

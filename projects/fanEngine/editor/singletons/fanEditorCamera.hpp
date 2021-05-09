@@ -7,23 +7,23 @@
 
 namespace fan
 {
-	class EcsWorld;
+    class EcsWorld;
 
-	//========================================================================================================
-	// Editor camera data (transform, camera, speed, sensitivity )
-	//========================================================================================================
-	struct EditorCamera : public EcsSingleton
-	{
-		ECS_SINGLETON( EditorCamera )
-		static void SetInfo( EcsSingletonInfo& _info );
-		static void Init( EcsWorld& _world, EcsSingleton& _component );
+    //==================================================================================================================================================================================================
+    // Editor camera data (transform, camera, speed, sensitivity )
+    //==================================================================================================================================================================================================
+    struct EditorCamera : public EcsSingleton
+    {
+    ECS_SINGLETON( EditorCamera )
+        static void SetInfo( EcsSingletonInfo& _info );
+        static void Init( EcsWorld& _world, EcsSingleton& _component );
 
-		EcsHandle mCameraHandle;
-		Fixed     mSpeed;
-		Fixed     mSpeedMultiplier;
-		glm::vec2 mXYSensitivity ;
+        EcsHandle mCameraHandle;
+        Fixed     mSpeed;
+        Fixed     mSpeedMultiplier;
+        glm::vec2 mXYSensitivity;
 
-		static void Update( EcsWorld& _world, const Fixed _delta );
-		static void CreateEditorCamera( EcsWorld& _world );
-	};
+        static void Update( EcsWorld& _world, const Fixed _delta );
+        static void CreateEditorCamera( EcsWorld& _world );
+    };
 }

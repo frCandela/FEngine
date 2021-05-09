@@ -24,11 +24,11 @@ set(CMAKE_PDB_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
 #compiler
 if (MSVC)
     link_directories(${CMAKE_SOURCE_DIR}/submodules/SFML/extlibs/libs-msvc/x64)
-    add_compile_options(/W4 /WX )
+    add_compile_options(/W4 /WX)
     add_compile_definitions(FAN_MSVC)
 elseif (MINGW)
     link_directories(${CMAKE_SOURCE_DIR}/submodules/SFML/extlibs/libs-mingw/x64)
-    add_compile_options( -Wall -Werror -Wextra -pedantic )
+    add_compile_options(-Wall -Werror -Wextra -pedantic)
     add_compile_definitions(FAN_MINGW)
 endif ()
 

@@ -7,8 +7,8 @@
 
 namespace fan
 {
-    //========================================================================================================
-    //========================================================================================================
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
     class UnitTestMesh2DManager : public UnitTest<UnitTestMesh2DManager>
     {
     public:
@@ -26,21 +26,20 @@ namespace fan
         void Create() override {}
         void Destroy() override
         {
-            Device * device = nullptr;  // when testing we dont generate gpu buffers
+            Device* device = nullptr;  // when testing we dont generate gpu buffers
             mMeshManager.Clear( *device );
         }
 
         Mesh2DManager mMeshManager;
 
         void TestAddMesh()
-
         {
             TEST_ASSERT( mMeshManager.Empty() );
             Mesh2D* mesh2D = new Mesh2D;
             const std::string meshName = "toto";
             mMeshManager.Add( mesh2D, meshName );
-            TEST_ASSERT( mesh2D->mPath == meshName);
-            TEST_ASSERT( ! mMeshManager.Empty() );
+            TEST_ASSERT( mesh2D->mPath == meshName );
+            TEST_ASSERT( !mMeshManager.Empty() );
             TEST_ASSERT( mMeshManager.MeshCount() == 1 );
         }
 
@@ -74,11 +73,12 @@ namespace fan
             TEST_ASSERT( mMeshManager.Empty() );
         }
 
-        void TestClear() {
+        void TestClear()
+        {
             Mesh2D* mesh1 = new Mesh2D;;
             mMeshManager.Add( mesh1, "mesh1" );
-            TEST_ASSERT( ! mMeshManager.Empty() );
-            Device * device = nullptr;
+            TEST_ASSERT( !mMeshManager.Empty() );
+            Device* device = nullptr;
             mMeshManager.Clear( *device );
             TEST_ASSERT( mMeshManager.Empty() );
         }
@@ -87,18 +87,18 @@ namespace fan
         {
             Mesh2D* mesh1 = new Mesh2D;
 
-            TEST_ASSERT( ! mesh1->mBuffersOutdated  );
+            TEST_ASSERT( !mesh1->mBuffersOutdated );
 
             mMeshManager.Add( mesh1, "mesh1" );
 
-            mesh1->LoadFromVertices({});
+            mesh1->LoadFromVertices( {} );
 
             TEST_ASSERT( mesh1->mBuffersOutdated );
 
-            Device * device = nullptr;
+            Device* device = nullptr;
             mMeshManager.CreateNewMeshes( *device );
 
-            TEST_ASSERT( ! mesh1->mBuffersOutdated  );
+            TEST_ASSERT( !mesh1->mBuffersOutdated );
         }
 
         void TestDestroy()
@@ -109,8 +109,8 @@ namespace fan
             TEST_ASSERT( mMeshManager.DestroyListSize() == 0 );
             mMeshManager.Remove( meshName );
             TEST_ASSERT( mMeshManager.DestroyListSize() == 1 );
-            Device * device = nullptr;
-            mMeshManager.Clear( * device );
+            Device* device = nullptr;
+            mMeshManager.Clear( *device );
             TEST_ASSERT( mMeshManager.DestroyListSize() == 0 );
         }
     };

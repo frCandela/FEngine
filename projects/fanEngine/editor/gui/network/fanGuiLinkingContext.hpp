@@ -5,22 +5,20 @@
 
 namespace fan
 {
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
     struct GuiLinkingContext
     {
-        //====================================================================================================
-        //====================================================================================================
         static GuiSingletonInfo GetInfo()
         {
             GuiSingletonInfo info;
-            info.mIcon  = ImGui::Link16;
-            info.mGroup = EngineGroups::Network;
-            info.onGui  = &GuiLinkingContext::OnGui;
-            info.mEditorName  = "linking context";
+            info.mIcon       = ImGui::Link16;
+            info.mGroup      = EngineGroups::Network;
+            info.onGui       = &GuiLinkingContext::OnGui;
+            info.mEditorName = "linking context";
             return info;
         }
 
-        //====================================================================================================
-        //====================================================================================================
         static void OnGui( EcsWorld&, EcsSingleton& _component )
         {
             LinkingContext& linkingContext = static_cast<LinkingContext&>( _component );

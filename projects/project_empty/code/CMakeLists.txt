@@ -10,7 +10,7 @@
           fanEngine
           )
 
-  include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+  include_directories(.)
 
   add_subdirectory(editor)
   add_subdirectory(game)

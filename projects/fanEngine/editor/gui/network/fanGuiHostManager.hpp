@@ -5,22 +5,20 @@
 
 namespace fan
 {
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
     struct GuiHostManager
     {
-        //====================================================================================================
-        //====================================================================================================
         static GuiSingletonInfo GetInfo()
         {
             GuiSingletonInfo info;
-            info.mIcon  = ImGui::Network16;
-            info.mGroup = EngineGroups::Network;
-            info.onGui  = &GuiHostManager::OnGui;
-            info.mEditorName  = "host manager";
+            info.mIcon       = ImGui::Network16;
+            info.mGroup      = EngineGroups::Network;
+            info.onGui       = &GuiHostManager::OnGui;
+            info.mEditorName = "host manager";
             return info;
         }
 
-        //====================================================================================================
-        //====================================================================================================
         static void OnGui( EcsWorld&, EcsSingleton& _component )
         {
             HostManager& hostManager = static_cast<HostManager&>( _component );

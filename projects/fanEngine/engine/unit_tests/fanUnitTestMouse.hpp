@@ -6,30 +6,30 @@
 
 namespace fan
 {
-    //========================================================================================================
-    //========================================================================================================
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
     class UnitTestMouse : public UnitTest<UnitTestMouse>
     {
     public:
         static std::vector<TestMethod> GetTests()
         {
-            return { { &UnitTestMouse::TestButtonPressed,               "Button pressed" },
-                     { &UnitTestMouse::TestButtonReleased,              "Button released" },
-                     { &UnitTestMouse::TestButtonDown,                  "Button down" },
-                     { &UnitTestMouse::TestScroll,                      "Scroll delta" },
-                     { &UnitTestMouse::TestPosition,                    "Position" },
-                     { &UnitTestMouse::TestLocalPosition,               "Local position" },
-                     { &UnitTestMouse::TestLockCursor,                  "Lock cursor" },
-                     { &UnitTestMouse::TestPositionDelta,               "Position delta" },
-                     { &UnitTestMouse::TestPositionLocalScreenSpace,    "Position local screen space" },
-                     { &UnitTestMouse::TestWIndowHovered,               "Window hovered" },
+            return { { &UnitTestMouse::TestButtonPressed,            "Button pressed" },
+                     { &UnitTestMouse::TestButtonReleased,           "Button released" },
+                     { &UnitTestMouse::TestButtonDown,               "Button down" },
+                     { &UnitTestMouse::TestScroll,                   "Scroll delta" },
+                     { &UnitTestMouse::TestPosition,                 "Position" },
+                     { &UnitTestMouse::TestLocalPosition,            "Local position" },
+                     { &UnitTestMouse::TestLockCursor,               "Lock cursor" },
+                     { &UnitTestMouse::TestPositionDelta,            "Position delta" },
+                     { &UnitTestMouse::TestPositionLocalScreenSpace, "Position local screen space" },
+                     { &UnitTestMouse::TestWIndowHovered,            "Window hovered" },
             };
         }
 
         void Create() override
         {
             // we emulate a glfw window by redirecting the WindowUserPointer to our test data
-            mOldFunc = Window::sGetWindowUserPtr;
+            mOldFunc                  = Window::sGetWindowUserPtr;
             Window::sGetWindowUserPtr = &UnitTestGetWindowUserPointer;
             mInputData.mMouse.Clear();
         }
@@ -44,7 +44,7 @@ namespace fan
         static void* UnitTestGetWindowUserPointer( GLFWwindow* _window ) { return _window; }
 
         Window::GetWindowUserPtrFunc mOldFunc = nullptr;
-        Window::InputData mInputData;
+        Window::InputData            mInputData;
 
         void TestButtonPressed()
         {
@@ -55,7 +55,7 @@ namespace fan
             Mouse::MouseButtonCallback( window, 0, GLFW_PRESS, -1 );
             TEST_ASSERT( mouse.mPressed[Mouse::button1] );
             Mouse::NextFrame( window, glm::vec2( 0.f, 0.f ), glm::vec2( 0.f, 0.f ) );
-            TEST_ASSERT( ! mouse.mPressed[Mouse::button1] );
+            TEST_ASSERT( !mouse.mPressed[Mouse::button1] );
         }
 
         void TestButtonReleased()
@@ -67,7 +67,7 @@ namespace fan
             Mouse::MouseButtonCallback( window, 0, GLFW_RELEASE, -1 );
             TEST_ASSERT( mouse.mReleased[Mouse::button1] );
             Mouse::NextFrame( window, glm::vec2( 0.f, 0.f ), glm::vec2( 0.f, 0.f ) );
-            TEST_ASSERT( ! mouse.mReleased[Mouse::button1] );
+            TEST_ASSERT( !mouse.mReleased[Mouse::button1] );
         }
 
         void TestButtonDown()
@@ -81,7 +81,7 @@ namespace fan
             Mouse::NextFrame( window, glm::vec2( 0.f, 0.f ), glm::vec2( 0.f, 0.f ) );
             TEST_ASSERT( mouse.mDown[Mouse::button1] );
             Mouse::MouseButtonCallback( window, 0, GLFW_RELEASE, -1 );
-            TEST_ASSERT( ! mouse.mDown[Mouse::button1] );
+            TEST_ASSERT( !mouse.mDown[Mouse::button1] );
         }
 
         void TestScroll()
@@ -118,10 +118,10 @@ namespace fan
             Mouse     & mouse  = mInputData.mMouse;
             GLFWwindow* window = GetWindow();
 
-            TEST_ASSERT( mouse.mScreenPosition == glm::vec2(0,0) );
-            TEST_ASSERT( mouse.mLocalPosition == glm::vec2(0,0) );
+            TEST_ASSERT( mouse.mScreenPosition == glm::vec2( 0, 0 ) );
+            TEST_ASSERT( mouse.mLocalPosition == glm::vec2( 0, 0 ) );
             const glm::vec2 screenpos = glm::vec2( 100.f, 200.f );
-            Mouse::NextFrame( window, screenpos, glm::vec2( 0.f, 0.f ));
+            Mouse::NextFrame( window, screenpos, glm::vec2( 0.f, 0.f ) );
             TEST_ASSERT( mouse.mScreenPosition == screenpos );
             TEST_ASSERT( mouse.mLocalPosition == ( mouse.mPosition - screenpos ) );
             Mouse::MouseCallback( window, 500., 200. );
@@ -133,7 +133,7 @@ namespace fan
             Mouse     & mouse  = mInputData.mMouse;
             GLFWwindow* window = GetWindow();
 
-            TEST_ASSERT( ! mouse.sLocked  );
+            TEST_ASSERT( !mouse.sLocked );
             Mouse::MouseCallback( window, 100., 200. );
             TEST_ASSERT( mouse.mPosition == glm::vec2( 100.f, 200.f ) );
             mouse.sLocked = true;
@@ -147,11 +147,11 @@ namespace fan
             Mouse     & mouse  = mInputData.mMouse;
             GLFWwindow* window = GetWindow();
 
-            TEST_ASSERT( mouse.mPositionDelta == glm::vec2( 0.f,0.f ) );
+            TEST_ASSERT( mouse.mPositionDelta == glm::vec2( 0.f, 0.f ) );
             Mouse::MouseCallback( window, 10., 20. );
-            TEST_ASSERT( mouse.mPositionDelta == glm::vec2( 10.f,20.f ) );
-            Mouse::NextFrame( window, glm::vec2( 0, 0), glm::vec2( 0.f, 0.f ) );
-            TEST_ASSERT( mouse.mPositionDelta == glm::vec2( 0.f,0.f ) );
+            TEST_ASSERT( mouse.mPositionDelta == glm::vec2( 10.f, 20.f ) );
+            Mouse::NextFrame( window, glm::vec2( 0, 0 ), glm::vec2( 0.f, 0.f ) );
+            TEST_ASSERT( mouse.mPositionDelta == glm::vec2( 0.f, 0.f ) );
         }
 
         void TestPositionLocalScreenSpace()
@@ -159,24 +159,24 @@ namespace fan
             Mouse     & mouse  = mInputData.mMouse;
             GLFWwindow* window = GetWindow();
 
-            TEST_ASSERT( mouse.mScreenPosition == glm::vec2( 0.f,0.f ) );
-            TEST_ASSERT( mouse.mScreenSize == glm::vec2( 0.f,0.f ) );
-            TEST_ASSERT( mouse.mLocalPosition == glm::vec2( 0.f,0.f ) );
-            const glm::vec2 winPos = glm::vec2(10,20);
-            const glm::vec2 winSize = glm::vec2(30,40);
+            TEST_ASSERT( mouse.mScreenPosition == glm::vec2( 0.f, 0.f ) );
+            TEST_ASSERT( mouse.mScreenSize == glm::vec2( 0.f, 0.f ) );
+            TEST_ASSERT( mouse.mLocalPosition == glm::vec2( 0.f, 0.f ) );
+            const glm::vec2 winPos  = glm::vec2( 10, 20 );
+            const glm::vec2 winSize = glm::vec2( 30, 40 );
             Mouse::NextFrame( window, winPos, winSize );
             Mouse::MouseCallback( window, winPos.x + winSize.x / 2.f, winPos.y + winSize.y / 2.f );
-            TEST_ASSERT( mouse.LocalScreenSpacePosition() == glm::vec2( 0.f,0.f ) );
+            TEST_ASSERT( mouse.LocalScreenSpacePosition() == glm::vec2( 0.f, 0.f ) );
             Mouse::MouseCallback( window, winPos.x, winPos.y );
-            TEST_ASSERT( mouse.LocalScreenSpacePosition() == glm::vec2( -1.f,-1.f ) );
+            TEST_ASSERT( mouse.LocalScreenSpacePosition() == glm::vec2( -1.f, -1.f ) );
             Mouse::MouseCallback( window, winPos.x + winSize.x, winPos.y + winSize.y );
-            TEST_ASSERT( mouse.LocalScreenSpacePosition() == glm::vec2( 1.f,1.f ) );
+            TEST_ASSERT( mouse.LocalScreenSpacePosition() == glm::vec2( 1.f, 1.f ) );
             Mouse::MouseCallback( window, -1000., 1000. );
-            TEST_ASSERT( mouse.LocalScreenSpacePosition() == glm::vec2( -1.f,1.f ) );
+            TEST_ASSERT( mouse.LocalScreenSpacePosition() == glm::vec2( -1.f, 1.f ) );
             Mouse::MouseCallback( window, 1000., -1000. );
-            TEST_ASSERT( mouse.LocalScreenSpacePosition() == glm::vec2( 1.f,-1.f ) );
+            TEST_ASSERT( mouse.LocalScreenSpacePosition() == glm::vec2( 1.f, -1.f ) );
             Mouse::NextFrame( window, glm::vec2( 0.f, 0.f ), glm::vec2( 0.f, 0.f ) );
-            TEST_ASSERT( mouse.LocalScreenSpacePosition() == glm::vec2( 0.f,0.f ) );
+            TEST_ASSERT( mouse.LocalScreenSpacePosition() == glm::vec2( 0.f, 0.f ) );
         }
 
         void TestWIndowHovered()
@@ -184,8 +184,8 @@ namespace fan
             Mouse     & mouse  = mInputData.mMouse;
             GLFWwindow* window = GetWindow();
             TEST_ASSERT( mouse.mWindowHovered == false );
-            const glm::vec2 winPos = glm::vec2(10,20);
-            const glm::vec2 winSize = glm::vec2(30,40);
+            const glm::vec2 winPos  = glm::vec2( 10, 20 );
+            const glm::vec2 winSize = glm::vec2( 30, 40 );
             Mouse::NextFrame( window, winPos, winSize );
             Mouse::MouseCallback( window, winPos.x, winPos.y );
             TEST_ASSERT( mouse.mWindowHovered == true );
@@ -193,9 +193,8 @@ namespace fan
             TEST_ASSERT( mouse.mWindowHovered == false );
             Mouse::MouseCallback( window, winPos.x + winSize.x - 1, winPos.y + winSize.y - 1 );
             TEST_ASSERT( mouse.mWindowHovered == true );
-            Mouse::NextFrame( window, glm::vec2( 0, 0), winSize );
+            Mouse::NextFrame( window, glm::vec2( 0, 0 ), winSize );
             TEST_ASSERT( mouse.mWindowHovered == false );
         }
-
     };
 }

@@ -6,10 +6,10 @@
 
 namespace fan
 {
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
     struct GuiFxPhysicsWorld
     {
-        //====================================================================================================
-        //====================================================================================================
         static GuiSingletonInfo GetInfo()
         {
             GuiSingletonInfo info;
@@ -20,8 +20,6 @@ namespace fan
             return info;
         }
 
-        //========================================================================================================
-        //========================================================================================================
         static void OnGui( EcsWorld&, EcsSingleton& _component )
         {
             FxPhysicsWorld& physicsWorld = static_cast<FxPhysicsWorld&>( _component );
@@ -83,8 +81,6 @@ namespace fan
             if( ImGui::DragInt( "used position iterations", &physicsWorld.mContactSolver.mPositionIterationsUsed ) ){}
             if( ImGui::DragInt( "used contact  iterations", &physicsWorld.mContactSolver.mVelocityIterationsUsed ) ){}
             ImGui::PopReadOnly();
-
-
         }
     };
 }

@@ -9,8 +9,8 @@
 
 namespace fan
 {
-    //========================================================================================================
-    //========================================================================================================
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
     void DrawModels::Create( Device& _device, uint32_t _imagesCount )
     {
         mSamplerTextures.Create( _device, 0, 8, VK_FILTER_LINEAR );
@@ -47,8 +47,8 @@ namespace fan
         mDescriptorUniforms.Create( _device, _imagesCount );
     }
 
-    //========================================================================================================
-    //========================================================================================================
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
     void DrawModels::Destroy( Device& _device )
     {
         mPipeline.Destroy( _device );
@@ -57,8 +57,8 @@ namespace fan
         mSamplerTextures.Destroy( _device );
     }
 
-    //========================================================================================================
-    //========================================================================================================
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
     PipelineConfig DrawModels::GetPipelineConfig( DescriptorImages& _imagesDescriptor ) const
     {
         PipelineConfig config( mVertexShader, mFragmentShader );
@@ -74,12 +74,9 @@ namespace fan
         return config;
     }
 
-    //========================================================================================================
-    //========================================================================================================
-    void DrawModels::BindDescriptors(
-            VkCommandBuffer _commandBuffer,
-            const size_t _indexFrame,
-            const uint32_t _indexOffset )
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    void DrawModels::BindDescriptors( VkCommandBuffer _commandBuffer, const size_t _indexFrame, const uint32_t _indexOffset )
     {
         std::vector<VkDescriptorSet> descriptors    = {
                 mDescriptorUniforms.mDescriptorSets[_indexFrame]
@@ -100,49 +97,19 @@ namespace fan
         );
     }
 
-    //========================================================================================================
-    //========================================================================================================
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
     void DrawModels::UpdateUniformBuffers( Device& _device, const size_t _index )
     {
-        mDescriptorUniforms.SetData(
-                _device,
-                0,
-                _index,
-                &mUniforms.mUniformsProjView,
-                sizeof( UniformViewProj ),
-                0 );
-        mDescriptorUniforms.SetData(
-                _device,
-                1,
-                _index,
-                &mUniforms.mDynamicUniformsMatrices[0],
-                mUniforms.mDynamicUniformsMatrices.Alignment() * mUniforms.mDynamicUniformsMatrices.Size(),
-                0 );
-        mDescriptorUniforms.SetData(
-                _device,
-                2,
-                _index,
-                &mUniforms.mUniformsCameraPosition,
-                sizeof( UniformCameraPosition ),
-                0 );
-        mDescriptorUniforms.SetData(
-                _device,
-                3,
-                _index,
-                &mUniforms.mDynamicUniformsMaterial[0],
-                mUniforms.mDynamicUniformsMaterial.Alignment() * mUniforms.mDynamicUniformsMaterial.Size(),
-                0 );
-        mDescriptorUniforms.SetData(
-                _device,
-                4,
-                _index,
-                &mUniforms.mUniformsLights,
-                sizeof( UniformLights ),
-                0 );
+        mDescriptorUniforms.SetData( _device, 0, _index, &mUniforms.mUniformsProjView, sizeof( UniformViewProj ), 0 );
+        mDescriptorUniforms.SetData( _device, 1, _index, &mUniforms.mDynamicUniformsMatrices[0], mUniforms.mDynamicUniformsMatrices.Alignment() * mUniforms.mDynamicUniformsMatrices.Size(), 0 );
+        mDescriptorUniforms.SetData( _device, 2, _index, &mUniforms.mUniformsCameraPosition, sizeof( UniformCameraPosition ), 0 );
+        mDescriptorUniforms.SetData( _device, 3, _index, &mUniforms.mDynamicUniformsMaterial[0], mUniforms.mDynamicUniformsMaterial.Alignment() * mUniforms.mDynamicUniformsMaterial.Size(), 0 );
+        mDescriptorUniforms.SetData( _device, 4, _index, &mUniforms.mUniformsLights, sizeof( UniformLights ), 0 );
     }
 
-    //========================================================================================================
-    //========================================================================================================
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
     void UniformsModelDraw::Create( const VkDeviceSize _minUniformBufferOffsetAlignment )
     {
         // Calculate required alignment based on minimum device offset alignment
@@ -170,14 +137,9 @@ namespace fan
         }
     }
 
-    //========================================================================================================
-    //========================================================================================================
-    void DrawModels::RecordCommandBuffer(
-            const size_t _index,
-            RenderPass& _renderPass,
-            FrameBuffer& _framebuffer,
-            VkExtent2D _extent,
-            DescriptorImages& _descriptorTextures )
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    void DrawModels::RecordCommandBuffer( const size_t _index, RenderPass& _renderPass, FrameBuffer& _framebuffer, VkExtent2D _extent, DescriptorImages& _descriptorTextures )
     {
         VkCommandBuffer                commandBuffer                = mCommandBuffers.mBuffers[_index];
         VkCommandBufferInheritanceInfo commandBufferInheritanceInfo = CommandBuffer::GetInheritanceInfo(
@@ -198,11 +160,7 @@ namespace fan
                 Buffer& buffer = mesh.mVertexBuffer[mesh.mCurrentBuffer];
                 if( buffer.mBuffer == VK_NULL_HANDLE ){ continue; }
 
-                BindTexture( commandBuffer,
-                             drawData.mTextureIndex,
-                             mDescriptorSampler,
-                             _descriptorTextures,
-                             mPipeline.mPipelineLayout );
+                BindTexture( commandBuffer, drawData.mTextureIndex, mDescriptorSampler, _descriptorTextures, mPipeline.mPipelineLayout );
                 BindDescriptors( commandBuffer, _index, meshIndex );
                 VkDeviceSize offsets[] = { 0 };
 
@@ -222,8 +180,8 @@ namespace fan
         }
     }
 
-    //========================================================================================================
-    //========================================================================================================
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
     void DrawModels::SetDrawData(
             Device& _device,
             const uint32_t _imagesCount,
@@ -237,16 +195,10 @@ namespace fan
             mDrawData.reserve( newSize );
             mUniforms.mDynamicUniformsMatrices.Resize( newSize );
             mUniforms.mDynamicUniformsMaterial.Resize( newSize );
-            mDescriptorUniforms.ResizeDynamicUniformBinding( _device,
-                                                             _imagesCount,
-                                                             mUniforms.mDynamicUniformsMatrices.Size(),
-                                                             mUniforms.mDynamicUniformsMatrices.Alignment(),
-                                                             1 );
-            mDescriptorUniforms.ResizeDynamicUniformBinding( _device,
-                                                             _imagesCount,
-                                                             mUniforms.mDynamicUniformsMaterial.Size(),
-                                                             mUniforms.mDynamicUniformsMaterial.Alignment(),
-                                                             3 );
+            mDescriptorUniforms.ResizeDynamicUniformBinding( _device, _imagesCount, mUniforms.mDynamicUniformsMatrices.Size(),
+                                                             mUniforms.mDynamicUniformsMatrices.Alignment(), 1 );
+            mDescriptorUniforms.ResizeDynamicUniformBinding( _device, _imagesCount, mUniforms.mDynamicUniformsMaterial.Size(),
+                                                             mUniforms.mDynamicUniformsMaterial.Alignment(), 3 );
             mDescriptorUniforms.UpdateDescriptorSets( _device, _imagesCount );
         }
 
@@ -271,8 +223,8 @@ namespace fan
         }
     }
 
-    //========================================================================================================
-    //========================================================================================================
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
     void DrawModels::SetPointLights( const std::vector<RenderDataPointLight>& _lightData )
     {
         fanAssert( _lightData.size() < RenderGlobal::sMaximumNumPointLights );
@@ -290,8 +242,8 @@ namespace fan
         }
     }
 
-    //========================================================================================================
-    //========================================================================================================
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
     void DrawModels::SetDirectionalLights( const std::vector<RenderDataDirectionalLight>& _lightData )
     {
         fanAssert( _lightData.size() < RenderGlobal::sMaximumNumDirectionalLight );
@@ -306,8 +258,8 @@ namespace fan
         }
     }
 
-    //========================================================================================================
-    //========================================================================================================
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
     void DrawModels::BindTexture(
             VkCommandBuffer _commandBuffer,
             const uint32_t _textureIndex,
@@ -321,15 +273,8 @@ namespace fan
                 _descriptorTextures.mDescriptorSets[_textureIndex], _descriptorSampler.mDescriptorSet
         };
 
-        vkCmdBindDescriptorSets(
-                _commandBuffer,
-                VK_PIPELINE_BIND_POINT_GRAPHICS,
-                _pipelineLayout,
-                1,
-                static_cast<uint32_t>( descriptors.size() ),
-                descriptors.data(),
-                0,
-                nullptr
+        vkCmdBindDescriptorSets( _commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipelineLayout, 1,
+                                 static_cast<uint32_t>( descriptors.size() ), descriptors.data(), 0, nullptr
         );
     }
 }

@@ -13,8 +13,8 @@ namespace fan
 {
     class IProject;
 
-    //========================================================================================================
-    //========================================================================================================
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
     class IProjectContainer
     {
     public:
@@ -24,16 +24,16 @@ namespace fan
         virtual void Run() = 0;
         void Exit();
 
-        Signal <>            mOnLPPSynch;
+        Signal<> mOnLPPSynch;
 
     protected:
         const LaunchSettings mLaunchSettings;
         bool                 mApplicationShouldExit;
 
-        Window               mWindow;
-        Renderer             mRenderer;
-        PrefabManager        mPrefabManager;
-        FullScreen           mFullScreen;
+        Window        mWindow;
+        Renderer      mRenderer;
+        PrefabManager mPrefabManager;
+        FullScreen    mFullScreen;
 
         void InitWorld( EcsWorld& _world );
         static void UpdateRenderWorld( Renderer& _renderer, IProject& _project, const glm::vec2 _size );

@@ -5,10 +5,10 @@
 
 namespace fan
 {
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
     struct GuiFxSphereCollider
     {
-        //====================================================================================================
-        //====================================================================================================
         static GuiComponentInfo GetInfo()
         {
             GuiComponentInfo info;
@@ -20,8 +20,6 @@ namespace fan
             return info;
         }
 
-        //========================================================================================================
-        //========================================================================================================
         static void OnGui( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
         {
             FxSphereCollider& sphere = static_cast<FxSphereCollider&>( _component );
@@ -31,17 +29,17 @@ namespace fan
                 // radius
                 if( ImGui::Button( "##radius" ) )
                 {
-                    sphere.mRadius = FIXED(0.5);
-                    _world.GetComponent<SceneNode>(_entity).AddFlag( SceneNode::BoundsOutdated );
-                    GuiFxRigidbody::TryUpdateInvInertiaTensorLocal(  _world, _entity );
+                    sphere.mRadius = FIXED( 0.5 );
+                    _world.GetComponent<SceneNode>( _entity ).AddFlag( SceneNode::BoundsOutdated );
+                    GuiFxRigidbody::TryUpdateInvInertiaTensorLocal( _world, _entity );
                 }
                 ImGui::SameLine();
                 float radius = sphere.mRadius.ToFloat();
                 if( ImGui::DragFloat( "radius", &radius, 0.01f, -1000.f, 1000.f ) )
                 {
                     sphere.mRadius = Fixed::FromFloat( radius );
-                    _world.GetComponent<SceneNode>(_entity).AddFlag( SceneNode::BoundsOutdated );
-                    GuiFxRigidbody::TryUpdateInvInertiaTensorLocal(  _world, _entity );
+                    _world.GetComponent<SceneNode>( _entity ).AddFlag( SceneNode::BoundsOutdated );
+                    GuiFxRigidbody::TryUpdateInvInertiaTensorLocal( _world, _entity );
                 }
 
                 // offset

@@ -5,44 +5,45 @@
 #include "engine/ui/fanUIRenderer.hpp"
 #include "engine/singletons/fanRenderResources.hpp"
 #include "render/resources/fanFontManager.hpp"
+#include "render/fanRenderGlobal.hpp"
 
 namespace fan
 {
-    //========================================================================================================
-    //========================================================================================================
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
     struct SUpdateUIText : EcsSystem
     {
         static EcsSignature GetSignature( const EcsWorld& _world )
         {
-            return  _world.GetSignature<UITransform>() |
-                    _world.GetSignature<UIRenderer>() |
-                    _world.GetSignature<UIText>() |
-                    _world.GetSignature<TagUIModified>();
+            return _world.GetSignature<UITransform>() |
+                   _world.GetSignature<UIRenderer>() |
+                   _world.GetSignature<UIText>() |
+                   _world.GetSignature<TagUIModified>();
         }
 
         static void Run( EcsWorld& _world, const EcsView& _view )
         {
             RenderResources& resources = _world.GetSingleton<RenderResources>();
 
-            auto textIt = _view.begin<UIText>();
-            auto rendererIt = _view.begin<UIRenderer>();
+            auto textIt      = _view.begin<UIText>();
+            auto rendererIt  = _view.begin<UIRenderer>();
             auto transformIt = _view.begin<UITransform>();
             for( ; transformIt != _view.end<UITransform>(); ++transformIt, ++rendererIt, ++textIt )
             {
                 _world.RemoveTag<TagUIModified>( textIt.GetEntity() );
 
                 UITransform& transform = *transformIt;
-                UIRenderer&  renderer = *rendererIt;
-                UIText&      text = *textIt;
+                UIRenderer & renderer  = *rendererIt;
+                UIText     & text      = *textIt;
 
                 if( text.mText.empty() )
                 {
-                    renderer.mMesh2D = nullptr;
+                    renderer.mMesh2D  = nullptr;
                     renderer.mTexture = nullptr;
                     continue;
                 }
 
-                Font * font = *text.mFontPtr;
+                Font* font = *text.mFontPtr;
                 if( font == nullptr )
                 {
                     font = resources.mFontManager->Load( RenderGlobal::sDefaultGameFont );
@@ -50,7 +51,7 @@ namespace fan
                 }
                 fanAssert( font != nullptr );
 
-                const Font::Atlas * atlas = font->FindAtlas( text.mSize );
+                const Font::Atlas* atlas             = font->FindAtlas( text.mSize );
                 if( atlas == nullptr )
                 {
                     atlas = font->GenerateAtlas( *resources.mTextureManager, text.mSize );
@@ -61,7 +62,7 @@ namespace fan
                 Font::ToUTF8( text.mText, unicode );
 
                 std::vector<const Font::Glyph*> glyphs;
-                for( uint32_t codePoint : unicode ) { glyphs.push_back( &atlas->GetGlyph( codePoint ) ); }
+                for( uint32_t                   codePoint : unicode ){ glyphs.push_back( &atlas->GetGlyph( codePoint ) ); }
 
                 glm::ivec2 textOffset;
                 CalculateTextOffsetAndSize( glyphs, textOffset, transform.mSize );
@@ -70,14 +71,14 @@ namespace fan
                 const float           atlasPixelSize = (float)atlas->GetPixelSize();
                 const glm::vec2       scale          = glm::vec2( atlasPixelSize ) /
                                                        glm::vec2( transform.mSize );
-                long          x = 0;
-                for( int i = 0; i < glyphs.size(); i++ )
+                long                  x              = 0;
+                for( int              i              = 0; i < glyphs.size(); i++ )
                 {
                     const Font::Glyph& glyph = *glyphs[i];
 
                     glm::vec2 uvPos  = glm::vec2( glyph.mUVPos ) / atlasPixelSize;
                     glm::vec2 uvSize = glm::vec2( glyph.mSize ) / atlasPixelSize;
-                    glm::vec2 pos    = 2.f * ( glm::vec2( -textOffset) +
+                    glm::vec2 pos    = 2.f * ( glm::vec2( -textOffset ) +
                                                glm::vec2( x / 64, 0 ) +
                                                glm::vec2( glyph.mBearing.x, -glyph.mBearing.y ) ) /
                                        atlasPixelSize * scale;
@@ -97,7 +98,7 @@ namespace fan
                 }
 
                 text.mMesh2D->LoadFromVertices( vertices );
-                renderer.mMesh2D = text.mMesh2D;
+                renderer.mMesh2D  = text.mMesh2D;
                 renderer.mTexture = atlas->mTexture;
             }
         }
@@ -106,14 +107,14 @@ namespace fan
                                                 glm::ivec2& _outOffset,
                                                 glm::ivec2& _outSize )
         {
-            _outOffset = glm::ivec2( _glyphs[0]->mBearing.x, 0);
-            glm::ivec2 max(0,0);
-            for( int i = 0; i < _glyphs.size(); i++ )
+            _outOffset                   = glm::ivec2( _glyphs[0]->mBearing.x, 0 );
+            glm::ivec2       max( 0, 0 );
+            for( int         i           = 0; i < _glyphs.size(); i++ )
             {
                 const Font::Glyph& glyph = *_glyphs[i];
                 max.x += glyph.mAdvance;
-                _outOffset.y = std::min( _outOffset.y, -glyph.mBearing.y );
-                max.y        = std::max( max.y, glyph.mSize.y - glyph.mBearing.y );
+                _outOffset.y             = std::min( _outOffset.y, -glyph.mBearing.y );
+                max.y                    = std::max( max.y, glyph.mSize.y - glyph.mBearing.y );
             }
             const Font::Glyph& lastGlyph = **_glyphs.rbegin();
             max.x -= lastGlyph.mAdvance;

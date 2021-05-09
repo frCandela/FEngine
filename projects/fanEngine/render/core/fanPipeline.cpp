@@ -6,8 +6,8 @@
 
 namespace fan
 {
-    //========================================================================================================
-    //========================================================================================================
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
     PipelineConfig::PipelineConfig( const Shader& _vert, const Shader& _frag )
     {
         vertshaderStageInfos.sType               = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
@@ -29,13 +29,13 @@ namespace fan
         bindingDescription.clear();
         attributeDescriptions.clear();
 
-        inputAssemblyStateInfo.sType           = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
+        inputAssemblyStateInfo.sType                  = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
         inputAssemblyStateInfo.pNext                  = nullptr;
         inputAssemblyStateInfo.flags                  = 0;
         inputAssemblyStateInfo.topology               = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
         inputAssemblyStateInfo.primitiveRestartEnable = VK_FALSE;
 
-        rasterizationStateInfo.sType             = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
+        rasterizationStateInfo.sType                   = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
         rasterizationStateInfo.pNext                   = nullptr;
         rasterizationStateInfo.flags                   = 0;
         rasterizationStateInfo.depthClampEnable        = VK_FALSE;
@@ -59,7 +59,7 @@ namespace fan
         //multisampleStateCreateInfo.alphaToCoverageEnable=;
         //multisampleStateCreateInfo.alphaToOneEnable=;
 
-        depthStencilStateInfo.sType              = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
+        depthStencilStateInfo.sType                 = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
         depthStencilStateInfo.pNext                 = nullptr;
         depthStencilStateInfo.flags                 = 0;
         depthStencilStateInfo.depthTestEnable       = VK_TRUE;
@@ -102,20 +102,20 @@ namespace fan
         pushConstantRanges.clear();
     }
 
-    //========================================================================================================
-    //========================================================================================================
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
     bool Pipeline::Create( Device& _device,
                            PipelineConfig _pipelineConfig,
                            VkExtent2D _extent,
                            VkRenderPass _renderPass,
                            const bool _createCache )
     {
-       fanAssert( mPipelineLayout == VK_NULL_HANDLE );
-       fanAssert( mPipeline == VK_NULL_HANDLE );
+        fanAssert( mPipelineLayout == VK_NULL_HANDLE );
+        fanAssert( mPipeline == VK_NULL_HANDLE );
 
         if( _createCache )
         {
-           fanAssert( mPipelineCache == VK_NULL_HANDLE );
+            fanAssert( mPipelineCache == VK_NULL_HANDLE );
             VkPipelineCacheCreateInfo pipelineCacheCreateInfo = {};
             pipelineCacheCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
             vkCreatePipelineCache( _device.mDevice, &pipelineCacheCreateInfo, nullptr, &mPipelineCache );
@@ -133,11 +133,11 @@ namespace fan
         scissor.offset = { 0, 0 };
         scissor.extent = _extent;
 
-       fanAssert( _pipelineConfig.bindingDescription.size() > 0 );
-       fanAssert( _pipelineConfig.attributeDescriptions.size() > 0 );
+        fanAssert( _pipelineConfig.bindingDescription.size() > 0 );
+        fanAssert( _pipelineConfig.attributeDescriptions.size() > 0 );
 
         VkPipelineVertexInputStateCreateInfo vertexInputStateCreateInfo = {};
-        vertexInputStateCreateInfo.sType        = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+        vertexInputStateCreateInfo.sType                           = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
         vertexInputStateCreateInfo.pNext                           = nullptr;
         vertexInputStateCreateInfo.flags                           = 0;
         vertexInputStateCreateInfo.vertexBindingDescriptionCount   = static_cast< uint32_t >(
@@ -145,7 +145,7 @@ namespace fan
         vertexInputStateCreateInfo.pVertexBindingDescriptions      = _pipelineConfig.bindingDescription.data();
         vertexInputStateCreateInfo.vertexAttributeDescriptionCount = static_cast< uint32_t >(
                 _pipelineConfig.attributeDescriptions.size() );
-        vertexInputStateCreateInfo.pVertexAttributeDescriptions= _pipelineConfig.attributeDescriptions.data();
+        vertexInputStateCreateInfo.pVertexAttributeDescriptions = _pipelineConfig.attributeDescriptions.data();
 
         VkPipelineViewportStateCreateInfo viewportStateCreateInfo = {};
         viewportStateCreateInfo.sType         = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
@@ -206,9 +206,9 @@ namespace fan
         graphicsPipelineCreateInfo.pViewportState      = &viewportStateCreateInfo;
         graphicsPipelineCreateInfo.pRasterizationState = &_pipelineConfig.rasterizationStateInfo;
         graphicsPipelineCreateInfo.pMultisampleState   = &_pipelineConfig.multisampleStateInfo;
-        graphicsPipelineCreateInfo.pDepthStencilState       = &_pipelineConfig.depthStencilStateInfo;
-        graphicsPipelineCreateInfo.pColorBlendState         = &_pipelineConfig.colorBlendStateInfo;
-        graphicsPipelineCreateInfo.pDynamicState            = &dynamicStateCreateInfo;
+        graphicsPipelineCreateInfo.pDepthStencilState  = &_pipelineConfig.depthStencilStateInfo;
+        graphicsPipelineCreateInfo.pColorBlendState    = &_pipelineConfig.colorBlendStateInfo;
+        graphicsPipelineCreateInfo.pDynamicState       = &dynamicStateCreateInfo;
         graphicsPipelineCreateInfo.layout              = mPipelineLayout;
         graphicsPipelineCreateInfo.renderPass          = _renderPass;
         graphicsPipelineCreateInfo.subpass             = 0;
@@ -240,8 +240,8 @@ namespace fan
         return true;
     }
 
-    //========================================================================================================
-    //========================================================================================================
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
     void Pipeline::Bind( VkCommandBuffer _commandBuffer, VkExtent2D _extent )
     {
         VkViewport viewport;
@@ -262,8 +262,8 @@ namespace fan
         vkCmdBindPipeline( _commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mPipeline );
     }
 
-    //========================================================================================================
-    //========================================================================================================
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
     void Pipeline::Destroy( Device& _device )
     {
         if( mPipelineCache != VK_NULL_HANDLE )

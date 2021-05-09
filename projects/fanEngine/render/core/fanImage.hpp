@@ -4,13 +4,13 @@
 
 namespace fan
 {
-	struct Device;
+    struct Device;
 
-	//========================================================================================================
-	// 2D image with optional mipmaps
-	//========================================================================================================
-	struct Image
-	{
+    //==================================================================================================================================================================================================
+    // 2D image with optional mipmaps
+    //==================================================================================================================================================================================================
+    struct Image
+    {
         bool Create( Device& _device,
                      const VkFormat _format,
                      const VkExtent2D _size,
@@ -23,7 +23,7 @@ namespace fan
                                     VkImageLayout _newLayout,
                                     uint32_t _mipLevels );
 
-		VkImage			mImage	= VK_NULL_HANDLE;
-		VkDeviceMemory	mMemory	= VK_NULL_HANDLE;
-	};
+        VkImage        mImage  = VK_NULL_HANDLE;
+        VkDeviceMemory mMemory = VK_NULL_HANDLE;
+    };
 }

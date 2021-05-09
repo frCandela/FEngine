@@ -4,15 +4,15 @@
 
 namespace ImGui
 {
-	//========================================================================================================
-	// utility for displaying imgui icons
-	//========================================================================================================
-	enum IconType : int
-	{
+    //==================================================================================================================================================================================================
+    // utility for displaying imgui icons
+    //==================================================================================================================================================================================================
+    enum IconType : int
+    {
         None16 = 0,
 
-		// editor windows
-		Imgui16,
+        // editor windows
+        Imgui16,
         Renderer16,
         Scene16,
         Inspector16,
@@ -24,8 +24,8 @@ namespace ImGui
         Terrain16,
         UnitTests16,
 
-		// special
-		Gameobject16,
+        // special
+        Gameobject16,
         Prefab16,
         Mesh16,
         LockOpen16,
@@ -34,8 +34,8 @@ namespace ImGui
         Font16,
         Application16,
 
-		// special
-		Play16,
+        // special
+        Play16,
         Pause16,
         Step16,
         Stop16,
@@ -50,8 +50,8 @@ namespace ImGui
         Plus8,
         Minus8,
 
-		// scene components
-		Image16,
+        // scene components
+        Image16,
         Camera16,
         Transform16,
         Particles16,
@@ -74,8 +74,8 @@ namespace ImGui
         Layout16,
         Align16,
 
-		// singletons
-		Time16,
+        // singletons
+        Time16,
         Spawn16,
         Connection16,
         Socket16,
@@ -88,8 +88,8 @@ namespace ImGui
         ClientNet16,
         RenderDebug16,
 
-		// generics	
-		SolarSystem16,
+        // generics
+        SolarSystem16,
         Heart16,
         Energy16,
         Joystick16,
@@ -99,49 +99,49 @@ namespace ImGui
         SunEruption16,
         MainMenu16,
 
-		// network
-		ReliabilityLayer16,
+        // network
+        ReliabilityLayer16,
         GameData16,
         NumIcons
-	};
+    };
 
-	//========================================================================================================
-	//========================================================================================================
-	struct IconImpl
-	{
-		struct IconData
-		{
-			ImVec2 mUv0;
-			ImVec2 mUv1;
-		};
-		static const float    sIconImageSize;
-		static const IconData sIconsList[];
-	};
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    struct IconImpl
+    {
+        struct IconData
+        {
+            ImVec2 mUv0;
+            ImVec2 mUv1;
+        };
+        static const float    sIconImageSize;
+        static const IconData sIconsList[];
+    };
 
-	//========================================================================================================
-	//========================================================================================================
-	inline void Icon( const IconType _id,
-					  const ImVec2& _size,
-					  const ImVec4& _tintColor = ImVec4( 1, 1, 1, 1 ),
-					  const ImVec4& _borderColor = ImVec4( 0, 0, 0, 0 ) )
-	{
-	    // @todo remove this hardcoded 42 that tells imgui renderer to bind the icons descriptors
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    inline void Icon( const IconType _id,
+                      const ImVec2& _size,
+                      const ImVec4& _tintColor = ImVec4( 1, 1, 1, 1 ),
+                      const ImVec4& _borderColor = ImVec4( 0, 0, 0, 0 ) )
+    {
+        // @todo remove this hardcoded 42 that tells imgui renderer to bind the icons descriptors
         ImGui::Image( (void*)42,
                       _size,
                       IconImpl::sIconsList[_id].mUv0,
                       IconImpl::sIconsList[_id].mUv1,
                       _tintColor, _borderColor );
-	}
+    }
 
-	//========================================================================================================
-	//========================================================================================================
-	inline bool ButtonIcon( const IconType _id,
-							const ImVec2& _size,
-							const int _framePadding = -1,
-							const ImVec4& _bgColor = ImVec4( 0, 0, 0, 0 ),
-							const ImVec4& _tintColor = ImVec4( 1, 1, 1, 1 ) )
-	{
-		ImGui::PushID( _id );
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    inline bool ButtonIcon( const IconType _id,
+                            const ImVec2& _size,
+                            const int _framePadding = -1,
+                            const ImVec4& _bgColor = ImVec4( 0, 0, 0, 0 ),
+                            const ImVec4& _tintColor = ImVec4( 1, 1, 1, 1 ) )
+    {
+        ImGui::PushID( _id );
         bool result = ImGui::ImageButton( (void*)42,
                                           _size,
                                           IconImpl::sIconsList[_id].mUv0,
@@ -149,7 +149,7 @@ namespace ImGui
                                           _framePadding,
                                           _bgColor,
                                           _tintColor );
-		ImGui::PopID();
-		return result;
-	}
+        ImGui::PopID();
+        return result;
+    }
 }

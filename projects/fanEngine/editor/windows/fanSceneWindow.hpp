@@ -5,38 +5,38 @@
 
 namespace fan
 {
-	struct Scene;
-	struct SceneNode;
+    struct Scene;
+    struct SceneNode;
 
-	//========================================================================================================
-	// shows the scene nodes tree
-	//========================================================================================================
-	class SceneWindow : public EditorWindow
-	{
-	public:
-		Signal< SceneNode* > onSelectSceneNode;
+    //==================================================================================================================================================================================================
+    // shows the scene nodes tree
+    //==================================================================================================================================================================================================
+    class SceneWindow : public EditorWindow
+    {
+    public:
+        Signal<SceneNode*> onSelectSceneNode;
 
-		SceneWindow();
-		~SceneWindow();
+        SceneWindow();
+        ~SceneWindow();
 
-		// Callbacks
-		void OnExpandHierarchy( Scene& /*_scene*/ ) { mExpandSceneHierarchy = true; }
+        // Callbacks
+        void OnExpandHierarchy( Scene& /*_scene*/ ) { mExpandSceneHierarchy = true; }
 
-	protected:
-		void OnGui( EcsWorld& _world ) override;
+    protected:
+        void OnGui( EcsWorld& _world ) override;
 
-	private:
-		std::string mPathBuffer;
-		char        mTextBuffer[ 32 ];
-		SceneNode*  mLastSceneNodeRightClicked = nullptr;
-		bool        mExpandSceneHierarchy = false;
+    private:
+        std::string mPathBuffer;
+        char        mTextBuffer[32];
+        SceneNode* mLastSceneNodeRightClicked = nullptr;
+        bool mExpandSceneHierarchy = false;
 
-		void NewSceneNodeModal( EcsWorld& _world );
-		void RenameSceneNodeModal();
-		void ExportPrefabModal( EcsWorld& _world );
-		void ImportPrefabModal( EcsWorld& _world );
-		void PopupRightClick( EcsWorld& _world );
+        void NewSceneNodeModal( EcsWorld& _world );
+        void RenameSceneNodeModal();
+        void ExportPrefabModal( EcsWorld& _world );
+        void ImportPrefabModal( EcsWorld& _world );
+        void PopupRightClick( EcsWorld& _world );
 
-		void R_DrawSceneTree( SceneNode& _node, SceneNode*& _nodeRightClicked );
-	};
+        void R_DrawSceneTree( SceneNode& _node, SceneNode*& _nodeRightClicked );
+    };
 }

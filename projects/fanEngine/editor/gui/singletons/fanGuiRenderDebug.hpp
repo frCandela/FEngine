@@ -5,22 +5,20 @@
 
 namespace fan
 {
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
     struct GuiRenderDebug
     {
-        //====================================================================================================
-        //====================================================================================================
         static GuiSingletonInfo GetInfo()
         {
             GuiSingletonInfo info;
-            info.mIcon  = ImGui::RenderDebug16;
-            info.mGroup = EngineGroups::SceneRender;
-            info.onGui  = &GuiRenderDebug::OnGui;
-            info.mEditorName  = "render debug";
+            info.mIcon       = ImGui::RenderDebug16;
+            info.mGroup      = EngineGroups::SceneRender;
+            info.onGui       = &GuiRenderDebug::OnGui;
+            info.mEditorName = "render debug";
             return info;
         }
 
-        //========================================================================================================
-        //========================================================================================================
         static void OnGui( EcsWorld&, EcsSingleton& _component )
         {
             RenderDebug& renderDebug = static_cast<RenderDebug&>( _component );

@@ -4,21 +4,21 @@
 
 namespace fan
 {
-	struct EditorSelection;
+    struct EditorSelection;
 
-	//========================================================================================================
-	// copy paste editor callbacks
-	//========================================================================================================
-	struct EditorCopyPaste : EcsSingleton
-	{
-		ECS_SINGLETON( EditorCopyPaste )
-		static void SetInfo( EcsSingletonInfo& _info );
-		static void Init( EcsWorld& _world, EcsSingleton& _component );
+    //==================================================================================================================================================================================================
+    // copy paste editor callbacks
+    //==================================================================================================================================================================================================
+    struct EditorCopyPaste : EcsSingleton
+    {
+    ECS_SINGLETON( EditorCopyPaste )
+        static void SetInfo( EcsSingletonInfo& _info );
+        static void Init( EcsWorld& _world, EcsSingleton& _component );
 
-		// editor callbacks
-		void OnCopy();
-		void OnPaste();
+        // editor callbacks
+        void OnCopy();
+        void OnPaste();
 
-		EditorSelection* mSelection;
-	};
+        EditorSelection* mSelection;
+    };
 }

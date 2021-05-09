@@ -6,8 +6,8 @@
 
 namespace fan
 {
-    //==========================================================================================================================
-    //==========================================================================================================================
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
     class Path
     {
     public:
@@ -16,9 +16,9 @@ namespace fan
         static std::string GetProjectPath() { return sProjectPath; }
 
         static bool IsAbsolute( const std::string& _path );
-        static bool IsRootDrive(const std::string& _path );
-        static bool IsDirectory(const std::string& _path );
-        static bool IsFile( const std::string& _path ) { return !IsDirectory(_path); };
+        static bool IsRootDrive( const std::string& _path );
+        static bool IsDirectory( const std::string& _path );
+        static bool IsFile( const std::string& _path ) { return !IsDirectory( _path ); };
 
         static std::string MakeRelative( const std::string& _path );
         static std::string Normalize( const std::string& _path );

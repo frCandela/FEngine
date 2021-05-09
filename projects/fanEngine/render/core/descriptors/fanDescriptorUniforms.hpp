@@ -8,22 +8,22 @@
 
 namespace fan
 {
-	struct Device;
+    struct Device;
 
-	//========================================================================================================
-	// Create a uniform buffer descriptor or a dynamic  uniform buffer descriptor
-	// @todo the descriptor class shouldn't create buffers for the user, they should be passed as arguments
-	//========================================================================================================
-	struct DescriptorUniforms
-	{
-		//================================================================
-		// Contain the information for a descriptor binding
-		// used when creating & updating the descriptor sets
-		//================================================================
-		struct BindingData
-		{
-			VkDescriptorSetLayoutBinding mLayoutBinding;
-			Buffer                       mBuffers[ SwapChain::sMaxFramesInFlight ];
+    //==================================================================================================================================================================================================
+    // Create a uniform buffer descriptor or a dynamic  uniform buffer descriptor
+    // @todo the descriptor class shouldn't create buffers for the user, they should be passed as arguments
+    //==================================================================================================================================================================================================
+    struct DescriptorUniforms
+    {
+        //================================================================
+        // Contain the information for a descriptor binding
+        // used when creating & updating the descriptor sets
+        //================================================================
+        struct BindingData
+        {
+            VkDescriptorSetLayoutBinding mLayoutBinding;
+            Buffer                       mBuffers[SwapChain::sMaxFramesInFlight];
 
             void CreateBuffers( Device& _device,
                                 const size_t _count,
@@ -40,10 +40,10 @@ namespace fan
                                        VkShaderStageFlags _stage,
                                        VkDeviceSize _bufferSize,
                                        VkDeviceSize _alignment );
-		bool Create( Device& _device, const uint32_t _count = 1 );
-		void Destroy( Device& _device );
+        bool Create( Device& _device, const uint32_t _count = 1 );
+        void Destroy( Device& _device );
 
-		void Bind( VkCommandBuffer _commandBuffer, VkPipelineLayout _pipelineLayout, const size_t _index );
+        void Bind( VkCommandBuffer _commandBuffer, VkPipelineLayout _pipelineLayout, const size_t _index );
         void SetData( Device& _device,
                       const size_t _indexBinding,
                       const size_t _indexBuffer,
@@ -55,13 +55,13 @@ namespace fan
                                           VkDeviceSize _bufferSize,
                                           VkDeviceSize _alignment,
                                           const int _index );
-		void UpdateDescriptorSets( Device& _device, const uint32_t _count );		
+        void UpdateDescriptorSets( Device& _device, const uint32_t _count );
 
-		VkDescriptorSetLayout		mDescriptorSetLayout               = VK_NULL_HANDLE;
-		VkDescriptorPool			mDescriptorPool                    = VK_NULL_HANDLE;
-        VkDescriptorSet mDescriptorSets[SwapChain::sMaxFramesInFlight] = { VK_NULL_HANDLE,
-                                                                           VK_NULL_HANDLE,
-                                                                           VK_NULL_HANDLE };
-		std::vector< BindingData >  mBindingData;
-	};
+        VkDescriptorSetLayout    mDescriptorSetLayout                           = VK_NULL_HANDLE;
+        VkDescriptorPool         mDescriptorPool                                = VK_NULL_HANDLE;
+        VkDescriptorSet          mDescriptorSets[SwapChain::sMaxFramesInFlight] = { VK_NULL_HANDLE,
+                                                                                    VK_NULL_HANDLE,
+                                                                                    VK_NULL_HANDLE };
+        std::vector<BindingData> mBindingData;
+    };
 }

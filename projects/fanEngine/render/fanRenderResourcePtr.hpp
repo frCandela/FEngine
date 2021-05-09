@@ -7,38 +7,46 @@
 
 namespace fan
 {
-	//========================================================================================================
-	//========================================================================================================
-	class TexturePtr : public ResourcePtr<Texture>
-	{
-	public:
-		TexturePtr( Texture* _texture = nullptr ) : ResourcePtr<Texture>( _texture ) {}
-		
-		void Init( const std::string _path ) { mPath = _path; }
-		const std::string& GetPath() const { return mPath; }
-		
-		ResourcePtr& operator=( Texture* _resource ) { SetResource( _resource ); return *this; }
-	private:
-		std::string mPath;
-	};
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    class TexturePtr : public ResourcePtr<Texture>
+    {
+    public:
+        TexturePtr( Texture* _texture = nullptr ) : ResourcePtr<Texture>( _texture ) {}
 
-	//========================================================================================================
-	//========================================================================================================
-	class MeshPtr : public ResourcePtr<Mesh>
-	{
-	public:
-		MeshPtr( Mesh* _mesh = nullptr ) : ResourcePtr<Mesh>( _mesh ) {}
-		
-		void Init( const std::string _path ) { mPath = _path; }
-		const std::string&	GetPath() const { return mPath;  }
+        void Init( const std::string _path ) { mPath = _path; }
+        const std::string& GetPath() const { return mPath; }
 
-		ResourcePtr& operator=( Mesh* _resource ) { SetResource( _resource ); return *this; }
-	private:
-		std::string mPath;
-	};
+        ResourcePtr& operator=( Texture* _resource )
+        {
+            SetResource( _resource );
+            return *this;
+        }
+    private:
+        std::string mPath;
+    };
 
-    //========================================================================================================
-    //========================================================================================================
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    class MeshPtr : public ResourcePtr<Mesh>
+    {
+    public:
+        MeshPtr( Mesh* _mesh = nullptr ) : ResourcePtr<Mesh>( _mesh ) {}
+
+        void Init( const std::string _path ) { mPath = _path; }
+        const std::string& GetPath() const { return mPath; }
+
+        ResourcePtr& operator=( Mesh* _resource )
+        {
+            SetResource( _resource );
+            return *this;
+        }
+    private:
+        std::string mPath;
+    };
+
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
     class FontPtr : public ResourcePtr<Font>
     {
     public:
@@ -47,7 +55,11 @@ namespace fan
         void Init( const std::string _path ) { mPath = _path; }
         const std::string& GetPath() const { return mPath; }
 
-        ResourcePtr& operator=( Font* _resource ) { SetResource( _resource ); return *this; }
+        ResourcePtr& operator=( Font* _resource )
+        {
+            SetResource( _resource );
+            return *this;
+        }
     private:
         std::string mPath;
     };

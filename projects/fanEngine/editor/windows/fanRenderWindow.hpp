@@ -4,20 +4,20 @@
 
 namespace fan
 {
-	class Renderer;
+    class Renderer;
 
-	//========================================================================================================
-	// shows data from the renderer
-	// loaded mesh, textures, prefabs, lights & buffer sizes
-	//========================================================================================================
-	class RenderWindow : public EditorWindow
-	{
-	public:
-		RenderWindow( Renderer& _renderer );
+    //==================================================================================================================================================================================================
+    // shows data from the renderer
+    // loaded mesh, textures, prefabs, lights & buffer sizes
+    //==================================================================================================================================================================================================
+    class RenderWindow : public EditorWindow
+    {
+    public:
+        RenderWindow( Renderer& _renderer );
 
-	protected:
-		Renderer& mRenderer;
+    protected:
+        Renderer& mRenderer;
 
-		void OnGui( EcsWorld& _world ) override;
-	};
+        void OnGui( EcsWorld& _world ) override;
+    };
 }

@@ -3,7 +3,6 @@
 #include "core/input/fanInput.hpp"
 #include "core/input/fanInputManager.hpp"
 #include "core/shapes/fanRay.hpp"
-#include "core/math/fanMathUtils.hpp"
 #include "engine/physics/fanFxTransform.hpp"
 #include "engine/components/fanCamera.hpp"
 #include "engine/components/fanSceneNode.hpp"
@@ -12,14 +11,14 @@
 
 namespace fan
 {
-    //========================================================================================================
-    //========================================================================================================
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
     void EditorCamera::SetInfo( EcsSingletonInfo& /*_info*/ )
     {
     }
 
-    //========================================================================================================
-    //========================================================================================================
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
     void EditorCamera::Init( EcsWorld& /*_world*/, EcsSingleton& _component )
     {
         EditorCamera& editorCamera = static_cast<EditorCamera&>( _component );
@@ -30,9 +29,9 @@ namespace fan
         editorCamera.mXYSensitivity   = glm::vec2( 0.3f, 0.3f );
     }
 
-    //========================================================================================================
+    //==================================================================================================================================================================================================
     // updates the editor camera position & rotation
-    //========================================================================================================
+    //==================================================================================================================================================================================================
     void EditorCamera::Update( EcsWorld& _world, const Fixed _delta )
     {
         Mouse& mouse = _world.GetSingleton<Mouse>();
@@ -68,28 +67,28 @@ namespace fan
         {
             // Rotation depending on mouse movement
             const Fixed      invertAxis = -1;
-            const Quaternion rotationY = Quaternion::AngleAxis(Fixed::FromFloat(-editorCamera.mXYSensitivity.x * mouseDelta.x),  Vector3::sUp );
-            const Quaternion rotationX = Quaternion::AngleAxis( Fixed::FromFloat( -editorCamera.mXYSensitivity.y * mouseDelta.y ), invertAxis * cameraTransform.Left());
+            const Quaternion rotationY  = Quaternion::AngleAxis( Fixed::FromFloat( -editorCamera.mXYSensitivity.x * mouseDelta.x ), Vector3::sUp );
+            const Quaternion rotationX  = Quaternion::AngleAxis( Fixed::FromFloat( -editorCamera.mXYSensitivity.y * mouseDelta.y ), invertAxis * cameraTransform.Left() );
             cameraTransform.mRotation = rotationX * rotationY * cameraTransform.mRotation;
 
             // Remove roll
             const Vector3 relativeLeft = cameraTransform.Left();
             const Vector3 leftNoRoll( relativeLeft.x, 0, relativeLeft.z );
             const Vector3 axis         = Vector3::Cross( relativeLeft, leftNoRoll );
-            const Fixed   angle        = Vector3::Angle(leftNoRoll, relativeLeft );
+            const Fixed   angle        = Vector3::Angle( leftNoRoll, relativeLeft );
             if( angle != 0 )
             {
                 const Quaternion rot = Quaternion::AngleAxis( angle, axis );
-                cameraTransform.mRotation =  rot * cameraTransform.mRotation;
+                cameraTransform.mRotation = rot * cameraTransform.mRotation;
             }
         }
-        cameraTransform.mPosition = position;
+        cameraTransform.mPosition  = position;
     }
 
-    //========================================================================================================
+    //==================================================================================================================================================================================================
     // creates the editor camera entity & components
     // setups the EditorCamera singleton
-    //========================================================================================================
+    //==================================================================================================================================================================================================
     void EditorCamera::CreateEditorCamera( EcsWorld& _world )
     {
         Scene& scene = _world.GetSingleton<Scene>();
@@ -102,7 +101,7 @@ namespace fan
         FxTransform& transform = _world.AddComponent<FxTransform>( cameraID );
         _world.AddComponent<Camera>( cameraID );
 
-        transform.mPosition = Vector3( 0, 0, -2 );
+        transform.mPosition     = Vector3( 0, 0, -2 );
         scene.mMainCameraHandle = cameraNode.mHandle;
 
         // set editor camera singleton

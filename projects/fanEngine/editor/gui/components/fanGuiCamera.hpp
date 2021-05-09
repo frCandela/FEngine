@@ -5,10 +5,10 @@
 
 namespace fan
 {
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
     struct GuiCamera
     {
-        //====================================================================================================
-        //====================================================================================================
         static GuiComponentInfo GetInfo()
         {
             GuiComponentInfo info;
@@ -16,12 +16,10 @@ namespace fan
             info.mGroup      = EngineGroups::Scene;
             info.onGui       = &GuiCamera::OnGui;
             info.mEditorPath = "/";
-            info.mEditorName       = "camera";
+            info.mEditorName = "camera";
             return info;
         }
 
-        //========================================================================================================
-        //========================================================================================================
         static void OnGui( EcsWorld& /*_world*/, EcsEntity /*_entityID*/, EcsComponent& _component )
         {
             Camera& camera = static_cast<Camera&>( _component );
@@ -44,7 +42,7 @@ namespace fan
                     }
                     ImGui::SameLine();
                     float fov = camera.mFov.ToFloat();
-                    if( ImGui::DragFloat( "fov", &fov, 1.f, 1.f, 179.f ) ){ camera.mFov = Fixed::FromFloat(fov);}
+                    if( ImGui::DragFloat( "fov", &fov, 1.f, 1.f, 179.f ) ){ camera.mFov = Fixed::FromFloat( fov ); }
                 }
                 else if( camera.mType == Camera::Type::Orthogonal )
                 {
@@ -56,18 +54,18 @@ namespace fan
                     ImGui::SameLine();
 
                     float orthoSize = camera.mOrthoSize.ToFloat();
-                    if( ImGui::DragFloat( "orthoSize", &orthoSize, 1.f, 0.f, 100.f ) ){ camera.mOrthoSize = Fixed::FromFloat(orthoSize);}
+                    if( ImGui::DragFloat( "orthoSize", &orthoSize, 1.f, 0.f, 100.f ) ){ camera.mOrthoSize = Fixed::FromFloat( orthoSize ); }
                 }
 
                 // nearDistance
                 if( ImGui::Button( "##nearDistance" ) )
                 {
-                    camera.mNearDistance = FIXED(0.01);
+                    camera.mNearDistance = FIXED( 0.01 );
                 }
                 ImGui::SameLine();
 
                 float nearDistance = camera.mNearDistance.ToFloat();
-                if( ImGui::DragFloat( "near distance", &nearDistance, 0.001f, 0.01f, 10.f ) ){ camera.mNearDistance = Fixed::FromFloat(nearDistance);}
+                if( ImGui::DragFloat( "near distance", &nearDistance, 0.001f, 0.01f, 10.f ) ){ camera.mNearDistance = Fixed::FromFloat( nearDistance ); }
 
                 // far distance
                 if( ImGui::Button( "##fardistance" ) )
@@ -77,7 +75,7 @@ namespace fan
                 ImGui::SameLine();
 
                 float farDistance = camera.mFarDistance.ToFloat();
-                if( ImGui::DragFloat( "far distance", &farDistance, 10.f, 0.05f, 10000.f ) ){ camera.mFarDistance = Fixed::FromFloat(farDistance);}
+                if( ImGui::DragFloat( "far distance", &farDistance, 10.f, 0.05f, 10000.f ) ){ camera.mFarDistance = Fixed::FromFloat( farDistance ); }
             }
             ImGui::PopItemWidth();
         }

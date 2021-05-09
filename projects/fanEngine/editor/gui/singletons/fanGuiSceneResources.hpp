@@ -7,22 +7,20 @@
 
 namespace fan
 {
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
     struct GuiSceneResources
     {
-        //====================================================================================================
-        //====================================================================================================
         static GuiSingletonInfo GetInfo()
         {
             GuiSingletonInfo info;
-            info.mIcon  = ImGui::IconType::Scene16;
-            info.mGroup = EngineGroups::SceneRender;
-            info.onGui  = &GuiSceneResources::OnGui;
-            info.mEditorName  = "scene resources";
+            info.mIcon       = ImGui::IconType::Scene16;
+            info.mGroup      = EngineGroups::SceneRender;
+            info.onGui       = &GuiSceneResources::OnGui;
+            info.mEditorName = "scene resources";
             return info;
         }
 
-        //========================================================================================================
-        //========================================================================================================
         static void OnGui( EcsWorld& /*_world*/, EcsSingleton& _singleton )
         {
             if( ImGui::CollapsingHeader( "prefabs" ) )

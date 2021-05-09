@@ -5,15 +5,15 @@
 
 namespace fan
 {
-	struct Device;
-	struct RenderPass;
-	struct ImageView;
+    struct Device;
+    struct RenderPass;
+    struct ImageView;
 
-	//========================================================================================================
-	// render target with attachments (color, depth, etc. )
-	//========================================================================================================
-	struct FrameBuffer
-	{
+    //==================================================================================================================================================================================================
+    // render target with attachments (color, depth, etc. )
+    //==================================================================================================================================================================================================
+    struct FrameBuffer
+    {
         void CreateForSwapchain( Device& _device,
                                  const size_t _framesCount,
                                  const VkExtent2D _extent,
@@ -25,10 +25,10 @@ namespace fan
                      RenderPass& _renderPass,
                      const VkImageView* _attachments,
                      uint32_t _attCount );
-		void Destroy( Device& _device );
+        void Destroy( Device& _device );
 
         VkFramebuffer mFrameBuffers[SwapChain::sMaxFramesInFlight] = { VK_NULL_HANDLE,
                                                                        VK_NULL_HANDLE,
                                                                        VK_NULL_HANDLE };
-	};
+    };
 }

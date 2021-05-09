@@ -5,13 +5,13 @@
 
 namespace fan
 {
-	struct Device;
+    struct Device;
 
-	//========================================================================================================
-	// abstraction of a vulkan render pass
-	//========================================================================================================
-	struct RenderPass
-	{
+    //==================================================================================================================================================================================================
+    // abstraction of a vulkan render pass
+    //==================================================================================================================================================================================================
+    struct RenderPass
+    {
         bool Create( Device& _device,
                      VkAttachmentDescription* _attachmentdescriptions,
                      uint32_t _countAttachments,
@@ -19,14 +19,14 @@ namespace fan
                      uint32_t _countSubpasses,
                      VkSubpassDependency* _dependencies,
                      uint32_t _countDependencies );
-		void Destroy( Device& _device );
+        void Destroy( Device& _device );
 
         static VkAttachmentDescription GetColorAttachment( const VkFormat _format,
                                                            const VkImageLayout _finalLayout );
-		static VkAttachmentDescription	GetDepthAttachment( const VkFormat _format );
-		static VkAttachmentReference	GetColorAttachmentReference( const uint32_t _index );
-		static VkAttachmentReference	GetDepthAttachmentReference( const uint32_t _index );
-		static VkSubpassDependency		GetDependency();
+        static VkAttachmentDescription GetDepthAttachment( const VkFormat _format );
+        static VkAttachmentReference GetColorAttachmentReference( const uint32_t _index );
+        static VkAttachmentReference GetDepthAttachmentReference( const uint32_t _index );
+        static VkSubpassDependency GetDependency();
         static VkSubpassDescription GetSubpassDescription( VkAttachmentReference* _colorReferences,
                                                            uint32_t _count,
                                                            VkAttachmentReference* _depthReference );
@@ -36,6 +36,6 @@ namespace fan
                                                    const VkClearValue* _clearValue,
                                                    uint32_t _clearCount );
 
-		VkRenderPass mRenderPass = VK_NULL_HANDLE;
-	};
+        VkRenderPass mRenderPass = VK_NULL_HANDLE;
+    };
 }

@@ -7,27 +7,27 @@
 
 namespace fan
 {
-	class Window;
-	struct Scene;
+    class Window;
+    struct Scene;
 
-	//========================================================================================================
-	// This container runs the game
-	// Auto load a scene & displays it, no editor features
-	// runs the main loop & manages events
-	//========================================================================================================
-	class GameProjectContainer : public IProjectContainer
-	{
-	public:
-		GameProjectContainer( LaunchSettings& _settings, IProject& _project );
-		~GameProjectContainer() override {};
+    //==================================================================================================================================================================================================
+    // This container runs the game
+    // Auto load a scene & displays it, no editor features
+    // runs the main loop & manages events
+    //==================================================================================================================================================================================================
+    class GameProjectContainer : public IProjectContainer
+    {
+    public:
+        GameProjectContainer( LaunchSettings& _settings, IProject& _project );
+        ~GameProjectContainer() override {};
 
-		void Run() override;
-		void Step();
+        void Run() override;
+        void Step();
 
-	private:
-        IProject&   mProject;
-        FrameIndex  mLastLogicFrameRendered;
+    private:
+        IProject& mProject;
+        FrameIndex mLastLogicFrameRendered;
 
         LaunchSettings& AdaptSettings( LaunchSettings& _settings );
-	};
+    };
 }

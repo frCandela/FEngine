@@ -1,30 +1,32 @@
 #ifdef FAN_LIVEPP
 
 #include "fanDisableWarnings.hpp"
+
 WARNINGS_LIVEPP()
 #include "LivePP/API/LPP_API.h"
+
 WARNINGS_POP()
 
 #include "engine/project/fanIProjectContainer.hpp"
 
 namespace fan
 {
-    //==========================================================================================================================
+    //==================================================================================================================================================================================================
     // Runs the engine and connects it to the Live++ hot reload
-    //==========================================================================================================================
+    //==================================================================================================================================================================================================
     class LPPLauncher
     {
     public:
-        LPPLauncher ( const std::string& _appName )
+        LPPLauncher( const std::string& _appName )
         {
             mLivePP = lpp::lppLoadAndRegister( FAN_LIVEPP_PATH, _appName.c_str() );
             lpp::lppEnableAllCallingModulesSync( mLivePP );
-            lpp::lppInstallExceptionHandler(mLivePP);
+            lpp::lppInstallExceptionHandler( mLivePP );
         }
 
-        ~LPPLauncher(){  ::FreeLibrary( mLivePP );}
+        ~LPPLauncher() { ::FreeLibrary( mLivePP ); }
 
-        void Run( IProjectContainer& _projectContainer  )
+        void Run( IProjectContainer& _projectContainer )
         {
             _projectContainer.mOnLPPSynch.Connect( &LPPLauncher::OnSync, this );
             _projectContainer.Run();
@@ -34,7 +36,7 @@ namespace fan
     private:
         void OnSync() { lpp::lppSyncPoint( mLivePP ); }
 
-        HMODULE            mLivePP;
+        HMODULE mLivePP;
     };
 }
 #endif

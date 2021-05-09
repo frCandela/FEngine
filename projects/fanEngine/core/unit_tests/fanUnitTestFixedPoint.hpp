@@ -7,8 +7,8 @@
 
 namespace fan
 {
-    //======================================================================================================================
-    //======================================================================================================================
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
     class UnitTestFixedPoint : public UnitTest<UnitTestFixedPoint>
     {
     public:
@@ -19,7 +19,7 @@ namespace fan
                      { &UnitTestFixedPoint::TestDoubles,        "Double constructor" },
                      { &UnitTestFixedPoint::TestStrings,        "String constructor" },
                      { &UnitTestFixedPoint::TestComparisons,    "Comparisons" },
-                     { &UnitTestFixedPoint::TestSpecialValues,    "Special values" },
+                     { &UnitTestFixedPoint::TestSpecialValues,  "Special values" },
                      { &UnitTestFixedPoint::TestAddition,       "Addition" },
                      { &UnitTestFixedPoint::TestSubtraction,    "Subtraction" },
                      { &UnitTestFixedPoint::TestMultiplication, "Addition" },
@@ -41,7 +41,7 @@ namespace fan
                      { &UnitTestFixedPoint::TestTan,            "Tan" },
                      { &UnitTestFixedPoint::TestATan2,          "ATan2" },
                      { &UnitTestFixedPoint::TestSqrt,           "Sqrt" },
-                     { &UnitTestFixedPoint::TestInvSqrt,    "InvSqrt" },
+                     { &UnitTestFixedPoint::TestInvSqrt,        "InvSqrt" },
             };
         }
 
@@ -406,7 +406,7 @@ namespace fan
 
             FixedFunction  fxCos     = &Fixed::Cos;
             DoubleFunction doubleCos = &std::cos;
-            double error = MaxErrorFixedVsDouble( fxCos, doubleCos, ( -FX_TWO_PI ).ToDouble(), ( FX_TWO_PI ).ToDouble(), 0.0001 );
+            double         error     = MaxErrorFixedVsDouble( fxCos, doubleCos, ( -FX_TWO_PI ).ToDouble(), ( FX_TWO_PI ).ToDouble(), 0.0001 );
             TEST_ASSERT( error < 0.0005 ) // [0,1]
         }
 
@@ -425,9 +425,9 @@ namespace fan
             static_assert( Fixed::Tan( 0 ) == 0 );
 
             FixedFunction  fxTan     = &Fixed::Tan;
-            DoubleFunction doubleTan= &std::tan;
-            const double step = 0.001;
-            double         error      = MaxErrorFixedVsDouble( fxTan, doubleTan, ( -FX_HALF_PI ).ToDouble() + 0.1, ( FX_HALF_PI ).ToDouble() - 0.1, step);
+            DoubleFunction doubleTan = &std::tan;
+            const double   step      = 0.001;
+            double         error     = MaxErrorFixedVsDouble( fxTan, doubleTan, ( -FX_HALF_PI ).ToDouble() + 0.1, ( FX_HALF_PI ).ToDouble() - 0.1, step );
             TEST_ASSERT( error < 0.01 )
         }
 
@@ -472,18 +472,18 @@ namespace fan
         {
             {
                 //ScopedTimer timer( "fast" );
-                double      error = MaxErrorFixedVsDouble( &Fixed::InvSqrt, &sqrtRef, 0.05, 1, 0.001 );
+                double error = MaxErrorFixedVsDouble( &Fixed::InvSqrt, &sqrtRef, 0.05, 1, 0.001 );
                 TEST_ASSERT( error < 0.01 )// [1,max]
                 error = MaxErrorFixedVsDouble( &Fixed::InvSqrt, &sqrtRef, 1, 1000, 0.1 );
                 TEST_ASSERT( error < 0.01 )// [1,max]
             }
-           /* {
-               // ScopedTimer timer( "slow" );
-                double      error = MaxErrorFixedVsDouble( &SlowInvSqrt, &sqrtRef, 0.05, 1, 0.001 );
-                TEST_ASSERT( error < 0.01 )// [1,max]
-                error             = MaxErrorFixedVsDouble( &SlowInvSqrt, &sqrtRef, 1, 1000, 0.01 );
-                TEST_ASSERT( error < 0.01 )// [1,max]
-            }*/
+            /* {
+                // ScopedTimer timer( "slow" );
+                 double      error = MaxErrorFixedVsDouble( &SlowInvSqrt, &sqrtRef, 0.05, 1, 0.001 );
+                 TEST_ASSERT( error < 0.01 )// [1,max]
+                 error             = MaxErrorFixedVsDouble( &SlowInvSqrt, &sqrtRef, 1, 1000, 0.01 );
+                 TEST_ASSERT( error < 0.01 )// [1,max]
+             }*/
         }
     };
 }

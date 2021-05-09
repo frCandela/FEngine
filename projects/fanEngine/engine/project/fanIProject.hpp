@@ -6,15 +6,15 @@
 
 namespace fan
 {
-    //==========================================================================================================================
-    //==========================================================================================================================
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
     class IProject
     {
     public:
-        IProject(){}
+        IProject() {}
         IProject( IProject const& ) = delete;
         IProject& operator=( IProject const& ) = delete;
-        virtual ~IProject(){}
+        virtual ~IProject() {}
 
         virtual void Init() = 0;
         virtual void Start() = 0;
@@ -23,12 +23,12 @@ namespace fan
         virtual void Render() = 0;
         virtual void OnGui() = 0;
 
-        static void EcsIncludeEngine    ( EcsWorld& _world );
-        static void EcsIncludePhysics ( EcsWorld& _world );
+        static void EcsIncludeEngine( EcsWorld& _world );
+        static void EcsIncludePhysics( EcsWorld& _world );
         static void EcsIncludeRender3D( EcsWorld& _world );
         static void EcsIncludeRenderUI( EcsWorld& _world );
-        static void EcsIncludeNetworkClient ( EcsWorld& _world );
-        static void EcsIncludeNetworkServer ( EcsWorld& _world );
+        static void EcsIncludeNetworkClient( EcsWorld& _world );
+        static void EcsIncludeNetworkServer( EcsWorld& _world );
 
         EcsWorld    mWorld;
         std::string mName;

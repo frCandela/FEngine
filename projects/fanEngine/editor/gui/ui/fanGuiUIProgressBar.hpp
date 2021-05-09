@@ -6,10 +6,10 @@
 
 namespace fan
 {
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
     struct GuiUIProgressBar
     {
-        //====================================================================================================
-        //====================================================================================================
         static GuiComponentInfo GetInfo()
         {
             GuiComponentInfo info;
@@ -17,13 +17,11 @@ namespace fan
             info.mGroup      = EngineGroups::SceneUI;
             info.onGui       = &GuiUIProgressBar::OnGui;
             info.mEditorPath = "ui/";
-            info.mEditorName       = "ui progress bar";
+            info.mEditorName = "ui progress bar";
             return info;
         }
 
-        //========================================================================================================
-        //========================================================================================================
-        static  void OnGui( EcsWorld& /*_world*/, EcsEntity /*_entityID*/, EcsComponent& _component )
+        static void OnGui( EcsWorld& /*_world*/, EcsEntity /*_entityID*/, EcsComponent& _component )
         {
             UIProgressBar& progressBar = static_cast<UIProgressBar&>( _component );
 

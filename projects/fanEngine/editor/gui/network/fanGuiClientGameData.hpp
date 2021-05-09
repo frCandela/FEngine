@@ -5,22 +5,20 @@
 
 namespace fan
 {
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
     struct GuiClientGameData
     {
-        //====================================================================================================
-        //====================================================================================================
         static GuiComponentInfo GetInfo()
         {
             GuiComponentInfo info;
-            info.mIcon  = ImGui::GameData16;
-            info.mGroup = EngineGroups::Network;
-            info.onGui  = &GuiClientGameData::OnGui;
-            info.mEditorName  = "client game data";
+            info.mIcon       = ImGui::GameData16;
+            info.mGroup      = EngineGroups::Network;
+            info.onGui       = &GuiClientGameData::OnGui;
+            info.mEditorName = "client game data";
             return info;
         }
 
-        //========================================================================================================
-        //========================================================================================================
         static void OnGui( EcsWorld& /*_world*/, EcsEntity /*_entityID*/, EcsComponent& _component )
         {
             ClientGameData& gameData = static_cast<ClientGameData&>( _component );
