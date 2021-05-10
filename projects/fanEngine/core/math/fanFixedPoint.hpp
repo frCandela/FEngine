@@ -20,6 +20,11 @@ namespace fan
         static constexpr int      sSqrtMaxIteration = 10;
         static_assert( ( sFractionalMask & sIntegerMask ) == 0 );
 
+        #define FX_TWO_PI       FIXED(6.283185307)
+        #define FX_PI           FIXED(3.141592654)
+        #define FX_HALF_PI      FIXED(1.570796327)
+        #define FX_BIAS         FIXED(0.0001)
+        #define FX_FUZZY_ZERO   FIXED(0.0005)
     public:
         using DataType = int32_t;
         static constexpr int32_t sMaxInteger    = ( 1 << ( sIntegerSize - 1 ) ) - 1;
@@ -32,13 +37,13 @@ namespace fan
         static const Fixed sMaxValue;
         static const Fixed sMinValue;
         static const Fixed sMinFractionalValue;
+        static const Fixed sTwoPi;
+        static const Fixed sPi;
+        static const Fixed sHalfPi;
+        static const Fixed sBias;
+        static const Fixed sFuzzyZero;
 
         #define FIXED( str ) ([]() { constexpr Fixed x = Fixed(#str); return x; }())
-        #define FX_TWO_PI       FIXED(6.283185307)
-        #define FX_PI           FIXED(3.141592654)
-        #define FX_HALF_PI      FIXED(1.570796327)
-        #define FX_BIAS         FIXED(0.0001)
-        #define FX_FUZZY_ZERO   FIXED(0.0005)
 
         constexpr Fixed() {}
         constexpr Fixed( const int _integer ) : mData( static_cast<DataType>(_integer << sFractionalSize) ) {}

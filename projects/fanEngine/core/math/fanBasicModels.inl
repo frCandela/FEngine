@@ -154,7 +154,7 @@ namespace fan
         baseVertices.reserve( _numSubdivisions );
         for( int subdivisionIndex             = 0; subdivisionIndex < _numSubdivisions; subdivisionIndex++ )
         {
-            Fixed   angle = 2 * subdivisionIndex * FX_PI / _numSubdivisions;
+            Fixed   angle = 2 * subdivisionIndex * Fixed::sPi / _numSubdivisions;
             Vector3 point( Fixed::Cos( angle ), 0, Fixed::Sin( angle ) );
             baseVertices.push_back( _radius * point );
         }

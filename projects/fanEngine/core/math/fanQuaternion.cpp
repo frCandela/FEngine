@@ -108,7 +108,7 @@ namespace fan
             r12 = Fixed( 2 ) * ( mAxis.x * mAxis.y - mAngle * mAxis.z );
             r13 = Fixed( 2 ) * ( mAxis.x * mAxis.z + mAngle * mAxis.y );
             u.x = Fixed::Degrees( 0 ); //roll
-            u.y = Fixed::Degrees( ( -( FX_PI / 2 ) * r31 / tmp ) );   // pitch
+            u.y = Fixed::Degrees( ( -( Fixed::sPi / 2 ) * r31 / tmp ) );   // pitch
             u.z = Fixed::Degrees( Fixed::ATan2( -r12, -r31 * r13 ) ); // yaw
             return u;
         }

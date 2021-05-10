@@ -268,17 +268,17 @@ namespace fan
 
 
             // Radians
-            TEST_ASSERT( Fixed::IsFuzzyZero( Fixed::Radians( 90 ) - FX_HALF_PI ) );
-            TEST_ASSERT( Fixed::IsFuzzyZero( Fixed::Radians( 180 ) - FX_PI ) );
-            TEST_ASSERT( Fixed::IsFuzzyZero( Fixed::Radians( -180 ) - ( -FX_PI ) ) );
+            TEST_ASSERT( Fixed::IsFuzzyZero( Fixed::Radians( 90 ) - Fixed::sHalfPi ) );
+            TEST_ASSERT( Fixed::IsFuzzyZero( Fixed::Radians( 180 ) - Fixed::sPi ) );
+            TEST_ASSERT( Fixed::IsFuzzyZero( Fixed::Radians( -180 ) - ( -Fixed::sPi ) ) );
 
-            double d = ( Fixed::Degrees( FX_HALF_PI ) - 90 ).ToDouble();
+            double d = ( Fixed::Degrees( Fixed::sHalfPi ) - 90 ).ToDouble();
             (void)d;
 
             // Radians
-            TEST_ASSERT( Fixed::IsFuzzyZero( Fixed::Degrees( FX_HALF_PI ) - 90 ) );
-            TEST_ASSERT( Fixed::IsFuzzyZero( Fixed::Degrees( FX_PI ) - 180 ) );
-            TEST_ASSERT( Fixed::IsFuzzyZero( Fixed::Degrees( -FX_PI ) - ( -180 ) ) );
+            TEST_ASSERT( Fixed::IsFuzzyZero( Fixed::Degrees( Fixed::sHalfPi ) - 90 ) );
+            TEST_ASSERT( Fixed::IsFuzzyZero( Fixed::Degrees( Fixed::sPi ) - 180 ) );
+            TEST_ASSERT( Fixed::IsFuzzyZero( Fixed::Degrees( -Fixed::sPi ) - ( -180 ) ) );
         }
 
         void TestSign()
@@ -366,26 +366,26 @@ namespace fan
         {
             static_assert( Fixed::Sin( FIXED( 0 ) ) == FIXED( 0 ) );
 
-            TEST_ASSERT( Fixed::IsFuzzyZero( FX_PI - FIXED( 3.141592654 ) ) )
-            TEST_ASSERT( Fixed::IsFuzzyZero( Fixed::Sin( FX_PI ) ) );
-            TEST_ASSERT( Fixed::IsFuzzyZero( Fixed::Sin( FX_HALF_PI ) - 1 ) );
-            TEST_ASSERT( Fixed::IsFuzzyZero( Fixed::Sin( -FX_HALF_PI ) - ( -1 ) ) );
-            TEST_ASSERT( Fixed::Sin( FX_PI + 1 ) == Fixed::Sin( -FX_PI + 1 ) );
-            TEST_ASSERT( Fixed::Sin( -FX_PI - 1 ) == Fixed::Sin( FX_PI - 1 ) );
+            TEST_ASSERT( Fixed::IsFuzzyZero( Fixed::sPi - FIXED( 3.141592654 ) ) )
+            TEST_ASSERT( Fixed::IsFuzzyZero( Fixed::Sin( Fixed::sPi ) ) );
+            TEST_ASSERT( Fixed::IsFuzzyZero( Fixed::Sin( Fixed::sHalfPi ) - 1 ) );
+            TEST_ASSERT( Fixed::IsFuzzyZero( Fixed::Sin( -Fixed::sHalfPi ) - ( -1 ) ) );
+            TEST_ASSERT( Fixed::Sin( Fixed::sPi + 1 ) == Fixed::Sin( -Fixed::sPi + 1 ) );
+            TEST_ASSERT( Fixed::Sin( -Fixed::sPi - 1 ) == Fixed::Sin( Fixed::sPi - 1 ) );
 
             FixedFunction  fxSin     = &Fixed::Sin;
             DoubleFunction doubleSin = &std::sin;
             double         error     = MaxErrorFixedVsDouble( fxSin,
                                                               doubleSin,
-                                                              ( -FX_TWO_PI ).ToDouble(),
-                                                              ( FX_TWO_PI ).ToDouble(),
+                                                              ( -Fixed::sTwoPi ).ToDouble(),
+                                                              ( Fixed::sTwoPi ).ToDouble(),
                                                               0.0001 );
             TEST_ASSERT( error < 0.0005 ) // [0,1]
         }
 
         void TestASin()
         {
-            static_assert( Fixed::ASin( 1 ) == FX_HALF_PI );
+            static_assert( Fixed::ASin( 1 ) == FX_HALF_PI);
 
             FixedFunction  fxASin     = &Fixed::ASin;
             DoubleFunction doubleASin = &std::asin;
@@ -397,16 +397,16 @@ namespace fan
         {
             static_assert( Fixed::Cos( 0 ) == 1 );
 
-            TEST_ASSERT( Fixed::IsFuzzyZero( Fixed::Cos( FX_PI ) - ( -1 ) ) );
-            TEST_ASSERT( Fixed::IsFuzzyZero( Fixed::Cos( FX_HALF_PI ) ) );
-            TEST_ASSERT( Fixed::IsFuzzyZero( Fixed::Cos( -FX_HALF_PI ) ) );
+            TEST_ASSERT( Fixed::IsFuzzyZero( Fixed::Cos( Fixed::sPi ) - ( -1 ) ) );
+            TEST_ASSERT( Fixed::IsFuzzyZero( Fixed::Cos( Fixed::sHalfPi ) ) );
+            TEST_ASSERT( Fixed::IsFuzzyZero( Fixed::Cos( -Fixed::sHalfPi ) ) );
 
-            TEST_ASSERT( Fixed::Cos( FX_PI + 1 ) == Fixed::Cos( -FX_PI + 1 ) );
-            TEST_ASSERT( Fixed::Cos( -FX_PI - 1 ) == Fixed::Cos( FX_PI - 1 ) );
+            TEST_ASSERT( Fixed::Cos( Fixed::sPi + 1 ) == Fixed::Cos( -Fixed::sPi + 1 ) );
+            TEST_ASSERT( Fixed::Cos( -Fixed::sPi - 1 ) == Fixed::Cos( Fixed::sPi - 1 ) );
 
             FixedFunction  fxCos     = &Fixed::Cos;
             DoubleFunction doubleCos = &std::cos;
-            double         error     = MaxErrorFixedVsDouble( fxCos, doubleCos, ( -FX_TWO_PI ).ToDouble(), ( FX_TWO_PI ).ToDouble(), 0.0001 );
+            double         error     = MaxErrorFixedVsDouble( fxCos, doubleCos, ( -Fixed::sTwoPi ).ToDouble(), ( Fixed::sTwoPi ).ToDouble(), 0.0001 );
             TEST_ASSERT( error < 0.0005 ) // [0,1]
         }
 
@@ -427,7 +427,7 @@ namespace fan
             FixedFunction  fxTan     = &Fixed::Tan;
             DoubleFunction doubleTan = &std::tan;
             const double   step      = 0.001;
-            double         error     = MaxErrorFixedVsDouble( fxTan, doubleTan, ( -FX_HALF_PI ).ToDouble() + 0.1, ( FX_HALF_PI ).ToDouble() - 0.1, step );
+            double         error     = MaxErrorFixedVsDouble( fxTan, doubleTan, ( -Fixed::sHalfPi ).ToDouble() + 0.1, ( Fixed::sHalfPi ).ToDouble() - 0.1, step );
             TEST_ASSERT( error < 0.01 )
         }
 

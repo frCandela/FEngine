@@ -30,7 +30,7 @@ namespace fan
     //==================================================================================================================================================================================================
     bool Triangle::RayCast( const Vector3 _origin, const Vector3 _dir, Vector3& _outIntersection ) const
     {
-        Fixed   EPSILON = FX_FUZZY_ZERO;
+        Fixed   EPSILON = Fixed::sFuzzyZero;
         Vector3 e1      = mV1 - mV0;    // edge 1
         Vector3 e2      = mV2 - mV0;    // edge 2
         Vector3 h       = Vector3::Cross( _dir, e2 );    //

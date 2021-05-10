@@ -89,7 +89,7 @@ namespace fan
 
         const Vector3 other      = Vector3( -_axis[1], -_axis[2], _axis[0] );
         Vector3       orthogonal = _radius * Vector3::Cross( _axis, other ).Normalized();
-        const Fixed   angle      = 2 * FX_PI / _nbSegments;
+        const Fixed   angle      = 2 * Fixed::sPi / _nbSegments;
 
         std::vector<DebugVertex>& lines = _depthTestEnable ? mDebugLines : mDebugLinesNoDepthTest;
         for( uint32_t segmentIndex = 0; segmentIndex < _nbSegments; segmentIndex++ )

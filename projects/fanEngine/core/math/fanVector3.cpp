@@ -17,15 +17,15 @@ namespace fan
     void Vector3::Normalize()
     {
         const Fixed magnitude = Magnitude();
-        if( magnitude > FX_BIAS ) // don't divide by zero
+        if( magnitude > Fixed::sBias ) // don't divide by zero
         {
             x /= magnitude;
             y /= magnitude;
             z /= magnitude;
         }
-        if( Fixed::Abs( x ) < FX_BIAS ){ x = 0; }
-        if( Fixed::Abs( y ) < FX_BIAS ){ y = 0; }
-        if( Fixed::Abs( z ) < FX_BIAS ){ z = 0; }
+        if( Fixed::Abs( x ) < Fixed::sBias ){ x = 0; }
+        if( Fixed::Abs( y ) < Fixed::sBias ){ y = 0; }
+        if( Fixed::Abs( z ) < Fixed::sBias ){ z = 0; }
     }
 
     //==================================================================================================================================================================================================
@@ -42,15 +42,15 @@ namespace fan
     void Vector3::FastNormalize()
     {
         const Fixed invMagnitude = Fixed::InvSqrt( SqrMagnitude() );
-        if( invMagnitude > FX_BIAS ) // don't divide by zero
+        if( invMagnitude > Fixed::sBias ) // don't divide by zero
         {
             x *= invMagnitude;
             y *= invMagnitude;
             z *= invMagnitude;
         }
-        if( Fixed::Abs( x ) < FX_BIAS ){ x = 0; }
-        if( Fixed::Abs( y ) < FX_BIAS ){ y = 0; }
-        if( Fixed::Abs( z ) < FX_BIAS ){ z = 0; }
+        if( Fixed::Abs( x ) < Fixed::sBias ){ x = 0; }
+        if( Fixed::Abs( y ) < Fixed::sBias ){ y = 0; }
+        if( Fixed::Abs( z ) < Fixed::sBias ){ z = 0; }
     }
 
     //==================================================================================================================================================================================================
