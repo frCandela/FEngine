@@ -1,7 +1,7 @@
 #pragma  once
 
 #include "core/ecs/fanEcsComponent.hpp"
-#include "engine/physics/fanFxTransform.hpp"
+#include "engine/physics/fanTransform.hpp"
 
 namespace fan
 {
@@ -17,9 +17,9 @@ namespace fan
         static void Save( const EcsComponent& _component, Json& _json );
         static void Load( EcsComponent& _component, const Json& _json );
 
-        FxTransform mLocalTransform;
-        bool        mLocked;
+        Transform mLocalTransform;
+        bool      mLocked;
 
-        static void UpdateLocalTransform( FollowTransform& _followTransform, FxTransform& _transform, SceneNode& _sceneNode );
+        static void UpdateLocalTransform( FollowTransform& _followTransform, Transform& _transform, SceneNode& _sceneNode );
     };
 }

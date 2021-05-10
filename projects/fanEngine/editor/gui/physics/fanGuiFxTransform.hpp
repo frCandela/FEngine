@@ -1,6 +1,6 @@
 #pragma once
 
-#include "engine/physics/fanFxTransform.hpp"
+#include "engine/physics/fanTransform.hpp"
 #include "editor/singletons/fanEditorGuiInfo.hpp"
 #include "editor/fanModals.hpp"
 
@@ -16,14 +16,14 @@ namespace fan
             info.mIcon       = ImGui::IconType::Transform16;
             info.mGroup      = EngineGroups::Scene;
             info.onGui       = &GuiFxTransform::OnGui;
-            info.mEditorPath = "fixedPoint/";
+            info.mEditorPath = "/";
             info.mEditorName = "fxTransform";
             return info;
         }
 
         static void OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component )
         {
-            FxTransform& transform = static_cast<FxTransform&>( _component );
+            Transform& transform = static_cast<Transform&>( _component );
             ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() - 16 );
             {
                 ImGui::PushID( "fixed_transform" );

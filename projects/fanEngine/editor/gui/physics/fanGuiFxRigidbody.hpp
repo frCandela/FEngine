@@ -1,9 +1,9 @@
 #pragma once
 
-#include "engine/physics/fanFxRigidbody.hpp"
+#include "engine/physics/fanRigidbody.hpp"
 #include "editor/singletons/fanEditorGuiInfo.hpp"
-#include "engine/physics/fanFxBoxCollider.hpp"
-#include "engine/physics/fanFxSphereCollider.hpp"
+#include "engine/physics/fanBoxCollider.hpp"
+#include "engine/physics/fanSphereCollider.hpp"
 
 namespace fan
 {
@@ -17,14 +17,14 @@ namespace fan
             info.mIcon       = ImGui::IconType::Rigidbody16;
             info.mGroup      = EngineGroups::ScenePhysics;
             info.onGui       = &OnGui;
-            info.mEditorPath = "fixedPoint/";
+            info.mEditorPath = "physics/";
             info.mEditorName = "fxRigidbody";
             return info;
         }
 
         static void OnGui( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
         {
-            FxRigidbody& rb = static_cast<FxRigidbody&>( _component );
+            Rigidbody& rb = static_cast<Rigidbody&>( _component );
             ImGui::PushID( "FxRigidbody" );
             ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() - 16 );
             {
@@ -120,22 +120,22 @@ namespace fan
         //==================================================================================================================================================================================================
         static void TryUpdateInvInertiaTensorLocal( EcsWorld& _world, EcsEntity _entity )
         {
-            if( !_world.HasComponent<FxRigidbody>( _entity ) ){ return; }
-            FxRigidbody& rb = _world.GetComponent<FxRigidbody>( _entity );
+            if( !_world.HasComponent<Rigidbody>( _entity ) ){ return; }
+            Rigidbody& rb = _world.GetComponent<Rigidbody>( _entity );
 
             if( rb.mInverseMass == 0 )
             {
                 rb.mInverseInertiaTensorLocal = Matrix3::sZero;
             }
-            else if( _world.HasComponent<FxSphereCollider>( _entity ) )
+            else if( _world.HasComponent<SphereCollider>( _entity ) )
             {
-                const FxSphereCollider& sphereCollider = _world.GetComponent<FxSphereCollider>( _entity );
-                rb.mInverseInertiaTensorLocal = FxRigidbody::SphereInertiaTensor( rb.mInverseMass, sphereCollider.mRadius ).Inverse();
+                const SphereCollider& sphereCollider = _world.GetComponent<SphereCollider>( _entity );
+                rb.mInverseInertiaTensorLocal = Rigidbody::SphereInertiaTensor( rb.mInverseMass, sphereCollider.mRadius ).Inverse();
             }
-            else if( _world.HasComponent<FxBoxCollider>( _entity ) )
+            else if( _world.HasComponent<BoxCollider>( _entity ) )
             {
-                const FxBoxCollider& boxCollider = _world.GetComponent<FxBoxCollider>( _entity );
-                rb.mInverseInertiaTensorLocal = FxRigidbody::BoxInertiaTensor( rb.mInverseMass, boxCollider.mHalfExtents ).Inverse();
+                const BoxCollider& boxCollider = _world.GetComponent<BoxCollider>( _entity );
+                rb.mInverseInertiaTensorLocal = Rigidbody::BoxInertiaTensor( rb.mInverseMass, boxCollider.mHalfExtents ).Inverse();
             }
             else
             {

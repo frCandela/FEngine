@@ -1,4 +1,4 @@
-#include <engine/physics/fanFxTransform.hpp>
+#include <engine/physics/fanTransform.hpp>
 #include "fanIProjectContainer.hpp"
 #include "core/time/fanProfiler.hpp"
 #include "engine/project/fanIProject.hpp"
@@ -92,7 +92,7 @@ namespace fan
             Camera& camera = world.GetComponent<Camera>( cameraID );
             camera.mAspectRatio = Fixed::FromFloat( _size[0] / _size[1] );
 
-            FxTransform& cameraTransform = world.GetComponent<FxTransform>( cameraID );
+            Transform& cameraTransform = world.GetComponent<Transform>( cameraID );
             _renderer.SetMainCamera( camera.GetProjection(), camera.GetView( cameraTransform ), cameraTransform.mPosition.ToGlm() );
         }
     }

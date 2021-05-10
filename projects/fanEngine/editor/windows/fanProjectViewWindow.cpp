@@ -40,8 +40,8 @@ namespace fan
         glm::vec2    size      = glm::vec2( imGuiSize.x, imGuiSize.y );
         if( mSize != size )
         {
-            mSize.x = glm::clamp( size.x, 0.f, 2160.f );
-            mSize.y = glm::clamp( size.y, 0.f, 3840.f );
+            mSize.x = glm::clamp( size.x, 0.f, 3840.f );
+            mSize.y = glm::clamp( size.y, 0.f, 2160.f );
             mOnSizeChanged.Emmit( { (uint32_t)mSize[0], (uint32_t)mSize[1] } );
         }
 

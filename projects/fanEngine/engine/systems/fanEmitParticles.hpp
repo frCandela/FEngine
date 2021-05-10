@@ -1,6 +1,6 @@
 #include "core/ecs/fanEcsSystem.hpp"
 #include "core/random/fanRandom.hpp"
-#include "engine/physics/fanFxTransform.hpp"
+#include "engine/physics/fanTransform.hpp"
 #include "engine/components/fanParticleEmitter.hpp"
 #include "engine/components/fanParticle.hpp"
 
@@ -13,7 +13,7 @@ namespace fan
     {
         static EcsSignature GetSignature( const EcsWorld& _world )
         {
-            return _world.GetSignature<FxTransform>() | _world.GetSignature<ParticleEmitter>();
+            return _world.GetSignature<Transform>() | _world.GetSignature<ParticleEmitter>();
         }
 
         static void Run( EcsWorld& _world, const EcsView& _view, const float _delta )
@@ -22,12 +22,12 @@ namespace fan
 
             if( _delta == 0.f ){ return; }
 
-            auto transformIt       = _view.begin<FxTransform>();
+            auto transformIt       = _view.begin<Transform>();
             auto particleEmitterIt = _view.begin<ParticleEmitter>();
-            for( ; transformIt != _view.end<FxTransform>(); ++transformIt, ++particleEmitterIt )
+            for( ; transformIt != _view.end<Transform>(); ++transformIt, ++particleEmitterIt )
             {
-                const FxTransform& emitterTransform = *transformIt;
-                ParticleEmitter  & emitter          = *particleEmitterIt;
+                const Transform& emitterTransform = *transformIt;
+                ParticleEmitter& emitter          = *particleEmitterIt;
 
                 if( emitter.mParticlesPerSecond > 0.f && emitter.mEnabled )
                 {

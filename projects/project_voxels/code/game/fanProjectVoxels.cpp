@@ -1,11 +1,10 @@
 #include "game/fanProjectVoxels.hpp"
-#include "core/math/fanFixedPoint.hpp"
 #include "core/random/fanSimplexNoise.hpp"
 #include "core/math/fanQuaternion.hpp"
 #include "core/time/fanScopedTimer.hpp"
 #include "network/singletons/fanTime.hpp"
 #include "engine/singletons/fanRenderDebug.hpp"
-#include "engine/physics/fanUpdateFxRigidbodies.hpp"
+#include "engine/physics/fanUpdateRigidbodies.hpp"
 #include "engine/systems/fanUpdateBounds.hpp"
 #include "engine/systems/fanUpdateUIText.hpp"
 #include "engine/systems/fanRaycastUI.hpp"
@@ -49,7 +48,6 @@ namespace fan
     {
         mWorld.AddComponentType<TestComponent>();
         mWorld.AddSingletonType<TestSingleton>();
-        mWorld.AddSingletonType<VoxelTerrain>();
 
 #ifdef FAN_EDITOR
         EditorGuiInfo& guiInfos = mWorld.GetSingleton<EditorGuiInfo>();
@@ -71,7 +69,7 @@ namespace fan
         SceneNode cameraNode = scene.CreateSceneNode( "game_camera", &scene.GetRootNode() );
         scene.SetMainCamera( cameraNode.mHandle );
         EcsEntity cameraEntity = mWorld.GetEntity( cameraNode.mHandle );
-        mWorld.AddComponent<FxTransform>( cameraEntity );
+        mWorld.AddComponent<Transform>( cameraEntity );
         mWorld.AddComponent<Camera>( cameraEntity );
     }
 
@@ -140,7 +138,7 @@ namespace fan
         //const Time& time = mWorld.GetSingleton<Time>();
 
         // physics & transforms
-        mWorld.Run<SIntegrateFxRigidbodies>( _delta );
+        mWorld.Run<SIntegrateRigidbodies>( _delta );
         mWorld.Run<SDetectCollisions>( _delta );
 
         mWorld.Run<SMoveFollowTransforms>();
@@ -168,7 +166,6 @@ namespace fan
         RenderWorld& renderWorld = mWorld.GetSingleton<RenderWorld>();
         renderWorld.drawData.clear();
 
-        mWorld.Run<SUpdateRenderWorldModelsFixed>( renderWorld );
         mWorld.Run<SUpdateRenderWorldModels>( renderWorld );
         mWorld.ForceRun<SUpdateRenderWorldUI>();
         mWorld.ForceRun<SUpdateRenderWorldPointLights>();

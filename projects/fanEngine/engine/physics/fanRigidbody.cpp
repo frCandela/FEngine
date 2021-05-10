@@ -1,25 +1,25 @@
 #include <core/fanDebug.hpp>
-#include "engine/physics/fanFxRigidbody.hpp"
-#include "fanFxTransform.hpp"
-#include "engine/physics/fanFxPhysicsWorld.hpp"
+#include "engine/physics/fanRigidbody.hpp"
+#include "fanTransform.hpp"
+#include "engine/physics/fanPhysicsWorld.hpp"
 
 namespace fan
 {
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void FxRigidbody::SetInfo( EcsComponentInfo& _info )
+    void Rigidbody::SetInfo( EcsComponentInfo& _info )
     {
-        _info.load = &FxRigidbody::Load;
-        _info.save = &FxRigidbody::Save;
+        _info.load = &Rigidbody::Load;
+        _info.save = &Rigidbody::Save;
     }
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void FxRigidbody::Init( EcsWorld& _world, EcsEntity, EcsComponent& _component )
+    void Rigidbody::Init( EcsWorld& _world, EcsEntity, EcsComponent& _component )
     {
         // clear
-        const FxPhysicsWorld& physicsWorld = _world.GetSingleton<FxPhysicsWorld>();
-        FxRigidbody         & rb           = static_cast<FxRigidbody&>( _component );
+        const PhysicsWorld& physicsWorld = _world.GetSingleton<PhysicsWorld>();
+        Rigidbody         & rb           = static_cast<Rigidbody&>( _component );
         rb.mInverseMass               = 1;
         rb.mInverseInertiaTensorLocal = Matrix3::sZero;
         rb.mVelocity                  = Vector3::sZero;
@@ -35,7 +35,7 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void FxRigidbody::ApplyForce( const Vector3& _force, const Vector3& _localPoint )
+    void Rigidbody::ApplyForce( const Vector3& _force, const Vector3& _localPoint )
     {
         ApplyCentralForce( _force );
         ApplyTorque( Vector3::Cross( _localPoint, _force ) );
@@ -68,7 +68,7 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void FxRigidbody::CalculateDerivedData( FxTransform& _transform )
+    void Rigidbody::CalculateDerivedData( Transform& _transform )
     {
         Matrix4 transform( _transform.mRotation, _transform.mPosition );
         TransformInertiaTensor( mInverseInertiaTensorLocal, transform, mInverseInertiaTensorWorld );
@@ -77,14 +77,14 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void FxRigidbody::ClearAccumulators()
+    void Rigidbody::ClearAccumulators()
     {
         mForcesAccumulator = mTorqueAccumulator = Vector3::sZero;
     }
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void FxRigidbody::SetSleeping( const bool _isSleeping )
+    void Rigidbody::SetSleeping( const bool _isSleeping )
     {
         if( _isSleeping == mIsSleeping ){ return; }
         if( _isSleeping )
@@ -105,7 +105,7 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void FxRigidbody::UpdateMotion()
+    void Rigidbody::UpdateMotion()
     {
         Fixed                 newMotion = Vector3::Dot( mVelocity, mVelocity ) + Vector3::Dot( mRotation, mRotation );
         constexpr const Fixed bias      = FIXED( 0.8 );
@@ -120,7 +120,7 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    Matrix3 FxRigidbody::SphereInertiaTensor( const Fixed _inverseMass, const Fixed _radius )
+    Matrix3 Rigidbody::SphereInertiaTensor( const Fixed _inverseMass, const Fixed _radius )
     {
         const Fixed value = Fixed( 2 ) / 5 * _radius * _radius / _inverseMass;
         return value * Matrix3::sIdentity;
@@ -128,7 +128,7 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    Matrix3 FxRigidbody::BoxInertiaTensor( const Fixed _inverseMass, const Vector3 _halfExtents )
+    Matrix3 Rigidbody::BoxInertiaTensor( const Fixed _inverseMass, const Vector3 _halfExtents )
     {
         const Vector3 e      = _halfExtents * 2;
         const Fixed   valueX = Fixed( 1 ) / 12 * ( e.y * e.y + e.z * e.z ) / _inverseMass;
@@ -141,9 +141,9 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void FxRigidbody::Save( const EcsComponent& _component, Json& _json )
+    void Rigidbody::Save( const EcsComponent& _component, Json& _json )
     {
-        const FxRigidbody& rb = static_cast<const FxRigidbody&>( _component );
+        const Rigidbody& rb = static_cast<const Rigidbody&>( _component );
         Serializable::SaveFixed( _json, "inv_mass", rb.mInverseMass );
         Serializable::SaveVec3( _json, "velocity", rb.mVelocity );
         Serializable::SaveVec3( _json, "rotation", rb.mRotation );
@@ -154,9 +154,9 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void FxRigidbody::Load( EcsComponent& _component, const Json& _json )
+    void Rigidbody::Load( EcsComponent& _component, const Json& _json )
     {
-        FxRigidbody& rb = static_cast<FxRigidbody&>( _component );
+        Rigidbody& rb = static_cast<Rigidbody&>( _component );
         Serializable::LoadFixed( _json, "inv_mass", rb.mInverseMass );
         Serializable::LoadVec3( _json, "velocity", rb.mVelocity );
         Serializable::LoadVec3( _json, "rotation", rb.mRotation );

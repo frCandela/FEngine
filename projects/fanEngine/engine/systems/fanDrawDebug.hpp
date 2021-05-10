@@ -7,8 +7,8 @@
 #include "engine/singletons/fanRenderDebug.hpp"
 #include "engine/singletons/fanScene.hpp"
 #include "engine/fanSceneTags.hpp"
-#include "engine/physics/fanFxSphereCollider.hpp"
-#include "engine/physics/fanFxBoxCollider.hpp"
+#include "engine/physics/fanSphereCollider.hpp"
+#include "engine/physics/fanBoxCollider.hpp"
 
 namespace fan
 {
@@ -43,16 +43,16 @@ namespace fan
     {
         static EcsSignature GetSignature( const EcsWorld& _world )
         {
-            return _world.GetSignature<MeshRenderer>() | _world.GetSignature<FxTransform>();
+            return _world.GetSignature<MeshRenderer>() | _world.GetSignature<Transform>();
         }
         static void Run( EcsWorld& _world, const EcsView& _view )
         {
             auto meshRendererIt = _view.begin<MeshRenderer>();
-            auto transformIt    = _view.begin<FxTransform>();
+            auto transformIt    = _view.begin<Transform>();
             for( ; meshRendererIt != _view.end<MeshRenderer>(); ++meshRendererIt, ++transformIt )
             {
                 const MeshRenderer& meshRenderer = *meshRendererIt;
-                const FxTransform & transform    = *transformIt;
+                const Transform   & transform    = *transformIt;
 
                 if( *meshRenderer.mMesh != nullptr )
                 {
@@ -81,16 +81,16 @@ namespace fan
     {
         static EcsSignature GetSignature( const EcsWorld& _world )
         {
-            return _world.GetSignature<MeshRenderer>() | _world.GetSignature<FxTransform>();
+            return _world.GetSignature<MeshRenderer>() | _world.GetSignature<Transform>();
         }
         static void Run( EcsWorld& _world, const EcsView& _view )
         {
             auto meshRendererIt = _view.begin<MeshRenderer>();
-            auto transformIt    = _view.begin<FxTransform>();
+            auto transformIt    = _view.begin<Transform>();
             for( ; meshRendererIt != _view.end<MeshRenderer>(); ++meshRendererIt, ++transformIt )
             {
                 const MeshRenderer& meshRenderer = *meshRendererIt;
-                const FxTransform & transform    = *transformIt;
+                const Transform   & transform    = *transformIt;
                 if( *meshRenderer.mMesh == nullptr ){ continue; }
 
                 const glm::mat4 modelMat = transform.GetModelMatrix();
@@ -117,17 +117,17 @@ namespace fan
     {
         static EcsSignature GetSignature( const EcsWorld& _world )
         {
-            return _world.GetSignature<MeshRenderer>() | _world.GetSignature<FxTransform>();
+            return _world.GetSignature<MeshRenderer>() | _world.GetSignature<Transform>();
         }
 
         static void Run( EcsWorld& _world, const EcsView& _view )
         {
             auto meshRendererIt = _view.begin<MeshRenderer>();
-            auto transformIt    = _view.begin<FxTransform>();
+            auto transformIt    = _view.begin<Transform>();
             for( ; meshRendererIt != _view.end<MeshRenderer>(); ++meshRendererIt, ++transformIt )
             {
                 const MeshRenderer& meshRenderer = *meshRendererIt;
-                const FxTransform & transform    = *transformIt;
+                const Transform   & transform    = *transformIt;
 
                 if( *meshRenderer.mMesh == nullptr ){ continue; }
 
@@ -164,22 +164,22 @@ namespace fan
     {
         static EcsSignature GetSignature( const EcsWorld& _world )
         {
-            return _world.GetSignature<PointLight>() | _world.GetSignature<FxTransform>();
+            return _world.GetSignature<PointLight>() | _world.GetSignature<Transform>();
         }
         static void Run( EcsWorld& _world, const EcsView& _view )
         {
             auto lightIt     = _view.begin<PointLight>();
-            auto transformIt = _view.begin<FxTransform>();
+            auto transformIt = _view.begin<Transform>();
             RenderDebug& renderDebug = _world.GetSingleton<RenderDebug>();
             for( ; lightIt != _view.end<PointLight>(); ++lightIt, ++transformIt )
             {
-                const PointLight & light     = *lightIt;
-                const FxTransform& transform = *transformIt;
+                const PointLight& light     = *lightIt;
+                const Transform & transform = *transformIt;
                 DrawPointLight( renderDebug, transform, light );
             }
         }
 
-        static void DrawPointLight( RenderDebug& _renderDebug, const FxTransform& _transform, const PointLight& _light )
+        static void DrawPointLight( RenderDebug& _renderDebug, const Transform& _transform, const PointLight& _light )
         {
             const Fixed lightRange = PointLight::GetLightRange( _light );
             if( lightRange > 0 )
@@ -196,23 +196,23 @@ namespace fan
     {
         static EcsSignature GetSignature( const EcsWorld& _world )
         {
-            return _world.GetSignature<DirectionalLight>() | _world.GetSignature<FxTransform>();
+            return _world.GetSignature<DirectionalLight>() | _world.GetSignature<Transform>();
         }
 
         static void Run( EcsWorld& _world, const EcsView& _view )
         {
             auto lightIt     = _view.begin<DirectionalLight>();
-            auto transformIt = _view.begin<FxTransform>();
+            auto transformIt = _view.begin<Transform>();
             RenderDebug& renderDebug = _world.GetSingleton<RenderDebug>();
             for( ; lightIt != _view.end<DirectionalLight>(); ++lightIt, ++transformIt )
             {
                 const DirectionalLight& light     = *lightIt;
-                const FxTransform     & transform = *transformIt;
+                const Transform       & transform = *transformIt;
                 DrawDirectionalLight( renderDebug, transform, light );
             }
         }
 
-        static void DrawDirectionalLight( RenderDebug& _renderDebug, const FxTransform& _transform, const DirectionalLight& /*_light*/ )
+        static void DrawDirectionalLight( RenderDebug& _renderDebug, const Transform& _transform, const DirectionalLight& /*_light*/ )
         {
             const Vector3 pos         = _transform.mPosition;
             const Vector3 dir         = _transform.Forward();
@@ -227,7 +227,7 @@ namespace fan
                 const Vector3 offset = offsets[offsetIndex];
                 _renderDebug.DebugLine( pos + offset, pos + offset + length * dir, color, false );
             }
-            _renderDebug.DebugIcoSphere( FxTransform::Make( _transform.mRotation, _transform.mPosition ), radius, 0, color, false );
+            _renderDebug.DebugIcoSphere( Transform::Make( _transform.mRotation, _transform.mPosition ), radius, 0, color, false );
         }
     };
 
@@ -238,22 +238,22 @@ namespace fan
     {
         static EcsSignature GetSignature( const EcsWorld& _world )
         {
-            return _world.GetSignature<FxTransform>() | _world.GetSignature<FxSphereCollider>();
+            return _world.GetSignature<Transform>() | _world.GetSignature<SphereCollider>();
         }
 
         static void Run( EcsWorld& _world, const EcsView& _view )
         {
             RenderDebug& renderDebug = _world.GetSingleton<RenderDebug>();
 
-            auto transformIt = _view.begin<FxTransform>();
-            auto sphereIt    = _view.begin<FxSphereCollider>();
-            for( ; transformIt != _view.end<FxTransform>(); ++transformIt, ++sphereIt )
+            auto transformIt = _view.begin<Transform>();
+            auto sphereIt    = _view.begin<SphereCollider>();
+            for( ; transformIt != _view.end<Transform>(); ++transformIt, ++sphereIt )
             {
                 Draw( *sphereIt, *transformIt, renderDebug );
             }
         }
 
-        static void Draw( const FxSphereCollider& _sphere, const FxTransform& _transform, RenderDebug& _renderDebug )
+        static void Draw( const SphereCollider& _sphere, const Transform& _transform, RenderDebug& _renderDebug )
         {
             _renderDebug.DebugSphere( _transform.mPosition + _transform.TransformDirection( _sphere.mOffset ), _sphere.mRadius, Color::sGreen, false );
         }
@@ -266,24 +266,24 @@ namespace fan
     {
         static EcsSignature GetSignature( const EcsWorld& _world )
         {
-            return _world.GetSignature<FxTransform>() | _world.GetSignature<FxBoxCollider>();
+            return _world.GetSignature<Transform>() | _world.GetSignature<BoxCollider>();
         }
 
         static void Run( EcsWorld& _world, const EcsView& _view )
         {
             RenderDebug& renderDebug = _world.GetSingleton<RenderDebug>();
 
-            auto transformIt = _view.begin<FxTransform>();
-            auto boxIt       = _view.begin<FxBoxCollider>();
-            for( ; transformIt != _view.end<FxTransform>(); ++transformIt, ++boxIt )
+            auto transformIt = _view.begin<Transform>();
+            auto boxIt       = _view.begin<BoxCollider>();
+            for( ; transformIt != _view.end<Transform>(); ++transformIt, ++boxIt )
             {
                 Draw( *boxIt, *transformIt, renderDebug );
             }
         }
 
-        static void Draw( const FxBoxCollider& _box, const FxTransform& _transform, RenderDebug& _renderDebug )
+        static void Draw( const BoxCollider& _box, const Transform& _transform, RenderDebug& _renderDebug )
         {
-            FxTransform transform = FxTransform::Make( _transform.mRotation, _transform.mPosition );
+            Transform transform = Transform::Make( _transform.mRotation, _transform.mPosition );
             _renderDebug.DebugCube( transform, _box.mHalfExtents, Color::sGreen, false );
         }
     };

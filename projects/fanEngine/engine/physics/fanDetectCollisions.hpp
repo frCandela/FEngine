@@ -1,10 +1,10 @@
 #include "core/ecs/fanEcsSystem.hpp"
 #include "core/time/fanProfiler.hpp"
-#include "engine/physics/fanFxPhysicsWorld.hpp"
-#include "engine/physics/fanFxRigidbody.hpp"
-#include "engine/physics/fanFxBoxCollider.hpp"
-#include "engine/physics/fanFxSphereCollider.hpp"
-#include "fanFxTransform.hpp"
+#include "engine/physics/fanPhysicsWorld.hpp"
+#include "engine/physics/fanRigidbody.hpp"
+#include "engine/physics/fanBoxCollider.hpp"
+#include "engine/physics/fanSphereCollider.hpp"
+#include "fanTransform.hpp"
 
 namespace fan
 {
@@ -15,35 +15,35 @@ namespace fan
     {
         static EcsSignature GetSignature( const EcsWorld& _world )
         {
-            return _world.GetSignature<FxRigidbody>() | _world.GetSignature<FxTransform>();
+            return _world.GetSignature<Rigidbody>() | _world.GetSignature<Transform>();
         }
 
         static void Run( EcsWorld& _world, const EcsView& _view, Fixed _delta )
         {
-            FxPhysicsWorld& physicsWorld = _world.GetSingleton<FxPhysicsWorld>();
+            PhysicsWorld& physicsWorld = _world.GetSingleton<PhysicsWorld>();
             (void)_delta;
             //if( _delta != 0 )
             {
                 SCOPED_PROFILE( detect_collisions )
                 struct RigidbodyData
                 {
-                    FxTransform     * transform;
-                    FxRigidbody     * rigidbody;
-                    FxSphereCollider* sphere;
-                    FxBoxCollider   * box;
+                    Transform* transform;
+                    Rigidbody* rigidbody;
+                    SphereCollider* sphere;
+                    BoxCollider   * box;
                 };
 
                 // Get all bodies
                 std::vector<RigidbodyData> bodies;
-                auto                       rbIt        = _view.begin<FxRigidbody>();
-                auto                       transformIt = _view.begin<FxTransform>();
-                for( ; rbIt != _view.end<FxRigidbody>(); ++rbIt, ++transformIt )
+                auto                       rbIt        = _view.begin<Rigidbody>();
+                auto                       transformIt = _view.begin<Transform>();
+                for( ; rbIt != _view.end<Rigidbody>(); ++rbIt, ++transformIt )
                 {
                     EcsEntity     entity   = rbIt.GetEntity();
                     RigidbodyData bodyData = { &( *transformIt ),
                                                &( *rbIt ),
-                                               _world.HasComponent<FxSphereCollider>( entity ) ? &_world.GetComponent<FxSphereCollider>( entity ) : nullptr,
-                                               _world.HasComponent<FxBoxCollider>( entity ) ? &_world.GetComponent<FxBoxCollider>( entity ) : nullptr };
+                                               _world.HasComponent<SphereCollider>( entity ) ? &_world.GetComponent<SphereCollider>( entity ) : nullptr,
+                                               _world.HasComponent<BoxCollider>( entity ) ? &_world.GetComponent<BoxCollider>( entity ) : nullptr };
                     if( bodyData.box != nullptr || bodyData.sphere != nullptr )
                     {
                         bodies.push_back( bodyData );

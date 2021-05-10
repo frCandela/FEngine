@@ -5,14 +5,14 @@
 
 namespace fan
 {
-    struct FxRigidbody;
-    struct FxTransform;
+    struct Rigidbody;
+    struct Transform;
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
     struct Contact
     {
-        FxRigidbody* rigidbody[2] = { nullptr, nullptr };
+        Rigidbody* rigidbody[2] = { nullptr, nullptr };
         Vector3 normal;
         Vector3 position;
         Fixed   penetration;

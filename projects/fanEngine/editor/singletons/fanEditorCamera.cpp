@@ -3,7 +3,7 @@
 #include "core/input/fanInput.hpp"
 #include "core/input/fanInputManager.hpp"
 #include "core/shapes/fanRay.hpp"
-#include "engine/physics/fanFxTransform.hpp"
+#include "engine/physics/fanTransform.hpp"
 #include "engine/components/fanCamera.hpp"
 #include "engine/components/fanSceneNode.hpp"
 #include "engine/singletons/fanMouse.hpp"
@@ -42,7 +42,7 @@ namespace fan
 
         EditorCamera& editorCamera = _world.GetSingleton<EditorCamera>();
         const EcsEntity cameraEntity = _world.GetEntity( editorCamera.mCameraHandle );
-        FxTransform& cameraTransform = _world.GetComponent<FxTransform>( cameraEntity );
+        Transform& cameraTransform = _world.GetComponent<Transform>( cameraEntity );
 
         Vector3 position    = cameraTransform.mPosition;
         Fixed   forwardAxis = Fixed::FromFloat( Input::Get().Manager().GetAxis( "editor_forward" ) );
@@ -98,7 +98,7 @@ namespace fan
         EcsEntity cameraID = _world.GetEntity( cameraNode.mHandle );
         cameraNode.AddFlag( SceneNode::NoSave | SceneNode::NoDelete | SceneNode::NoRaycast );
 
-        FxTransform& transform = _world.AddComponent<FxTransform>( cameraID );
+        Transform& transform = _world.AddComponent<Transform>( cameraID );
         _world.AddComponent<Camera>( cameraID );
 
         transform.mPosition     = Vector3( 0, 0, -2 );

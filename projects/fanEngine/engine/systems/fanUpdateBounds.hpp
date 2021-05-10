@@ -4,10 +4,10 @@
 #include "engine/components/fanBounds.hpp"
 #include "engine/components/fanMeshRenderer.hpp"
 #include "engine/components/fanSceneNode.hpp"
-#include "engine/physics/fanFxTransform.hpp"
-#include "engine/components/fanFxScale.hpp"
-#include "engine/physics/fanFxSphereCollider.hpp"
-#include "engine/physics/fanFxBoxCollider.hpp"
+#include "engine/physics/fanTransform.hpp"
+#include "engine/components/fanScale.hpp"
+#include "engine/physics/fanSphereCollider.hpp"
+#include "engine/physics/fanBoxCollider.hpp"
 
 namespace fan
 {
@@ -21,14 +21,14 @@ namespace fan
             return
                     _world.GetSignature<SceneNode>() |
                     _world.GetSignature<MeshRenderer>() |
-                    _world.GetSignature<FxTransform>() |
+                    _world.GetSignature<Transform>() |
                     _world.GetSignature<Bounds>();
         }
 
         static void Run( EcsWorld& _world, const EcsView& _view )
         {
             auto meshRendererIt = _view.begin<MeshRenderer>();
-            auto transformIt    = _view.begin<FxTransform>();
+            auto transformIt    = _view.begin<Transform>();
             auto boundsIt       = _view.begin<Bounds>();
             auto sceneNodeIt    = _view.begin<SceneNode>();
             for( ; meshRendererIt != _view.end<MeshRenderer>(); ++meshRendererIt, ++transformIt, ++boundsIt, ++sceneNodeIt )
@@ -39,10 +39,10 @@ namespace fan
                     continue;
                 }
                 const MeshRenderer& renderer  = *meshRendererIt;
-                const FxTransform & transform = *transformIt;
+                const Transform   & transform = *transformIt;
                 Bounds            & bounds    = *boundsIt;
 
-                FxScale* scaling = _world.SafeGetComponent<FxScale>( boundsIt.GetEntity() );
+                Scale* scaling = _world.SafeGetComponent<Scale>( boundsIt.GetEntity() );
 
                 if( *renderer.mMesh != nullptr )
                 {
@@ -70,16 +70,16 @@ namespace fan
         {
             return
                     _world.GetSignature<SceneNode>() |
-                    _world.GetSignature<FxTransform>() |
+                    _world.GetSignature<Transform>() |
                     _world.GetSignature<Bounds>();
         }
 
         static void Run( EcsWorld& /*_world*/, const EcsView& _view )
         {
-            auto transformIt = _view.begin<FxTransform>();
+            auto transformIt = _view.begin<Transform>();
             auto boundsIt    = _view.begin<Bounds>();
             auto sceneNodeIt = _view.begin<SceneNode>();
-            for( ; transformIt != _view.end<FxTransform>(); ++transformIt, ++boundsIt, ++sceneNodeIt )
+            for( ; transformIt != _view.end<Transform>(); ++transformIt, ++boundsIt, ++sceneNodeIt )
             {
                 SceneNode& sceneNode = *sceneNodeIt;
                 if( !sceneNode.HasFlag( SceneNode::BoundsOutdated ) )
@@ -87,8 +87,8 @@ namespace fan
                     continue;
                 }
 
-                const FxTransform& transform = *transformIt;
-                Bounds           & bounds    = *boundsIt;
+                const Transform& transform = *transformIt;
+                Bounds         & bounds    = *boundsIt;
 
                 const Fixed sizeBounds = FIXED( 0.2 );
                 bounds.mAabb = AABB( transform.mPosition - sizeBounds * Vector3::sOne,
@@ -106,19 +106,19 @@ namespace fan
         static EcsSignature GetSignature( const EcsWorld& _world )
         {
             return
-                    _world.GetSignature<FxTransform>() |
-                    _world.GetSignature<FxSphereCollider>() |
+                    _world.GetSignature<Transform>() |
+                    _world.GetSignature<SphereCollider>() |
                     _world.GetSignature<SceneNode>() |
                     _world.GetSignature<Bounds>();
         }
 
         static void Run( EcsWorld& /*_world*/, const EcsView& _view )
         {
-            auto transformIt = _view.begin<FxTransform>();
+            auto transformIt = _view.begin<Transform>();
             auto boundsIt    = _view.begin<Bounds>();
             auto sceneNodeIt = _view.begin<SceneNode>();
-            auto sphereIt    = _view.begin<FxSphereCollider>();
-            for( ; transformIt != _view.end<FxTransform>(); ++transformIt, ++boundsIt, ++sceneNodeIt, ++sphereIt )
+            auto sphereIt    = _view.begin<SphereCollider>();
+            for( ; transformIt != _view.end<Transform>(); ++transformIt, ++boundsIt, ++sceneNodeIt, ++sphereIt )
             {
                 SceneNode& sceneNode = *sceneNodeIt;
                 if( !sceneNode.HasFlag( SceneNode::BoundsOutdated ) )
@@ -126,9 +126,9 @@ namespace fan
                     continue;
                 }
 
-                const FxTransform& transform = *transformIt;
-                Bounds           & bounds    = *boundsIt;
-                FxSphereCollider & sphere    = *sphereIt;
+                const Transform& transform = *transformIt;
+                Bounds         & bounds    = *boundsIt;
+                SphereCollider & sphere    = *sphereIt;
 
                 const Vector3 origin = transform.mPosition;
                 bounds.mAabb = AABB( transform.mPosition - sphere.mRadius * Vector3::sOne,
@@ -146,19 +146,19 @@ namespace fan
         static EcsSignature GetSignature( const EcsWorld& _world )
         {
             return
-                    _world.GetSignature<FxTransform>() |
-                    _world.GetSignature<FxBoxCollider>() |
+                    _world.GetSignature<Transform>() |
+                    _world.GetSignature<BoxCollider>() |
                     _world.GetSignature<SceneNode>() |
                     _world.GetSignature<Bounds>();
         }
 
         static void Run( EcsWorld& /*_world*/, const EcsView& _view )
         {
-            auto transformIt = _view.begin<FxTransform>();
+            auto transformIt = _view.begin<Transform>();
             auto boundsIt    = _view.begin<Bounds>();
             auto sceneNodeIt = _view.begin<SceneNode>();
-            auto boxIt       = _view.begin<FxBoxCollider>();
-            for( ; transformIt != _view.end<FxTransform>(); ++transformIt, ++boundsIt, ++sceneNodeIt, ++boxIt )
+            auto boxIt       = _view.begin<BoxCollider>();
+            for( ; transformIt != _view.end<Transform>(); ++transformIt, ++boundsIt, ++sceneNodeIt, ++boxIt )
             {
                 SceneNode& sceneNode = *sceneNodeIt;
                 if( !sceneNode.HasFlag( SceneNode::BoundsOutdated ) )
@@ -166,9 +166,9 @@ namespace fan
                     continue;
                 }
 
-                const FxTransform& transform = *transformIt;
-                Bounds           & bounds    = *boundsIt;
-                FxBoxCollider    & box       = *boxIt;
+                const Transform& transform = *transformIt;
+                Bounds         & bounds    = *boundsIt;
+                BoxCollider    & box       = *boxIt;
 
                 std::vector<Vector3> pointCloud = {
                         Vector3( box.mHalfExtents.x, box.mHalfExtents.y, box.mHalfExtents.z ),

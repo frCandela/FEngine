@@ -1,38 +1,38 @@
-#include "engine/physics/fanFxBoxCollider.hpp"
+#include "engine/physics/fanBoxCollider.hpp"
 #include "core/memory/fanSerializable.hpp"
 
 namespace fan
 {
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void FxBoxCollider::SetInfo( EcsComponentInfo& _info )
+    void BoxCollider::SetInfo( EcsComponentInfo& _info )
     {
-        _info.load = &FxBoxCollider::Load;
-        _info.save = &FxBoxCollider::Save;
+        _info.load = &BoxCollider::Load;
+        _info.save = &BoxCollider::Save;
     }
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void FxBoxCollider::Init( EcsWorld&, EcsEntity, EcsComponent& _component )
+    void BoxCollider::Init( EcsWorld&, EcsEntity, EcsComponent& _component )
     {
         // clear
-        FxBoxCollider& collider = static_cast<FxBoxCollider&>( _component );
+        BoxCollider& collider = static_cast<BoxCollider&>( _component );
         collider.mHalfExtents = FIXED( 0.5 ) * Vector3::sOne;
     }
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void FxBoxCollider::Save( const EcsComponent& _component, Json& _json )
+    void BoxCollider::Save( const EcsComponent& _component, Json& _json )
     {
-        const FxBoxCollider& collider = static_cast<const FxBoxCollider&>( _component );
+        const BoxCollider& collider = static_cast<const BoxCollider&>( _component );
         Serializable::SaveVec3( _json, "half_extents", collider.mHalfExtents );
     }
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void FxBoxCollider::Load( EcsComponent& _component, const Json& _json )
+    void BoxCollider::Load( EcsComponent& _component, const Json& _json )
     {
-        FxBoxCollider& collider = static_cast<FxBoxCollider&>( _component );
+        BoxCollider& collider = static_cast<BoxCollider&>( _component );
         Serializable::LoadVec3( _json, "half_extents", collider.mHalfExtents );
     }
 }

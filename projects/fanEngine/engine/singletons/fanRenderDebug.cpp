@@ -2,7 +2,7 @@
 #include "core/math/fanBasicModels.hpp"
 #include "core/fanDebug.hpp"
 #include "core/math/fanVector3.hpp"
-#include "engine/physics/fanFxTransform.hpp"
+#include "engine/physics/fanTransform.hpp"
 #include "editor/fanModals.hpp"
 
 namespace fan
@@ -116,7 +116,7 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void RenderDebug::DebugCube( const FxTransform& _transform, const Vector3& _halfExtent, const Color _color, const bool _depthTestEnable )
+    void RenderDebug::DebugCube( const Transform& _transform, const Vector3& _halfExtent, const Color _color, const bool _depthTestEnable )
     {
         std::vector<Vector3> cube = GetCube( _halfExtent );
 
@@ -159,7 +159,7 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void RenderDebug::DebugIcoSphere( const FxTransform& _transform, const Fixed _radius, const int _numSubdivisions, const Color _color, const bool _depthTestEnable )
+    void RenderDebug::DebugIcoSphere( const Transform& _transform, const Fixed _radius, const int _numSubdivisions, const Color _color, const bool _depthTestEnable )
     {
         if( _radius <= 0 )
         {
@@ -196,7 +196,7 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void RenderDebug::DebugCone( const FxTransform& _transform, const Fixed _radius, const Fixed _height, const int _numSubdivisions, const Color _color )
+    void RenderDebug::DebugCone( const Transform& _transform, const Fixed _radius, const Fixed _height, const int _numSubdivisions, const Color _color )
     {
         std::vector<Vector3> cone = GetCone( _radius, _height, _numSubdivisions );
 

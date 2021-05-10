@@ -65,7 +65,7 @@ namespace fan
             logCounter                  = 0;
             fanAssertMsg( false, "message" );
             TEST_ASSERT( logCounter == 1 );
-            const std::string targetLog = "Assert:message func:TestAssertMessage line:68 file:";
+            const std::string targetLog = "Assert:message func:TestAssertMessage line:66 file:";
             TEST_ASSERT( mlastLog.message.size() > targetLog.size() );
             // we don't test the file path
             const std::string subString = mlastLog.message.substr( 0, targetLog.size() );

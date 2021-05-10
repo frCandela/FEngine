@@ -1,8 +1,8 @@
 #include "core/fanDebug.hpp"
 #include "core/time/fanProfiler.hpp"
 #include "engine/physics/fanContactSolver.hpp"
-#include "engine/physics/fanFxRigidbody.hpp"
-#include "fanFxTransform.hpp"
+#include "engine/physics/fanRigidbody.hpp"
+#include "fanTransform.hpp"
 #include "engine/singletons/fanRenderDebug.hpp"
 
 namespace fan
@@ -189,7 +189,7 @@ namespace fan
             // calculates the angular/linear inertia of each objects to determine the ratio of rotation/translation used for solving interpenetration
             if( _contact.rigidbody[i] )
             {
-                const FxRigidbody& rb = *_contact.rigidbody[i];
+                const Rigidbody& rb = *_contact.rigidbody[i];
                 const Vector3 torquePerUnitImpulse   = Vector3::Cross( _contact.relativeContactPosition[i], _contact.normal );
                 const Vector3 rotationPerUnitImpulse = rb.mInverseInertiaTensorWorld * torquePerUnitImpulse;
                 const Vector3 velocityPerUnitImpulse = Vector3::Cross( rotationPerUnitImpulse, _contact.relativeContactPosition[i] );
@@ -227,7 +227,7 @@ namespace fan
         {
             if( _contact.rigidbody[i] )
             {
-                FxRigidbody& rb = *_contact.rigidbody[i];
+                Rigidbody& rb = *_contact.rigidbody[i];
                 const Vector3 velocityChange = _contact.normal * linearMove[i];
                 rb.mTransform->mPosition += velocityChange; // translate to solve interpenetration
                 _outVelocityChange[i] = velocityChange;

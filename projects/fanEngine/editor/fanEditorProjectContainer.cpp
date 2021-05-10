@@ -256,6 +256,14 @@ namespace fan
             {
                 mLastLogicFrameRendered = currentTime.mFrameIndex;
 
+                // Update input
+                const glm::vec2 viewPosition = mProjectViewWindow->GetPosition();
+                const glm::vec2 viewSize     = mProjectViewWindow->GetSize();
+                Mouse::NextFrame( mWindow.mWindow, viewPosition, viewSize );
+                Input::Get().NewFrame();
+                Input::Get().Manager().PullEvents();
+                currentWorld.GetSingleton<Mouse>().UpdateData( mWindow.mWindow );
+
                 SCOPED_PROFILE( debug_draw );
                 if( mMainMenuBar->ShowWireframe() ){ currentWorld.Run<SDrawDebugWireframe>(); }
                 if( mMainMenuBar->ShowNormals() ){ currentWorld.Run<SDrawDebugNormals>(); }
@@ -278,20 +286,13 @@ namespace fan
                 }
                 currentWorld.GetSingleton<EditorSelection>().Update( mProjectViewWindow->IsHovered() );
 
-                // Update input
-                const glm::vec2 viewPosition = mProjectViewWindow->GetPosition();
-                const glm::vec2 viewSize     = mProjectViewWindow->GetSize();
-                Mouse::NextFrame( mWindow.mWindow, viewPosition, viewSize );
-                Input::Get().NewFrame();
-                Input::Get().Manager().PullEvents();
-                currentWorld.GetSingleton<Mouse>().UpdateData( mWindow.mWindow );
+                // ImGui render
+                ImGui::NewFrame();
+                mMainMenuBar->Draw( currentWorld );
+                currentProject.OnGui();
+                ImGui::Render();
             }
 
-            // ImGui render
-            ImGui::NewFrame();
-            mMainMenuBar->Draw( currentWorld );
-            currentProject.OnGui();
-            ImGui::Render();
             currentProject.Render();
 
             Time::RegisterFrameDrawn( currentTime, deltaTime );
@@ -338,7 +339,7 @@ namespace fan
 
             // Saves the camera position for restoring it later
             const EcsEntity oldCameraID = world.GetEntity( mScene.mMainCameraHandle );
-            mPrevCameraTransform = world.GetComponent<FxTransform>( oldCameraID );
+            mPrevCameraTransform = world.GetComponent<Transform>( oldCameraID );
             // save old selection
             SceneNode* prevSelectionNode = world.GetSingleton<EditorSelection>().GetSelectedSceneNode();
             mPrevSelectionHandle = prevSelectionNode != nullptr ? prevSelectionNode->mHandle : 0;
@@ -350,7 +351,7 @@ namespace fan
 
             // restore camera transform
             const EcsEntity newCameraID = world.GetEntity( mScene.mMainCameraHandle );
-            world.GetComponent<FxTransform>( newCameraID ) = mPrevCameraTransform;
+            world.GetComponent<Transform>( newCameraID ) = mPrevCameraTransform;
 
             // restore selection
             if( mPrevSelectionHandle != 0 &&
@@ -364,8 +365,8 @@ namespace fan
         }
 
         Scene& mScene;
-        EcsHandle   mPrevSelectionHandle = 0;
-        FxTransform mPrevCameraTransform;
+        EcsHandle mPrevSelectionHandle = 0;
+        Transform mPrevCameraTransform;
     };
 
     //==================================================================================================================================================================================================

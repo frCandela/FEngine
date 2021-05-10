@@ -142,13 +142,13 @@ namespace fan
         editorGui.mComponentInfos[SceneNode::Info::sType]        = GuiSceneNode::GetInfo();
 
         // fx physics
-        editorGui.mComponentInfos[FxRigidbody::Info::sType]      = GuiFxRigidbody::GetInfo();
-        editorGui.mSingletonInfos[FxPhysicsWorld::Info::sType]   = GuiFxPhysicsWorld::GetInfo();
-        editorGui.mComponentInfos[FxBoxCollider::Info::sType]    = GuiFxBoxCollider::GetInfo();
-        editorGui.mComponentInfos[FxSphereCollider::Info::sType] = GuiFxSphereCollider::GetInfo();
+        editorGui.mComponentInfos[Rigidbody::Info::sType]    = GuiFxRigidbody::GetInfo();
+        editorGui.mSingletonInfos[PhysicsWorld::Info::sType] = GuiFxPhysicsWorld::GetInfo();
+        editorGui.mComponentInfos[BoxCollider::Info::sType]    = GuiFxBoxCollider::GetInfo();
+        editorGui.mComponentInfos[SphereCollider::Info::sType] = GuiFxSphereCollider::GetInfo();
 
-        editorGui.mComponentInfos[FxTransform::Info::sType] = GuiFxTransform::GetInfo();
-        editorGui.mComponentInfos[FxScale::Info::sType]     = GuiFxScale::GetInfo();
+        editorGui.mComponentInfos[Transform::Info::sType] = GuiFxTransform::GetInfo();
+        editorGui.mComponentInfos[Scale::Info::sType]     = GuiFxScale::GetInfo();
     }
 
     //==================================================================================================================================================================================================

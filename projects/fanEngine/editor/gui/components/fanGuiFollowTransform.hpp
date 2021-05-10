@@ -31,8 +31,8 @@ namespace fan
             {
                 followTransform.mLocked = !followTransform.mLocked;
 
-                FxTransform* transform = _world.SafeGetComponent<FxTransform>( _entityID );
-                SceneNode  * sceneNode = _world.SafeGetComponent<SceneNode>( _entityID );
+                Transform* transform = _world.SafeGetComponent<Transform>( _entityID );
+                SceneNode* sceneNode = _world.SafeGetComponent<SceneNode>( _entityID );
                 if( transform != nullptr && sceneNode != nullptr )
                 {
                     FollowTransform::UpdateLocalTransform( followTransform, *transform, *sceneNode );

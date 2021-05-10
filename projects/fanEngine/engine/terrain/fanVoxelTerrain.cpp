@@ -2,7 +2,7 @@
 #include "core/memory/fanSerializable.hpp"
 #include "engine/singletons/fanRenderResources.hpp"
 #include "engine/components/fanSceneNode.hpp"
-#include "engine/physics/fanFxTransform.hpp"
+#include "engine/physics/fanTransform.hpp"
 #include "engine/components/fanMeshRenderer.hpp"
 #include "engine/components/fanMaterial.hpp"
 #include "engine/singletons/fanScene.hpp"
@@ -85,7 +85,7 @@ namespace fan
                     chunk.mPosition = position;
                     chunk.mHandle   = chunkNode.mHandle;
 
-                    FxTransform& transform = _world.AddComponent<FxTransform>( entity );
+                    Transform& transform = _world.AddComponent<Transform>( entity );
                     transform.mPosition = Fixed( VoxelChunk::sSize ) * Vector3( position.x, position.y, position.z );
 
                     Mesh* mesh = renderResources.mMeshManager->Get( chunkName );

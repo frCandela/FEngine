@@ -13,9 +13,13 @@
 #include "engine/systems/fanEmitParticles.hpp"
 #include "engine/systems/fanGenerateParticles.hpp"
 #include "engine/systems/fanUpdateRenderWorld.hpp"
+#include "engine/singletons/fanScene.hpp"
+#include "engine/components/fanSceneNode.hpp"
+#include "engine/components/fanCamera.hpp"
 
 #include "game/components/fanTestComponent.hpp"
 #include "game/singletons/fanTestSingleton.hpp"
+
 
 #ifdef FAN_EDITOR
 #include "editor/singletons/fanEditorGuiInfo.hpp"
@@ -54,6 +58,13 @@ namespace fan
         MeshManager& meshManager = *mWorld.GetSingleton<RenderResources>().mMeshManager;
         RenderWorld& renderWorld = mWorld.GetSingleton<RenderWorld>();
         meshManager.Add( renderWorld.mParticlesMesh, "particles_mesh_" + mName );
+
+        Scene& scene = mWorld.GetSingleton<Scene>();
+        SceneNode cameraNode = scene.CreateSceneNode( "game_camera", &scene.GetRootNode() );
+        scene.SetMainCamera( cameraNode.mHandle );
+        EcsEntity cameraEntity = mWorld.GetEntity( cameraNode.mHandle );
+        mWorld.AddComponent<Transform>( cameraEntity );
+        mWorld.AddComponent<Camera>( cameraEntity );
     }
 
     //==================================================================================================================================================================================================
@@ -93,7 +104,6 @@ namespace fan
         renderWorld.drawData.clear();
 
         mWorld.ForceRun<SUpdateRenderWorldModels>( renderWorld );
-        mWorld.ForceRun<SUpdateRenderWorldModelsFixed>( renderWorld );
         mWorld.ForceRun<SUpdateRenderWorldUI>();
         mWorld.ForceRun<SUpdateRenderWorldPointLights>();
         mWorld.ForceRun<SUpdateRenderWorldDirectionalLights>();

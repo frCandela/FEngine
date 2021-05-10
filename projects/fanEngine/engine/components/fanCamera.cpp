@@ -1,6 +1,6 @@
 #include "engine/components/fanCamera.hpp"
 
-#include "engine/physics/fanFxTransform.hpp"
+#include "engine/physics/fanTransform.hpp"
 #include "render/fanRenderSerializable.hpp"
 #include "core/shapes/fanRay.hpp"
 
@@ -59,7 +59,7 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    glm::mat4 Camera::GetView( const FxTransform& _cameraTransform ) const
+    glm::mat4 Camera::GetView( const Transform& _cameraTransform ) const
     {
         return glm::lookAt( _cameraTransform.mPosition.ToGlm(), ( _cameraTransform.mPosition + _cameraTransform.Forward() ).ToGlm(), _cameraTransform.Up().ToGlm() );
     }
@@ -90,7 +90,7 @@ namespace fan
     // Returns a ray going from camera through a screen point
     // ( with screenSpacePosition between {-1.f,-1.f} and {1.f,1.f} ).
     //==================================================================================================================================================================================================
-    Ray Camera::ScreenPosToRay( const FxTransform& _cameraTransform, const glm::vec2& _screenSpacePosition ) const
+    Ray Camera::ScreenPosToRay( const Transform& _cameraTransform, const glm::vec2& _screenSpacePosition ) const
     {
         fanAssert( _screenSpacePosition.x >= -1.f && _screenSpacePosition.x <= 1.f );
         fanAssert( _screenSpacePosition.y >= -1.f && _screenSpacePosition.y <= 1.f );
@@ -130,7 +130,7 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    glm::vec2 Camera::WorldPosToScreen( const FxTransform& _cameraTransform, const Vector3& _worldPosition ) const
+    glm::vec2 Camera::WorldPosToScreen( const Transform& _cameraTransform, const Vector3& _worldPosition ) const
     {
         if( mType == Type::Perspective )
         {

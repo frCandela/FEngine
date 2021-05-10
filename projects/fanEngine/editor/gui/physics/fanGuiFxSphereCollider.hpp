@@ -1,6 +1,6 @@
 #pragma once
 
-#include "engine/physics/fanFxSphereCollider.hpp"
+#include "engine/physics/fanSphereCollider.hpp"
 #include "editor/singletons/fanEditorGuiInfo.hpp"
 
 namespace fan
@@ -15,14 +15,14 @@ namespace fan
             info.mIcon       = ImGui::IconType::SphereShape16;
             info.mGroup      = EngineGroups::ScenePhysics;
             info.onGui       = &OnGui;
-            info.mEditorPath = "fixedPoint/";
+            info.mEditorPath = "physics/";
             info.mEditorName = "fxSphereCollider";
             return info;
         }
 
         static void OnGui( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
         {
-            FxSphereCollider& sphere = static_cast<FxSphereCollider&>( _component );
+            SphereCollider& sphere = static_cast<SphereCollider&>( _component );
             ImGui::PushID( "fxSphereCollider" );
             ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() - 16 );
             {

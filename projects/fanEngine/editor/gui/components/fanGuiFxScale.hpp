@@ -1,6 +1,6 @@
 #pragma once
 
-#include "engine/components/fanFxScale.hpp"
+#include "engine/components/fanScale.hpp"
 #include "editor/singletons/fanEditorGuiInfo.hpp"
 #include "editor/fanModals.hpp"
 
@@ -16,14 +16,14 @@ namespace fan
             info.mIcon       = ImGui::IconType::Transform16;
             info.mGroup      = EngineGroups::Scene;
             info.onGui       = &GuiFxScale::OnGui;
-            info.mEditorPath = "fixedPoint/";
+            info.mEditorPath = "/";
             info.mEditorName = "fxScale";
             return info;
         }
 
         static void OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component )
         {
-            FxScale& scale = static_cast<FxScale&>( _component );
+            Scale& scale = static_cast<Scale&>( _component );
             ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() - 16 );
             {
                 ImGui::PushID( "fixed_scale" );

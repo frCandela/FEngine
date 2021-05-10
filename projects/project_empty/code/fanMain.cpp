@@ -38,7 +38,7 @@ int main( int _argc, char* _argv[] )
     settings.mWindowName = project.mName + "_editor";
     fan::EditorProjectContainer projectContainer( settings, { &project } );
 #else
-    settings.mWindowName = projectName + "_game";
+    settings.mWindowName = project.mName  + "_game";
     fan::GameProjectContainer projectContainer( settings, project );
 #endif
 

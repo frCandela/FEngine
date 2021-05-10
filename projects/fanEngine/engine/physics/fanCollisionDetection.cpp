@@ -1,17 +1,17 @@
 #include "engine/physics/fanCollisionDetection.hpp"
 
 #include "core/time/fanProfiler.hpp"
-#include "engine/physics/fanFxRigidbody.hpp"
-#include "fanFxTransform.hpp"
-#include "engine/physics/fanFxSphereCollider.hpp"
-#include "engine/physics/fanFxBoxCollider.hpp"
+#include "engine/physics/fanRigidbody.hpp"
+#include "fanTransform.hpp"
+#include "engine/physics/fanSphereCollider.hpp"
+#include "engine/physics/fanBoxCollider.hpp"
 #include "engine/singletons/fanRenderDebug.hpp"
 
 namespace fan
 {
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void CollisionDetection::SphereWithSphere( FxRigidbody& _rb0, FxSphereCollider& _sphere0, FxRigidbody& _rb1, FxSphereCollider& _sphere1, std::vector<Contact>& _outContacts )
+    void CollisionDetection::SphereWithSphere( Rigidbody& _rb0, SphereCollider& _sphere0, Rigidbody& _rb1, SphereCollider& _sphere1, std::vector<Contact>& _outContacts )
     {
         Vector3 p0 = _rb0.mTransform->mPosition + _rb0.mTransform->TransformDirection( _sphere0.mOffset );
         Vector3 p1 = _rb1.mTransform->mPosition + _rb1.mTransform->TransformDirection( _sphere1.mOffset );
@@ -31,7 +31,7 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void CollisionDetection::SphereWithPlane( FxRigidbody& _rigidbody, FxSphereCollider& _sphere, const Vector3& _normal, const Fixed _offset, std::vector<Contact>& _outContacts )
+    void CollisionDetection::SphereWithPlane( Rigidbody& _rigidbody, SphereCollider& _sphere, const Vector3& _normal, const Fixed _offset, std::vector<Contact>& _outContacts )
     {
         Vector3 position    = _rigidbody.mTransform->mPosition + _rigidbody.mTransform->TransformDirection( _sphere.mOffset );
         Fixed   penetration = Vector3::Dot( position, _normal ) - _offset - _sphere.mRadius;
@@ -47,7 +47,7 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void CollisionDetection::BoxWithPlane( FxRigidbody& _rigidbody, FxBoxCollider& _box, const Vector3& _normal, const Fixed _offset, std::vector<Contact>& _outContacts )
+    void CollisionDetection::BoxWithPlane( Rigidbody& _rigidbody, BoxCollider& _box, const Vector3& _normal, const Fixed _offset, std::vector<Contact>& _outContacts )
     {
         Vector3  vertices[8] = {
                 ( *_rigidbody.mTransform ) * Vector3( _box.mHalfExtents.x, _box.mHalfExtents.y, _box.mHalfExtents.z ),
@@ -77,8 +77,8 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void CollisionDetection::SphereWithBox( FxRigidbody& _rbSphere, FxSphereCollider& _sphere,
-                                            FxRigidbody& _rbBox, FxBoxCollider& _box, std::vector<Contact>& _outContacts )
+    void CollisionDetection::SphereWithBox( Rigidbody& _rbSphere, SphereCollider& _sphere,
+                                            Rigidbody& _rbBox, BoxCollider& _box, std::vector<Contact>& _outContacts )
     {
         // calculates in box space
         Vector3 centerSphere         = _rbSphere.mTransform->mPosition + _sphere.mOffset;
@@ -125,7 +125,7 @@ namespace fan
     RenderDebug* tmprd;
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    Fixed ProjectToAxis( const Matrix4& _transform, const FxBoxCollider& _box, const Vector3& _axis )
+    Fixed ProjectToAxis( const Matrix4& _transform, const BoxCollider& _box, const Vector3& _axis )
     {
         return _box.mHalfExtents.x * Fixed::Abs( Vector3::Dot( _transform.GetX(), _axis ) ) +
                _box.mHalfExtents.y * Fixed::Abs( Vector3::Dot( _transform.GetY(), _axis ) ) +
@@ -134,7 +134,7 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    bool BoxesOverlapOnAxis( const Vector3& _axis, const Matrix4& _boxTransform0, const FxBoxCollider& _box0, const Matrix4& _boxTransform1, const FxBoxCollider& _box1 )
+    bool BoxesOverlapOnAxis( const Vector3& _axis, const Matrix4& _boxTransform0, const BoxCollider& _box0, const Matrix4& _boxTransform1, const BoxCollider& _box1 )
     {
         const Fixed   projection0 = ProjectToAxis( _boxTransform0, _box0, _axis );
         const Fixed   projection1 = ProjectToAxis( _boxTransform1, _box1, _axis );
@@ -145,7 +145,7 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    bool BoxWithPoint( FxRigidbody& _rb0, const FxBoxCollider& _box0, Matrix4& _transform0, FxRigidbody& _rb1, const Vector3& _point1, Contact& _outContact )
+    bool BoxWithPoint( Rigidbody& _rb0, const BoxCollider& _box0, Matrix4& _transform0, Rigidbody& _rb1, const Vector3& _point1, Contact& _outContact )
     {
         const Vector3 relativePoint = _rb0.mTransform->InverseTransformPoint( _point1 );
 
@@ -184,7 +184,7 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void BoxVerticesWithBox( FxRigidbody& _rb0, FxBoxCollider& _box0, Matrix4& _transform0, FxRigidbody& _rb1, FxBoxCollider& _box1, Matrix4& _transform1, std::vector<Contact>& _outContacts )
+    void BoxVerticesWithBox( Rigidbody& _rb0, BoxCollider& _box0, Matrix4& _transform0, Rigidbody& _rb1, BoxCollider& _box1, Matrix4& _transform1, std::vector<Contact>& _outContacts )
     {
         Vector3  vertices0[8] = {
                 _transform0 * Vector3( _box0.mHalfExtents.x, _box0.mHalfExtents.y, _box0.mHalfExtents.z ),
@@ -210,7 +210,7 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void CollisionDetection::BoxWithBox( FxRigidbody& _rb0, FxBoxCollider& _box0, FxRigidbody& _rb1, FxBoxCollider& _box1, std::vector<Contact>& _outContacts )
+    void CollisionDetection::BoxWithBox( Rigidbody& _rb0, BoxCollider& _box0, Rigidbody& _rb1, BoxCollider& _box1, std::vector<Contact>& _outContacts )
     {
         SCOPED_PROFILE( box_with_box )
 

@@ -13,13 +13,13 @@
 #include "engine/fanPrefab.hpp"
 #include "engine/components/fanMeshRenderer.hpp"
 #include "engine/components/fanSceneNode.hpp"
-#include "engine/physics/fanFxTransform.hpp"
+#include "engine/physics/fanTransform.hpp"
 #include "engine/components/fanMaterial.hpp"
 #include "engine/components/fanPointLight.hpp"
 #include "engine/components/fanDirectionalLight.hpp"
 #include "engine/components/fanParticleEmitter.hpp"
-#include "engine/physics/fanFxBoxCollider.hpp"
-#include "engine/physics/fanFxRigidbody.hpp"
+#include "engine/physics/fanBoxCollider.hpp"
+#include "engine/physics/fanRigidbody.hpp"
 #include "editor/fanModals.hpp"
 #include "editor/singletons/fanEditorSelection.hpp"
 
@@ -84,9 +84,9 @@ namespace fan
                 EcsWorld& world = *scene.mWorld;
                 Vector3         origin   = Vector3::sZero;
                 const EcsEntity parentID = world.GetEntity( mLastSceneNodeRightClicked->mHandle );
-                if( world.HasComponent<FxTransform>( parentID ) )
+                if( world.HasComponent<Transform>( parentID ) )
                 {
-                    origin = world.GetComponent<FxTransform>( parentID ).mPosition;
+                    origin = world.GetComponent<Transform>( parentID ).mPosition;
                 }
 
                 // Entities templates
@@ -100,7 +100,7 @@ namespace fan
                     const EcsEntity entity = world.GetEntity( node.mHandle );
                     RenderResources& renderResources = _world.GetSingleton<RenderResources>();
 
-                    FxTransform& transform = world.AddComponent<FxTransform>( entity );
+                    Transform& transform = world.AddComponent<Transform>( entity );
                     transform.mPosition = origin;
 
                     MeshRenderer& meshRenderer = world.AddComponent<MeshRenderer>( entity );
@@ -121,7 +121,7 @@ namespace fan
                     const EcsEntity entity = world.GetEntity( node.mHandle );
                     RenderResources& renderResources = _world.GetSingleton<RenderResources>();
 
-                    FxTransform& transform = world.AddComponent<FxTransform>( entity );
+                    Transform& transform = world.AddComponent<Transform>( entity );
                     transform.mPosition = origin;
 
                     MeshRenderer& meshRenderer = world.AddComponent<MeshRenderer>( entity );
@@ -130,10 +130,10 @@ namespace fan
                     material.mTexture = renderResources.mTextureManager->Get( RenderGlobal::sTextureWhite );
                     onSelectSceneNode.Emmit( &node );
 
-                    FxRigidbody   rb  = world.AddComponent<FxRigidbody>( entity );
-                    FxBoxCollider box = world.AddComponent<FxBoxCollider>( entity );
+                    Rigidbody   rb  = world.AddComponent<Rigidbody>( entity );
+                    BoxCollider box = world.AddComponent<BoxCollider>( entity );
 
-                    rb.mInverseInertiaTensorLocal = FxRigidbody::BoxInertiaTensor( rb.mInverseMass, box.mHalfExtents ).Inverse();
+                    rb.mInverseInertiaTensorLocal = Rigidbody::BoxInertiaTensor( rb.mInverseMass, box.mHalfExtents ).Inverse();
                 }
 
                 // point light
@@ -144,7 +144,7 @@ namespace fan
                     SceneNode& node = scene.CreateSceneNode( "point_light", mLastSceneNodeRightClicked );
                     const EcsEntity entity = world.GetEntity( node.mHandle );
 
-                    FxTransform& transform = world.AddComponent<FxTransform>( entity );
+                    Transform& transform = world.AddComponent<Transform>( entity );
                     transform.mPosition = origin;
                     world.AddComponent<PointLight>( entity );
                     onSelectSceneNode.Emmit( &node );
@@ -159,7 +159,7 @@ namespace fan
                                                              mLastSceneNodeRightClicked );
                     const EcsEntity entity = world.GetEntity( node.mHandle );
 
-                    FxTransform& transform = world.AddComponent<FxTransform>( entity );
+                    Transform& transform = world.AddComponent<Transform>( entity );
                     transform.mPosition = origin;
 
                     world.AddComponent<DirectionalLight>( entity );
@@ -175,7 +175,7 @@ namespace fan
                     SceneNode& node = scene.CreateSceneNode( "particle_system", mLastSceneNodeRightClicked );
                     const EcsEntity entity = world.GetEntity( node.mHandle );
 
-                    FxTransform& transform = world.AddComponent<FxTransform>( entity );
+                    Transform& transform = world.AddComponent<Transform>( entity );
                     transform.mPosition = origin;
 
                     world.AddComponent<ParticleEmitter>( entity );

@@ -2,7 +2,7 @@
 
 #include "core/unit_tests/fanUnitTest.hpp"
 #include "render/fanWindow.hpp"
-#include "engine/physics/fanFxTransform.hpp"
+#include "engine/physics/fanTransform.hpp"
 
 namespace fan
 {
@@ -23,12 +23,12 @@ namespace fan
             };
         }
 
-        FxTransform mTransform;
+        Transform mTransform;
 
         void Create() override
         {
             EcsWorld mWorld;
-            FxTransform::Init( mWorld, EcsEntity(), mTransform );
+            Transform::Init( mWorld, EcsEntity(), mTransform );
         }
         void Destroy() override {}
 
@@ -118,7 +118,7 @@ namespace fan
 
         void TestInverse()
         {
-            FxTransform inverse = mTransform.Inverse();
+            Transform inverse = mTransform.Inverse();
             TEST_ASSERT( inverse.mPosition == mTransform.mPosition )
             TEST_ASSERT( inverse.mRotation == mTransform.mRotation )
 
@@ -137,7 +137,7 @@ namespace fan
 
         void TestMultiply()
         {
-            FxTransform inverse = mTransform.Inverse();
+            Transform inverse = mTransform.Inverse();
             TEST_ASSERT( inverse.mPosition == mTransform.mPosition )
             TEST_ASSERT( inverse.mRotation == mTransform.mRotation )
 

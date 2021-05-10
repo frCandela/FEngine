@@ -3,7 +3,7 @@
 #include "engine/components/fanSceneNode.hpp"
 #include "engine/components/fanBounds.hpp"
 #include "engine/components/fanMeshRenderer.hpp"
-#include "engine/physics/fanFxTransform.hpp"
+#include "engine/physics/fanTransform.hpp"
 
 namespace fan
 {
@@ -19,7 +19,7 @@ namespace fan
             return
                     _world.GetSignature<Bounds>() |
                     _world.GetSignature<SceneNode>() |
-                    _world.GetSignature<FxTransform>();
+                    _world.GetSignature<Transform>();
         }
 
         static void Run( EcsWorld& _world, const EcsView& _view, const Ray& _ray, std::vector<EcsEntity>& _outResults )
@@ -43,13 +43,13 @@ namespace fan
             // raycast
             auto boundsIt    = _view.begin<Bounds>();
             auto sceneNodeIt = _view.begin<SceneNode>();
-            auto TransformIt = _view.begin<FxTransform>();
+            auto TransformIt = _view.begin<Transform>();
             for( ; boundsIt != _view.end<Bounds>(); ++boundsIt, ++sceneNodeIt, ++TransformIt )
             {
                 const EcsEntity entity = boundsIt.GetEntity();
                 const Bounds   & bounds    = *boundsIt;
                 const SceneNode& sceneNode = *sceneNodeIt;
-                const FxTransform transform = *TransformIt;
+                const Transform transform = *TransformIt;
 
                 // check NO_RAYCAST flag
                 if( sceneNode.HasFlag( SceneNode::NoRaycast ) )
@@ -105,7 +105,7 @@ namespace fan
             return
                     _world.GetSignature<Bounds>() |
                     _world.GetSignature<SceneNode>() |
-                    _world.GetSignature<FxTransform>();
+                    _world.GetSignature<Transform>();
         }
 
         static void Run( EcsWorld& _world, const EcsView& _view, const Ray& _ray, std::vector<EcsEntity>& _outResults )
@@ -129,13 +129,13 @@ namespace fan
             // raycast
             auto boundsIt    = _view.begin<Bounds>();
             auto sceneNodeIt = _view.begin<SceneNode>();
-            auto TransformIt = _view.begin<FxTransform>();
+            auto TransformIt = _view.begin<Transform>();
             for( ; boundsIt != _view.end<Bounds>(); ++boundsIt, ++sceneNodeIt, ++TransformIt )
             {
                 const EcsEntity entity = boundsIt.GetEntity();
                 const Bounds   & bounds    = *boundsIt;
                 const SceneNode& sceneNode = *sceneNodeIt;
-                const FxTransform transform = *TransformIt;
+                const Transform transform = *TransformIt;
 
                 // check NO_RAYCAST flag
                 if( sceneNode.HasFlag( SceneNode::NoRaycast ) )

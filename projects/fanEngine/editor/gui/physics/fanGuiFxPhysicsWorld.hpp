@@ -1,6 +1,6 @@
 #pragma once
 
-#include "engine/physics/fanFxPhysicsWorld.hpp"
+#include "engine/physics/fanPhysicsWorld.hpp"
 #include "editor/singletons/fanEditorGuiInfo.hpp"
 
 namespace fan
@@ -21,7 +21,7 @@ namespace fan
 
         static void OnGui( EcsWorld&, EcsSingleton& _component )
         {
-            FxPhysicsWorld& physicsWorld = static_cast<FxPhysicsWorld&>( _component );
+            PhysicsWorld& physicsWorld = static_cast<PhysicsWorld&>( _component );
 
             // gravity
             glm::vec3 gravity = physicsWorld.mGravity.ToGlm();

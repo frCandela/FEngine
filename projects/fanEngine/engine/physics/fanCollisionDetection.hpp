@@ -6,9 +6,9 @@
 
 namespace fan
 {
-    struct FxRigidbody;
-    struct FxSphereCollider;
-    struct FxBoxCollider;
+    struct Rigidbody;
+    struct SphereCollider;
+    struct BoxCollider;
     struct RenderDebug;
 
     //==================================================================================================================================================================================================
@@ -18,10 +18,10 @@ namespace fan
         static RenderDebug* tmpRd;
         std::vector<Contact> mContacts;
 
-        static void SphereWithSphere( FxRigidbody& _rb0, FxSphereCollider& _sphere0, FxRigidbody& _rb1, FxSphereCollider& _sphere1, std::vector<Contact>& _outContacts );
-        static void BoxWithBox( FxRigidbody& _rb0, FxBoxCollider& _box0, FxRigidbody& _rb1, FxBoxCollider& _box1, std::vector<Contact>& _outContacts );
-        static void SphereWithBox( FxRigidbody& _rbSphere, FxSphereCollider& _sphere, FxRigidbody& _rbBox, FxBoxCollider& _box, std::vector<Contact>& _outContacts );
-        static void SphereWithPlane( FxRigidbody& _rigidbody, FxSphereCollider& _sphere, const Vector3& _normal, const Fixed _offset, std::vector<Contact>& _outContacts );
-        static void BoxWithPlane( FxRigidbody& _rigidbody, FxBoxCollider& _box, const Vector3& _normal, const Fixed _offset, std::vector<Contact>& _outContacts );
+        static void SphereWithSphere( Rigidbody& _rb0, SphereCollider& _sphere0, Rigidbody& _rb1, SphereCollider& _sphere1, std::vector<Contact>& _outContacts );
+        static void BoxWithBox( Rigidbody& _rb0, BoxCollider& _box0, Rigidbody& _rb1, BoxCollider& _box1, std::vector<Contact>& _outContacts );
+        static void SphereWithBox( Rigidbody& _rbSphere, SphereCollider& _sphere, Rigidbody& _rbBox, BoxCollider& _box, std::vector<Contact>& _outContacts );
+        static void SphereWithPlane( Rigidbody& _rigidbody, SphereCollider& _sphere, const Vector3& _normal, const Fixed _offset, std::vector<Contact>& _outContacts );
+        static void BoxWithPlane( Rigidbody& _rigidbody, BoxCollider& _box, const Vector3& _normal, const Fixed _offset, std::vector<Contact>& _outContacts );
     };
 }

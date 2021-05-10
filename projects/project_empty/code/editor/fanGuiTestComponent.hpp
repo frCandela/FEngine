@@ -16,7 +16,7 @@ namespace fan
             info.mGroup      = EngineGroups::Game;
             info.onGui       = &GuiTestComponent::OnGui;
             info.mEditorName = "test component";
-            info.mEditorPath = "game/test/";
+            info.mEditorPath = "game/";
             return info;
         }
 

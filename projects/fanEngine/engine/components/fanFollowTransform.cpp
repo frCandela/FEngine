@@ -30,12 +30,12 @@ namespace fan
     //==================================================================================================================================================================================================
     // calculates the new local transform from the follower & target transforms
     //==================================================================================================================================================================================================
-    void FollowTransform::UpdateLocalTransform( FollowTransform& _followTransform, FxTransform& _transform, SceneNode& _sceneNode )
+    void FollowTransform::UpdateLocalTransform( FollowTransform& _followTransform, Transform& _transform, SceneNode& _sceneNode )
     {
         fanAssert( _sceneNode.mParentHandle != 0 );
         EcsWorld& world = *_sceneNode.mScene->mWorld;
         EcsEntity parentEntity = world.GetEntity( _sceneNode.mParentHandle );
-        FxTransform* parentTransform = world.SafeGetComponent<FxTransform>( parentEntity );
+        Transform* parentTransform = world.SafeGetComponent<Transform>( parentEntity );
 
         if( parentTransform != nullptr )
         {
@@ -43,7 +43,7 @@ namespace fan
         }
         else
         {
-            _followTransform.mLocalTransform = FxTransform::sIdentity;
+            _followTransform.mLocalTransform = Transform::sIdentity;
         }
     }
 

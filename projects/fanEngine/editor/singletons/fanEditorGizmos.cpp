@@ -5,7 +5,7 @@
 #include "core/math/fanBasicModels.hpp"
 #include "core/ecs/fanEcsWorld.hpp"
 #include "engine/components/fanSceneNode.hpp"
-#include "engine/physics/fanFxTransform.hpp"
+#include "engine/physics/fanTransform.hpp"
 #include "engine/components/fanCamera.hpp"
 #include "engine/singletons/fanRenderDebug.hpp"
 #include "engine/singletons/fanMouse.hpp"
@@ -31,7 +31,7 @@ namespace fan
     // Returns the new position of the move gizmo
     // Caller must provide a unique ID to allow proper caching of the user input data
     //==================================================================================================================================================================================================
-    bool EditorGizmos::DrawMoveGizmo( const FxTransform& _transform, const size_t _uniqueID, Vector3& _newPosition )
+    bool EditorGizmos::DrawMoveGizmo( const Transform& _transform, const size_t _uniqueID, Vector3& _newPosition )
     {
         Scene& scene = mWorld->GetSingleton<Scene>();
         Mouse& mouse = mWorld->GetSingleton<Mouse>();
@@ -39,8 +39,8 @@ namespace fan
         // Get main camera data
         EcsWorld& world = *scene.mWorld;
         const EcsEntity id = world.GetEntity( scene.mMainCameraHandle );
-        const FxTransform& cameraTransform = world.GetComponent<FxTransform>( id );
-        const Camera     & camera          = world.GetComponent<Camera>( id );
+        const Transform & cameraTransform = world.GetComponent<Transform>( id );
+        const Camera    & camera          = world.GetComponent<Camera>( id );
 
         GizmoCacheData& cacheData = mGizmoCacheData[_uniqueID];
         const Vector3     origin           = _transform.mPosition;
@@ -48,11 +48,11 @@ namespace fan
                                                Vector3( 0, 1, 0 ),
                                                Vector3( 0, 0, 1 ) };
         const Vector3     cameraPosition   = cameraTransform.mPosition;
-        const Fixed       size             = FIXED( 0.2 ) * Vector3::Distance( origin, cameraPosition );
-        const FxTransform coneRotation[3]  = {
-                FxTransform::Make( Quaternion::Euler( 0, 0, -90 ), size * axisDirection[0] ),
-                FxTransform::Make( Quaternion::sIdentity, size * axisDirection[1] ),
-                FxTransform::Make( Quaternion::Euler( 90, 0, 0 ), size * axisDirection[2] )
+        const Fixed     size              = FIXED( 0.2 ) * Vector3::Distance( origin, cameraPosition );
+        const Transform coneRotation[3]   = {
+                Transform::Make( Quaternion::Euler( 0, 0, -90 ), size * axisDirection[0] ),
+                Transform::Make( Quaternion::sIdentity, size * axisDirection[1] ),
+                Transform::Make( Quaternion::Euler( 90, 0, 0 ), size * axisDirection[2] )
         };
 
         _newPosition = _transform.mPosition;
@@ -65,7 +65,7 @@ namespace fan
 
             // Generates a cone shape
             std::vector<Vector3> coneTris  = GetCone( FIXED( 0.1 ) * size, FIXED( 0.5 ) * size, 10 );
-            FxTransform          transform = _transform * coneRotation[axisIndex];
+            Transform            transform = _transform * coneRotation[axisIndex];
             for( int             vertIndex = 0; vertIndex < (int)coneTris.size(); vertIndex++ )
             {
                 coneTris[vertIndex] = transform * coneTris[vertIndex];

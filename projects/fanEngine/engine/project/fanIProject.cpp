@@ -13,14 +13,15 @@
 #include "engine/singletons/fanMouse.hpp"
 #include "engine/singletons/fanApplication.hpp"
 #include "network/singletons/fanTime.hpp"
+#include "engine/terrain/fanVoxelTerrain.hpp"
 
 // physics
-#include "engine/physics/fanFxTransform.hpp"
-#include "engine/components/fanFxScale.hpp"
-#include "engine/physics/fanFxRigidbody.hpp"
-#include "engine/physics/fanFxSphereCollider.hpp"
-#include "engine/physics/fanFxBoxCollider.hpp"
-#include "engine/physics/fanFxPhysicsWorld.hpp"
+#include "engine/physics/fanTransform.hpp"
+#include "engine/components/fanScale.hpp"
+#include "engine/physics/fanRigidbody.hpp"
+#include "engine/physics/fanSphereCollider.hpp"
+#include "engine/physics/fanBoxCollider.hpp"
+#include "engine/physics/fanPhysicsWorld.hpp"
 
 //render 3D
 #include "engine/components/fanDirectionalLight.hpp"
@@ -74,8 +75,8 @@ namespace fan
         _world.AddComponentType<FollowTransform>();
         _world.AddComponentType<Bounds>();
 
-        _world.AddComponentType<FxTransform>();
-        _world.AddComponentType<FxScale>();
+        _world.AddComponentType<Transform>();
+        _world.AddComponentType<Scale>();
 
         _world.AddSingletonType<Scene>();
         _world.AddSingletonType<SceneResources>();
@@ -83,16 +84,17 @@ namespace fan
         _world.AddSingletonType<Mouse>();
         _world.AddSingletonType<Application>();
         _world.AddSingletonType<Time>();
+        _world.AddSingletonType<VoxelTerrain>();
     }
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
     void IProject::EcsIncludePhysics( EcsWorld& _world )
     {
-        _world.AddSingletonType<FxPhysicsWorld>();
-        _world.AddComponentType<FxRigidbody>();
-        _world.AddComponentType<FxSphereCollider>();
-        _world.AddComponentType<FxBoxCollider>();
+        _world.AddSingletonType<PhysicsWorld>();
+        _world.AddComponentType<Rigidbody>();
+        _world.AddComponentType<SphereCollider>();
+        _world.AddComponentType<BoxCollider>();
     }
 
     //==================================================================================================================================================================================================

@@ -317,6 +317,7 @@ namespace fan
                     const Json& jSingleton_i = jSingletons[childIndex];
                     unsigned staticIndex = 0;
                     Serializable::LoadUInt( jSingleton_i, "singleton_id", staticIndex );
+
                     const EcsSingletonInfo* info = mWorld->SafeGetSingletonInfo( staticIndex );
                     if( info != nullptr && info->load != nullptr )
                     {
@@ -382,6 +383,7 @@ namespace fan
                 const Json& jComponent_i = jComponents[childIndex];
                 unsigned staticIndex = 0;
                 Serializable::LoadUInt( jComponent_i, "component_type", staticIndex );
+
                 const EcsComponentInfo* info = world.SafeGetComponentInfo( staticIndex );
                 if( info != nullptr )
                 {

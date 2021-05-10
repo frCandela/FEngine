@@ -6,7 +6,7 @@
 
 namespace fan
 {
-    struct FxTransform;
+    struct Transform;
     struct Vector3;
     struct Ray;
 
@@ -32,9 +32,9 @@ namespace fan
         Fixed mFarDistance;
         Type  mType;
 
-        glm::mat4 GetView( const FxTransform& _cameraTransform ) const;
+        glm::mat4 GetView( const Transform& _cameraTransform ) const;
         glm::mat4 GetProjection() const;
-        Ray ScreenPosToRay( const FxTransform& _cameraTransform, const glm::vec2& _screenSpacePosition ) const;
-        glm::vec2 WorldPosToScreen( const FxTransform& _cameraTransform, const Vector3& _worldPosition ) const;
+        Ray ScreenPosToRay( const Transform& _cameraTransform, const glm::vec2& _screenSpacePosition ) const;
+        glm::vec2 WorldPosToScreen( const Transform& _cameraTransform, const Vector3& _worldPosition ) const;
     };
 }

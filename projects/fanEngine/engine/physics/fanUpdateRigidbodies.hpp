@@ -1,31 +1,31 @@
 #include "core/ecs/fanEcsSystem.hpp"
-#include "engine/physics/fanFxPhysicsWorld.hpp"
-#include "engine/physics/fanFxRigidbody.hpp"
-#include "fanFxTransform.hpp"
+#include "engine/physics/fanPhysicsWorld.hpp"
+#include "engine/physics/fanRigidbody.hpp"
+#include "fanTransform.hpp"
 
 namespace fan
 {
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    struct SIntegrateFxRigidbodies : EcsSystem
+    struct SIntegrateRigidbodies : EcsSystem
     {
         static EcsSignature GetSignature( const EcsWorld& _world )
         {
-            return _world.GetSignature<FxRigidbody>() | _world.GetSignature<FxTransform>();
+            return _world.GetSignature<Rigidbody>() | _world.GetSignature<Transform>();
         }
 
         static void Run( EcsWorld& _world, const EcsView& _view, const Fixed _delta )
         {
             if( _delta == 0 ){ return; }
 
-            FxPhysicsWorld& physicsWorld = _world.GetSingleton<FxPhysicsWorld>();
+            PhysicsWorld& physicsWorld = _world.GetSingleton<PhysicsWorld>();
 
-            auto transformIt = _view.begin<FxTransform>();
-            auto rbIt        = _view.begin<FxRigidbody>();
-            for( ; transformIt != _view.end<FxTransform>(); ++transformIt, ++rbIt )
+            auto transformIt = _view.begin<Transform>();
+            auto rbIt        = _view.begin<Rigidbody>();
+            for( ; transformIt != _view.end<Transform>(); ++transformIt, ++rbIt )
             {
-                FxTransform& transform = *transformIt;
-                FxRigidbody& rb        = *rbIt;
+                Transform& transform = *transformIt;
+                Rigidbody& rb        = *rbIt;
 
                 if( rb.mInverseMass == 0 || rb.mIsSleeping )
                 {

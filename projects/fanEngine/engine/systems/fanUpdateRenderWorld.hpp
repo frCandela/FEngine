@@ -1,15 +1,15 @@
 #include "core/ecs/fanEcsSystem.hpp"
 #include "engine/singletons/fanRenderWorld.hpp"
 #include "engine/components/fanMeshRenderer.hpp"
-#include "engine/physics/fanFxTransform.hpp"
-#include "engine/physics/fanFxTransform.hpp"
+#include "engine/physics/fanTransform.hpp"
+#include "engine/physics/fanTransform.hpp"
 #include "engine/components/fanSceneNode.hpp"
 #include "engine/components/fanMaterial.hpp"
 #include "engine/ui/fanUITransform.hpp"
 #include "engine/ui/fanUIRenderer.hpp"
 #include "engine/components/fanPointLight.hpp"
 #include "engine/components/fanDirectionalLight.hpp"
-#include "engine/components/fanFxScale.hpp"
+#include "engine/components/fanScale.hpp"
 #include "engine/fanSceneTags.hpp"
 
 namespace fan
@@ -22,68 +22,26 @@ namespace fan
         static EcsSignature GetSignature( const EcsWorld& _world )
         {
             return _world.GetSignature<MeshRenderer>()
-                   | _world.GetSignature<FxTransform>()
-                   | _world.GetSignature<Material>();
-        }
-
-        static void Run( EcsWorld&, const EcsView& _view, RenderWorld& _renderWorld )
-        {
-            auto meshRendererIt = _view.begin<MeshRenderer>();
-            auto transformIt    = _view.begin<FxTransform>();
-            auto materialIt     = _view.begin<Material>();
-            // get all mesh and adds them to the render world
-            for( ; meshRendererIt != _view.end<MeshRenderer>();
-                   ++meshRendererIt, ++transformIt, ++materialIt )
-            {
-                MeshRenderer& meshRenderer = *meshRendererIt;
-                FxTransform & transform    = *transformIt;
-                Material    & material     = *materialIt;
-
-                if( meshRenderer.mMesh.IsValid() && !meshRenderer.mMesh->mIndices.empty() )
-                {
-                    // drawMesh data;
-                    RenderDataModel data;
-                    data.mMesh         = *meshRenderer.mMesh;
-                    data.mModelMatrix  = transform.GetModelMatrix();
-                    data.mNormalMatrix = transform.GetNormalMatrix();
-                    data.mTextureIndex = material.mTexture.IsValid() ? material.mTexture->mIndex : 0;
-                    data.mColor        = material.mColor.ToGLM();
-                    data.mShininess    = material.mShininess;
-
-                    _renderWorld.drawData.push_back( data );
-                }
-            }
-        }
-    };
-
-    //==================================================================================================================================================================================================
-    // Update the render world rendered meshes
-    //==================================================================================================================================================================================================
-    struct SUpdateRenderWorldModelsFixed : EcsSystem
-    {
-        static EcsSignature GetSignature( const EcsWorld& _world )
-        {
-            return _world.GetSignature<MeshRenderer>()
-                   | _world.GetSignature<FxTransform>()
+                   | _world.GetSignature<Transform>()
                    | _world.GetSignature<Material>();
         }
 
         static void Run( EcsWorld& _world, const EcsView& _view, RenderWorld& _renderWorld )
         {
             auto meshRendererIt = _view.begin<MeshRenderer>();
-            auto transformIt    = _view.begin<FxTransform>();
+            auto transformIt    = _view.begin<Transform>();
             auto materialIt     = _view.begin<Material>();
             // get all mesh and adds them to the render world
             for( ; meshRendererIt != _view.end<MeshRenderer>(); ++meshRendererIt, ++transformIt, ++materialIt )
             {
                 MeshRenderer& meshRenderer = *meshRendererIt;
-                FxTransform & transform    = *transformIt;
+                Transform   & transform    = *transformIt;
                 Material    & material     = *materialIt;
 
                 if( meshRenderer.mMesh.IsValid() && !meshRenderer.mMesh->mIndices.empty() )
                 {
                     const EcsEntity entity = transformIt.GetEntity();
-                    const Vector3   scale  = _world.HasComponent<FxScale>( entity ) ? _world.GetComponent<FxScale>( entity ).mScale : Vector3::sOne;
+                    const Vector3   scale  = _world.HasComponent<Scale>( entity ) ? _world.GetComponent<Scale>( entity ).mScale : Vector3::sOne;
 
                     // drawMesh data;
                     RenderDataModel data;
@@ -158,7 +116,7 @@ namespace fan
     {
         static EcsSignature GetSignature( const EcsWorld& _world )
         {
-            return _world.GetSignature<FxTransform>()
+            return _world.GetSignature<Transform>()
                    | _world.GetSignature<PointLight>();
         }
 
@@ -167,12 +125,12 @@ namespace fan
             RenderWorld& renderWorld = _world.GetSingleton<RenderWorld>();
             renderWorld.pointLights.clear();
 
-            auto transformIt = _view.begin<FxTransform>();
+            auto transformIt = _view.begin<Transform>();
             auto lightIt     = _view.begin<PointLight>();
-            for( ; transformIt != _view.end<FxTransform>(); ++transformIt, ++lightIt )
+            for( ; transformIt != _view.end<Transform>(); ++transformIt, ++lightIt )
             {
-                const FxTransform& transform = *transformIt;
-                PointLight       & light     = *lightIt;
+                const Transform& transform = *transformIt;
+                PointLight     & light     = *lightIt;
 
                 RenderDataPointLight pointLight;
                 pointLight.mPosition  = glm::vec4( transform.mPosition.ToGlm(), 1.f );
@@ -195,7 +153,7 @@ namespace fan
     {
         static EcsSignature GetSignature( const EcsWorld& _world )
         {
-            return _world.GetSignature<FxTransform>()
+            return _world.GetSignature<Transform>()
                    | _world.GetSignature<DirectionalLight>();
         }
 
@@ -204,12 +162,12 @@ namespace fan
             RenderWorld& renderWorld = _world.GetSingleton<RenderWorld>();
             renderWorld.directionalLights.clear();
 
-            auto transformIt = _view.begin<FxTransform>();
+            auto transformIt = _view.begin<Transform>();
             auto lightIt     = _view.begin<DirectionalLight>();
-            for( ; transformIt != _view.end<FxTransform>(); ++transformIt, ++lightIt )
+            for( ; transformIt != _view.end<Transform>(); ++transformIt, ++lightIt )
             {
-                const FxTransform& transform        = *transformIt;
-                DirectionalLight & directionalLight = *lightIt;
+                const Transform & transform        = *transformIt;
+                DirectionalLight& directionalLight = *lightIt;
 
                 RenderDataDirectionalLight light;
                 light.mDirection = glm::vec4( transform.Forward().ToGlm(), 1 );

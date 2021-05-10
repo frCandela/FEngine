@@ -1,6 +1,6 @@
 #include "core/ecs/fanEcsWorld.hpp"
 #include "core/ecs/fanEcsSystem.hpp"
-#include "engine/physics/fanFxTransform.hpp"
+#include "engine/physics/fanTransform.hpp"
 #include "engine/components/fanFollowTransform.hpp"
 #include "engine/components/fanSceneNode.hpp"
 
@@ -14,7 +14,7 @@ namespace fan
     {
         static EcsSignature GetSignature( const EcsWorld& _world )
         {
-            return _world.GetSignature<FxTransform>() |
+            return _world.GetSignature<Transform>() |
                    _world.GetSignature<SceneNode>() |
                    _world.GetSignature<FollowTransform>();
         }
@@ -22,17 +22,17 @@ namespace fan
         static void Run( EcsWorld& _world, const EcsView& _view )
         {
             auto sceneNodeIt       = _view.begin<SceneNode>();
-            auto transformIt       = _view.begin<FxTransform>();
+            auto transformIt       = _view.begin<Transform>();
             auto followTransformIt = _view.begin<FollowTransform>();
-            for( ; transformIt != _view.end<FxTransform>(); ++transformIt, ++followTransformIt, ++sceneNodeIt )
+            for( ; transformIt != _view.end<Transform>(); ++transformIt, ++followTransformIt, ++sceneNodeIt )
             {
-                const FxTransform& follow          = *transformIt;
-                FollowTransform  & followTransform = *followTransformIt;
-                SceneNode        & sceneNode       = *sceneNodeIt;
+                const Transform& follow          = *transformIt;
+                FollowTransform& followTransform = *followTransformIt;
+                SceneNode      & sceneNode       = *sceneNodeIt;
 
                 fanAssert( sceneNode.mParentHandle != 0 );
                 EcsEntity parentEntity = _world.GetEntity( sceneNode.mParentHandle );
-                FxTransform* parentTransform = _world.SafeGetComponent<FxTransform>( parentEntity );
+                Transform* parentTransform = _world.SafeGetComponent<Transform>( parentEntity );
                 if( parentTransform != nullptr )
                 {
                     followTransform.mLocalTransform = parentTransform->Inverse() * follow;
@@ -48,7 +48,7 @@ namespace fan
     {
         static EcsSignature GetSignature( const EcsWorld& _world )
         {
-            return _world.GetSignature<FxTransform>() |
+            return _world.GetSignature<Transform>() |
                    _world.GetSignature<SceneNode>() |
                    _world.GetSignature<FollowTransform>();
         }
@@ -56,17 +56,17 @@ namespace fan
         static void Run( EcsWorld& _world, const EcsView& _view )
         {
             auto sceneNodeIt       = _view.begin<SceneNode>();
-            auto transformIt       = _view.begin<FxTransform>();
+            auto transformIt       = _view.begin<Transform>();
             auto followTransformIt = _view.begin<FollowTransform>();
-            for( ; transformIt != _view.end<FxTransform>(); ++transformIt, ++followTransformIt, ++sceneNodeIt )
+            for( ; transformIt != _view.end<Transform>(); ++transformIt, ++followTransformIt, ++sceneNodeIt )
             {
-                FxTransform          & follow          = *transformIt;
+                Transform            & follow          = *transformIt;
                 const FollowTransform& followTransform = *followTransformIt;
                 SceneNode            & sceneNode       = *sceneNodeIt;
 
                 fanAssert( sceneNode.mParentHandle != 0 );
                 EcsEntity parentEntity = _world.GetEntity( sceneNode.mParentHandle );
-                FxTransform* parentTransform = _world.SafeGetComponent<FxTransform>( parentEntity );
+                Transform* parentTransform = _world.SafeGetComponent<Transform>( parentEntity );
                 if( followTransform.mLocked && parentTransform != nullptr )
                 {
                     follow = ( *parentTransform ) * followTransform.mLocalTransform;

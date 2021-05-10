@@ -7,7 +7,7 @@
 namespace fan
 {
     class EcsWorld;
-    struct FxTransform;
+    struct Transform;
 
     //==================================================================================================================================================================================================
     // allows displaying of the translation manipulator
@@ -26,7 +26,7 @@ namespace fan
             bool    pressed = false;
             Vector3 offset;
         };
-        bool DrawMoveGizmo( const FxTransform& _transform, const size_t _uniqueID, Vector3& _newPosition );
+        bool DrawMoveGizmo( const Transform& _transform, const size_t _uniqueID, Vector3& _newPosition );
 
         std::map<size_t, GizmoCacheData> mGizmoCacheData;
         EcsWorld* mWorld;

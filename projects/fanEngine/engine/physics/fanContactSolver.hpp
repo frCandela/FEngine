@@ -13,8 +13,8 @@ namespace fan
     {
         static RenderDebug* tmpRd;
 
-        int mMaxPositionsIterations = 50;
-        int mMaxVelocityIterations  = 50;
+        int mMaxPositionsIterations = 6;
+        int mMaxVelocityIterations  = 6;
         int mVelocityIterationsUsed;
         int mPositionIterationsUsed;
 

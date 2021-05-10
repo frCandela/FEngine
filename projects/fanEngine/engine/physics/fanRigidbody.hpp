@@ -8,13 +8,13 @@
 
 namespace fan
 {
-    struct FxTransform;
+    struct Transform;
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    struct FxRigidbody : public EcsComponent
+    struct Rigidbody : public EcsComponent
     {
-    ECS_COMPONENT( FxRigidbody )
+    ECS_COMPONENT( Rigidbody )
         static void SetInfo( EcsComponentInfo& _info );
         static void Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component );
         static void Save( const EcsComponent& _component, Json& _json );
@@ -33,12 +33,12 @@ namespace fan
         Vector3                      mForcesAccumulator;
         Vector3                      mTorqueAccumulator;
         Matrix3                      mInverseInertiaTensorWorld;
-        FxTransform* mTransform; // buffered at the beginning of the frame
+        Transform* mTransform; // buffered at the beginning of the frame
 
         void ApplyCentralForce( const Vector3& _force ) { mForcesAccumulator += _force; }
         void ApplyForce( const Vector3& _force, const Vector3& _localPoint );
         void ApplyTorque( const Vector3& _torque ) { mTorqueAccumulator += _torque; }
-        void CalculateDerivedData( FxTransform& _transform );
+        void CalculateDerivedData( Transform& _transform );
         void ClearAccumulators();
         void SetSleeping( const bool _isSleeping );
         void UpdateMotion();

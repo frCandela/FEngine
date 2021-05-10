@@ -11,9 +11,9 @@ namespace fan
     // allows registering of rigidbodies and quick rigidbodies access through handles
     // triggers collision callbacks
     //==================================================================================================================================================================================================
-    struct FxPhysicsWorld : public EcsSingleton
+    struct PhysicsWorld : public EcsSingleton
     {
-    ECS_SINGLETON( FxPhysicsWorld )
+    ECS_SINGLETON( PhysicsWorld )
         static void SetInfo( EcsSingletonInfo& _info );
         static void Init( EcsWorld& _world, EcsSingleton& _component );
         static void Save( const EcsSingleton& _component, Json& _json );

@@ -1,37 +1,42 @@
-#include "engine/components/fanFxScale.hpp"
+#include "engine/physics/fanSphereCollider.hpp"
 #include "core/memory/fanSerializable.hpp"
 
 namespace fan
 {
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void FxScale::SetInfo( EcsComponentInfo& _info )
+    void SphereCollider::SetInfo( EcsComponentInfo& _info )
     {
-        _info.save = &FxScale::Save;
-        _info.load = &FxScale::Load;
+        _info.load = &SphereCollider::Load;
+        _info.save = &SphereCollider::Save;
     }
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void FxScale::Init( EcsWorld& /*_world*/, EcsEntity /*_entity*/, EcsComponent& _component )
+    void SphereCollider::Init( EcsWorld&, EcsEntity, EcsComponent& _component )
     {
-        FxScale& scale = static_cast<FxScale&>( _component );
-        scale.mScale = Vector3::sOne;
+        // clear
+        SphereCollider& collider = static_cast<SphereCollider&>( _component );
+        collider.mRadius = FIXED( 0.5 );
+        collider.mOffset = Vector3::sZero;
     }
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void FxScale::Save( const EcsComponent& _component, Json& _json )
+    void SphereCollider::Save( const EcsComponent& _component, Json& _json )
     {
-        const FxScale& scale = static_cast<const FxScale&>( _component );
-        Serializable::SaveVec3( _json, "scale", scale.mScale );
+        const SphereCollider& collider = static_cast<const SphereCollider&>( _component );
+        Serializable::SaveFixed( _json, "radius", collider.mRadius );
+        Serializable::SaveVec3( _json, "offset", collider.mOffset );
     }
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void FxScale::Load( EcsComponent& _component, const Json& _json )
+    void SphereCollider::Load( EcsComponent& _component, const Json& _json )
     {
-        FxScale& scale = static_cast<FxScale&>( _component );
-        Serializable::LoadVec3( _json, "scale", scale.mScale );
+        SphereCollider& collider = static_cast<SphereCollider&>( _component );
+        Serializable::LoadFixed( _json, "radius", collider.mRadius );
+        Serializable::LoadVec3( _json, "offset", collider.mOffset );
     }
 }
+
