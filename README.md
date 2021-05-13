@@ -1,32 +1,19 @@
-# FEngine
-FEngine is a 3D game engine. It uses Vulkan for Rendering, Dear ImGui for user interface and a lot of other open libraries for various purposes.
+# Dark Reign 3
+This is my attempt at remaking one of my favourite games Dark Reign 2.
 
-## Some features: 
-* Global
-	 * Game Editor
-	 * Entity Component System architecture
-	 * Scene tree
-	 * Profiling
-	 * keyboard & gamepad input
-	 * client/server network tools
-	 * Reflection / Serialization
-	 * Rich UI & tools
-* Rendering
-	 * 3D Models
-	 * ui
-	 * directional & point lights
-	 * Phong illumination
-	 * Postprocessing
-	 * Debug lines/shapes
-	 * Shader runtime compilation
-	 * glTF mesh 
-	 * png textures
+## Target Features
+* online multiplayer mode
+* solo skirmish mode against AI
+* sprawlers faction
+* fully destructible/constructible voxel terrain and environment
 
 ## Dependencies : 	
+This project is using my custom game engine with a few middlewares.
+
+* Build : [CMake](https://cmake.org/)
 * 3D Models IO : [glTF ](https://github.com/KhronosGroup/glTF)	
 * Serialization : [nlohmann json](https://github.com/nlohmann/json)
 * png images : [stb_image](https://github.com/nothings/stb)
-* physics : [bullet physics](https://github.com/bulletphysics/bullet3/blob/master/LICENSE.txt)
 * convex hull : [Antti Kuukka - QuickHull ](https://github.com/akuukka/quickhull)
 * window & input : [glfw](https://github.com/glfw/glfw)
 * shader math : [glm](https://github.com/g-truc/glm)
@@ -35,7 +22,5 @@ FEngine is a 3D game engine. It uses Vulkan for Rendering, Dear ImGui for user i
 * network : [SFML 2.5.1](https://www.sfml-dev.org/index.php)
 	
 ## Content
-* UI assets: [Kenney](https://kenney.nl/assets/ui-pack)
-	
-## Screenshots
-![Editor preview](/docs/screenshot3.png)
+* Dark Reign 2 original assets
+* Prototype assets: [Kenney](https://kenney.nl/assets/ui-pack)

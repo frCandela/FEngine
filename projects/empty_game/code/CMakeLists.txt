@@ -1,16 +1,16 @@
-﻿  set(GAME_NAME "voxels")
+﻿  set(GAME_NAME "empty_game")
 
   file(GLOB_RECURSE GAME_SRC *.cpp)
   file(GLOB_RECURSE GAME_H *.hpp)
 
   set(GAME_LIBS
-          fanEngine
+          fanCore
           fanRender
           fanNetwork
-          fanCore
+          fanEngine
           )
 
-  include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+  include_directories(.)
 
   add_subdirectory(editor)
   add_subdirectory(game)

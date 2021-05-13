@@ -1,16 +1,16 @@
-﻿  set(GAME_NAME "empty")
+﻿  set(GAME_NAME "darkreign3")
 
   file(GLOB_RECURSE GAME_SRC *.cpp)
   file(GLOB_RECURSE GAME_H *.hpp)
 
   set(GAME_LIBS
-          fanCore
+          fanEngine
           fanRender
           fanNetwork
-          fanEngine
+          fanCore
           )
 
-  include_directories(.)
+  include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
   add_subdirectory(editor)
   add_subdirectory(game)

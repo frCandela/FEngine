@@ -6,7 +6,7 @@
 #include "engine/game/fanLiveppLauncher.hpp"
 #include "core/fanPath.hpp"
 #include "engine/game/fanLaunchArgs.hpp"
-#include "game/fanGameVoxels.hpp"
+#include "game/fanDarkReign3.hpp"
 
 #ifdef FAN_EDITOR
     #include "editor/fanEditorPlayer.hpp"
@@ -34,10 +34,10 @@ int main( int _argc, char* _argv[] )
 
     fan::Path::SetGamePath( GAME_PATH );
 
-    fan::GameVoxels   game;
-    const std::string name = "Voxels";
+    fan::DarkReign3   game;
+    const std::string name = "Dark Reign 3";
 #ifdef FAN_EDITOR
-    settings.mWindowName = "Fan Engine Editor - " + name;
+    settings.mWindowName = "FanEngine Editor - " + name;
     fan::EditorPlayer player( settings, { &game } );
 #else
     settings.mWindowName = name;

@@ -64,5 +64,5 @@ include_directories(
 )
 
 add_subdirectory(fanEngine)
-add_subdirectory(game_empty)
-add_subdirectory(game_voxels)
+add_subdirectory(empty_game)
+add_subdirectory(darkreign3)
