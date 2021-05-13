@@ -39,7 +39,7 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void IProjectContainer::InitWorld( EcsWorld& _world )
+    void IProjectContainer::SetWorldResourcesPointers( EcsWorld& _world )
     {
         RenderResources& renderResources = _world.GetSingleton<RenderResources>();
         renderResources.SetPointers( &mRenderer.mMeshManager,

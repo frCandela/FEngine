@@ -94,34 +94,12 @@ namespace fan
             IProject::EcsIncludePhysics( world );
             IProject::EcsIncludeRender3D( world );
             IProject::EcsIncludeRenderUI( world );
+            EcsIncludeEditor( world );
 
-            world.AddSingletonType<EditorSettings>();
             EditorSettings& editorSerializedValues = world.GetSingleton<EditorSettings>();
             editorSerializedValues.mData = &mEditorSettings;
 
-            world.AddSingletonType<EditorGuiInfo>();
-            world.AddSingletonType<EditorPlayState>();
-            world.AddSingletonType<EditorCamera>();
-            world.AddSingletonType<EditorGrid>();
-            world.AddSingletonType<EditorSelection>();
-            world.AddSingletonType<EditorCopyPaste>();
-            world.AddSingletonType<EditorGizmos>();
-            world.AddSingletonType<EditorMainMenuBar>();
-            world.AddSingletonType<ConsoleWindow>();
-            world.AddSingletonType<EcsWindow>();
-            world.AddSingletonType<InspectorWindow>();
-            world.AddSingletonType<PreferencesWindow>();
-            world.AddSingletonType<ProfilerWindow>();
-            world.AddSingletonType<ProjectViewWindow>();
-            world.AddSingletonType<RenderWindow>();
-            world.AddSingletonType<SceneWindow>();
-            world.AddSingletonType<SingletonsWindow>();
-            world.AddSingletonType<TerrainWindow>();
-            world.AddSingletonType<UnitTestsWindow>();
-
-            world.AddTagType<TagEditorOnly>();
-
-            InitWorld( world );
+            IProjectContainer::SetWorldResourcesPointers( world );
 
             RenderWorld& renderWorld = world.GetSingleton<RenderWorld>();
             renderWorld.mIsHeadless = ( &project != &GetCurrentProject() );
@@ -500,6 +478,34 @@ namespace fan
                 ImGui::End();
             }
         }
+    }
+
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    void EditorProjectContainer::EcsIncludeEditor( EcsWorld& _world )
+    {
+        _world.AddSingletonType<EditorSettings>();
+        _world.AddSingletonType<EditorGuiInfo>();
+        _world.AddSingletonType<EditorPlayState>();
+        _world.AddSingletonType<EditorCamera>();
+        _world.AddSingletonType<EditorGrid>();
+        _world.AddSingletonType<EditorSelection>();
+        _world.AddSingletonType<EditorCopyPaste>();
+        _world.AddSingletonType<EditorGizmos>();
+        _world.AddSingletonType<EditorMainMenuBar>();
+        _world.AddSingletonType<ConsoleWindow>();
+        _world.AddSingletonType<EcsWindow>();
+        _world.AddSingletonType<InspectorWindow>();
+        _world.AddSingletonType<PreferencesWindow>();
+        _world.AddSingletonType<ProfilerWindow>();
+        _world.AddSingletonType<ProjectViewWindow>();
+        _world.AddSingletonType<RenderWindow>();
+        _world.AddSingletonType<SceneWindow>();
+        _world.AddSingletonType<SingletonsWindow>();
+        _world.AddSingletonType<TerrainWindow>();
+        _world.AddSingletonType<UnitTestsWindow>();
+
+        _world.AddTagType<TagEditorOnly>();
     }
 
     //==================================================================================================================================================================================================

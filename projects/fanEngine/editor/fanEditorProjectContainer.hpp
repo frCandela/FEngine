@@ -57,5 +57,6 @@ namespace fan
         static void Resume( IProject& _project );
         static void UseEditorCamera( EcsWorld& _world );
         static void DrawEditorUI( EcsWorld& _world );
+        static void EcsIncludeEditor( EcsWorld& _world );
     };
 }

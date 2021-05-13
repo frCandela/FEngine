@@ -35,7 +35,7 @@ namespace fan
         PrefabManager mPrefabManager;
         FullScreen    mFullScreen;
 
-        void InitWorld( EcsWorld& _world );
+        void SetWorldResourcesPointers( EcsWorld& _world );
         static void UpdateRenderWorld( Renderer& _renderer, IProject& _project, const glm::vec2 _size );
     };
 }

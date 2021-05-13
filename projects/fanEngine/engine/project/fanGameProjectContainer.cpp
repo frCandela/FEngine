@@ -26,7 +26,7 @@ namespace fan
         IProject::EcsIncludeRender3D( mProject.mWorld );
         IProject::EcsIncludeRenderUI( mProject.mWorld );
 
-        InitWorld( mProject.mWorld );
+        IProjectContainer::SetWorldResourcesPointers( mProject.mWorld );
 
         Application& app = mProject.mWorld.GetSingleton<Application>();
         app.mOnQuit.Connect( &IProjectContainer::Exit, (IProjectContainer*)this );
