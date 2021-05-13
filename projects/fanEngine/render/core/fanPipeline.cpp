@@ -145,7 +145,7 @@ namespace fan
         vertexInputStateCreateInfo.pVertexBindingDescriptions      = _pipelineConfig.bindingDescription.data();
         vertexInputStateCreateInfo.vertexAttributeDescriptionCount = static_cast< uint32_t >(
                 _pipelineConfig.attributeDescriptions.size() );
-        vertexInputStateCreateInfo.pVertexAttributeDescriptions = _pipelineConfig.attributeDescriptions.data();
+        vertexInputStateCreateInfo.pVertexAttributeDescriptions    = _pipelineConfig.attributeDescriptions.data();
 
         VkPipelineViewportStateCreateInfo viewportStateCreateInfo = {};
         viewportStateCreateInfo.sType         = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;

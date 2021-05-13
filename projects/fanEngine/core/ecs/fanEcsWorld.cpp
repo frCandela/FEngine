@@ -1,3 +1,4 @@
+#include "core/fanBits.hpp"
 #include "core/ecs/fanEcsWorld.hpp"
 #include "core/time/fanProfiler.hpp"
 #include "core/fanDebug.hpp"
@@ -220,17 +221,19 @@ namespace fan
     //==================================================================================================================================================================================================
     void EcsWorld::InitSingletons()
     {
-        // clears singleton components
         for( std::pair<uint32_t, EcsSingleton*> pair : mSingletons )
         {
             const EcsSingletonInfo& info = GetSingletonInfo( pair.first );
-            info.init( *this, *pair.second );
+            if( !BITMASK_TRUE_ANY( info.mFlags, EcsSingletonFlags::InitOnce ) )
+            {
+                info.init( *this, *pair.second );
+            }
         }
     }
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void EcsWorld::PostInitSingletons()
+    void EcsWorld::PostInitSingletons( const bool _force )
     {
         // clears singleton components
         for( std::pair<uint32_t, EcsSingleton*> pair : mSingletons )
@@ -238,7 +241,10 @@ namespace fan
             const EcsSingletonInfo& info = GetSingletonInfo( pair.first );
             if( info.postInit != nullptr )
             {
-                info.postInit( *this, *pair.second );
+                if( !BITMASK_TRUE_ANY( info.mFlags, EcsSingletonFlags::InitOnce ) || _force )
+                {
+                    info.postInit( *this, *pair.second );
+                }
             }
         }
     }

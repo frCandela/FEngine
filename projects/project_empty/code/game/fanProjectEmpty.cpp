@@ -115,7 +115,7 @@ namespace fan
     {
         if( ImGui::Begin( "testoss" ) )
         {
-            ImGui::End();
         }
+        ImGui::End();
     }
 }

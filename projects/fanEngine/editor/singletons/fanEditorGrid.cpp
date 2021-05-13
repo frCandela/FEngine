@@ -20,7 +20,7 @@ namespace fan
     {
         EditorGrid& editorGrid = static_cast<EditorGrid&>( _component );
         editorGrid.mOffset     = Vector3::sZero;
-        editorGrid.mColor      = Color( 0.164f, 0.287f, 0.331f, 1.f );
+        editorGrid.mColor      = Color::sGrey;
         editorGrid.mSpacing    = 1;
         editorGrid.mLinesCount = 10;
         editorGrid.mIsVisible  = true;

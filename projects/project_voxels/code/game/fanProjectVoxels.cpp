@@ -184,7 +184,7 @@ namespace fan
             ImGui::SliderInt( "voxels generation", &completionVoxelsGenerationCpy, 0, max );
             int completionMeshGenerationCpy = completionMeshGeneration;
             ImGui::SliderInt( "mesh generation", &completionMeshGenerationCpy, 0, max );
-            ImGui::End();
         }
+        ImGui::End();
     }
 }

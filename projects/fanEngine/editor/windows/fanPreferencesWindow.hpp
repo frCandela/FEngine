@@ -1,33 +1,43 @@
 #pragma once
 
-#include "editor/windows/fanEditorWindow.hpp"
+#include "core/ecs/fanEcsSingleton.hpp"
 #include "core/input/fanInputManager.hpp"
+#include "editor/singletons/fanEditorGuiInfo.hpp"
 
 namespace fan
 {
-    class Renderer;
-    class FullScreen;
+    struct EditorSettings;
 
     //==================================================================================================================================================================================================
     // shortcut & axis edition
     // imgui colors
     //==================================================================================================================================================================================================
-    class PreferencesWindow : public EditorWindow
+    struct PreferencesWindow : EcsSingleton
     {
-    public:
-        PreferencesWindow( Renderer& _renderer, FullScreen& _fullScreen );
-        ~PreferencesWindow();
+    ECS_SINGLETON( PreferencesWindow )
 
-        static void SetDefaultColors();
-    protected:
-        void OnGui( EcsWorld& _world ) override;
+        static void SetInfo( EcsSingletonInfo& _info );
+        static void Init( EcsWorld& _world, EcsSingleton& _singleton );
 
-    private:
-        Renderer  & mRenderer;
-        FullScreen& mFullScreen;
-
-        void DrawJoysticks();
-        void DrawShortcuts();
         static void LogColorsCppInitCode();
+    };
+
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    struct GuiPreferencesWindow
+    {
+        static GuiSingletonInfo GetInfo()
+        {
+            GuiSingletonInfo info;
+            info.mEditorName = "preferences";
+            info.mIcon       = ImGui::Preferences16;
+            info.mGroup      = EngineGroups::Editor;
+            info.mType       = GuiSingletonInfo::Type::ToolWindow;
+            info.onGui       = &GuiPreferencesWindow::OnGui;
+            return info;
+        }
+        static void OnGui( EcsWorld& _world, EcsSingleton& _singleton );
+        static void DrawJoysticks( PreferencesWindow& _preferencesWindow );
+        static void DrawShortcuts( EditorSettings& _editorSettings );
     };
 }

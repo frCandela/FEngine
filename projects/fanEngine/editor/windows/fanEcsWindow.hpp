@@ -1,6 +1,7 @@
 #pragma once
 
-#include "editor/windows/fanEditorWindow.hpp"
+#include "core/ecs/fanEcsSingleton.hpp"
+#include "editor/singletons/fanEditorGuiInfo.hpp"
 
 namespace fan
 {
@@ -9,12 +10,29 @@ namespace fan
     //==================================================================================================================================================================================================
     // displays the state of the ecs world ( entities, components, memory consumption etc. )
     //==================================================================================================================================================================================================
-    class EcsWindow : public EditorWindow
+    struct EcsWindow : EcsSingleton
     {
-    public:
-        EcsWindow();
+    ECS_SINGLETON( EcsWindow )
 
-    protected:
-        void OnGui( EcsWorld& _world ) override;
+        static void SetInfo( EcsSingletonInfo& _info );
+        static void Init( EcsWorld& _world, EcsSingleton& _singleton );
+    };
+
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    struct GuiEcsWindow
+    {
+        static GuiSingletonInfo GetInfo()
+        {
+            GuiSingletonInfo info;
+            info.mEditorName = "ecs";
+            info.mIcon       = ImGui::Ecs16;
+            info.mGroup      = EngineGroups::Editor;
+            info.mType       = GuiSingletonInfo::Type::ToolWindow;
+            info.onGui       = &GuiEcsWindow::OnGui;
+            return info;
+        }
+
+        static void OnGui( EcsWorld& _world, EcsSingleton& _singleton );
     };
 }

@@ -88,10 +88,7 @@ namespace ImGui
         {
             // '.' Selectable to go to the parent
             if( _path != "." &&
-                ImGui::Selectable( ".",
-                                   false,
-                                   ImGuiSelectableFlags_DontClosePopups |
-                                   ImGuiSelectableFlags_AllowDoubleClick ) )
+                ImGui::Selectable( ".", false, ImGuiSelectableFlags_DontClosePopups | ImGuiSelectableFlags_AllowDoubleClick ) )
             {
                 if( !fan::Path::IsRootDrive( _path ) )
                 {
@@ -261,22 +258,12 @@ namespace ImGui
             if( itemDoubleClicked )
             {
             }
-            /*if ( std::filesystem::is_directory( newEntry ) )
-            {
-                _path = newEntry;
-            }
-            else if ( std::filesystem::is_regular_file( newEntry ) )
-            {
-                _path = newEntry;
-            }*/
             ImGui::EndChild();
 
             ImGui::Text( _path.c_str() );
             ImGui::Separator();
 
-            if( itemDoubleClicked == true ||
-                ImGui::Button( "Ok" ) ||
-                ImGui::IsKeyPressed( GLFW_KEY_ENTER, false ) )
+            if( itemDoubleClicked == true || ImGui::Button( "Ok" ) || ImGui::IsKeyPressed( GLFW_KEY_ENTER, false ) )
             {
                 if( fan::Path::IsFile( _path ) )
                 {

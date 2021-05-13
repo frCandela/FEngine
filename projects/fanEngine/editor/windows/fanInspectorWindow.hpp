@@ -1,8 +1,9 @@
 #pragma once
 
 #include <set>
-#include "editor/windows/fanEditorWindow.hpp"
+#include "core/ecs/fanEcsSingleton.hpp"
 #include "core/ecs/fanEcsTypes.hpp"
+#include "editor/singletons/fanEditorGuiInfo.hpp"
 
 namespace fan
 {
@@ -13,15 +14,13 @@ namespace fan
     //==================================================================================================================================================================================================
     // displays a scene node and its components
     //==================================================================================================================================================================================================
-    class InspectorWindow : public EditorWindow
+    struct InspectorWindow : EcsSingleton
     {
-    public:
-        InspectorWindow();
+    ECS_SINGLETON( InspectorWindow )
 
-    protected:
-        void OnGui( EcsWorld& _world ) override;
+        static void SetInfo( EcsSingletonInfo& _info );
+        static void Init( EcsWorld& _world, EcsSingleton& _singleton );
 
-    private:
         static void NewComponentPopup( EcsWorld& _world );
         static std::string SplitPaths( std::vector<std::string>& _current, std::vector<std::string>& _next );
         static void NewComponentItem( EcsWorld& _world, const EcsComponentInfo& _info );
@@ -30,5 +29,22 @@ namespace fan
                                      EcsWorld& _world,
                                      const std::vector<EcsComponentInfo>& _components,
                                      const std::vector<std::string>& _componentsPath );
+    };
+
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    struct GuiInspectorWindow
+    {
+        static GuiSingletonInfo GetInfo()
+        {
+            GuiSingletonInfo info;
+            info.mEditorName = "inspector";
+            info.mIcon       = ImGui::Inspector16;
+            info.mGroup      = EngineGroups::Editor;
+            info.mType       = GuiSingletonInfo::Type::ToolWindow;
+            info.onGui       = &GuiInspectorWindow::OnGui;
+            return info;
+        }
+        static void OnGui( EcsWorld& _world, EcsSingleton& _singleton );
     };
 }

@@ -1,13 +1,25 @@
 #include "editor/singletons/fanEditorGuiInfo.hpp"
 
 // EDITOR
-#include "editor/gui/editor/fanGuiEditorGuiInfo.hpp"
-#include "editor/gui/editor/fanGuiEditorCamera.hpp"
-#include "editor/gui/editor/fanGuiEditorCopyPaste.hpp"
-#include "editor/gui/editor/fanGuiEditorGizmos.hpp"
-#include "editor/gui/editor/fanGuiEditorGrid.hpp"
-#include "editor/gui/editor/fanGuiEditorPlayState.hpp"
-#include "editor/gui/editor/fanGuiEditorSelection.hpp"
+#include "editor/singletons/fanEditorCamera.hpp"
+#include "editor/singletons/fanEditorCopyPaste.hpp"
+#include "editor/singletons/fanEditorGizmos.hpp"
+#include "editor/singletons/fanEditorGrid.hpp"
+#include "editor/singletons/fanEditorPlayState.hpp"
+#include "editor/singletons/fanEditorSelection.hpp"
+#include "editor/singletons/fanEditorSettings.hpp"
+#include "editor/singletons/fanEditorMainMenuBar.hpp"
+#include "editor/windows/fanConsoleWindow.hpp"
+#include "editor/windows/fanEcsWindow.hpp"
+#include "editor/windows/fanInspectorWindow.hpp"
+#include "editor/windows/fanPreferencesWindow.hpp"
+#include "editor/windows/fanProfilerWindow.hpp"
+#include "editor/windows/fanProjectViewWindow.hpp"
+#include "editor/windows/fanRenderWindow.hpp"
+#include "editor/windows/fanSceneWindow.hpp"
+#include "editor/windows/fanSingletonsWindow.hpp"
+#include "editor/windows/fanTerrainWindow.hpp"
+#include "editor/windows/fanUnitsTestsWindow.hpp"
 
 // NETWORK
 #include "editor/gui/network/fanGuiHostManager.hpp"
@@ -29,7 +41,7 @@
 #include "editor/gui/network/fanGuiLinkingContextUnregisterer.hpp"
 #include "editor/gui/network/fanGuiReliabilityLayer.hpp"
 
-// SCENE
+// ENGINE
 #include "editor/gui/singletons/fanGuiApplication.hpp"
 #include "editor/gui/singletons/fanGuiMouse.hpp"
 #include "editor/gui/singletons/fanGuiRenderDebug.hpp"
@@ -71,24 +83,43 @@ namespace fan
 {
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void EditorGuiInfo::SetInfo( EcsSingletonInfo& /*_info*/ )
+    void EditorGuiInfo::SetInfo( EcsSingletonInfo& _info )
     {
+        _info.mFlags |= EcsSingletonFlags::InitOnce;
     }
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void EditorGuiInfo::Init( EcsWorld& /*_world*/, EcsSingleton& _component )
+    void EditorGuiInfo::Init( EcsWorld& /*_world*/, EcsSingleton& _singleton )
     {
-        EditorGuiInfo& editorGui = static_cast<EditorGuiInfo&>( _component );
+        EditorGuiInfo& editorGui = static_cast<EditorGuiInfo&>( _singleton );
+        editorGui.mSingletonInfos.clear();
+        editorGui.mComponentInfos.clear();
 
         //editor
-        editorGui.mSingletonInfos[EditorGuiInfo::Info::sType]   = GuiEditorGuiInfo::GetInfo();
-        editorGui.mSingletonInfos[EditorCamera::Info::sType]    = GuiEditorCamera::GetInfo();
-        editorGui.mSingletonInfos[EditorCopyPaste::Info::sType] = GuiEditorCopyPaste::GetInfo();
-        editorGui.mSingletonInfos[EditorGizmos::Info::sType]    = GuiEditorGizmos::GetInfo();
-        editorGui.mSingletonInfos[EditorGrid::Info::sType]      = GuiEditorGrid::GetInfo();
-        editorGui.mSingletonInfos[EditorPlayState::Info::sType] = GuiEditorPlayState::GetInfo();
-        editorGui.mSingletonInfos[EditorSelection::Info::sType] = GuiEditorSelection::GetInfo();
+        editorGui.mSingletonInfos[EditorGuiInfo::Info::sType]     = GuiEditorGuiInfo::GetInfo();
+        editorGui.mSingletonInfos[EditorCamera::Info::sType]      = GuiEditorCamera::GetInfo();
+        editorGui.mSingletonInfos[EditorCopyPaste::Info::sType]   = GuiEditorCopyPaste::GetInfo();
+        editorGui.mSingletonInfos[EditorGizmos::Info::sType]      = GuiEditorGizmos::GetInfo();
+        editorGui.mSingletonInfos[EditorGrid::Info::sType]        = GuiEditorGrid::GetInfo();
+        editorGui.mSingletonInfos[EditorPlayState::Info::sType]   = GuiEditorPlayState::GetInfo();
+        editorGui.mSingletonInfos[EditorSelection::Info::sType]   = GuiEditorSelection::GetInfo();
+        editorGui.mSingletonInfos[EditorSettings::Info::sType]    = GuiEditorSettings::GetInfo();
+        editorGui.mSingletonInfos[EditorMainMenuBar::Info::sType] = GuiEditorMainMenuBar::GetInfo();
+
+
+        // editor windows
+        editorGui.mSingletonInfos[ConsoleWindow::Info::sType]     = GuiConsoleWindow::GetInfo();
+        editorGui.mSingletonInfos[EcsWindow::Info::sType]         = GuiEcsWindow::GetInfo();
+        editorGui.mSingletonInfos[InspectorWindow::Info::sType]   = GuiInspectorWindow::GetInfo();
+        editorGui.mSingletonInfos[PreferencesWindow::Info::sType] = GuiPreferencesWindow::GetInfo();
+        editorGui.mSingletonInfos[ProfilerWindow::Info::sType]    = GuiProfilerWindow::GetInfo();
+        editorGui.mSingletonInfos[ProjectViewWindow::Info::sType] = GuiProjectViewWindow::GetInfo();
+        editorGui.mSingletonInfos[RenderWindow::Info::sType]      = GuiRenderWindow::GetInfo();
+        editorGui.mSingletonInfos[SceneWindow::Info::sType]       = GuiSceneWindow::GetInfo();
+        editorGui.mSingletonInfos[SingletonsWindow::Info::sType]  = GuiSingletonsWindow::GetInfo();
+        editorGui.mSingletonInfos[TerrainWindow::Info::sType]     = GuiTerrainWindow::GetInfo();
+        editorGui.mSingletonInfos[UnitTestsWindow::Info::sType]   = GuiUnitTestsWindow::GetInfo();
 
         //network
         editorGui.mSingletonInfos[HostManager::Info::sType]      = GuiHostManager::GetInfo();
@@ -97,18 +128,18 @@ namespace fan
         editorGui.mSingletonInfos[SpawnManager::Info::sType]     = GuiSpawnManager::GetInfo();
         editorGui.mSingletonInfos[Time::Info::sType]             = GuiTime::GetInfo();
 
-        editorGui.mComponentInfos[ClientConnection::Info::sType]     = GuiEntityClientConnection::GetInfo();
-        editorGui.mComponentInfos[ClientGameData::Info::sType]       = GuiClientGameData::GetInfo();
-        editorGui.mComponentInfos[ClientReplication::Info::sType]    = GuiClientReplication::GetInfo();
-        editorGui.mComponentInfos[ClientRollback::Info::sType]       = GuiClientRollback::GetInfo();
-        editorGui.mComponentInfos[ClientRPC::Info::sType]            = GuiClientRPC::GetInfo();
-        editorGui.mComponentInfos[EntityReplication::Info::sType]    = GuiEntityReplication::GetInfo();
-        editorGui.mComponentInfos[HostConnection::Info::sType]       = GuiHostConnection::GetInfo();
-        editorGui.mComponentInfos[HostGameData::Info::sType]         = GuiHostGameData::GetInfo();
-        editorGui.mComponentInfos[HostPersistentHandle::Info::sType] = GuiHostPersistentHandle::GetInfo();
-        editorGui.mComponentInfos[HostReplication::Info::sType]      = GuiHostReplication::GetInfo();
+        editorGui.mComponentInfos[ClientConnection::Info::sType]           = GuiEntityClientConnection::GetInfo();
+        editorGui.mComponentInfos[ClientGameData::Info::sType]             = GuiClientGameData::GetInfo();
+        editorGui.mComponentInfos[ClientReplication::Info::sType]          = GuiClientReplication::GetInfo();
+        editorGui.mComponentInfos[ClientRollback::Info::sType]             = GuiClientRollback::GetInfo();
+        editorGui.mComponentInfos[ClientRPC::Info::sType]                  = GuiClientRPC::GetInfo();
+        editorGui.mComponentInfos[EntityReplication::Info::sType]          = GuiEntityReplication::GetInfo();
+        editorGui.mComponentInfos[HostConnection::Info::sType]             = GuiHostConnection::GetInfo();
+        editorGui.mComponentInfos[HostGameData::Info::sType]               = GuiHostGameData::GetInfo();
+        editorGui.mComponentInfos[HostPersistentHandle::Info::sType]       = GuiHostPersistentHandle::GetInfo();
+        editorGui.mComponentInfos[HostReplication::Info::sType]            = GuiHostReplication::GetInfo();
         editorGui.mComponentInfos[LinkingContextUnregisterer::Info::sType] = GuiLinkingContextUnregisterer::GetInfo();
-        editorGui.mComponentInfos[ReliabilityLayer::Info::sType] = GuiReliabilityLayer::GetInfo();
+        editorGui.mComponentInfos[ReliabilityLayer::Info::sType]           = GuiReliabilityLayer::GetInfo();
 
         // scene
         editorGui.mSingletonInfos[Application::Info::sType]     = GuiApplication::GetInfo();
@@ -142,26 +173,12 @@ namespace fan
         editorGui.mComponentInfos[SceneNode::Info::sType]        = GuiSceneNode::GetInfo();
 
         // fx physics
-        editorGui.mComponentInfos[Rigidbody::Info::sType]    = GuiFxRigidbody::GetInfo();
-        editorGui.mSingletonInfos[PhysicsWorld::Info::sType] = GuiFxPhysicsWorld::GetInfo();
+        editorGui.mComponentInfos[Rigidbody::Info::sType]      = GuiFxRigidbody::GetInfo();
+        editorGui.mSingletonInfos[PhysicsWorld::Info::sType]   = GuiFxPhysicsWorld::GetInfo();
         editorGui.mComponentInfos[BoxCollider::Info::sType]    = GuiFxBoxCollider::GetInfo();
         editorGui.mComponentInfos[SphereCollider::Info::sType] = GuiFxSphereCollider::GetInfo();
 
         editorGui.mComponentInfos[Transform::Info::sType] = GuiFxTransform::GetInfo();
         editorGui.mComponentInfos[Scale::Info::sType]     = GuiFxScale::GetInfo();
-    }
-
-    //==================================================================================================================================================================================================
-    //==================================================================================================================================================================================================
-    const GuiComponentInfo& EditorGuiInfo::GetComponentInfo( const uint32_t _type ) const
-    {
-        return mComponentInfos.at( _type );
-    }
-
-    //==================================================================================================================================================================================================
-    //==================================================================================================================================================================================================
-    const GuiSingletonInfo& EditorGuiInfo::GetSingletonInfo( const uint32_t _type ) const
-    {
-        return mSingletonInfos.at( _type );
     }
 }

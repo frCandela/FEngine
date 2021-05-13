@@ -32,6 +32,12 @@ namespace fan
     class EcsWorld;
     struct SlotBase;
 
+    enum EcsSingletonFlags
+    {
+        None     = 0,
+        InitOnce = 1,
+    };
+
     //==================================================================================================================================================================================================
     // EcsSingletonInfo is runtime type information for singleton components
     // Function pointers :
@@ -47,6 +53,7 @@ namespace fan
     {
         std::string            mName;
         uint32_t               mType;
+        uint32_t               mFlags = EcsSingletonFlags::None;
         std::vector<SlotBase*> mSlots;                         // callable methods
 
         void ( * init )( EcsWorld&, EcsSingleton& ) = nullptr; // called at creation and rebuild

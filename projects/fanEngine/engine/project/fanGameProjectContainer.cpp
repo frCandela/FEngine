@@ -26,8 +26,6 @@ namespace fan
         IProject::EcsIncludeRender3D( mProject.mWorld );
         IProject::EcsIncludeRenderUI( mProject.mWorld );
 
-        SerializedValues::Get().LoadKeyBindings();
-
         InitWorld( mProject.mWorld );
 
         Application& app = mProject.mWorld.GetSingleton<Application>();
@@ -50,11 +48,6 @@ namespace fan
     //==================================================================================================================================================================================================
     LaunchSettings& GameProjectContainer::AdaptSettings( LaunchSettings& _settings )
     {
-        if( !_settings.mForceWindowDimensions )
-        {
-            SerializedValues::LoadWindowPosition( _settings.mWindow_position );
-            SerializedValues::LoadWindowSize( _settings.mWindow_size );
-        }
         _settings.mIconPath     = RenderGlobal::sGameIcon;
         _settings.mLaunchEditor = false;
         return _settings;

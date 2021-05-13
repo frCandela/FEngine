@@ -1,6 +1,7 @@
 #pragma once
 
 #include "core/ecs/fanEcsSingleton.hpp"
+#include "editor/singletons/fanEditorGuiInfo.hpp"
 
 namespace fan
 {
@@ -20,5 +21,19 @@ namespace fan
         void OnPaste();
 
         EditorSelection* mSelection;
+    };
+
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    struct GuiEditorCopyPaste
+    {
+        static GuiSingletonInfo GetInfo()
+        {
+            GuiSingletonInfo info;
+            info.mEditorName = "editor copy/paste";
+            info.mIcon       = ImGui::CopyPaste16;
+            info.mGroup      = EngineGroups::Editor;
+            return info;
+        }
     };
 }

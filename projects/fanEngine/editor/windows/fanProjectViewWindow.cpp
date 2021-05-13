@@ -8,48 +8,51 @@ namespace fan
 {
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    ProjectViewWindow::ProjectViewWindow( /*const LaunchSettings::NetworkMode _launchMode*/ ) //@todo repair this
-            : EditorWindow( "project view", ImGui::IconType::Joystick16 ), mIsHovered( false )
+    void ProjectViewWindow::SetInfo( EcsSingletonInfo& _info )
     {
-        AddFlag( ImGuiWindowFlags_MenuBar );
-
-        // compute project world str for
-        /*switch( _launchMode )
-        {
-            case LaunchSettings::NetworkMode::EditorClient:
-                memcpy( mStringProjectSelectionCombo, "client\0\0", 8 );
-                break;
-            case LaunchSettings::NetworkMode::EditorServer:
-                memcpy( mStringProjectSelectionCombo, "server\0\0", 8 );
-                break;
-            case LaunchSettings::NetworkMode::EditorClientServer:*/
-        memcpy( mStringProjectSelectionCombo, "client\0server\0\0,", 16 );/*
-                break;
-            default:
-                fanAssert( false );
-                break;
-		}*/
+        _info.mFlags |= EcsSingletonFlags::InitOnce;
     }
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void ProjectViewWindow::OnGui( EcsWorld& _world )
+    void ProjectViewWindow::Init( EcsWorld&, EcsSingleton& _singleton )
     {
+        ProjectViewWindow& projectViewWindow = static_cast<ProjectViewWindow&>( _singleton );
+        projectViewWindow.mOnSizeChanged.Clear();
+        projectViewWindow.mOnPlay.Clear();
+        projectViewWindow.mOnPause.Clear();
+        projectViewWindow.mOnResume.Clear();
+        projectViewWindow.mOnStop.Clear();
+        projectViewWindow.mOnStep.Clear();
+        projectViewWindow.mOnSelectProject.Clear();
+        projectViewWindow.mSize           = glm::vec2( 1.f, 1.f );
+        projectViewWindow.mPosition = {};
+        projectViewWindow.mIsHovered = false;
+        projectViewWindow.mCurrentProject = 0;
+        memcpy( projectViewWindow.mStringProjectSelectionCombo, "game 1\0\0,", 16 );
+    }
+
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    void GuiProjectViewWindow::OnGui( EcsWorld& _world, EcsSingleton& _singleton )
+    {
+        ProjectViewWindow& projectViewWindow = static_cast<ProjectViewWindow&>( _singleton );
+
         // update window size
         const ImVec2 imGuiSize = ImGui::GetContentRegionAvail();
         glm::vec2    size      = glm::vec2( imGuiSize.x, imGuiSize.y );
-        if( mSize != size )
+        if( projectViewWindow.mSize != size )
         {
-            mSize.x = glm::clamp( size.x, 0.f, 3840.f );
-            mSize.y = glm::clamp( size.y, 0.f, 2160.f );
-            mOnSizeChanged.Emmit( { (uint32_t)mSize[0], (uint32_t)mSize[1] } );
+            projectViewWindow.mSize.x = glm::clamp( size.x, 0.f, 3840.f );
+            projectViewWindow.mSize.y = glm::clamp( size.y, 0.f, 2160.f );
+            projectViewWindow.mOnSizeChanged.Emmit( { (uint32_t)projectViewWindow.mSize[0], (uint32_t)projectViewWindow.mSize[1] } );
         }
 
         // draw menu bar
         if( ImGui::BeginMenuBar() )
         {
 
-            ImGui::Text( "%d x %d", (int)mSize.x, (int)mSize.y );
+            ImGui::Text( "%d x %d", (int)projectViewWindow.mSize.x, (int)projectViewWindow.mSize.y );
 
             const ImVec4 disabledColor = ImVec4( 0.3f, 0.3f, 0.3f, 0.3f );
 
@@ -63,7 +66,7 @@ namespace fan
                                        ImVec4( 0, 0, 0, 0 ),
                                        ImVec4( 1.f, 1.f, 1.f, 1.f ) ) )
                 {
-                    mOnPlay.Emmit();
+                    projectViewWindow.mOnPlay.Emmit();
                 }
             }
             else
@@ -71,7 +74,7 @@ namespace fan
                 // Stop
                 if( ImGui::ButtonIcon( ImGui::Stop16, { 16, 16 }, -1, ImVec4( 0, 0, 0, 0 ) ) )
                 {
-                    mOnStop.Emmit();
+                    projectViewWindow.mOnStop.Emmit();
                 }
             }
 
@@ -83,8 +86,8 @@ namespace fan
             // Pause
             if( ImGui::ButtonIcon( ImGui::Pause16, { 16, 16 }, -1, ImVec4( 0, 0, 0, 0.f ), pauseTint ) )
             {
-                if( playState.mState == EditorPlayState::PLAYING ){ mOnPause.Emmit(); }
-                else if( playState.mState == EditorPlayState::PAUSED ){ mOnResume.Emmit(); }
+                if( playState.mState == EditorPlayState::PLAYING ){ projectViewWindow.mOnPause.Emmit(); }
+                else if( playState.mState == EditorPlayState::PAUSED ){ projectViewWindow.mOnResume.Emmit(); }
             }
 
             // Step
@@ -94,15 +97,15 @@ namespace fan
             if( ImGui::ButtonIcon( ImGui::Step16, { 16, 16 }, -1, ImVec4( 0, 0, 0, 0 ), stepTint ) &&
                 playState.mState == EditorPlayState::PAUSED )
             {
-                mOnStep.Emmit();
+                projectViewWindow.mOnStep.Emmit();
             }
 
             // combo current world
             ImGui::Spacing();
             ImGui::SetNextItemWidth( 200.f );
-            if( ImGui::Combo( "##current project", &mCurrentProject, mStringProjectSelectionCombo ) )
+            if( ImGui::Combo( "##current project", &projectViewWindow.mCurrentProject, projectViewWindow.mStringProjectSelectionCombo ) )
             {
-                mOnSelectProject.Emmit( mCurrentProject );
+                projectViewWindow.mOnSelectProject.Emmit( projectViewWindow.mCurrentProject );
             }
 
             ImGui::EndMenuBar();
@@ -112,11 +115,11 @@ namespace fan
         const ImVec2 cursorPos = ImGui::GetCursorPos();
         const ImVec2 windowPos = ImGui::GetWindowPos();
 
-        mPosition = glm::vec2( cursorPos.x + windowPos.x, cursorPos.y + windowPos.y );
+        projectViewWindow.mPosition = glm::vec2( cursorPos.x + windowPos.x, cursorPos.y + windowPos.y );
 
         // Draw project
         ImGui::Image( (void*)12, imGuiSize );
 
-        mIsHovered = ImGui::IsItemHovered();
+        projectViewWindow.mIsHovered = ImGui::IsItemHovered();
     }
 }

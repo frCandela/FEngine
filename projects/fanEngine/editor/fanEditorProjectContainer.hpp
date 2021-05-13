@@ -1,14 +1,12 @@
 #pragma once
 
 #include "network/fanNetConfig.hpp"
-#include "core/memory/fanSerializedValues.hpp"
 #include "core/ecs/fanEcsWorld.hpp"
 #include "engine/project/fanIProjectContainer.hpp"
+#include "editor/singletons/fanEditorSettings.hpp"
 
 namespace fan
 {
-    class ProjectViewWindow;
-    class MainMenuBar;
     class Window;
     struct Scene;
 
@@ -21,20 +19,18 @@ namespace fan
     {
     public:
         EditorProjectContainer( LaunchSettings& _settings, const std::vector<IProject*>& _projects );
-        ~EditorProjectContainer() override;
 
         void Run() override;
         void Step();
+
     private:
         std::vector<IProject*> mProjects;
         int                    mCurrentProject = 0;
         bool                   mShowUi         = true;
-        MainMenuBar      * mMainMenuBar;
-        ProjectViewWindow* mProjectViewWindow;
-        FrameIndex mLastLogicFrameRendered;
+        FrameIndex             mLastLogicFrameRendered;
+        EditorSettingsData     mEditorSettings;
         IProject& GetCurrentProject() { return *mProjects[mCurrentProject]; }
         LaunchSettings& AdaptSettings( LaunchSettings& _settings );
-        static void UseEditorCamera( EcsWorld& _world );
 
         void OnCycleCurrentProject();
         void OnSwitchPlayStop();
@@ -52,13 +48,14 @@ namespace fan
         void OnDeleteSelection();
         void OnToogleTransformLock();
         void OnSelect( const int _index );
+        void OnSceneLoad( Scene& _scene );
+        void OnToggleShowUI() { mShowUi = !mShowUi; }
 
         static void Start( IProject& _project );
         static void Stop( IProject& _project );
         static void Pause( IProject& _project );
         static void Resume( IProject& _project );
-
-        void OnSceneLoad( Scene& _scene );
-        void OnToggleShowUI() { mShowUi = !mShowUi; }
+        static void UseEditorCamera( EcsWorld& _world );
+        static void DrawEditorUI( EcsWorld& _world );
     };
 }

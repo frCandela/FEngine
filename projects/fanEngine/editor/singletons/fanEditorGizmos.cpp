@@ -39,17 +39,17 @@ namespace fan
         // Get main camera data
         EcsWorld& world = *scene.mWorld;
         const EcsEntity id = world.GetEntity( scene.mMainCameraHandle );
-        const Transform & cameraTransform = world.GetComponent<Transform>( id );
-        const Camera    & camera          = world.GetComponent<Camera>( id );
+        const Transform& cameraTransform = world.GetComponent<Transform>( id );
+        const Camera   & camera          = world.GetComponent<Camera>( id );
 
         GizmoCacheData& cacheData = mGizmoCacheData[_uniqueID];
-        const Vector3     origin           = _transform.mPosition;
-        const Vector3     axisDirection[3] = { Vector3( 1, 0, 0 ),
-                                               Vector3( 0, 1, 0 ),
-                                               Vector3( 0, 0, 1 ) };
-        const Vector3     cameraPosition   = cameraTransform.mPosition;
-        const Fixed     size              = FIXED( 0.2 ) * Vector3::Distance( origin, cameraPosition );
-        const Transform coneRotation[3]   = {
+        const Vector3   origin           = _transform.mPosition;
+        const Vector3   axisDirection[3] = { Vector3( 1, 0, 0 ),
+                                             Vector3( 0, 1, 0 ),
+                                             Vector3( 0, 0, 1 ) };
+        const Vector3   cameraPosition   = cameraTransform.mPosition;
+        const Fixed     size             = FIXED( 0.2 ) * Vector3::Distance( origin, cameraPosition );
+        const Transform coneRotation[3]  = {
                 Transform::Make( Quaternion::Euler( 0, 0, -90 ), size * axisDirection[0] ),
                 Transform::Make( Quaternion::sIdentity, size * axisDirection[1] ),
                 Transform::Make( Quaternion::Euler( 90, 0, 0 ), size * axisDirection[2] )

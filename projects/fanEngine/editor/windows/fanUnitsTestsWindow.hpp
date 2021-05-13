@@ -1,7 +1,8 @@
 #pragma once
 
-#include "editor/windows/fanEditorWindow.hpp"
+#include "core/ecs/fanEcsSingleton.hpp"
 #include "core/unit_tests/fanUnitTest.hpp"
+#include "editor/singletons/fanEditorGuiInfo.hpp"
 
 namespace fan
 {
@@ -9,12 +10,13 @@ namespace fan
     //==================================================================================================================================================================================================
     // shows the singletons from the game ecs
     //==================================================================================================================================================================================================
-    class UnitTestsWindow : public EditorWindow
+    struct UnitTestsWindow : EcsSingleton
     {
-    public:
-        UnitTestsWindow();
+    ECS_SINGLETON( UnitTestsWindow )
 
-    protected:
+        static void SetInfo( EcsSingletonInfo& _info );
+        static void Init( EcsWorld& _world, EcsSingleton& _singleton );
+
         struct TestArgument
         {
             using RunMethod = UnitTestResult ( * )();
@@ -23,7 +25,6 @@ namespace fan
             UnitTestResult& mTestDisplay;
         };
 
-        void OnGui( EcsWorld& _world ) override;
         std::vector<TestArgument> GetTests();
         static void DrawTest( const UnitTestResult::TestResult& _testResult );
         static void DrawUnitTest( const TestArgument& _testArgument );
@@ -49,5 +50,22 @@ namespace fan
         UnitTestResult mFxTransformResult;
         UnitTestResult mBitsResult;
         UnitTestResult mQueueResult;
+    };
+
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    struct GuiUnitTestsWindow
+    {
+        static GuiSingletonInfo GetInfo()
+        {
+            GuiSingletonInfo info;
+            info.mEditorName = "unit tests";
+            info.mIcon       = ImGui::UnitTests16;
+            info.mGroup      = EngineGroups::Editor;
+            info.mType       = GuiSingletonInfo::Type::ToolWindow;
+            info.onGui       = &GuiUnitTestsWindow::OnGui;
+            return info;
+        }
+        static void OnGui( EcsWorld& _world, EcsSingleton& _singleton );
     };
 }

@@ -3,10 +3,10 @@
 #include <fstream>
 #include "core/fanPath.hpp"
 #include "core/fanDebug.hpp"
-#include "engine/singletons/fanRenderResources.hpp"
-#include "editor/fanDragnDrop.hpp"
+#include "core/time/fanProfiler.hpp"
 #include "render/resources/fanTextureManager.hpp"
 #include "render/resources/fanMeshManager.hpp"
+#include "engine/singletons/fanRenderResources.hpp"
 #include "engine/fanPrefabManager.hpp"
 #include "engine/singletons/fanSceneResources.hpp"
 #include "engine/singletons/fanScene.hpp"
@@ -18,50 +18,61 @@
 #include "engine/components/fanPointLight.hpp"
 #include "engine/components/fanDirectionalLight.hpp"
 #include "engine/components/fanParticleEmitter.hpp"
+#include "editor/singletons/fanEditorSelection.hpp"
 #include "engine/physics/fanBoxCollider.hpp"
 #include "engine/physics/fanRigidbody.hpp"
+#include "editor/fanDragnDrop.hpp"
 #include "editor/fanModals.hpp"
-#include "editor/singletons/fanEditorSelection.hpp"
 
 namespace fan
 {
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    SceneWindow::SceneWindow() : EditorWindow( "scene", ImGui::IconType::Scene16 )
+    void SceneWindow::SetInfo( EcsSingletonInfo& _info )
     {
-        mTextBuffer[0] = '\0';
+        _info.mFlags |= EcsSingletonFlags::InitOnce;
     }
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    SceneWindow::~SceneWindow() {}
+    void SceneWindow::Init( EcsWorld&, EcsSingleton& _singleton )
+    {
+        SceneWindow& sceneWindow = static_cast<SceneWindow&>( _singleton );
+        sceneWindow.onSelectSceneNode.Clear();
+        sceneWindow.mPathBuffer = "";
+        sceneWindow.mTextBuffer[0] = '\0';
+        sceneWindow.mLastSceneNodeRightClicked = nullptr;
+        sceneWindow.mExpandSceneHierarchy = false;
+    }
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void SceneWindow::OnGui( EcsWorld& _world )
+    void GuiSceneWindow::OnGui( EcsWorld& _world, EcsSingleton& _singleton )
     {
-        //SCOPED_PROFILE( scene );
+        SceneWindow& sceneWindow = static_cast<SceneWindow&>( _singleton );
+
+        SCOPED_PROFILE( gui_scene_window );
 
         Scene& scene = _world.GetSingleton<Scene>();
 
-        ImGui::Icon( GetIconType(), { 16, 16 } );
+        ImGui::Icon( ImGui::Scene16, { 16, 16 } );
         ImGui::SameLine();
         ImGui::Text( scene.mPath.c_str() );
         ImGui::Separator();
 
         // Draws all scene nodes
         SceneNode* nodeRightClicked = nullptr;
-        R_DrawSceneTree( scene.GetRootNode(), nodeRightClicked );
+        sceneWindow.R_DrawSceneTree( scene.GetRootNode(), nodeRightClicked );
 
-        mExpandSceneHierarchy = false;
+        sceneWindow.mExpandSceneHierarchy = false;
 
         if( nodeRightClicked != nullptr )
         {
             ImGui::OpenPopup( "scene_window_node_rclicked" );
-            mLastSceneNodeRightClicked = nodeRightClicked;
+            sceneWindow.mLastSceneNodeRightClicked = nodeRightClicked;
         }
 
-        PopupRightClick( _world );
+        sceneWindow.PopupRightClick( _world );
     }
 
     //==================================================================================================================================================================================================

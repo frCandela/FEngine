@@ -7,64 +7,69 @@
 
 namespace fan
 {
-    //==================================================================================================================================================================================================
-    //==================================================================================================================================================================================================
-    ProfilerWindow::ProfilerWindow() : EditorWindow( "profiler", ImGui::IconType::Profiler16 ), mColor1( 0.49f, 1.f, 0.8f ), mColor2( 0.29f, 0.8f, 1.f ), mColorHovered( 0.64f, 0.96f, 0.99f )
-    {
-        Profiler::Get().mOnProfilingEnd.Connect( &ProfilerWindow::OnProfilerEnd, this );
+    static const Color sColor1       = Color( 0.49f, 1.f, 0.8f );
+    static const Color sColor2       = Color( 0.29f, 0.8f, 1.f );
+    static const Color sColorHovered = Color( 0.64f, 0.96f, 0.99f );
 
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    void ProfilerWindow::SetInfo( EcsSingletonInfo& _info )
+    {
+        _info.mFlags |= EcsSingletonFlags::InitOnce;
+    }
+
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    void ProfilerWindow::Init( EcsWorld&, EcsSingleton& _singleton )
+    {
+        ProfilerWindow& profilerWindow = static_cast<ProfilerWindow&>( _singleton );
+        profilerWindow.mIntervalsCopy.clear();
+        profilerWindow.mFreezeCapture      = false;
+        profilerWindow.mLastScrollPosition = 0.f;
+        profilerWindow.mScale              = 1.f;
+        profilerWindow.mSpeed              = 0.2f;
+
+        Profiler::Get().mOnProfilingEnd.Connect( &ProfilerWindow::OnProfilerEnd, &profilerWindow );
         Signal<>& freezeCaptureSignal = *Input::Get().Manager().FindEvent( "freeze_capture" );
-        freezeCaptureSignal.Connect( &ProfilerWindow::OnToogleFreezeCapture, this );
-    }
-
-    //==================================================================================================================================================================================================
-    // Called when the profiling session ended,
-    // copies the intervals before they are cleared & reused by the profiler
-    //==================================================================================================================================================================================================
-    void ProfilerWindow::OnProfilerEnd()
-    {
-        if( !mFreezeCapture )
-        {
-            mIntervalsCopy = Profiler::Get().GetIntervals();
-        }
+        freezeCaptureSignal.Connect( &ProfilerWindow::OnToogleFreezeCapture, &profilerWindow );
     }
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void ProfilerWindow::OnGui( EcsWorld& /*_world*/ )
+    void GuiProfilerWindow::OnGui( EcsWorld&, EcsSingleton& _singleton )
     {
+        ProfilerWindow& profilerWindow = static_cast<ProfilerWindow&>( _singleton );
+        (void)profilerWindow;
+
         SCOPED_PROFILE( profiler );
 
         // UI
         {
-            ImGui::Checkbox( "freeze capture", &mFreezeCapture );
+            ImGui::Checkbox( "freeze capture", &profilerWindow.mFreezeCapture );
             ImGui::SameLine();
             ImGui::FanShowHelpMarker( "press \"END\" to toogle" );
             ImGui::SameLine();
-            ImGui::DragFloat( "speed", &mSpeed, 0.01f, 0.f, 10.f );
+            ImGui::DragFloat( "speed", &profilerWindow.mSpeed, 0.01f, 0.f, 10.f );
         }
 
         // Returns if no data
-        if( mIntervalsCopy.size() == 0 )
+        if( profilerWindow.mIntervalsCopy.size() == 0 )
         {
             return;
         }
 
-        const float width = mScale * ImGui::GetWindowWidth();
+        const float width = profilerWindow.mScale * ImGui::GetWindowWidth();
 
         // Draw graph in a child region
         ImGui::SetNextWindowContentSize( ImVec2( width, 180.f ) );
-        ImGui::BeginChild( "##ScrollingRegion",
-                           ImVec2( 0.f, 200 ),
-                           false,
-                           ImGuiWindowFlags_HorizontalScrollbar );
+        ImGui::BeginChild( "##ScrollingRegion", ImVec2( 0.f, 200 ), false, ImGuiWindowFlags_HorizontalScrollbar );
         {
 
             // Constants
             const float            fontHeight  = ImGui::GetFontSize();
-            const float            totalTime   = Clock::SecondsBetween( mIntervalsCopy[0].mTime,
-                                                                        mIntervalsCopy[mIntervalsCopy.size() - 1].mTime );
-            const Clock::TimePoint beginTime   = mIntervalsCopy[0].mTime;
+            const float            totalTime   = Clock::SecondsBetween( profilerWindow.mIntervalsCopy[0].mTime,
+                                                                        profilerWindow.mIntervalsCopy[profilerWindow.mIntervalsCopy.size() - 1].mTime );
+            const Clock::TimePoint beginTime   = profilerWindow.mIntervalsCopy[0].mTime;
             const ImVec2           unsclaledTL = ImGui::GetCursorScreenPos();
             const ImVec2           tl          = { unsclaledTL.x, unsclaledTL.y };
             const ImColor          colorText   = Color::sBlack.ToImGui();
@@ -81,18 +86,18 @@ namespace fan
             {
                 // Zoom on mouse scroll
                 const ImGuiIO& io = ImGui::GetIO();
-                mScale += mSpeed * io.MouseWheel;
-                if( mScale < 1.f ){ mScale = 1.f; }
+                profilerWindow.mScale += profilerWindow.mSpeed * io.MouseWheel;
+                if( profilerWindow.mScale < 1.f ){ profilerWindow.mScale = 1.f; }
 
                 // reset scroll to locked position
-                const float target = width * ( mLastScrollPosition - 0.5f * sizeScrollBar );
+                const float target = width * ( profilerWindow.mLastScrollPosition - 0.5f * sizeScrollBar );
                 ImGui::SetScrollX( target );
             }
 
             // Set scroll locked position
             if( ImGui::IsWindowHovered() && ImGui::IsMouseClicked( 1 ) )
             {
-                mLastScrollPosition = mousePos;
+                profilerWindow.mLastScrollPosition = mousePos;
             }
 
             // Used to represent the last color used at a specific depth ( alternate between two colors )
@@ -100,33 +105,33 @@ namespace fan
             lastColorStateAtDepth.fill( false );
 
             int      endIndex = 0;
-            for( int index    = 0; index < (int)mIntervalsCopy.size() / 2; ++index )
+            for( int index    = 0; index < (int)profilerWindow.mIntervalsCopy.size() / 2; ++index )
             {
 
                 // Find next closed interval
-                while( !mIntervalsCopy[endIndex].IsClosing() )
+                while( !profilerWindow.mIntervalsCopy[endIndex].IsClosing() )
                 {
                     ++endIndex;
                 }
 
                 // Find the corresponding opened interval
-                const size_t endId      = mIntervalsCopy[endIndex].mID;
+                const size_t endId      = profilerWindow.mIntervalsCopy[endIndex].mID;
                 int          beginIndex = 0;
                 size_t       depth      = 0; // Stack depth of the scope
-                while( mIntervalsCopy[beginIndex].mID != endId )
+                while( profilerWindow.mIntervalsCopy[beginIndex].mID != endId )
                 {
-                    if( mIntervalsCopy[beginIndex].IsOpening() )
+                    if( profilerWindow.mIntervalsCopy[beginIndex].IsOpening() )
                     {
                         ++depth;
                     }
-                    else if( mIntervalsCopy[beginIndex].IsClosing() )
+                    else if( profilerWindow.mIntervalsCopy[beginIndex].IsClosing() )
                     {
                         --depth;
                     }
                     ++beginIndex;
                 }
-                const Profiler::Interval& begin = mIntervalsCopy[beginIndex];
-                const Profiler::Interval& end   = mIntervalsCopy[endIndex];
+                const Profiler::Interval& begin = profilerWindow.mIntervalsCopy[beginIndex];
+                const Profiler::Interval& end   = profilerWindow.mIntervalsCopy[endIndex];
 
                 // Useful values
                 const float  ratio    = Clock::SecondsBetween( begin.mTime, end.mTime ) / totalTime;
@@ -138,12 +143,12 @@ namespace fan
                 // Alternates colors on elements at the same depth
                 fanAssert( depth < lastColorStateAtDepth.size() );
                 lastColorStateAtDepth[depth] = !lastColorStateAtDepth[depth];
-                Color color = lastColorStateAtDepth[depth] ? mColor1 : mColor2;
+                Color color = lastColorStateAtDepth[depth] ? sColor1 : sColor2;
 
                 // Draw tooltip
                 if( ImGui::IsMouseHoveringRect( tli, bri ) )
                 {
-                    color = mColorHovered;
+                    color = sColorHovered;
                     ImGui::BeginTooltip();
 
                     std::stringstream ss;
@@ -155,25 +160,30 @@ namespace fan
                 }
 
                 // Draw rectangle
-                draw_list->AddRectFilled( tli,
-                                          bri,
-                                          ImGui::GetColorU32( color.ToImGui() ),
-                                          0.0f,
-                                          ImDrawCornerFlags_All );
+                draw_list->AddRectFilled( tli, bri, ImGui::GetColorU32( color.ToImGui() ), 0.0f, ImDrawCornerFlags_All );
 
                 // Draw text
                 const float textWidth = ImGui::CalcTextSize( begin.mName ).x;
                 const float iWidth    = bri.x - tli.x;
                 if( iWidth > textWidth )
                 {
-                    draw_list->AddText( { tli.x + 0.5f * ( iWidth - textWidth ), tli.y },
-                                        colorText,
-                                        begin.mName,
-                                        begin.mName + std::strlen( begin.mName ) );
+                    draw_list->AddText( { tli.x + 0.5f * ( iWidth - textWidth ), tli.y }, colorText, begin.mName, begin.mName + std::strlen( begin.mName ) );
                 }
                 ++endIndex;
             }
         }
         ImGui::EndChild();
+    }
+
+    //==================================================================================================================================================================================================
+    // Called when the profiling session ended,
+    // copies the intervals before they are cleared & reused by the profiler
+    //==================================================================================================================================================================================================
+    void ProfilerWindow::OnProfilerEnd()
+    {
+        if( !mFreezeCapture )
+        {
+            mIntervalsCopy = Profiler::Get().GetIntervals();
+        }
     }
 }

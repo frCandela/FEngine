@@ -33,9 +33,9 @@ namespace fan
             Ratio, Pixels
         };
 
-        AlignCorner mCorner;
+        AlignCorner    mCorner;
         AlignDirection mDirection;
-        UnitType mUnitType;
-        glm::vec2 mOffset; // in pixel or in size ratio
+        UnitType       mUnitType;
+        glm::vec2      mOffset; // in pixel or in size ratio
     };
 }

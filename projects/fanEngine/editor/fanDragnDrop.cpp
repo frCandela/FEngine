@@ -11,6 +11,7 @@
 #include "render/resources/fanMesh.hpp"
 #include "render/resources/fanFont.hpp"
 #include "editor/fanImguiIcons.hpp"
+#include "editor/singletons/fanEditorSettings.hpp"
 
 namespace ImGui
 {
@@ -53,21 +54,19 @@ namespace ImGui
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void FanBeginDragDropSourceComponent( fan::EcsWorld& _world,
-                                          fan::EcsHandle& _handle,
-                                          uint32_t _type,
-                                          ImGuiDragDropFlags _flags )
+    void FanBeginDragDropSourceComponent( fan::EcsWorld& _world, fan::EcsHandle& _handle, uint32_t _type, ImGuiDragDropFlags _flags )
     {
         if( ImGui::BeginDragDropSource( _flags ) )
         {
-            const fan::EcsComponentInfo& info    = _world.GetComponentInfo( _type );
-            const fan::EditorGuiInfo   & gui     = _world.GetSingleton<fan::EditorGuiInfo>();
-            const fan::GuiComponentInfo& guiInfo = gui.GetComponentInfo( info.mType );
+            const fan::EcsComponentInfo& info     = _world.GetComponentInfo( _type );
+            const fan::EditorGuiInfo   & gui      = _world.GetSingleton<fan::EditorGuiInfo>();
+            const fan::EditorSettings  & settings = _world.GetSingleton<fan::EditorSettings>();
+            const fan::GuiComponentInfo& guiInfo  = gui.GetComponentInfo( info.mType );
 
             std::string      nameid  = ComponentPayload::sPrefix + std::to_string( info.mType );
             ComponentPayload payload = { _handle, _type };
             ImGui::SetDragDropPayload( nameid.c_str(), &payload, sizeof( payload ) );
-            ImGui::Icon( guiInfo.mIcon, { 16, 16 }, fan::GroupsColors::GetColor( guiInfo.mGroup ) );
+            ImGui::Icon( guiInfo.mIcon, { 16, 16 }, settings.mData->mGroupsColors.GetColor( guiInfo.mGroup ) );
             ImGui::SameLine();
             ImGui::Text( info.mName.c_str() );
             ImGui::EndDragDropSource();
@@ -80,14 +79,15 @@ namespace ImGui
     {
         if( ImGui::BeginDragDropSource( _flags ) )
         {
-            const fan::EcsSingletonInfo& info    = _world.GetSingletonInfo( _type );
-            const fan::EditorGuiInfo   & gui     = _world.GetSingleton<fan::EditorGuiInfo>();
-            const fan::GuiSingletonInfo& guiInfo = gui.GetSingletonInfo( info.mType );
+            const fan::EcsSingletonInfo& info     = _world.GetSingletonInfo( _type );
+            const fan::EditorGuiInfo   & gui      = _world.GetSingleton<fan::EditorGuiInfo>();
+            const fan::EditorSettings  & settings = _world.GetSingleton<fan::EditorSettings>();
+            const fan::GuiSingletonInfo& guiInfo  = gui.GetSingletonInfo( info.mType );
 
             std::string      nameid  = SingletonPayload::sPrefix + std::to_string( info.mType );
             SingletonPayload payload = { _type };
             ImGui::SetDragDropPayload( nameid.c_str(), &payload, sizeof( payload ) );
-            ImGui::Icon( guiInfo.mIcon, { 16, 16 }, fan::GroupsColors::GetColor( guiInfo.mGroup ) );
+            ImGui::Icon( guiInfo.mIcon, { 16, 16 }, settings.mData->mGroupsColors.GetColor( guiInfo.mGroup ) );
             ImGui::SameLine();
             ImGui::Text( info.mName.c_str() );
             ImGui::EndDragDropSource();

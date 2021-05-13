@@ -9,18 +9,31 @@
 #include "editor/singletons/fanEditorSelection.hpp"
 #include "editor/singletons/fanEditorGuiInfo.hpp"
 #include "editor/gui/fanGroupsColors.hpp"
+#include "editor/singletons/fanEditorSettings.hpp"
 
 namespace fan
 {
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    InspectorWindow::InspectorWindow() :
-            EditorWindow( "inspector", ImGui::IconType::Inspector16 ) {}
+    void InspectorWindow::SetInfo( EcsSingletonInfo& _info )
+    {
+        _info.mFlags |= EcsSingletonFlags::InitOnce;
+    }
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void InspectorWindow::OnGui( EcsWorld& _world )
+    void InspectorWindow::Init( EcsWorld&, EcsSingleton& _singleton )
     {
+        InspectorWindow& inspectorWindow = static_cast<InspectorWindow&>( _singleton );
+        (void)inspectorWindow;
+    }
+
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    void GuiInspectorWindow::OnGui( EcsWorld& _world, EcsSingleton& _singleton )
+    {
+        InspectorWindow& inspectorWindow = static_cast<InspectorWindow&>( _singleton );
+        (void)inspectorWindow;
         SCOPED_PROFILE( inspector );
 
         EcsHandle handleSelected = _world.GetSingleton<EditorSelection>().mSelectedNodeHandle;
@@ -30,11 +43,12 @@ namespace fan
             const EcsEntity entity = _world.GetEntity( node.mHandle );
 
             // scene node gui
-            ImGui::Icon( GetIconType(), { 16, 16 } );
+            ImGui::Icon( ImGui::Inspector16, { 16, 16 } );
             ImGui::SameLine();
             ImGui::Text( "Scene node : %s", node.mName.c_str() );
 
-            const EditorGuiInfo        & gui = _world.GetSingleton<EditorGuiInfo>();
+            const EditorSettings       & settings = _world.GetSingleton<EditorSettings>();
+            const EditorGuiInfo        & gui      = _world.GetSingleton<EditorGuiInfo>();
             for( const EcsComponentInfo& info : _world.GetComponentInfos() )
             {
                 if( !_world.HasComponent( entity, info.mType ) ){ continue; }
@@ -47,7 +61,7 @@ namespace fan
                 ImGui::Separator();
 
                 // Icon
-                ImGui::Icon( guiInfo.mIcon, { 16, 16 }, GroupsColors::GetColor( guiInfo.mGroup ) );
+                ImGui::Icon( guiInfo.mIcon, { 16, 16 }, settings.mData->mGroupsColors.GetColor( guiInfo.mGroup ) );
                 ImGui::SameLine();
                 ImGui::FanBeginDragDropSourceComponent( _world,
                                                         node.mHandle,
@@ -80,7 +94,7 @@ namespace fan
                 ImGui::OpenPopup( "new_component" );
             }
 
-            NewComponentPopup( _world );
+            InspectorWindow::NewComponentPopup( _world );
         }
     }
 
@@ -187,10 +201,11 @@ namespace fan
     //==================================================================================================================================================================================================
     void InspectorWindow::NewComponentItem( EcsWorld& _world, const EcsComponentInfo& _info )
     {
-        const EditorGuiInfo        & gui     = _world.GetSingleton<EditorGuiInfo>();
-        const fan::GuiComponentInfo& guiInfo = gui.GetComponentInfo( _info.mType );
+        const EditorGuiInfo        & gui      = _world.GetSingleton<EditorGuiInfo>();
+        const fan::GuiComponentInfo& guiInfo  = gui.GetComponentInfo( _info.mType );
+        const EditorSettings       & settings = _world.GetSingleton<EditorSettings>();
 
-        ImGui::Icon( guiInfo.mIcon, { 16, 16 }, GroupsColors::GetColor( guiInfo.mGroup ) );
+        ImGui::Icon( guiInfo.mIcon, { 16, 16 }, settings.mData->mGroupsColors.GetColor( guiInfo.mGroup ) );
         ImGui::SameLine();
         if( ImGui::MenuItem( _info.mName.c_str() ) )
         {

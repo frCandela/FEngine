@@ -16,9 +16,9 @@ namespace fan
         static void Save( const EcsComponent& _component, Json& _json );
         static void Load( EcsComponent& _component, const Json& _json );
 
-        ComponentPtr<UITransform> mTargetTransform;
-        float                     mProgress; // between 0-1
-        int                       mMaxSize;  // in pixels
+        ComponentPtr <UITransform> mTargetTransform;
+        float                      mProgress; // between 0-1
+        int                        mMaxSize;  // in pixels
 
         void SetProgress( const float _progress );
     };

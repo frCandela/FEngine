@@ -27,8 +27,8 @@ namespace fan
                 SCOPED_PROFILE( detect_collisions )
                 struct RigidbodyData
                 {
-                    Transform* transform;
-                    Rigidbody* rigidbody;
+                    Transform     * transform;
+                    Rigidbody     * rigidbody;
                     SphereCollider* sphere;
                     BoxCollider   * box;
                 };

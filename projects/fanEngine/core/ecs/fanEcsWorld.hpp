@@ -53,7 +53,7 @@ namespace fan
         void ApplyTransitions();
         void Clear();
         void InitSingletons();
-        void PostInitSingletons();
+        void PostInitSingletons( const bool _force = false );
         int NumComponents() const { return int( mComponentsInfo.size() ); }
         int NumTags() const { return ecsSignatureLength - mNextTagIndex - 1; }
         int GetFistTagIndex() const { return mNextTagIndex + 1; }
@@ -194,8 +194,6 @@ namespace fan
         info.init  = &_SingletonType::Init;
         info.mType = _SingletonType::Info::sType;
         mSingletonInfos[_SingletonType::Info::sType] = info;
-
-        // init singleton
         info.init( *this, *singleton );
     }
 

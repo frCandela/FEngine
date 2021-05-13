@@ -7,7 +7,7 @@ set(FAN_CORE_LIBS
         quickhull
         )
 
-set( LIBRARY_NAME fanCore )
+set(LIBRARY_NAME fanCore)
 
 add_library(${LIBRARY_NAME} STATIC ${FAN_CORE_SRC} ${FAN_CORE_H})
 target_link_libraries(${LIBRARY_NAME} ${FAN_CORE_LIBS})

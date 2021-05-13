@@ -385,7 +385,7 @@ namespace fan
 
         void TestASin()
         {
-            static_assert( Fixed::ASin( 1 ) == FX_HALF_PI);
+            static_assert( Fixed::ASin( 1 ) == FX_HALF_PI );
 
             FixedFunction  fxASin     = &Fixed::ASin;
             DoubleFunction doubleASin = &std::asin;

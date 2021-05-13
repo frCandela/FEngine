@@ -18,18 +18,30 @@ namespace fan
 {
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    RenderWindow::RenderWindow( Renderer& _renderer )
-            : EditorWindow( "renderer", ImGui::IconType::Renderer16 ), mRenderer( _renderer ) {}
+    void RenderWindow::SetInfo( EcsSingletonInfo& _info )
+    {
+        _info.mFlags |= EcsSingletonFlags::InitOnce;
+    }
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void RenderWindow::OnGui( EcsWorld& _world )
+    void RenderWindow::Init( EcsWorld&, EcsSingleton& _singleton )
     {
+        RenderWindow& renderWindow = static_cast<RenderWindow&>( _singleton );
+        renderWindow.mRenderer = nullptr;
+    }
+
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    void GuiRenderWindow::OnGui( EcsWorld& _world, EcsSingleton& _singleton )
+    {
+        RenderWindow& renderWindow = static_cast<RenderWindow&>( _singleton );
+
         SCOPED_PROFILE( render );
 
         const RenderResources& renderResources = _world.GetSingleton<RenderResources>();
 
-        ImGui::Icon( GetIconType(), { 16, 16 } );
+        ImGui::Icon( ImGui::Renderer16, { 16, 16 } );
         ImGui::SameLine();
         ImGui::Text( "Renderer" );
 
@@ -84,7 +96,7 @@ namespace fan
 
         if( ImGui::CollapsingHeader( "Rendered Mesh : " ) )
         {
-            const std::vector<DrawData>& meshArray = mRenderer.mDrawModels.mDrawData;
+            const std::vector<DrawData>& meshArray = renderWindow.mRenderer->mDrawModels.mDrawData;
             for( uint32_t meshIndex = 0; meshIndex < meshArray.size(); meshIndex++ )
             {
                 const DrawData& drawData = meshArray[meshIndex];
@@ -99,7 +111,7 @@ namespace fan
             }
         }
 
-        UniformLights& lights = mRenderer.mDrawModels.mUniforms.mUniformsLights;
+        UniformLights& lights = renderWindow.mRenderer->mDrawModels.mUniforms.mUniformsLights;
         if( ImGui::CollapsingHeader( "Directional lights : " ) )
         {
             ImGui::PushItemWidth( 150 );

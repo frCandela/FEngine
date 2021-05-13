@@ -120,7 +120,7 @@ namespace fan
                             break;
                         default:
                             layoutPosition = { 0, 0 };
-                            layoutSize = { 0, 0 };
+                            layoutSize     = { 0, 0 };
                             fanAssert( false );
                             break;
                     }

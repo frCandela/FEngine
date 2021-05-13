@@ -21,7 +21,7 @@ namespace fan
         glm::ivec2  mWindow_size           = { -1, -1 };
 
 #ifdef NDEBUG
-        bool mEnableLivepp = false;	    // disables Live++ hot reload
+        bool mEnableLivepp = false;        // disables Live++ hot reload
 #else
         bool mEnableLivepp = true;        // enables Live++ hot reload
 #endif // !NDEBUG

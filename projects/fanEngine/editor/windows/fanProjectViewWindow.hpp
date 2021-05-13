@@ -1,9 +1,10 @@
 #pragma once
 
-#include "core/ecs/fanSignal.hpp"
-#include "editor/windows/fanEditorWindow.hpp"
-#include "engine/project/fanLaunchSettings.hpp"
 #include "glfw/glfw3.h"
+#include "core/ecs/fanEcsSingleton.hpp"
+#include "core/ecs/fanSignal.hpp"
+#include "engine/project/fanLaunchSettings.hpp"
+#include "editor/singletons/fanEditorGuiInfo.hpp"
 
 namespace fan
 {
@@ -12,9 +13,13 @@ namespace fan
     //==================================================================================================================================================================================================
     // 3D view displaying a world in a project
     //==================================================================================================================================================================================================
-    class ProjectViewWindow : public EditorWindow
+    struct ProjectViewWindow : EcsSingleton
     {
-    public:
+    ECS_SINGLETON( ProjectViewWindow )
+
+        static void SetInfo( EcsSingletonInfo& _info );
+        static void Init( EcsWorld& _world, EcsSingleton& _singleton );
+
         Signal<VkExtent2D> mOnSizeChanged;
         Signal<>           mOnPlay;
         Signal<>           mOnPause;
@@ -23,20 +28,28 @@ namespace fan
         Signal<>           mOnStep;
         Signal<int>        mOnSelectProject;
 
-        ProjectViewWindow( /*const LaunchSettings::NetworkMode _launchMode*/ );
-        glm::vec2 GetSize() const { return mSize; }
-        glm::vec2 GetPosition() const { return mPosition; }
-        float GetAspectRatio() const { return (float)mSize[0] / (float)mSize[1]; }
-        bool IsHovered() const { return mIsHovered; }
-        void SetCurrentProject( const int _index ) { mCurrentProject = _index; }
-    protected:
-        void OnGui( EcsWorld& _world ) override;
-
-    private:
         glm::vec2 mSize           = glm::vec2( 1.f, 1.f );
         glm::vec2 mPosition;
         bool      mIsHovered;
         char      mStringProjectSelectionCombo[16];
         int       mCurrentProject = 0;
+    };
+
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    struct GuiProjectViewWindow
+    {
+        static GuiSingletonInfo GetInfo()
+        {
+            GuiSingletonInfo info;
+            info.mEditorName       = "project view";
+            info.mIcon             = ImGui::Joystick16;
+            info.mGroup            = EngineGroups::Editor;
+            info.mType             = GuiSingletonInfo::Type::ToolWindow;
+            info.mImGuiWindowFlags = ImGuiWindowFlags_MenuBar;
+            info.onGui             = &GuiProjectViewWindow::OnGui;
+            return info;
+        }
+        static void OnGui( EcsWorld& _world, EcsSingleton& _singleton );
     };
 }

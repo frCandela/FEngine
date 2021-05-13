@@ -5,6 +5,7 @@
 #include "editor/singletons/fanEditorGuiInfo.hpp"
 #include "editor/fanModals.hpp"
 #include "editor/gui/fanGroupsColors.hpp"
+#include "editor/singletons/fanEditorSettings.hpp"
 
 namespace ImGui
 {
@@ -34,7 +35,8 @@ namespace ImGui
     //==================================================================================================================================================================================================
     void FanPopupSetSingletonSlot::Draw( fan::EcsWorld& _world, fan::SlotPtr& _slotPtr )
     {
-        const fan::EditorGuiInfo& gui = _world.GetSingleton<fan::EditorGuiInfo>();
+        const fan::EditorGuiInfo & gui      = _world.GetSingleton<fan::EditorGuiInfo>();
+        const fan::EditorSettings& settings = _world.GetSingleton<fan::EditorSettings>();
 
         ImGui::SetNextWindowSize( { 400, 400 } );
         if( ImGui::BeginPopupModal( sName,
@@ -52,7 +54,7 @@ namespace ImGui
                     didNotDrawAnything = false;
                     // display the slot
                     const fan::GuiSingletonInfo& guiInfo = gui.GetSingletonInfo( info.mType );
-                    ImGui::Icon( guiInfo.mIcon, { 16, 16 }, fan::GroupsColors::GetColor( guiInfo.mGroup ) );
+                    ImGui::Icon( guiInfo.mIcon, { 16, 16 }, settings.mData->mGroupsColors.GetColor( guiInfo.mGroup ) );
                     ImGui::SameLine();
                     if( ImGui::TreeNode( info.mName.c_str() ) )
                     {
@@ -96,9 +98,7 @@ namespace ImGui
     void FanPopupSetComponentSlot::Draw( fan::EcsWorld& _world, fan::SlotPtr& _slotPtr )
     {
         ImGui::SetNextWindowSize( { 400, 400 } );
-        if( ImGui::BeginPopupModal( sName,
-                                    NULL,
-                                    ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove ) )
+        if( ImGui::BeginPopupModal( sName, NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove ) )
         {
             if( !_slotPtr.IsComponentSlot() )
             {
@@ -111,6 +111,7 @@ namespace ImGui
             {
                 std::vector<fan::EcsComponentInfo*> infos;
 
+                fan::EditorSettings& settings = _world.GetSingleton<fan::EditorSettings>();
                 fan::EcsEntity entity             = _world.GetEntity( _slotPtr.Data().mHandle );
                 bool           didNotDrawAnything = true;
                 for( int       componentIndex     = 0; componentIndex < _world.NumComponents(); ++componentIndex )
@@ -123,7 +124,7 @@ namespace ImGui
 
                     const fan::EditorGuiInfo   & gui     = _world.GetSingleton<fan::EditorGuiInfo>();
                     const fan::GuiComponentInfo& guiInfo = gui.GetComponentInfo( info.mType );
-                    ImGui::Icon( guiInfo.mIcon, { 16, 16 }, fan::GroupsColors::GetColor( guiInfo.mGroup ) );
+                    ImGui::Icon( guiInfo.mIcon, { 16, 16 }, settings.mData->mGroupsColors.GetColor( guiInfo.mGroup ) );
                     ImGui::SameLine();
                     if( ImGui::TreeNode( info.mName.c_str() ) )
                     {
@@ -160,13 +161,12 @@ namespace ImGui
     //==================================================================================================================================================================================================
     void DrawTooltipSingleton( fan::EcsWorld& _world, fan::SlotPtr& _ptr )
     {
-        const fan::EditorGuiInfo& guiInfo = _world.GetSingleton<fan::EditorGuiInfo>();
+        const fan::EditorGuiInfo & guiInfo  = _world.GetSingleton<fan::EditorGuiInfo>();
+        const fan::EditorSettings& settings = _world.GetSingleton<fan::EditorSettings>();
 
         ImGui::BeginTooltip();
         const fan::GuiSingletonInfo& targetSingletonInfo = guiInfo.GetSingletonInfo( _ptr.Data().mType );
-        ImGui::Icon( targetSingletonInfo.mIcon,
-                     { 16, 16 },
-                     fan::GroupsColors::GetColor( targetSingletonInfo.mGroup ) );
+        ImGui::Icon( targetSingletonInfo.mIcon, { 16, 16 }, settings.mData->mGroupsColors.GetColor( targetSingletonInfo.mGroup ) );
         ImGui::SameLine();
         ImGui::Text( "target singleton: %s", targetSingletonInfo.mEditorName.c_str() );
         const std::string targetSlotName = _ptr.Data().mSlot == nullptr ?
@@ -182,22 +182,19 @@ namespace ImGui
     //==================================================================================================================================================================================================
     void DrawTooltipComponent( fan::EcsWorld& _world, fan::SlotPtr& _ptr )
     {
-        const fan::EditorGuiInfo& guiInfo = _world.GetSingleton<fan::EditorGuiInfo>();
+        const fan::EditorGuiInfo & guiInfo  = _world.GetSingleton<fan::EditorGuiInfo>();
+        const fan::EditorSettings& settings = _world.GetSingleton<fan::EditorSettings>();
 
         ImGui::BeginTooltip();
         fan::EcsEntity entity = _world.GetEntity( _ptr.Data().mHandle );
         const fan::GuiComponentInfo& sceneNodeInfo = guiInfo.GetComponentInfo( fan::SceneNode::Info::sType );
-        ImGui::Icon( sceneNodeInfo.mIcon,
-                     { 16, 16 },
-                     fan::GroupsColors::GetColor( sceneNodeInfo.mGroup ) );
+        ImGui::Icon( sceneNodeInfo.mIcon, { 16, 16 }, settings.mData->mGroupsColors.GetColor( sceneNodeInfo.mGroup ) );
         const fan::SceneNode& sceneNode = _world.GetComponent<fan::SceneNode>( entity );
         ImGui::SameLine();
         ImGui::Text( "scene node      : %s", sceneNode.mName.c_str() );
 
         const fan::GuiComponentInfo& targetComponentInfo = guiInfo.GetComponentInfo( _ptr.Data().mType );
-        ImGui::Icon( targetComponentInfo.mIcon,
-                     { 16, 16 },
-                     fan::GroupsColors::GetColor( targetComponentInfo.mGroup ) );
+        ImGui::Icon( targetComponentInfo.mIcon, { 16, 16 }, settings.mData->mGroupsColors.GetColor( targetComponentInfo.mGroup ) );
         ImGui::SameLine();
         ImGui::Text( "target component: %s", targetComponentInfo.mEditorName.c_str() );
         const std::string targetSlotName = _ptr.Data().mSlot == nullptr ?

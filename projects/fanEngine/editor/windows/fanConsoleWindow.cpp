@@ -6,6 +6,113 @@
 namespace fan
 {
     //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    void ConsoleWindow::SetInfo( EcsSingletonInfo& _info )
+    {
+        _info.destroy = &ConsoleWindow::Destroy;
+        _info.mFlags |= EcsSingletonFlags::InitOnce;
+    }
+
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    void ConsoleWindow::Init( EcsWorld&, EcsSingleton& _singleton )
+    {
+        ConsoleWindow& consoleWindow = static_cast<ConsoleWindow&>( _singleton );
+        consoleWindow.mMaxSizeLogBuffers = 1024;
+        consoleWindow.mFirstLogIndex     = 0;
+        consoleWindow.mGrabFocus         = false;
+        consoleWindow.mInputBuffer[0] = '\0';
+        consoleWindow.mLogBuffer.clear();
+        consoleWindow.mLogBuffer.reserve( consoleWindow.mMaxSizeLogBuffers );
+        consoleWindow.mScrollDown = false;
+        consoleWindow.mGrabFocus = false;
+        Debug::Get().onNewLog.Connect( &ConsoleWindow::OnNewLog, &consoleWindow );
+    }
+
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    void ConsoleWindow::Destroy( EcsWorld&, EcsSingleton& )
+    {
+        Debug::Get().onNewLog.Clear();
+    }
+
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    void GuiConsoleWindow::OnGui( EcsWorld&, EcsSingleton& _singleton )
+    {
+        ConsoleWindow& console = static_cast<ConsoleWindow&>( _singleton );
+
+        SCOPED_PROFILE( console_win )
+
+        // List the logs
+        const float height = ImGui::GetWindowHeight();
+        if( height > 60 )
+        {
+            ImGui::BeginChild( "scrolling",
+                               ImVec2( 0, height - 65 ),
+                               true,
+                               ImGuiWindowFlags_AlwaysVerticalScrollbar );
+            for( int logIndex = console.mFirstLogIndex; logIndex < console.mFirstLogIndex + (int)console.mLogBuffer.size(); logIndex++ )
+            {
+                const ConsoleWindow::LogItemCompiled& item = console.mLogBuffer[logIndex % console.mMaxSizeLogBuffers];
+                ImGui::TextColored( item.mColor, item.mLogMessage.c_str() );    // Time
+            }
+            if( console.mScrollDown )
+            {
+                ImGui::SetScrollHereY( 1.0f );
+                console.mScrollDown = false;
+            }
+            ImGui::EndChild();
+        }
+
+        // Text input
+
+        if( console.mGrabFocus )
+        {
+            ImGui::SetKeyboardFocusHere();
+            console.mGrabFocus = false;
+        }
+
+        // Icon
+        ImGui::Icon( ImGui::Console16, { 16, 16 } );
+        ImGui::SameLine();
+
+        // Input
+        bool pressed = false;
+        ImGui::PushItemWidth( ImGui::GetWindowWidth() - 90 );
+        if( ImGui::InputText( "##input_console", console.mInputBuffer, IM_ARRAYSIZE( console.mInputBuffer ), ImGuiInputTextFlags_EnterReturnsTrue ) )
+        {
+            pressed = true;
+        }
+        ImGui::PopItemWidth();
+        ImGui::SameLine();
+
+        // Button
+        if( ImGui::Button( ">>" ) )
+        {
+            pressed = true;
+        }
+        if( pressed == true )
+        {
+            const std::string message = console.mInputBuffer;
+            if( message.size() > 0 )
+            {
+                if( message != "clear" )
+                {
+                    Debug::Get() << "Unknown command: " << message << Debug::Endl();
+                }
+                else
+                {
+                    Debug::Get().Clear();
+                }
+                console.mInputBuffer[0] = '\0';
+                console.mScrollDown = true;
+                console.mGrabFocus  = true;
+            }
+        }
+    }
+
+    //==================================================================================================================================================================================================
     // ConsoleWindow::LogItem nested constructor
     //==================================================================================================================================================================================================
     ConsoleWindow::LogItemCompiled::LogItemCompiled( const Debug::LogItem& _logItem )
@@ -13,26 +120,6 @@ namespace fan
         mSeverity   = _logItem.severity;
         mLogMessage = Debug::SecondsToString( _logItem.time ).c_str() + std::string( " " ) + _logItem.message;
         mColor      = GetSeverityColor( _logItem.severity );
-    }
-
-    //==================================================================================================================================================================================================
-    //==================================================================================================================================================================================================
-    ConsoleWindow::ConsoleWindow() :
-            EditorWindow( "console", ImGui::IconType::Console16 ),
-            mMaxSizeLogBuffers( 256 ),
-            mFirstLogIndex( 0 ),
-            mGrabFocus( false )
-    {
-        mInputBuffer[0] = '\0';
-        mLogBuffer.reserve( mMaxSizeLogBuffers );
-        Debug::Get().onNewLog.Connect( &ConsoleWindow::OnNewLog, this );
-    }
-
-    //==================================================================================================================================================================================================
-    //==================================================================================================================================================================================================
-    ConsoleWindow::~ConsoleWindow()
-    {
-        Debug::Get().onNewLog.Clear();
     }
 
     //==================================================================================================================================================================================================
@@ -49,85 +136,6 @@ namespace fan
         {
             mLogBuffer[mFirstLogIndex] = LogItemCompiled( _item );
             mFirstLogIndex = ( mFirstLogIndex + 1 ) % mMaxSizeLogBuffers;
-        }
-    }
-
-    //==================================================================================================================================================================================================
-    //==================================================================================================================================================================================================
-    void ConsoleWindow::OnGui( EcsWorld& /*_world*/ )
-    {
-        SCOPED_PROFILE( console )
-
-        // List the logs
-        const float height = ImGui::GetWindowHeight();
-        if( height > 60 )
-        {
-            ImGui::BeginChild( "scrolling",
-                               ImVec2( 0, height - 65 ),
-                               true,
-                               ImGuiWindowFlags_AlwaysVerticalScrollbar );
-            for( int logIndex = mFirstLogIndex;
-                 logIndex < mFirstLogIndex + (int)mLogBuffer.size();
-                 logIndex++ )
-            {
-                const LogItemCompiled& item = mLogBuffer[logIndex % mMaxSizeLogBuffers];
-                ImGui::TextColored( item.mColor, item.mLogMessage.c_str() );    // Time
-            }
-            if( mScrollDown )
-            {
-                ImGui::SetScrollHereY( 1.0f );
-                mScrollDown = false;
-            }
-            ImGui::EndChild();
-        }
-
-        // Text input
-
-        if( mGrabFocus )
-        {
-            ImGui::SetKeyboardFocusHere();
-            mGrabFocus = false;
-        }
-
-        // Icon
-        ImGui::Icon( GetIconType(), { 16, 16 } );
-        ImGui::SameLine();
-
-        // Input
-        bool pressed = false;
-        ImGui::PushItemWidth( ImGui::GetWindowWidth() - 90 );
-        if( ImGui::InputText( "##input_console",
-                              mInputBuffer,
-                              IM_ARRAYSIZE( mInputBuffer ),
-                              ImGuiInputTextFlags_EnterReturnsTrue ) )
-        {
-            pressed = true;
-        }
-        ImGui::PopItemWidth();
-        ImGui::SameLine();
-
-        // Button
-        if( ImGui::Button( ">>" ) )
-        {
-            pressed = true;
-        }
-        if( pressed == true )
-        {
-            const std::string message = mInputBuffer;
-            if( message.size() > 0 )
-            {
-                if( message != "clear" )
-                {
-                    Debug::Get() << "Unknown command: " << message << Debug::Endl();
-                }
-                else
-                {
-                    Debug::Get().Clear();
-                }
-                mInputBuffer[0] = '\0';
-                mScrollDown = true;
-                mGrabFocus  = true;
-            }
         }
     }
 

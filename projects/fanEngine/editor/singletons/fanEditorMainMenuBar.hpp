@@ -1,46 +1,65 @@
 #pragma once
 
+#include <set>
 #include "core/ecs/fanEcsSingleton.hpp"
-#include "core/time/fanProfiler.hpp"
-#include "core/fanColor.hpp"
+#include "core/ecs/fanSignal.hpp"
 #include "editor/singletons/fanEditorGuiInfo.hpp"
 
 namespace fan
 {
+    struct Scene;
+
     //==================================================================================================================================================================================================
-    // Displays profiling data from the  profiler ( SCOPED_PROFILE macros )
+    // top main menu bar of the editor
     //==================================================================================================================================================================================================
-    struct ProfilerWindow : EcsSingleton
+    struct EditorMainMenuBar : EcsSingleton
     {
-    ECS_SINGLETON( ProfilerWindow )
+    ECS_SINGLETON( EditorMainMenuBar )
 
         static void SetInfo( EcsSingletonInfo& _info );
         static void Init( EcsWorld& _world, EcsSingleton& _singleton );
 
-        std::vector<Profiler::Interval> mIntervalsCopy;
-        bool                            mFreezeCapture;
-        float                           mLastScrollPosition;
-        float                           mScale;
-        float                           mSpeed;
+        static void Open( EcsWorld& _world );
+        static void New( EcsWorld& _world );
+        static void Reload( EcsWorld& _world );
+        static void Save( EcsWorld& _world );
+        static void SaveAs( EcsWorld& _world );
 
-        void OnProfilerEnd();
-        void OnToogleFreezeCapture() { mFreezeCapture = !mFreezeCapture; }
+        Signal<> mOnReloadShaders;
+        Signal<> mOnReloadIcons;
+        Signal<> mOnExit;
+
+        bool mShowImguiDemoWindow;
+        bool mShowHull;
+        bool mShowAABB;
+        bool mShowWireframe;
+        bool mShowNormals;
+        bool mShowLights;
+        bool mShowUiBounds;
+
+        bool mOpenNewScenePopupLater;
+        bool mOpenLoadScenePopupLater;
+        bool mOpenSaveScenePopupLater;
+
+        // Temporary buffers
+        std::string mPathBuffer;
     };
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    struct GuiProfilerWindow
+    struct GuiEditorMainMenuBar
     {
         static GuiSingletonInfo GetInfo()
         {
             GuiSingletonInfo info;
-            info.mEditorName = "profiler";
-            info.mIcon       = ImGui::Profiler16;
+            info.mEditorName = "main menu bar";
+            info.mIcon       = ImGui::None16;
             info.mGroup      = EngineGroups::Editor;
-            info.mType       = GuiSingletonInfo::Type::ToolWindow;
-            info.onGui       = &GuiProfilerWindow::OnGui;
+            info.onGui       = &GuiEditorMainMenuBar::OnGui;
+            info.mType       = GuiSingletonInfo::Type::Other;
             return info;
         }
         static void OnGui( EcsWorld& _world, EcsSingleton& _singleton );
+        static void DrawModals( EditorMainMenuBar& _mainMenuBar, Scene& _scene );
     };
 }

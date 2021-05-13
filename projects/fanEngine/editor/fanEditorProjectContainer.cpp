@@ -2,6 +2,7 @@
 #include <engine/systems/fanUpdateBounds.hpp>
 #include "core/input/fanInputManager.hpp"
 #include "core/input/fanInput.hpp"
+#include "core/fanBits.hpp"
 
 #include "network/singletons/fanTime.hpp"
 
@@ -23,14 +24,13 @@
 #include "editor/windows/fanEcsWindow.hpp"
 #include "editor/windows/fanTerrainWindow.hpp"
 
-#include "editor/fanMainMenuBar.hpp"
+#include "editor/singletons/fanEditorMainMenuBar.hpp"
 #include "editor/fanEditorProjectContainer.hpp"
 #include "editor/singletons/fanEditorSelection.hpp"
 #include "editor/singletons/fanEditorCopyPaste.hpp"
 #include "editor/singletons/fanEditorGizmos.hpp"
 #include "editor/singletons/fanEditorCamera.hpp"
 #include "editor/singletons/fanEditorGrid.hpp"
-#include "editor/singletons/fanEditorGuiInfo.hpp"
 #include "engine/singletons/fanRenderWorld.hpp"
 #include "editor/singletons/fanEditorPlayState.hpp"
 
@@ -43,6 +43,9 @@ namespace fan
             mProjects( _projects ),
             mLastLogicFrameRendered( 0 )
     {
+        EditorSettingsData::LoadJsonFromDisk( mEditorSettings.mJson );
+        EditorSettingsData::LoadSettingsFromJson( mEditorSettings );
+
         // Creates keyboard events
         Input::Get().Manager().CreateKeyboardEvent( "delete", Keyboard::DELETE );
         Input::Get().Manager().CreateKeyboardEvent( "open_scene", Keyboard::O, Keyboard::LEFT_CONTROL );
@@ -65,29 +68,6 @@ namespace fan
         Input::Get().Manager().CreateKeyboardAxis( "editor_up", Keyboard::E, Keyboard::Q );
         Input::Get().Manager().CreateKeyboardAxis( "editor_boost", Keyboard::LEFT_SHIFT, Keyboard::NONE );
 
-        // Initialize editor components
-        mMainMenuBar       = new MainMenuBar();
-        mProjectViewWindow = new ProjectViewWindow( /*_settings.launchMode*/ ); // @todo repair this
-        SceneWindow& sceneWindow = *new SceneWindow();
-        mMainMenuBar->SetWindows( {
-                                          mProjectViewWindow,
-                                          &sceneWindow,
-                                          new RenderWindow( mRenderer ),
-                                          new InspectorWindow(),
-                                          new ConsoleWindow(),
-                                          new EcsWindow(),
-                                          new ProfilerWindow(),
-                                          new PreferencesWindow( mRenderer, mFullScreen ),
-                                          new SingletonsWindow(),
-                                          new UnitTestsWindow(),
-                                          new TerrainWindow()
-                                  } );
-
-        // Instance messages
-        mMainMenuBar->mOnReloadShaders.Connect( &Renderer::ReloadShaders, &mRenderer );
-        mMainMenuBar->mOnReloadIcons.Connect( &Renderer::ReloadIcons, &mRenderer );
-        mMainMenuBar->mOnExit.Connect( &IProjectContainer::Exit, (IProjectContainer*)this );
-
         // Events linking
         InputManager& manager = Input::Get().Manager();
         manager.FindEvent( "reload_shaders" )->Connect( &Renderer::ReloadShaders, &mRenderer );
@@ -104,14 +84,6 @@ namespace fan
         manager.FindEvent( "delete" )->Connect( &EditorProjectContainer::OnDeleteSelection, this );
         manager.FindEvent( "toogle_follow_transform_lock" )->Connect( &EditorProjectContainer::OnToogleTransformLock, this );
 
-        mProjectViewWindow->mOnSizeChanged.Connect( &Renderer::ResizeGame, &mRenderer );
-        mProjectViewWindow->mOnPlay.Connect( &EditorProjectContainer::OnStart, this );
-        mProjectViewWindow->mOnPause.Connect( &EditorProjectContainer::OnPause, this );
-        mProjectViewWindow->mOnResume.Connect( &EditorProjectContainer::OnResume, this );
-        mProjectViewWindow->mOnStop.Connect( &EditorProjectContainer::OnStop, this );
-        mProjectViewWindow->mOnStep.Connect( &EditorProjectContainer::OnStep, this );
-        mProjectViewWindow->mOnSelectProject.Connect( &EditorProjectContainer::OnSelect, this );
-
         // Loop over all worlds to initialize them
         for( int i = 0; i < (int)mProjects.size(); i++ )
         {
@@ -123,6 +95,10 @@ namespace fan
             IProject::EcsIncludeRender3D( world );
             IProject::EcsIncludeRenderUI( world );
 
+            world.AddSingletonType<EditorSettings>();
+            EditorSettings& editorSerializedValues = world.GetSingleton<EditorSettings>();
+            editorSerializedValues.mData = &mEditorSettings;
+
             world.AddSingletonType<EditorGuiInfo>();
             world.AddSingletonType<EditorPlayState>();
             world.AddSingletonType<EditorCamera>();
@@ -130,6 +106,19 @@ namespace fan
             world.AddSingletonType<EditorSelection>();
             world.AddSingletonType<EditorCopyPaste>();
             world.AddSingletonType<EditorGizmos>();
+            world.AddSingletonType<EditorMainMenuBar>();
+            world.AddSingletonType<ConsoleWindow>();
+            world.AddSingletonType<EcsWindow>();
+            world.AddSingletonType<InspectorWindow>();
+            world.AddSingletonType<PreferencesWindow>();
+            world.AddSingletonType<ProfilerWindow>();
+            world.AddSingletonType<ProjectViewWindow>();
+            world.AddSingletonType<RenderWindow>();
+            world.AddSingletonType<SceneWindow>();
+            world.AddSingletonType<SingletonsWindow>();
+            world.AddSingletonType<TerrainWindow>();
+            world.AddSingletonType<UnitTestsWindow>();
+
             world.AddTagType<TagEditorOnly>();
 
             InitWorld( world );
@@ -141,10 +130,29 @@ namespace fan
             EditorSelection& selection = world.GetSingleton<EditorSelection>();
 
             selection.ConnectCallbacks( scene );
-            sceneWindow.onSelectSceneNode.Connect( &EditorSelection::SetSelectedSceneNode, &selection );
 
-            scene.mOnLoad.Connect( &SceneWindow::OnExpandHierarchy, &sceneWindow );
-            scene.mOnLoad.Connect( &EditorProjectContainer::OnSceneLoad, this );
+            {
+                EditorMainMenuBar& mainMenuBar = world.GetSingleton<EditorMainMenuBar>();
+                mainMenuBar.mOnReloadShaders.Connect( &Renderer::ReloadShaders, &mRenderer );
+                mainMenuBar.mOnReloadIcons.Connect( &Renderer::ReloadIcons, &mRenderer );
+                mainMenuBar.mOnExit.Connect( &IProjectContainer::Exit, (IProjectContainer*)this );
+
+                ProjectViewWindow& projectViewWindow = world.GetSingleton<ProjectViewWindow>();
+                projectViewWindow.mOnSizeChanged.Connect( &Renderer::ResizeGame, &mRenderer );
+                projectViewWindow.mOnPlay.Connect( &EditorProjectContainer::OnStart, this );
+                projectViewWindow.mOnPause.Connect( &EditorProjectContainer::OnPause, this );
+                projectViewWindow.mOnResume.Connect( &EditorProjectContainer::OnResume, this );
+                projectViewWindow.mOnStop.Connect( &EditorProjectContainer::OnStop, this );
+                projectViewWindow.mOnStep.Connect( &EditorProjectContainer::OnStep, this );
+                projectViewWindow.mOnSelectProject.Connect( &EditorProjectContainer::OnSelect, this );
+
+                SceneWindow& sceneWindow = world.GetSingleton<SceneWindow>();
+                sceneWindow.onSelectSceneNode.Connect( &EditorSelection::SetSelectedSceneNode, &selection );
+                scene.mOnLoad.Connect( &SceneWindow::OnExpandHierarchy, &sceneWindow );
+                scene.mOnLoad.Connect( &EditorProjectContainer::OnSceneLoad, this );
+            }
+            project.Init();
+            world.PostInitSingletons( true );
 
             // load scene
             scene.New();
@@ -158,9 +166,6 @@ namespace fan
                     Start( project );
                 }
             }
-
-            project.Init();
-            world.PostInitSingletons();
         }
     }
 
@@ -170,26 +175,13 @@ namespace fan
     {
         if( !_settings.mForceWindowDimensions )
         {
-            SerializedValues::LoadWindowPosition( _settings.mWindow_position );
-            SerializedValues::LoadWindowSize( _settings.mWindow_size );
+            Json json;
+            EditorSettingsData::LoadJsonFromDisk( json );
+            EditorSettingsData::LoadWindowSizeAndPosition( json, _settings.mWindow_size, _settings.mWindow_position );
         }
         _settings.mIconPath     = RenderGlobal::sEditorIcon;
         _settings.mLaunchEditor = true;
         return _settings;
-    }
-
-    //==================================================================================================================================================================================================
-    //==================================================================================================================================================================================================
-    EditorProjectContainer::~EditorProjectContainer()
-    {
-        // Deletes ui
-        delete mMainMenuBar;
-        if( !mLaunchSettings.mForceWindowDimensions )
-        {
-            SerializedValues::SaveWindowPosition( mWindow.GetPosition() );
-            SerializedValues::SaveWindowSize( mWindow.GetSize() );
-        }
-        SerializedValues::Get().SaveValuesToDisk();
     }
 
     //==================================================================================================================================================================================================
@@ -201,7 +193,12 @@ namespace fan
         {
             Step();
         }
+
         Debug::Log( "Exit application" );
+
+        EditorSettingsData::SaveSettingsToJson( mEditorSettings );
+        EditorSettingsData::SaveWindowSizeAndPosition( mEditorSettings.mJson, mRenderer.mWindow.GetSize(), mRenderer.mWindow.GetPosition() );
+        EditorSettingsData::SaveJsonToDisk( mEditorSettings.mJson );
     }
 
     //==================================================================================================================================================================================================
@@ -244,6 +241,8 @@ namespace fan
 
         mOnLPPSynch.Emmit();
 
+        ProjectViewWindow& currentProjectViewWindow = currentWorld.GetSingleton<ProjectViewWindow>();
+
         // Render world
         const double deltaTime = elapsedTime - currentTime.mLastRenderTime;
         if( deltaTime > currentTime.mRenderDelta.ToDouble() )
@@ -257,20 +256,19 @@ namespace fan
                 mLastLogicFrameRendered = currentTime.mFrameIndex;
 
                 // Update input
-                const glm::vec2 viewPosition = mProjectViewWindow->GetPosition();
-                const glm::vec2 viewSize     = mProjectViewWindow->GetSize();
-                Mouse::NextFrame( mWindow.mWindow, viewPosition, viewSize );
+                Mouse::NextFrame( mWindow.mWindow, currentProjectViewWindow.mPosition, currentProjectViewWindow.mSize );
                 Input::Get().NewFrame();
                 Input::Get().Manager().PullEvents();
                 currentWorld.GetSingleton<Mouse>().UpdateData( mWindow.mWindow );
 
                 SCOPED_PROFILE( debug_draw );
-                if( mMainMenuBar->ShowWireframe() ){ currentWorld.Run<SDrawDebugWireframe>(); }
-                if( mMainMenuBar->ShowNormals() ){ currentWorld.Run<SDrawDebugNormals>(); }
-                if( mMainMenuBar->ShowAABB() ){ currentWorld.Run<SDrawDebugBounds>(); }
-                if( mMainMenuBar->ShowHull() ){ currentWorld.Run<SDrawDebugHull>(); }
-                if( mMainMenuBar->ShowUiBounds() ){ currentWorld.Run<SDrawDebugUiBounds>(); }
-                if( mMainMenuBar->ShowLights() )
+                EditorMainMenuBar& mainMenuBar = currentWorld.GetSingleton<EditorMainMenuBar>();
+                if( mainMenuBar.mShowWireframe ){ currentWorld.Run<SDrawDebugWireframe>(); }
+                if( mainMenuBar.mShowNormals ){ currentWorld.Run<SDrawDebugNormals>(); }
+                if( mainMenuBar.mShowAABB ){ currentWorld.Run<SDrawDebugBounds>(); }
+                if( mainMenuBar.mShowHull ){ currentWorld.Run<SDrawDebugHull>(); }
+                if( mainMenuBar.mShowUiBounds ){ currentWorld.Run<SDrawDebugUiBounds>(); }
+                if( mainMenuBar.mShowLights )
                 {
                     currentWorld.Run<SDrawDebugPointLights>();
                     currentWorld.Run<SDrawDebugDirectionalLights>();
@@ -284,11 +282,11 @@ namespace fan
                 {
                     EditorCamera::Update( currentWorld, currentTime.mLogicDelta );
                 }
-                currentWorld.GetSingleton<EditorSelection>().Update( mProjectViewWindow->IsHovered() );
+                currentWorld.GetSingleton<EditorSelection>().Update( currentProjectViewWindow.mIsHovered );
 
                 // ImGui render
                 ImGui::NewFrame();
-                mMainMenuBar->Draw( currentWorld );
+                DrawEditorUI( currentWorld );
                 currentProject.OnGui();
                 ImGui::Render();
             }
@@ -297,7 +295,7 @@ namespace fan
 
             Time::RegisterFrameDrawn( currentTime, deltaTime );
 
-            UpdateRenderWorld( mRenderer, currentProject, mProjectViewWindow->GetSize() );
+            UpdateRenderWorld( mRenderer, currentProject, currentProjectViewWindow.mSize );
 
             mRenderer.DrawFrame();
 
@@ -357,9 +355,7 @@ namespace fan
             if( mPrevSelectionHandle != 0 &&
                 mScene.mNodes.find( mPrevSelectionHandle ) != mScene.mNodes.end() )
             {
-                fan::SceneNode& node = world.GetComponent<fan::SceneNode>
-                        ( world.GetEntity( mPrevSelectionHandle ) );
-
+                fan::SceneNode& node = world.GetComponent<fan::SceneNode>( world.GetEntity( mPrevSelectionHandle ) );
                 world.GetSingleton<EditorSelection>().SetSelectedSceneNode( &node );
             }
         }
@@ -472,9 +468,45 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void EditorProjectContainer::OnOpen() { mMainMenuBar->Open( GetCurrentProject().mWorld ); }
-    void EditorProjectContainer::OnReload() { mMainMenuBar->Reload( GetCurrentProject().mWorld ); }
-    void EditorProjectContainer::OnSave() { mMainMenuBar->Save( GetCurrentProject().mWorld ); }
+    void EditorProjectContainer::DrawEditorUI( EcsWorld& _world )
+    {
+        // Draw tool windows
+        EditorGuiInfo    & guiInfos       = _world.GetSingleton<EditorGuiInfo>();
+        EditorMainMenuBar& mainMenuBar    = _world.GetSingleton<EditorMainMenuBar>();
+        EditorSettings   & editorSettings = _world.GetSingleton<EditorSettings>();
+
+        // Draw main menu bar
+        GuiSingletonInfo& mainMenuBarInfo = guiInfos.GetSingletonInfo( EditorMainMenuBar::Info::sType );
+        ( *mainMenuBarInfo.onGui )( _world, mainMenuBar );
+
+        // Draw imgui demo window
+        if( mainMenuBar.mShowImguiDemoWindow )
+        {
+            ImGui::ShowDemoWindow( &mainMenuBar.mShowImguiDemoWindow );
+        }
+
+        // Draw tool windows
+        for( auto& pair : guiInfos.mSingletonInfos )
+        {
+            GuiSingletonInfo& info    = pair.second;
+            bool            & visible = editorSettings.mData->mToolWindowsVisibility[pair.first];
+            if( visible && info.mType == GuiSingletonInfo::Type::ToolWindow )
+            {
+                EcsSingleton& singleton = _world.GetSingleton( pair.first );
+                if( ImGui::Begin( info.mEditorName.c_str(), &visible, info.mImGuiWindowFlags ) )
+                {
+                    ( *info.onGui )( _world, singleton );
+                }
+                ImGui::End();
+            }
+        }
+    }
+
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    void EditorProjectContainer::OnOpen() { GetCurrentProject().mWorld.GetSingleton<EditorMainMenuBar>().Open( GetCurrentProject().mWorld ); }
+    void EditorProjectContainer::OnReload() { GetCurrentProject().mWorld.GetSingleton<EditorMainMenuBar>().Reload( GetCurrentProject().mWorld ); }
+    void EditorProjectContainer::OnSave() { GetCurrentProject().mWorld.GetSingleton<EditorMainMenuBar>().Save( GetCurrentProject().mWorld ); }
     void EditorProjectContainer::OnCopy()
     {
         GetCurrentProject().mWorld.GetSingleton<EditorCopyPaste>().OnCopy();
@@ -509,7 +541,8 @@ namespace fan
             renderWorld.mIsHeadless = ( i != mCurrentProject );
         }
 
-        mProjectViewWindow->SetCurrentProject( mCurrentProject );
+        ProjectViewWindow& projectViewWindow = GetCurrentProject().mWorld.GetSingleton<ProjectViewWindow>();
+        projectViewWindow.mCurrentProject = mCurrentProject;
     }
 
     //==================================================================================================================================================================================================

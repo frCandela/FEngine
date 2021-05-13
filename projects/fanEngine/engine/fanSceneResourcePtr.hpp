@@ -19,7 +19,7 @@ namespace fan
         ComponentPtrBase( uint32_t _type ) : mType( _type ) {}
         void Init( EcsWorld& _world )
         {
-            mWorld = &_world;
+            mWorld  = &_world;
             mHandle = 0;
         }
         void Create( EcsHandle _handle );
@@ -30,7 +30,7 @@ namespace fan
         EcsComponent* operator->() const { return &( **this ); /* use operator* */ }
 
         EcsWorld* mWorld;
-        const uint32_t mType = 0;
+        const uint32_t mType   = 0;
         EcsHandle      mHandle = 0;
     };
 

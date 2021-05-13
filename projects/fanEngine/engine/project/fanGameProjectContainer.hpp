@@ -1,6 +1,5 @@
 #pragma once
 
-#include "core/memory/fanSerializedValues.hpp"
 #include "core/ecs/fanEcsWorld.hpp"
 #include "engine/project/fanIProjectContainer.hpp"
 #include "network/fanNetConfig.hpp"

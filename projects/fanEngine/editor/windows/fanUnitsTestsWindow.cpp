@@ -25,7 +25,53 @@ namespace fan
 {
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    UnitTestsWindow::UnitTestsWindow() : EditorWindow( "unit tests", ImGui::IconType::UnitTests16 ) {}
+    void UnitTestsWindow::SetInfo( EcsSingletonInfo& /*_info*/ ) {}
+
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    void UnitTestsWindow::Init( EcsWorld&, EcsSingleton& _singleton )
+    {
+        UnitTestsWindow& unitTestsWindow = static_cast<UnitTestsWindow&>( _singleton );
+        (void)unitTestsWindow;
+    }
+
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    void GuiUnitTestsWindow::OnGui( EcsWorld&, EcsSingleton& _singleton )
+    {
+        using TestArgument = UnitTestsWindow::TestArgument;
+        UnitTestsWindow& unitTestsWindow = static_cast<UnitTestsWindow&>( _singleton );
+        SCOPED_PROFILE( unit_tests_window );
+
+        const std::vector<TestArgument> tests = unitTestsWindow.GetTests();
+
+        ImGui::Icon( ImGui::UnitTests16, { 16, 16 } );
+        ImGui::SameLine();
+        if( ImGui::Button( "Test all" ) )
+        {
+            bool oldValueAssertBreakEnabled = AssertUtils::sFanAssertBreakEnabled;
+
+            AssertUtils::sFanAssertBreakEnabled          = false;
+            AssertUtils::sFanAssertBreakUnitTestsEnabled = false;
+            for( const TestArgument& testArgument : tests ){ UnitTestsWindow::RunTest( testArgument ); }
+            AssertUtils::sFanAssertBreakUnitTestsEnabled = true;
+            AssertUtils::sFanAssertBreakEnabled          = oldValueAssertBreakEnabled;
+        }
+        ImGui::SameLine();
+        if( ImGui::Button( "Clear all" ) )
+        {
+            for( const TestArgument& testArgument : tests ){ UnitTestsWindow::ClearTest( testArgument ); }
+        }
+#ifndef NDEBUG
+        if( System::HasDebugger() )
+        {
+            ImGui::SameLine();
+            ImGui::Checkbox( "enable break", &AssertUtils::sFanAssertBreakEnabled );
+        }
+#endif
+        ImGui::Spacing();
+        for( const TestArgument& testArgument : tests ){ UnitTestsWindow::DrawUnitTest( testArgument ); }
+    }
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
@@ -53,43 +99,6 @@ namespace fan
                 { "Bits", &UnitTestBits::RunTests, mBitsResult },
                 { "Queue", &UnitTestQueue::RunTests, mQueueResult },
         };
-    }
-
-    //==================================================================================================================================================================================================
-    // draw all singletons of the ecs world
-    //==================================================================================================================================================================================================
-    void UnitTestsWindow::OnGui( EcsWorld& /*_world*/ )
-    {
-        SCOPED_PROFILE( unit_tests_window );
-
-        const std::vector<TestArgument> tests = GetTests();
-
-        ImGui::Icon( mIconType, { 16, 16 } );
-        ImGui::SameLine();
-        if( ImGui::Button( "Test all" ) )
-        {
-            bool oldValueAssertBreakEnabled = AssertUtils::sFanAssertBreakEnabled;
-
-            AssertUtils::sFanAssertBreakEnabled          = false;
-            AssertUtils::sFanAssertBreakUnitTestsEnabled = false;
-            for( const TestArgument& testArgument : tests ){ RunTest( testArgument ); }
-            AssertUtils::sFanAssertBreakUnitTestsEnabled = true;
-            AssertUtils::sFanAssertBreakEnabled          = oldValueAssertBreakEnabled;
-        }
-        ImGui::SameLine();
-        if( ImGui::Button( "Clear all" ) )
-        {
-            for( const TestArgument& testArgument : tests ){ ClearTest( testArgument ); }
-        }
-#ifndef NDEBUG
-        if( System::HasDebugger() )
-        {
-            ImGui::SameLine();
-            ImGui::Checkbox( "enable break", &AssertUtils::sFanAssertBreakEnabled );
-        }
-#endif
-        ImGui::Spacing();
-        for( const TestArgument& testArgument : tests ){ DrawUnitTest( testArgument ); }
     }
 
     //==================================================================================================================================================================================================

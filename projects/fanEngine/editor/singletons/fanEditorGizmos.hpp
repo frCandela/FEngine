@@ -3,6 +3,7 @@
 #include <map>
 #include "core/ecs/fanEcsSingleton.hpp"
 #include "core/math/fanVector3.hpp"
+#include "editor/singletons/fanEditorGuiInfo.hpp"
 
 namespace fan
 {
@@ -30,5 +31,19 @@ namespace fan
 
         std::map<size_t, GizmoCacheData> mGizmoCacheData;
         EcsWorld* mWorld;
+    };
+
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    struct GuiEditorGizmos
+    {
+        static GuiSingletonInfo GetInfo()
+        {
+            GuiSingletonInfo info;
+            info.mEditorName = "editor gizmo";
+            info.mIcon       = ImGui::Gizmos16;
+            info.mGroup      = EngineGroups::Editor;
+            return info;
+        }
     };
 }

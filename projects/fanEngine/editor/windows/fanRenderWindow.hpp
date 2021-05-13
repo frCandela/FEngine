@@ -1,6 +1,7 @@
 #pragma once
 
-#include "editor/windows/fanEditorWindow.hpp"
+#include "core/ecs/fanEcsSingleton.hpp"
+#include "editor/singletons/fanEditorGuiInfo.hpp"
 
 namespace fan
 {
@@ -10,14 +11,30 @@ namespace fan
     // shows data from the renderer
     // loaded mesh, textures, prefabs, lights & buffer sizes
     //==================================================================================================================================================================================================
-    class RenderWindow : public EditorWindow
+    struct RenderWindow : EcsSingleton
     {
-    public:
-        RenderWindow( Renderer& _renderer );
+    ECS_SINGLETON( RenderWindow )
 
-    protected:
-        Renderer& mRenderer;
+        static void SetInfo( EcsSingletonInfo& _info );
+        static void Init( EcsWorld& _world, EcsSingleton& _singleton );
 
-        void OnGui( EcsWorld& _world ) override;
+        Renderer* mRenderer;
+    };
+
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    struct GuiRenderWindow
+    {
+        static GuiSingletonInfo GetInfo()
+        {
+            GuiSingletonInfo info;
+            info.mEditorName = "renderer";
+            info.mIcon       = ImGui::Renderer16;
+            info.mGroup      = EngineGroups::Editor;
+            info.mType       = GuiSingletonInfo::Type::ToolWindow;
+            info.onGui       = &GuiRenderWindow::OnGui;
+            return info;
+        }
+        static void OnGui( EcsWorld& _world, EcsSingleton& _singleton );
     };
 }

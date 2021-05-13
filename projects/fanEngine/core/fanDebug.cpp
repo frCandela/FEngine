@@ -19,10 +19,10 @@ namespace fan
     {
         // Push the log into the buffer
         LogItem item;
-        item.message = mStringstream.str();
+        item.message  = mStringstream.str();
         item.severity = mCurrentSeverity;
-        item.type = mCurrentType;
-        item.time = glfwGetTime();
+        item.type     = mCurrentType;
+        item.time     = glfwGetTime();
         mLogBuffer.push_back( item );
 
         // stdio

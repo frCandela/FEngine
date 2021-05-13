@@ -2,6 +2,7 @@
 
 #include "core/ecs/fanSignal.hpp"
 #include "core/ecs/fanEcsSingleton.hpp"
+#include "editor/singletons/fanEditorGuiInfo.hpp"
 
 namespace fan
 {
@@ -30,5 +31,19 @@ namespace fan
 
         void OnSceneNodeDeleted( SceneNode* _node );
         void OnToogleTransformLock();
+    };
+
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    struct GuiEditorSelection
+    {
+        static GuiSingletonInfo GetInfo()
+        {
+            GuiSingletonInfo info;
+            info.mEditorName = "editor selection";
+            info.mIcon       = ImGui::Selection16;
+            info.mGroup      = EngineGroups::Editor;
+            return info;
+        }
     };
 }

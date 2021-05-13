@@ -258,9 +258,9 @@ namespace fan
             TEST_ASSERT( rotationY90translate * vec == Vector3( 25, -9, -2 ) )
             TEST_ASSERT( rotationY90translate.InverseTransform( rotationY90translate * vec ) == vec )
 
-            Matrix4   rotationX90Y90Z90translate( 0, 0, 1, 4,
-                                                  0, -1, 0, 5,
-                                                  1, 0, 0, 9 );
+            Matrix4 rotationX90Y90Z90translate( 0, 0, 1, 4,
+                                                0, -1, 0, 5,
+                                                1, 0, 0, 9 );
             TEST_ASSERT( rotationX90Y90Z90translate * vec == Vector3( 25, 19, 17 ) )
             TEST_ASSERT( rotationX90Y90Z90translate.InverseTransform( rotationX90Y90Z90translate * vec ) == vec )
 

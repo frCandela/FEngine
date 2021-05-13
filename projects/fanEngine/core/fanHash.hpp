@@ -60,7 +60,7 @@ namespace fan
 __pragma(warning(suppress: 4307))                               \
 hash_str::compile_time_hash<hash_str::hash_function(string)>()
 #else
-#define SSID(string)                                            \
+#define SSID( string )                                            \
 hash_str::compile_time_hash<hash_str::hash_function(string)>()
 #endif
 }

@@ -4,30 +4,43 @@
 #include "core/time/fanProfiler.hpp"
 #include "editor/fanDragnDrop.hpp"
 #include "editor/gui/fanGroupsColors.hpp"
-#include "editor/singletons/fanEditorGuiInfo.hpp"
+#include "editor/singletons/fanEditorSettings.hpp"
 
 namespace fan
 {
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    SingletonsWindow::SingletonsWindow() :
-            EditorWindow( "singletons", ImGui::IconType::Singleton16 ) {}
+    void SingletonsWindow::SetInfo( EcsSingletonInfo& _info )
+    {
+        _info.mFlags |= EcsSingletonFlags::InitOnce;
+    }
 
     //==================================================================================================================================================================================================
-    // draw all singletons of the ecs world
     //==================================================================================================================================================================================================
-    void SingletonsWindow::OnGui( EcsWorld& _world )
+    void SingletonsWindow::Init( EcsWorld&, EcsSingleton& _singleton )
     {
+        SingletonsWindow& singletonsWindow = static_cast<SingletonsWindow&>( _singleton );
+        (void)singletonsWindow;
+    }
+
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    void GuiSingletonsWindow::OnGui( EcsWorld& _world, EcsSingleton& _singleton )
+    {
+        SingletonsWindow& singletonsWindow = static_cast<SingletonsWindow&>( _singleton );
+        (void)singletonsWindow;
+
         SCOPED_PROFILE( singleton_win );
-        const EditorGuiInfo                & gui   = _world.GetSingleton<EditorGuiInfo>();
-        const std::vector<EcsSingletonInfo>& infos = _world.GetVectorSingletonInfo();
+        const EditorGuiInfo                & gui      = _world.GetSingleton<EditorGuiInfo>();
+        const EditorSettings               & settings = _world.GetSingleton<EditorSettings>();
+        const std::vector<EcsSingletonInfo>& infos    = _world.GetVectorSingletonInfo();
         for( const EcsSingletonInfo        & info : infos )
         {
             const fan::GuiSingletonInfo& guiInfo = gui.GetSingletonInfo( info.mType );
-            if( guiInfo.onGui != nullptr )
+            if( guiInfo.onGui != nullptr && guiInfo.mType == GuiSingletonInfo::Type::Default )
             {
                 ImGui::SetCursorPosY( ImGui::GetCursorPosY() + 3 ); // moves cursor lower to center the icon
-                ImGui::Icon( guiInfo.mIcon, { 16, 16 }, GroupsColors::GetColor( guiInfo.mGroup ) );
+                ImGui::Icon( guiInfo.mIcon, { 16, 16 }, settings.mData->mGroupsColors.GetColor( guiInfo.mGroup ) );
                 ImGui::SameLine();
                 ImGui::SetCursorPosY( ImGui::GetCursorPosY() - 3 );        // resets the cursor
                 if( ImGui::CollapsingHeader( info.mName.c_str() ) )

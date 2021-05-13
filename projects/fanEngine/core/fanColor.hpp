@@ -43,7 +43,6 @@ namespace fan
         static const Color sPink;
         static const Color sOrange;
 
-    private:
         glm::vec4 mColorData;
     };
 }

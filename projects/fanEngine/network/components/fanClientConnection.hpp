@@ -26,7 +26,7 @@ namespace fan
             Stopping            // Client is being stopped, a disconnect packet must be sent to the server
         };
 
-        Signal<PlayerID> mOnLoginSuccess;
+        Signal <PlayerID> mOnLoginSuccess;
 
         UdpSocket* mSocket;
         Port          mClientPort;

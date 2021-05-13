@@ -82,11 +82,11 @@ namespace fan
             Vector3   v1       = _offset + sEdges[triangleIndices[1]];
             Vector3   v2       = _offset + sEdges[triangleIndices[2]];
             Vector3   fxNormal = Vector3::Cross( ( v1 - v2 ), ( v0 - v2 ) ).FastNormalized();
-            glm::vec3 normal   = fxNormal.ToGlm() ;
+            glm::vec3 normal   = fxNormal.ToGlm();
 
-            _vertices.push_back( {  v0.ToGlm() , normal, Color::sWhite.ToGLM(), { 0, 0 } } );
-            _vertices.push_back( {  v2.ToGlm() , normal, Color::sWhite.ToGLM(), { 0, 0 } } );
-            _vertices.push_back( {  v1.ToGlm() , normal, Color::sWhite.ToGLM(), { 0, 0 } } );
+            _vertices.push_back( { v0.ToGlm(), normal, Color::sWhite.ToGLM(), { 0, 0 } } );
+            _vertices.push_back( { v2.ToGlm(), normal, Color::sWhite.ToGLM(), { 0, 0 } } );
+            _vertices.push_back( { v1.ToGlm(), normal, Color::sWhite.ToGLM(), { 0, 0 } } );
         }
     }
 
@@ -596,3 +596,4 @@ namespace fan
             { { -1, -1, -1 }, { -1, -1, -1 }, { -1, -1, -1 }, { -1, -1, -1 }, { -1, -1, -1 } },
     };
 }
+       

@@ -21,7 +21,9 @@ namespace fan
             mRenderer( mWindow, _settings.mLaunchEditor ? Renderer::ViewType::Editor : Renderer::ViewType::Game )
     {
         Mouse::SetCallbacks( mWindow.mWindow );
-        mFullScreen.SavePreviousPositionAndSize( mWindow );
+
+        mFullScreen.mWindowedPosition = mWindow.GetPosition();
+        mFullScreen.mWindowedSize     = mWindow.GetSize();
 
         SceneResources::SetupResources( mPrefabManager );
         RenderResources::SetupResources( mRenderer.mMeshManager, mRenderer.mMesh2DManager, mRenderer.mTextureManager, mRenderer.mFontManager );
@@ -95,5 +97,8 @@ namespace fan
             Transform& cameraTransform = world.GetComponent<Transform>( cameraID );
             _renderer.SetMainCamera( camera.GetProjection(), camera.GetView( cameraTransform ), cameraTransform.mPosition.ToGlm() );
         }
+
+        _renderer.mClearColor                       = renderWorld.mClearColor.ToGLM();
+        _renderer.mDrawPostprocess.mUniforms.mColor = renderWorld.mFilterColor.ToGLM();
     }
 }

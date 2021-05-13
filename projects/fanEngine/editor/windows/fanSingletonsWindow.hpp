@@ -1,7 +1,8 @@
 #pragma once
 
-#include "editor/windows/fanEditorWindow.hpp"
 #include "core/ecs/fanEcsSingleton.hpp"
+#include "core/ecs/fanEcsSingleton.hpp"
+#include "editor/singletons/fanEditorGuiInfo.hpp"
 
 namespace fan
 {
@@ -10,12 +11,28 @@ namespace fan
     //==================================================================================================================================================================================================
     // shows the singletons from the game ecs
     //==================================================================================================================================================================================================
-    class SingletonsWindow : public EditorWindow
+    struct SingletonsWindow : EcsSingleton
     {
-    public:
-        SingletonsWindow();
+    ECS_SINGLETON( SingletonsWindow )
 
-    protected:
-        void OnGui( EcsWorld& _world ) override;
+        static void SetInfo( EcsSingletonInfo& _info );
+        static void Init( EcsWorld& _world, EcsSingleton& _singleton );
+    };
+
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    struct GuiSingletonsWindow
+    {
+        static GuiSingletonInfo GetInfo()
+        {
+            GuiSingletonInfo info;
+            info.mEditorName = "singletons";
+            info.mIcon       = ImGui::Singleton16;
+            info.mGroup      = EngineGroups::Editor;
+            info.mType       = GuiSingletonInfo::Type::ToolWindow;
+            info.onGui       = &GuiSingletonsWindow::OnGui;
+            return info;
+        }
+        static void OnGui( EcsWorld& _world, EcsSingleton& _singleton );
     };
 }

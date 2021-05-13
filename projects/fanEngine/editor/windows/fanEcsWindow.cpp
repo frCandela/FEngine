@@ -10,31 +10,32 @@
 #include "editor/fanModals.hpp"
 #include "editor/gui/fanGroupsColors.hpp"
 #include "editor/singletons/fanEditorGuiInfo.hpp"
+#include "editor/singletons/fanEditorSettings.hpp"
 
 namespace fan
 {
-
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    EcsWindow::EcsWindow() :
-            EditorWindow( "ecs", ImGui::IconType::Ecs16 )
+    void EcsWindow::SetInfo( EcsSingletonInfo& _info )
     {
-    }
-
-    //================================================================
-    // helper function to create a formatted string like "Storage: 1024 (16Ko)"
-    //================================================================
-    std::string TagCountSize( const char* _tag, const size_t _count, const size_t _size )
-    {
-        std::stringstream ssStorage;
-        ssStorage << _tag << ": " << _count << " (" << _count * _size / 1000 << "Ko)";
-        return ssStorage.str();
+        _info.mFlags |= EcsSingletonFlags::InitOnce;
     }
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void EcsWindow::OnGui( EcsWorld& _world )
+    void EcsWindow::Init( EcsWorld&, EcsSingleton& _singleton )
     {
+        EcsWindow& ecsWindow = static_cast<EcsWindow&>( _singleton );
+        (void)ecsWindow;
+    }
+
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    void GuiEcsWindow::OnGui( EcsWorld& _world, EcsSingleton& _singleton )
+    {
+        EcsWindow& ecsWindow = static_cast<EcsWindow&>( _singleton );
+        (void)ecsWindow;
+
         // Global
         if( ImGui::CollapsingHeader( "Global" ) )
         {
@@ -87,8 +88,9 @@ namespace fan
 
 
                 // chunks
-                const fan::EditorGuiInfo           & gui   = _world.GetSingleton<EditorGuiInfo>();
-                const std::vector<EcsComponentInfo>& infos = _world.GetComponentInfos();
+                const fan::EditorGuiInfo           & gui      = _world.GetSingleton<EditorGuiInfo>();
+                const fan::EditorSettings          & settings = _world.GetSingleton<fan::EditorSettings>();
+                const std::vector<EcsComponentInfo>& infos    = _world.GetComponentInfos();
                 for( int componentIndex = 0; componentIndex < _world.NumComponents(); componentIndex++ )
                 {
                     if( archetype->GetSignature()[componentIndex] )
@@ -97,7 +99,7 @@ namespace fan
                         const fan::GuiComponentInfo& guiInfo = gui.GetComponentInfo( info.mType );
 
                         std::stringstream ss;
-                        ImGui::Icon( guiInfo.mIcon, { 16, 16 }, GroupsColors::GetColor( guiInfo.mGroup ) );
+                        ImGui::Icon( guiInfo.mIcon, { 16, 16 }, settings.mData->mGroupsColors.GetColor( guiInfo.mGroup ) );
                         ImGui::SameLine();
                         ss << info.mName.c_str();
                         for( int i = 0; i < 19 - (int)info.mName.size(); i++ )
@@ -160,5 +162,15 @@ namespace fan
             }
             ImGui::Columns( 1 );
         }
+    }
+
+    //================================================================
+    // helper function to create a formatted string like "Storage: 1024 (16Ko)"
+    //================================================================
+    std::string TagCountSize( const char* _tag, const size_t _count, const size_t _size )
+    {
+        std::stringstream ssStorage;
+        ssStorage << _tag << ": " << _count << " (" << _count * _size / 1000 << "Ko)";
+        return ssStorage.str();
     }
 }

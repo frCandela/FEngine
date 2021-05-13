@@ -23,10 +23,10 @@ namespace fan
         //================================================================
         struct InFlightPacket
         {
-            PacketTag         mTag;
-            double            mTimeDispatch;
-            Signal<PacketTag> mOnFailure;
-            Signal<PacketTag> mOnSuccess;
+            PacketTag          mTag;
+            double             mTimeDispatch;
+            Signal <PacketTag> mOnFailure;
+            Signal <PacketTag> mOnSuccess;
         };
 
         static const float         sTimeoutDuration;        // time after which a packet is considered dropped
