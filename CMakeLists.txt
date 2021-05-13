@@ -1,40 +1,12 @@
 ﻿cmake_minimum_required(VERSION 3.8)
+
 project("FEngine")
-set(CMAKE_CXX_STANDARD 17)
 
-set(VULKAN_DIR C:/VulkanSDK/1.2.162.0)
-set(SHADERC_DIR C:/VulkanSDK/shaderc)
-set(LIVEPP_DIR C:/lpp)
-
-set(LIVEPP_ENABLE ON)
-
-link_directories("${VULKAN_DIR}/Lib")
-link_directories(submodules/SFML/extlibs/libs-msvc/x64)
-if (${CMAKE_BUILD_TYPE} MATCHES Debug)
-    link_directories(${SHADERC_DIR}/debug)
-    set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/debug)
-    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/debug)
-    add_compile_options(/FUNCTIONPADMIN)
-elseif (${CMAKE_BUILD_TYPE} MATCHES Release)
-    link_directories(${SHADERC_DIR}/release)
-    set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/release)
-    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/release)
-    set(LIVEPP_ENABLE OFF)
-endif ()
-set(CMAKE_PDB_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
-
+#Removes default MSVC warning setting
 if (MSVC)
-    #Removes default warning setting
     if (CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
         string(REGEX REPLACE "/W[0-4]" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
     endif ()
-    add_compile_definitions(FAN_WIN32)
-endif ()
-
-if (LIVEPP_ENABLE)
-    add_compile_definitions(FAN_LIVEPP_PATH=L"${LIVEPP_DIR}/LivePP")
-    add_compile_definitions(FAN_LIVEPP)
-    include_directories(${LIVEPP_DIR})
 endif ()
 
 add_subdirectory(submodules)
