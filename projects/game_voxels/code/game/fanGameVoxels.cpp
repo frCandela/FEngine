@@ -26,11 +26,9 @@
 #include "game/systems/fanTestSystem.hpp"
 
 #ifdef FAN_EDITOR
-#include "editor/fanModals.hpp"
+#include "editor/singletons/fanEditorSettings.hpp"
 #include "editor/fanGuiTestSingleton.hpp"
 #include "editor/fanGuiTestComponent.hpp"
-#include "editor/gui/singletons/fanGuiVoxelTerrain.hpp"
-
 #endif
 
 namespace fan
@@ -43,10 +41,9 @@ namespace fan
         mWorld.AddSingletonType<TestSingleton>();
 
 #ifdef FAN_EDITOR
-        EditorGuiInfo& guiInfos = mWorld.GetSingleton<EditorGuiInfo>();
-        guiInfos.mSingletonInfos[TestSingleton::Info::sType] = GuiVoxelTerrain::GetInfo();
-        guiInfos.mSingletonInfos[TestSingleton::Info::sType] = GuiTestSingleton::GetInfo();
-        guiInfos.mComponentInfos[TestComponent::Info::sType] = GuiTestComponent::GetInfo();
+        EditorSettings& settings = mWorld.GetSingleton<EditorSettings>();
+        settings.mSingletonInfos[TestSingleton::Info::sType] = GuiTestSingleton::GetInfo();
+        settings.mComponentInfos[TestComponent::Info::sType] = GuiTestComponent::GetInfo();
 #endif
     }
 

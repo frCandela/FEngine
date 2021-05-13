@@ -22,11 +22,10 @@ namespace fan
             Mouse mMouse;
         };
 
-        Window( const std::string& _name, const glm::ivec2 _position, const glm::ivec2 _size );
+        Window( const std::string& _name, const glm::ivec2 _position, const glm::ivec2 _size, const std::string _iconPath );
         ~Window();
 
         void CreateGLFWWIndow( const std::string& _name, const glm::ivec2 _position, const glm::ivec2 _size );
-        void PostCreateWindow( const glm::ivec2 _size );
         void SetFullscreen();
         void SetWindowed( const glm::ivec2 _position, const glm::ivec2 _size );
         bool SetIcon( const std::string& _path );

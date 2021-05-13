@@ -3,7 +3,7 @@
 #include <set>
 #include "core/ecs/fanEcsSingleton.hpp"
 #include "core/ecs/fanSignal.hpp"
-#include "editor/singletons/fanEditorGuiInfo.hpp"
+#include "editor/fanGuiInfos.hpp"
 
 namespace fan
 {

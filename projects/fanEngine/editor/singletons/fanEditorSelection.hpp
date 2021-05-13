@@ -2,7 +2,7 @@
 
 #include "core/ecs/fanSignal.hpp"
 #include "core/ecs/fanEcsSingleton.hpp"
-#include "editor/singletons/fanEditorGuiInfo.hpp"
+#include "editor/fanGuiInfos.hpp"
 
 namespace fan
 {

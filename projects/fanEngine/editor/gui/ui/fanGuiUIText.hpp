@@ -2,7 +2,7 @@
 
 #include "engine/ui/fanUIText.hpp"
 #include "engine/fanSceneTags.hpp"
-#include "editor/singletons/fanEditorGuiInfo.hpp"
+#include "editor/fanGuiInfos.hpp"
 
 namespace fan
 {

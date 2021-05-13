@@ -3,7 +3,7 @@
 #include <map>
 #include "core/ecs/fanEcsSingleton.hpp"
 #include "core/math/fanVector3.hpp"
-#include "editor/singletons/fanEditorGuiInfo.hpp"
+#include "editor/fanGuiInfos.hpp"
 
 namespace fan
 {

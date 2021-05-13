@@ -1,7 +1,7 @@
 #pragma once
 
 #include "engine/singletons/fanSceneResources.hpp"
-#include "editor/singletons/fanEditorGuiInfo.hpp"
+#include "editor/fanGuiInfos.hpp"
 #include "engine/fanPrefabManager.hpp"
 #include "engine/fanPrefab.hpp"
 

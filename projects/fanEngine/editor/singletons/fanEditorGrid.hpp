@@ -3,7 +3,7 @@
 #include "core/ecs/fanEcsSingleton.hpp"
 #include "core/fanColor.hpp"
 #include "core/math/fanVector3.hpp"
-#include "editor/singletons/fanEditorGuiInfo.hpp"
+#include "editor/fanGuiInfos.hpp"
 #include "editor/fanModals.hpp"
 
 namespace fan

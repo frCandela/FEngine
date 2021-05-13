@@ -1,5 +1,5 @@
 #include "network/components/fanEntityReplication.hpp"
-#include "editor/singletons/fanEditorGuiInfo.hpp"
+#include "editor/fanGuiInfos.hpp"
 
 #include "core/ecs/fanEcsWorld.hpp"
 
@@ -29,10 +29,10 @@ namespace fan
                 ImGui::Text( "exclude: %u", replication.mExclude );
                 ImGui::Text( "replicated components: " );
                 ImGui::Indent();
-                const EditorGuiInfo& gui = _world.GetSingleton<EditorGuiInfo>();
+                const EditorSettings& settings = _world.GetSingleton<EditorSettings>();
                 for( uint32_t type : replication.mComponentTypes )
                 {
-                    const GuiComponentInfo& guiInfo = gui.GetComponentInfo( type );
+                    const GuiComponentInfo& guiInfo = settings.GetComponentInfo( type );
                     ImGui::Icon( guiInfo.mIcon, { 16, 16 } );
                     ImGui::SameLine();
                     ImGui::Text( "%s", guiInfo.mEditorName.c_str() );

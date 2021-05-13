@@ -1,7 +1,7 @@
 #pragma once
 
 #include "engine/components/fanDirectionalLight.hpp"
-#include "editor/singletons/fanEditorGuiInfo.hpp"
+#include "editor/fanGuiInfos.hpp"
 #include "editor/fanModals.hpp"
 
 namespace fan

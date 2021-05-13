@@ -8,11 +8,12 @@
 #include "render/fanRenderer.hpp"
 #include "render/resources/fanMesh.hpp"
 #include "render/resources/fanMesh2D.hpp"
-#include "editor/fanDragnDrop.hpp"
+#include "engine/singletons/fanRenderWorld.hpp"
 #include "engine/singletons/fanSceneResources.hpp"
 #include "engine/singletons/fanRenderResources.hpp"
 #include "engine/fanPrefabManager.hpp"
 #include "engine/fanPrefab.hpp"
+#include "editor/fanDragnDrop.hpp"
 
 namespace fan
 {
@@ -38,7 +39,7 @@ namespace fan
         RenderWindow& renderWindow = static_cast<RenderWindow&>( _singleton );
 
         SCOPED_PROFILE( render );
-
+        
         const RenderResources& renderResources = _world.GetSingleton<RenderResources>();
 
         ImGui::Icon( ImGui::Renderer16, { 16, 16 } );

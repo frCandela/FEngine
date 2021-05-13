@@ -8,6 +8,85 @@
 #include "core/math/fanVector3.hpp"
 #include "core/fanColor.hpp"
 
+// EDITOR
+#include "editor/singletons/fanEditorCamera.hpp"
+#include "editor/singletons/fanEditorCopyPaste.hpp"
+#include "editor/singletons/fanEditorGizmos.hpp"
+#include "editor/singletons/fanEditorGrid.hpp"
+#include "editor/singletons/fanEditorPlayState.hpp"
+#include "editor/singletons/fanEditorSelection.hpp"
+#include "editor/singletons/fanEditorSettings.hpp"
+#include "editor/singletons/fanEditorMainMenuBar.hpp"
+#include "editor/windows/fanConsoleWindow.hpp"
+#include "editor/windows/fanEcsWindow.hpp"
+#include "editor/windows/fanInspectorWindow.hpp"
+#include "editor/windows/fanPreferencesWindow.hpp"
+#include "editor/windows/fanProfilerWindow.hpp"
+#include "editor/windows/fanGameViewWindow.hpp"
+#include "editor/windows/fanRenderWindow.hpp"
+#include "editor/windows/fanSceneWindow.hpp"
+#include "editor/windows/fanSingletonsWindow.hpp"
+#include "editor/windows/fanTerrainWindow.hpp"
+#include "editor/windows/fanUnitsTestsWindow.hpp"
+
+// NETWORK
+#include "editor/gui/network/fanGuiHostManager.hpp"
+#include "editor/gui/network/fanGuiLinkingContext.hpp"
+#include "editor/gui/network/fanGuiServerConnection.hpp"
+#include "editor/gui/network/fanGuiSpawnManager.hpp"
+#include "editor/gui/network/fanGuiTime.hpp"
+
+#include "editor/gui/network/fanGuiClientConnection.hpp"
+#include "editor/gui/network/fanGuiClientGameData.hpp"
+#include "editor/gui/network/fanGuiClientReplication.hpp"
+#include "editor/gui/network/fanGuiClientRollback.hpp"
+#include "editor/gui/network/fanGuiClientRPC.hpp"
+#include "editor/gui/network/fanGuiEntityReplication.hpp"
+#include "editor/gui/network/fanGuiHostConnection.hpp"
+#include "editor/gui/network/fanGuiHostGameData.hpp"
+#include "editor/gui/network/fanGuiHostPersistentHandle.hpp"
+#include "editor/gui/network/fanGuiHostReplication.hpp"
+#include "editor/gui/network/fanGuiLinkingContextUnregisterer.hpp"
+#include "editor/gui/network/fanGuiReliabilityLayer.hpp"
+
+// ENGINE
+#include "editor/gui/singletons/fanGuiApplication.hpp"
+#include "editor/gui/singletons/fanGuiMouse.hpp"
+#include "editor/gui/singletons/fanGuiRenderDebug.hpp"
+#include "editor/gui/singletons/fanGuiRenderResources.hpp"
+#include "editor/gui/singletons/fanGuiRenderWorld.hpp"
+#include "editor/gui/singletons/fanGuiScene.hpp"
+#include "editor/gui/singletons/fanGuiScenePointers.hpp"
+#include "editor/gui/singletons/fanGuiSceneResources.hpp"
+#include "editor/gui/singletons/fanGuiVoxelTerrain.hpp"
+
+#include "editor/gui/ui/fanGuiUIAlign.hpp"
+#include "editor/gui/ui/fanGuiUIButton.hpp"
+#include "editor/gui/ui/fanGuiUILayout.hpp"
+#include "editor/gui/ui/fanGuiUIProgressBar.hpp"
+#include "editor/gui/ui/fanGuiUIRenderer.hpp"
+#include "editor/gui/ui/fanGuiUIText.hpp"
+#include "editor/gui/ui/fanGuiUITransform.hpp"
+
+#include "editor/gui/components/fanGuiBounds.hpp"
+#include "editor/gui/components/fanGuiCamera.hpp"
+#include "editor/gui/components/fanGuiDirectionalLight.hpp"
+#include "editor/gui/components/fanGuiExpirationTime.hpp"
+#include "editor/gui/components/fanGuiFollowTransform.hpp"
+#include "editor/gui/components/fanGuiMaterial.hpp"
+#include "editor/gui/components/fanGuiMeshRenderer.hpp"
+#include "editor/gui/components/fanGuiParticle.hpp"
+#include "editor/gui/components/fanGuiParticleEmitter.hpp"
+#include "editor/gui/components/fanGuiPointLight.hpp"
+#include "editor/gui/components/fanGuiSceneNode.hpp"
+#include "editor/gui/components/fanGuiFxScale.hpp"
+
+#include "editor/gui/physics/fanGuiFxTransform.hpp"
+#include "editor/gui/physics/fanGuiFxRigidbody.hpp"
+#include "editor/gui/physics/fanGuiFxSphereCollider.hpp"
+#include "editor/gui/physics/fanGuiFxBoxCollider.hpp"
+#include "editor/gui/physics/fanGuiFxPhysicsWorld.hpp"
+
 namespace fan
 {
     static const char* sJsonPath           = "editor_data.json";
@@ -28,8 +107,10 @@ namespace fan
     //==================================================================================================================================================================================================
     void EditorSettings::Init( EcsWorld& /*_world*/, EcsSingleton& _singleton )
     {
-        EditorSettings& serializedValues = static_cast<EditorSettings&>( _singleton );
-        serializedValues.mData = nullptr;
+        EditorSettings& settings = static_cast<EditorSettings&>( _singleton );
+        settings.mData = nullptr;
+        InitComponentInfos( settings.mComponentInfos );
+        InitSingletonInfos( settings.mSingletonInfos );
     }
 
     //==================================================================================================================================================================================================
@@ -160,41 +241,100 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    /*void SaveEditorColor( Json& _json, const char* _name, const Color& _color )
+    void EditorSettings::InitSingletonInfos( std::unordered_map<uint32_t, GuiSingletonInfo>& _singletonInfos )
     {
-        Serializable::SaveColor( _json[sColorsName], _name, _color );
+        _singletonInfos.clear();
+
+        //editor
+        _singletonInfos[EditorCamera::Info::sType]      = GuiEditorCamera::GetInfo();
+        _singletonInfos[EditorCopyPaste::Info::sType]   = GuiEditorCopyPaste::GetInfo();
+        _singletonInfos[EditorGizmos::Info::sType]      = GuiEditorGizmos::GetInfo();
+        _singletonInfos[EditorGrid::Info::sType]        = GuiEditorGrid::GetInfo();
+        _singletonInfos[EditorPlayState::Info::sType]   = GuiEditorPlayState::GetInfo();
+        _singletonInfos[EditorSelection::Info::sType]   = GuiEditorSelection::GetInfo();
+        _singletonInfos[EditorSettings::Info::sType]    = GuiEditorSettings::GetInfo();
+        _singletonInfos[EditorMainMenuBar::Info::sType] = GuiEditorMainMenuBar::GetInfo();
+
+        // editor windows
+        _singletonInfos[ConsoleWindow::Info::sType]     = GuiConsoleWindow::GetInfo();
+        _singletonInfos[EcsWindow::Info::sType]         = GuiEcsWindow::GetInfo();
+        _singletonInfos[InspectorWindow::Info::sType]   = GuiInspectorWindow::GetInfo();
+        _singletonInfos[PreferencesWindow::Info::sType] = GuiPreferencesWindow::GetInfo();
+        _singletonInfos[ProfilerWindow::Info::sType]    = GuiProfilerWindow::GetInfo();
+        _singletonInfos[GameViewWindow::Info::sType]    = GuiGameViewWindow::GetInfo();
+        _singletonInfos[RenderWindow::Info::sType]      = GuiRenderWindow::GetInfo();
+        _singletonInfos[SceneWindow::Info::sType]       = GuiSceneWindow::GetInfo();
+        _singletonInfos[SingletonsWindow::Info::sType]  = GuiSingletonsWindow::GetInfo();
+        _singletonInfos[TerrainWindow::Info::sType]     = GuiTerrainWindow::GetInfo();
+        _singletonInfos[UnitTestsWindow::Info::sType]   = GuiUnitTestsWindow::GetInfo();
+
+        //network
+        _singletonInfos[HostManager::Info::sType]      = GuiHostManager::GetInfo();
+        _singletonInfos[LinkingContext::Info::sType]   = GuiLinkingContext::GetInfo();
+        _singletonInfos[ServerConnection::Info::sType] = GuiServerConnection::GetInfo();
+        _singletonInfos[SpawnManager::Info::sType]     = GuiSpawnManager::GetInfo();
+        _singletonInfos[Time::Info::sType]             = GuiTime::GetInfo();
+
+        // engine
+        _singletonInfos[Application::Info::sType]     = GuiApplication::GetInfo();
+        _singletonInfos[Mouse::Info::sType]           = GuiMouse::GetInfo();
+        _singletonInfos[RenderDebug::Info::sType]     = GuiRenderDebug::GetInfo();
+        _singletonInfos[RenderResources::Info::sType] = GuiRenderResources::GetInfo();
+        _singletonInfos[RenderWorld::Info::sType]     = GuiRenderWorld::GetInfo();
+        _singletonInfos[Scene::Info::sType]           = GuiScene::GetInfo();
+        _singletonInfos[ScenePointers::Info::sType]   = GuiScenePointers::GetInfo();
+        _singletonInfos[SceneResources::Info::sType]  = GuiSceneResources::GetInfo();
+        _singletonInfos[VoxelTerrain::Info::sType]    = GuiVoxelTerrain::GetInfo();
+
+        // fx physics
+        _singletonInfos[PhysicsWorld::Info::sType] = GuiFxPhysicsWorld::GetInfo();
     }
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    bool LoadEditorColor( const Json& _json, const char* _name, Color& _outColor )
+    void EditorSettings::InitComponentInfos( std::unordered_map<uint32_t, GuiComponentInfo>& _componentInfos )
     {
-        const Json* token = Serializable::FindToken( _json, sColorsName );
-        if( token != nullptr )
-        {
-            return Serializable::LoadColor( *token, _name, _outColor );
-        }
-        return false;
-    }
+        _componentInfos.clear();
 
-    //==================================================================================================================================================================================================
-    //==================================================================================================================================================================================================
-    void SaveEditorWindowVisibleState( Json& _json, const uint32_t _type, const bool _visible )
-    {
-        Serializable::SaveBool( _json[sToolWindowName], _name, _visible );
-    }
+        _componentInfos[ClientConnection::Info::sType]           = GuiEntityClientConnection::GetInfo();
+        _componentInfos[ClientGameData::Info::sType]             = GuiClientGameData::GetInfo();
+        _componentInfos[ClientReplication::Info::sType]          = GuiClientReplication::GetInfo();
+        _componentInfos[ClientRollback::Info::sType]             = GuiClientRollback::GetInfo();
+        _componentInfos[ClientRPC::Info::sType]                  = GuiClientRPC::GetInfo();
+        _componentInfos[EntityReplication::Info::sType]          = GuiEntityReplication::GetInfo();
+        _componentInfos[HostConnection::Info::sType]             = GuiHostConnection::GetInfo();
+        _componentInfos[HostGameData::Info::sType]               = GuiHostGameData::GetInfo();
+        _componentInfos[HostPersistentHandle::Info::sType]       = GuiHostPersistentHandle::GetInfo();
+        _componentInfos[HostReplication::Info::sType]            = GuiHostReplication::GetInfo();
+        _componentInfos[LinkingContextUnregisterer::Info::sType] = GuiLinkingContextUnregisterer::GetInfo();
+        _componentInfos[ReliabilityLayer::Info::sType]           = GuiReliabilityLayer::GetInfo();
 
-    //==================================================================================================================================================================================================
-    //==================================================================================================================================================================================================
-    bool LoadEditorWindowVisibleState( const Json& _json, const uint32_t _type, bool _outVisible )
-    {
-        const Json* token = Serializable::FindToken( _json, _type );
-        if( token != nullptr )
-        {
-            return Serializable::LoadBool( *token, _name, _outVisible );
-        }
-        return false;
-    }*/
+        _componentInfos[UIAlign::Info::sType]       = GuiUIAlign::GetInfo();
+        _componentInfos[UIButton::Info::sType]      = GuiUIButton::GetInfo();
+        _componentInfos[UILayout::Info::sType]      = GuiUILayout::GetInfo();
+        _componentInfos[UIProgressBar::Info::sType] = GuiUIProgressBar::GetInfo();
+        _componentInfos[UIRenderer::Info::sType]    = GuiUIRenderer::GetInfo();
+        _componentInfos[UIText::Info::sType]        = GuiUIText::GetInfo();
+        _componentInfos[UITransform::Info::sType]   = GuiUITransform::GetInfo();
+
+        _componentInfos[Bounds::Info::sType]           = GuiBounds::GetInfo();
+        _componentInfos[Camera::Info::sType]           = GuiCamera::GetInfo();
+        _componentInfos[DirectionalLight::Info::sType] = GuiDirectionalLight::GetInfo();
+        _componentInfos[ExpirationTime::Info::sType]   = GuiExpirationTime::GetInfo();
+        _componentInfos[FollowTransform::Info::sType]  = GuiFollowTransform::GetInfo();
+        _componentInfos[Material::Info::sType]         = GuiMaterial::GetInfo();
+        _componentInfos[MeshRenderer::Info::sType]     = GuiMeshRenderer::GetInfo();
+        _componentInfos[Particle::Info::sType]         = GuiParticle::GetInfo();
+        _componentInfos[ParticleEmitter::Info::sType]  = GuiParticleEmitter::GetInfo();
+        _componentInfos[PointLight::Info::sType]       = GuiPointLight::GetInfo();
+        _componentInfos[SceneNode::Info::sType]        = GuiSceneNode::GetInfo();
+
+        _componentInfos[Rigidbody::Info::sType]      = GuiFxRigidbody::GetInfo();
+        _componentInfos[BoxCollider::Info::sType]    = GuiFxBoxCollider::GetInfo();
+        _componentInfos[SphereCollider::Info::sType] = GuiFxSphereCollider::GetInfo();
+        _componentInfos[Transform::Info::sType]      = GuiFxTransform::GetInfo();
+        _componentInfos[Scale::Info::sType]          = GuiFxScale::GetInfo();
+    }
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================

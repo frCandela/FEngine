@@ -5,7 +5,7 @@
 #include "fanJson.hpp"
 #include "fanDisableWarnings.hpp"
 #include "fanGlm.hpp"
-#include "editor/singletons/fanEditorGuiInfo.hpp"
+#include "editor/fanGuiInfos.hpp"
 #include "editor/gui/fanGroupsColors.hpp"
 
 namespace fan
@@ -41,7 +41,16 @@ namespace fan
         static void SetInfo( EcsSingletonInfo& _info );
         static void Init( EcsWorld& _world, EcsSingleton& _component );
 
+        GuiComponentInfo& GetComponentInfo( const uint32_t _type ) { return mComponentInfos.at( _type ); }
+        GuiSingletonInfo& GetSingletonInfo( const uint32_t _type ) { return mSingletonInfos.at( _type ); }
+        const GuiComponentInfo& GetComponentInfo( const uint32_t _type ) const { return mComponentInfos.at( _type ); }
+        const GuiSingletonInfo& GetSingletonInfo( const uint32_t _type ) const { return mSingletonInfos.at( _type ); }
+        static void InitSingletonInfos(std::unordered_map<uint32_t, GuiSingletonInfo>& _singletonInfos);
+        static void InitComponentInfos(std::unordered_map<uint32_t, GuiComponentInfo>& _componentInfos);
+
         EditorSettingsData* mData;
+        std::unordered_map<uint32_t, GuiSingletonInfo> mSingletonInfos;
+        std::unordered_map<uint32_t, GuiComponentInfo> mComponentInfos;
     };
 
     //==================================================================================================================================================================================================

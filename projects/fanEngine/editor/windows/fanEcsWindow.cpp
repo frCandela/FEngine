@@ -9,7 +9,7 @@
 #include "engine/fanSceneTags.hpp"
 #include "editor/fanModals.hpp"
 #include "editor/gui/fanGroupsColors.hpp"
-#include "editor/singletons/fanEditorGuiInfo.hpp"
+#include "editor/fanGuiInfos.hpp"
 #include "editor/singletons/fanEditorSettings.hpp"
 
 namespace fan
@@ -88,7 +88,6 @@ namespace fan
 
 
                 // chunks
-                const fan::EditorGuiInfo           & gui      = _world.GetSingleton<EditorGuiInfo>();
                 const fan::EditorSettings          & settings = _world.GetSingleton<fan::EditorSettings>();
                 const std::vector<EcsComponentInfo>& infos    = _world.GetComponentInfos();
                 for( int componentIndex = 0; componentIndex < _world.NumComponents(); componentIndex++ )
@@ -96,7 +95,7 @@ namespace fan
                     if( archetype->GetSignature()[componentIndex] )
                     {
                         const EcsComponentInfo     & info    = infos[componentIndex];
-                        const fan::GuiComponentInfo& guiInfo = gui.GetComponentInfo( info.mType );
+                        const fan::GuiComponentInfo& guiInfo = settings.GetComponentInfo( info.mType );
 
                         std::stringstream ss;
                         ImGui::Icon( guiInfo.mIcon, { 16, 16 }, settings.mData->mGroupsColors.GetColor( guiInfo.mGroup ) );

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "engine/ui/fanUIProgressBar.hpp"
-#include "editor/singletons/fanEditorGuiInfo.hpp"
+#include "editor/fanGuiInfos.hpp"
 #include "editor/gui/fanGuiSceneResourcePtr.hpp"
 
 namespace fan

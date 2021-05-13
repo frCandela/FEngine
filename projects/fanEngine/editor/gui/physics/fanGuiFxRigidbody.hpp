@@ -1,7 +1,7 @@
 #pragma once
 
 #include "engine/physics/fanRigidbody.hpp"
-#include "editor/singletons/fanEditorGuiInfo.hpp"
+#include "editor/fanGuiInfos.hpp"
 #include "engine/physics/fanBoxCollider.hpp"
 #include "engine/physics/fanSphereCollider.hpp"
 

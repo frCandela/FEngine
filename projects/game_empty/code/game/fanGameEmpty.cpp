@@ -20,7 +20,7 @@
 #include "game/singletons/fanTestSingleton.hpp"
 
 #ifdef FAN_EDITOR
-#include "editor/singletons/fanEditorGuiInfo.hpp"
+#include "editor/singletons/fanEditorSettings.hpp"
 #include "editor/fanGuiTestSingleton.hpp"
 #include "editor/fanGuiTestComponent.hpp"
 #endif
@@ -35,9 +35,9 @@ namespace fan
         mWorld.AddSingletonType<TestSingleton>();
 
 #ifdef FAN_EDITOR
-        EditorGuiInfo& editorGui = mWorld.GetSingleton<EditorGuiInfo>();
-        editorGui.mSingletonInfos[TestSingleton::Info::sType] = GuiTestSingleton::GetInfo();
-        editorGui.mComponentInfos[TestComponent::Info::sType] = GuiTestComponent::GetInfo();
+        EditorSettings& settings = mWorld.GetSingleton<EditorSettings>();
+        settings.mSingletonInfos[TestSingleton::Info::sType] = GuiTestSingleton::GetInfo();
+        settings.mComponentInfos[TestComponent::Info::sType] = GuiTestComponent::GetInfo();
 #endif
     }
 

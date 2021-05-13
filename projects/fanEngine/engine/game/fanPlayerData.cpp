@@ -80,7 +80,7 @@ namespace fan
     PlayerData::PlayerData( const LaunchSettings& _settings ) :
             mLaunchSettings( _settings ),
             mApplicationShouldExit( false ),
-            mWindow( _settings.mWindowName, _settings.mWindow_position, _settings.mWindow_size ),
+            mWindow( _settings.mWindowName, _settings.mWindow_position, _settings.mWindow_size, _settings.mIconPath ),
             mRenderer( mWindow, _settings.mLaunchEditor ? Renderer::ViewType::Editor : Renderer::ViewType::Game )
     {
         Mouse::SetCallbacks( mWindow.mWindow );
@@ -90,7 +90,6 @@ namespace fan
 
         SceneResources::SetupResources( mPrefabManager );
         RenderResources::SetupResources( mRenderer.mMeshManager, mRenderer.mMesh2DManager, mRenderer.mTextureManager, mRenderer.mFontManager );
-        mWindow.SetIcon( _settings.mIconPath );
     }
 
     //==================================================================================================================================================================================================
@@ -156,6 +155,23 @@ namespace fan
 
         _renderer.mClearColor                       = renderWorld.mClearColor.ToGLM();
         _renderer.mDrawPostprocess.mUniforms.mColor = renderWorld.mFilterColor.ToGLM();
+    }
+
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    void PlayerData::MatchFullscreenState( const FullScreen& _fullscreen, Window& _window )
+    {
+        if( _window.IsFullscreen() != _fullscreen.mIsFullScreen )
+        {
+            if( _fullscreen.mIsFullScreen )
+            {
+                _window.SetFullscreen();
+            }
+            else
+            {
+                _window.SetWindowed( _fullscreen.mWindowedPosition, _fullscreen.mWindowedSize );
+            }
+        }
     }
 
     //==================================================================================================================================================================================================

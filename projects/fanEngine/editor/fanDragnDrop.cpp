@@ -6,7 +6,7 @@
 #include "engine/fanPrefab.hpp"
 #include "engine/singletons/fanScene.hpp"
 #include "editor/gui/fanGroupsColors.hpp"
-#include "editor/singletons/fanEditorGuiInfo.hpp"
+#include "editor/fanGuiInfos.hpp"
 #include "render/resources/fanTexture.hpp"
 #include "render/resources/fanMesh.hpp"
 #include "render/resources/fanFont.hpp"
@@ -59,9 +59,8 @@ namespace ImGui
         if( ImGui::BeginDragDropSource( _flags ) )
         {
             const fan::EcsComponentInfo& info     = _world.GetComponentInfo( _type );
-            const fan::EditorGuiInfo   & gui      = _world.GetSingleton<fan::EditorGuiInfo>();
             const fan::EditorSettings  & settings = _world.GetSingleton<fan::EditorSettings>();
-            const fan::GuiComponentInfo& guiInfo  = gui.GetComponentInfo( info.mType );
+            const fan::GuiComponentInfo& guiInfo  = settings.GetComponentInfo( info.mType );
 
             std::string      nameid  = ComponentPayload::sPrefix + std::to_string( info.mType );
             ComponentPayload payload = { _handle, _type };
@@ -80,9 +79,8 @@ namespace ImGui
         if( ImGui::BeginDragDropSource( _flags ) )
         {
             const fan::EcsSingletonInfo& info     = _world.GetSingletonInfo( _type );
-            const fan::EditorGuiInfo   & gui      = _world.GetSingleton<fan::EditorGuiInfo>();
             const fan::EditorSettings  & settings = _world.GetSingleton<fan::EditorSettings>();
-            const fan::GuiSingletonInfo& guiInfo  = gui.GetSingletonInfo( info.mType );
+            const fan::GuiSingletonInfo& guiInfo  = settings.GetSingletonInfo( info.mType );
 
             std::string      nameid  = SingletonPayload::sPrefix + std::to_string( info.mType );
             SingletonPayload payload = { _type };

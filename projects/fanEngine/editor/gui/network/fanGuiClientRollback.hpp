@@ -1,5 +1,5 @@
 #include "network/components/fanClientRollback.hpp"
-#include "editor/singletons/fanEditorGuiInfo.hpp"
+#include "editor/fanGuiInfos.hpp"
 
 namespace fan
 {

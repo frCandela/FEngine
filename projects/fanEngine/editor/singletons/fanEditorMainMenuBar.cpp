@@ -127,7 +127,9 @@ namespace fan
                 if( ImGui::MenuItem( "Reload ecs infos" ) )
                 {
                     _world.ReloadInfos();
-                    EditorGuiInfo::Init( _world, _world.GetSingleton<EditorGuiInfo>() );
+                    EditorSettings& settings = _world.GetSingleton<EditorSettings>();
+                    EditorSettings::InitComponentInfos( settings.mComponentInfos );
+                    EditorSettings::InitSingletonInfos( settings.mSingletonInfos );
                 }
 
                 ImGui::Separator();
@@ -147,9 +149,8 @@ namespace fan
                 ImGui::SameLine();
                 ImGui::MenuItem( "Imgui demo", nullptr, &mainMenuBar.mShowImguiDemoWindow );
 
-                EditorSettings& editorSettings = _world.GetSingleton<EditorSettings>();
-                EditorGuiInfo & guiInfos       = _world.GetSingleton<EditorGuiInfo>();
-                for( auto     & pair : guiInfos.mSingletonInfos )
+                EditorSettings& settings = _world.GetSingleton<EditorSettings>();
+                for( auto     & pair : settings.mSingletonInfos )
                 {
                     const GuiSingletonInfo& info = pair.second;
                     if( info.mType == GuiSingletonInfo::Type::ToolWindow )
@@ -157,7 +158,7 @@ namespace fan
                         ImGui::Icon( info.mIcon, { 16, 16 } );
                         ImGui::SameLine();
                         const uint32_t singletonType = pair.first;
-                        bool& visible = editorSettings.mData->mToolWindowsVisibility[singletonType];
+                        bool& visible = settings.mData->mToolWindowsVisibility[singletonType];
                         ImGui::MenuItem( info.mEditorName.c_str(), nullptr, &visible );
                     }
                 }
@@ -182,9 +183,9 @@ namespace fan
             {
                 ImGui::PushItemWidth( 150.f );
 
-                const EditorGuiInfo        & gui     = _world.GetSingleton<EditorGuiInfo>();
-                const fan::GuiSingletonInfo& guiInfo = gui.GetSingletonInfo( EditorGrid::Info::sType );
-                EditorGrid                 & grid    = _world.GetSingleton<EditorGrid>();
+                const EditorSettings       & settings = _world.GetSingleton<EditorSettings>();
+                const fan::GuiSingletonInfo& guiInfo  = settings.GetSingletonInfo( EditorGrid::Info::sType );
+                EditorGrid                 & grid     = _world.GetSingleton<EditorGrid>();
 
                 ( *guiInfo.onGui )( _world, grid );
                 ImGui::PopItemWidth();

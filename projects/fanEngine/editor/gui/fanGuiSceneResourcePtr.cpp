@@ -2,9 +2,9 @@
 
 #include "core/fanPath.hpp"
 #include "engine/components/fanSceneNode.hpp"
-#include "editor/fanDragnDrop.hpp"
 #include "render/fanRenderGlobal.hpp"
-#include "editor/singletons/fanEditorGuiInfo.hpp"
+#include "editor/singletons/fanEditorSettings.hpp"
+#include "editor/fanDragnDrop.hpp"
 #include "editor/fanModals.hpp"
 
 namespace ImGui
@@ -31,8 +31,8 @@ namespace ImGui
             name = info.mName + " : " + node.mName;
         }
         // icon
-        const fan::EditorGuiInfo   & gui     = world.GetSingleton<fan::EditorGuiInfo>();
-        const fan::GuiComponentInfo& guiInfo = gui.GetComponentInfo( info.mType );
+        const fan::EditorSettings   & settings = world.GetSingleton<fan::EditorSettings>();
+        const fan::GuiComponentInfo& guiInfo   = settings.GetComponentInfo( info.mType );
         if( ImGui::ButtonIcon( guiInfo.mIcon, { 16, 16 } ) )
         {
             returnValue = true;

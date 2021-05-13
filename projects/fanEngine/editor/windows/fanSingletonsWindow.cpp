@@ -31,12 +31,11 @@ namespace fan
         (void)singletonsWindow;
 
         SCOPED_PROFILE( singleton_win );
-        const EditorGuiInfo                & gui      = _world.GetSingleton<EditorGuiInfo>();
         const EditorSettings               & settings = _world.GetSingleton<EditorSettings>();
         const std::vector<EcsSingletonInfo>& infos    = _world.GetVectorSingletonInfo();
         for( const EcsSingletonInfo        & info : infos )
         {
-            const fan::GuiSingletonInfo& guiInfo = gui.GetSingletonInfo( info.mType );
+            const fan::GuiSingletonInfo& guiInfo = settings.GetSingletonInfo( info.mType );
             if( guiInfo.onGui != nullptr && guiInfo.mType == GuiSingletonInfo::Type::Default )
             {
                 ImGui::SetCursorPosY( ImGui::GetCursorPosY() + 3 ); // moves cursor lower to center the icon

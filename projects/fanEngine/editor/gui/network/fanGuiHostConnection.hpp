@@ -1,7 +1,7 @@
 #pragma once
 
 #include "network/components/fanHostConnection.hpp"
-#include "editor/singletons/fanEditorGuiInfo.hpp"
+#include "editor/fanGuiInfos.hpp"
 #include "editor/gui/fanGuiNetworkCommon.hpp"
 
 namespace fan

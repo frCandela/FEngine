@@ -34,13 +34,7 @@ namespace fan
         void FreePixels();
 
     private:
-        void CreateImage( Device& _device,
-                          VkExtent2D _extent,
-                          uint32_t _mipLevels,
-                          VkFormat _format,
-                          VkImageTiling _tiling,
-                          VkImageUsageFlags _usage,
-                          VkMemoryPropertyFlags _properties );
+        void CreateImage( Device& _device, VkExtent2D _extent, uint32_t _mipLevels, VkFormat _format, VkImageTiling _tiling, VkImageUsageFlags _usage, VkMemoryPropertyFlags _properties );
 
         void CreateImageView( Device& _device, VkFormat _format, VkImageViewType _viewType, VkImageSubresourceRange _subresourceRange );
         void CopyBufferToImage( VkCommandBuffer _commandBuffer, VkBuffer _buffer, VkExtent2D _extent );

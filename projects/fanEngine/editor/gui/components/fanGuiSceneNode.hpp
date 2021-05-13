@@ -2,7 +2,7 @@
 
 #include "engine/components/fanSceneNode.hpp"
 #include "engine/singletons/fanScene.hpp"
-#include "editor/singletons/fanEditorGuiInfo.hpp"
+#include "editor/fanGuiInfos.hpp"
 
 namespace fan
 {

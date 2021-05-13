@@ -274,8 +274,9 @@ namespace fan
             Time::RegisterFrameDrawn( currentTime, deltaTime );
 
             PlayerData::UpdateRenderWorld( mData.mRenderer, currentGame, currentGameViewWindow.mSize );
-
             mData.mRenderer.DrawFrame();
+
+            PlayerData::MatchFullscreenState( currentWorld.GetSingleton<RenderWorld>().mFullscreen, mData.mWindow );
 
             Profiler::Get().End();
             Profiler::Get().Begin();
@@ -453,12 +454,11 @@ namespace fan
     void EditorPlayer::DrawEditorUI( EcsWorld& _world )
     {
         // Draw tool windows
-        EditorGuiInfo    & guiInfos       = _world.GetSingleton<EditorGuiInfo>();
-        EditorMainMenuBar& mainMenuBar    = _world.GetSingleton<EditorMainMenuBar>();
-        EditorSettings   & editorSettings = _world.GetSingleton<EditorSettings>();
+        EditorMainMenuBar& mainMenuBar = _world.GetSingleton<EditorMainMenuBar>();
+        EditorSettings   & settings    = _world.GetSingleton<EditorSettings>();
 
         // Draw main menu bar
-        GuiSingletonInfo& mainMenuBarInfo = guiInfos.GetSingletonInfo( EditorMainMenuBar::Info::sType );
+        GuiSingletonInfo& mainMenuBarInfo = settings.GetSingletonInfo( EditorMainMenuBar::Info::sType );
         ( *mainMenuBarInfo.onGui )( _world, mainMenuBar );
 
         // Draw imgui demo window
@@ -468,10 +468,10 @@ namespace fan
         }
 
         // Draw tool windows
-        for( auto& pair : guiInfos.mSingletonInfos )
+        for( auto& pair : settings.mSingletonInfos )
         {
             GuiSingletonInfo& info    = pair.second;
-            bool            & visible = editorSettings.mData->mToolWindowsVisibility[pair.first];
+            bool            & visible = settings.mData->mToolWindowsVisibility[pair.first];
             if( visible && info.mType == GuiSingletonInfo::Type::ToolWindow )
             {
                 EcsSingleton& singleton = _world.GetSingleton( pair.first );
@@ -489,7 +489,6 @@ namespace fan
     void EditorPlayer::EcsIncludeEditor( EcsWorld& _world )
     {
         _world.AddSingletonType<EditorSettings>();
-        _world.AddSingletonType<EditorGuiInfo>();
         _world.AddSingletonType<EditorPlayState>();
         _world.AddSingletonType<EditorCamera>();
         _world.AddSingletonType<EditorGrid>();

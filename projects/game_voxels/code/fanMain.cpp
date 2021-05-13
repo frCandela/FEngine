@@ -35,12 +35,12 @@ int main( int _argc, char* _argv[] )
     fan::Path::SetGamePath( GAME_PATH );
 
     fan::GameVoxels   game;
-    const std::string name = "game_voxels";
+    const std::string name = "Voxels";
 #ifdef FAN_EDITOR
-    settings.mWindowName = name + "_editor";
+    settings.mWindowName = "Fan Engine Editor - " + name;
     fan::EditorPlayer player( settings, { &game } );
 #else
-    settings.mWindowName = name + "_game";
+    settings.mWindowName = name;
     fan::GamePlayer player( settings, game );
 #endif
 

@@ -7,7 +7,7 @@
 #include "engine/components/fanSceneNode.hpp"
 #include "core/time/fanProfiler.hpp"
 #include "editor/singletons/fanEditorSelection.hpp"
-#include "editor/singletons/fanEditorGuiInfo.hpp"
+#include "editor/fanGuiInfos.hpp"
 #include "editor/gui/fanGroupsColors.hpp"
 #include "editor/singletons/fanEditorSettings.hpp"
 
@@ -48,14 +48,13 @@ namespace fan
             ImGui::Text( "Scene node : %s", node.mName.c_str() );
 
             const EditorSettings       & settings = _world.GetSingleton<EditorSettings>();
-            const EditorGuiInfo        & gui      = _world.GetSingleton<EditorGuiInfo>();
             for( const EcsComponentInfo& info : _world.GetComponentInfos() )
             {
                 if( !_world.HasComponent( entity, info.mType ) ){ continue; }
 
                 EcsComponent& component = _world.GetComponent( entity, info.mType );
 
-                const fan::GuiComponentInfo& guiInfo = gui.GetComponentInfo( info.mType );
+                const fan::GuiComponentInfo& guiInfo = settings.GetComponentInfo( info.mType );
                 if( guiInfo.onGui == nullptr ){ continue; }
 
                 ImGui::Separator();
@@ -63,15 +62,9 @@ namespace fan
                 // Icon
                 ImGui::Icon( guiInfo.mIcon, { 16, 16 }, settings.mData->mGroupsColors.GetColor( guiInfo.mGroup ) );
                 ImGui::SameLine();
-                ImGui::FanBeginDragDropSourceComponent( _world,
-                                                        node.mHandle,
-                                                        info.mType,
-                                                        ImGuiDragDropFlags_SourceAllowNullID );
+                ImGui::FanBeginDragDropSourceComponent( _world, node.mHandle, info.mType, ImGuiDragDropFlags_SourceAllowNullID );
                 ImGui::Text( "%s", info.mName.c_str() );
-                ImGui::FanBeginDragDropSourceComponent( _world,
-                                                        node.mHandle,
-                                                        info.mType,
-                                                        ImGuiDragDropFlags_SourceAllowNullID );
+                ImGui::FanBeginDragDropSourceComponent( _world, node.mHandle, info.mType, ImGuiDragDropFlags_SourceAllowNullID );
 
                 // Delete button
                 std::stringstream ss;
@@ -103,7 +96,7 @@ namespace fan
     //==================================================================================================================================================================================================
     void InspectorWindow::NewComponentPopup( EcsWorld& _world )
     {
-        const EditorGuiInfo& gui = _world.GetSingleton<EditorGuiInfo>();
+        const EditorSettings& settings = _world.GetSingleton<EditorSettings>();
 
         if( ImGui::BeginPopup( "new_component" ) )
         {
@@ -111,7 +104,7 @@ namespace fan
             std::vector<EcsComponentInfo> components = _world.GetComponentInfos();
             for( int                      i          = (int)components.size() - 1; i >= 0; i-- )
             {
-                const fan::GuiComponentInfo& guiInfo = gui.GetComponentInfo( components[i].mType );
+                const fan::GuiComponentInfo& guiInfo = settings.GetComponentInfo( components[i].mType );
                 if( std::string( guiInfo.mEditorPath ).empty() )
                 {
                     components.erase( components.begin() + i );
@@ -123,7 +116,7 @@ namespace fan
             componentsPath.reserve( components.size() );
             for( int i = 0; i < (int)components.size(); i++ )
             {
-                const fan::GuiComponentInfo& guiInfo = gui.GetComponentInfo( components[i].mType );
+                const fan::GuiComponentInfo& guiInfo = settings.GetComponentInfo( components[i].mType );
                 componentsPath.push_back( guiInfo.mEditorPath );
             }
 
@@ -201,9 +194,8 @@ namespace fan
     //==================================================================================================================================================================================================
     void InspectorWindow::NewComponentItem( EcsWorld& _world, const EcsComponentInfo& _info )
     {
-        const EditorGuiInfo        & gui      = _world.GetSingleton<EditorGuiInfo>();
-        const fan::GuiComponentInfo& guiInfo  = gui.GetComponentInfo( _info.mType );
         const EditorSettings       & settings = _world.GetSingleton<EditorSettings>();
+        const fan::GuiComponentInfo& guiInfo  = settings.GetComponentInfo( _info.mType );
 
         ImGui::Icon( guiInfo.mIcon, { 16, 16 }, settings.mData->mGroupsColors.GetColor( guiInfo.mGroup ) );
         ImGui::SameLine();

@@ -4,7 +4,7 @@
 #include "fanDisableWarnings.hpp"
 #include "fanGlm.hpp"
 #include "core/math/fanFixedPoint.hpp"
-#include "editor/singletons/fanEditorGuiInfo.hpp"
+#include "editor/fanGuiInfos.hpp"
 
 namespace fan
 {

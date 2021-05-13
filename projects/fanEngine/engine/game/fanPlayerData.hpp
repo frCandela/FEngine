@@ -30,6 +30,7 @@ namespace fan
 
         static void InitWorldResources( EcsWorld& _world, PlayerData& _playerData );
         static void UpdateRenderWorld( Renderer& _renderer, IGame& _game, const glm::vec2 _size );
+        static void MatchFullscreenState( const FullScreen& _fullscreen, Window& _window );
         static void EcsIncludeEngine( EcsWorld& _world );
         static void EcsIncludePhysics( EcsWorld& _world );
         static void EcsIncludeRender3D( EcsWorld& _world );

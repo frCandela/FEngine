@@ -1,7 +1,7 @@
 #pragma once
 
 #include "engine/singletons/fanRenderResources.hpp"
-#include "editor/singletons/fanEditorGuiInfo.hpp"
+#include "editor/fanGuiInfos.hpp"
 #include "render/resources/fanMesh.hpp"
 #include "render/resources/fanMesh2D.hpp"
 #include "render/resources/fanTexture.hpp"

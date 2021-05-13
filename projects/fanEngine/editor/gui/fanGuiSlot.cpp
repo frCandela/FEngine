@@ -2,7 +2,7 @@
 #include "core/ecs/fanEcsWorld.hpp"
 #include "editor/fanDragnDrop.hpp"
 #include "engine/components/fanSceneNode.hpp"
-#include "editor/singletons/fanEditorGuiInfo.hpp"
+#include "editor/fanGuiInfos.hpp"
 #include "editor/fanModals.hpp"
 #include "editor/gui/fanGroupsColors.hpp"
 #include "editor/singletons/fanEditorSettings.hpp"
@@ -35,7 +35,6 @@ namespace ImGui
     //==================================================================================================================================================================================================
     void FanPopupSetSingletonSlot::Draw( fan::EcsWorld& _world, fan::SlotPtr& _slotPtr )
     {
-        const fan::EditorGuiInfo & gui      = _world.GetSingleton<fan::EditorGuiInfo>();
         const fan::EditorSettings& settings = _world.GetSingleton<fan::EditorSettings>();
 
         ImGui::SetNextWindowSize( { 400, 400 } );
@@ -53,7 +52,7 @@ namespace ImGui
 
                     didNotDrawAnything = false;
                     // display the slot
-                    const fan::GuiSingletonInfo& guiInfo = gui.GetSingletonInfo( info.mType );
+                    const fan::GuiSingletonInfo& guiInfo = settings.GetSingletonInfo( info.mType );
                     ImGui::Icon( guiInfo.mIcon, { 16, 16 }, settings.mData->mGroupsColors.GetColor( guiInfo.mGroup ) );
                     ImGui::SameLine();
                     if( ImGui::TreeNode( info.mName.c_str() ) )
@@ -122,8 +121,7 @@ namespace ImGui
 
                     didNotDrawAnything = false;
 
-                    const fan::EditorGuiInfo   & gui     = _world.GetSingleton<fan::EditorGuiInfo>();
-                    const fan::GuiComponentInfo& guiInfo = gui.GetComponentInfo( info.mType );
+                    const fan::GuiComponentInfo& guiInfo = settings.GetComponentInfo( info.mType );
                     ImGui::Icon( guiInfo.mIcon, { 16, 16 }, settings.mData->mGroupsColors.GetColor( guiInfo.mGroup ) );
                     ImGui::SameLine();
                     if( ImGui::TreeNode( info.mName.c_str() ) )
@@ -161,11 +159,10 @@ namespace ImGui
     //==================================================================================================================================================================================================
     void DrawTooltipSingleton( fan::EcsWorld& _world, fan::SlotPtr& _ptr )
     {
-        const fan::EditorGuiInfo & guiInfo  = _world.GetSingleton<fan::EditorGuiInfo>();
         const fan::EditorSettings& settings = _world.GetSingleton<fan::EditorSettings>();
 
         ImGui::BeginTooltip();
-        const fan::GuiSingletonInfo& targetSingletonInfo = guiInfo.GetSingletonInfo( _ptr.Data().mType );
+        const fan::GuiSingletonInfo& targetSingletonInfo = settings.GetSingletonInfo( _ptr.Data().mType );
         ImGui::Icon( targetSingletonInfo.mIcon, { 16, 16 }, settings.mData->mGroupsColors.GetColor( targetSingletonInfo.mGroup ) );
         ImGui::SameLine();
         ImGui::Text( "target singleton: %s", targetSingletonInfo.mEditorName.c_str() );
@@ -182,18 +179,17 @@ namespace ImGui
     //==================================================================================================================================================================================================
     void DrawTooltipComponent( fan::EcsWorld& _world, fan::SlotPtr& _ptr )
     {
-        const fan::EditorGuiInfo & guiInfo  = _world.GetSingleton<fan::EditorGuiInfo>();
         const fan::EditorSettings& settings = _world.GetSingleton<fan::EditorSettings>();
 
         ImGui::BeginTooltip();
         fan::EcsEntity entity = _world.GetEntity( _ptr.Data().mHandle );
-        const fan::GuiComponentInfo& sceneNodeInfo = guiInfo.GetComponentInfo( fan::SceneNode::Info::sType );
+        const fan::GuiComponentInfo& sceneNodeInfo = settings.GetComponentInfo( fan::SceneNode::Info::sType );
         ImGui::Icon( sceneNodeInfo.mIcon, { 16, 16 }, settings.mData->mGroupsColors.GetColor( sceneNodeInfo.mGroup ) );
         const fan::SceneNode& sceneNode = _world.GetComponent<fan::SceneNode>( entity );
         ImGui::SameLine();
         ImGui::Text( "scene node      : %s", sceneNode.mName.c_str() );
 
-        const fan::GuiComponentInfo& targetComponentInfo = guiInfo.GetComponentInfo( _ptr.Data().mType );
+        const fan::GuiComponentInfo& targetComponentInfo = settings.GetComponentInfo( _ptr.Data().mType );
         ImGui::Icon( targetComponentInfo.mIcon, { 16, 16 }, settings.mData->mGroupsColors.GetColor( targetComponentInfo.mGroup ) );
         ImGui::SameLine();
         ImGui::Text( "target component: %s", targetComponentInfo.mEditorName.c_str() );

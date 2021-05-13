@@ -1,7 +1,8 @@
 #pragma once
 
 #include "engine/terrain/fanVoxelTerrain.hpp"
-#include "editor/singletons/fanEditorGuiInfo.hpp"
+#include "editor/fanGuiInfos.hpp"
+#include "editor/fanModals.hpp"
 
 namespace fan
 {

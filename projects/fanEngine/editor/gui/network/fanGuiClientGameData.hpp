@@ -1,6 +1,6 @@
 #pragma once
 
-#include "editor/singletons/fanEditorGuiInfo.hpp"
+#include "editor/fanGuiInfos.hpp"
 #include "network/components/fanClientGameData.hpp"
 
 namespace fan

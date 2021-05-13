@@ -3,7 +3,7 @@
 #include "core/ecs/fanEcsSingleton.hpp"
 #include "core/ecs/fanSignal.hpp"
 #include "engine/game/fanLaunchSettings.hpp"
-#include "editor/singletons/fanEditorGuiInfo.hpp"
+#include "editor/fanGuiInfos.hpp"
 
 namespace fan
 {
