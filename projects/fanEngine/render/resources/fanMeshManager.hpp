@@ -27,7 +27,7 @@ namespace fan
         void Remove( const std::string& _path );
         void Clear( Device& _device );
         bool Empty() const { return mMeshes.empty(); }
-        void ResolvePtr( ResourcePtr<Mesh>& _resourcePtr );
+        void ResolvePtr( ResourcePtr <Mesh>& _resourcePtr );
 
         void CreateNewMeshes( Device& _device );
         void DestroyRemovedMeshes( Device& _device );

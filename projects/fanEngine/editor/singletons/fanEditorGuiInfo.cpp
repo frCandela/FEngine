@@ -14,7 +14,7 @@
 #include "editor/windows/fanInspectorWindow.hpp"
 #include "editor/windows/fanPreferencesWindow.hpp"
 #include "editor/windows/fanProfilerWindow.hpp"
-#include "editor/windows/fanProjectViewWindow.hpp"
+#include "editor/windows/fanGameViewWindow.hpp"
 #include "editor/windows/fanRenderWindow.hpp"
 #include "editor/windows/fanSceneWindow.hpp"
 #include "editor/windows/fanSingletonsWindow.hpp"
@@ -114,7 +114,7 @@ namespace fan
         editorGui.mSingletonInfos[InspectorWindow::Info::sType]   = GuiInspectorWindow::GetInfo();
         editorGui.mSingletonInfos[PreferencesWindow::Info::sType] = GuiPreferencesWindow::GetInfo();
         editorGui.mSingletonInfos[ProfilerWindow::Info::sType]    = GuiProfilerWindow::GetInfo();
-        editorGui.mSingletonInfos[ProjectViewWindow::Info::sType] = GuiProjectViewWindow::GetInfo();
+        editorGui.mSingletonInfos[GameViewWindow::Info::sType]    = GuiGameViewWindow::GetInfo();
         editorGui.mSingletonInfos[RenderWindow::Info::sType]      = GuiRenderWindow::GetInfo();
         editorGui.mSingletonInfos[SceneWindow::Info::sType]       = GuiSceneWindow::GetInfo();
         editorGui.mSingletonInfos[SingletonsWindow::Info::sType]  = GuiSingletonsWindow::GetInfo();

@@ -31,17 +31,17 @@ namespace fan
 
         // List of available rpc
         Signal<int>        mOnShiftFrameIndex;
-        static const RpcID sRpcIdShiftFrame                  = SSID( "RPCShiftFrame" );
+        static const RpcID sRpcIdShiftFrame                 = SSID( "RPCShiftFrame" );
         void UnwrapShiftClientFrame( sf::Packet& _packet );
         static PacketReplication RPCShiftClientFrame( const int _framesDelta );
 
-        Signal <SpawnID, FrameIndex, sf::Packet> mOnSpawn;
-        static const RpcID                       sRpcIdSpawn = SSID( "RPCSpawn" );
+        Signal<SpawnID, FrameIndex, sf::Packet> mOnSpawn;
+        static const RpcID                      sRpcIdSpawn = SSID( "RPCSpawn" );
         void UnwrapSpawn( sf::Packet& _packet );
         static PacketReplication RPCSpawn( const SpawnInfo& _spawnInfo );
 
-        Signal <NetID>     mOnDespawn;
-        static const RpcID sRpcIdDespawn                     = SSID( "RPCDespawn" );
+        Signal<NetID>      mOnDespawn;
+        static const RpcID sRpcIdDespawn                    = SSID( "RPCDespawn" );
         void UnwrapDespawn( sf::Packet& _packet );
         static PacketReplication RPCDespawn( const NetID _netID );
     };

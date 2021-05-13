@@ -4,19 +4,19 @@
 
 namespace fan
 {
-    std::string Path::sProjectPath = "";
+    std::string Path::sGamePath = "";
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    bool Path::SetProjectPath( const std::string& _projectPath )
+    bool Path::SetGamePath( const std::string& _gamePath )
     {
-        fanAssertMsg( sProjectPath.empty(), "project path assigned multiple times" );
-        if( !_projectPath.empty() && IsAbsolute( _projectPath ) )
+        fanAssertMsg( sGamePath.empty(), "game path assigned multiple times" );
+        if( !_gamePath.empty() && IsAbsolute( _gamePath ) )
         {
-            sProjectPath = Normalize( _projectPath );
-            if( *sProjectPath.rbegin() != '/' )
+            sGamePath = Normalize( _gamePath );
+            if( *sGamePath.rbegin() != '/' )
             {
-                sProjectPath += '/';
+                sGamePath += '/';
             }
             return true;
         }
@@ -27,7 +27,7 @@ namespace fan
     //==================================================================================================================================================================================================
     void Path::Reset()
     {
-        sProjectPath = "";
+        sGamePath = "";
     }
 
     //==================================================================================================================================================================================================
@@ -97,7 +97,7 @@ namespace fan
         const std::string normalizedPath = Normalize( _path );
         if( normalizedPath.empty() ){ return ""; }
 
-        const std::string absoluteRoot = sProjectPath + "content/";
+        const std::string absoluteRoot = sGamePath + "content/";
         if( normalizedPath.starts_with( absoluteRoot ) )
         {
             return std::string( normalizedPath.begin() + absoluteRoot.size(), normalizedPath.end() );
@@ -118,7 +118,7 @@ namespace fan
 
         if( normalizedPath.empty() || !IsAbsolute( normalizedPath ) )
         {
-            normalizedPath = sProjectPath + "content/" + normalizedPath;
+            normalizedPath = sGamePath + "content/" + normalizedPath;
         }
         return normalizedPath;
     }

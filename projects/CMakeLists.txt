@@ -64,5 +64,5 @@ include_directories(
 )
 
 add_subdirectory(fanEngine)
-add_subdirectory(project_empty)
-add_subdirectory(project_voxels)
+add_subdirectory(game_empty)
+add_subdirectory(game_voxels)

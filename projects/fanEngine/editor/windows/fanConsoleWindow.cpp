@@ -25,7 +25,7 @@ namespace fan
         consoleWindow.mLogBuffer.clear();
         consoleWindow.mLogBuffer.reserve( consoleWindow.mMaxSizeLogBuffers );
         consoleWindow.mScrollDown = false;
-        consoleWindow.mGrabFocus = false;
+        consoleWindow.mGrabFocus  = false;
         Debug::Get().onNewLog.Connect( &ConsoleWindow::OnNewLog, &consoleWindow );
     }
 

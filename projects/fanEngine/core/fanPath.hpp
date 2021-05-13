@@ -12,8 +12,8 @@ namespace fan
     {
     public:
         static void Reset();
-        static bool SetProjectPath( const std::string& _projectPath );
-        static std::string GetProjectPath() { return sProjectPath; }
+        static bool SetGamePath( const std::string& _gamePath );
+        static std::string GetGamePath() { return sGamePath; }
 
         static bool IsAbsolute( const std::string& _path );
         static bool IsRootDrive( const std::string& _path );
@@ -30,6 +30,6 @@ namespace fan
         static std::vector<std::string> ListDirectory( const std::string& _path );
 
     private:
-        static std::string sProjectPath;
+        static std::string sGamePath;
     };
 }

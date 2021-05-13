@@ -1,5 +1,6 @@
 #pragma once
 
+#include "glfw/glfw3.h"
 #include "core/ecs/fanEcsSingleton.hpp"
 #include "core/ecs/fanSignal.hpp"
 #include "engine/game/fanLaunchSettings.hpp"
@@ -7,34 +8,48 @@
 
 namespace fan
 {
-    struct NoiseOctave;
     class EcsWorld;
 
     //==================================================================================================================================================================================================
+    // 3D view displaying a world in a game
     //==================================================================================================================================================================================================
-    struct TerrainWindow : EcsSingleton
+    struct GameViewWindow : EcsSingleton
     {
-    ECS_SINGLETON( TerrainWindow )
+    ECS_SINGLETON( GameViewWindow )
 
         static void SetInfo( EcsSingletonInfo& _info );
         static void Init( EcsWorld& _world, EcsSingleton& _singleton );
+
+        Signal<VkExtent2D> mOnSizeChanged;
+        Signal<>           mOnPlay;
+        Signal<>           mOnPause;
+        Signal<>           mOnResume;
+        Signal<>           mOnStop;
+        Signal<>           mOnStep;
+        Signal<int>        mOnSelectGame;
+
+        glm::vec2 mSize        = glm::vec2( 1.f, 1.f );
+        glm::vec2 mPosition;
+        bool      mIsHovered;
+        char      mStringGameSelectionCombo[16];
+        int       mCurrentGame = 0;
     };
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    struct GuiTerrainWindow
+    struct GuiGameViewWindow
     {
         static GuiSingletonInfo GetInfo()
         {
             GuiSingletonInfo info;
-            info.mEditorName = "terrain editor";
-            info.mIcon       = ImGui::Terrain16;
-            info.mGroup      = EngineGroups::Editor;
-            info.mType       = GuiSingletonInfo::Type::ToolWindow;
-            info.onGui       = &GuiTerrainWindow::OnGui;
+            info.mEditorName       = "game view";
+            info.mIcon             = ImGui::Joystick16;
+            info.mGroup            = EngineGroups::Editor;
+            info.mType             = GuiSingletonInfo::Type::ToolWindow;
+            info.mImGuiWindowFlags = ImGuiWindowFlags_MenuBar;
+            info.onGui             = &GuiGameViewWindow::OnGui;
             return info;
         }
         static void OnGui( EcsWorld& _world, EcsSingleton& _singleton );
-        static bool GuiNoiseOctave( const char* _name, NoiseOctave& _octave );
     };
 }

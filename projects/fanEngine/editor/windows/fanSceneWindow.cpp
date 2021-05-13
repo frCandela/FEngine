@@ -42,7 +42,7 @@ namespace fan
         sceneWindow.mPathBuffer = "";
         sceneWindow.mTextBuffer[0] = '\0';
         sceneWindow.mLastSceneNodeRightClicked = nullptr;
-        sceneWindow.mExpandSceneHierarchy = false;
+        sceneWindow.mExpandSceneHierarchy      = false;
     }
 
     //==================================================================================================================================================================================================

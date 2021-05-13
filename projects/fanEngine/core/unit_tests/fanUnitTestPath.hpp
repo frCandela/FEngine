@@ -15,7 +15,7 @@ namespace fan
             return { { &UnitTestPath::TestNormalize,         "Normalize" },
                      { &UnitTestPath::TestMakeRelative,      "Make relative" },
                      { &UnitTestPath::TestIsAbsolute,        "Is absolute" },
-                     { &UnitTestPath::TestSetProjectPath,    "Set project path" },
+                     { &UnitTestPath::TestSetGamePath,       "Set game path" },
                      { &UnitTestPath::TestNormalizeAbsolute, "Normalize absolute" },
                      { &UnitTestPath::TestDirectory,         "Directory" },
                      { &UnitTestPath::TestFilename,          "Filename" },
@@ -25,20 +25,20 @@ namespace fan
             };
         }
 
-        std::string mOldProjectPath;
+        std::string mOldGamePath;
 
         void Create() override
         {
-            mOldProjectPath = Path::GetProjectPath();
+            mOldGamePath = Path::GetGamePath();
             Path::Reset();
         }
 
         void Destroy() override
         {
             Path::Reset();
-            if( !mOldProjectPath.empty() )
+            if( !mOldGamePath.empty() )
             {
-                Path::SetProjectPath( mOldProjectPath );
+                Path::SetGamePath( mOldGamePath );
             }
         }
 
@@ -59,7 +59,7 @@ namespace fan
 
         void TestMakeRelative()
         {
-            Path::SetProjectPath( "C:/blob" );
+            Path::SetGamePath( "C:/blob" );
             TEST_ASSERT( Path::Normalize( "textures/hello.png" ) == "C:/blob/content/textures/hello.png" )
             TEST_ASSERT( Path::MakeRelative( "C:/blob/content/textures/hello.png" ) == "textures/hello.png" )
             TEST_ASSERT( Path::MakeRelative( Path::Normalize( "textures/hello.png" ) ) == "textures/hello.png" )
@@ -68,18 +68,18 @@ namespace fan
             TEST_ASSERT( Path::MakeRelative( "" ) == "" )
         }
 
-        void TestSetProjectPath()
+        void TestSetGamePath()
         {
-            bool result = Path::SetProjectPath( "" );
+            bool result = Path::SetGamePath( "" );
             TEST_ASSERT( result == false );
-            TEST_ASSERT( Path::GetProjectPath() == "" );
+            TEST_ASSERT( Path::GetGamePath() == "" );
 
-            Path::SetProjectPath( "D:/test" );
-            TEST_ASSERT( Path::GetProjectPath() == "D:/test/" );
+            Path::SetGamePath( "D:/test" );
+            TEST_ASSERT( Path::GetGamePath() == "D:/test/" );
 
             Path::Reset();
-            Path::SetProjectPath( "D:////test/\\//" );
-            TEST_ASSERT( Path::GetProjectPath() == "D:/test/" );
+            Path::SetGamePath( "D:////test/\\//" );
+            TEST_ASSERT( Path::GetGamePath() == "D:/test/" );
         }
 
         void TestIsAbsolute()
@@ -92,7 +92,7 @@ namespace fan
 
         void TestNormalizeAbsolute()
         {
-            Path::SetProjectPath( "D:/test" );
+            Path::SetGamePath( "D:/test" );
             TEST_ASSERT( Path::Normalize( "test.png" ) == "D:/test/content/test.png" );
             TEST_ASSERT( Path::Normalize( "/test.png" ) == "D:/test/content/test.png" );
         }
@@ -150,7 +150,7 @@ namespace fan
 
         void TestList()
         {
-            Path::SetProjectPath( mOldProjectPath );
+            Path::SetGamePath( mOldGamePath );
             std::vector files = Path::ListDirectory( Path::Normalize( "/" ) );
             TEST_ASSERT( !files.empty() );
             for( std::string path : files )
