@@ -5,17 +5,15 @@
 
 namespace fan
 {
-
     struct Mesh;
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    struct GLTFImporter
+    struct GLTFExporter
     {
-        bool Load( const std::string& _relativePath );
-        bool GetMesh( Mesh& _mesh );
+        void Export( const Mesh& _mesh );
+        bool Save( const std::string& _path );
 
-        std::string mPath;    // file relative path
-        Json        mJson;    // gltf json data
+        Json        mJson;
     };
 }
