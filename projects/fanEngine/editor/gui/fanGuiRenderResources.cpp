@@ -140,7 +140,10 @@ namespace ImGui
         {
             ImGui::BeginTooltip();
             ImGui::Text( mesh->mPath.c_str() );
-            ImGui::Text( "%d triangles", (int)mesh->mIndices.size() / 3 );
+            for( fan::SubMesh& subMesh : mesh->mSubMeshes )
+            {
+                ImGui::Text( "%d triangles", (int)subMesh.mIndices.size() / 3 );
+            }
             ImGui::EndTooltip();
         }
 

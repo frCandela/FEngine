@@ -38,7 +38,7 @@ namespace fan
                 Transform   & transform    = *transformIt;
                 Material    & material     = *materialIt;
 
-                if( meshRenderer.mMesh.IsValid() && !meshRenderer.mMesh->mIndices.empty() )
+                if( meshRenderer.mMesh.IsValid() && !meshRenderer.mMesh->Empty() )
                 {
                     const EcsEntity entity = transformIt.GetEntity();
                     const Vector3   scale  = _world.HasComponent<Scale>( entity ) ? _world.GetComponent<Scale>( entity ).mScale : Vector3::sOne;

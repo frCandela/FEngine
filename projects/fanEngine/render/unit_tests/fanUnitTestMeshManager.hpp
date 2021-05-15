@@ -102,26 +102,31 @@ namespace fan
         {
             Mesh* mesh1 = new Mesh();
             Mesh* mesh2 = new Mesh();
+            mesh1->mSubMeshes.resize( 1 );
+            mesh2->mSubMeshes.resize( 1 );
 
-            TEST_ASSERT( !mesh1->mBuffersOutdated );
-            TEST_ASSERT( !mesh2->mBuffersOutdated );
+            SubMesh& submesh1 = mesh1->mSubMeshes[0];
+            SubMesh& submesh2 = mesh2->mSubMeshes[0];
+
+            TEST_ASSERT( !submesh1.mBuffersOutdated );
+            TEST_ASSERT( !submesh2.mBuffersOutdated );
 
             mMeshManager.Add( mesh1, "mesh1" );
             mMeshManager.Add( mesh2, "mesh2" );
 
-            mesh1->mVertices = {};
-            mesh1->LoadFromVertices();
-            mesh2->LoadFromFile( RenderGlobal::sMeshCube );
-            mesh2->mVertices.clear();
+           submesh1.mVertices = {};
+           submesh1.LoadFromVertices();
+           mesh2->LoadFromFile( RenderGlobal::sMeshCube );
+           submesh2.mVertices.clear();
 
-            TEST_ASSERT( mesh1->mBuffersOutdated );
-            TEST_ASSERT( mesh2->mBuffersOutdated );
+            TEST_ASSERT( submesh1.mBuffersOutdated );
+            TEST_ASSERT( submesh2.mBuffersOutdated );
 
             Device* device = nullptr;
             mMeshManager.CreateNewMeshes( *device );
 
-            TEST_ASSERT( !mesh1->mBuffersOutdated );
-            TEST_ASSERT( !mesh2->mBuffersOutdated );
+            TEST_ASSERT( !submesh1.mBuffersOutdated );
+            TEST_ASSERT( !submesh2.mBuffersOutdated );
         }
 
         void TestDestroy()

@@ -91,10 +91,11 @@ namespace fan
                     Mesh* mesh = renderResources.mMeshManager->Get( chunkName );
                     if( !mesh ){ mesh = new Mesh; }
                     MeshRenderer& renderer = _world.AddComponent<MeshRenderer>( entity );
-                    mesh->mOptimizeVertices = false;
-                    mesh->mAutoUpdateHull   = false;
-                    mesh->mHostVisible      = true;
-                    renderer.mMesh          = mesh;
+                    mesh->mSubMeshes.resize( 1 );
+                    mesh->mSubMeshes[0].mOptimizeVertices = false;
+                    mesh->mSubMeshes[0].mHostVisible      = true;
+                    mesh->mAutoUpdateHull                 = false;
+                    renderer.mMesh                        = mesh;
                     renderResources.mMeshManager->Add( mesh, chunkName );
 
                     Material& material = _world.AddComponent<Material>( entity );

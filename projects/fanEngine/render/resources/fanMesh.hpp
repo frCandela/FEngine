@@ -13,6 +13,26 @@ struct Device;
 namespace fan
 {
     //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    struct SubMesh
+    {
+        std::vector<Vertex>   mVertices;
+        std::vector<uint32_t> mIndices;
+        Buffer                mIndexBuffer[SwapChain::sMaxFramesInFlight];
+        Buffer                mVertexBuffer[SwapChain::sMaxFramesInFlight];
+        bool                  mBuffersOutdated  = false;
+        bool                  mOptimizeVertices = true;
+        uint32_t              mCurrentBuffer    = 0;
+        bool                  mHostVisible      = false;
+
+        bool LoadFromVertices();
+        void OptimizeVertices();
+        void Create( Device& _device );
+        void Destroy( Device& _device );
+        bool RayCast( const Vector3 _origin, const Vector3 _dir, Vector3& _outIntersection ) const;
+    };
+
+    //==================================================================================================================================================================================================
     // 3D mesh composed of triangles
     // can have a convex hull computed for it
     //==================================================================================================================================================================================================
@@ -20,23 +40,14 @@ namespace fan
     {
         bool RayCast( const Vector3 _origin, const Vector3 _dir, Vector3& _outIntersection ) const;
         bool LoadFromFile( const std::string& _path );
-        bool LoadFromVertices();
-        void OptimizeVertices();
+
         void GenerateConvexHull();
-        void Create( Device& _device );
-        void Destroy( Device& _device );
+        bool Empty() const;
 
         std::string           mPath;
-        std::vector<Vertex>   mVertices;
-        std::vector<uint32_t> mIndices;
         ConvexHull            mConvexHull;
-        Buffer                mIndexBuffer[SwapChain::sMaxFramesInFlight];
-        Buffer                mVertexBuffer[SwapChain::sMaxFramesInFlight];
-        uint32_t              mCurrentBuffer    = 0;
-        int                   mIndex            = -1;
-        bool                  mHostVisible      = false;
-        bool                  mOptimizeVertices = true;
         bool                  mAutoUpdateHull   = true;
-        bool                  mBuffersOutdated  = false;
+        std::vector<SubMesh>  mSubMeshes;
+        int                   mIndex            = -1;
     };
 }

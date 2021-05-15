@@ -22,7 +22,7 @@ namespace fan
             if( _delta == 0.f ){ return; }
 
             RenderWorld& renderWorld = _world.GetSingleton<RenderWorld>();
-            Mesh       & mesh        = *renderWorld.mParticlesMesh;
+            SubMesh    & mesh        = renderWorld.mParticlesMesh->mSubMeshes[0];
             mesh.mVertices.resize( _view.Size() * 3 );
             const float size = 0.05f;
 
@@ -32,18 +32,9 @@ namespace fan
 
                 glm::vec3 color = particle.mColor.ToGLM3();
                 // pos, normal, color, uv;
-                mesh.mVertices.push_back( { particle.mPosition + glm::vec3( -size, 0.0f, -size ),
-                                            glm::vec3( 0.f, 1.f, 0.f ),
-                                            color,
-                                            glm::vec2( -0.5f, -0.5f ) } );
-                mesh.mVertices.push_back( { particle.mPosition + glm::vec3( 0, 0.0f, size ),
-                                            glm::vec3( 0.f, 1.f, 0.f ),
-                                            color,
-                                            glm::vec2( -0.5f, -0.5f ) } );
-                mesh.mVertices.push_back( { particle.mPosition + glm::vec3( size, 0.0f, -size ),
-                                            glm::vec3( 0.f, 1.f, 0.f ),
-                                            color,
-                                            glm::vec2( -0.5f, -0.5f ) } );
+                mesh.mVertices.push_back( { particle.mPosition + glm::vec3( -size, 0.0f, -size ), glm::vec3( 0.f, 1.f, 0.f ), color, glm::vec2( -0.5f, -0.5f ) } );
+                mesh.mVertices.push_back( { particle.mPosition + glm::vec3( 0, 0.0f, size ), glm::vec3( 0.f, 1.f, 0.f ), color, glm::vec2( -0.5f, -0.5f ) } );
+                mesh.mVertices.push_back( { particle.mPosition + glm::vec3( size, 0.0f, -size ), glm::vec3( 0.f, 1.f, 0.f ), color, glm::vec2( -0.5f, -0.5f ) } );
             }
             mesh.LoadFromVertices();
         }

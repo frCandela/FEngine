@@ -117,7 +117,7 @@ namespace fan
         renderWorld.mTargetSize = _size;
 
         // particles mesh
-        if( !renderWorld.mParticlesMesh->mIndices.empty() )
+        if( !renderWorld.mParticlesMesh->mSubMeshes[0].mIndices.empty() )
         {
             RenderDataModel particlesDrawData;
             particlesDrawData.mMesh         = renderWorld.mParticlesMesh;

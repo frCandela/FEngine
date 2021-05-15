@@ -58,16 +58,18 @@ namespace fan
                 {
                     const glm::mat4 modelMat  = transform.GetModelMatrix();
                     const glm::mat4 normalMat = transform.GetNormalMatrix();
-                    const std::vector<uint32_t>& indices  = meshRenderer.mMesh->mIndices;
-                    const std::vector<Vertex>  & vertices = meshRenderer.mMesh->mVertices;
-
-                    for( int index = 0; index < (int)indices.size(); index++ )
+                    for( SubMesh& subMesh : meshRenderer.mMesh->mSubMeshes )
                     {
-                        const Vertex& vertex = vertices[indices[index]];
-                        const Vector3 position = Vector3( modelMat * glm::vec4( vertex.mPos, 1.f ) );
-                        const Vector3 normal   = Vector3( normalMat * glm::vec4( vertex.mNormal, 1.f ) );
-                        RenderDebug& renderDebug = _world.GetSingleton<RenderDebug>();
-                        renderDebug.DebugLine( position, position + FIXED( 0.1 ) * normal, Color::sGreen );
+                        const std::vector<uint32_t>& indices  = subMesh.mIndices;
+                        const std::vector<Vertex>  & vertices = subMesh.mVertices;
+                        for( int index = 0; index < (int)indices.size(); index++ )
+                        {
+                            const Vertex& vertex = vertices[indices[index]];
+                            const Vector3 position = Vector3( modelMat * glm::vec4( vertex.mPos, 1.f ) );
+                            const Vector3 normal   = Vector3( normalMat * glm::vec4( vertex.mNormal, 1.f ) );
+                            RenderDebug& renderDebug = _world.GetSingleton<RenderDebug>();
+                            renderDebug.DebugLine( position, position + FIXED( 0.1 ) * normal, Color::sGreen );
+                        }
                     }
                 }
             }
@@ -94,17 +96,20 @@ namespace fan
                 if( *meshRenderer.mMesh == nullptr ){ continue; }
 
                 const glm::mat4 modelMat = transform.GetModelMatrix();
-                const std::vector<uint32_t>& indices  = meshRenderer.mMesh->mIndices;
-                const std::vector<Vertex>  & vertices = meshRenderer.mMesh->mVertices;
-
-                for( int index = 0; index < (int)indices.size() / 3; index++ )
+                for( SubMesh& subMesh : meshRenderer.mMesh->mSubMeshes )
                 {
-                    const Vector3 v0 = Vector3( modelMat * glm::vec4( vertices[indices[3 * index + 0]].mPos, 1.f ) );
-                    const Vector3 v1 = Vector3( modelMat * glm::vec4( vertices[indices[3 * index + 1]].mPos, 1.f ) );
-                    const Vector3 v2 = Vector3( modelMat * glm::vec4( vertices[indices[3 * index + 2]].mPos, 1.f ) );
-                    _world.GetSingleton<RenderDebug>().DebugLine( v0, v1, Color::sYellow );
-                    _world.GetSingleton<RenderDebug>().DebugLine( v1, v2, Color::sYellow );
-                    _world.GetSingleton<RenderDebug>().DebugLine( v2, v0, Color::sYellow );
+                    const std::vector<uint32_t>& indices  = subMesh.mIndices;
+                    const std::vector<Vertex>  & vertices = subMesh.mVertices;
+
+                    for( int index = 0; index < (int)indices.size() / 3; index++ )
+                    {
+                        const Vector3 v0 = Vector3( modelMat * glm::vec4( vertices[indices[3 * index + 0]].mPos, 1.f ) );
+                        const Vector3 v1 = Vector3( modelMat * glm::vec4( vertices[indices[3 * index + 1]].mPos, 1.f ) );
+                        const Vector3 v2 = Vector3( modelMat * glm::vec4( vertices[indices[3 * index + 2]].mPos, 1.f ) );
+                        _world.GetSingleton<RenderDebug>().DebugLine( v0, v1, Color::sYellow );
+                        _world.GetSingleton<RenderDebug>().DebugLine( v1, v2, Color::sYellow );
+                        _world.GetSingleton<RenderDebug>().DebugLine( v2, v0, Color::sYellow );
+                    }
                 }
             }
         }

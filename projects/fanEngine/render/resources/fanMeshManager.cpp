@@ -86,7 +86,10 @@ namespace fan
     {
         for( Mesh* mesh : mMeshes )
         {
-            mesh->Destroy( _device );
+            for( SubMesh& subMesh : mesh->mSubMeshes )
+            {
+                subMesh.Destroy( _device );
+            }
             delete mesh;
         }
         mMeshes.clear();
@@ -99,9 +102,12 @@ namespace fan
     {
         for( Mesh* mesh : mMeshes )
         {
-            if( mesh->mBuffersOutdated )
+            for( SubMesh& subMesh : mesh->mSubMeshes )
             {
-                mesh->Create( _device );
+                if( subMesh.mBuffersOutdated )
+                {
+                    subMesh.Create( _device );
+                }
             }
         }
     }
@@ -112,7 +118,10 @@ namespace fan
     {
         for( Mesh* mesh : mDestroyList )
         {
-            mesh->Destroy( _device );
+            for( SubMesh& subMesh : mesh->mSubMeshes )
+            {
+                subMesh.Destroy( _device );
+            }
             delete mesh;
         }
         mDestroyList.clear();

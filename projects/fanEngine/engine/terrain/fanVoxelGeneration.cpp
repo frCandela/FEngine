@@ -92,7 +92,7 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void GenerateLocalVoxels( VoxelChunk& _chunk, Mesh& _mesh )
+    void GenerateLocalVoxels( VoxelChunk& _chunk, SubMesh& _mesh )
     {
         for( int x = 0; x < VoxelChunk::sSize - 1; ++x )
         {
@@ -116,7 +116,7 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void GenerateLeftVoxels( const VoxelChunk& _leftChunk, VoxelChunk& _chunk, Mesh& _mesh )
+    void GenerateLeftVoxels( const VoxelChunk& _leftChunk, VoxelChunk& _chunk, SubMesh& _mesh )
     {
         for( int y = 0; y < VoxelChunk::sSize - 1; ++y )
         {
@@ -138,7 +138,7 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void GenerateTopVoxels( const VoxelChunk& _topChunk, VoxelChunk& _chunk, Mesh& _mesh )
+    void GenerateTopVoxels( const VoxelChunk& _topChunk, VoxelChunk& _chunk, SubMesh& _mesh )
     {
         for( int x = 0; x < VoxelChunk::sSize - 1; ++x )
         {
@@ -160,7 +160,7 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void GenerateForwardVoxels( const VoxelChunk& _forwardChunk, VoxelChunk& _chunk, Mesh& _mesh )
+    void GenerateForwardVoxels( const VoxelChunk& _forwardChunk, VoxelChunk& _chunk, SubMesh& _mesh )
     {
         for( int x = 0; x < VoxelChunk::sSize - 1; ++x )
         {
@@ -182,7 +182,7 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void GenerateLeftTopVoxels( const VoxelChunk& _leftChunk, const VoxelChunk& _topChunk, const VoxelChunk& _leftTopChunk, VoxelChunk& _chunk, Mesh& _mesh )
+    void GenerateLeftTopVoxels( const VoxelChunk& _leftChunk, const VoxelChunk& _topChunk, const VoxelChunk& _leftTopChunk, VoxelChunk& _chunk, SubMesh& _mesh )
     {
 
         for( int z = 0; z < VoxelChunk::sSize - 1; ++z )
@@ -202,7 +202,7 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void GenerateLeftForwardVoxels( const VoxelChunk& _leftChunk, const VoxelChunk& _forwardChunk, const VoxelChunk& _leftForwardChunk, VoxelChunk& _chunk, Mesh& _mesh )
+    void GenerateLeftForwardVoxels( const VoxelChunk& _leftChunk, const VoxelChunk& _forwardChunk, const VoxelChunk& _leftForwardChunk, VoxelChunk& _chunk, SubMesh& _mesh )
     {
         for( int y = 0; y < VoxelChunk::sSize - 1; ++y )
         {
@@ -221,7 +221,7 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void GenerateTopForwardVoxels( const VoxelChunk& _topChunk, const VoxelChunk& _forwardChunk, const VoxelChunk& _topForwardChunk, VoxelChunk& _chunk, Mesh& _mesh )
+    void GenerateTopForwardVoxels( const VoxelChunk& _topChunk, const VoxelChunk& _forwardChunk, const VoxelChunk& _topForwardChunk, VoxelChunk& _chunk, SubMesh& _mesh )
     {
         for( int x = 0; x < VoxelChunk::sSize - 1; ++x )
         {
@@ -240,7 +240,7 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void VoxelGenerator::GenerateMesh( const VoxelTerrain& _terrain, VoxelChunk& _chunk, Mesh& _mesh )
+    void VoxelGenerator::GenerateMesh( const VoxelTerrain& _terrain, VoxelChunk& _chunk, SubMesh& _mesh )
     {
         // ScopedTimer         timerMesh( "gen voxel mesh" );
         _chunk.mIsMeshOutdated = false;

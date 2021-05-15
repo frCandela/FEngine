@@ -11,9 +11,11 @@ namespace fan
         const Json& jAttribute = jPrimitive["attributes"];
         const bool hasNormal    = jAttribute.find( "NORMAL" ) != jAttribute.end();
         const bool hasTexcoord0 = jAttribute.find( "TEXCOORD_0" ) != jAttribute.end();
+        const bool hasMaterial = jPrimitive.find( "material" ) != jPrimitive.end();
 
         mIndices   = jPrimitive["indices"];
         mPosition  = jAttribute["POSITION"];
+        mMaterial    = hasMaterial ? int( jPrimitive["material"] ) : 0;
         mNormal    = hasNormal ? int( jAttribute["NORMAL"] ) : -1;
         mTexCoord0 = hasTexcoord0 ? int( jAttribute["TEXCOORD_0"] ) : -1;
     }
@@ -22,6 +24,7 @@ namespace fan
     //==================================================================================================================================================================================================
     void GLTFPrimitive::Save( Json& jPrimitive ) const
     {
+        jPrimitive["material"] = mMaterial;
         if( mIndices >= 0 ){ jPrimitive["indices"] = mIndices; }
         Json& jAttribute = jPrimitive["attributes"];
         {
@@ -36,7 +39,12 @@ namespace fan
     void GLTFMesh::Load( const Json& jMesh )
     {
         mName = jMesh["name"];
-        mPrimitive0.Load( jMesh["primitives"][0] );
+        const Json& jPrimitives = jMesh["primitives"];
+        mPrimitives.resize( jPrimitives.size() );
+        for( int i = 0; i < jPrimitives.size(); ++i )
+        {
+            mPrimitives[i].Load( jPrimitives[i] );
+        }
     }
 
     //==================================================================================================================================================================================================
@@ -44,7 +52,10 @@ namespace fan
     void GLTFMesh::Save( Json& jMesh ) const
     {
         jMesh["name"] = mName;
-        mPrimitive0.Save( jMesh["primitives"][0] );
+        for( int i = 0; i < mPrimitives.size(); ++i )
+        {
+            mPrimitives[i].Save( jMesh["primitives"][i] );
+        }
     }
 
     //==================================================================================================================================================================================================
@@ -67,7 +78,7 @@ namespace fan
         _jBufferView["buffer"]     = mBuffer;
         _jBufferView["byteLength"] = mByteLength;
         _jBufferView["byteOffset"] = mByteOffset;
-       //if( mByteStride >= 0 ){ _jBufferView["byteStride"] = mByteStride; }
+        //if( mByteStride >= 0 ){ _jBufferView["byteStride"] = mByteStride; }
     }
 
     //==================================================================================================================================================================================================

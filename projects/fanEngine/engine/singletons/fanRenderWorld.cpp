@@ -42,8 +42,9 @@ namespace fan
         renderWorld.directionalLights.clear();
         renderWorld.mTargetSize                       = { 1920, 1080 };
         renderWorld.mParticlesMesh                    = new Mesh();
-        renderWorld.mParticlesMesh->mHostVisible      = true;
-        renderWorld.mParticlesMesh->mOptimizeVertices = false;
+        renderWorld.mParticlesMesh->mSubMeshes.resize(1);
+        renderWorld.mParticlesMesh->mSubMeshes[0].mHostVisible      = true;
+        renderWorld.mParticlesMesh->mSubMeshes[0].mOptimizeVertices = false;
         renderWorld.mParticlesMesh->mAutoUpdateHull   = false;
         renderWorld.mIsHeadless                       = false;
         renderWorld.mClearColor                       = Color::sDarkGrey;

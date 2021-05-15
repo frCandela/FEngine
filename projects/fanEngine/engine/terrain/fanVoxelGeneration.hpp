@@ -16,7 +16,7 @@ namespace fan
         void Initialize();
 
         static void GenerateBlocks( const VoxelTerrain& _terrain, VoxelChunk& _chunk );
-        static void GenerateMesh( const VoxelTerrain& _terrain, VoxelChunk& _chunk, Mesh& _mesh );
+        static void GenerateMesh( const VoxelTerrain& _terrain, VoxelChunk& _chunk, SubMesh& _mesh );
         static void GenerateVertices( const int _caseID, const Vector3 offset, std::vector<Vertex>& _vertices );
 
         int          mSeed;

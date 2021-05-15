@@ -25,10 +25,12 @@ namespace fan
                 Debug::Get() << "Failed to load mesh : " << mPath << Debug::Endl();
                 return false;
             }
-
-            OptimizeVertices();
+            for( SubMesh& subMesh : mSubMeshes )
+            {
+                subMesh.OptimizeVertices();
+                subMesh.mBuffersOutdated = true;
+            }
             GenerateConvexHull();
-            mBuffersOutdated = true;
 
             mPath = _path;
             return true;
@@ -39,7 +41,7 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    bool Mesh::LoadFromVertices()
+    bool SubMesh::LoadFromVertices()
     {
         // Generate fake indices
         mIndices.clear();
@@ -51,7 +53,7 @@ namespace fan
 
         // Cleanup
         OptimizeVertices();
-        GenerateConvexHull();
+        //GenerateConvexHull();
         mBuffersOutdated = true;
 
         return true;
@@ -60,7 +62,7 @@ namespace fan
     //==================================================================================================================================================================================================
     // Removes duplicates vertices & generates a corresponding index buffer
     //==================================================================================================================================================================================================
-    void Mesh::OptimizeVertices()
+    void SubMesh::OptimizeVertices()
     {
 
         if( !mOptimizeVertices ){ return; }
@@ -90,19 +92,43 @@ namespace fan
     }
 
     //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    bool Mesh::Empty() const
+    {
+        for( SubMesh subMesh : mSubMeshes )
+        {
+            if( !subMesh.mIndices.empty() )
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    //==================================================================================================================================================================================================
     // Creates a convex hull from the mesh geometry
     //==================================================================================================================================================================================================
     void Mesh::GenerateConvexHull()
     {
-        if( mVertices.empty() || !mAutoUpdateHull ){ return; }
+        if( !mAutoUpdateHull ){ return; }
+
+        int numVertices = 0;
+        for( SubMesh& subMesh : mSubMeshes )
+        {
+            numVertices += (int)subMesh.mVertices.size();
+        }
+        if( numVertices == 0 ){ return; }
 
         // Generate points clouds from vertex list
         std::vector<Vector3> pointCloud;
-        pointCloud.reserve( mVertices.size() );
-        for( int point = 0; point < (int)mVertices.size(); point++ )
+        pointCloud.reserve( numVertices );
+        for( SubMesh& subMesh : mSubMeshes )
         {
-            Vertex& vertex = mVertices[point];
-            pointCloud.push_back( Vector3( vertex.mPos ) );
+            for( int point = 0; point < (int)subMesh.mVertices.size(); point++ )
+            {
+                Vertex& vertex = subMesh.mVertices[point];
+                pointCloud.push_back( Vector3( vertex.mPos ) );
+            }
         }
         mConvexHull.ComputeQuickHull( pointCloud );
     }
@@ -110,7 +136,7 @@ namespace fan
     //==================================================================================================================================================================================================
     // Raycast on all triangles of the mesh
     //==================================================================================================================================================================================================
-    bool Mesh::RayCast( const Vector3 _origin, const Vector3 _direction, Vector3& _outIntersection ) const
+    bool SubMesh::RayCast( const Vector3 _origin, const Vector3 _direction, Vector3& _outIntersection ) const
     {
         Vector3  intersection;
         Fixed    closestDistance = Fixed::sMaxValue;
@@ -136,7 +162,21 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void Mesh::Destroy( Device& _device )
+    bool Mesh::RayCast( const Vector3 _origin, const Vector3 _direction, Vector3& _outIntersection ) const
+    {
+        for( const SubMesh& subMesh : mSubMeshes )
+        {
+            if( subMesh.RayCast( _origin, _direction, _outIntersection ) )
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    void SubMesh::Destroy( Device& _device )
     {
         for( int i = 0; i < (int)SwapChain::sMaxFramesInFlight; i++ )
         {
@@ -147,7 +187,7 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void Mesh::Create( Device& _device )
+    void SubMesh::Create( Device& _device )
     {
         mBuffersOutdated = false;
 

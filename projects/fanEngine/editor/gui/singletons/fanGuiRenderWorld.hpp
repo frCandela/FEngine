@@ -27,7 +27,7 @@ namespace fan
             ImGui::Text( "ui mesh:            %d", (int)renderWorld.uiDrawData.size() );
             ImGui::Text( "pointLights:        %d", (int)renderWorld.pointLights.size() );
             ImGui::Text( "directionalLights:  %d", (int)renderWorld.directionalLights.size() );
-            ImGui::Text( "particles vertices: %d", (int)renderWorld.mParticlesMesh->mVertices.size() );
+            ImGui::Text( "particles vertices: %d", (int)renderWorld.mParticlesMesh->mSubMeshes[0].mVertices.size() );
             ImGui::Text( "target size:        %d x %d", (int)renderWorld.mTargetSize.x, (int)renderWorld.mTargetSize.y );
             ImGui::Checkbox("fullscreen", &renderWorld.mFullscreen.mIsFullScreen );
             ImGui::PushReadOnly();
