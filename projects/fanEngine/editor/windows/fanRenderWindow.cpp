@@ -95,23 +95,6 @@ namespace fan
             }
         }
 
-        if( ImGui::CollapsingHeader( "Rendered Mesh : " ) )
-        {
-            const std::vector<DrawData>& meshArray = renderWindow.mRenderer->mDrawModels.mDrawData;
-            for( uint32_t meshIndex = 0; meshIndex < meshArray.size(); meshIndex++ )
-            {
-                const DrawData& drawData = meshArray[meshIndex];
-                if( drawData.mMesh != nullptr )
-                {
-                    ImGui::Text( drawData.mMesh->mPath.c_str() );
-                }
-                else
-                {
-                    ImGui::Text( "Empty slot" );
-                }
-            }
-        }
-
         UniformLights& lights = renderWindow.mRenderer->mDrawModels.mUniforms.mUniformsLights;
         if( ImGui::CollapsingHeader( "Directional lights : " ) )
         {

@@ -155,21 +155,18 @@ namespace fan
             for( uint32_t meshIndex = 0; meshIndex < mDrawData.size(); meshIndex++ )
             {
                 DrawData& drawData = mDrawData[meshIndex];
-                Mesh    & mesh     = *drawData.mMesh;
+                SubMesh & subMesh  = *drawData.mMesh;
 
-                for( SubMesh& subMesh : mesh.mSubMeshes )
-                {
-                    Buffer& buffer = subMesh.mVertexBuffer[subMesh.mCurrentBuffer];
-                    if( buffer.mBuffer == VK_NULL_HANDLE ){ continue; }
+                Buffer& buffer = subMesh.mVertexBuffer[subMesh.mCurrentBuffer];
+                if( buffer.mBuffer == VK_NULL_HANDLE ){ continue; }
 
-                    BindTexture( commandBuffer, drawData.mTextureIndex, mDescriptorSampler, _descriptorTextures, mPipeline.mPipelineLayout );
-                    BindDescriptors( commandBuffer, _index, meshIndex );
-                    VkDeviceSize offsets[] = { 0 };
+                BindTexture( commandBuffer, drawData.mTextureIndex, mDescriptorSampler, _descriptorTextures, mPipeline.mPipelineLayout );
+                BindDescriptors( commandBuffer, _index, meshIndex );
+                VkDeviceSize offsets[] = { 0 };
 
-                    vkCmdBindVertexBuffers( commandBuffer, 0, 1, &subMesh.mVertexBuffer[subMesh.mCurrentBuffer].mBuffer, offsets );
-                    vkCmdBindIndexBuffer( commandBuffer, subMesh.mIndexBuffer[subMesh.mCurrentBuffer].mBuffer, 0, VK_INDEX_TYPE_UINT32 );
-                    vkCmdDrawIndexed( commandBuffer, static_cast<uint32_t>( subMesh.mIndices.size() ), 1, 0, 0, 0 );
-                }
+                vkCmdBindVertexBuffers( commandBuffer, 0, 1, &subMesh.mVertexBuffer[subMesh.mCurrentBuffer].mBuffer, offsets );
+                vkCmdBindIndexBuffer( commandBuffer, subMesh.mIndexBuffer[subMesh.mCurrentBuffer].mBuffer, 0, VK_INDEX_TYPE_UINT32 );
+                vkCmdDrawIndexed( commandBuffer, static_cast<uint32_t>( subMesh.mIndices.size() ), 1, 0, 0, 0 );
             }
 
             if( vkEndCommandBuffer( commandBuffer ) != VK_SUCCESS )
@@ -211,7 +208,7 @@ namespace fan
             const RenderDataModel& data = _drawData[dataIndex];
 
             fanAssert( data.mMesh != nullptr );
-            fanAssert( !data.mMesh->Empty() );
+            fanAssert( !data.mMesh->mIndices.empty() );
 
             // Transform
             mUniforms.mDynamicUniformsMatrices[dataIndex].mModelMat  = data.mModelMatrix;

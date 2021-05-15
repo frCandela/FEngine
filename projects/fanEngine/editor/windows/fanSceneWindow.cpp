@@ -119,7 +119,7 @@ namespace fan
 
                     Material& material = world.AddComponent<Material>( entity );
 
-                    material.mTexture = renderResources.mTextureManager->Get( RenderGlobal::sTextureWhite );
+                    material.mMaterials[0].mTexture = renderResources.mTextureManager->Get( RenderGlobal::sTextureWhite );
                     onSelectSceneNode.Emmit( &node );
                 }
 
@@ -138,7 +138,7 @@ namespace fan
                     MeshRenderer& meshRenderer = world.AddComponent<MeshRenderer>( entity );
                     meshRenderer.mMesh = renderResources.mMeshManager->GetOrLoad( RenderGlobal::sMeshCube );
                     Material& material = world.AddComponent<Material>( entity );
-                    material.mTexture = renderResources.mTextureManager->Get( RenderGlobal::sTextureWhite );
+                    material.mMaterials[0].mTexture = renderResources.mTextureManager->Get( RenderGlobal::sTextureWhite );
                     onSelectSceneNode.Emmit( &node );
 
                     Rigidbody   rb  = world.AddComponent<Rigidbody>( entity );

@@ -17,10 +17,7 @@ namespace fan
     void Material::Init( EcsWorld& /*_world*/, EcsEntity /*_entity*/, EcsComponent& _component )
     {
         Material& material = static_cast<Material&>( _component );
-
-        material.mTexture   = nullptr;
-        material.mShininess = 1;
-        material.mColor     = Color::sWhite;
+        material.mMaterials.resize(1);
     }
 
     //==================================================================================================================================================================================================
@@ -28,10 +25,13 @@ namespace fan
     void Material::Save( const EcsComponent& _component, Json& _json )
     {
         const Material& material = static_cast<const Material&>( _component );
-
-        Serializable::SaveUInt( _json, "shininess", material.mShininess );
-        Serializable::SaveColor( _json, "color", material.mColor );
-        Serializable::SaveTexturePtr( _json, "material", material.mTexture );
+        Json & jsonMaterials = _json["materials"];
+        for( int i = 0; i < (int)material.mMaterials.size(); i++)
+        {
+            Serializable::SaveUInt(         jsonMaterials[i], "shininess",  material.mMaterials[i].mShininess );
+            Serializable::SaveColor(        jsonMaterials[i], "color",      material.mMaterials[i].mColor );
+            Serializable::SaveTexturePtr(   jsonMaterials[i], "material",   material.mMaterials[i].mTexture );
+        }
     }
 
     //==================================================================================================================================================================================================
@@ -39,9 +39,13 @@ namespace fan
     void Material::Load( EcsComponent& _component, const Json& _json )
     {
         Material& material = static_cast<Material&>( _component );
-
-        Serializable::LoadUInt( _json, "shininess", material.mShininess );
-        Serializable::LoadColor( _json, "color", material.mColor );
-        Serializable::LoadTexturePtr( _json, "material", material.mTexture );
+        const Json & jsonMaterials = _json["materials"];
+        material.mMaterials.resize( jsonMaterials.size() );
+        for( int i = 0; i < (int)material.mMaterials.size(); i++)
+        {
+            Serializable::LoadUInt(         jsonMaterials[i], "shininess",  material.mMaterials[i].mShininess );
+            Serializable::LoadColor(        jsonMaterials[i], "color",      material.mMaterials[i].mColor );
+            Serializable::LoadTexturePtr(   jsonMaterials[i], "material",   material.mMaterials[i].mTexture );
+        }
     }
 }

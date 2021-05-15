@@ -120,7 +120,7 @@ namespace fan
         if( !renderWorld.mParticlesMesh->mSubMeshes[0].mIndices.empty() )
         {
             RenderDataModel particlesDrawData;
-            particlesDrawData.mMesh         = renderWorld.mParticlesMesh;
+            particlesDrawData.mMesh         = &renderWorld.mParticlesMesh->mSubMeshes[0];
             particlesDrawData.mModelMatrix  = glm::mat4( 1.f );
             particlesDrawData.mNormalMatrix = glm::mat4( 1.f );
             particlesDrawData.mColor        = glm::vec4( 1.f, 1.f, 1.f, 1.f );

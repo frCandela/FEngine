@@ -25,22 +25,41 @@ namespace fan
         {
             Material& material = static_cast<Material&>( _component );
 
-            ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() - 16 );
+            if( ImGui::ButtonIcon(ImGui::IconType::Plus8, {8,8}) &&  material.mMaterials.size() < Material::sMaxSubMaterials)
             {
-                // Filter color
-                if( ImGui::Button( "##color" ) ){ material.mColor = Color::sWhite; }
-                ImGui::SameLine();
-                ImGui::ColorEdit4( "color", material.mColor.Data(), ImGui::fanColorEditFlags );
-
-                if( ImGui::Button( "##shininess" ) ){ material.mShininess = 1; }
-                ImGui::SameLine();
-                ImGui::DragInt( "shininess", (int*)&material.mShininess, 1, 1, 256 );
-                ImGui::SameLine();
-                ImGui::FanShowHelpMarker( "sharpness of the specular reflection" );
+                material.mMaterials.push_back({});
             }
-            ImGui::PopItemWidth();
+            ImGui::SameLine();
+            if( ImGui::ButtonIcon(ImGui::IconType::Minus16, {8,8}) &&  material.mMaterials.size() > 1)
+            {
+                material.mMaterials.pop_back();
+            }
+            for( int i = 0; i < (int)material.mMaterials.size(); ++i )
+            {
+                SubMaterial& subMaterial = material.mMaterials[i];
+                if( ImGui::CollapsingHeader(("material " + std::to_string(i)).c_str()) )
+                {
+                    ImGui::PushID(i);
+                    ImGui::Indent();
+                    ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() - 32 );
+                    {
+                        // Filter color
+                        if( ImGui::Button( "##color" ) ){ subMaterial.mColor = Color::sWhite; }
+                        ImGui::SameLine();
+                        ImGui::ColorEdit4( "color", subMaterial.mColor.Data(), ImGui::fanColorEditFlags );
 
-            ImGui::FanTexturePtr( "mat texture", material.mTexture );
+                        if( ImGui::Button( "##shininess" ) ){ subMaterial.mShininess = 1; }
+                        ImGui::SameLine();
+                        ImGui::DragInt( "shininess", (int*)&subMaterial.mShininess, 1, 1, 256 );
+                        ImGui::SameLine();
+                        ImGui::FanShowHelpMarker( "sharpness of the specular reflection" );
+                    }
+                    ImGui::PopItemWidth();
+                    ImGui::FanTexturePtr( "mat texture", subMaterial.mTexture );
+                    ImGui::Unindent();
+                    ImGui::PopID();
+                }
+            }
         }
     };
 }

@@ -99,7 +99,7 @@ namespace fan
                     renderResources.mMeshManager->Add( mesh, chunkName );
 
                     Material& material = _world.AddComponent<Material>( entity );
-                    material.mTexture = texture;
+                    material.mMaterials[0].mTexture = texture;
                 }
             }
         }

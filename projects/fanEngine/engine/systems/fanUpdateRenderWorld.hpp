@@ -43,16 +43,23 @@ namespace fan
                     const EcsEntity entity = transformIt.GetEntity();
                     const Vector3   scale  = _world.HasComponent<Scale>( entity ) ? _world.GetComponent<Scale>( entity ).mScale : Vector3::sOne;
 
-                    // drawMesh data;
-                    RenderDataModel data;
-                    data.mMesh         = *meshRenderer.mMesh;
-                    data.mModelMatrix  = transform.GetModelMatrix( scale );
-                    data.mNormalMatrix = transform.GetNormalMatrix( scale );
-                    data.mTextureIndex = material.mTexture.IsValid() ? material.mTexture->mIndex : 0;
-                    data.mColor        = material.mColor.ToGLM();
-                    data.mShininess    = material.mShininess;
+                    for( int i = 0; i < meshRenderer.mMesh->mSubMeshes.size(); i++ )
+                    {
+                        SubMesh& subMesh = meshRenderer.mMesh->mSubMeshes[i];
 
-                    _renderWorld.drawData.push_back( data );
+                        // drawMesh data;
+                        RenderDataModel data;
+                        data.mMesh         = &subMesh;
+                        data.mModelMatrix  = transform.GetModelMatrix( scale );
+                        data.mNormalMatrix = transform.GetNormalMatrix( scale );
+
+                        SubMaterial& subMaterial = i < material.mMaterials.size() ? material.mMaterials[i] : material.mMaterials[material.mMaterials.size() - 1];
+                        data.mTextureIndex = subMaterial.mTexture.IsValid() ? subMaterial.mTexture->mIndex : 0;
+                        data.mColor        = subMaterial.mColor.ToGLM();
+                        data.mShininess    = subMaterial.mShininess;
+
+                        _renderWorld.drawData.push_back( data );
+                    }
                 }
             }
         }
