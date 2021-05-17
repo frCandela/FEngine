@@ -22,8 +22,8 @@ int main( int _argc, char* _argv[] )
     std::vector<std::string> args;
     args.push_back( _argv[0] );
     // force arguments into the command line
-// 	args.push_back( "-livepp" );
-// 	args.push_back( "0" );
+ 	//args.push_back( "-livepp" );
+ 	//args.push_back( "0" );
     // generates a list of strings from the command line arguments
     for( int i             = 1; i < _argc; i++ ){ args.push_back( _argv[i] ); }
 

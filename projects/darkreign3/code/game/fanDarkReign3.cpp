@@ -1,3 +1,4 @@
+#include <editor/gui/fanGuiRenderResources.hpp>
 #include "game/fanDarkReign3.hpp"
 #include "core/random/fanSimplexNoise.hpp"
 #include "core/math/fanQuaternion.hpp"
@@ -29,7 +30,11 @@
 #include "editor/singletons/fanEditorSettings.hpp"
 #include "editor/fanGuiTestSingleton.hpp"
 #include "editor/fanGuiTestComponent.hpp"
+#include "editor/fanModals.hpp"
+
 #endif
+
+#include "render/fanGLTFExporter.hpp"
 
 namespace fan
 {
@@ -109,7 +114,7 @@ namespace fan
                 {
                     EcsEntity entity = mWorld.GetEntity( chunk.mHandle );
                     MeshRenderer& meshRenderer = mWorld.GetComponent<MeshRenderer>( entity );
-                    VoxelGenerator::GenerateMesh( terrain, chunk, **( meshRenderer.mMesh ) );
+                    VoxelGenerator::GenerateMesh( terrain, chunk, ( meshRenderer.mMesh )->mSubMeshes[0] );
                     completionMeshGeneration = i;
                     break;
                 }
@@ -162,6 +167,8 @@ namespace fan
         mWorld.ForceRun<SUpdateRenderWorldDirectionalLights>();
     }
 
+    MeshPtr meshPtr;
+
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
     void DarkReign3::OnGui()
@@ -173,6 +180,15 @@ namespace fan
             ImGui::SliderInt( "voxels generation", &completionVoxelsGenerationCpy, 0, max );
             int completionMeshGenerationCpy = completionMeshGeneration;
             ImGui::SliderInt( "mesh generation", &completionMeshGenerationCpy, 0, max );
+
+            ImGui::FanMeshPtr( "mesh", meshPtr );
+
+            if( ImGui::Button( "export" ) && meshPtr != nullptr )
+            {
+                GLTFExporter exporter;
+                exporter.Export( **meshPtr );
+                exporter.Save( "exported_mesh.gltf" );
+            }
         }
         ImGui::End();
     }

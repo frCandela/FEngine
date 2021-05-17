@@ -39,13 +39,25 @@ namespace fan
     void Material::Load( EcsComponent& _component, const Json& _json )
     {
         Material& material = static_cast<Material&>( _component );
-        const Json & jsonMaterials = _json["materials"];
-        material.mMaterials.resize( jsonMaterials.size() );
-        for( int i = 0; i < (int)material.mMaterials.size(); i++)
+
+        auto it = _json.find("materials");
+        if( it != _json.end() )
         {
-            Serializable::LoadUInt(         jsonMaterials[i], "shininess",  material.mMaterials[i].mShininess );
-            Serializable::LoadColor(        jsonMaterials[i], "color",      material.mMaterials[i].mColor );
-            Serializable::LoadTexturePtr(   jsonMaterials[i], "material",   material.mMaterials[i].mTexture );
+            const Json & jsonMaterials = _json["materials"];
+            material.mMaterials.resize( jsonMaterials.size() );
+            for( int i = 0; i < (int)material.mMaterials.size(); i++)
+            {
+                Serializable::LoadUInt(         jsonMaterials[i], "shininess",  material.mMaterials[i].mShininess );
+                Serializable::LoadColor(        jsonMaterials[i], "color",      material.mMaterials[i].mColor );
+                Serializable::LoadTexturePtr(   jsonMaterials[i], "material",   material.mMaterials[i].mTexture );
+            }
+        }
+        else
+        {
+            material.mMaterials.resize( 1 );
+            Serializable::LoadUInt(        _json , "shininess",  material.mMaterials[0].mShininess );
+            Serializable::LoadColor(       _json , "color",      material.mMaterials[0].mColor );
+            Serializable::LoadTexturePtr(  _json , "material",   material.mMaterials[0].mTexture );
         }
     }
 }
