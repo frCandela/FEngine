@@ -9,7 +9,6 @@ namespace fan
     {
         mSeed         = 42;
         mSimplexNoise = SimplexNoise( mSeed );
-        mThreshold    = FIXED( 0.5 );
         m3DOctaves[0] = m3DOctaves[1] = m2DOctave = {};
         mClearSides = false;
     }
@@ -35,27 +34,28 @@ namespace fan
                     const Vector3 chunkOffset    = VoxelChunk::sSize * Vector3( _chunk.mPosition.x, _chunk.mPosition.y, _chunk.mPosition.z );
                     const Vector3 globalPosition = chunkOffset + Vector3( x, y, z );
 
-                    Fixed simplexVal3D0 = 1 + FIXED( 0.5 ) * generator.mSimplexNoise.Noise( generator.m3DOctaves[0].mFrequency * globalPosition );
-                    Fixed simplexVal3D1 = 1 + FIXED( 0.5 ) * generator.mSimplexNoise.Noise( generator.m3DOctaves[1].mFrequency * globalPosition );
-                    Fixed simplexVal2D  = 1 + FIXED( 0.5 ) * generator.mSimplexNoise.Noise( globalPosition.x * generator.m2DOctave.mFrequency, globalPosition.z * generator.m2DOctave.mFrequency );
+                    Fixed simplexVal2D  = generator.mSimplexNoise.Noise( globalPosition.x * generator.m2DOctave.mFrequency, globalPosition.z * generator.m2DOctave.mFrequency );
+                    Fixed simplexVal3D0 = generator.mSimplexNoise.Noise( generator.m3DOctaves[0].mFrequency * globalPosition );
+                    Fixed simplexVal3D1 = generator.mSimplexNoise.Noise( generator.m3DOctaves[1].mFrequency * globalPosition );
 
+                    simplexVal2D *= generator.m2DOctave.mAmplitude;
                     simplexVal3D0 *= generator.m3DOctaves[0].mAmplitude;
                     simplexVal3D1 *= generator.m3DOctaves[1].mAmplitude;
-                    simplexVal2D *= generator.m2DOctave.mAmplitude;
 
                     Fixed heightRatio = globalPosition.y / maxPosition.y;
-                    simplexVal3D0 *= 1 - generator.m3DOctaves[0].mHeightWeight * heightRatio;
-                    simplexVal3D1 *= 1 - generator.m3DOctaves[0].mHeightWeight * heightRatio;
+                    simplexVal2D *= 1 - generator.m2DOctave.mHeightWeight * heightRatio;
+                    simplexVal3D0 -= generator.m3DOctaves[0].mHeightWeight * ( 2 * heightRatio - 1 );
+                    simplexVal3D1 -= generator.m3DOctaves[1].mHeightWeight * ( 2 * heightRatio - 1 );
 
+                    simplexVal2D  += generator.m2DOctave.mHeightOffset;
                     simplexVal3D0 += generator.m3DOctaves[0].mHeightOffset;
                     simplexVal3D1 += generator.m3DOctaves[1].mHeightOffset;
-                    simplexVal2D += generator.m2DOctave.mHeightOffset;
 
                     Fixed simplexVal = generator.m2DOctave.mWeight * ( 1 + FIXED( 0.5 ) * simplexVal2D - globalPosition.y / maxSize.y + generator.m2DOctave.mHeightOffset )
                                        + generator.m3DOctaves[0].mWeight * simplexVal3D0
                                        + generator.m3DOctaves[1].mWeight * simplexVal3D1;
 
-                    _chunk( x, y, z ) = simplexVal > generator.mThreshold;
+                    _chunk( x, y, z ) = simplexVal;
 
                     if( !generator.mClearSides )
                     {
@@ -72,27 +72,125 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void VoxelGenerator::GenerateVertices( const int _caseID, const Vector3 _offset, std::vector<Vertex>& _vertices )
+    Vector3 VoxelGenerator::VertexInterpolate( const VoxelGenerator& _generator, const VoxelCellDensity& _cellDensity, int _edgeIndex )
     {
-        const int numPolys = sCaseToNumPolys[_caseID];
+        Vector3 corner1, corner2;
+        Fixed   density1, density2;
+        switch( _edgeIndex )
+        {
+            case 0:
+                density1 = _cellDensity.mBLB;
+                density2 = _cellDensity.mTLB;
+                corner1  = Vector3( 1, 0, 0 );
+                corner2  = Vector3( 1, 1, 0 );
+                break;
+            case 1:
+                density1 = _cellDensity.mTLB;
+                density2 = _cellDensity.mTRB;
+                corner1  = Vector3( 1, 1, 0 );
+                corner2  = Vector3( 0, 1, 0 );
+                break;
+            case 2:
+                density1 = _cellDensity.mTRB;
+                density2 = _cellDensity.mBRB;
+                corner1  = Vector3( 0, 1, 0 );
+                corner2  = Vector3( 0, 0, 0 );
+                break;
+            case 3:
+                density1 = _cellDensity.mBRB;
+                density2 = _cellDensity.mBLB;
+                corner1  = Vector3( 0, 0, 0 );
+                corner2  = Vector3( 1, 0, 0 );
+                break;
+            case 4:
+                density1 = _cellDensity.mBLF;
+                density2 = _cellDensity.mTLF;
+                corner1  = Vector3( 1, 0, 1 );
+                corner2  = Vector3( 1, 1, 1 );
+                break;
+            case 5:
+                density1 = _cellDensity.mTLF;
+                density2 = _cellDensity.mTRF;
+                corner1  = Vector3( 1, 1, 1 );
+                corner2  = Vector3( 0, 1, 1 );
+                break;
+            case 6:
+                density1 = _cellDensity.mTRF;
+                density2 = _cellDensity.mBRF;
+                corner1  = Vector3( 0, 1, 1 );
+                corner2  = Vector3( 0, 0, 1 );
+                break;
+            case 7:
+                density1 = _cellDensity.mBRF;
+                density2 = _cellDensity.mBLF;
+                corner1  = Vector3( 0, 0, 1 );
+                corner2  = Vector3( 1, 0, 1 );
+                break;
+            case 8:
+                density1 = _cellDensity.mBLB;
+                density2 = _cellDensity.mBLF;
+                corner1  = Vector3( 1, 0, 0 );
+                corner2  = Vector3( 1, 0, 1 );
+                break;
+            case 9:
+                density1 = _cellDensity.mTLB;
+                density2 = _cellDensity.mTLF;
+                corner1  = Vector3( 1, 1, 0 );
+                corner2  = Vector3( 1, 1, 1 );
+                break;
+            case 10:
+                density1 = _cellDensity.mTRB;
+                density2 = _cellDensity.mTRF;
+                corner1  = Vector3( 0, 1, 0 );
+                corner2  = Vector3( 0, 1, 1 );
+                break;
+            case 11:
+                density1 = _cellDensity.mBRB;
+                density2 = _cellDensity.mBRF;
+                corner1  = Vector3( 0, 0, 0 );
+                corner2  = Vector3( 0, 0, 1 );
+                break;
+            default:
+                fanAssert( false );
+                density1 = density2 = Fixed( 0 );
+                corner1  = corner2  = Vector3::sZero;
+                return VoxelGenerator::sEdges[_edgeIndex];
+                break;
+        }
+
+        (void)_generator;
+        const Fixed scale = density1 / ( density1 - density2 );
+        fanAssert( scale >= 0 && scale <= 1 );
+        const Vector3 scaled   = corner1 + scale * ( corner2 - corner1 );
+        const Vector3 unscaled = VoxelGenerator::sEdges[_edgeIndex];
+
+        return _generator.mInterpolationScale * scaled + ( 1 - _generator.mInterpolationScale ) * unscaled;
+    }
+
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    void VoxelGenerator::GenerateVertices( const VoxelGenerator& _generator, const VoxelCellDensity _cellDensity, const Vector3 _offset, std::vector<Vertex>& _vertices )
+    {
+        const int caseID   = _cellDensity.CaseID();
+        const int numPolys = sCaseToNumPolys[caseID];
         for( int  i        = 0; i < numPolys; ++i )
         {
-            const int8_t* triangleIndices = sEdgeConnectList[_caseID][i];
-            Vector3   v0       = _offset + sEdges[triangleIndices[0]];
-            Vector3   v1       = _offset + sEdges[triangleIndices[1]];
-            Vector3   v2       = _offset + sEdges[triangleIndices[2]];
+            const int8_t* triangleIndices = sEdgeConnectList[caseID][i];
+            Vector3   v0       = _offset + VertexInterpolate( _generator, _cellDensity, triangleIndices[0] );
+            Vector3   v1       = _offset + VertexInterpolate( _generator, _cellDensity, triangleIndices[1] );
+            Vector3   v2       = _offset + VertexInterpolate( _generator, _cellDensity, triangleIndices[2] );
             Vector3   fxNormal = Vector3::Cross( ( v1 - v2 ), ( v0 - v2 ) ).FastNormalized();
             glm::vec3 normal   = fxNormal.ToGlm();
 
-            _vertices.push_back( { v0.ToGlm(), normal, Color::sWhite.ToGLM(), { 0, 0 } } );
-            _vertices.push_back( { v2.ToGlm(), normal, Color::sWhite.ToGLM(), { 0, 0 } } );
-            _vertices.push_back( { v1.ToGlm(), normal, Color::sWhite.ToGLM(), { 0, 0 } } );
+            _vertices.push_back( { v0.ToGlm(), normal, Color( 1, 0, 0 ).ToGLM(), { 0, 0 } } );
+            _vertices.push_back( { v2.ToGlm(), normal, Color( 1, 0, 0 ).ToGLM(), { 0, 0 } } );
+            _vertices.push_back( { v1.ToGlm(), normal, Color( 1, 0, 0 ).ToGLM(), { 0, 0 } } );
         }
     }
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void GenerateLocalVoxels( VoxelChunk& _chunk, SubMesh& _mesh )
+    void GenerateLocalVoxels( const VoxelGenerator& _generator, VoxelChunk& _chunk, SubMesh& _mesh )
     {
         for( int x = 0; x < VoxelChunk::sSize - 1; ++x )
         {
@@ -100,15 +198,15 @@ namespace fan
             {
                 for( int z = 0; z < VoxelChunk::sSize - 1; ++z )
                 {
-                    const int caseID = _chunk( x + 1, y + 0, z + 0 ) << 0 |
-                                       _chunk( x + 1, y + 1, z + 0 ) << 1 |
-                                       _chunk( x + 0, y + 1, z + 0 ) << 2 |
-                                       _chunk( x + 0, y + 0, z + 0 ) << 3 |
-                                       _chunk( x + 1, y + 0, z + 1 ) << 4 |
-                                       _chunk( x + 1, y + 1, z + 1 ) << 5 |
-                                       _chunk( x + 0, y + 1, z + 1 ) << 6 |
-                                       _chunk( x + 0, y + 0, z + 1 ) << 7;
-                    VoxelGenerator::GenerateVertices( caseID, Vector3( x, y, z ), _mesh.mVertices );
+                    const VoxelCellDensity cellDensity = { _chunk( x + 1, y + 0, z + 0 ),
+                                                           _chunk( x + 1, y + 1, z + 0 ),
+                                                           _chunk( x + 0, y + 1, z + 0 ),
+                                                           _chunk( x + 0, y + 0, z + 0 ),
+                                                           _chunk( x + 1, y + 0, z + 1 ),
+                                                           _chunk( x + 1, y + 1, z + 1 ),
+                                                           _chunk( x + 0, y + 1, z + 1 ),
+                                                           _chunk( x + 0, y + 0, z + 1 ) };
+                    VoxelGenerator::GenerateVertices( _generator, cellDensity, Vector3( x, y, z ), _mesh.mVertices );
                 }
             }
         }
@@ -116,125 +214,131 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void GenerateLeftVoxels( const VoxelChunk& _leftChunk, VoxelChunk& _chunk, SubMesh& _mesh )
+    void GenerateLeftVoxels( const VoxelGenerator& _generator, const VoxelChunk& _leftChunk, VoxelChunk& _chunk, SubMesh& _mesh )
     {
         for( int y = 0; y < VoxelChunk::sSize - 1; ++y )
         {
             for( int z = 0; z < VoxelChunk::sSize - 1; ++z )
             {
-                const int x      = VoxelChunk::sSize - 1;
-                const int caseID = _leftChunk( 0, y + 0, z + 0 ) << 0 |
-                                   _leftChunk( 0, y + 1, z + 0 ) << 1 |
-                                   _chunk( x, y + 1, z + 0 ) << 2 |
-                                   _chunk( x, y + 0, z + 0 ) << 3 |
-                                   _leftChunk( 0, y + 0, z + 1 ) << 4 |
-                                   _leftChunk( 0, y + 1, z + 1 ) << 5 |
-                                   _chunk( x, y + 1, z + 1 ) << 6 |
-                                   _chunk( x, y + 0, z + 1 ) << 7;
-                VoxelGenerator::GenerateVertices( caseID, Vector3( x, y, z ), _mesh.mVertices );
+                const int              x           = VoxelChunk::sSize - 1;
+                const VoxelCellDensity cellDensity = { _leftChunk( 0, y + 0, z + 0 ),
+                                                       _leftChunk( 0, y + 1, z + 0 ),
+                                                       _chunk( x, y + 1, z + 0 ),
+                                                       _chunk( x, y + 0, z + 0 ),
+                                                       _leftChunk( 0, y + 0, z + 1 ),
+                                                       _leftChunk( 0, y + 1, z + 1 ),
+                                                       _chunk( x, y + 1, z + 1 ),
+                                                       _chunk( x, y + 0, z + 1 ) };
+                VoxelGenerator::GenerateVertices( _generator, cellDensity, Vector3( x, y, z ), _mesh.mVertices );
             }
         }
     }
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void GenerateTopVoxels( const VoxelChunk& _topChunk, VoxelChunk& _chunk, SubMesh& _mesh )
+    void GenerateTopVoxels( const VoxelGenerator& _generator, const VoxelChunk& _topChunk, VoxelChunk& _chunk, SubMesh& _mesh )
     {
         for( int x = 0; x < VoxelChunk::sSize - 1; ++x )
         {
             for( int z = 0; z < VoxelChunk::sSize - 1; ++z )
             {
-                const int y      = VoxelChunk::sSize - 1;
-                const int caseID = _chunk( x + 1, y, z + 0 ) << 0 |
-                                   _topChunk( x + 1, 0, z + 0 ) << 1 |
-                                   _topChunk( x + 0, 0, z + 0 ) << 2 |
-                                   _chunk( x + 0, y, z + 0 ) << 3 |
-                                   _chunk( x + 1, y, z + 1 ) << 4 |
-                                   _topChunk( x + 1, 0, z + 1 ) << 5 |
-                                   _topChunk( x + 0, 0, z + 1 ) << 6 |
-                                   _chunk( x + 0, y, z + 1 ) << 7;
-                VoxelGenerator::GenerateVertices( caseID, Vector3( x, y, z ), _mesh.mVertices );
+                const int              y           = VoxelChunk::sSize - 1;
+                const VoxelCellDensity cellDensity = { _chunk( x + 1, y, z + 0 ),
+                                                       _topChunk( x + 1, 0, z + 0 ),
+                                                       _topChunk( x + 0, 0, z + 0 ),
+                                                       _chunk( x + 0, y, z + 0 ),
+                                                       _chunk( x + 1, y, z + 1 ),
+                                                       _topChunk( x + 1, 0, z + 1 ),
+                                                       _topChunk( x + 0, 0, z + 1 ),
+                                                       _chunk( x + 0, y, z + 1 ) };
+                VoxelGenerator::GenerateVertices( _generator, cellDensity, Vector3( x, y, z ), _mesh.mVertices );
             }
         }
     }
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void GenerateForwardVoxels( const VoxelChunk& _forwardChunk, VoxelChunk& _chunk, SubMesh& _mesh )
+    void GenerateForwardVoxels( const VoxelGenerator& _generator, const VoxelChunk& _forwardChunk, VoxelChunk& _chunk, SubMesh& _mesh )
     {
         for( int x = 0; x < VoxelChunk::sSize - 1; ++x )
         {
             for( int y = 0; y < VoxelChunk::sSize - 1; ++y )
             {
-                const int z      = VoxelChunk::sSize - 1;
-                const int caseID = _chunk( x + 1, y + 0, z ) << 0 |
-                                   _chunk( x + 1, y + 1, z ) << 1 |
-                                   _chunk( x + 0, y + 1, z ) << 2 |
-                                   _chunk( x + 0, y + 0, z ) << 3 |
-                                   _forwardChunk( x + 1, y + 0, 0 ) << 4 |
-                                   _forwardChunk( x + 1, y + 1, 0 ) << 5 |
-                                   _forwardChunk( x + 0, y + 1, 0 ) << 6 |
-                                   _forwardChunk( x + 0, y + 0, 0 ) << 7;
-                VoxelGenerator::GenerateVertices( caseID, Vector3( x, y, z ), _mesh.mVertices );
+                const int              z           = VoxelChunk::sSize - 1;
+                const VoxelCellDensity cellDensity = { _chunk( x + 1, y + 0, z ),
+                                                       _chunk( x + 1, y + 1, z ),
+                                                       _chunk( x + 0, y + 1, z ),
+                                                       _chunk( x + 0, y + 0, z ),
+                                                       _forwardChunk( x + 1, y + 0, 0 ),
+                                                       _forwardChunk( x + 1, y + 1, 0 ),
+                                                       _forwardChunk( x + 0, y + 1, 0 ),
+                                                       _forwardChunk( x + 0, y + 0, 0 ) };
+                VoxelGenerator::GenerateVertices( _generator, cellDensity, Vector3( x, y, z ), _mesh.mVertices );
             }
         }
     }
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void GenerateLeftTopVoxels( const VoxelChunk& _leftChunk, const VoxelChunk& _topChunk, const VoxelChunk& _leftTopChunk, VoxelChunk& _chunk, SubMesh& _mesh )
+    void GenerateLeftTopVoxels( const VoxelGenerator& _generator, const VoxelChunk& _leftChunk, const VoxelChunk& _topChunk, const VoxelChunk& _leftTopChunk, VoxelChunk& _chunk, SubMesh& _mesh )
     {
 
         for( int z = 0; z < VoxelChunk::sSize - 1; ++z )
         {
-            const int xy     = VoxelChunk::sSize - 1;
-            const int caseID = _leftChunk( 0, xy + 0, z + 0 ) << 0 |
-                               _leftTopChunk( 0, 0, z + 0 ) << 1 |
-                               _topChunk( xy, 0, z + 0 ) << 2 |
-                               _chunk( xy, xy, z + 0 ) << 3 |
-                               _leftChunk( 0, xy, z + 1 ) << 4 |
-                               _leftTopChunk( 0, 0, z + 1 ) << 5 |
-                               _topChunk( xy, 0, z + 1 ) << 6 |
-                               _chunk( xy, xy, z + 1 ) << 7;
-            VoxelGenerator::GenerateVertices( caseID, Vector3( xy, xy, z ), _mesh.mVertices );
+            const int              xy          = VoxelChunk::sSize - 1;
+            const VoxelCellDensity cellDensity = { _leftChunk( 0, xy + 0, z + 0 ),
+                                                   _leftTopChunk( 0, 0, z + 0 ),
+                                                   _topChunk( xy, 0, z + 0 ),
+                                                   _chunk( xy, xy, z + 0 ),
+                                                   _leftChunk( 0, xy, z + 1 ),
+                                                   _leftTopChunk( 0, 0, z + 1 ),
+                                                   _topChunk( xy, 0, z + 1 ),
+                                                   _chunk( xy, xy, z + 1 ) };
+            VoxelGenerator::GenerateVertices( _generator, cellDensity, Vector3( xy, xy, z ), _mesh.mVertices );
         }
     }
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void GenerateLeftForwardVoxels( const VoxelChunk& _leftChunk, const VoxelChunk& _forwardChunk, const VoxelChunk& _leftForwardChunk, VoxelChunk& _chunk, SubMesh& _mesh )
+    void GenerateLeftForwardVoxels( const VoxelGenerator& _generator,
+                                    const VoxelChunk& _leftChunk,
+                                    const VoxelChunk& _forwardChunk,
+                                    const VoxelChunk& _leftForwardChunk,
+                                    VoxelChunk& _chunk,
+                                    SubMesh& _mesh )
     {
         for( int y = 0; y < VoxelChunk::sSize - 1; ++y )
         {
-            const int xz     = VoxelChunk::sSize - 1;
-            const int caseID = _leftChunk( 0, y + 0, xz ) << 0 |
-                               _leftChunk( 0, y + 1, xz ) << 1 |
-                               _chunk( xz, y + 1, xz ) << 2 |
-                               _chunk( xz, y + 0, xz ) << 3 |
-                               _leftForwardChunk( 0, y + 0, 0 ) << 4 |
-                               _leftForwardChunk( 0, y + 1, 0 ) << 5 |
-                               _forwardChunk( xz, y + 1, 0 ) << 6 |
-                               _forwardChunk( xz, y + 0, 0 ) << 7;
-            VoxelGenerator::GenerateVertices( caseID, Vector3( xz, y, xz ), _mesh.mVertices );
+            const int              xz          = VoxelChunk::sSize - 1;
+            const VoxelCellDensity cellDensity = { _leftChunk( 0, y + 0, xz ),
+                                                   _leftChunk( 0, y + 1, xz ),
+                                                   _chunk( xz, y + 1, xz ),
+                                                   _chunk( xz, y + 0, xz ),
+                                                   _leftForwardChunk( 0, y + 0, 0 ),
+                                                   _leftForwardChunk( 0, y + 1, 0 ),
+                                                   _forwardChunk( xz, y + 1, 0 ),
+                                                   _forwardChunk( xz, y + 0, 0 ) };
+            VoxelGenerator::GenerateVertices( _generator, cellDensity, Vector3( xz, y, xz ), _mesh.mVertices );
         }
     }
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void GenerateTopForwardVoxels( const VoxelChunk& _topChunk, const VoxelChunk& _forwardChunk, const VoxelChunk& _topForwardChunk, VoxelChunk& _chunk, SubMesh& _mesh )
+    void
+    GenerateTopForwardVoxels( const VoxelGenerator& _generator, const VoxelChunk& _topChunk, const VoxelChunk& _forwardChunk, const VoxelChunk& _topForwardChunk, VoxelChunk& _chunk, SubMesh& _mesh )
     {
         for( int x = 0; x < VoxelChunk::sSize - 1; ++x )
         {
-            const int yz     = VoxelChunk::sSize - 1;
-            const int caseID = _chunk( x + 1, yz, yz ) << 0 |
-                               _topChunk( x + 1, 0, yz ) << 1 |
-                               _topChunk( x + 0, 0, yz ) << 2 |
-                               _chunk( x + 0, yz, yz ) << 3 |
-                               _forwardChunk( x + 1, yz, 0 ) << 4 |
-                               _topForwardChunk( x + 1, 0, 0 ) << 5 |
-                               _topForwardChunk( x + 0, 0, 0 ) << 6 |
-                               _forwardChunk( x + 0, yz, 0 ) << 7;
-            VoxelGenerator::GenerateVertices( caseID, Vector3( x, yz, yz ), _mesh.mVertices );
+            const int              yz          = VoxelChunk::sSize - 1;
+            const VoxelCellDensity cellDensity = { _chunk( x + 1, yz, yz ),
+                                                   _topChunk( x + 1, 0, yz ),
+                                                   _topChunk( x + 0, 0, yz ),
+                                                   _chunk( x + 0, yz, yz ),
+                                                   _forwardChunk( x + 1, yz, 0 ),
+                                                   _topForwardChunk( x + 1, 0, 0 ),
+                                                   _topForwardChunk( x + 0, 0, 0 ),
+                                                   _forwardChunk( x + 0, yz, 0 ) };
+            VoxelGenerator::GenerateVertices( _generator, cellDensity, Vector3( x, yz, yz ), _mesh.mVertices );
         }
     }
 
@@ -260,27 +364,27 @@ namespace fan
         const VoxelChunk* topForwardChunk     = topChunk && forwardChunk ? &_terrain.GetChunk( { _chunk.mPosition.x, topChunkY, forwardChunkZ } ) : nullptr;
         const VoxelChunk* topLeftForwardChunk = leftChunk && topChunk && forwardChunk ? &_terrain.GetChunk( { leftChunkX, topChunkY, forwardChunkZ } ) : nullptr;
 
-        GenerateLocalVoxels( _chunk, _mesh );
+        GenerateLocalVoxels( _terrain.mGenerator, _chunk, _mesh );
 
-        if( leftChunk ){ GenerateLeftVoxels( *leftChunk, _chunk, _mesh ); }
-        if( topChunk ){ GenerateTopVoxels( *topChunk, _chunk, _mesh ); }
-        if( forwardChunk ){ GenerateForwardVoxels( *forwardChunk, _chunk, _mesh ); }
-        if( leftChunk && topChunk ){ GenerateLeftTopVoxels( *leftChunk, *topChunk, *leftTopChunk, _chunk, _mesh ); }
-        if( leftChunk && forwardChunk ){ GenerateLeftForwardVoxels( *leftChunk, *forwardChunk, *leftForwardChunk, _chunk, _mesh ); }
-        if( topChunk && forwardChunk ){ GenerateTopForwardVoxels( *topChunk, *forwardChunk, *topForwardChunk, _chunk, _mesh ); }
+        if( leftChunk ){ GenerateLeftVoxels( _terrain.mGenerator, *leftChunk, _chunk, _mesh ); }
+        if( topChunk ){ GenerateTopVoxels( _terrain.mGenerator, *topChunk, _chunk, _mesh ); }
+        if( forwardChunk ){ GenerateForwardVoxels( _terrain.mGenerator, *forwardChunk, _chunk, _mesh ); }
+        if( leftChunk && topChunk ){ GenerateLeftTopVoxels( _terrain.mGenerator, *leftChunk, *topChunk, *leftTopChunk, _chunk, _mesh ); }
+        if( leftChunk && forwardChunk ){ GenerateLeftForwardVoxels( _terrain.mGenerator, *leftChunk, *forwardChunk, *leftForwardChunk, _chunk, _mesh ); }
+        if( topChunk && forwardChunk ){ GenerateTopForwardVoxels( _terrain.mGenerator, *topChunk, *forwardChunk, *topForwardChunk, _chunk, _mesh ); }
         if( leftChunk && topChunk && forwardChunk )
         {
-            const int xyz    = VoxelChunk::sSize - 1;
-            const int caseID =
-                              ( *leftChunk )( 0, xyz, xyz ) << 0 |
-                              ( *leftTopChunk )( 0, 0, xyz ) << 1 |
-                              ( *topChunk )( xyz, 0, xyz ) << 2 |
-                              ( _chunk )( xyz, xyz, xyz ) << 3 |
-                              ( *leftForwardChunk )( 0, xyz, 0 ) << 4 |
-                              ( *topLeftForwardChunk )( 0, 0, 0 ) << 5 |
-                              ( *topForwardChunk )( xyz, 0, 0 ) << 6 |
-                              ( *forwardChunk )( xyz, xyz, 0 ) << 7;
-            VoxelGenerator::GenerateVertices( caseID, Vector3( xyz, xyz, xyz ), _mesh.mVertices );
+            const int              xyz         = VoxelChunk::sSize - 1;
+            const VoxelCellDensity cellDensity = {
+                    ( *leftChunk )( 0, xyz, xyz ),
+                    ( *leftTopChunk )( 0, 0, xyz ),
+                    ( *topChunk )( xyz, 0, xyz ),
+                    ( _chunk )( xyz, xyz, xyz ),
+                    ( *leftForwardChunk )( 0, xyz, 0 ),
+                    ( *topLeftForwardChunk )( 0, 0, 0 ),
+                    ( *topForwardChunk )( xyz, 0, 0 ),
+                    ( *forwardChunk )( xyz, xyz, 0 ) };
+            VoxelGenerator::GenerateVertices( _terrain.mGenerator, cellDensity, Vector3( xyz, xyz, xyz ), _mesh.mVertices );
         }
 
         glm::vec3 chunkOffset = VoxelChunk::sSize * _chunk.mPosition;
@@ -301,10 +405,12 @@ namespace fan
             FIXED( 0.5 ) * Vector3( 1, 2, 0 ),
             FIXED( 0.5 ) * Vector3( 0, 1, 0 ),
             FIXED( 0.5 ) * Vector3( 1, 0, 0 ),
+
             FIXED( 0.5 ) * Vector3( 2, 1, 2 ),
             FIXED( 0.5 ) * Vector3( 1, 2, 2 ),
             FIXED( 0.5 ) * Vector3( 0, 1, 2 ),
             FIXED( 0.5 ) * Vector3( 1, 0, 2 ),
+
             FIXED( 0.5 ) * Vector3( 2, 0, 1 ),
             FIXED( 0.5 ) * Vector3( 2, 2, 1 ),
             FIXED( 0.5 ) * Vector3( 0, 2, 1 ),

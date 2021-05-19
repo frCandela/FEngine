@@ -61,11 +61,8 @@ namespace fan
         ImGui::DragInt( "chunk size", &chunkSize );
         ImGui::PopReadOnly();
 
-        // treshold
-        float treshold = terrain.mGenerator.mThreshold.ToFloat();
-        if( ImGui::SliderFloat( "treshold", &treshold, 0, 1 ) )
+        if( ImGui::DragFixed( " interpolation", &terrain.mGenerator.mInterpolationScale, 0.01f, 0, 1.f ) )
         {
-            terrain.mGenerator.mThreshold = Fixed::FromFloat( treshold );
             generateTerrain = true;
         }
 
@@ -128,7 +125,7 @@ namespace fan
 
             // height weight
             float heightWeight = _octave.mHeightWeight.ToFloat();
-            if( ImGui::SliderFloat( "height weight", &heightWeight, 0, 1 ) )
+            if( ImGui::SliderFloat( "height weight", &heightWeight, 0, 50 ) )
             {
                 _octave.mHeightWeight = Fixed::FromFloat( heightWeight );
                 generateTerrain = true;

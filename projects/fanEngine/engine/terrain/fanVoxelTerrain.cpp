@@ -141,7 +141,7 @@ namespace fan
         const VoxelTerrain& terrain = static_cast<const VoxelTerrain&>( _component );
         Serializable::SaveInt3( _json, "size", terrain.mSize );
         Serializable::SaveInt( _json, "seed", terrain.mGenerator.mSeed );
-        Serializable::SaveFixed( _json, "threshold", terrain.mGenerator.mThreshold );
+        Serializable::SaveFixed( _json, "interpolation_scale", terrain.mGenerator.mInterpolationScale );
         Serializable::SaveBool( _json, "clear_sides", terrain.mGenerator.mClearSides );
         NoiseOctave::Save( _json, "3d_octave_0", terrain.mGenerator.m3DOctaves[0] );
         NoiseOctave::Save( _json, "3d_octave_1", terrain.mGenerator.m3DOctaves[1] );
@@ -151,7 +151,7 @@ namespace fan
         for( int i = 0; i < terrain.mSize.x * terrain.mSize.y * terrain.mSize.z; ++i )
         {
             VoxelChunk& chunk = terrain.mChunks[i];
-            chunksJson[i] = Base64::Encode( (unsigned char*)chunk.mVoxels, VoxelChunk::sSize * VoxelChunk::sSize * VoxelChunk::sSize );
+            chunksJson[i] = Base64::Encode( (unsigned char*)chunk.mVoxels, VoxelChunk::sSize * VoxelChunk::sSize * VoxelChunk::sSize * sizeof(Fixed));
         }
     }
 
@@ -162,7 +162,7 @@ namespace fan
         VoxelTerrain& terrain = static_cast<VoxelTerrain&>( _component );
         Serializable::LoadInt3( _json, "size", terrain.mSize );
         Serializable::LoadInt( _json, "seed", terrain.mGenerator.mSeed );
-        Serializable::LoadFixed( _json, "threshold", terrain.mGenerator.mThreshold );
+        Serializable::LoadFixed( _json, "interpolation_scale", terrain.mGenerator.mInterpolationScale );
         Serializable::LoadBool( _json, "clear_sides", terrain.mGenerator.mClearSides );
         NoiseOctave::Load( _json, "3d_octave_0", terrain.mGenerator.m3DOctaves[0] );
         NoiseOctave::Load( _json, "3d_octave_1", terrain.mGenerator.m3DOctaves[1] );
@@ -179,7 +179,7 @@ namespace fan
             {
                 VoxelChunk& chunk = terrain.mChunks[i];
                 std::string data = Base64::Decode( ( *chunksJson )[i] );
-                fanAssert( data.length() == VoxelChunk::sSize * VoxelChunk::sSize * VoxelChunk::sSize );
+                fanAssert( data.length() == VoxelChunk::sSize * VoxelChunk::sSize * VoxelChunk::sSize * sizeof(Fixed) );
                 memcpy( chunk.mVoxels, data.data(), data.length() );
                 chunk.mIsGenerated = true;
             }
