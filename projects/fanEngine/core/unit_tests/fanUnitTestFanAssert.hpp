@@ -22,11 +22,11 @@ namespace fan
 
         void Create() override
         {
-            Debug::Get().onNewLog.Connect( &UnitTestFanAssert::OnNewLog, this );
+            Debug::Get().mOnNewLog.Connect( &UnitTestFanAssert::OnNewLog, this );
         }
         void Destroy() override
         {
-            Debug::Get().onNewLog.Disconnect( (size_t)this );
+            Debug::Get().mOnNewLog.Disconnect( (size_t)this );
         }
 
         void OnNewLog( const Debug::LogItem _logItem )
@@ -57,7 +57,7 @@ namespace fan
             logCounter = 0;
             fanAssert( false );
             TEST_ASSERT( logCounter == 1 );
-            TEST_ASSERT( mlastLog.severity == Debug::Severity::error );
+            TEST_ASSERT( mlastLog.mSeverity == Debug::Severity::Error );
         }
 
         void TestAssertMessage()
@@ -66,9 +66,9 @@ namespace fan
             fanAssertMsg( false, "message" );
             TEST_ASSERT( logCounter == 1 );
             const std::string targetLog = "Assert:message func:TestAssertMessage line:66 file:";
-            TEST_ASSERT( mlastLog.message.size() > targetLog.size() );
+            TEST_ASSERT( mlastLog.mMessage.size() > targetLog.size() );
             // we don't test the file path
-            const std::string subString = mlastLog.message.substr( 0, targetLog.size() );
+            const std::string subString = mlastLog.mMessage.substr( 0, targetLog.size() );
             TEST_ASSERT( subString == targetLog );
         }
     };

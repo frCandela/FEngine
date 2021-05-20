@@ -60,7 +60,7 @@ namespace fan
         for( int primitiveIndex = 0; primitiveIndex < _mesh.mSubMeshes.size(); ++primitiveIndex )
         {
             Json& jMaterial = jMaterials[primitiveIndex];
-            jMaterial["name"] = "material" + std::to_string(primitiveIndex);
+            jMaterial["name"] = "material" + std::to_string( primitiveIndex );
 
             const SubMesh& subMesh = _mesh.mSubMeshes[primitiveIndex];
             const int            indicesCount    = (int)subMesh.mIndices.size();
@@ -90,11 +90,11 @@ namespace fan
 
             {
                 GLTFAccessor accessorPositions;
-                accessorPositions.mBufferView    = nextAccessor+0;
+                accessorPositions.mBufferView    = nextAccessor + 0;
                 accessorPositions.mComponentType = GLTFComponentType::Float;
                 accessorPositions.mCount         = vertexCount;
                 accessorPositions.mType          = GLTFType::Vec3;
-                accessorPositions.Save( jAccessors[nextAccessor+0] );
+                accessorPositions.Save( jAccessors[nextAccessor + 0] );
 
                 GLTFAccessor accessorNormals;
                 accessorNormals.mBufferView    = nextAccessor + 1;

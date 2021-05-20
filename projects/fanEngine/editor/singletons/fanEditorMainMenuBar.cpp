@@ -265,7 +265,7 @@ namespace fan
         if( ImGui::FanSaveFileModal( "Save scene", RenderGlobal::sSceneExtensions, _mainMenuBar.mPathBuffer ) )
         {
             _scene.mPath = _mainMenuBar.mPathBuffer;
-            Debug::Get() << Debug::Severity::log << "saving scene: " << _scene.mPath << Debug::Endl();
+            Debug::Log() << "saving scene: " << _scene.mPath << Debug::Endl();
             _scene.Save();
         }
     }
@@ -330,7 +330,7 @@ namespace fan
                     prevSelectionNode->mHandle :
                     0;
 
-            Debug::Get() << Debug::Severity::log << "loading scene: " << scene.mPath << Debug::Endl();
+            Debug::Log() << "loading scene: " << scene.mPath << Debug::Endl();
             scene.LoadFrom( scene.mPath );
 
             // restore camera
@@ -366,7 +366,7 @@ namespace fan
 
         if( !scene.mPath.empty() )
         {
-            Debug::Get() << Debug::Severity::log << "saving scene: " << scene.mPath << Debug::Endl();
+            Debug::Log() << "saving scene: " << scene.mPath << Debug::Endl();
             scene.Save();
         }
         else

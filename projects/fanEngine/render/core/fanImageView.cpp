@@ -44,7 +44,7 @@ namespace fan
         imageViewCreateInfo.subresourceRange.layerCount     = VK_REMAINING_ARRAY_LAYERS;
 
         VkResult result = vkCreateImageView( _device.mDevice, &imageViewCreateInfo, nullptr, &mImageView );
-        Debug::Log() << std::hex << "VkImageView           " << mImageView << std::dec << Debug::Endl();
+        Debug::Log() << Debug::Type::Render << std::hex << "VkImageView           " << mImageView << std::dec << Debug::Endl();
 
         _device.AddDebugName( (uint64_t)mImageView, "ImageView" );
 

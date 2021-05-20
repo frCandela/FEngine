@@ -163,8 +163,7 @@ namespace fan
                             if( diff > 10 )
                             {
                                 Debug::Log() << "shifting host frame index : " << min + targetFrameDifference;
-                                Debug::Get() << " " << hostConnection.mIp.toString()
-                                        << "::" << hostConnection.mPort << Debug::Endl();
+                                Debug::Log() << " " << hostConnection.mIp.toString() << "::" << hostConnection.mPort << Debug::Endl();
                             }
                         }
                     }

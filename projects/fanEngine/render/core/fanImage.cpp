@@ -80,8 +80,8 @@ namespace fan
             Debug::Error( "Could not bind memory to image" );
             return false;
         }
-        Debug::Log() << std::hex << "VkImage               " << mImage << std::dec << Debug::Endl();
-        Debug::Log() << "VkDeviceMemory        " << mMemory << std::dec << Debug::Endl();
+        Debug::Log() << Debug::Type::Render << std::hex << "VkImage               " << mImage << std::dec << Debug::Endl();
+        Debug::Log() << Debug::Type::Render << "VkDeviceMemory        " << mMemory << std::dec << Debug::Endl();
 
         _device.AddDebugName( (uint64_t)mImage, "Image" );
         _device.AddDebugName( (uint64_t)mMemory, "Image" );

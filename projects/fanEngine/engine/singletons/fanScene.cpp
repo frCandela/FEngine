@@ -352,7 +352,7 @@ namespace fan
         }
         else
         {
-            Debug::Get() << Debug::Severity::error << "failed to open file " << _path << Debug::Endl();
+            Debug::Error() << "failed to open file " << _path << Debug::Endl();
             New();
             return false;
         }

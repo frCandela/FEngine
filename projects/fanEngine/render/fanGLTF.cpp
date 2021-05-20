@@ -11,11 +11,11 @@ namespace fan
         const Json& jAttribute = jPrimitive["attributes"];
         const bool hasNormal    = jAttribute.find( "NORMAL" ) != jAttribute.end();
         const bool hasTexcoord0 = jAttribute.find( "TEXCOORD_0" ) != jAttribute.end();
-        const bool hasMaterial = jPrimitive.find( "material" ) != jPrimitive.end();
+        const bool hasMaterial  = jPrimitive.find( "material" ) != jPrimitive.end();
 
         mIndices   = jPrimitive["indices"];
         mPosition  = jAttribute["POSITION"];
-        mMaterial    = hasMaterial ? int( jPrimitive["material"] ) : 0;
+        mMaterial  = hasMaterial ? int( jPrimitive["material"] ) : 0;
         mNormal    = hasNormal ? int( jAttribute["NORMAL"] ) : -1;
         mTexCoord0 = hasTexcoord0 ? int( jAttribute["TEXCOORD_0"] ) : -1;
     }

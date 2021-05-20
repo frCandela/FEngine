@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include "glfw/glfw3.h"
+#include "core/fanBits.hpp"
 
 namespace fan
 {
@@ -9,8 +10,10 @@ namespace fan
     //==================================================================================================================================================================================================
     Debug::Debug()
     {
-        mCurrentSeverity = Severity::log;
-        mCurrentType     = Type::other;
+        mCurrentSeverity   = Severity::Log;
+        mCurrentType       = Type::Default;
+        mTypesPrintedToStd = ~0;
+        BIT_CLEAR( mTypesPrintedToStd, (int)Debug::Type::Render );
     }
 
     //==================================================================================================================================================================================================
@@ -19,95 +22,98 @@ namespace fan
     {
         // Push the log into the buffer
         LogItem item;
-        item.message  = mStringstream.str();
-        item.severity = mCurrentSeverity;
-        item.type     = mCurrentType;
-        item.time     = glfwGetTime();
+        item.mMessage  = mStringstream.str();
+        item.mSeverity = mCurrentSeverity;
+        item.mType     = mCurrentType;
+        item.mTime     = glfwGetTime();
         mLogBuffer.push_back( item );
 
         // stdio
-        std::cout << Debug::SecondsToString( item.time );
-        switch( mCurrentSeverity )
+        if( BIT_TRUE( mTypesPrintedToStd, (int)item.mType ) )
         {
-            case Severity::log:
+            std::cout << Debug::SecondsToString( item.mTime );
+            switch( mCurrentSeverity )
             {
-                std::cout << "[LOG]";
+                case Severity::Log:
+                {
+                    std::cout << "[LOG]";
+                }
+                    break;
+                case Severity::Warning:
+                {
+                    std::cout << "[WARNING]";
+                }
+                    break;
+                case Severity::Error:
+                {
+                    std::cout << "[ERROR]";
+                }
+                    break;
+                case Severity::Highlight:
+                {
+                    std::cout << "[HIGH]";
+                }
+                    break;
+                default:
+                    fanAssert( false );
+                    break;
             }
-                break;
-            case Severity::warning:
-            {
-                std::cout << "[WARNING]";
-            }
-                break;
-            case Severity::error:
-            {
-                std::cout << "[ERROR]";
-            }
-                break;
-            case Severity::highlight:
-            {
-                std::cout << "[HIGH]";
-            }
-                break;
-            default:
-                fanAssert( false );
-                break;
+            std::cout << " " << mStringstream.str().c_str() << std::endl;
         }
-        std::cout << " " << mStringstream.str().c_str() << std::endl;
         mStringstream.str( "" ); // clear
-        mCurrentSeverity = Severity::log;
-        mCurrentType     = Type::other;
-        onNewLog.Emmit( item );
+        mCurrentSeverity = Severity::Log;
+        mCurrentType     = Type::Default;
+        mOnNewLog.Emmit( item );
     }
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void Debug::Log( const std::string _message )
+    void Debug::Log( const std::string _message, const Type _type )
     {
-        Get() << Severity::log << _message << Debug::Endl();
+        Get() << _type << Severity::Log << _message << Debug::Endl();
     }
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void Debug::Warning( const std::string _message )
+    void Debug::Warning( const std::string _message, const Type _type )
     {
-        Get() << Severity::warning << _message << Debug::Endl();
+        Get() << _type << Severity::Warning << _message << Debug::Endl();
     }
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void Debug::Error( const std::string _message )
+    void Debug::Error( const std::string _message, const Type _type )
     {
-        Get() << Severity::error << _message << Debug::Endl();
+        Get() << _type << Severity::Error << _message << Debug::Endl();
     }
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void Debug::Highlight( const std::string _message )
+    void Debug::Highlight( const std::string _message, const Type _type )
     {
-        Get() << Severity::highlight << _message << Debug::Endl();
+        Get() << _type << Severity::Highlight << _message << Debug::Endl();
     }
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
     Debug& Debug::Log()
     {
-        Get() << Debug::Severity::log;
+        Get() << Debug::Severity::Log;
         return Get();
     }
     Debug& Debug::Warning()
     {
-        Get() << Debug::Severity::warning;
+        Get() << Debug::Severity::Warning;
         return Get();
     }
     Debug& Debug::Error()
     {
-        Get() << Debug::Severity::error;
+        Get() << Debug::Severity::Error;
         return Get();
     }
     Debug& Debug::Highlight()
     {
-        Get() << Debug::Severity::highlight;
+        Get() << Debug::Severity::Highlight;
         return Get();
     }
 

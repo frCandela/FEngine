@@ -52,11 +52,11 @@ namespace fan
     //================================================================
     struct GLTFPrimitive
     {
-        int mIndices  = -1;
-        int mPosition = -1;
+        int mIndices   = -1;
+        int mPosition  = -1;
         int mNormal    = -1;
         int mTexCoord0 = -1;
-        int mMaterial = 0;
+        int mMaterial  = 0;
 
         void Load( const Json& jPrimitive );
         void Save( Json& jPrimitive ) const;
@@ -113,7 +113,7 @@ namespace fan
     //================================================================
     struct GLTFMesh
     {
-        std::string   mName;
+        std::string                mName;
         std::vector<GLTFPrimitive> mPrimitives;
 
         void Load( const Json& jMesh );

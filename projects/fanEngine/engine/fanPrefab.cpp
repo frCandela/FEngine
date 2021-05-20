@@ -36,7 +36,7 @@ namespace fan
         std::ifstream inStream( Path::Normalize( _path ) );
         if( inStream.is_open() && inStream.good() )
         {
-            Debug::Get() << Debug::Severity::log << "loading prefab: " << _path << Debug::Endl();
+            Debug::Log() << "loading prefab: " << _path << Debug::Endl();
             inStream >> mJson;
 
             if( mJson.contains( "prefab" ) )

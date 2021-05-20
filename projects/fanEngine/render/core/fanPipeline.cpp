@@ -184,12 +184,7 @@ namespace fan
             Debug::Error( "Could not allocate command pool." );
             return false;
         }
-        Debug::Log()
-                << std::hex
-                << "VkPipelineLayout      "
-                << mPipelineLayout
-                << std::dec
-                << Debug::Endl();
+        Debug::Log() << Debug::Type::Render << std::hex << "VkPipelineLayout      " << mPipelineLayout << std::dec << Debug::Endl();
 
         std::vector<VkPipelineShaderStageCreateInfo> shaderStages = { _pipelineConfig.vertshaderStageInfos,
                                                                       _pipelineConfig.fragShaderStageInfos };
@@ -231,12 +226,7 @@ namespace fan
         _device.AddDebugName( (uint64_t)mPipelineLayout, "Pipeline" );
         _device.AddDebugName( (uint64_t)mPipeline, "Pipeline" );
 
-        Debug::Log()
-                << std::hex
-                << "VkPipeline            "
-                << mPipeline
-                << std::dec
-                << Debug::Endl();
+        Debug::Log() << Debug::Type::Render << std::hex << "VkPipeline            " << mPipeline << std::dec << Debug::Endl();
         return true;
     }
 

@@ -63,8 +63,7 @@ namespace fan
         {
             Debug::Error() << "vulkan device creation failed" << Debug::Endl();
         }
-        Debug::Log() << std::hex << "vkDevice:             " << mDeviceProperties.deviceName
-                << std::dec << Debug::Endl();
+        Debug::Log() << std::hex << "VkDevice:             " << mDeviceProperties.deviceName << std::dec << Debug::Endl();
 
         VkQueue computeQueue = VK_NULL_HANDLE, presentQueue = VK_NULL_HANDLE;
         vkGetDeviceQueue( mDevice, graphicsQueueFamilyIndex, 0, &mGraphicsQueue );
@@ -84,7 +83,7 @@ namespace fan
         {
             Debug::Error( "Could not allocate command pool." );
         }
-        Debug::Log() << std::hex << "VkCommandPool         " << mCommandPool << std::dec << Debug::Endl();
+        Debug::Log() << Debug::Type::Render << std::hex << "VkCommandPool         " << mCommandPool << std::dec << Debug::Endl();
     }
 
     //==================================================================================================================================================================================================

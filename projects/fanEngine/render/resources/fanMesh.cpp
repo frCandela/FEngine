@@ -22,7 +22,7 @@ namespace fan
         {
             if( !importer.GetMesh( *this ) )
             {
-                Debug::Get() << "Failed to load mesh : " << mPath << Debug::Endl();
+                Debug::Warning() << "Failed to load mesh : " << mPath << Debug::Endl();
                 return false;
             }
             for( SubMesh& subMesh : mSubMeshes )

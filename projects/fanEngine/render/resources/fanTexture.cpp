@@ -210,7 +210,7 @@ namespace fan
             throw std::runtime_error( "failed to create image!" );
         }
 
-        Debug::Log() << std::hex << "VkImage               " << mImage << std::dec << Debug::Endl();
+        Debug::Log() << Debug::Type::Render << std::hex << "VkImage               " << mImage << std::dec << Debug::Endl();
 
         // Allocate memory for the image
         VkMemoryRequirements memRequirements;
@@ -225,8 +225,8 @@ namespace fan
         {
             throw std::runtime_error( "failed to allocate image memory!" );
         }
-        Debug::Get() << Debug::Severity::log << std::hex << "VkDeviceMemory        ";
-        Debug::Get() << mMemory << std::dec << Debug::Endl();
+        Debug::Log() << Debug::Type::Render << std::hex << "VkDeviceMemory        ";
+        Debug::Log() << Debug::Type::Render << mMemory << std::dec << Debug::Endl();
 
         vkBindImageMemory( _device.mDevice, mImage, mMemory, 0 );
     }
@@ -250,9 +250,7 @@ namespace fan
         {
             throw std::runtime_error( "failed to create texture image view!" );
         }
-
-        Debug::Get() << Debug::Severity::log << std::hex << "VkImageView           ";
-        Debug::Get() << mImageView << std::dec << Debug::Endl();
+        Debug::Log() << Debug::Type::Render << std::hex << "VkImageView           " << mImageView << std::dec << Debug::Endl();
     }
 
     //==================================================================================================================================================================================================
@@ -333,7 +331,7 @@ namespace fan
         mPixels = stbi_load( Path::Normalize( _path ).c_str(), &texWidth, &texHeight, &texChannels, STBI_rgb_alpha );
         if( mPixels == nullptr )
         {
-            Debug::Get() << Debug::Severity::error << "Unable to load texture: " << _path << Debug::Endl();
+            Debug::Error() << "Unable to load texture: " << _path << Debug::Endl();
             return false;
         }
 

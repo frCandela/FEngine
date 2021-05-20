@@ -114,10 +114,10 @@ namespace fan
             mMeshManager.Add( mesh1, "mesh1" );
             mMeshManager.Add( mesh2, "mesh2" );
 
-           submesh1.mVertices = {};
-           submesh1.LoadFromVertices();
-           mesh2->LoadFromFile( RenderGlobal::sMeshCube );
-           submesh2.mVertices.clear();
+            submesh1.mVertices = {};
+            submesh1.LoadFromVertices();
+            mesh2->LoadFromFile( RenderGlobal::sMeshCube );
+            submesh2.mVertices.clear();
 
             TEST_ASSERT( submesh1.mBuffersOutdated );
             TEST_ASSERT( submesh2.mBuffersOutdated );

@@ -37,8 +37,7 @@ namespace fan
             {
                 Debug::Error( "Could not create swapchain framebuffer" );
             }
-            Debug::Log() << std::hex << "VkFramebuffer         " << mFrameBuffers[i] << " swapchain"
-                    << std::dec << Debug::Endl();
+            Debug::Log() << Debug::Type::Render << std::hex << "VkFramebuffer         " << mFrameBuffers[i] << " swapchain" << std::dec << Debug::Endl();
 
             _device.AddDebugName( (uint64_t)mFrameBuffers[i], "Framebuffer" );
         }
@@ -76,8 +75,7 @@ namespace fan
             {
                 Debug::Error( "Could not create framebuffer" );
             }
-            Debug::Log() << std::hex << "VkFramebuffer         " << mFrameBuffers[i]
-                    << std::dec << Debug::Endl();
+            Debug::Log() << Debug::Type::Render << std::hex << "VkFramebuffer         " << mFrameBuffers[i] << std::dec << Debug::Endl();
         }
     }
 

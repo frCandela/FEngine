@@ -247,7 +247,7 @@ namespace fan
         swapchainCreateInfo.oldSwapchain          = oldSwapchain;
 
         vkCreateSwapchainKHR( _device.mDevice, &swapchainCreateInfo, nullptr, &mSwapchain );
-        Debug::Log() << std::hex << "VkSwapchainKHR        " << mSwapchain << std::dec << Debug::Endl();
+        Debug::Log() << Debug::Type::Render << std::hex << "VkSwapchainKHR        " << mSwapchain << std::dec << Debug::Endl();
 
         if( oldSwapchain != VK_NULL_HANDLE )
         {
@@ -264,8 +264,7 @@ namespace fan
 
         for( uint32_t imageIndex = 0; imageIndex < mImagesCount; imageIndex++ )
         {
-            Debug::Log() << std::hex << "VkImage swapchain     " << mImages[imageIndex]
-                    << std::dec << Debug::Endl();
+            Debug::Log() << Debug::Type::Render << std::hex << "VkImage swapchain     " << mImages[imageIndex] << std::dec << Debug::Endl();
         }
     }
 
@@ -289,14 +288,9 @@ namespace fan
             vkCreateSemaphore( _device.mDevice, &semaphoreCreateInfo, nullptr, &mRenderFinishedSemaphores[semaphoreIndex] );
             vkCreateFence( _device.mDevice, &fenceCreateInfo, nullptr, &mInFlightFences[semaphoreIndex] );
 
-            Debug::Get() << Debug::Severity::log << std::hex << "VkSemaphore           "
-                    << mImagesAvailableSemaphores[semaphoreIndex] << std::dec << Debug::Endl();
-
-            Debug::Get() << Debug::Severity::log << std::hex << "VkSemaphore           "
-                    << mRenderFinishedSemaphores[semaphoreIndex] << std::dec << Debug::Endl();
-
-            Debug::Get() << Debug::Severity::log << std::hex << "VkFence               "
-                    << mInFlightFences[semaphoreIndex] << std::dec << Debug::Endl();
+            Debug::Log() << Debug::Type::Render << std::hex << "VkSemaphore           " << mImagesAvailableSemaphores[semaphoreIndex] << std::dec << Debug::Endl();
+            Debug::Log() << Debug::Type::Render << std::hex << "VkSemaphore           " << mRenderFinishedSemaphores[semaphoreIndex] << std::dec << Debug::Endl();
+            Debug::Log() << Debug::Type::Render << std::hex << "VkFence               " << mInFlightFences[semaphoreIndex] << std::dec << Debug::Endl();
         }
     }
 

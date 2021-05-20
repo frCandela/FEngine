@@ -162,8 +162,7 @@ namespace fan
                 vkGetInstanceProcAddr( mInstance, "vkCreateDebugReportCallbackEXT" );
         if( func != nullptr && func( mInstance, &createInfo, nullptr, &mDebugReportCallback ) == VK_SUCCESS )
         {
-            Debug::Log() << std::hex << "VkDebugCallback       " << mDebugReportCallback
-                    << std::dec << Debug::Endl();
+            Debug::Log() << Debug::Type::Render << std::hex << "VkDebugCallback       " << mDebugReportCallback << std::dec << Debug::Endl();
             return true;
         }
 
@@ -181,7 +180,7 @@ namespace fan
                                                             const char* _msg,
                                                             void* _userData )
     {
-        //Debug::Get() << Debug::Severity::error << "Vulkan  Error:  " << _msg << Debug::Endl();
+        Debug::Error() << Debug::Type::Render << "Vulkan  Error:  " << _msg << Debug::Endl();
         std::stringstream ss;
         ss << "######## VkError";
 

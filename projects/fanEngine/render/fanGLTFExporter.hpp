@@ -14,6 +14,6 @@ namespace fan
         void Export( const Mesh& _mesh );
         bool Save( const std::string& _path );
 
-        Json        mJson;
+        Json mJson;
     };
 }

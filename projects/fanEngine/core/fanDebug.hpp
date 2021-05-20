@@ -15,33 +15,36 @@ namespace fan
     {
         friend class Singleton<Debug>;
     public:
+
         enum class Code
         {
-            endl
+            EndLine,
+            meh
         };
         enum class Severity
         {
-            log = 0, highlight = 1, warning = 2, error = 3
+            Log = 0, Highlight = 1, Warning = 2, Error = 3
         };
         enum class Type
         {
-            render, scene, game, other
+            Default = 0, Render = 1, Engine = 2, Game = 3, Sound = 4, Editor = 5, Count = 6
         };
         struct LogItem
         {
-            Severity    severity;
-            Type        type;
-            std::string message;
-            double      time;
+            Severity    mSeverity;
+            Type        mType;
+            std::string mMessage;
+            double      mTime;
         };
-        Signal<LogItem> onNewLog;
+        Signal<LogItem> mOnNewLog;
+        int             mTypesPrintedToStd;
 
-        static Code Endl() { return Code::endl; }
+        static Code Endl() { return Code::EndLine; }
 
-        static void Log( const std::string _message );
-        static void Warning( const std::string _message );
-        static void Error( const std::string _message );
-        static void Highlight( const std::string _message );
+        static void Log( const std::string _message, const Type _type = Type::Default );
+        static void Warning( const std::string _message, const Type _type = Type::Default );
+        static void Error( const std::string _message, const Type _type = Type::Default );
+        static void Highlight( const std::string _message, const Type _type = Type::Default );
 
         static Debug& Log();
         static Debug& Warning();
@@ -52,10 +55,9 @@ namespace fan
         static std::string SecondsToString( const double _seconds );
         const std::vector<LogItem>& GetLogBuffer() { return mLogBuffer; }
 
-    protected:
+    private:
         Debug();
 
-    private:
         Severity             mCurrentSeverity;
         Type                 mCurrentType;
         std::stringstream    mStringstream;
@@ -64,7 +66,6 @@ namespace fan
         void Flush();
 
     public:
-        //====================================================================================================
         Debug& operator<<( Severity _severity )
         {    // Set the severity of the current log
             mCurrentSeverity = _severity;
@@ -83,16 +84,15 @@ namespace fan
             return *this;
         }
 
-        //====================================================================================================
         template< typename T >
         Debug& operator<<( T _msg )
         {    // Appends a value to the current log
             mStringstream << _msg;
             return *this;
         }
-        //====================================================================================================
+
         Debug& operator<<( Code /*_code*/ )
-        {    // Special case of Debug::Get() << Debug::Endl()
+        {    // Special case of Debug::Get() << Debug::Endl
             Flush();
             return *this;
         }

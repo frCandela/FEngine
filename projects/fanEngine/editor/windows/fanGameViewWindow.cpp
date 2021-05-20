@@ -51,7 +51,6 @@ namespace fan
         // draw menu bar
         if( ImGui::BeginMenuBar() )
         {
-
             ImGui::Text( "%d x %d", (int)gameViewWindow.mSize.x, (int)gameViewWindow.mSize.y );
 
             const ImVec4 disabledColor = ImVec4( 0.3f, 0.3f, 0.3f, 0.3f );
@@ -78,24 +77,26 @@ namespace fan
                 }
             }
 
-            const ImVec4 pauseTint
-                                 = playState.mState == EditorPlayState::PLAYING ? ImVec4( 1.f, 1.f, 1.f, 1.f )
-                            : playState.mState == EditorPlayState::PAUSED ? ImVec4( 0.9f, 0.9f, 0.9f, 1.f )
-                                    : disabledColor;
+            const ImVec4 pauseTint = playState.mState == EditorPlayState::PLAYING ? ImVec4( 1.f, 1.f, 1.f, 1.f )
+                    : playState.mState == EditorPlayState::PAUSED ? ImVec4( 0.9f, 0.9f, 0.9f, 1.f )
+                            : disabledColor;
 
             // Pause
             if( ImGui::ButtonIcon( ImGui::Pause16, { 16, 16 }, -1, ImVec4( 0, 0, 0, 0.f ), pauseTint ) )
             {
-                if( playState.mState == EditorPlayState::PLAYING ){ gameViewWindow.mOnPause.Emmit(); }
-                else if( playState.mState == EditorPlayState::PAUSED ){ gameViewWindow.mOnResume.Emmit(); }
+                if( playState.mState == EditorPlayState::PLAYING )
+                {
+                    gameViewWindow.mOnPause.Emmit();
+                }
+                else if( playState.mState == EditorPlayState::PAUSED )
+                {
+                    gameViewWindow.mOnResume.Emmit();
+                }
             }
 
             // Step
-            const ImVec4 stepTint = playState.mState == EditorPlayState::PAUSED
-                    ? ImVec4( 1.f, 1.f, 1.f, 1.f )
-                    : disabledColor;
-            if( ImGui::ButtonIcon( ImGui::Step16, { 16, 16 }, -1, ImVec4( 0, 0, 0, 0 ), stepTint ) &&
-                playState.mState == EditorPlayState::PAUSED )
+            const ImVec4 stepTint = playState.mState == EditorPlayState::PAUSED ? ImVec4( 1.f, 1.f, 1.f, 1.f ) : disabledColor;
+            if( ImGui::ButtonIcon( ImGui::Step16, { 16, 16 }, -1, ImVec4( 0, 0, 0, 0 ), stepTint ) && playState.mState == EditorPlayState::PAUSED )
             {
                 gameViewWindow.mOnStep.Emmit();
             }
@@ -107,7 +108,6 @@ namespace fan
             {
                 gameViewWindow.mOnSelectGame.Emmit( gameViewWindow.mCurrentGame );
             }
-
             ImGui::EndMenuBar();
         }
 

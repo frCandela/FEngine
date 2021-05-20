@@ -33,7 +33,7 @@ namespace fan
             Debug::Error( "Could not create render pass" );
             return false;
         }
-        Debug::Log() << std::hex << "VkRenderPass          " << mRenderPass << std::dec << Debug::Endl();
+        Debug::Log() << Debug::Type::Render << std::hex << "VkRenderPass          " << mRenderPass << std::dec << Debug::Endl();
 
         _device.AddDebugName( (uint64_t)mRenderPass, "RenderPass" );
 

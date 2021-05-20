@@ -125,13 +125,13 @@ namespace fan
             const unsigned      glyphIndex = FT_Get_Char_Index( mFace, charcode );
             if( FT_Load_Glyph( mFace, glyphIndex, FT_LOAD_DEFAULT ) != 0 )
             {
-                Debug::Log( "error" );
+                Debug::Error( "font glyph failed to load" );
                 continue;
             }
 
             if( FT_Render_Glyph( mFace->glyph, FT_RENDER_MODE_NORMAL ) != 0 )
             {
-                Debug::Log( "error" );
+                Debug::Error( "font glyph failed to load" );
                 continue;
             }
 

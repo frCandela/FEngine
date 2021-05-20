@@ -45,8 +45,8 @@ namespace fan
     bool GLTFImporter::GetMesh( Mesh& _mesh )
     {
         // Get main json lists
-        const Json& jMeshes    = mJson["meshes"];
-        const Json& jAccessors = mJson["accessors"];
+        const Json& jMeshes      = mJson["meshes"];
+        const Json& jAccessors   = mJson["accessors"];
         const Json& jBufferViews = mJson["bufferViews"];
         const Json& jBuffers     = mJson["buffers"];
         std::vector<std::string> m_loadedBuffers;
@@ -64,9 +64,8 @@ namespace fan
         GLTFMesh mesh;
         mesh.Load( jMeshes[0] );
 
-
-        fanAssert( _mesh.mSubMeshes.empty());
-        _mesh.mSubMeshes.resize(mesh.mPrimitives.size());
+        fanAssert( _mesh.mSubMeshes.empty() );
+        _mesh.mSubMeshes.resize( mesh.mPrimitives.size() );
         for( int primitiveIndex = 0; primitiveIndex < mesh.mPrimitives.size(); ++primitiveIndex )
         {
             std::vector<uint32_t>& meshIndices  = _mesh.mSubMeshes[primitiveIndex].mIndices;
@@ -182,8 +181,6 @@ namespace fan
                 meshVertices[i].mColor = glm::vec3( 1, 1, 1 );
             }
         }
-
-
 
         return true;
     }

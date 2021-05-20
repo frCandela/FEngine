@@ -144,8 +144,7 @@ namespace fan
                 Debug::Error( "Could not allocate descriptor set layout." );
                 return false;
             }
-            Debug::Log() << std::hex << "VkDescriptorSetLayout " << mDescriptorSetLayout
-                    << std::dec << Debug::Endl();
+            Debug::Log() << Debug::Type::Render << std::hex << "VkDescriptorSetLayout " << mDescriptorSetLayout << std::dec << Debug::Endl();
         }
 
         // Create DescriptorPool
@@ -171,7 +170,7 @@ namespace fan
                 Debug::Error( "Could not allocate descriptor pool." );
                 return false;
             }
-            Debug::Log() << std::hex << "VkDescriptorPool      " << mDescriptorPool
+            Debug::Log() << Debug::Type::Render << std::hex << "VkDescriptorPool      " << mDescriptorPool
                     << std::dec << Debug::Endl();
         }
 
@@ -198,8 +197,7 @@ namespace fan
             }
             for( uint32_t setIndex = 0; setIndex < _count; setIndex++ )
             {
-                Debug::Log() << std::hex << "VkDescriptorSet       " << mDescriptorSets[setIndex]
-                        << std::dec << Debug::Endl();
+                Debug::Log() << Debug::Type::Render << std::hex << "VkDescriptorSet       " << mDescriptorSets[setIndex] << std::dec << Debug::Endl();
             }
         }
 
@@ -277,3 +275,4 @@ namespace fan
         }
     }
 }
+      

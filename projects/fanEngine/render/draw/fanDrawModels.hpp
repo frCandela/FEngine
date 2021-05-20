@@ -19,7 +19,7 @@ namespace fan
     //==================================================================================================================================================================================================
     struct RenderDataModel
     {
-        SubMesh*  mMesh;
+        SubMesh* mMesh;
         glm::mat4 mModelMatrix;
         glm::mat4 mNormalMatrix;
         glm::vec4 mColor;

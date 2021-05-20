@@ -1,6 +1,7 @@
 #include "editor/windows/fanConsoleWindow.hpp"
 #include "core/input/fanKeyboard.hpp"
 #include "core/time/fanProfiler.hpp"
+#include "core/fanBits.hpp"
 #include "network/singletons/fanTime.hpp"
 
 namespace fan
@@ -9,7 +10,6 @@ namespace fan
     //==================================================================================================================================================================================================
     void ConsoleWindow::SetInfo( EcsSingletonInfo& _info )
     {
-        _info.destroy = &ConsoleWindow::Destroy;
         _info.mFlags |= EcsSingletonFlags::InitOnce;
     }
 
@@ -18,22 +18,23 @@ namespace fan
     void ConsoleWindow::Init( EcsWorld&, EcsSingleton& _singleton )
     {
         ConsoleWindow& consoleWindow = static_cast<ConsoleWindow&>( _singleton );
-        consoleWindow.mMaxSizeLogBuffers = 1024;
+        consoleWindow.mMaxSizeLogBuffers = 65536;
         consoleWindow.mFirstLogIndex     = 0;
         consoleWindow.mGrabFocus         = false;
         consoleWindow.mInputBuffer[0] = '\0';
         consoleWindow.mLogBuffer.clear();
         consoleWindow.mLogBuffer.reserve( consoleWindow.mMaxSizeLogBuffers );
-        consoleWindow.mScrollDown = false;
-        consoleWindow.mGrabFocus  = false;
-        Debug::Get().onNewLog.Connect( &ConsoleWindow::OnNewLog, &consoleWindow );
-    }
+        consoleWindow.mScrollDown       = false;
+        consoleWindow.mGrabFocus        = false;
+        consoleWindow.mVisibleLogsTypes = ~0;
+        BIT_CLEAR( consoleWindow.mVisibleLogsTypes, int( Debug::Type::Render) );
+        Debug::Get().mOnNewLog.Connect( &ConsoleWindow::OnNewLog, &consoleWindow );
 
-    //==================================================================================================================================================================================================
-    //==================================================================================================================================================================================================
-    void ConsoleWindow::Destroy( EcsWorld&, EcsSingleton& )
-    {
-        Debug::Get().onNewLog.Clear();
+        // catch up with already displayed logs
+        for( const Debug::LogItem& log : Debug::Get().GetLogBuffer() )
+        {
+            consoleWindow.OnNewLog( log );
+        }
     }
 
     //==================================================================================================================================================================================================
@@ -44,18 +45,46 @@ namespace fan
 
         SCOPED_PROFILE( console_win )
 
+        // menu bar
+        if( ImGui::BeginMenuBar() )
+        {
+            static_assert( (int)Debug::Type::Count == 6 );
+            const char* names[6] = { "Default", "Render", "Engine", "Game", "Sound", "Editor" };
+
+            if( ImGui::BeginMenu( "View" ) )
+            {
+                for( int i = 0; i < (int)Debug::Type::Count; i++ )
+                {
+                    bool visible = BIT_TRUE( console.mVisibleLogsTypes, i );
+                    if( ImGui::MenuItem( names[i], nullptr, &visible ) )
+                    {
+                        if( visible )
+                        {
+                            BIT_SET( console.mVisibleLogsTypes, i );
+                        }
+                        else
+                        {
+                            BIT_CLEAR( console.mVisibleLogsTypes, i );
+                        }
+                    }
+                }
+                ImGui::EndMenu();
+            }
+            ImGui::EndMenuBar();
+        }
+
         // List the logs
         const float height = ImGui::GetWindowHeight();
         if( height > 60 )
         {
-            ImGui::BeginChild( "scrolling",
-                               ImVec2( 0, height - 65 ),
-                               true,
-                               ImGuiWindowFlags_AlwaysVerticalScrollbar );
+            ImGui::BeginChild( "scrolling", ImVec2( 0, height - 85 ), true, ImGuiWindowFlags_AlwaysVerticalScrollbar );
             for( int logIndex = console.mFirstLogIndex; logIndex < console.mFirstLogIndex + (int)console.mLogBuffer.size(); logIndex++ )
             {
                 const ConsoleWindow::LogItemCompiled& item = console.mLogBuffer[logIndex % console.mMaxSizeLogBuffers];
-                ImGui::TextColored( item.mColor, item.mLogMessage.c_str() );    // Time
+                if( BIT_TRUE( console.mVisibleLogsTypes, (int)item.mType ) )
+                {
+                    ImGui::TextColored( item.mColor, item.mLogMessage.c_str() );    // Time
+                }
             }
             if( console.mScrollDown )
             {
@@ -66,7 +95,6 @@ namespace fan
         }
 
         // Text input
-
         if( console.mGrabFocus )
         {
             ImGui::SetKeyboardFocusHere();
@@ -99,11 +127,13 @@ namespace fan
             {
                 if( message != "clear" )
                 {
-                    Debug::Get() << "Unknown command: " << message << Debug::Endl();
+                    Debug::Log() << message << Debug::Endl();
                 }
                 else
                 {
+                    Debug::Log( "Clearing logs ", Debug::Type::Editor );
                     Debug::Get().Clear();
+                    console.mLogBuffer.clear();
                 }
                 console.mInputBuffer[0] = '\0';
                 console.mScrollDown = true;
@@ -117,9 +147,10 @@ namespace fan
     //==================================================================================================================================================================================================
     ConsoleWindow::LogItemCompiled::LogItemCompiled( const Debug::LogItem& _logItem )
     {
-        mSeverity   = _logItem.severity;
-        mLogMessage = Debug::SecondsToString( _logItem.time ).c_str() + std::string( " " ) + _logItem.message;
-        mColor      = GetSeverityColor( _logItem.severity );
+        mSeverity   = _logItem.mSeverity;
+        mLogMessage = Debug::SecondsToString( _logItem.mTime ).c_str() + std::string( " " ) + _logItem.mMessage;
+        mColor      = GetSeverityColor( _logItem.mSeverity );
+        mType       = _logItem.mType;
     }
 
     //==================================================================================================================================================================================================
@@ -145,22 +176,22 @@ namespace fan
     {
         switch( _severity )
         {
-            case Debug::Severity::log:
+            case Debug::Severity::Log:
             {
                 return { 1, 1, 1, 1 };        // White
             }
                 break;
-            case Debug::Severity::highlight:
+            case Debug::Severity::Highlight:
             {
                 return { 0, 1, 0, 1 };        // Green
             }
                 break;
-            case Debug::Severity::warning:
+            case Debug::Severity::Warning:
             {
                 return { 1, 1, 0, 1 };        // Yellow
             }
                 break;
-            case Debug::Severity::error:
+            case Debug::Severity::Error:
             {
                 return { 1, 0, 0, 1 };        // Red
             }

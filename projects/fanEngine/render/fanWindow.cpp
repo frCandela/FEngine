@@ -134,7 +134,7 @@ namespace fan
         glfwWindowHint( GLFW_RESIZABLE, GLFW_TRUE );
         mWindow = glfwCreateWindow( _size.x, _size.y, _name.c_str(), nullptr/* fullscreen monitor */, nullptr );
         glfwCreateWindowSurface( mInstance.mInstance, mWindow, nullptr, &mSurface );
-        Debug::Log() << std::hex << "VkSurfaceKHR          " << mSurface << std::dec << Debug::Endl();
+        Debug::Log() << Debug::Type::Render << std::hex << "VkSurfaceKHR          " << mSurface << std::dec << Debug::Endl();
         glfwSetWindowPos( mWindow, _position.x, _position.y );
         glfwSetWindowSize( mWindow, _size.x, _size.y );
         glfwSetWindowPos( mWindow, _position.x, _position.y );

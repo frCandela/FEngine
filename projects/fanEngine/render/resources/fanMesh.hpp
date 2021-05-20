@@ -44,10 +44,10 @@ namespace fan
         void GenerateConvexHull();
         bool Empty() const;
 
-        std::string           mPath;
-        ConvexHull            mConvexHull;
-        bool                  mAutoUpdateHull   = true;
-        std::vector<SubMesh>  mSubMeshes;
-        int                   mIndex            = -1;
+        std::string          mPath;
+        ConvexHull           mConvexHull;
+        bool                 mAutoUpdateHull = true;
+        std::vector<SubMesh> mSubMeshes;
+        int                  mIndex          = -1;
     };
 }

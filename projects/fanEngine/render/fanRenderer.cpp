@@ -342,7 +342,7 @@ namespace fan
     void Renderer::WaitIdle()
     {
         vkDeviceWaitIdle( mDevice.mDevice );
-        Debug::Log( "Renderer idle" );
+        Debug::Log( "Renderer idle", Debug::Type::Render );
     }
 
     //==================================================================================================================================================================================================

@@ -16,13 +16,13 @@ namespace fan
 
         static void SetInfo( EcsSingletonInfo& _info );
         static void Init( EcsWorld& _world, EcsSingleton& _singleton );
-        static void Destroy( EcsWorld&, EcsSingleton& );
 
         // Log item with its string already ready to draw
         struct LogItemCompiled
         {
             LogItemCompiled( const Debug::LogItem& _logItem );
             Debug::Severity mSeverity;
+            Debug::Type     mType;
             std::string     mLogMessage;
             ImVec4          mColor;
         };
@@ -34,6 +34,7 @@ namespace fan
         char                         mInputBuffer[sInputBufferSize];
         bool                         mScrollDown;
         bool                         mGrabFocus;
+        int                          mVisibleLogsTypes;
 
         static ImVec4 GetSeverityColor( const Debug::Severity& _severity );
         void OnNewLog( Debug::LogItem _item );
@@ -51,6 +52,7 @@ namespace fan
             info.mGroup      = EngineGroups::Editor;
             info.mType       = GuiSingletonInfo::Type::ToolWindow;
             info.onGui       = &GuiConsoleWindow::OnGui;
+            info.mImGuiWindowFlags = ImGuiWindowFlags_MenuBar;
             return info;
         }
 

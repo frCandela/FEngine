@@ -29,7 +29,7 @@ namespace fan
                 return false;
             }
 
-            Debug::Log() << "loading default shader " << defaultShaderPath << Debug::Endl();
+            Debug::Log() << Debug::Type::Render << "loading default shader " << defaultShaderPath << Debug::Endl();
             spirvCode = SpirvCompiler::GetFromGlsl( Path::Normalize( defaultShaderPath ) );
 
             if( spirvCode.empty() )
@@ -53,7 +53,7 @@ namespace fan
             Debug::Error() << "Could not create shader module: " << _path << Debug::Endl();
             return false;
         }
-        Debug::Log() << std::hex << "VkShaderModule        " << mShaderModule << std::dec << Debug::Endl();
+        Debug::Log() << Debug::Type::Render << std::hex << "VkShaderModule        " << mShaderModule << std::dec << Debug::Endl();
 
         _device.AddDebugName( (uint64_t)mShaderModule, _path );
 
@@ -81,7 +81,7 @@ namespace fan
 
         if( file.is_open() == false )
         {
-            Debug::Get() << Debug::Severity::error << "failed to open file: " << _filename << Debug::Endl();
+            Debug::Error() << "failed to open file: " << _filename << Debug::Endl();
             return {};
         }
 
