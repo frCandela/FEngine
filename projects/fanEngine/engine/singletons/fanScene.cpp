@@ -67,7 +67,8 @@ namespace fan
         sceneNode.AddFlag( SceneNode::BoundsOutdated );
         if( _parentNode == nullptr ) // root node
         {
-            sceneNode.AddFlag( SceneNode::NoRaycast | SceneNode::NoDelete );
+            sceneNode.AddFlag( SceneNode::NoRaycast );
+            sceneNode.AddFlag( SceneNode::NoDelete );
         }
 
         sceneNode.Build( _name, *this, handle, _parentNode );

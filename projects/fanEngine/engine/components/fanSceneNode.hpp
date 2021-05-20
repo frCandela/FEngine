@@ -38,8 +38,8 @@ namespace fan
         void SetParent( SceneNode* _parent );
         SceneNode& GetParent() const;
         void InsertBelow( SceneNode& _brother );
-        bool HasFlag( uint32_t _flag ) const { return mFlags & _flag; }
-        void AddFlag( uint32_t _flag ) { mFlags |= _flag; }
+        bool HasFlag( const Flags _flag ) const { return mFlags & _flag; }
+        void AddFlag( const Flags _flag ) { mFlags |= _flag; }
         void RemoveFlag( Flags _flag ) { mFlags &= ~_flag; }
 
         static void GetDescendantsOf( const SceneNode& _root, std::vector<SceneNode*>& _outList );

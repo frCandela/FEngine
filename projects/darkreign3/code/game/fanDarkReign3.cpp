@@ -114,7 +114,10 @@ namespace fan
                 {
                     EcsEntity entity = mWorld.GetEntity( chunk.mHandle );
                     MeshRenderer& meshRenderer = mWorld.GetComponent<MeshRenderer>( entity );
+                    SceneNode   & sceneNode    = mWorld.GetComponent<SceneNode>( entity );
+                    sceneNode.AddFlag( SceneNode::BoundsOutdated );
                     VoxelGenerator::GenerateMesh( terrain, chunk, ( meshRenderer.mMesh )->mSubMeshes[0] );
+                    ( meshRenderer.mMesh )->GenerateConvexHull();
                     completionMeshGeneration = i;
                     break;
                 }

@@ -53,7 +53,6 @@ namespace fan
 
         // Cleanup
         OptimizeVertices();
-        //GenerateConvexHull();
         mBuffersOutdated = true;
 
         return true;

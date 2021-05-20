@@ -92,9 +92,8 @@ namespace fan
                     if( !mesh ){ mesh = new Mesh; }
                     MeshRenderer& renderer = _world.AddComponent<MeshRenderer>( entity );
                     mesh->mSubMeshes.resize( 1 );
-                    mesh->mSubMeshes[0].mOptimizeVertices = false;
+                    mesh->mSubMeshes[0].mOptimizeVertices = true;
                     mesh->mSubMeshes[0].mHostVisible      = true;
-                    mesh->mAutoUpdateHull                 = false;
                     renderer.mMesh                        = mesh;
                     renderResources.mMeshManager->Add( mesh, chunkName );
 
