@@ -21,6 +21,8 @@ namespace fan
         Mesh2D* mMesh;
         glm::vec2 mPosition;
         glm::vec2 mScale;
+        glm::vec2 mUvOffset;
+        glm::vec2 mUvScale;
         glm::vec4 mColor;
         uint32_t  mTextureIndex;
         int       mDepth = 0;
@@ -37,11 +39,20 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
+    struct DynamicUniformUIFrag
+    {
+        glm::vec2 mUvOffset;
+        glm::vec2 mUvScale;
+    };
+
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
     struct UniformsUI
     {
         void Create( const VkDeviceSize _minUniformBufferOffsetAlignment );
 
-        AlignedMemory <DynamicUniformUIVert> mDynamicUniforms;
+        AlignedMemory <DynamicUniformUIVert> mDynamicUniformsVert;
+        AlignedMemory <DynamicUniformUIFrag> mDynamicUniformsFrag;
     };
 
     //==================================================================================================================================================================================================
@@ -62,7 +73,7 @@ namespace fan
         Pipeline                mPipeline;
         Shader                  mFragmentShader;
         Shader                  mVertexShader;
-        DescriptorUniforms      mDescriptorTransform;
+        DescriptorUniforms      mDescriptor;
         UniformsUI              mUniforms;
         DescriptorSampler       mDescriptorSampler;
         Sampler                 mSampler;

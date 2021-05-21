@@ -53,11 +53,7 @@ namespace fan
     //==================================================================================================================================================================================================
     // Adds a uniform buffer binding
     //==================================================================================================================================================================================================
-    void DescriptorUniforms::AddDynamicUniformBinding( Device& _device,
-                                                       const size_t _count,
-                                                       VkShaderStageFlags _stage,
-                                                       VkDeviceSize _bufferSize,
-                                                       VkDeviceSize _alignment )
+    void DescriptorUniforms::AddDynamicUniformBinding( Device& _device, const size_t _count, VkShaderStageFlags _stage, VkDeviceSize _bufferSize, VkDeviceSize _alignment )
     {
         BindingData bindingData;
         bindingData.CreateBuffers( _device, _count, _bufferSize * _alignment, _alignment );

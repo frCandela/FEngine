@@ -26,8 +26,11 @@ namespace fan
         {
             UIRenderer& ui = static_cast<UIRenderer&>( _component );
 
+            ImGui::PushID( "ui_renderer" );
             ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() );
             {
+                ImGui::FanTexturePtr( "ui texture", ui.mTexture );
+
                 // color
                 if( ImGui::Button( "##TransPos" ) )
                 {
@@ -36,8 +39,25 @@ namespace fan
                 ImGui::SameLine();
                 ImGui::ColorEdit4( "color", ui.mColor.Data(), ImGui::fanColorEditFlags );
 
-                // texture
-                ImGui::FanTexturePtr( "ui texture", ui.mTexture );
+                // uv offset
+                if( ImGui::Button( "##uv_offset" ) )
+                {
+                    ui.mUvOffset = { 0, 0 };
+                }
+                ImGui::SameLine();
+                ImGui::DragInt2( "uv offset", &ui.mUvOffset[0] );
+
+                // tiling
+                if( ImGui::Button( "##tiling" ) )
+                {
+                    ui.mTiling = { 1, 1 };
+                }
+                ImGui::SameLine();
+                ImGui::DragInt2( "tiling", &ui.mTiling[0], 1, 1, 1000 );
+
+                if( ImGui::Button( "##depth ui" ) ){ ui.mDepth = 0; }
+                ImGui::SameLine();
+                ImGui::DragInt( "depth", &ui.mDepth, 1, 0, 1024 );
 
                 // enabled
                 bool isEnabled = _world.HasTag<TagUIVisible>( _entity );
@@ -46,12 +66,9 @@ namespace fan
                     if( isEnabled ){ _world.AddTag<TagUIVisible>( _entity ); }
                     else{ _world.RemoveTag<TagUIVisible>( _entity ); }
                 }
-
-                if( ImGui::Button( "##depth ui" ) ){ ui.mDepth = 0; }
-                ImGui::SameLine();
-                ImGui::DragInt( "depth", &ui.mDepth, 1, 0, 1024 );
             }
             ImGui::PopItemWidth();
+            ImGui::PopID();
         }
     };
 }

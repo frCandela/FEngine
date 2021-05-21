@@ -2,6 +2,7 @@
 
 #include "engine/ui/fanUITransform.hpp"
 #include "editor/fanGuiInfos.hpp"
+#include "engine/ui/fanUIRenderer.hpp"
 
 namespace fan
 {
@@ -20,7 +21,7 @@ namespace fan
             return info;
         }
 
-        static void OnGui( EcsWorld& /*_world*/, EcsEntity /*_entityID*/, EcsComponent& _component )
+        static void OnGui( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
         {
             UITransform& transform = static_cast<UITransform&>( _component );
 
@@ -30,7 +31,22 @@ namespace fan
                 ImGui::SameLine();
                 ImGui::DragInt2( "position", &transform.mPosition.x, 1, 0 );
 
-                if( ImGui::Button( "##resetUIsize" ) ){ transform.mSize = glm::ivec2( 100, 100 ); }
+                if( ImGui::Button( "##resetUIsize" ) )
+                {
+                    if( _world.HasComponent<UIRenderer>(_entity))
+                    {
+                        UIRenderer renderer = _world.GetComponent<UIRenderer>( _entity );
+                        if( renderer.mTexture != nullptr )
+                        {
+                            transform.mSize.x = renderer.mTexture->mExtent.width;
+                            transform.mSize.y = renderer.mTexture->mExtent.height;
+                        }
+                    }
+                    else
+                    {
+                        transform.mSize = glm::ivec2( 100, 100 );
+                    }
+                }
                 ImGui::SameLine();
                 ImGui::DragInt2( "size##sizeUI", &transform.mSize.x, 0.1f );
             }

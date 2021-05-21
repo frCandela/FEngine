@@ -95,13 +95,14 @@ namespace fan
                     continue;
                 }
 
-                const glm::vec2 size = glm::vec2( transform.mSize.x, transform.mSize.y );
-                const glm::vec2 pos  = glm::vec2( transform.mPosition.x, transform.mPosition.y );
+                const glm::vec2 textureSize = glm::vec2( renderer.mTexture != nullptr ? glm::ivec2( renderer.mTexture->mExtent.width, renderer.mTexture->mExtent.height ) : glm::ivec2 { 1, 1 } );
 
                 RenderDataMesh2D data;
                 data.mMesh         = renderer.mMesh2D;
-                data.mPosition     = pos / renderWorld.mTargetSize * 2.f - glm::vec2( 1.f, 1.f );
-                data.mScale        = size / renderWorld.mTargetSize;
+                data.mPosition     = glm::vec2( transform.mPosition ) / renderWorld.mTargetSize * 2.f - glm::vec2( 1.f, 1.f );
+                data.mScale        = glm::vec2( transform.mSize ) / renderWorld.mTargetSize;
+                data.mUvOffset     = glm::vec2( renderer.mUvOffset ) / textureSize;
+                data.mUvScale      = glm::vec2( renderer.mTiling );
                 data.mColor        = renderer.mColor.ToGLM();
                 data.mTextureIndex = renderer.GetTexture() != nullptr ? renderer.GetTexture()->mIndex : 0;
                 data.mDepth        = renderer.mDepth;

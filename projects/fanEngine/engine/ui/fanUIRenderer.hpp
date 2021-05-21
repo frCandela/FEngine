@@ -16,8 +16,10 @@ namespace fan
         static void Save( const EcsComponent& _component, Json& _json );
         static void Load( EcsComponent& _component, const Json& _json );
 
-        Mesh2D* mMesh2D;
+        Mesh2D*    mMesh2D;
         Color      mColor;
+        glm::ivec2 mUvOffset;
+        glm::ivec2 mTiling;
         TexturePtr mTexture;
         int        mDepth;
 
