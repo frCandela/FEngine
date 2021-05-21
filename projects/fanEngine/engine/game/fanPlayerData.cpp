@@ -7,8 +7,8 @@
 #include "engine/singletons/fanScene.hpp"
 #include "engine/singletons/fanApplication.hpp"
 #include "engine/components/fanCamera.hpp"
-#include "engine/singletons/fanRenderResources.hpp"
-#include "engine/singletons/fanSceneResources.hpp"
+#include "engine/singletons/fanEngineResources.hpp"
+#include "engine/singletons/fanEngineResources.hpp"
 
 // base
 #include "engine/fanSceneTags.hpp"
@@ -18,7 +18,7 @@
 #include "engine/components/fanFollowTransform.hpp"
 #include "engine/components/fanBounds.hpp"
 #include "engine/singletons/fanScene.hpp"
-#include "engine/singletons/fanSceneResources.hpp"
+#include "engine/singletons/fanEngineResources.hpp"
 #include "engine/singletons/fanScenePointers.hpp"
 #include "engine/singletons/fanMouse.hpp"
 #include "engine/singletons/fanApplication.hpp"
@@ -41,7 +41,7 @@
 #include "engine/components/fanParticleEmitter.hpp"
 #include "engine/components/fanParticle.hpp"
 #include "engine/singletons/fanRenderWorld.hpp"
-#include "engine/singletons/fanRenderResources.hpp"
+#include "engine/singletons/fanEngineResources.hpp"
 #include "engine/singletons/fanRenderDebug.hpp"
 
 // render ui
@@ -88,21 +88,19 @@ namespace fan
         mFullScreen.mWindowedPosition = mWindow.GetPosition();
         mFullScreen.mWindowedSize     = mWindow.GetSize();
 
-        SceneResources::SetupResources( mPrefabManager );
-        RenderResources::SetupResources( mRenderer.mMeshManager, mRenderer.mMesh2DManager, mRenderer.mTextureManager, mRenderer.mFontManager );
+        EngineResources::SetupResources( mPrefabManager, mRenderer.mMeshManager, mRenderer.mMesh2DManager, mRenderer.mTextureManager, mRenderer.mFontManager );
     }
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
     void PlayerData::InitWorldResources( EcsWorld& _world, PlayerData& _playerData )
     {
-        RenderResources& renderResources = _world.GetSingleton<RenderResources>();
-        renderResources.SetPointers( &_playerData.mRenderer.mMeshManager,
+        EngineResources& engineResources = _world.GetSingleton<EngineResources>();
+        engineResources.SetPointers( &_playerData.mPrefabManager,
+                                     &_playerData.mRenderer.mMeshManager,
                                      &_playerData.mRenderer.mMesh2DManager,
                                      &_playerData.mRenderer.mTextureManager,
                                      &_playerData.mRenderer.mFontManager );
-        SceneResources& sceneResources = _world.GetSingleton<SceneResources>();
-        sceneResources.SetPointers( &_playerData.mPrefabManager );
     }
 
     //==================================================================================================================================================================================================
@@ -188,7 +186,7 @@ namespace fan
         _world.AddComponentType<Scale>();
 
         _world.AddSingletonType<Scene>();
-        _world.AddSingletonType<SceneResources>();
+        _world.AddSingletonType<EngineResources>();
         _world.AddSingletonType<ScenePointers>();
         _world.AddSingletonType<Mouse>();
         _world.AddSingletonType<Application>();
@@ -218,7 +216,6 @@ namespace fan
         _world.AddComponentType<Particle>();
 
         _world.AddSingletonType<RenderWorld>();
-        _world.AddSingletonType<RenderResources>();
         _world.AddSingletonType<RenderDebug>();
     }
 

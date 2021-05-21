@@ -2,7 +2,7 @@
 #include "render/fanRenderSerializable.hpp"
 #include "render/resources/fanMesh2DManager.hpp"
 #include "render/fanRenderGlobal.hpp"
-#include "engine/singletons/fanRenderResources.hpp"
+#include "engine/singletons/fanEngineResources.hpp"
 #include "engine/fanSceneTags.hpp"
 #include "editor/fanModals.hpp"
 
@@ -20,10 +20,10 @@ namespace fan
     //==================================================================================================================================================================================================
     void UIRenderer::Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
     {
-        RenderResources& renderResources = _world.GetSingleton<RenderResources>();
+        EngineResources& engineResources = _world.GetSingleton<EngineResources>();
 
         UIRenderer& uiRenderer = static_cast<UIRenderer&>( _component );
-        uiRenderer.mMesh2D = renderResources.mMesh2DManager->Get( RenderGlobal::sMesh2DQuad );
+        uiRenderer.mMesh2D = engineResources.mMesh2DManager->Get( RenderGlobal::sMesh2DQuad );
         uiRenderer.mColor  = Color::sWhite;
         uiRenderer.mUvOffset = {0,0};
         uiRenderer.mTiling = {1,1};

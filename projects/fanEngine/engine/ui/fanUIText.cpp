@@ -3,9 +3,8 @@
 #include "render/resources/fanMesh2DManager.hpp"
 #include "fanUIText.hpp"
 #include "engine/fanEngineSerializable.hpp"
-#include "engine/singletons/fanRenderResources.hpp"
+#include "engine/singletons/fanEngineResources.hpp"
 #include "engine/fanSceneTags.hpp"
-#include "render/resources/fanFont.hpp"
 #include "render/fanRenderSerializable.hpp"
 
 namespace fan
@@ -28,7 +27,7 @@ namespace fan
         text.mSize    = 18;
         text.mFontPtr = nullptr;
 
-        _world.GetSingleton<RenderResources>().mMesh2DManager->Add( text.mMesh2D, "text_mesh" );
+        _world.GetSingleton<EngineResources>().mMesh2DManager->Add( text.mMesh2D, "text_mesh" );
         _world.AddTag<TagUIModified>( _entity );
     }
 

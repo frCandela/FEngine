@@ -1,5 +1,6 @@
-#include "engine/singletons/fanRenderResources.hpp"
-#include "core/fanPath.hpp"
+#include "engine/singletons/fanEngineResources.hpp"
+#include "engine/fanPrefabManager.hpp"
+#include "engine/fanPrefab.hpp"
 #include "render/resources/fanMesh.hpp"
 #include "render/resources/fanMesh2D.hpp"
 #include "render/resources/fanTextureManager.hpp"
@@ -12,25 +13,23 @@ namespace fan
 {
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void RenderResources::SetInfo( EcsSingletonInfo& /*_info*/ )
+    void EngineResources::SetInfo( EcsSingletonInfo& /*_info*/ )
     {
     }
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void RenderResources::Init( EcsWorld& /*_world*/, EcsSingleton& _singleton )
+    void EngineResources::Init( EcsWorld& /*_world*/, EcsSingleton& _singleton )
     {
-        RenderResources& renderResources = static_cast<RenderResources&>( _singleton );
-        (void)renderResources;
+        EngineResources& sceneResources = static_cast<EngineResources&>( _singleton );
+        (void)sceneResources;
     }
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void RenderResources::SetPointers( MeshManager* _meshManager,
-                                       Mesh2DManager* _mesh2DManager,
-                                       TextureManager* _textureManager,
-                                       FontManager* _fontManager )
+    void EngineResources::SetPointers( PrefabManager* _prefabManager, MeshManager* _meshManager, Mesh2DManager* _mesh2DManager, TextureManager* _textureManager, FontManager* _fontManager )
     {
+        mPrefabManager  = _prefabManager;
         mMeshManager    = _meshManager;
         mMesh2DManager  = _mesh2DManager;
         mTextureManager = _textureManager;
@@ -39,11 +38,9 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void RenderResources::SetupResources( MeshManager& _meshManager,
-                                          Mesh2DManager& _mesh2DManager,
-                                          TextureManager& _textureManager,
-                                          FontManager& _fontManager )
+    void EngineResources::SetupResources( PrefabManager& _prefabManager, MeshManager& _meshManager, Mesh2DManager& _mesh2DManager, TextureManager& _textureManager, FontManager& _fontManager )
     {
+        ResourcePtr<Prefab>::sOnResolve.Connect( &PrefabManager::ResolvePtr, &_prefabManager );
         ResourcePtr<Mesh>::sOnResolve.Connect( &MeshManager::ResolvePtr, &_meshManager );
         ResourcePtr<Texture>::sOnResolve.Connect( &TextureManager::ResolvePtr, &_textureManager );
         ResourcePtr<Font>::sOnResolve.Connect( &FontManager::ResolvePtr, &_fontManager );
@@ -51,14 +48,14 @@ namespace fan
         _fontManager.Load( RenderGlobal::sDefaultGameFont );
 
         _meshManager.Load( RenderGlobal::sDefaultMesh );
-        Mesh2D* quad2D = RenderResources::CreateMesh2DQuad();
+        Mesh2D* quad2D = EngineResources::CreateMesh2DQuad();
         _mesh2DManager.Add( quad2D, RenderGlobal::sMesh2DQuad );
         _textureManager.Load( RenderGlobal::sWhiteTexture );
     }
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    Mesh2D* RenderResources::CreateMesh2DQuad()
+    Mesh2D* EngineResources::CreateMesh2DQuad()
     {
         Mesh2D* mesh2D = new Mesh2D();
         std::vector<UIVertex> vertices = {

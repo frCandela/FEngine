@@ -56,16 +56,24 @@ namespace fan
     //==================================================================================================================================================================================================
     void DarkReign3::Start()
     {
-        MeshManager& meshManager = *mWorld.GetSingleton<RenderResources>().mMeshManager;
+        MeshManager& meshManager = *mWorld.GetSingleton<EngineResources>().mMeshManager;
         RenderWorld& renderWorld = mWorld.GetSingleton<RenderWorld>();
         meshManager.Add( renderWorld.mParticlesMesh, "particles_mesh" );
 
         Scene& scene = mWorld.GetSingleton<Scene>();
         SceneNode cameraNode = scene.CreateSceneNode( "game_camera", &scene.GetRootNode() );
-        scene.SetMainCamera( cameraNode.mHandle );
+
         EcsEntity cameraEntity = mWorld.GetEntity( cameraNode.mHandle );
-        mWorld.AddComponent<Transform>( cameraEntity );
         mWorld.AddComponent<Camera>( cameraEntity );
+        Transform& cameraTransform = mWorld.AddComponent<Transform>( cameraEntity );
+
+        if( scene.mMainCameraHandle != 0)
+        {
+            Transform& prevCameraTransform = mWorld.GetComponent<Transform>( mWorld.GetEntity( scene.mMainCameraHandle ) );
+            cameraTransform = prevCameraTransform;
+        }
+
+        scene.SetMainCamera( cameraNode.mHandle );
     }
 
     //==================================================================================================================================================================================================
@@ -170,7 +178,6 @@ namespace fan
         mWorld.ForceRun<SUpdateRenderWorldDirectionalLights>();
     }
 
-    MeshPtr meshPtr;
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
@@ -183,15 +190,6 @@ namespace fan
             ImGui::SliderInt( "voxels generation", &completionVoxelsGenerationCpy, 0, max );
             int completionMeshGenerationCpy = completionMeshGeneration;
             ImGui::SliderInt( "mesh generation", &completionMeshGenerationCpy, 0, max );
-
-            ImGui::FanMeshPtr( "mesh", meshPtr );
-
-            if( ImGui::Button( "export" ) && meshPtr != nullptr )
-            {
-                GLTFExporter exporter;
-                exporter.Export( **meshPtr );
-                exporter.Save( "exported_mesh.gltf" );
-            }
         }
         ImGui::End();
     }

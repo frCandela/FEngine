@@ -9,8 +9,8 @@
 #include "render/resources/fanMesh.hpp"
 #include "render/resources/fanMesh2D.hpp"
 #include "engine/singletons/fanRenderWorld.hpp"
-#include "engine/singletons/fanSceneResources.hpp"
-#include "engine/singletons/fanRenderResources.hpp"
+#include "engine/singletons/fanEngineResources.hpp"
+#include "engine/singletons/fanEngineResources.hpp"
 #include "engine/fanPrefabManager.hpp"
 #include "engine/fanPrefab.hpp"
 #include "editor/fanDragnDrop.hpp"
@@ -40,7 +40,7 @@ namespace fan
 
         SCOPED_PROFILE( render );
         
-        const RenderResources& renderResources = _world.GetSingleton<RenderResources>();
+        const EngineResources& engineResources = _world.GetSingleton<EngineResources>();
 
         ImGui::Icon( ImGui::Renderer16, { 16, 16 } );
         ImGui::SameLine();
@@ -48,7 +48,7 @@ namespace fan
 
         if( ImGui::CollapsingHeader( "Loaded 3D meshes : " ) )
         {
-            for( Mesh* mesh : renderResources.mMeshManager->GetMeshes() )
+            for( Mesh* mesh : engineResources.mMeshManager->GetMeshes() )
             {
                 ImGui::Text( "index: %d name: %s", mesh->mIndex, mesh->mPath.c_str() );
                 ImGui::FanBeginDragDropSourceMesh( mesh, ImGuiDragDropFlags_SourceAllowNullID );
@@ -57,7 +57,7 @@ namespace fan
 
         if( ImGui::CollapsingHeader( "Loaded 2D meshes : " ) )
         {
-            for( Mesh2D* mesh : renderResources.mMesh2DManager->GetMeshes() )
+            for( Mesh2D* mesh : engineResources.mMesh2DManager->GetMeshes() )
             {
                 ImGui::Text( "name: %s", mesh->mPath.c_str() );
             }
@@ -65,7 +65,7 @@ namespace fan
 
         if( ImGui::CollapsingHeader( "Loaded textures : " ) )
         {
-            for( Texture* tex : renderResources.mTextureManager->GetTextures() )
+            for( Texture* tex : engineResources.mTextureManager->GetTextures() )
             {
                 ImGui::Text( "ref: %d size: %u x %u name: %s",
                              tex->GetRefCount(),
@@ -78,7 +78,7 @@ namespace fan
 
         if( ImGui::CollapsingHeader( "Loaded fonts : " ) )
         {
-            for( Font* font : renderResources.mFontManager->GetFonts() )
+            for( Font* font : engineResources.mFontManager->GetFonts() )
             {
                 ImGui::Text( font->mPath.c_str() );
                 ImGui::FanBeginDragDropSourceFont( font, ImGuiDragDropFlags_SourceAllowNullID );
@@ -88,8 +88,7 @@ namespace fan
         // Display mesh list
         if( ImGui::CollapsingHeader( "Loaded prefabs : " ) )
         {
-            SceneResources& sceneResources = _world.GetSingleton<SceneResources>();
-            for( const auto pair : sceneResources.mPrefabManager->GetPrefabs() )
+            for( const auto pair : engineResources.mPrefabManager->GetPrefabs() )
             {
                 ImGui::Text( "ref: %d name: %s", pair.second->GetRefCount(), pair.second->mPath.c_str() );
             }

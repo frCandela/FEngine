@@ -53,11 +53,10 @@
 #include "editor/gui/singletons/fanGuiApplication.hpp"
 #include "editor/gui/singletons/fanGuiMouse.hpp"
 #include "editor/gui/singletons/fanGuiRenderDebug.hpp"
-#include "editor/gui/singletons/fanGuiRenderResources.hpp"
+#include "editor/gui/singletons/fanGuiEngineResources.hpp"
 #include "editor/gui/singletons/fanGuiRenderWorld.hpp"
 #include "editor/gui/singletons/fanGuiScene.hpp"
 #include "editor/gui/singletons/fanGuiScenePointers.hpp"
-#include "editor/gui/singletons/fanGuiSceneResources.hpp"
 #include "editor/gui/singletons/fanGuiVoxelTerrain.hpp"
 
 #include "editor/gui/ui/fanGuiUIAlign.hpp"
@@ -279,11 +278,10 @@ namespace fan
         _singletonInfos[Application::Info::sType]     = GuiApplication::GetInfo();
         _singletonInfos[Mouse::Info::sType]           = GuiMouse::GetInfo();
         _singletonInfos[RenderDebug::Info::sType]     = GuiRenderDebug::GetInfo();
-        _singletonInfos[RenderResources::Info::sType] = GuiRenderResources::GetInfo();
+        _singletonInfos[EngineResources::Info::sType] = GuiEngineResources::GetInfo();
         _singletonInfos[RenderWorld::Info::sType]     = GuiRenderWorld::GetInfo();
         _singletonInfos[Scene::Info::sType]           = GuiScene::GetInfo();
         _singletonInfos[ScenePointers::Info::sType]   = GuiScenePointers::GetInfo();
-        _singletonInfos[SceneResources::Info::sType]  = GuiSceneResources::GetInfo();
         _singletonInfos[VoxelTerrain::Info::sType]    = GuiVoxelTerrain::GetInfo();
 
         // fx physics

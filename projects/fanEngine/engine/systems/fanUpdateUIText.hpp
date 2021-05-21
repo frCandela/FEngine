@@ -3,7 +3,7 @@
 #include "engine/ui/fanUITransform.hpp"
 #include "engine/ui/fanUIText.hpp"
 #include "engine/ui/fanUIRenderer.hpp"
-#include "engine/singletons/fanRenderResources.hpp"
+#include "engine/singletons/fanEngineResources.hpp"
 #include "render/resources/fanFontManager.hpp"
 #include "render/fanRenderGlobal.hpp"
 
@@ -23,7 +23,7 @@ namespace fan
 
         static void Run( EcsWorld& _world, const EcsView& _view )
         {
-            RenderResources& resources = _world.GetSingleton<RenderResources>();
+            EngineResources& engineResources = _world.GetSingleton<EngineResources>();
 
             auto textIt      = _view.begin<UIText>();
             auto rendererIt  = _view.begin<UIRenderer>();
@@ -46,7 +46,7 @@ namespace fan
                 Font* font = *text.mFontPtr;
                 if( font == nullptr )
                 {
-                    font = resources.mFontManager->Load( RenderGlobal::sDefaultGameFont );
+                    font = engineResources.mFontManager->Load( RenderGlobal::sDefaultGameFont );
                     text.mFontPtr = font;
                 }
                 fanAssert( font != nullptr );
@@ -54,7 +54,7 @@ namespace fan
                 const Font::Atlas* atlas             = font->FindAtlas( text.mSize );
                 if( atlas == nullptr )
                 {
-                    atlas = font->GenerateAtlas( *resources.mTextureManager, text.mSize );
+                    atlas = font->GenerateAtlas( *engineResources.mTextureManager, text.mSize );
                     fanAssert( atlas != nullptr );
                 }
 
