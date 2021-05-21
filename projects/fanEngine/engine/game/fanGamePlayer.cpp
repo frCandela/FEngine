@@ -7,6 +7,7 @@
 #include "engine/systems/fanUpdateBounds.hpp"
 #include "engine/systems/fanUpdateTransforms.hpp"
 #include "engine/systems/fanUpdateRenderWorld.hpp"
+#include "engine/singletons/fanEngineResources.hpp"
 #include "engine/singletons/fanScene.hpp"
 #include "engine/singletons/fanRenderDebug.hpp"
 #include "engine/singletons/fanApplication.hpp"
@@ -28,7 +29,11 @@ namespace fan
         PlayerData::EcsIncludeRender3D( world );
         PlayerData::EcsIncludeRenderUI( world );
 
-        PlayerData::InitWorldResources( world, mData );
+        world.GetSingleton<EngineResources>().SetupResources( mData.mPrefabManager,
+                                                              mData.mRenderer.mMeshManager,
+                                                              mData.mRenderer.mMesh2DManager,
+                                                              mData.mRenderer.mTextureManager,
+                                                              mData.mRenderer.mFontManager );
 
         Application& app = world.GetSingleton<Application>();
         app.mOnQuit.Connect( &GamePlayer::Exit, this );

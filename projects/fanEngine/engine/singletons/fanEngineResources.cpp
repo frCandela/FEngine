@@ -27,13 +27,19 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void EngineResources::SetPointers( PrefabManager* _prefabManager, MeshManager* _meshManager, Mesh2DManager* _mesh2DManager, TextureManager* _textureManager, FontManager* _fontManager )
+    Mesh2D* CreateMesh2DQuad()
     {
-        mPrefabManager  = _prefabManager;
-        mMeshManager    = _meshManager;
-        mMesh2DManager  = _mesh2DManager;
-        mTextureManager = _textureManager;
-        mFontManager    = _fontManager;
+        Mesh2D* mesh2D = new Mesh2D();
+        std::vector<UIVertex> vertices = {
+                UIVertex( glm::vec2( +2.f, +0.f ), glm::vec2( +1.f, +0.f ) ),
+                UIVertex( glm::vec2( +0.f, +0.f ), glm::vec2( +0.f, +0.f ) ),
+                UIVertex( glm::vec2( +2.f, +2.f ), glm::vec2( +1.f, +1.f ) ),
+                UIVertex( glm::vec2( +0.f, +0.f ), glm::vec2( +0.f, +0.f ) ),
+                UIVertex( glm::vec2( +0.f, +2.f ), glm::vec2( +0.f, +1.f ) ),
+                UIVertex( glm::vec2( +2.f, +2.f ), glm::vec2( +1.f, +1.f ) )
+        };
+        mesh2D->LoadFromVertices( vertices );
+        return mesh2D;
     }
 
     //==================================================================================================================================================================================================
@@ -48,25 +54,14 @@ namespace fan
         _fontManager.Load( RenderGlobal::sDefaultGameFont );
 
         _meshManager.Load( RenderGlobal::sDefaultMesh );
-        Mesh2D* quad2D = EngineResources::CreateMesh2DQuad();
+        Mesh2D* quad2D = CreateMesh2DQuad();
         _mesh2DManager.Add( quad2D, RenderGlobal::sMesh2DQuad );
         _textureManager.Load( RenderGlobal::sWhiteTexture );
-    }
 
-    //==================================================================================================================================================================================================
-    //==================================================================================================================================================================================================
-    Mesh2D* EngineResources::CreateMesh2DQuad()
-    {
-        Mesh2D* mesh2D = new Mesh2D();
-        std::vector<UIVertex> vertices = {
-                UIVertex( glm::vec2( +2.f, +0.f ), glm::vec2( +1.f, +0.f ) ),
-                UIVertex( glm::vec2( +0.f, +0.f ), glm::vec2( +0.f, +0.f ) ),
-                UIVertex( glm::vec2( +2.f, +2.f ), glm::vec2( +1.f, +1.f ) ),
-                UIVertex( glm::vec2( +0.f, +0.f ), glm::vec2( +0.f, +0.f ) ),
-                UIVertex( glm::vec2( +0.f, +2.f ), glm::vec2( +0.f, +1.f ) ),
-                UIVertex( glm::vec2( +2.f, +2.f ), glm::vec2( +1.f, +1.f ) )
-        };
-        mesh2D->LoadFromVertices( vertices );
-        return mesh2D;
+        mPrefabManager  = &_prefabManager;
+        mMeshManager    = &_meshManager;
+        mMesh2DManager  = &_mesh2DManager;
+        mTextureManager = &_textureManager;
+        mFontManager    = &_fontManager;
     }
 }

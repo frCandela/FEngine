@@ -87,20 +87,6 @@ namespace fan
 
         mFullScreen.mWindowedPosition = mWindow.GetPosition();
         mFullScreen.mWindowedSize     = mWindow.GetSize();
-
-        EngineResources::SetupResources( mPrefabManager, mRenderer.mMeshManager, mRenderer.mMesh2DManager, mRenderer.mTextureManager, mRenderer.mFontManager );
-    }
-
-    //==================================================================================================================================================================================================
-    //==================================================================================================================================================================================================
-    void PlayerData::InitWorldResources( EcsWorld& _world, PlayerData& _playerData )
-    {
-        EngineResources& engineResources = _world.GetSingleton<EngineResources>();
-        engineResources.SetPointers( &_playerData.mPrefabManager,
-                                     &_playerData.mRenderer.mMeshManager,
-                                     &_playerData.mRenderer.mMesh2DManager,
-                                     &_playerData.mRenderer.mTextureManager,
-                                     &_playerData.mRenderer.mFontManager );
     }
 
     //==================================================================================================================================================================================================

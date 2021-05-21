@@ -19,9 +19,7 @@ namespace fan
         static void SetInfo( EcsSingletonInfo& _info );
         static void Init( EcsWorld& _world, EcsSingleton& _singleton );
 
-        static void SetupResources( PrefabManager& _prefabManager, MeshManager& _meshManager, Mesh2DManager& _mesh2DManager, TextureManager& _textureManager, FontManager& _font );
-        void SetPointers( PrefabManager* _prefabManager, MeshManager* _meshManager, Mesh2DManager* _mesh2DManager, TextureManager* _textureManager, FontManager* _fontManager );
-        static Mesh2D* CreateMesh2DQuad();
+        void SetupResources( PrefabManager& _prefabManager, MeshManager& _meshManager, Mesh2DManager& _mesh2DManager, TextureManager& _textureManager, FontManager& _fontManager );
 
         PrefabManager * mPrefabManager  = nullptr;
         MeshManager   * mMeshManager    = nullptr;

@@ -2,7 +2,6 @@
 #include <engine/systems/fanUpdateBounds.hpp>
 #include "core/input/fanInputManager.hpp"
 #include "core/input/fanInput.hpp"
-#include "core/fanBits.hpp"
 
 #include "network/singletons/fanTime.hpp"
 
@@ -32,6 +31,7 @@
 #include "editor/singletons/fanEditorCamera.hpp"
 #include "editor/singletons/fanEditorGrid.hpp"
 #include "engine/singletons/fanRenderWorld.hpp"
+#include "engine/singletons/fanEngineResources.hpp"
 #include "editor/singletons/fanEditorPlayState.hpp"
 
 namespace fan
@@ -99,7 +99,11 @@ namespace fan
             EditorSettings& editorSerializedValues = world.GetSingleton<EditorSettings>();
             editorSerializedValues.mData = &mEditorSettings;
 
-            PlayerData::InitWorldResources( world, mData );
+            world.GetSingleton<EngineResources>().SetupResources( mData.mPrefabManager,
+                                                                  mData.mRenderer.mMeshManager,
+                                                                  mData.mRenderer.mMesh2DManager,
+                                                                  mData.mRenderer.mTextureManager,
+                                                                  mData.mRenderer.mFontManager );
 
             RenderWorld& renderWorld = world.GetSingleton<RenderWorld>();
             renderWorld.mIsHeadless = ( &game != &GetCurrentGame() );
