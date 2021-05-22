@@ -1,7 +1,7 @@
 #include "engine/components/fanMeshRenderer.hpp"
 #include <sstream>
 #include "core/memory/fanSerializable.hpp"
-#include "render/fanRenderSerializable.hpp"
+#include "engine/fanEngineSerializable.hpp"
 
 namespace fan
 {
@@ -26,7 +26,7 @@ namespace fan
     void MeshRenderer::Save( const EcsComponent& _component, Json& _json )
     {
         const MeshRenderer& meshRenderer = static_cast<const MeshRenderer&>( _component );
-        Serializable::SaveMeshPtr( _json, "path", meshRenderer.mMesh );
+        Serializable::SaveResourcePtr( _json, "path", meshRenderer.mMesh.mData );
     }
 
     //==================================================================================================================================================================================================
@@ -34,6 +34,6 @@ namespace fan
     void MeshRenderer::Load( EcsComponent& _component, const Json& _json )
     {
         MeshRenderer& meshRenderer = static_cast<MeshRenderer&>( _component );
-        Serializable::LoadMeshPtr( _json, "path", meshRenderer.mMesh );
+        Serializable::LoadResourcePtr( _json, "path", meshRenderer.mMesh.mData );
     }
 }

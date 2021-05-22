@@ -1,7 +1,7 @@
 #include "engine/fanEngineSerializable.hpp"
 
 #include "core/resources/fanResourcePtr.hpp"
-#include "engine/fanSceneResourcePtr.hpp"
+#include "engine/resources/fanSceneResourcePtr.hpp"
 #include "engine/singletons/fanScenePointers.hpp"
 
 namespace fan
@@ -71,26 +71,5 @@ namespace fan
         }
 
         return true;
-    }
-
-    //==================================================================================================================================================================================================
-    //==================================================================================================================================================================================================
-    void Serializable::SaveResourcePtr( Json& _json, const char* _name, const ResourcePtrData& _ptr )
-    {
-        _json[_name] = ( _ptr.mResource != nullptr ? _ptr.mPath : "" );
-    }
-
-    //==================================================================================================================================================================================================
-    //==================================================================================================================================================================================================
-    bool Serializable::LoadResourcePtr( const Json& _json, const char* _name, ResourcePtrData& _outPtr )
-    {
-        const Json* token = FindToken( _json, _name );
-        if( token != nullptr )
-        {
-            _outPtr.mPath = *token;
-            _outPtr.Resolve();
-            return true;
-        }
-        return false;
     }
 }

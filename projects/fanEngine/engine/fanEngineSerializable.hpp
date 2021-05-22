@@ -13,9 +13,6 @@ namespace fan
     //==================================================================================================================================================================================================
     namespace Serializable
     {
-        void SaveResourcePtr( Json& _json, const char* _name, const ResourcePtrData& _ptr );
-        bool LoadResourcePtr( const Json& _json, const char* _name, ResourcePtrData& _outPtr );
-
         bool LoadComponentPtr( const Json& _json, const char* _name, ComponentPtrBase& _outPtr );
         void SaveComponentPtr( Json& _json, const char* _name, const ComponentPtrBase& _ptr );
 

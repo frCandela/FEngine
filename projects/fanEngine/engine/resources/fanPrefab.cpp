@@ -1,4 +1,4 @@
-#include "engine/fanPrefab.hpp"
+#include "fanPrefab.hpp"
 
 #include <fstream>
 #include "core/fanDebug.hpp"

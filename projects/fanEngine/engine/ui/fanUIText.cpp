@@ -5,7 +5,7 @@
 #include "engine/fanEngineSerializable.hpp"
 #include "engine/singletons/fanEngineResources.hpp"
 #include "engine/fanSceneTags.hpp"
-#include "render/fanRenderSerializable.hpp"
+#include "core/memory/fanSerializable.hpp"
 
 namespace fan
 {

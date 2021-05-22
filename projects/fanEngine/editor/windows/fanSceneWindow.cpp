@@ -10,7 +10,7 @@
 #include "core/resources/fanResourceManager.hpp"
 #include "engine/singletons/fanEngineResources.hpp"
 #include "engine/singletons/fanScene.hpp"
-#include "engine/fanPrefab.hpp"
+#include "engine/resources/fanPrefab.hpp"
 #include "engine/components/fanMeshRenderer.hpp"
 #include "engine/components/fanSceneNode.hpp"
 #include "engine/physics/fanTransform.hpp"

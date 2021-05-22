@@ -1,12 +1,12 @@
 #include "engine/singletons/fanEngineResources.hpp"
 #include "core/resources/fanResourceManager.hpp"
-#include "engine/fanPrefab.hpp"
+#include "engine/resources/fanPrefab.hpp"
 #include "render/resources/fanMesh.hpp"
 #include "render/resources/fanMesh2D.hpp"
 #include "render/resources/fanTextureManager.hpp"
 #include "render/resources/fanMesh2DManager.hpp"
 #include "render/resources/fanMeshManager.hpp"
-#include "render/resources/fanFont.hpp"
+#include "engine/resources/fanFont.hpp"
 
 namespace fan
 {

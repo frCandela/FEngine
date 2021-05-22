@@ -1,4 +1,4 @@
-#include "render/resources/fanFont.hpp"
+#include "fanFont.hpp"
 
 #include "fanDisableWarnings.hpp"
 

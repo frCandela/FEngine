@@ -1,6 +1,6 @@
 #pragma once
 
-#include "engine/fanSceneResourcePtr.hpp"
+#include "engine/resources/fanSceneResourcePtr.hpp"
 
 namespace fan
 {

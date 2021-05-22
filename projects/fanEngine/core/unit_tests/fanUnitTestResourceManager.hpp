@@ -2,8 +2,8 @@
 
 #include "core/unit_tests/fanUnitTest.hpp"
 #include "core/resources/fanResourceManager.hpp"
-#include "engine/fanPrefab.hpp"
-#include "engine/fanSceneResourcePtr.hpp"
+#include "engine/resources/fanPrefab.hpp"
+#include "engine/resources/fanSceneResourcePtr.hpp"
 
 namespace fan
 {
@@ -22,6 +22,7 @@ namespace fan
                     { &UnitTestResourceManager::TestCount,      "Count" },
                     { &UnitTestResourceManager::TestResolvePtr, "Resolve Ptr" },
                     { &UnitTestResourceManager::TestClear,      "Clear" },
+                    { &UnitTestResourceManager::TestDuplicates, "Duplicates" },
             };
         }
 
@@ -140,6 +141,16 @@ namespace fan
             TEST_ASSERT( mResources.Count<Prefab>() == 1 );
             mResources.Clear();
             TEST_ASSERT( mResources.Count<Prefab>() == 0 );
+        }
+
+        void TestDuplicates()
+        {
+            Prefab* prefab0 = mResources.Load<Prefab>( sPrefabName0 );
+            Prefab* prefab1 = mResources.Load<Prefab>( sPrefabName0 );
+
+            TEST_ASSERT( prefab0 != nullptr );
+            TEST_ASSERT( prefab1 != nullptr );
+            TEST_ASSERT( prefab0 != prefab1 );
         }
     };
 }

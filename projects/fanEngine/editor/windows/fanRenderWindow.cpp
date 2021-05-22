@@ -12,7 +12,7 @@
 #include "engine/singletons/fanEngineResources.hpp"
 #include "engine/singletons/fanEngineResources.hpp"
 #include "core/resources/fanResourceManager.hpp"
-#include "engine/fanPrefab.hpp"
+#include "engine/resources/fanPrefab.hpp"
 #include "editor/fanDragnDrop.hpp"
 
 namespace fan

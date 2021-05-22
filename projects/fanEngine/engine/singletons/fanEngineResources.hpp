@@ -1,7 +1,7 @@
 #pragma once
 
 #include "core/ecs/fanEcsSingleton.hpp"
-#include "engine/fanCursors.hpp"
+#include "engine/resources/fanCursors.hpp"
 
 namespace fan
 {

@@ -1,9 +1,13 @@
 #pragma once
 
+#include "core/resources/fanResourcePtr.hpp"
+//#include "render/resources/fanMesh.hpp"
+//#include "render/resources/fanTexture.hpp"
+
 namespace fan
 {
-    class TexturePtr;
-    class MeshPtr;
+    struct Texture;
+    struct Mesh;
 }
 
 //============================================================================================================
@@ -11,6 +15,6 @@ namespace fan
 //============================================================================================================
 namespace ImGui
 {
-    bool FanTexturePtr( const char* _label, fan::TexturePtr& _ptr );
-    bool FanMeshPtr( const char* _label, fan::MeshPtr& _ptr );
+    bool FanTexturePtr( const char* _label, fan::ResourcePtr<fan::Texture>& _ptr );
+    bool FanMeshPtr( const char* _label, fan::ResourcePtr<fan::Mesh>& _ptr );
 }

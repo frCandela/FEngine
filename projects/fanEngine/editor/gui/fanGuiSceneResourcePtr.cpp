@@ -3,7 +3,7 @@
 #include "core/fanPath.hpp"
 #include "engine/components/fanSceneNode.hpp"
 #include "render/fanRenderGlobal.hpp"
-#include "render/resources/fanFont.hpp"
+#include "engine/resources/fanFont.hpp"
 #include "editor/singletons/fanEditorSettings.hpp"
 #include "editor/fanDragnDrop.hpp"
 #include "editor/fanModals.hpp"

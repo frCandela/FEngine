@@ -6,7 +6,6 @@
 #include "render/unit_tests/fanUnitTestMeshManager.hpp"
 #include "render/unit_tests/fanUnitTestMesh2DManager.hpp"
 #include "render/unit_tests/fanUnitTestTextureManager.hpp"
-#include "render/unit_tests/fanUnitTestFontManager.hpp"
 #include "engine/unit_tests/fanUnitTestMouse.hpp"
 #include "core/unit_tests/fanUnitTestSignal.hpp"
 #include "core/unit_tests/fanUnitTestEcs.hpp"
@@ -43,7 +42,6 @@ namespace fan
                 { "Mesh manager", &UnitTestMeshManager::RunTests, mMeshManagerResult },
                 { "Mesh2D manager", &UnitTestMesh2DManager::RunTests, mMesh2DManagerResult },
                 { "Texture manager", &UnitTestTextureManager::RunTests, mTextureManagerResult },
-                { "Font manager", &UnitTestFontManager::RunTests, mFontManagerResult },
 #ifndef NDEBUG
                 { "fanAssert", &UnitTestFanAssert::RunTests, mFanAssertResult },
 #endif

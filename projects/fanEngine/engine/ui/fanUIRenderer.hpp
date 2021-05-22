@@ -1,8 +1,9 @@
 #pragma  once
 
 #include "core/ecs/fanEcsComponent.hpp"
-#include "render/fanRenderResourcePtr.hpp"
 #include "render/resources/fanMesh2D.hpp"
+#include "core/resources/fanResourcePtr.hpp"
+#include "render/resources/fanTexture.hpp"
 
 namespace fan
 {
@@ -20,8 +21,8 @@ namespace fan
         Color      mColor;
         glm::ivec2 mUvOffset;
         glm::ivec2 mTiling;
-        TexturePtr mTexture;
         int        mDepth;
+        ResourcePtr<Texture> mTexture;
 
         glm::ivec2 GetTextureSize() const;
         Texture* GetTexture() const { return *mTexture; }

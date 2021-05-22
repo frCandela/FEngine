@@ -1,5 +1,5 @@
 #include "engine/components/fanExpirationTime.hpp"
-#include "render/fanRenderSerializable.hpp"
+#include "core/memory/fanSerializable.hpp"
 
 namespace fan
 {

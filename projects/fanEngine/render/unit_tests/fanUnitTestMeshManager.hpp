@@ -4,7 +4,6 @@
 #include "render/resources/fanMeshManager.hpp"
 #include "render/fanRenderGlobal.hpp"
 #include "render/resources/fanMesh.hpp"
-#include "render/fanRenderResourcePtr.hpp"
 
 namespace fan
 {
@@ -90,9 +89,9 @@ namespace fan
         void TestResolveRscPtr()
         {
             Mesh* meshCube = mMeshManager.Load( RenderGlobal::sMeshCube );
-            MeshPtr rscPtr;
+            ResourcePtr<Mesh> rscPtr;
             TEST_ASSERT( !rscPtr.IsValid() );
-            rscPtr.Init( RenderGlobal::sMeshCube );
+            rscPtr->mPath = RenderGlobal::sMeshCube;
             mMeshManager.ResolvePtr( rscPtr.mData );
             TEST_ASSERT( rscPtr.IsValid() );
             TEST_ASSERT( meshCube == rscPtr.mData.mResource );

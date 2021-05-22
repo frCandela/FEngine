@@ -1,7 +1,7 @@
 #pragma  once
 
 #include "core/ecs/fanEcsComponent.hpp"
-#include "render/fanRenderResourcePtr.hpp"
+#include "core/fanColor.hpp"
 
 namespace fan
 {

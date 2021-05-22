@@ -13,6 +13,7 @@ namespace fan
     struct Vector3;
     struct Quaternion;
     struct Fixed;
+    struct ResourcePtrData;
 
     //==================================================================================================================================================================================================
     // Helpers for serializing variables into json
@@ -48,6 +49,9 @@ namespace fan
         bool LoadUInt64( const Json& _json, const char* _name, uint64_t& _outUInt64 );
         bool LoadBool( const Json& _json, const char* _name, bool& _outBool );
         bool LoadString( const Json& _json, const char* _name, std::string& _outString );
+
+        void SaveResourcePtr( Json& _json, const char* _name, const ResourcePtrData& _ptr );
+        bool LoadResourcePtr( const Json& _json, const char* _name, ResourcePtrData& _outPtr );
 
         bool ContainsToken( const Json& _json, const char* _name );
         const Json* FindToken( const Json& _json, const char* _name );

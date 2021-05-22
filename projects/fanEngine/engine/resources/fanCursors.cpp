@@ -1,5 +1,5 @@
-#include "engine/fanCursors.hpp"
-#include "glfw/glfw3.h"
+#include "fanCursors.hpp"
+#include "GLFW/glfw3.h"
 
 namespace fan
 {

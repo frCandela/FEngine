@@ -1,6 +1,6 @@
 #include "fanUIButton.hpp"
 #include "editor/fanModals.hpp"
-#include "render/fanRenderSerializable.hpp"
+#include "engine/fanEngineSerializable.hpp"
 #include "engine/fanSceneTags.hpp"
 
 namespace fan
@@ -39,8 +39,8 @@ namespace fan
 
         Serializable::SaveColor( _json, "color_normal", button.mColorNormal );
         Serializable::SaveColor( _json, "color_hovered", button.mColorHovered );
-        Serializable::SaveTexturePtr( _json, "image_normal", button.mImageNormal );
-        Serializable::SaveTexturePtr( _json, "image_pressed", button.mImagePressed );
+        Serializable::SaveResourcePtr( _json, "image_normal", button.mImageNormal.mData );
+        Serializable::SaveResourcePtr( _json, "image_pressed", button.mImagePressed.mData );
         Serializable::SaveSlotPtr( _json, "pressed_slot_ptr", button.mSlotPtr );
     }
 
@@ -51,8 +51,8 @@ namespace fan
         UIButton& button = static_cast<UIButton&>( _component );
         Serializable::LoadColor( _json, "color_normal", button.mColorNormal );
         Serializable::LoadColor( _json, "color_hovered", button.mColorHovered );
-        Serializable::LoadTexturePtr( _json, "image_normal", button.mImageNormal );
-        Serializable::LoadTexturePtr( _json, "image_pressed", button.mImagePressed );
+        Serializable::LoadResourcePtr( _json, "image_normal", button.mImageNormal.mData );
+        Serializable::LoadResourcePtr( _json, "image_pressed", button.mImagePressed.mData );
         Serializable::LoadSlotPtr( _json, "pressed_slot_ptr", button.mSlotPtr );
     }
 }

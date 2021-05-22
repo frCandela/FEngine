@@ -5,7 +5,7 @@
 #include "render/resources/fanMesh.hpp"
 #include "render/resources/fanMesh2D.hpp"
 #include "render/resources/fanTexture.hpp"
-#include "engine/fanPrefab.hpp"
+#include "engine/resources/fanPrefab.hpp"
 #include "core/resources/fanResourceManager.hpp"
 
 namespace fan

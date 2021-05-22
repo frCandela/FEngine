@@ -1,7 +1,9 @@
 #pragma  once
 
 #include "core/ecs/fanEcsComponent.hpp"
-#include "render/fanRenderResourcePtr.hpp"
+#include "core/resources/fanResourcePtr.hpp"
+#include "core/fanColor.hpp"
+#include "render/resources/fanTexture.hpp"
 
 namespace fan
 {
@@ -9,9 +11,9 @@ namespace fan
     //==================================================================================================================================================================================================
     struct SubMaterial
     {
-        TexturePtr mTexture= nullptr;
-        uint32_t   mShininess= 1;
-        Color      mColor= Color::sWhite;
+        ResourcePtr <Texture> mTexture   = nullptr;
+        uint32_t              mShininess = 1;
+        Color                 mColor     = Color::sWhite;
     };
 
     //==================================================================================================================================================================================================

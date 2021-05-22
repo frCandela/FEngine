@@ -1,7 +1,7 @@
 #include "engine/components/fanCamera.hpp"
 
 #include "engine/physics/fanTransform.hpp"
-#include "render/fanRenderSerializable.hpp"
+#include "core/memory/fanSerializable.hpp"
 #include "core/shapes/fanRay.hpp"
 
 namespace fan

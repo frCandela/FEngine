@@ -2,7 +2,7 @@
 
 #include "core/ecs/fanEcsComponent.hpp"
 #include "core/math/fanFixedPoint.hpp"
-#include "render/fanRenderResourcePtr.hpp"
+#include "fanGlm.hpp"
 
 namespace fan
 {

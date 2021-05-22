@@ -37,7 +37,11 @@ namespace fan
         ResourceType* operator*() const { return (ResourceType*)( mData.mResource ); } //@todo return a reference
         bool operator==( const ResourceType* _other ) const { return _other == mData.mResource; }
         bool operator!=( const ResourceType* _other ) const { return _other != mData.mResource; }
-
+        ResourcePtr& operator=( ResourceType* _resource )
+        {
+            mData.mResource =  _resource;
+            return *this;
+        }
         bool IsValid() const { return mData.mResource != nullptr; }
 
         ResourcePtrData mData;

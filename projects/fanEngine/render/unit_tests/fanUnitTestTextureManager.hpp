@@ -3,6 +3,7 @@
 #include "core/unit_tests/fanUnitTest.hpp"
 #include "render/resources/fanTextureManager.hpp"
 #include "render/fanRenderGlobal.hpp"
+#include "render/resources/fanTexture.hpp"
 
 namespace fan
 {
@@ -91,9 +92,9 @@ namespace fan
         void TestResolveRscPtr()
         {
             Texture* textureDefault = mTextureManager.Load( RenderGlobal::sDefaultTexture );
-            TexturePtr rscPtr;
+            ResourcePtr<Texture> rscPtr;
             TEST_ASSERT( !rscPtr.IsValid() );
-            rscPtr.Init( RenderGlobal::sDefaultTexture );
+            rscPtr->mPath = RenderGlobal::sDefaultTexture;
             mTextureManager.ResolvePtr( rscPtr.mData );
             TEST_ASSERT( rscPtr.IsValid() );
             TEST_ASSERT( textureDefault == rscPtr.mData.mResource );

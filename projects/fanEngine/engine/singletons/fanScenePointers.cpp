@@ -1,7 +1,7 @@
 #include "core/ecs/fanSlot.hpp"
 #include "engine/singletons/fanScenePointers.hpp"
 #include "engine/singletons/fanScene.hpp"
-#include "engine/fanSceneResourcePtr.hpp"
+#include "engine/resources/fanSceneResourcePtr.hpp"
 
 namespace fan
 {

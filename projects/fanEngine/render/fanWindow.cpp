@@ -1,5 +1,5 @@
 #include "render/fanWindow.hpp"
-#include "engine/fanCursors.hpp"
+#include "engine/resources/fanCursors.hpp"
 #include "core/fanDebug.hpp"
 #include "core/input/fanInput.hpp"
 #include "render/resources/fanTexture.hpp"

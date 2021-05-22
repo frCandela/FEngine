@@ -1,11 +1,12 @@
 #include "editor/gui/fanGuiRenderResources.hpp"
 #include <sstream>
 #include "core/fanPath.hpp"
-#include "render/fanRenderResourcePtr.hpp"
 #include "render/fanRenderGlobal.hpp"
 #include "editor/fanDragnDrop.hpp"
 #include "editor/fanModals.hpp"
 #include "editor/fanImguiIcons.hpp"
+#include "render/resources/fanMesh.hpp"
+#include "render/resources/fanTexture.hpp"
 
 namespace ImGui
 {
@@ -14,7 +15,7 @@ namespace ImGui
     // Draws a ImGui widget for displaying a TexturePtr
     // Returns true if the value (TexturePtr) was edited
     //==================================================================================================================================================================================================
-    bool FanTexturePtr( const char* _label, fan::TexturePtr& _ptr )
+    bool FanTexturePtr( const char* _label, fan::ResourcePtr<fan::Texture>& _ptr )
     {
         bool returnValue = false;
 
@@ -85,7 +86,7 @@ namespace ImGui
         // Modal set value
         if( ImGui::FanLoadFileModal( modalName.c_str(), fan::RenderGlobal::sImagesExtensions, sPathBuffer ) )
         {
-            _ptr.Init( sPathBuffer );
+            _ptr->mPath = sPathBuffer;
             _ptr.mData.Resolve();
             returnValue = true;
         }
@@ -100,7 +101,7 @@ namespace ImGui
     // Draws a ImGui widget for displaying a MeshPtr
     // Returns true if the value (MeshPtr) was edited
     //==================================================================================================================================================================================================
-    bool FanMeshPtr( const char* _label, fan::MeshPtr& _ptr )
+    bool FanMeshPtr( const char* _label, fan::ResourcePtr<fan::Mesh>& _ptr )
     {
         bool returnValue = false;
 
@@ -163,7 +164,7 @@ namespace ImGui
 
         if( ImGui::FanLoadFileModal( modalName.c_str(), fan::RenderGlobal::sMeshExtensions, sPathBuffer ) )
         {
-            _ptr.Init( sPathBuffer );
+            _ptr->mPath = sPathBuffer;
             _ptr.mData.Resolve();
             returnValue = true;
         }

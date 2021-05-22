@@ -1,4 +1,4 @@
-#include "engine/fanSceneResourcePtr.hpp"
+#include "fanSceneResourcePtr.hpp"
 
 #include "engine/singletons/fanScenePointers.hpp"
 

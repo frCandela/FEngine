@@ -2,10 +2,9 @@
 
 #include "core/ecs/fanEcsComponent.hpp"
 #include "core/ecs/fanSlot.hpp"
-#include "fanUITransform.hpp"
-#include "engine/fanSceneResourcePtr.hpp"
+#include "core/resources/fanResourcePtr.hpp"
 #include "core/fanColor.hpp"
-#include "render/fanRenderResourcePtr.hpp"
+#include "render/resources/fanTexture.hpp"
 
 namespace fan
 {
@@ -23,8 +22,8 @@ namespace fan
         bool       mIsPressed;
         Color      mColorNormal;
         Color      mColorHovered;
-        TexturePtr mImageNormal;
-        TexturePtr mImagePressed;
+        ResourcePtr<Texture> mImageNormal;
+        ResourcePtr<Texture> mImagePressed;
 
         Signal<> mPressed;
         SlotPtr  mSlotPtr;

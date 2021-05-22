@@ -1,7 +1,8 @@
 #pragma  once
 
 #include "core/ecs/fanEcsComponent.hpp"
-#include "render/fanRenderResourcePtr.hpp"
+#include "core/resources/fanResourcePtr.hpp"
+#include "render/resources/fanMesh.hpp"
 
 namespace fan
 {
@@ -17,6 +18,6 @@ namespace fan
         static void Save( const EcsComponent& _component, Json& _json );
         static void Load( EcsComponent& _component, const Json& _json );
 
-        MeshPtr mMesh;
+        ResourcePtr<Mesh> mMesh;
     };
 }
