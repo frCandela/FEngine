@@ -8,65 +8,53 @@ namespace fan
 {
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    template< typename ResourceType >
-    class ResourcePtr
+    struct ResourcePtrData
     {
-    public:
-        static Signal<ResourcePtr<ResourceType>&> sOnResolve;
-
-        ResourcePtr( Resource* _resource = nullptr );
-        virtual ~ResourcePtr();
+        uint32_t    mType = 0;
+        std::string mPath = "";
+        Resource                * mResource  = nullptr;
+        Signal<ResourcePtrData&>* mOnResolve = nullptr;
 
         void Resolve()
         {
-            SetResource( nullptr );
-            sOnResolve.Emmit( *this );
+            if( !mPath.empty() )
+            {
+                ( *mOnResolve ).Emmit( *this );
+            }
         }
-        bool IsValid() const { return mResource != nullptr; }
-        ResourceType* GetResource() const { return static_cast< ResourceType* >( mResource ); }
+    };
 
-        ResourceType* operator->() const { return (ResourceType*)( mResource ); } //@todo return a reference
-        ResourceType* operator*() const { return (ResourceType*)( mResource ); } //@todo return a reference
-        bool operator==( const ResourceType* _other ) const { return _other == mResource; }
-        bool operator!=( const ResourceType* _other ) const { return _other != mResource; }
-    protected:
-        void SetResource( Resource* _resource );
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    template< typename ResourceType >
+    struct ResourcePtr
+    {
+        static Signal<ResourcePtrData&> sOnResolve;
 
-    private:
-        Resource* mResource = nullptr;
+        ResourcePtr( Resource* _resource = nullptr );
+        virtual ~ResourcePtr();
+        ResourceType* operator->() const { return (ResourceType*)( mData.mResource ); } //@todo return a reference
+        ResourceType* operator*() const { return (ResourceType*)( mData.mResource ); } //@todo return a reference
+        bool operator==( const ResourceType* _other ) const { return _other == mData.mResource; }
+        bool operator!=( const ResourceType* _other ) const { return _other != mData.mResource; }
+
+        bool IsValid() const { return mData.mResource != nullptr; }
+
+        ResourcePtrData mData;
     };
 
     template< typename _ResourceType >
-    Signal<ResourcePtr<_ResourceType>&> ResourcePtr<_ResourceType>::sOnResolve;
+    Signal<ResourcePtrData&> ResourcePtr<_ResourceType>::sOnResolve;
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
     template< typename _ResourceType >
-    ResourcePtr<_ResourceType>::ResourcePtr( Resource* _resource ) :
-            mResource( _resource )
+    ResourcePtr<_ResourceType>::ResourcePtr( Resource* _resource )
     {
-        fanAssert( mResource == nullptr );
-        SetResource( _resource );
-    }
-
-    //==================================================================================================================================================================================================
-    //==================================================================================================================================================================================================
-    template< typename _ResourceType >
-    void ResourcePtr<_ResourceType>::SetResource( Resource* _resource )
-    {
-        if( _resource == mResource ){ return; }
-
-        if( mResource != nullptr )
-        {
-            mResource->DecreaseRefCount();
-            mResource = nullptr;
-        }
-
-        if( _resource != nullptr )
-        {
-            mResource = _resource;
-            mResource->IncreaseRefCount();
-        }
+        fanAssert( mData.mResource == nullptr );
+        mData.mResource  = _resource;
+        mData.mType      = _ResourceType::Info::sType;
+        mData.mOnResolve = &sOnResolve;
     }
 
     //==================================================================================================================================================================================================
@@ -74,9 +62,5 @@ namespace fan
     template< typename _ResourceType >
     ResourcePtr<_ResourceType>::~ResourcePtr()
     {
-        if( mResource != nullptr )
-        {
-            mResource->DecreaseRefCount();
-        }
     }
 }

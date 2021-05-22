@@ -4,19 +4,20 @@
 
 namespace fan
 {
-    class PrefabPtr;
     class SlotPtr;
     struct ComponentPtrBase;
-
+    struct ResourcePtrData;
     class EcsWorld;
 
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
     namespace Serializable
     {
-        void SaveComponentPtr( Json& _json, const char* _name, const ComponentPtrBase& _ptr );
-        void SavePrefabPtr( Json& _json, const char* _name, const PrefabPtr& _ptr );
+        void SaveResourcePtr( Json& _json, const char* _name, const ResourcePtrData& _ptr );
+        bool LoadResourcePtr( const Json& _json, const char* _name, ResourcePtrData& _outPtr );
 
         bool LoadComponentPtr( const Json& _json, const char* _name, ComponentPtrBase& _outPtr );
-        bool LoadPrefabPtr( const Json& _json, const char* _name, PrefabPtr& _outPtr );
+        void SaveComponentPtr( Json& _json, const char* _name, const ComponentPtrBase& _ptr );
 
         void SaveSlotPtr( Json& _json, const char* _name, const SlotPtr& _ptr );
         bool LoadSlotPtr( const Json& _json, const char* _name, SlotPtr& _outPtr );

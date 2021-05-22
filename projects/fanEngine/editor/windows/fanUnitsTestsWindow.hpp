@@ -35,7 +35,6 @@ namespace fan
         UnitTestResult mMeshManagerResult;
         UnitTestResult mMesh2DManagerResult;
         UnitTestResult mTextureManagerResult;
-        UnitTestResult mPrefabManagerResult;
         UnitTestResult mFontManagerResult;
         UnitTestResult mFanAssertResult;
         UnitTestResult mGlfwMouseResult;
@@ -50,6 +49,7 @@ namespace fan
         UnitTestResult mFxTransformResult;
         UnitTestResult mBitsResult;
         UnitTestResult mQueueResult;
+        UnitTestResult mResourcesManagerResult;
     };
 
     //==================================================================================================================================================================================================

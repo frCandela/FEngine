@@ -129,18 +129,16 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void MeshManager::ResolvePtr( ResourcePtr<Mesh>& _resourcePtr )
+    void MeshManager::ResolvePtr( ResourcePtrData& _resourcePtr )
     {
-        fanAssert( !_resourcePtr.IsValid() );
+        fanAssert( _resourcePtr.mResource == nullptr );
 
-        MeshPtr          & meshPtr = static_cast< MeshPtr& >( _resourcePtr );
-        const std::string& path    = meshPtr.GetPath();
-        if( !path.empty() && !Path::Extension( path ).empty() )
+        if( !_resourcePtr.mPath.empty() && !Path::Extension( _resourcePtr.mPath ).empty() )
         {
-            Mesh* mesh = GetOrLoad( meshPtr.GetPath() );
+            Mesh* mesh = GetOrLoad( _resourcePtr.mPath );
             if( mesh != nullptr )
             {
-                meshPtr = mesh;
+                _resourcePtr.mResource = mesh;
             }
         }
     }

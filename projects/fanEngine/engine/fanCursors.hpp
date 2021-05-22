@@ -1,27 +1,27 @@
-#pragma once
+#pragma  once
 
-#include "core/fanHash.hpp"
+#include "fanGlm.hpp"
+
+struct GLFWcursor;
 
 namespace fan
 {
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    #define FAN_RESOURCE( _ResourceType )                               \
-    public:                                                             \
-    template <class T> struct fanResourceInfo                           \
-    {                                                                   \
-        static constexpr const char* sName{ #_ResourceType };           \
-        static constexpr uint32_t    sType{ SSID( #_ResourceType ) };   \
-    };                                                                  \
-    using Info = fanResourceInfo< _ResourceType >
+    struct Cursor
+    {
+        void Create( uint8_t* _pixels, const glm::ivec2 _size, const glm::ivec2 _hotSpot );
+        void Destroy();
+
+        GLFWcursor* mCursor = nullptr;
+    };
 
     //==================================================================================================================================================================================================
-    // Base class for resources ( Mesh, textures etc.)
     //==================================================================================================================================================================================================
-    struct Resource
+    struct Cursors
     {
-        int         mRefCount = 0;
-        uint32_t    mGUID;
-        uint32_t    mType;
+
+
+
     };
 }

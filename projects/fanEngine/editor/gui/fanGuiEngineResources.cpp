@@ -83,11 +83,10 @@ namespace ImGui
         }
 
         // Modal set value
-        if( ImGui::FanLoadFileModal( modalName.c_str(),
-                                     fan::RenderGlobal::sImagesExtensions, sPathBuffer ) )
+        if( ImGui::FanLoadFileModal( modalName.c_str(), fan::RenderGlobal::sImagesExtensions, sPathBuffer ) )
         {
             _ptr.Init( sPathBuffer );
-            _ptr.Resolve();
+            _ptr.mData.Resolve();
             returnValue = true;
         }
 
@@ -165,77 +164,7 @@ namespace ImGui
         if( ImGui::FanLoadFileModal( modalName.c_str(), fan::RenderGlobal::sMeshExtensions, sPathBuffer ) )
         {
             _ptr.Init( sPathBuffer );
-            _ptr.Resolve();
-            returnValue = true;
-        }
-
-        ImGui::SameLine();
-        ImGui::Text( _label );
-
-        return returnValue;
-    }
-
-    //==================================================================================================================================================================================================
-    //==================================================================================================================================================================================================
-    bool FanFontPtr( const char* _label, fan::FontPtr& _ptr )
-    {
-        bool returnValue = false;
-
-        fan::Font* font = *_ptr;
-        const std::string name = ( font == nullptr ) ? "null" : fan::Path::FileName( font->mPath );
-
-        // Set button icon & modal
-        const std::string  modalName = std::string( "Find font (" ) + _label + ")";
-        static std::string sPathBuffer;
-        ImGui::PushID( _label );
-        {
-            if( ImGui::ButtonIcon( ImGui::IconType::Font16, { 16, 16 } ) )
-            {
-                _ptr        = nullptr;
-                returnValue = true;
-            }
-        }
-        ImGui::PopID();
-        ImGui::SameLine();
-
-        // name button
-        const float width = 0.6f * ImGui::GetWindowWidth() - ImGui::GetCursorPosX() + 23;
-        if( ImGui::Button( name.c_str(), ImVec2( width, 0.f ) ) )
-        {
-            ImGui::OpenPopup( modalName.c_str() );
-            if( sPathBuffer.empty() )
-            {
-                sPathBuffer = fan::Path::Normalize( fan::RenderGlobal::sFontsPath );
-            }
-        }
-        ImGui::SameLine();
-        ImGui::FanBeginDragDropSourceFont( font );
-
-        // tooltip
-        if( font != nullptr )
-        {
-            ImGui::FanToolTip( font->mPath.c_str() );
-        }
-
-        // dragndrop
-        fan::Font* fontDrop = ImGui::FanBeginDragDropTargetFont();
-        if( fontDrop )
-        {
-            _ptr        = fontDrop;
-            returnValue = true;
-        }
-
-        // Right click = clear
-        if( ImGui::IsItemClicked( 1 ) )
-        {
-            _ptr        = nullptr;
-            returnValue = true;
-        }
-
-        if( ImGui::FanLoadFileModal( modalName.c_str(), fan::RenderGlobal::sFontsExtensions, sPathBuffer ) )
-        {
-            _ptr.Init( sPathBuffer );
-            _ptr.Resolve();
+            _ptr.mData.Resolve();
             returnValue = true;
         }
 

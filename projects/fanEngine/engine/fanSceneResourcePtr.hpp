@@ -77,26 +77,7 @@ namespace fan
             return &( *( *this ) ) == _component;
         }
     };
-
-    //==================================================================================================================================================================================================
-    // holds a pointer to a prefab of the prefab resource manager
-    // can be initialized with a prefab path to be resolved later
-    //==================================================================================================================================================================================================
-    class PrefabPtr : public ResourcePtr<Prefab>
-    {
-    public:
-        PrefabPtr( Prefab* _prefab = nullptr ) : ResourcePtr<Prefab>( _prefab ) {}
-        void Init( const std::string _path ) { mPath = _path; }
-        const std::string& GetPath() const { return mPath; }
-
-        ResourcePtr& Set( Prefab* _resource )
-        {
-            SetResource( _resource );
-            return *this;
-        }
-    private:
-        std::string mPath;
-    };
 }
+
 
 

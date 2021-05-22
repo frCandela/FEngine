@@ -1,14 +1,14 @@
 #pragma once
 
 #include "core/ecs/fanEcsSingleton.hpp"
+#include "engine/fanCursors.hpp"
 
 namespace fan
 {
-    class PrefabManager;
+    class ResourceManager;
     class MeshManager;
     class Mesh2DManager;
     class TextureManager;
-    class FontManager;
     struct Mesh2D;
 
     //==================================================================================================================================================================================================
@@ -19,14 +19,14 @@ namespace fan
         static void SetInfo( EcsSingletonInfo& _info );
         static void Init( EcsWorld& _world, EcsSingleton& _singleton );
 
-        void SetupResources( PrefabManager& _prefabManager, MeshManager& _meshManager, Mesh2DManager& _mesh2DManager, TextureManager& _textureManager, FontManager& _fontManager );
+        void SetupResources( ResourceManager& _resourceManager, MeshManager& _meshManager, Mesh2DManager& _mesh2DManager, TextureManager& _textureManager );
 
-        PrefabManager * mPrefabManager  = nullptr;
-        MeshManager   * mMeshManager    = nullptr;
-        Mesh2DManager * mMesh2DManager  = nullptr;
-        TextureManager* mTextureManager = nullptr;
-        FontManager   * mFontManager    = nullptr;
+        ResourceManager * mResourceManager ;
+        MeshManager   * mMeshManager   ;
+        Mesh2DManager * mMesh2DManager ;
+        TextureManager* mTextureManager;
 
-        //std::vector<Cursor> mCursors;
+        std::vector<Cursor> mCursors;
+        Cursor* mCurrentCursor;
     };
 }

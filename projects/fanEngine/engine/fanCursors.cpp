@@ -1,27 +1,23 @@
-#pragma once
-
-#include "core/fanHash.hpp"
+#include "engine/fanCursors.hpp"
+#include "glfw/glfw3.h"
 
 namespace fan
 {
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    #define FAN_RESOURCE( _ResourceType )                               \
-    public:                                                             \
-    template <class T> struct fanResourceInfo                           \
-    {                                                                   \
-        static constexpr const char* sName{ #_ResourceType };           \
-        static constexpr uint32_t    sType{ SSID( #_ResourceType ) };   \
-    };                                                                  \
-    using Info = fanResourceInfo< _ResourceType >
+    void Cursor::Create( uint8_t* _pixels, const glm::ivec2 _size, const glm::ivec2 _hotSpot )
+    {
+        GLFWimage image;
+        image.width  = _size.x;
+        image.height = _size.y;
+        image.pixels = _pixels;
+        mCursor = glfwCreateCursor( &image, _hotSpot.x, _hotSpot.y );
+    }
 
     //==================================================================================================================================================================================================
-    // Base class for resources ( Mesh, textures etc.)
     //==================================================================================================================================================================================================
-    struct Resource
+    void Cursor::Destroy()
     {
-        int         mRefCount = 0;
-        uint32_t    mGUID;
-        uint32_t    mType;
-    };
+        glfwDestroyCursor( mCursor );
+    }
 }

@@ -23,7 +23,7 @@ namespace fan
         void Remove( const std::string& _path );
         void Clear( Device& _device );
         bool Empty() const { return mTextures.empty(); }
-        void ResolvePtr( ResourcePtr <Texture>& _resourcePtr );
+        void ResolvePtr( ResourcePtrData& _resourcePtr );
 
         bool CreateNewTextures( Device& _device );
         void DestroyRemovedTextures( Device& _device );

@@ -14,17 +14,17 @@ namespace fan
         static std::vector<TestMethod> GetTests()
         {
             return {
-                    { &UnitTestFontManager::TestAdd,             "Add" },
+                    /*{ &UnitTestFontManager::TestAdd,             "Add" },
                     { &UnitTestFontManager::TestRemove,          "Remove" },
                     { &UnitTestFontManager::TestClear,           "Clear" },
                     { &UnitTestFontManager::TestDuplicates,      "Duplicates" },
-                    { &UnitTestFontManager::TestLoadInvalidFont, "Load Invalid" },
+                    { &UnitTestFontManager::TestLoadInvalidFont, "Load Invalid" },*/
             };
         }
         void Create() override {}
         void Destroy() override {}
 
-        FontManager mFontManager;
+        /*FontManager mFontManager;
 
         void TestAdd()
         {
@@ -75,6 +75,6 @@ namespace fan
         {
             Font* font1 = mFontManager.Load( "qsdfsdfsdfsdf" );
             TEST_ASSERT( font1 == nullptr );
-        }
+        }*/
     };
 }

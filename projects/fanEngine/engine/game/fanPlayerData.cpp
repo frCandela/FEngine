@@ -81,12 +81,37 @@ namespace fan
             mLaunchSettings( _settings ),
             mApplicationShouldExit( false ),
             mWindow( _settings.mWindowName, _settings.mWindow_position, _settings.mWindow_size, _settings.mIconPath ),
-            mRenderer( mWindow, _settings.mLaunchEditor ? Renderer::ViewType::Editor : Renderer::ViewType::Game )
+            mRenderer( mWindow, mResourceManager, _settings.mLaunchEditor ? Renderer::ViewType::Editor : Renderer::ViewType::Game )
     {
         Mouse::SetCallbacks( mWindow.mWindow );
 
         mFullScreen.mWindowedPosition = mWindow.GetPosition();
         mFullScreen.mWindowedSize     = mWindow.GetSize();
+
+        if( FT_Init_FreeType( &mFreetypeLib ) )
+        {
+            Debug::Error( "Could not init FreeType Library", Debug::Type::Engine );
+        }
+
+        {
+            ResourceInfo info;
+            info.mLoad = &LoadPrefab;
+            mResourceManager.AddResourceType<Prefab>( info );
+        }
+
+        {
+            ResourceInfo info;
+            info.mLoad = &LoadFont;
+            info.mDataPtr = &mFreetypeLib;
+            mResourceManager.AddResourceType<Font>( info );
+        }
+    }
+
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    PlayerData::~PlayerData()
+    {
+        FT_Done_FreeType( mFreetypeLib );
     }
 
     //==================================================================================================================================================================================================
@@ -254,4 +279,33 @@ namespace fan
         _world.AddSingletonType<HostManager>();
         _world.AddSingletonType<SpawnManager>();
     }
+
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    Resource* PlayerData::LoadPrefab( const std::string& _path, ResourceInfo& )
+    {
+        Debug::Log() << "Loading prefab" << _path << Debug::Endl();
+        Prefab* prefab = new Prefab();
+        if( ! prefab->CreateFromFile( _path ) )
+        {
+            delete prefab;
+            return (Resource*)nullptr;
+        }
+        return prefab;
+    };
+
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    Resource* PlayerData::LoadFont( const std::string& _path, ResourceInfo& _info )
+    {
+        Debug::Log() << "Loading font " << _path << Debug::Endl();
+        FT_Library& freetypeLib = *static_cast<FT_Library*>(_info.mDataPtr);
+        Font * font = new Font( freetypeLib, _path );
+        if( !font->IsValid() )
+        {
+            delete font;
+            return nullptr;
+        }
+        return font;
+    };
 }

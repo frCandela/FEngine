@@ -1,12 +1,12 @@
 #pragma  once
 
 #include "core/ecs/fanEcsComponent.hpp"
-#include "render/fanRenderResourcePtr.hpp"
+#include "core/resources/fanResourcePtr.hpp"
+#include "render/resources/fanFont.hpp"
 
 namespace fan
 {
     struct Mesh2D;
-    class Font;
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
@@ -20,7 +20,7 @@ namespace fan
 
         std::string mText;
         Mesh2D* mMesh2D;
-        FontPtr mFontPtr;
+        ResourcePtr<Font> mFontPtr;
         int     mSize;
     };
 }

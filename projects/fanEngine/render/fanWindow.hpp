@@ -10,6 +10,8 @@
 
 namespace fan
 {
+    struct Cursor;
+
     //==================================================================================================================================================================================================
     // Abstraction of the glfw window
     //==================================================================================================================================================================================================
@@ -29,6 +31,7 @@ namespace fan
         void SetFullscreen();
         void SetWindowed( const glm::ivec2 _position, const glm::ivec2 _size );
         bool SetIcon( const std::string& _path );
+        void SetCursor( const Cursor& _cursor );
         void SetPosition( const glm::ivec2 _position );
         void SetSize( const glm::ivec2 _size );
 

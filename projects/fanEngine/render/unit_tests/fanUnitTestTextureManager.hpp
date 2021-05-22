@@ -94,9 +94,9 @@ namespace fan
             TexturePtr rscPtr;
             TEST_ASSERT( !rscPtr.IsValid() );
             rscPtr.Init( RenderGlobal::sDefaultTexture );
-            mTextureManager.ResolvePtr( rscPtr );
+            mTextureManager.ResolvePtr( rscPtr.mData );
             TEST_ASSERT( rscPtr.IsValid() );
-            TEST_ASSERT( textureDefault == rscPtr.GetResource() );
+            TEST_ASSERT( textureDefault == rscPtr.mData.mResource );
         }
 
         void TestCreate()

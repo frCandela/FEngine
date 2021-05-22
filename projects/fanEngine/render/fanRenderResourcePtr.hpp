@@ -19,7 +19,7 @@ namespace fan
 
         ResourcePtr& operator=( Texture* _resource )
         {
-            SetResource( _resource );
+            mData.mResource = _resource ;
             return *this;
         }
     private:
@@ -38,26 +38,7 @@ namespace fan
 
         ResourcePtr& operator=( Mesh* _resource )
         {
-            SetResource( _resource );
-            return *this;
-        }
-    private:
-        std::string mPath;
-    };
-
-    //==================================================================================================================================================================================================
-    //==================================================================================================================================================================================================
-    class FontPtr : public ResourcePtr<Font>
-    {
-    public:
-        FontPtr( Font* _font = nullptr ) : ResourcePtr<Font>( _font ) {}
-
-        void Init( const std::string _path ) { mPath = _path; }
-        const std::string& GetPath() const { return mPath; }
-
-        ResourcePtr& operator=( Font* _resource )
-        {
-            SetResource( _resource );
+            mData.mResource =  _resource;
             return *this;
         }
     private:

@@ -1,10 +1,10 @@
 #include "core/ecs/fanEcsSystem.hpp"
 #include "core/ecs/fanEcsWorld.hpp"
+#include "core/resources/fanResourceManager.hpp"
 #include "engine/ui/fanUITransform.hpp"
 #include "engine/ui/fanUIText.hpp"
 #include "engine/ui/fanUIRenderer.hpp"
 #include "engine/singletons/fanEngineResources.hpp"
-#include "render/resources/fanFontManager.hpp"
 #include "render/fanRenderGlobal.hpp"
 
 namespace fan
@@ -46,7 +46,7 @@ namespace fan
                 Font* font = *text.mFontPtr;
                 if( font == nullptr )
                 {
-                    font = engineResources.mFontManager->Load( RenderGlobal::sDefaultGameFont );
+                    font = engineResources.mResourceManager->Load<Font>( RenderGlobal::sDefaultGameFont );
                     text.mFontPtr = font;
                 }
                 fanAssert( font != nullptr );

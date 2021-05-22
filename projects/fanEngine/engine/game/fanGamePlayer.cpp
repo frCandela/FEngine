@@ -29,11 +29,10 @@ namespace fan
         PlayerData::EcsIncludeRender3D( world );
         PlayerData::EcsIncludeRenderUI( world );
 
-        world.GetSingleton<EngineResources>().SetupResources( mData.mPrefabManager,
+        world.GetSingleton<EngineResources>().SetupResources( mData.mResourceManager,
                                                               mData.mRenderer.mMeshManager,
                                                               mData.mRenderer.mMesh2DManager,
-                                                              mData.mRenderer.mTextureManager,
-                                                              mData.mRenderer.mFontManager );
+                                                              mData.mRenderer.mTextureManager );
 
         Application& app = world.GetSingleton<Application>();
         app.mOnQuit.Connect( &GamePlayer::Exit, this );

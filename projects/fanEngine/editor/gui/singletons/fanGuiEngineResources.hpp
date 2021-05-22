@@ -5,7 +5,8 @@
 #include "render/resources/fanMesh.hpp"
 #include "render/resources/fanMesh2D.hpp"
 #include "render/resources/fanTexture.hpp"
-#include "engine/fanPrefabManager.hpp"
+#include "engine/fanPrefab.hpp"
+#include "core/resources/fanResourceManager.hpp"
 
 namespace fan
 {
@@ -29,10 +30,11 @@ namespace fan
 
             if( ImGui::CollapsingHeader( "prefabs" ) )
             {
-                const std::map<std::string, Prefab*>& prefabs = engineResources.mPrefabManager->GetPrefabs();
-                for( auto pair : prefabs )
+                std::vector<Prefab*> prefabs;
+                engineResources.mResourceManager->Get<Prefab>( prefabs );
+                for( Prefab* prefab : prefabs )
                 {
-                    ImGui::Text( pair.second->mPath.c_str() );
+                    ImGui::Text( prefab->mPath.c_str() );
                 }
             }
 

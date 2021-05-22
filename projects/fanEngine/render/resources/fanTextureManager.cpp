@@ -101,15 +101,13 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void TextureManager::ResolvePtr( ResourcePtr<Texture>& _resourcePtr )
+    void TextureManager::ResolvePtr( ResourcePtrData& _resourcePtr )
     {
-        fanAssert( !_resourcePtr.IsValid() );
-
-        TexturePtr& texturePtr = static_cast< TexturePtr& >( _resourcePtr );
-        Texture   * texture    = GetOrLoad( texturePtr.GetPath() );
+        fanAssert( _resourcePtr.mResource == nullptr );
+        Texture* texture = GetOrLoad( _resourcePtr.mPath );
         if( texture != nullptr )
         {
-            texturePtr = texture;
+            _resourcePtr.mResource = texture;
         }
     }
 

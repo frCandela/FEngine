@@ -93,9 +93,9 @@ namespace fan
             MeshPtr rscPtr;
             TEST_ASSERT( !rscPtr.IsValid() );
             rscPtr.Init( RenderGlobal::sMeshCube );
-            mMeshManager.ResolvePtr( rscPtr );
+            mMeshManager.ResolvePtr( rscPtr.mData );
             TEST_ASSERT( rscPtr.IsValid() );
-            TEST_ASSERT( meshCube == rscPtr.GetResource() );
+            TEST_ASSERT( meshCube == rscPtr.mData.mResource );
         }
 
         void TestCreate()

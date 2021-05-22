@@ -27,7 +27,7 @@ namespace fan
 
             ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() );
             {
-                if( ImGui::FanFontPtr( "font", text.mFontPtr ) )
+                if( ImGui::FanFont( "font", text.mFontPtr ) )
                 {
                     _world.AddTag<TagUIModified>( _entity );
                 }

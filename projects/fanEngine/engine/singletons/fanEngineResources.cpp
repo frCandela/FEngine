@@ -1,28 +1,33 @@
 #include "engine/singletons/fanEngineResources.hpp"
-#include "engine/fanPrefabManager.hpp"
+#include "core/resources/fanResourceManager.hpp"
 #include "engine/fanPrefab.hpp"
 #include "render/resources/fanMesh.hpp"
 #include "render/resources/fanMesh2D.hpp"
 #include "render/resources/fanTextureManager.hpp"
 #include "render/resources/fanMesh2DManager.hpp"
 #include "render/resources/fanMeshManager.hpp"
-#include "render/resources/fanFontManager.hpp"
 #include "render/resources/fanFont.hpp"
 
 namespace fan
 {
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void EngineResources::SetInfo( EcsSingletonInfo& /*_info*/ )
+    void EngineResources::SetInfo( EcsSingletonInfo& _info )
     {
+        _info.mFlags |= EcsSingletonFlags::InitOnce;
     }
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
     void EngineResources::Init( EcsWorld& /*_world*/, EcsSingleton& _singleton )
     {
-        EngineResources& sceneResources = static_cast<EngineResources&>( _singleton );
-        (void)sceneResources;
+        EngineResources& resources = static_cast<EngineResources&>( _singleton );
+        resources.mResourceManager  = nullptr;
+        resources.mMeshManager    = nullptr;
+        resources.mMesh2DManager  = nullptr;
+        resources.mTextureManager = nullptr;
+        resources.mCursors.clear();
+        resources.mCurrentCursor = nullptr;
     }
 
     //==================================================================================================================================================================================================
@@ -44,24 +49,23 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void EngineResources::SetupResources( PrefabManager& _prefabManager, MeshManager& _meshManager, Mesh2DManager& _mesh2DManager, TextureManager& _textureManager, FontManager& _fontManager )
+    void EngineResources::SetupResources( ResourceManager& _resourceManager, MeshManager& _meshManager, Mesh2DManager& _mesh2DManager, TextureManager& _textureManager )
     {
-        ResourcePtr<Prefab>::sOnResolve.Connect( &PrefabManager::ResolvePtr, &_prefabManager );
+        ResourcePtr<Prefab>::sOnResolve.Connect( &ResourceManager::ResolvePtr, &_resourceManager );
+        ResourcePtr<Font>::sOnResolve.Connect( &ResourceManager::ResolvePtr, &_resourceManager );
         ResourcePtr<Mesh>::sOnResolve.Connect( &MeshManager::ResolvePtr, &_meshManager );
         ResourcePtr<Texture>::sOnResolve.Connect( &TextureManager::ResolvePtr, &_textureManager );
-        ResourcePtr<Font>::sOnResolve.Connect( &FontManager::ResolvePtr, &_fontManager );
 
-        _fontManager.Load( RenderGlobal::sDefaultGameFont );
+        _resourceManager.Load<Font>( RenderGlobal::sDefaultGameFont );
 
         _meshManager.Load( RenderGlobal::sDefaultMesh );
         Mesh2D* quad2D = CreateMesh2DQuad();
         _mesh2DManager.Add( quad2D, RenderGlobal::sMesh2DQuad );
         _textureManager.Load( RenderGlobal::sWhiteTexture );
 
-        mPrefabManager  = &_prefabManager;
+        mResourceManager  = &_resourceManager;
         mMeshManager    = &_meshManager;
         mMesh2DManager  = &_mesh2DManager;
         mTextureManager = &_textureManager;
-        mFontManager    = &_fontManager;
     }
 }

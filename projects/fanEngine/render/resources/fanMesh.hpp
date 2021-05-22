@@ -2,7 +2,6 @@
 
 #include "core/shapes/fanConvexHull.hpp"
 #include "core/resources/fanResource.hpp"
-#include "core/resources/fanResource.hpp"
 #include "render/fanVertex.hpp"
 #include "render/core/fanBuffer.hpp"
 #include "render/core/fanSwapChain.hpp"
@@ -38,6 +37,8 @@ namespace fan
     //==================================================================================================================================================================================================
     struct Mesh : public Resource
     {
+        FAN_RESOURCE( Mesh );
+
         bool RayCast( const Vector3 _origin, const Vector3 _dir, Vector3& _outIntersection ) const;
         bool LoadFromFile( const std::string& _path );
 

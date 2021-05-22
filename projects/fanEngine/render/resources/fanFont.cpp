@@ -18,7 +18,7 @@ namespace fan
     {
         if( FT_New_Face( _ftLib, Path::Normalize( _path ).c_str(), 0, &mFace ) )
         {
-            Debug::Error() << "Freetype: Failed to load font " << _path << Debug::Endl();
+           Debug::Error() << "Freetype: Failed to load font " << _path << Debug::Endl();
             return;
         }
 

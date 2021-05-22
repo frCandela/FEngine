@@ -11,7 +11,7 @@
 #include "engine/singletons/fanRenderWorld.hpp"
 #include "engine/singletons/fanEngineResources.hpp"
 #include "engine/singletons/fanEngineResources.hpp"
-#include "engine/fanPrefabManager.hpp"
+#include "core/resources/fanResourceManager.hpp"
 #include "engine/fanPrefab.hpp"
 #include "editor/fanDragnDrop.hpp"
 
@@ -39,7 +39,7 @@ namespace fan
         RenderWindow& renderWindow = static_cast<RenderWindow&>( _singleton );
 
         SCOPED_PROFILE( render );
-        
+
         const EngineResources& engineResources = _world.GetSingleton<EngineResources>();
 
         ImGui::Icon( ImGui::Renderer16, { 16, 16 } );
@@ -68,7 +68,7 @@ namespace fan
             for( Texture* tex : engineResources.mTextureManager->GetTextures() )
             {
                 ImGui::Text( "ref: %d size: %u x %u name: %s",
-                             tex->GetRefCount(),
+                             tex->mRefCount,
                              tex->mExtent.width,
                              tex->mExtent.height,
                              tex->mPath.c_str() );
@@ -78,7 +78,9 @@ namespace fan
 
         if( ImGui::CollapsingHeader( "Loaded fonts : " ) )
         {
-            for( Font* font : engineResources.mFontManager->GetFonts() )
+            std::vector<Font*> fonts;
+            engineResources.mResourceManager->Get<Font>( fonts );
+            for( Font* font : fonts )
             {
                 ImGui::Text( font->mPath.c_str() );
                 ImGui::FanBeginDragDropSourceFont( font, ImGuiDragDropFlags_SourceAllowNullID );
@@ -88,9 +90,11 @@ namespace fan
         // Display mesh list
         if( ImGui::CollapsingHeader( "Loaded prefabs : " ) )
         {
-            for( const auto pair : engineResources.mPrefabManager->GetPrefabs() )
+            std::vector<Prefab*> prefabs;
+            engineResources.mResourceManager->Get<Prefab>( prefabs );
+            for( const Prefab* prefab : prefabs )
             {
-                ImGui::Text( "ref: %d name: %s", pair.second->GetRefCount(), pair.second->mPath.c_str() );
+                ImGui::Text( "ref: %d name: %s", prefab->mRefCount, prefab->mPath.c_str() );
             }
         }
 

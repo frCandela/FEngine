@@ -7,7 +7,6 @@
 #include "render/unit_tests/fanUnitTestMesh2DManager.hpp"
 #include "render/unit_tests/fanUnitTestTextureManager.hpp"
 #include "render/unit_tests/fanUnitTestFontManager.hpp"
-#include "engine/unit_tests/fanUnitTestPrefabManager.hpp"
 #include "engine/unit_tests/fanUnitTestMouse.hpp"
 #include "core/unit_tests/fanUnitTestSignal.hpp"
 #include "core/unit_tests/fanUnitTestEcs.hpp"
@@ -18,6 +17,7 @@
 #include "core/unit_tests/fanUnitTestMatrix4.hpp"
 #include "core/unit_tests/fanUnitTestQuaternion.hpp"
 #include "core/unit_tests/fanUnitTestBits.hpp"
+#include "core/unit_tests/fanUnitTestResourceManager.hpp"
 #include "engine/unit_tests/fanUnitTestFxTransform.hpp"
 #include "core/unit_tests/fanUnitTestQueue.hpp"
 
@@ -33,6 +33,34 @@ namespace fan
     {
         UnitTestsWindow& unitTestsWindow = static_cast<UnitTestsWindow&>( _singleton );
         (void)unitTestsWindow;
+    }
+
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    std::vector<UnitTestsWindow::TestArgument> UnitTestsWindow::GetTests()
+    {
+        return {
+                { "Mesh manager", &UnitTestMeshManager::RunTests, mMeshManagerResult },
+                { "Mesh2D manager", &UnitTestMesh2DManager::RunTests, mMesh2DManagerResult },
+                { "Texture manager", &UnitTestTextureManager::RunTests, mTextureManagerResult },
+                { "Font manager", &UnitTestFontManager::RunTests, mFontManagerResult },
+#ifndef NDEBUG
+                { "fanAssert", &UnitTestFanAssert::RunTests, mFanAssertResult },
+#endif
+                { "Mouse", &UnitTestMouse::RunTests, mGlfwMouseResult },
+                { "Signal", &UnitTestSignal::RunTests, mSignalResult },
+                { "Ecs", &UnitTestEcs::RunTests, mEcsResult },
+                { "Path", &UnitTestPath::RunTests, mPathResult },
+                { "FixedPoint", &UnitTestFixedPoint::RunTests, mFixedPointResult },
+                { "Vector3", &UnitTestVector3::RunTests, mVector3Result },
+                { "Matrix3", &UnitTestMatrix3::RunTests, mMatrix3Result },
+                { "Matrix4", &UnitTestMatrix4::RunTests, mMatrix4Result },
+                { "Quaternion", &UnitTestQuaternion::RunTests, mQuaternionResult },
+                { "FxTransform", &UnitTestFxTransform::RunTests, mFxTransformResult },
+                { "Bits", &UnitTestBits::RunTests, mBitsResult },
+                { "Queue", &UnitTestQueue::RunTests, mQueueResult },
+                { "Resource manager", &UnitTestResourceManager::RunTests, mResourcesManagerResult },
+        };
     }
 
     //==================================================================================================================================================================================================
@@ -71,34 +99,6 @@ namespace fan
 #endif
         ImGui::Spacing();
         for( const TestArgument& testArgument : tests ){ UnitTestsWindow::DrawUnitTest( testArgument ); }
-    }
-
-    //==================================================================================================================================================================================================
-    //==================================================================================================================================================================================================
-    std::vector<UnitTestsWindow::TestArgument> UnitTestsWindow::GetTests()
-    {
-        return {
-                { "Mesh manager", &UnitTestMeshManager::RunTests, mMeshManagerResult },
-                { "Mesh2D manager", &UnitTestMesh2DManager::RunTests, mMesh2DManagerResult },
-                { "Texture manager", &UnitTestTextureManager::RunTests, mTextureManagerResult },
-                { "Prefab manager", &UnitTestPrefabManager::RunTests, mPrefabManagerResult },
-                { "Font manager", &UnitTestFontManager::RunTests, mFontManagerResult },
-#ifndef NDEBUG
-                { "fanAssert", &UnitTestFanAssert::RunTests, mFanAssertResult },
-#endif
-                { "Mouse", &UnitTestMouse::RunTests, mGlfwMouseResult },
-                { "Signal", &UnitTestSignal::RunTests, mSignalResult },
-                { "Ecs", &UnitTestEcs::RunTests, mEcsResult },
-                { "Path", &UnitTestPath::RunTests, mPathResult },
-                { "FixedPoint", &UnitTestFixedPoint::RunTests, mFixedPointResult },
-                { "Vector3", &UnitTestVector3::RunTests, mVector3Result },
-                { "Matrix3", &UnitTestMatrix3::RunTests, mMatrix3Result },
-                { "Matrix4", &UnitTestMatrix4::RunTests, mMatrix4Result },
-                { "Quaternion", &UnitTestQuaternion::RunTests, mQuaternionResult },
-                { "FxTransform", &UnitTestFxTransform::RunTests, mFxTransformResult },
-                { "Bits", &UnitTestBits::RunTests, mBitsResult },
-                { "Queue", &UnitTestQueue::RunTests, mQueueResult },
-        };
     }
 
     //==================================================================================================================================================================================================

@@ -1,82 +1,71 @@
-#include "engine/fanPrefabManager.hpp"
-
-#include "engine/fanSceneResourcePtr.hpp"
+#include "core/resources/fanResourceManager.hpp"
 
 namespace fan
 {
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    PrefabManager::~PrefabManager() { Clear(); }
-
-    //==================================================================================================================================================================================================
-    //==================================================================================================================================================================================================
-    Prefab* PrefabManager::Get( const std::string& _path )
+    Resource* ResourceManager::Load( const uint32_t _type, const std::string& _path )
     {
-        auto it = mPrefabs.find( _path );
-        return it != mPrefabs.end() ? it->second : nullptr;
+        ResourceInfo& info = mResourceInfos[_type];
+        fanAssert( info.mLoad != nullptr );
+        Resource* resource = ( *info.mLoad )( _path, info );
+        if( resource != nullptr )
+        {
+            resource->mGUID = DSID( _path.c_str() );
+            resource->mType = _type;
+            fanAssert( mResources.find( resource->mGUID ) == mResources.end() );
+            mResources[resource->mGUID] = resource;
+            info.mCount++;
+        }
+        return resource;
     }
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    Prefab* PrefabManager::Load( const std::string& _path )
+    Resource* ResourceManager::Get( const uint32_t _type, const uint32_t _guid ) const
     {
-        if( _path.empty() ){ return nullptr; }
-
-        Prefab* prefab = Get( _path );
-        if( prefab != nullptr )
+        auto it = mResources.find( _guid );
+        if( it != mResources.end() )
         {
-            return prefab;
+            Resource* resource = it->second;
+            fanAssert( resource->mType == _type );
+            return resource;
         }
-        else
-        {
-            // Load
-            prefab = new Prefab();
-            if( prefab->CreateFromFile( _path ) )
-            {
-                mPrefabs[_path] = prefab;
-                return prefab;
-            }
-            delete prefab;
-            return nullptr;
-        }
+        return nullptr;
     }
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void PrefabManager::Remove( const std::string& _path )
+    Resource* ResourceManager::GetOrLoad( const uint32_t _type, const std::string& _path )
     {
-        auto it = mPrefabs.find( _path );
-        if( it != mPrefabs.end() )
+        Resource* resource = Get( _type, DSID( _path.c_str() ) );
+        if( resource == nullptr )
         {
-            delete it->second;
-            mPrefabs.erase( it );
+            return Load( _type, _path );
         }
+        return resource;
     }
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void PrefabManager::ResolvePtr( ResourcePtr<Prefab>& _resourcePtr )
+    void ResourceManager::ResolvePtr( ResourcePtrData& _resourcePtrData )
     {
-        fanAssert( !_resourcePtr.IsValid() );
-
-        PrefabPtr& prefabPtr = static_cast< PrefabPtr& >( _resourcePtr );
-        Prefab   * prefab    = Load( prefabPtr.GetPath() );
-
-        if( prefab != nullptr )
-        {
-            prefabPtr.Set( prefab );
-        }
+        _resourcePtrData.mResource = GetOrLoad( _resourcePtrData.mType, _resourcePtrData.mPath );
     }
 
     //==================================================================================================================================================================================================
-    // Deletes all cached prefabs
     //==================================================================================================================================================================================================
-    void PrefabManager::Clear()
+    void ResourceManager::Clear()
     {
-        for( auto pair : mPrefabs )
+        for( auto pair : mResources )
         {
             delete pair.second;
         }
-        mPrefabs.clear();
+        mResources.clear();
+
+        for( auto& pair : mResourceInfos )
+        {
+            pair.second.mCount = 0;
+        }
     }
 }

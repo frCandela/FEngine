@@ -13,8 +13,10 @@ namespace fan
     //==================================================================================================================================================================================================
     // like an Image but generated from a png file
     //==================================================================================================================================================================================================
-    struct Texture : public Resource
+    struct Texture : Resource
     {
+        FAN_RESOURCE(Texture);
+
         VkImage        mImage     = VK_NULL_HANDLE;
         VkImageView    mImageView = VK_NULL_HANDLE;
         VkDeviceMemory mMemory    = VK_NULL_HANDLE;

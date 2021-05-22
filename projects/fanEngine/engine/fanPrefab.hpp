@@ -15,6 +15,8 @@ namespace fan
     class Prefab : public Resource
     {
     public:
+        FAN_RESOURCE(Prefab);
+
         bool CreateFromJson( const Json& _json );
         bool CreateFromFile( const std::string& _path );
         void CreateFromSceneNode( const SceneNode& _node );

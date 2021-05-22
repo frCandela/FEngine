@@ -18,6 +18,8 @@ namespace fan
     class Font : public Resource
     {
     public:
+        FAN_RESOURCE( Font );
+
         struct Glyph
         {
             glm::ivec2 mUVPos;   // pixels

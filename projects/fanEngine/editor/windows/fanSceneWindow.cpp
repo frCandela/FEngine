@@ -7,7 +7,7 @@
 #include "render/resources/fanTextureManager.hpp"
 #include "render/resources/fanMeshManager.hpp"
 #include "engine/singletons/fanEngineResources.hpp"
-#include "engine/fanPrefabManager.hpp"
+#include "core/resources/fanResourceManager.hpp"
 #include "engine/singletons/fanEngineResources.hpp"
 #include "engine/singletons/fanScene.hpp"
 #include "engine/fanPrefab.hpp"
@@ -422,7 +422,7 @@ namespace fan
         if( ImGui::FanLoadFileModal( "import_prefab", RenderGlobal::sPrefabExtensions, mPathBuffer ) )
         {
             EngineResources& engineResources = _world.GetSingleton<EngineResources>();
-            Prefab        * prefab           = engineResources.mPrefabManager->Load( mPathBuffer );
+            Prefab        * prefab           = engineResources.mResourceManager->GetOrLoad<Prefab>( mPathBuffer );
             if( prefab != nullptr )
             {
                 prefab->Instantiate( *mLastSceneNodeRightClicked );
@@ -448,7 +448,7 @@ namespace fan
             {
                 // Try to update the existing prefab if it exists
                 EngineResources& engineRes = _world.GetSingleton<EngineResources>();
-                Prefab        * prefab     = engineRes.mPrefabManager->Get( Path::MakeRelative( mPathBuffer ) );
+                Prefab        * prefab     = engineRes.mResourceManager->Get<Prefab>( Path::MakeRelative( mPathBuffer ) );
                 if( prefab != nullptr )
                 {
                     prefab->CreateFromSceneNode( *mLastSceneNodeRightClicked );

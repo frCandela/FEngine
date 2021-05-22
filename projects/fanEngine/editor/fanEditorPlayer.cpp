@@ -99,11 +99,15 @@ namespace fan
             EditorSettings& editorSerializedValues = world.GetSingleton<EditorSettings>();
             editorSerializedValues.mData = &mEditorSettings;
 
-            world.GetSingleton<EngineResources>().SetupResources( mData.mPrefabManager,
+            world.GetSingleton<EngineResources>().SetupResources( mData.mResourceManager,
                                                                   mData.mRenderer.mMeshManager,
                                                                   mData.mRenderer.mMesh2DManager,
-                                                                  mData.mRenderer.mTextureManager,
-                                                                  mData.mRenderer.mFontManager );
+                                                                  mData.mRenderer.mTextureManager);
+            Cursor cursor;
+            unsigned char pixels[16 * 16 * 4];
+            memset(pixels, 0xff, sizeof(pixels));
+            cursor.Create(pixels, {16,16}, {0,0});
+            mData.mWindow.SetCursor( cursor );
 
             RenderWorld& renderWorld = world.GetSingleton<RenderWorld>();
             renderWorld.mIsHeadless = ( &game != &GetCurrentGame() );
