@@ -17,26 +17,24 @@ namespace fan
             mWindow( _window ),
             mResourceManager( _resourceManager ),
             mDevice( _window.mDevice ),
-            mViewType( _viewType )
+            mViewType( _viewType ) {}
+
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    void Renderer::Create()
     {
         const uint32_t imagesCount = mWindow.mSwapchain.mImagesCount;
         mGameExtent = mWindow.mSwapchain.mExtent;
-        RenderPass& finalRenderPass = ( mViewType == ViewType::Editor
-                ? mRenderPassImgui
-                : mRenderPassPostprocess );
+        RenderPass& finalRenderPass = ( mViewType == ViewType::Editor ? mRenderPassImgui : mRenderPassPostprocess );
 
         CreateRenderPasses();
 
         mSamplerGameColor.Create( mDevice, 0, 1.f, VK_FILTER_LINEAR );
         mSamplerPostprocessColor.Create( mDevice, 0, 1.f, VK_FILTER_LINEAR );
         CreateFramebuffers( mWindow.mSwapchain.mExtent );
-        mFramebuffersSwapchain.CreateForSwapchain( mDevice,
-                                                   imagesCount,
-                                                   mWindow.mSwapchain.mExtent,
-                                                   finalRenderPass,
-                                                   mWindow.mSwapchain.mImageViews );
+        mFramebuffersSwapchain.CreateForSwapchain( mDevice, imagesCount, mWindow.mSwapchain.mExtent, finalRenderPass, mWindow.mSwapchain.mImageViews );
 
-        mTextureManager.CreateNewTextures( mDevice );
+        BuildNewTextures( mDevice );
         CreateTextureDescriptor();
         CreateShaders();
 
@@ -58,7 +56,7 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    Renderer::~Renderer()
+    void Renderer::Destroy()
     {
         vkDeviceWaitIdle( mDevice.mDevice );
 
@@ -71,7 +69,7 @@ namespace fan
 
         mMeshManager.Clear( mDevice );
         mMesh2DManager.Clear( mDevice );
-        mTextureManager.Clear( mDevice );
+        ClearDestroyedTextures( mDevice );
         mDescriptorTextures.Destroy( mDevice );
 
         DestroyShaders();
@@ -148,34 +146,13 @@ namespace fan
         const PipelineConfig modelsPipelineConfig                = mDrawModels.GetPipelineConfig( mDescriptorTextures );
         const PipelineConfig uiPipelineConfig                    = mDrawUI.GetPipelineConfig( mDescriptorTextures );
 
-        mDrawDebug.mPipelineLines.Create( mDevice,
-                                          debugLinesPipelineConfig,
-                                          mGameExtent,
-                                          mRenderPassGame.mRenderPass );
-        mDrawDebug.mPipelineLinesNDT.Create( mDevice,
-                                             debugLinesNoDepthTestPipelineConfig,
-                                             mGameExtent,
-                                             mRenderPassGame.mRenderPass );
-        mDrawDebug.mPipelineTriangles.Create( mDevice,
-                                              debugTrianglesPipelineConfig,
-                                              mGameExtent,
-                                              mRenderPassGame.mRenderPass );
-        mDrawModels.mPipeline.Create( mDevice,
-                                      modelsPipelineConfig,
-                                      mGameExtent,
-                                      mRenderPassGame.mRenderPass );
-        mDrawDebug.mPipelineLines2D.Create( mDevice,
-                                            debugLines2DPipelineConfig,
-                                            mGameExtent,
-                                            mRenderPassPostprocess.mRenderPass );
-        mDrawUI.mPipeline.Create( mDevice,
-                                  uiPipelineConfig,
-                                  mGameExtent,
-                                  mRenderPassPostprocess.mRenderPass );
-        mDrawPostprocess.mPipeline.Create( mDevice,
-                                           ppPipelineConfig,
-                                           mGameExtent,
-                                           mRenderPassPostprocess.mRenderPass );
+        mDrawDebug.mPipelineLines.Create( mDevice, debugLinesPipelineConfig, mGameExtent, mRenderPassGame.mRenderPass );
+        mDrawDebug.mPipelineLinesNDT.Create( mDevice, debugLinesNoDepthTestPipelineConfig, mGameExtent, mRenderPassGame.mRenderPass );
+        mDrawDebug.mPipelineTriangles.Create( mDevice, debugTrianglesPipelineConfig, mGameExtent, mRenderPassGame.mRenderPass );
+        mDrawModels.mPipeline.Create( mDevice, modelsPipelineConfig, mGameExtent, mRenderPassGame.mRenderPass );
+        mDrawDebug.mPipelineLines2D.Create( mDevice, debugLines2DPipelineConfig, mGameExtent, mRenderPassPostprocess.mRenderPass );
+        mDrawUI.mPipeline.Create( mDevice, uiPipelineConfig, mGameExtent, mRenderPassPostprocess.mRenderPass );
+        mDrawPostprocess.mPipeline.Create( mDevice, ppPipelineConfig, mGameExtent, mRenderPassPostprocess.mRenderPass );
     }
 
     //==================================================================================================================================================================================================
@@ -229,11 +206,11 @@ namespace fan
 
             mMeshManager.DestroyRemovedMeshes( mDevice );
             mMesh2DManager.DestroyRemovedMeshes( mDevice );
-            mTextureManager.DestroyRemovedTextures( mDevice );
+            ClearDestroyedTextures( mDevice );
 
             mMeshManager.CreateNewMeshes( mDevice );
             mMesh2DManager.CreateNewMeshes( mDevice );
-            textureCreated = mTextureManager.CreateNewTextures( mDevice );
+            textureCreated = BuildNewTextures( mDevice );
         }
 
         ImGui::GetIO().DisplaySize = ImVec2( static_cast< float >( mWindow.mSwapchain.mExtent.width ),
@@ -337,6 +314,34 @@ namespace fan
         mDrawModels.UpdateUniformBuffers( _device, _index );
         mDrawDebug.UpdateUniformBuffers( _device, _index );
         mDrawUI.UpdateUniformBuffers( _device, _index );
+    }
+
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    bool Renderer::BuildNewTextures( Device& _device )
+    {
+        bool                  textureCreated = false;
+        std::vector<Texture*> textures;
+        mResourceManager.GetDirtyList<Texture>( textures );
+        for( Texture* texture : textures )
+        {
+            texture->Create( _device );
+            textureCreated = true;
+        }
+        return textureCreated;
+    }
+
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    void Renderer::ClearDestroyedTextures( Device& _device )
+    {
+        std::vector<Texture*> destroyedTexture;
+        mResourceManager.GetDestroyList<Texture>( destroyedTexture );
+        for( Texture* texture : destroyedTexture )
+        {
+            texture->Destroy( _device );
+            delete texture;
+        }
     }
 
     //==================================================================================================================================================================================================
@@ -743,11 +748,13 @@ namespace fan
     //==================================================================================================================================================================================================
     void Renderer::CreateTextureDescriptor()
     {
-        const std::vector<Texture*>& textures = mTextureManager.GetTextures();
+        std::vector<Texture*> textures;
+        mResourceManager.Get<Texture>( textures );
         std::vector<VkImageView> imageViews( textures.size() );
-        for( int                 i            = 0; i < (int)textures.size(); i++ )
+        for( int                 i = 0; i < (int)textures.size(); i++ )
         {
             imageViews[i] = textures[i]->mImageView;
+            textures[i]->mIndex = i;
         }
         mDescriptorTextures.Destroy( mDevice );
         mDescriptorTextures.Create( mDevice, imageViews.data(), static_cast<uint32_t>( imageViews.size() ) );

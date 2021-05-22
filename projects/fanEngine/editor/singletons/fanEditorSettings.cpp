@@ -116,7 +116,7 @@ namespace fan
     //==================================================================================================================================================================================================
     void EditorSettingsData::SaveJsonToDisk( Json& _json )
     {
-        Debug::Log( "Saving editor settings to disk" );
+        Debug::Log( "Saving editor settings" );
         std::ofstream outFile( sJsonPath );
         fanAssert( outFile.is_open() );
         outFile << _json;

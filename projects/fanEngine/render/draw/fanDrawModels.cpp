@@ -4,6 +4,7 @@
 #include "core/fanDebug.hpp"
 #include "render/fanVertex.hpp"
 #include "render/resources/fanMesh.hpp"
+#include "render/resources/fanTexture.hpp"
 #include "render/core/fanRenderPass.hpp"
 #include "render/core/fanFrameBuffer.hpp"
 
@@ -139,7 +140,7 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void DrawModels::RecordCommandBuffer( const size_t _index, RenderPass& _renderPass, FrameBuffer& _framebuffer, VkExtent2D _extent, DescriptorImages& _descriptorTextures )
+    void DrawModels::RecordCommandBuffer( const size_t _index, RenderPass& _renderPass, FrameBuffer& _framebuffer, VkExtent2D _extent, DescriptorImages& _descriptorImages )
     {
         VkCommandBuffer                commandBuffer                = mCommandBuffers.mBuffers[_index];
         VkCommandBufferInheritanceInfo commandBufferInheritanceInfo = CommandBuffer::GetInheritanceInfo(
@@ -160,7 +161,8 @@ namespace fan
                 Buffer& buffer = subMesh.mVertexBuffer[subMesh.mCurrentBuffer];
                 if( buffer.mBuffer == VK_NULL_HANDLE ){ continue; }
 
-                BindTexture( commandBuffer, drawData.mTextureIndex, mDescriptorSampler, _descriptorTextures, mPipeline.mPipelineLayout );
+                const uint32_t textureIndex = drawData.mTexture == nullptr ? 0 : drawData.mTexture->mIndex;
+                BindTexture( commandBuffer, textureIndex, mDescriptorSampler, _descriptorImages, mPipeline.mPipelineLayout );
                 BindDescriptors( commandBuffer, _index, meshIndex );
                 VkDeviceSize offsets[] = { 0 };
 
@@ -182,10 +184,7 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void DrawModels::SetDrawData(
-            Device& _device,
-            const uint32_t _imagesCount,
-            const std::vector<RenderDataModel>& _drawData )
+    void DrawModels::SetDrawData( Device& _device, const uint32_t _imagesCount, const std::vector<RenderDataModel>& _drawData )
     {
         if( _drawData.size() > mDrawData.capacity() )
         {
@@ -219,7 +218,7 @@ namespace fan
             mUniforms.mDynamicUniformsMaterial[dataIndex].mShininess = data.mShininess;
 
             // Mesh
-            mDrawData.push_back( { data.mMesh, data.mTextureIndex } );
+            mDrawData.push_back( { data.mMesh, data.mTexture } );
         }
     }
 
@@ -260,17 +259,16 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void DrawModels::BindTexture(
-            VkCommandBuffer _commandBuffer,
-            const uint32_t _textureIndex,
-            DescriptorSampler& _descriptorSampler,
-            DescriptorImages& _descriptorTextures,
-            VkPipelineLayout _pipelineLayout )
+    void DrawModels::BindTexture( VkCommandBuffer _commandBuffer,
+                                  const uint32_t _textureIndex,
+                                  DescriptorSampler& _descriptorSampler,
+                                  DescriptorImages& _descriptorImages,
+                                  VkPipelineLayout _pipelineLayout )
     {
-        fanAssert( _textureIndex < _descriptorTextures.mDescriptorSets.size() );
+        fanAssert( _textureIndex < _descriptorImages.mDescriptorSets.size() );
 
         std::vector<VkDescriptorSet> descriptors = {
-                _descriptorTextures.mDescriptorSets[_textureIndex], _descriptorSampler.mDescriptorSet
+                _descriptorImages.mDescriptorSets[_textureIndex], _descriptorSampler.mDescriptorSet
         };
 
         vkCmdBindDescriptorSets( _commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipelineLayout, 1,

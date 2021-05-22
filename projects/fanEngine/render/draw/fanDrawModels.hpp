@@ -14,17 +14,18 @@
 namespace fan
 {
     struct SubMesh;
+    struct Texture;
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
     struct RenderDataModel
     {
-        SubMesh* mMesh;
+        SubMesh*  mMesh;
+        Texture*  mTexture;
         glm::mat4 mModelMatrix;
         glm::mat4 mNormalMatrix;
         glm::vec4 mColor;
         uint32_t  mShininess;
-        uint32_t  mTextureIndex;
     };
 
     //==================================================================================================================================================================================================
@@ -136,7 +137,7 @@ namespace fan
     struct DrawData
     {
         SubMesh* mMesh;
-        uint32_t mTextureIndex;
+        Texture* mTexture;
     };
 
     struct RenderPass;
@@ -160,23 +161,11 @@ namespace fan
 
         void Create( Device& _device, uint32_t _imagesCount );
         void Destroy( Device& _device );
-        void BindDescriptors( VkCommandBuffer _commandBuffer,
-                              const size_t _indexFrame,
-                              const uint32_t _indexOffset );
+        void BindDescriptors( VkCommandBuffer _commandBuffer, const size_t _indexFrame, const uint32_t _indexOffset );
         void UpdateUniformBuffers( Device& _device, const size_t _index );
-        void RecordCommandBuffer( const size_t _index,
-                                  RenderPass& _renderPass,
-                                  FrameBuffer& _framebuffer,
-                                  VkExtent2D _extent,
-                                  DescriptorImages& _descriptorTextures );
-        void BindTexture( VkCommandBuffer _commandBuffer,
-                          const uint32_t _textureIndex,
-                          DescriptorSampler& _descriptorSampler,
-                          DescriptorImages& _descriptorTextures,
-                          VkPipelineLayout _pipelineLayout );
-        void SetDrawData( Device& _device,
-                          const uint32_t _imagesCount,
-                          const std::vector<RenderDataModel>& _drawData );
+        void RecordCommandBuffer( const size_t _index, RenderPass& _renderPass, FrameBuffer& _framebuffer, VkExtent2D _extent, DescriptorImages& _descriptorImages );
+        void BindTexture( VkCommandBuffer _commandBuffer, const uint32_t _textureIndex, DescriptorSampler& _descriptorSampler, DescriptorImages& _descriptorImages, VkPipelineLayout _pipelineLayout );
+        void SetDrawData( Device& _device, const uint32_t _imagesCount, const std::vector<RenderDataModel>& _drawData );
         void SetPointLights( const std::vector<RenderDataPointLight>& _lightData );
         void SetDirectionalLights( const std::vector<RenderDataDirectionalLight>& _lightData );
         PipelineConfig GetPipelineConfig( DescriptorImages& _imagesDescriptor ) const;

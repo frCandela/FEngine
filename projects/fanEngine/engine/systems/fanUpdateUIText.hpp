@@ -54,7 +54,7 @@ namespace fan
                 const Font::Atlas* atlas             = font->FindAtlas( text.mSize );
                 if( atlas == nullptr )
                 {
-                    atlas = font->GenerateAtlas( *engineResources.mTextureManager, text.mSize );
+                    atlas = font->GenerateAtlas( *engineResources.mResourceManager, text.mSize );
                     fanAssert( atlas != nullptr );
                 }
 

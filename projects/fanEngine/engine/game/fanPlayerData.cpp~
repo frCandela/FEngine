@@ -101,7 +101,7 @@ namespace fan
 
         {
             ResourceInfo info;
-            info.mLoad    = &LoadFont;
+            info.mLoad = &LoadFont;
             info.mDataPtr = &mFreetypeLib;
             mResources.AddResourceType<Font>( info );
         }
@@ -109,7 +109,7 @@ namespace fan
         {
             ResourceInfo info;
             info.mLoad           = &LoadTexture;
-            info.mUseDirtyList   = true;
+            info.mUseOutdatedList = true;
             info.mUseDestroyList = true;
             mResources.AddResourceType<Texture>( info );
         }
@@ -300,7 +300,7 @@ namespace fan
     {
         Debug::Log() << "Loading prefab" << _path << Debug::Endl();
         Prefab* prefab = new Prefab();
-        if( !prefab->CreateFromFile( _path ) )
+        if( ! prefab->CreateFromFile( _path ) )
         {
             delete prefab;
             return nullptr;
@@ -314,7 +314,7 @@ namespace fan
     {
         Debug::Log() << "Loading font " << _path << Debug::Endl();
         FT_Library& freetypeLib = *static_cast<FT_Library*>(_info.mDataPtr);
-        Font      * font        = new Font( freetypeLib, _path );
+        Font * font = new Font( freetypeLib, _path );
         if( !font->IsValid() )
         {
             delete font;
@@ -329,7 +329,7 @@ namespace fan
     {
         Debug::Log() << "Loading texture " << _path << Debug::Endl();
         Texture* texture = new Texture();
-        if( !texture->LoadFromFile( _path ) )
+        if( ! texture->LoadFromFile( _path ) )
         {
             delete texture;
             return nullptr;

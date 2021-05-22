@@ -19,14 +19,14 @@ namespace fan
     struct PlayerData
     {
         PlayerData( const LaunchSettings& _settings );
-        ~PlayerData();
+        void Destroy();
 
         Signal<>             mOnLPPSynch;
         const LaunchSettings mLaunchSettings;
         bool                 mApplicationShouldExit;
         Window               mWindow;
         Renderer             mRenderer;
-        ResourceManager      mResourceManager;
+        ResourceManager      mResources;
         FullScreen           mFullScreen;
         FT_Library           mFreetypeLib;
 
@@ -42,5 +42,6 @@ namespace fan
     private:
         static Resource* LoadPrefab( const std::string& _path, ResourceInfo& _info );
         static Resource* LoadFont( const std::string& _path, ResourceInfo& _info );
+        static Resource* LoadTexture( const std::string& _path, ResourceInfo& _info );
     };
 }

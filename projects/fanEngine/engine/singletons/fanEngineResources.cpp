@@ -3,7 +3,6 @@
 #include "engine/resources/fanPrefab.hpp"
 #include "render/resources/fanMesh.hpp"
 #include "render/resources/fanMesh2D.hpp"
-#include "render/resources/fanTextureManager.hpp"
 #include "render/resources/fanMesh2DManager.hpp"
 #include "render/resources/fanMeshManager.hpp"
 #include "engine/resources/fanFont.hpp"
@@ -25,7 +24,6 @@ namespace fan
         resources.mResourceManager  = nullptr;
         resources.mMeshManager    = nullptr;
         resources.mMesh2DManager  = nullptr;
-        resources.mTextureManager = nullptr;
         resources.mCursors.clear();
         resources.mCurrentCursor = nullptr;
     }
@@ -49,23 +47,23 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void EngineResources::SetupResources( ResourceManager& _resourceManager, MeshManager& _meshManager, Mesh2DManager& _mesh2DManager, TextureManager& _textureManager )
+    void EngineResources::SetupResources( ResourceManager& _resourceManager, MeshManager& _meshManager, Mesh2DManager& _mesh2DManager)
     {
         ResourcePtr<Prefab>::sOnResolve.Connect( &ResourceManager::ResolvePtr, &_resourceManager );
         ResourcePtr<Font>::sOnResolve.Connect( &ResourceManager::ResolvePtr, &_resourceManager );
+        ResourcePtr<Texture>::sOnResolve.Connect( &ResourceManager::ResolvePtr, &_resourceManager );
         ResourcePtr<Mesh>::sOnResolve.Connect( &MeshManager::ResolvePtr, &_meshManager );
-        ResourcePtr<Texture>::sOnResolve.Connect( &TextureManager::ResolvePtr, &_textureManager );
 
         _resourceManager.Load<Font>( RenderGlobal::sDefaultGameFont );
+        _resourceManager.Load<Texture>( RenderGlobal::sWhiteTexture );
 
         _meshManager.Load( RenderGlobal::sDefaultMesh );
         Mesh2D* quad2D = CreateMesh2DQuad();
         _mesh2DManager.Add( quad2D, RenderGlobal::sMesh2DQuad );
-        _textureManager.Load( RenderGlobal::sWhiteTexture );
+
 
         mResourceManager  = &_resourceManager;
         mMeshManager    = &_meshManager;
         mMesh2DManager  = &_mesh2DManager;
-        mTextureManager = &_textureManager;
     }
 }

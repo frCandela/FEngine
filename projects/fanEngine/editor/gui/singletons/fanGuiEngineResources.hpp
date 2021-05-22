@@ -58,7 +58,8 @@ namespace fan
 
             if( ImGui::CollapsingHeader( "textures" ) )
             {
-                const std::vector<Texture*>& textures = engineResources.mTextureManager->GetTextures();
+                std::vector<Texture*> textures;
+                engineResources.mResourceManager->Get<Texture>( textures );
                 for( const Texture         * texture : textures )
                 {
                     ImGui::Text( texture->mPath.c_str() );

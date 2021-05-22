@@ -1,5 +1,6 @@
-#include "core/time/fanScopedTimer.hpp"
 #include "core/memory/fanSerializable.hpp"
+#include "core/resources/fanResourceManager.hpp"
+#include "core/memory/fanBase64.hpp"
 #include "engine/singletons/fanEngineResources.hpp"
 #include "engine/components/fanSceneNode.hpp"
 #include "engine/physics/fanTransform.hpp"
@@ -7,9 +8,7 @@
 #include "engine/components/fanMaterial.hpp"
 #include "engine/singletons/fanScene.hpp"
 #include "engine/terrain/fanVoxelTerrain.hpp"
-#include "render/resources/fanTextureManager.hpp"
 #include "render/resources/fanMeshManager.hpp"
-#include "core/memory/fanBase64.hpp"
 
 namespace fan
 {
@@ -58,7 +57,7 @@ namespace fan
         if( _terrain.mSize.x <= 0 || _terrain.mSize.y <= 0 || _terrain.mSize.z <= 0 ){ return; }
 
         EngineResources& engineResources = _world.GetSingleton<EngineResources>();
-        Texture        * texture         = engineResources.mTextureManager->GetOrLoad( "_default/texture/white.png" );
+        Texture        * texture         = engineResources.mResourceManager->GetOrLoad<Texture>( "_default/texture/white.png" );
 
         Scene    & scene       = _world.GetSingleton<Scene>();
         SceneNode& terrainRoot = scene.CreateSceneNode( "terrain", &scene.GetRootNode() );

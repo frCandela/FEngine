@@ -15,14 +15,16 @@ namespace fan
         static std::vector<TestMethod> GetTests()
         {
             return {
-                    { &UnitTestResourceManager::TestLoad,       "Load" },
-                    { &UnitTestResourceManager::TestGet,        "Get" },
-                    { &UnitTestResourceManager::TestGetOrLoad,  "Get or load" },
-                    { &UnitTestResourceManager::TestRemove,     "Remove" },
-                    { &UnitTestResourceManager::TestCount,      "Count" },
-                    { &UnitTestResourceManager::TestResolvePtr, "Resolve Ptr" },
-                    { &UnitTestResourceManager::TestClear,      "Clear" },
-                    { &UnitTestResourceManager::TestDuplicates, "Duplicates" },
+                    { &UnitTestResourceManager::TestLoad,        "Load" },
+                    { &UnitTestResourceManager::TestGet,         "Get" },
+                    { &UnitTestResourceManager::TestGetOrLoad,   "Get or load" },
+                    { &UnitTestResourceManager::TestRemove,      "Remove" },
+                    { &UnitTestResourceManager::TestCount,       "Count" },
+                    { &UnitTestResourceManager::TestResolvePtr,  "Resolve Ptr" },
+                    { &UnitTestResourceManager::TestClear,       "Clear" },
+                    { &UnitTestResourceManager::TestDuplicates,  "Duplicates" },
+                    { &UnitTestResourceManager::TestDestroyList, "Destroy list" },
+                    { &UnitTestResourceManager::TestDirty,       "Dirty" },
             };
         }
 
@@ -32,7 +34,6 @@ namespace fan
 
         void Create() override
         {
-
             Resource* (* loadPrefab)( const std::string& _path, ResourceInfo& ) =
             []( const std::string& _path, ResourceInfo& )
             {
@@ -49,7 +50,8 @@ namespace fan
             };
 
             ResourceInfo info;
-            info.mLoad = loadPrefab;
+            info.mLoad           = loadPrefab;
+            info.mUseDestroyList = true;
             mResources.AddResourceType<Prefab>( info );
         }
 
@@ -99,13 +101,13 @@ namespace fan
         void TestRemove()
         {
             TEST_ASSERT( mResources.Count<Prefab>() == 0 );
-            bool result = mResources.Remove<Prefab>( sPrefabName0 );;
+            bool result = mResources.Remove( sPrefabName0 );;
             TEST_ASSERT( !result );
             mResources.Load<Prefab>( sPrefabName0 );
             TEST_ASSERT( mResources.Get<Prefab>( sPrefabName0 ) != nullptr );
-            result = mResources.Remove<Prefab>( sPrefabName0 );
+            result = mResources.Remove( sPrefabName0 );
             TEST_ASSERT( result );
-            result = mResources.Remove<Prefab>( sPrefabName0 );
+            result = mResources.Remove( sPrefabName0 );
             TEST_ASSERT( !result );
             TEST_ASSERT( mResources.Get<Prefab>( sPrefabName0 ) == nullptr );
         }
@@ -117,9 +119,9 @@ namespace fan
             TEST_ASSERT( mResources.Count<Prefab>() == 1 );
             mResources.Load<Prefab>( sPrefabName1 );
             TEST_ASSERT( mResources.Count<Prefab>() == 2 );
-            mResources.Remove<Prefab>( sPrefabName0 );
+            mResources.Remove( sPrefabName0 );
             TEST_ASSERT( mResources.Count<Prefab>() == 1 );
-            mResources.Remove<Prefab>( sPrefabName1 );
+            mResources.Remove( sPrefabName1 );
             TEST_ASSERT( mResources.Count<Prefab>() == 0 );
         }
 
@@ -151,6 +153,48 @@ namespace fan
             TEST_ASSERT( prefab0 != nullptr );
             TEST_ASSERT( prefab1 != nullptr );
             TEST_ASSERT( prefab0 != prefab1 );
+        }
+
+        void TestDestroyList()
+        {
+            Prefab* prefab0 = mResources.Load<Prefab>( sPrefabName0 );
+            TEST_ASSERT( prefab0 != nullptr );
+
+            std::vector<Prefab*> destroyList;
+            mResources.GetDestroyList<Prefab>( destroyList );
+            TEST_ASSERT( destroyList.size() == 0 );
+            mResources.Clear();
+            mResources.GetDestroyList<Prefab>( destroyList );
+            TEST_ASSERT( destroyList.size() == 1 );
+            TEST_ASSERT( destroyList[0] == prefab0 );
+            mResources.GetDestroyList<Prefab>( destroyList );
+            TEST_ASSERT( destroyList.size() == 0 )
+
+            prefab0 = mResources.Load<Prefab>( sPrefabName0 );
+            TEST_ASSERT( prefab0 != nullptr );
+            mResources.GetDestroyList<Prefab>( destroyList );
+            TEST_ASSERT( destroyList.size() == 0 )
+            mResources.Remove( prefab0->mGUID );
+            mResources.GetDestroyList<Prefab>( destroyList );
+            TEST_ASSERT( destroyList.size() == 1 )
+            mResources.GetDestroyList<Prefab>( destroyList );
+            TEST_ASSERT( destroyList.size() == 0 )
+        }
+
+        void TestDirty()
+        {
+            Prefab* prefab0 = mResources.Load<Prefab>( sPrefabName0 );
+            TEST_ASSERT( prefab0 != nullptr );
+
+            std::vector<Prefab*> dirtyList;
+            mResources.GetDirtyList<Prefab>( dirtyList );
+            TEST_ASSERT( dirtyList.size() == 0 );
+            mResources.SetOutdated(prefab0->mGUID);
+            mResources.GetDirtyList<Prefab>( dirtyList );
+            TEST_ASSERT( dirtyList.size() == 1 );
+            TEST_ASSERT( dirtyList[0] == prefab0 );
+            mResources.GetDirtyList<Prefab>( dirtyList );
+            TEST_ASSERT( dirtyList.size() == 0 )
         }
     };
 }

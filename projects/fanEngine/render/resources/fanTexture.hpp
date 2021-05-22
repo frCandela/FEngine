@@ -27,7 +27,6 @@ namespace fan
         std::string mPath;
         uint8_t* mPixels = nullptr;
         int  mIndex           = -1;
-        bool mBuffersOutdated = false;
 
         void LoadFromPixels( const uint8_t* _pixelsRGBA32, const glm::ivec2 _size, const uint32_t _mipLevels );
         bool LoadFromFile( const std::string& _path );

@@ -117,10 +117,7 @@ namespace fan
             {
                 vertexBuffer.Unmap( _device );
                 vertexBuffer.Destroy( _device );
-                vertexBuffer.Create( _device,
-                                     vertexBufferSize,
-                                     VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
-                                     VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT );
+                vertexBuffer.Create( _device, vertexBufferSize, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT );
                 mVertexCount[_index] = imDrawData->TotalVtxCount;
                 vertexBuffer.Map( _device );
                 _device.AddDebugName( (uint64_t)vertexBuffer.mBuffer, "imgui vertex buffer" );
@@ -134,10 +131,7 @@ namespace fan
             {
                 indexBuffer.Unmap( _device );
                 indexBuffer.Destroy( _device );
-                indexBuffer.Create( _device,
-                                    indexBufferSize,
-                                    VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
-                                    VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT );
+                indexBuffer.Create( _device, indexBufferSize, VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT );
                 mIndexCount[_index] = imDrawData->TotalIdxCount;
                 indexBuffer.Map( _device );
                 _device.AddDebugName( (uint64_t)indexBuffer.mBuffer, "imgui index buffer" );
@@ -350,9 +344,7 @@ namespace fan
     {
         PipelineConfig config( mVertexShader, mFragmentShader );
 
-        config.pushConstantRanges                           = { { VK_SHADER_STAGE_VERTEX_BIT,
-                                                                        0,
-                                                                        sizeof( PushConstBlock ) } };
+        config.pushConstantRanges                           = { { VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof( PushConstBlock ) } };
         config.descriptorSetLayouts                         = { mDescriptorImages.mDescriptorSetLayout };
         config.rasterizationStateInfo.cullMode              = VK_CULL_MODE_NONE;
         config.attachmentBlendStates[0].srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;

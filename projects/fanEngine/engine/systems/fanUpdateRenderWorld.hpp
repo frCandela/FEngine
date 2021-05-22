@@ -54,9 +54,9 @@ namespace fan
                         data.mNormalMatrix = transform.GetNormalMatrix( scale );
 
                         SubMaterial& subMaterial = i < material.mMaterials.size() ? material.mMaterials[i] : material.mMaterials[material.mMaterials.size() - 1];
-                        data.mTextureIndex = subMaterial.mTexture.IsValid() ? subMaterial.mTexture->mIndex : 0;
-                        data.mColor        = subMaterial.mColor.ToGLM();
-                        data.mShininess    = subMaterial.mShininess;
+                        data.mTexture   = subMaterial.mTexture;
+                        data.mColor     = subMaterial.mColor.ToGLM();
+                        data.mShininess = subMaterial.mShininess;
 
                         _renderWorld.drawData.push_back( data );
                     }

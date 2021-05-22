@@ -91,7 +91,7 @@ namespace fan
             Mesh* meshCube = mMeshManager.Load( RenderGlobal::sMeshCube );
             ResourcePtr<Mesh> rscPtr;
             TEST_ASSERT( !rscPtr.IsValid() );
-            rscPtr->mPath = RenderGlobal::sMeshCube;
+            rscPtr.mData.mPath = RenderGlobal::sMeshCube;
             mMeshManager.ResolvePtr( rscPtr.mData );
             TEST_ASSERT( rscPtr.IsValid() );
             TEST_ASSERT( meshCube == rscPtr.mData.mResource );

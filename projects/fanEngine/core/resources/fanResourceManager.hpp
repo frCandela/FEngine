@@ -12,10 +12,14 @@ namespace fan
     struct ResourceInfo
     {
         Resource* (* mLoad)( const std::string& _path, ResourceInfo& _info ) = nullptr;
-        //void (* mSave)( const Resource* _resource, const std::string& _path ) = nullptr;
 
+        bool mUseDestroyList = false;
+        bool mUseDirtyList   = false;
         void* mDataPtr = nullptr;
         int mCount = 0;
+
+        std::vector<Resource*> mDestroyList;
+        std::vector<Resource*> mDirtyList;
     };
 
     //==================================================================================================================================================================================================
@@ -30,6 +34,9 @@ namespace fan
         ResourceType* Load( const std::string& _path );
 
         template< class ResourceType >
+        void Add( ResourceType* _resource, const std::string& _path );
+
+        template< class ResourceType >
         ResourceType* Get( const std::string& _path ) const;
 
         template< class ResourceType >
@@ -41,11 +48,16 @@ namespace fan
         template< class ResourceType >
         ResourceType* GetOrLoad( const std::string& _path );
 
-        template< class ResourceType >
-        bool Remove( const std::string& _path );
+        bool Remove( const std::string& _path ) { return Remove( DSID( _path.c_str() ) ); }
+        bool Remove( const uint32_t _guid );
+
+        bool SetOutdated( const uint32_t _guid );
 
         template< class ResourceType >
-        bool Remove( const uint32_t _guid );
+        void GetDestroyList( std::vector<ResourceType*>& _destroyedList );
+
+        template< class ResourceType >
+        void GetDirtyList( std::vector<ResourceType*>& _outdatedList );
 
         template< class ResourceType >
         int Count() const;
@@ -56,8 +68,10 @@ namespace fan
 
     private:
         Resource* Load( const uint32_t _type, const std::string& _path );
+        void Add( const uint32_t _type, Resource* _resource, const std::string& _path );
         Resource* Get( const uint32_t _type, const uint32_t _guid ) const;
         Resource* GetOrLoad( const uint32_t _type, const std::string& _path );
+        void DeleteResource( std::map<uint32_t, Resource*>::iterator _iterator );
 
         std::map<uint32_t, Resource*>    mResources;
         std::map<uint32_t, ResourceInfo> mResourceInfos;
@@ -80,6 +94,14 @@ namespace fan
     ResourceType* ResourceManager::Load( const std::string& _path )
     {
         return static_cast<ResourceType*>(Load( ResourceType::Info::sType, _path ));
+    }
+
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    template< class ResourceType >
+    void ResourceManager::Add( ResourceType* _resource, const std::string& _path )
+    {
+        Add( ResourceType::Info::sType, _resource, _path );
     }
 
     //==================================================================================================================================================================================================
@@ -109,27 +131,31 @@ namespace fan
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
     template< class ResourceType >
-    bool ResourceManager::Remove( const std::string& _path )
+    void ResourceManager::GetDestroyList( std::vector<ResourceType*>& _destroyedList )
     {
-        return Remove<ResourceType>( DSID( _path.c_str() ) );
+        ResourceInfo& info = mResourceInfos[ResourceType::Info::sType];
+        fanAssert( info.mUseDestroyList );
+        _destroyedList.clear();
+        for( Resource* resource : info.mDestroyList )
+        {
+            _destroyedList.push_back( static_cast<ResourceType*>(resource) );
+        }
+        info.mDestroyList.clear();
     }
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
     template< class ResourceType >
-    bool ResourceManager::Remove( const uint32_t _guid )
+    void ResourceManager::GetDirtyList( std::vector<ResourceType*>& _outdatedList )
     {
-        auto it = mResources.find( _guid );
-        if( it != mResources.end() )
+        ResourceInfo& info = mResourceInfos[ResourceType::Info::sType];
+        fanAssert( info.mUseDirtyList );
+        _outdatedList.clear();
+        for( Resource* resource : info.mDirtyList )
         {
-            Resource* resource = it->second;
-            fanAssert( resource->mType == ResourceType::Info::sType );
-            mResources.erase( it );
-            ResourceInfo& info = mResourceInfos[ResourceType::Info::sType];
-            info.mCount--;
-            return true;
+            _outdatedList.push_back( static_cast<ResourceType*>(resource) );
         }
-        return false;
+        info.mDirtyList.clear();
     }
 
     //==================================================================================================================================================================================================

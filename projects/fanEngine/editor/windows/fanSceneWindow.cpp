@@ -4,7 +4,6 @@
 #include "core/fanPath.hpp"
 #include "core/fanDebug.hpp"
 #include "core/time/fanProfiler.hpp"
-#include "render/resources/fanTextureManager.hpp"
 #include "render/resources/fanMeshManager.hpp"
 #include "engine/singletons/fanEngineResources.hpp"
 #include "core/resources/fanResourceManager.hpp"
@@ -119,7 +118,7 @@ namespace fan
 
                     Material& material = world.AddComponent<Material>( entity );
 
-                    material.mMaterials[0].mTexture = engineResources.mTextureManager->Get( RenderGlobal::sTextureWhite );
+                    material.mMaterials[0].mTexture = engineResources.mResourceManager->Get<Texture>( RenderGlobal::sTextureWhite );
                     onSelectSceneNode.Emmit( &node );
                 }
 
@@ -138,7 +137,7 @@ namespace fan
                     MeshRenderer& meshRenderer = world.AddComponent<MeshRenderer>( entity );
                     meshRenderer.mMesh = engineResources.mMeshManager->GetOrLoad( RenderGlobal::sMeshCube );
                     Material& material = world.AddComponent<Material>( entity );
-                    material.mMaterials[0].mTexture = engineResources.mTextureManager->Get( RenderGlobal::sTextureWhite );
+                    material.mMaterials[0].mTexture = engineResources.mResourceManager->Get<Texture>( RenderGlobal::sTextureWhite );
                     onSelectSceneNode.Emmit( &node );
 
                     Rigidbody   rb  = world.AddComponent<Rigidbody>( entity );

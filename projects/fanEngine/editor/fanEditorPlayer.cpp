@@ -99,14 +99,13 @@ namespace fan
             EditorSettings& editorSerializedValues = world.GetSingleton<EditorSettings>();
             editorSerializedValues.mData = &mEditorSettings;
 
-            world.GetSingleton<EngineResources>().SetupResources( mData.mResourceManager,
+            world.GetSingleton<EngineResources>().SetupResources( mData.mResources,
                                                                   mData.mRenderer.mMeshManager,
-                                                                  mData.mRenderer.mMesh2DManager,
-                                                                  mData.mRenderer.mTextureManager);
-            Cursor cursor;
+                                                                  mData.mRenderer.mMesh2DManager );
+            Cursor        cursor;
             unsigned char pixels[16 * 16 * 4];
-            memset(pixels, 0xff, sizeof(pixels));
-            cursor.Create(pixels, {16,16}, {0,0});
+            memset( pixels, 0xff, sizeof( pixels ) );
+            cursor.Create( pixels, { 16, 16 }, { 0, 0 } );
             mData.mWindow.SetCursor( cursor );
 
             RenderWorld& renderWorld = world.GetSingleton<RenderWorld>();
@@ -180,11 +179,12 @@ namespace fan
             Step();
         }
 
-        Debug::Log( "Exit application" );
+        Debug::Log( "Exit application", Debug::Type::Editor );
 
         EditorSettingsData::SaveSettingsToJson( mEditorSettings );
         EditorSettingsData::SaveWindowSizeAndPosition( mEditorSettings.mJson, mData.mRenderer.mWindow.GetSize(), mData.mRenderer.mWindow.GetPosition() );
         EditorSettingsData::SaveJsonToDisk( mEditorSettings.mJson );
+        mData.Destroy();
     }
 
     //==================================================================================================================================================================================================

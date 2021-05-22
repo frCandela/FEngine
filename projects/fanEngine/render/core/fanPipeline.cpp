@@ -140,11 +140,9 @@ namespace fan
         vertexInputStateCreateInfo.sType                           = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
         vertexInputStateCreateInfo.pNext                           = nullptr;
         vertexInputStateCreateInfo.flags                           = 0;
-        vertexInputStateCreateInfo.vertexBindingDescriptionCount   = static_cast< uint32_t >(
-                _pipelineConfig.bindingDescription.size() );
+        vertexInputStateCreateInfo.vertexBindingDescriptionCount   = static_cast< uint32_t >(                _pipelineConfig.bindingDescription.size() );
         vertexInputStateCreateInfo.pVertexBindingDescriptions      = _pipelineConfig.bindingDescription.data();
-        vertexInputStateCreateInfo.vertexAttributeDescriptionCount = static_cast< uint32_t >(
-                _pipelineConfig.attributeDescriptions.size() );
+        vertexInputStateCreateInfo.vertexAttributeDescriptionCount = static_cast< uint32_t >(                _pipelineConfig.attributeDescriptions.size() );
         vertexInputStateCreateInfo.pVertexAttributeDescriptions    = _pipelineConfig.attributeDescriptions.data();
 
         VkPipelineViewportStateCreateInfo viewportStateCreateInfo = {};
@@ -171,17 +169,14 @@ namespace fan
         pipelineLayoutCreateInfo.sType                  = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
         pipelineLayoutCreateInfo.pNext                  = nullptr;
         pipelineLayoutCreateInfo.flags                  = 0;
-        pipelineLayoutCreateInfo.setLayoutCount         = static_cast< uint32_t >(
-                _pipelineConfig.descriptorSetLayouts.size() );
+        pipelineLayoutCreateInfo.setLayoutCount         = static_cast< uint32_t >(                _pipelineConfig.descriptorSetLayouts.size() );
         pipelineLayoutCreateInfo.pSetLayouts            = _pipelineConfig.descriptorSetLayouts.data();
-        pipelineLayoutCreateInfo.pushConstantRangeCount = static_cast< uint32_t >(
-                _pipelineConfig.pushConstantRanges.size() );
+        pipelineLayoutCreateInfo.pushConstantRangeCount = static_cast< uint32_t >(                _pipelineConfig.pushConstantRanges.size() );
         pipelineLayoutCreateInfo.pPushConstantRanges    = _pipelineConfig.pushConstantRanges.data();
 
-        if( vkCreatePipelineLayout( _device.mDevice, &pipelineLayoutCreateInfo, nullptr, &mPipelineLayout ) !=
-            VK_SUCCESS )
+        if( vkCreatePipelineLayout( _device.mDevice, &pipelineLayoutCreateInfo, nullptr, &mPipelineLayout ) != VK_SUCCESS )
         {
-            Debug::Error( "Could not allocate command pool." );
+            Debug::Error( "Could not create pipeline layout." );
             return false;
         }
         Debug::Log() << Debug::Type::Render << std::hex << "VkPipelineLayout      " << mPipelineLayout << std::dec << Debug::Endl();

@@ -29,10 +29,9 @@ namespace fan
         PlayerData::EcsIncludeRender3D( world );
         PlayerData::EcsIncludeRenderUI( world );
 
-        world.GetSingleton<EngineResources>().SetupResources( mData.mResourceManager,
+        world.GetSingleton<EngineResources>().SetupResources( mData.mResources,
                                                               mData.mRenderer.mMeshManager,
-                                                              mData.mRenderer.mMesh2DManager,
-                                                              mData.mRenderer.mTextureManager );
+                                                              mData.mRenderer.mMesh2DManager);
 
         Application& app = world.GetSingleton<Application>();
         app.mOnQuit.Connect( &GamePlayer::Exit, this );
@@ -68,7 +67,8 @@ namespace fan
         {
             Step();
         }
-        Debug::Log( "Exit application" );
+        Debug::Log( "Exit application", Debug::Type::Engine );
+        mData.Destroy();
     }
 
     //==================================================================================================================================================================================================

@@ -65,13 +65,11 @@ namespace fan
 
         if( ImGui::CollapsingHeader( "Loaded textures : " ) )
         {
-            for( Texture* tex : engineResources.mTextureManager->GetTextures() )
+            std::vector<Texture*> textures;
+            engineResources.mResourceManager.Get<Texture>( textures );
+            for( Texture* tex : textures )
             {
-                ImGui::Text( "ref: %d size: %u x %u name: %s",
-                             tex->mRefCount,
-                             tex->mExtent.width,
-                             tex->mExtent.height,
-                             tex->mPath.c_str() );
+                ImGui::Text( "ref: %d size: %u x %u name: %s", tex->mRefCount, tex->mExtent.width, tex->mExtent.height, tex->mPath.c_str() );
                 ImGui::FanBeginDragDropSourceTexture( tex, ImGuiDragDropFlags_SourceAllowNullID );
             }
         }

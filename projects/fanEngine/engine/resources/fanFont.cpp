@@ -8,7 +8,7 @@ WARNINGS_SFML_UTF_PUSH()
 WARNINGS_POP()
 #include "core/fanDebug.hpp"
 #include "core/fanPath.hpp"
-#include "render/resources/fanTextureManager.hpp"
+#include "core/resources/fanResourceManager.hpp"
 
 namespace fan
 {
@@ -88,7 +88,7 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    const Font::Atlas* Font::GenerateAtlas( TextureManager& _textureManager, const int _height )
+    const Font::Atlas* Font::GenerateAtlas( ResourceManager& _resources, const int _height )
     {
         fanAssert( FindAtlas( _height ) == nullptr );
         fanAssert( _height > 0 );
@@ -173,7 +173,7 @@ namespace fan
         }
 
         atlas.mTexture->LoadFromPixels( buffer, { bufferPixelSize, bufferPixelSize }, 1 );
-        _textureManager.Add( atlas.mTexture, mPath + "size_" + std::to_string( _height ) );
+        _resources.Add<Texture>( atlas.mTexture, mPath + "size_" + std::to_string( _height ) );
         mAtlases.push_back( atlas );
         return &*mAtlases.rbegin();
     }

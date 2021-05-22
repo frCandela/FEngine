@@ -7,7 +7,6 @@
 #include "render/fanVertex.hpp"
 #include "render/resources/fanMeshManager.hpp"
 #include "render/resources/fanMesh2DManager.hpp"
-#include "render/resources/fanTextureManager.hpp"
 #include "engine/resources/fanFont.hpp"
 #include "render/core/fanCommandBuffer.hpp"
 #include "render/core/fanRenderPass.hpp"
@@ -44,7 +43,8 @@ namespace fan
         };
 
         Renderer( Window& _window, ResourceManager& _resourceManager, const ViewType _viewType );
-        ~Renderer();
+        void Create();
+        void Destroy();
 
         void DrawFrame();
         void WaitIdle();
@@ -65,9 +65,8 @@ namespace fan
                                const std::vector<DebugVertex2D>& _debugLines2D );
 
         ResourceManager& mResourceManager;
-        MeshManager    mMeshManager;
-        Mesh2DManager  mMesh2DManager;
-        TextureManager mTextureManager;
+        MeshManager   mMeshManager;
+        Mesh2DManager mMesh2DManager;
         Window& mWindow;
         Device& mDevice;
 
@@ -122,6 +121,8 @@ namespace fan
         void DestroyPipelines();
 
         void UpdateUniformBuffers( Device& _device, const size_t _index );
+        bool BuildNewTextures( Device& _device );
+        void ClearDestroyedTextures( Device& _device );
         void SubmitCommandBuffers();
     };
 }

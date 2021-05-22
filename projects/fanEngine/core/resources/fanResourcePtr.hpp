@@ -35,11 +35,10 @@ namespace fan
         virtual ~ResourcePtr();
         ResourceType* operator->() const { return (ResourceType*)( mData.mResource ); } //@todo return a reference
         ResourceType* operator*() const { return (ResourceType*)( mData.mResource ); } //@todo return a reference
-        bool operator==( const ResourceType* _other ) const { return _other == mData.mResource; }
-        bool operator!=( const ResourceType* _other ) const { return _other != mData.mResource; }
+        operator ResourceType*() const { return static_cast<ResourceType*>(mData.mResource); }
         ResourcePtr& operator=( ResourceType* _resource )
         {
-            mData.mResource =  _resource;
+            mData.mResource = _resource;
             return *this;
         }
         bool IsValid() const { return mData.mResource != nullptr; }

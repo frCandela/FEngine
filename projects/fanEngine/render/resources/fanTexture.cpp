@@ -335,24 +335,20 @@ namespace fan
             return false;
         }
 
-        mExtent          = { (uint32_t)texWidth, (uint32_t)texHeight };
-        mMipLevels       = static_cast< uint32_t >( std::floor( std::log2( std::max( texWidth, texHeight ) ) ) ) + 1;
-        mMipLevels       = 1;
-        mBuffersOutdated = true;
+        mExtent    = { (uint32_t)texWidth, (uint32_t)texHeight };
+        mMipLevels = static_cast< uint32_t >( std::floor( std::log2( std::max( texWidth, texHeight ) ) ) ) + 1;
+        mMipLevels = 1;
 
         return true;
     }
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void Texture::LoadFromPixels( const uint8_t* _pixelsRGBA32,
-                                  const glm::ivec2 _size,
-                                  const uint32_t _mipLevels )
+    void Texture::LoadFromPixels( const uint8_t* _pixelsRGBA32, const glm::ivec2 _size, const uint32_t _mipLevels )
     {
         fanAssert( mPixels == nullptr );
         fanAssert( _mipLevels >= 1 );
 
-        mBuffersOutdated = true;
         if( _pixelsRGBA32 == nullptr ){ return; }
 
         const size_t size = _size.x * _size.y * 4 * sizeof( uint8_t );
@@ -366,8 +362,6 @@ namespace fan
     //==================================================================================================================================================================================================
     void Texture::Create( Device& _device )
     {
-        mBuffersOutdated = false;
-
         if( mPixels == nullptr ){ return; }
 
         fanAssert( mMemory == VK_NULL_HANDLE );

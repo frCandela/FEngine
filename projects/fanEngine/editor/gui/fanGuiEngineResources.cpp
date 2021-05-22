@@ -86,7 +86,7 @@ namespace ImGui
         // Modal set value
         if( ImGui::FanLoadFileModal( modalName.c_str(), fan::RenderGlobal::sImagesExtensions, sPathBuffer ) )
         {
-            _ptr->mPath = sPathBuffer;
+            _ptr.mData.mPath = sPathBuffer;
             _ptr.mData.Resolve();
             returnValue = true;
         }
