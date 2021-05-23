@@ -19,7 +19,6 @@ namespace fan
         std::vector<uint32_t> mIndices;
         Buffer                mIndexBuffer[SwapChain::sMaxFramesInFlight];
         Buffer                mVertexBuffer[SwapChain::sMaxFramesInFlight];
-        bool                  mBuffersOutdated  = false;
         bool                  mOptimizeVertices = true;
         uint32_t              mCurrentBuffer    = 0;
         bool                  mHostVisible      = false;
@@ -45,7 +44,6 @@ namespace fan
         void GenerateConvexHull();
         bool Empty() const;
 
-        std::string          mPath;
         ConvexHull           mConvexHull;
         bool                 mAutoUpdateHull = true;
         std::vector<SubMesh> mSubMeshes;

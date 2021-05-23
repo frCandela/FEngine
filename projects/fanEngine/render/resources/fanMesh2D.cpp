@@ -11,7 +11,6 @@ namespace fan
     bool Mesh2D::LoadFromVertices( const std::vector<UIVertex>& _vertices )
     {
         mVertices        = _vertices;
-        mBuffersOutdated = true;
         return true;
     }
 
@@ -19,7 +18,6 @@ namespace fan
     //==================================================================================================================================================================================================
     void Mesh2D::Create( Device& _device )
     {
-        mBuffersOutdated = false;
         if( mVertices.empty() ){ return; }
 
         const VkMemoryPropertyFlags memPropertyFlags = ( mHostVisible ?

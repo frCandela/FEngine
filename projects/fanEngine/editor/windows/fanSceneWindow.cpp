@@ -4,10 +4,8 @@
 #include "core/fanPath.hpp"
 #include "core/fanDebug.hpp"
 #include "core/time/fanProfiler.hpp"
-#include "render/resources/fanMeshManager.hpp"
 #include "engine/singletons/fanEngineResources.hpp"
 #include "core/resources/fanResourceManager.hpp"
-#include "engine/singletons/fanEngineResources.hpp"
 #include "engine/singletons/fanScene.hpp"
 #include "engine/resources/fanPrefab.hpp"
 #include "engine/components/fanMeshRenderer.hpp"
@@ -20,6 +18,7 @@
 #include "editor/singletons/fanEditorSelection.hpp"
 #include "engine/physics/fanBoxCollider.hpp"
 #include "engine/physics/fanRigidbody.hpp"
+#include "render/fanRenderGlobal.hpp"
 #include "editor/fanDragnDrop.hpp"
 #include "editor/fanModals.hpp"
 
@@ -114,11 +113,11 @@ namespace fan
                     transform.mPosition = origin;
 
                     MeshRenderer& meshRenderer = world.AddComponent<MeshRenderer>( entity );
-                    meshRenderer.mMesh = engineResources.mMeshManager->GetOrLoad( RenderGlobal::sMeshSphere );
+                    meshRenderer.mMesh = engineResources.mResources->GetOrLoad<Mesh>( RenderGlobal::sMeshSphere );
 
                     Material& material = world.AddComponent<Material>( entity );
 
-                    material.mMaterials[0].mTexture = engineResources.mResourceManager->Get<Texture>( RenderGlobal::sTextureWhite );
+                    material.mMaterials[0].mTexture = engineResources.mResources->GetOrLoad<Texture>( RenderGlobal::sTextureWhite );
                     onSelectSceneNode.Emmit( &node );
                 }
 
@@ -135,9 +134,9 @@ namespace fan
                     transform.mPosition = origin;
 
                     MeshRenderer& meshRenderer = world.AddComponent<MeshRenderer>( entity );
-                    meshRenderer.mMesh = engineResources.mMeshManager->GetOrLoad( RenderGlobal::sMeshCube );
+                    meshRenderer.mMesh = engineResources.mResources->GetOrLoad<Mesh>( RenderGlobal::sMeshCube );
                     Material& material = world.AddComponent<Material>( entity );
-                    material.mMaterials[0].mTexture = engineResources.mResourceManager->Get<Texture>( RenderGlobal::sTextureWhite );
+                    material.mMaterials[0].mTexture = engineResources.mResources->Get<Texture>( RenderGlobal::sTextureWhite );
                     onSelectSceneNode.Emmit( &node );
 
                     Rigidbody   rb  = world.AddComponent<Rigidbody>( entity );
@@ -421,7 +420,7 @@ namespace fan
         if( ImGui::FanLoadFileModal( "import_prefab", RenderGlobal::sPrefabExtensions, mPathBuffer ) )
         {
             EngineResources& engineResources = _world.GetSingleton<EngineResources>();
-            Prefab        * prefab           = engineResources.mResourceManager->GetOrLoad<Prefab>( mPathBuffer );
+            Prefab        * prefab           = engineResources.mResources->GetOrLoad<Prefab>( mPathBuffer );
             if( prefab != nullptr )
             {
                 prefab->Instantiate( *mLastSceneNodeRightClicked );
@@ -447,7 +446,7 @@ namespace fan
             {
                 // Try to update the existing prefab if it exists
                 EngineResources& engineRes = _world.GetSingleton<EngineResources>();
-                Prefab        * prefab     = engineRes.mResourceManager->Get<Prefab>( Path::MakeRelative( mPathBuffer ) );
+                Prefab        * prefab     = engineRes.mResources->Get<Prefab>( Path::MakeRelative( mPathBuffer ) );
                 if( prefab != nullptr )
                 {
                     prefab->CreateFromSceneNode( *mLastSceneNodeRightClicked );

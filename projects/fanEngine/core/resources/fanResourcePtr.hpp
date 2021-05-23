@@ -6,22 +6,15 @@
 
 namespace fan
 {
+    class ResourceManager;
+
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
     struct ResourcePtrData
     {
-        uint32_t    mType = 0;
-        std::string mPath = "";
-        Resource                * mResource  = nullptr;
-        Signal<ResourcePtrData&>* mOnResolve = nullptr;
-
-        void Resolve()
-        {
-            if( !mPath.empty() )
-            {
-                ( *mOnResolve ).Emmit( *this );
-            }
-        }
+        uint32_t mGUID = 0;
+        ResourceHandle * mHandle = nullptr; // owned by the resource manager
+        static ResourceManager* sResourceManager;
     };
 
     //==================================================================================================================================================================================================
@@ -29,41 +22,29 @@ namespace fan
     template< typename ResourceType >
     struct ResourcePtr
     {
-        static Signal<ResourcePtrData&> sOnResolve;
-
-        ResourcePtr( Resource* _resource = nullptr );
-        virtual ~ResourcePtr();
-        ResourceType* operator->() const { return (ResourceType*)( mData.mResource ); } //@todo return a reference
-        ResourceType* operator*() const { return (ResourceType*)( mData.mResource ); } //@todo return a reference
-        operator ResourceType*() const { return static_cast<ResourceType*>(mData.mResource); }
-        ResourcePtr& operator=( ResourceType* _resource )
+        ResourceType* operator->() const
         {
-            mData.mResource = _resource;
-            return *this;
+            ResourceType* resource = *this;
+            return resource;
         }
-        bool IsValid() const { return mData.mResource != nullptr; }
-
+        ResourceType& operator*() const
+        {
+            ResourceType* resource = *this;
+            return *resource;
+        }
+        operator ResourceType*() const
+        {
+            if( mData.mHandle != nullptr && mData.mHandle->mResource != nullptr )
+            {
+                return static_cast<ResourceType*>( mData.mHandle->mResource);
+            }
+            return nullptr;
+        }
+        ResourcePtr( ResourceHandle* _handle = nullptr )
+        {
+            mData.mHandle          = _handle;
+            mData.mGUID            = _handle != nullptr && _handle->mResource != nullptr ? _handle->mResource->mGUID : 0;
+        }
         ResourcePtrData mData;
     };
-
-    template< typename _ResourceType >
-    Signal<ResourcePtrData&> ResourcePtr<_ResourceType>::sOnResolve;
-
-    //==================================================================================================================================================================================================
-    //==================================================================================================================================================================================================
-    template< typename _ResourceType >
-    ResourcePtr<_ResourceType>::ResourcePtr( Resource* _resource )
-    {
-        fanAssert( mData.mResource == nullptr );
-        mData.mResource  = _resource;
-        mData.mType      = _ResourceType::Info::sType;
-        mData.mOnResolve = &sOnResolve;
-    }
-
-    //==================================================================================================================================================================================================
-    //==================================================================================================================================================================================================
-    template< typename _ResourceType >
-    ResourcePtr<_ResourceType>::~ResourcePtr()
-    {
-    }
 }

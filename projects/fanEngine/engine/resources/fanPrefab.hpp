@@ -26,6 +26,5 @@ namespace fan
         void Clear() { mJson = Json(); }
 
         Json        mJson;
-        std::string mPath;
     };
 }

@@ -1,6 +1,5 @@
 #include "engine/components/fanParticleEmitter.hpp"
 #include "core/memory/fanSerializable.hpp"
-#include "editor/fanModals.hpp"
 
 namespace fan
 {

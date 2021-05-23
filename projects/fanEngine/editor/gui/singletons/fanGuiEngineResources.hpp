@@ -30,9 +30,9 @@ namespace fan
 
             if( ImGui::CollapsingHeader( "prefabs" ) )
             {
-                std::vector<Prefab*> prefabs;
-                engineResources.mResourceManager->Get<Prefab>( prefabs );
-                for( Prefab* prefab : prefabs )
+                std::vector<ResourcePtr<Prefab>> prefabs;
+                engineResources.mResources->Get<Prefab>( prefabs );
+                for( ResourcePtr<Prefab> prefab : prefabs )
                 {
                     ImGui::Text( prefab->mPath.c_str() );
                 }
@@ -40,8 +40,9 @@ namespace fan
 
             if( ImGui::CollapsingHeader( "meshes" ) )
             {
-                const std::vector<Mesh*>& meshes = engineResources.mMeshManager->GetMeshes();
-                for( const Mesh         * mesh : meshes )
+                std::vector<ResourcePtr<Mesh>> meshes;
+                engineResources.mResources->Get<Mesh>( meshes );
+                for( ResourcePtr<Mesh> mesh : meshes )
                 {
                     ImGui::Text( mesh->mPath.c_str() );
                 }
@@ -49,8 +50,9 @@ namespace fan
 
             if( ImGui::CollapsingHeader( "meshes2D" ) )
             {
-                const std::vector<Mesh2D*>& meshes = engineResources.mMesh2DManager->GetMeshes();
-                for( const Mesh2D         * mesh : meshes )
+                std::vector<ResourcePtr<Mesh2D>> meshes2D;
+                engineResources.mResources->Get<Mesh2D>( meshes2D );
+                for( ResourcePtr<Mesh2D> mesh : meshes2D )
                 {
                     ImGui::Text( mesh->mPath.c_str() );
                 }
@@ -58,9 +60,9 @@ namespace fan
 
             if( ImGui::CollapsingHeader( "textures" ) )
             {
-                std::vector<Texture*> textures;
-                engineResources.mResourceManager->Get<Texture>( textures );
-                for( const Texture         * texture : textures )
+                std::vector<ResourcePtr<Texture>> textures;
+                engineResources.mResources->Get<Texture>( textures );
+                for( ResourcePtr<Texture> texture : textures )
                 {
                     ImGui::Text( texture->mPath.c_str() );
                 }

@@ -23,7 +23,7 @@ namespace fan
 
         static void Run( EcsWorld& _world, const EcsView& _view )
         {
-            EngineResources& engineResources = _world.GetSingleton<EngineResources>();
+            ResourceManager& resources = *_world.GetSingleton<EngineResources>().mResources;
 
             auto textIt      = _view.begin<UIText>();
             auto rendererIt  = _view.begin<UIRenderer>();
@@ -43,10 +43,10 @@ namespace fan
                     continue;
                 }
 
-                Font* font = *text.mFontPtr;
+                fan::ResourcePtr<fan::Font> font = text.mFontPtr;
                 if( font == nullptr )
                 {
-                    font = engineResources.mResourceManager->Load<Font>( RenderGlobal::sDefaultGameFont );
+                    font = resources.GetOrLoad<Font>( RenderGlobal::sDefaultGameFont );
                     text.mFontPtr = font;
                 }
                 fanAssert( font != nullptr );
@@ -54,7 +54,7 @@ namespace fan
                 const Font::Atlas* atlas             = font->FindAtlas( text.mSize );
                 if( atlas == nullptr )
                 {
-                    atlas = font->GenerateAtlas( *engineResources.mResourceManager, text.mSize );
+                    atlas = font->GenerateAtlas( resources, text.mSize );
                     fanAssert( atlas != nullptr );
                 }
 
@@ -98,6 +98,7 @@ namespace fan
                 }
 
                 text.mMesh2D->LoadFromVertices( vertices );
+                resources.SetDirty( text.mMesh2D->mGUID );
                 renderer.mMesh2D  = text.mMesh2D;
                 renderer.mTexture = atlas->mTexture;
             }

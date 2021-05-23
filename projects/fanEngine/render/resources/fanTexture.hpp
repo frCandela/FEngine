@@ -24,7 +24,6 @@ namespace fan
         uint32_t    mMipLevels  = 1;
         VkExtent2D  mExtent;
         uint32_t    mLayerCount = 1;
-        std::string mPath;
         uint8_t* mPixels = nullptr;
         int  mIndex           = -1;
 

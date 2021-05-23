@@ -93,6 +93,9 @@ namespace fan
             Debug::Error( "Could not init FreeType Library", Debug::Type::Engine );
         }
 
+        fanAssert(  ResourcePtrData::sResourceManager == nullptr );
+        ResourcePtrData::sResourceManager = &mResources;
+
         {
             ResourceInfo info;
             info.mLoad = &LoadPrefab;
@@ -112,6 +115,21 @@ namespace fan
             info.mUseDirtyList   = true;
             info.mUseDestroyList = true;
             mResources.AddResourceType<Texture>( info );
+        }
+
+        {
+            ResourceInfo info;
+            info.mLoad           = &LoadMesh;
+            info.mUseDirtyList   = true;
+            info.mUseDestroyList = true;
+            mResources.AddResourceType<Mesh>( info );
+        }
+
+        {
+            ResourceInfo info;
+            info.mUseDirtyList   = true;
+            info.mUseDestroyList = true;
+            mResources.AddResourceType<Mesh2D>( info );
         }
 
         mResources.Load<Texture>( RenderGlobal::sDefaultTexture );
@@ -298,7 +316,7 @@ namespace fan
     //==================================================================================================================================================================================================
     Resource* PlayerData::LoadPrefab( const std::string& _path, ResourceInfo& )
     {
-        Debug::Log() << "Loading prefab" << _path << Debug::Endl();
+        Debug::Log() << Debug::Type::Resources << "Loading prefab" << _path << Debug::Endl();
         Prefab* prefab = new Prefab();
         if( !prefab->CreateFromFile( _path ) )
         {
@@ -312,7 +330,7 @@ namespace fan
     //==================================================================================================================================================================================================
     Resource* PlayerData::LoadFont( const std::string& _path, ResourceInfo& _info )
     {
-        Debug::Log() << "Loading font " << _path << Debug::Endl();
+        Debug::Log() << Debug::Type::Resources  << "Loading font " << _path << Debug::Endl();
         FT_Library& freetypeLib = *static_cast<FT_Library*>(_info.mDataPtr);
         Font      * font        = new Font( freetypeLib, _path );
         if( !font->IsValid() )
@@ -327,7 +345,7 @@ namespace fan
     //==================================================================================================================================================================================================
     Resource* PlayerData::LoadTexture( const std::string& _path, ResourceInfo& )
     {
-        Debug::Log() << "Loading texture " << _path << Debug::Endl();
+        Debug::Log() << Debug::Type::Resources  << "Loading texture " << _path << Debug::Endl();
         Texture* texture = new Texture();
         if( !texture->LoadFromFile( _path ) )
         {
@@ -335,5 +353,19 @@ namespace fan
             return nullptr;
         }
         return texture;
+    }
+
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    Resource* PlayerData::LoadMesh( const std::string& _path, ResourceInfo& )
+    {
+        Debug::Log() << Debug::Type::Resources  << "Loading mesh " << _path << Debug::Endl();
+        Mesh* mesh = new Mesh();
+        if( !mesh->LoadFromFile( _path ) )
+        {
+            delete mesh;
+            return nullptr;
+        }
+        return mesh;
     }
 }

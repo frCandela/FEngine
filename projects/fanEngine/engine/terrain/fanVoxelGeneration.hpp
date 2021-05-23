@@ -47,7 +47,6 @@ namespace fan
 
         int          mSeed;
         SimplexNoise mSimplexNoise;
-        Fixed        mThreshold;
         Fixed        mInterpolationScale;
         bool         mClearSides;
         NoiseOctave  m2DOctave;

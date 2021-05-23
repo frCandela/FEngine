@@ -2,6 +2,7 @@
 
 #include "imgui/imgui.h"
 #include "core/ecs/fanEcsComponent.hpp"
+#include "core/resources/fanResourcePtr.hpp"
 
 namespace fan
 {
@@ -39,17 +40,18 @@ namespace ImGui
         static bool IsSingletonPayload( const ImGuiPayload* _payload );
     };
 
-    void FanBeginDragDropSourcePrefab( fan::Prefab* _prefab, ImGuiDragDropFlags _flags = ImGuiDragDropFlags_None );
-    fan::Prefab* FanBeginDragDropTargetPrefab();
+    void FanBeginDragDropSourcePrefab( fan::ResourcePtr<fan::Prefab> _prefab, ImGuiDragDropFlags _flags = ImGuiDragDropFlags_None );
+    fan::ResourcePtr<fan::Prefab> FanBeginDragDropTargetPrefab();
     void FanBeginDragDropSourceSingleton( fan::EcsWorld& _world, uint32_t _type, ImGuiDragDropFlags _flags = ImGuiDragDropFlags_None );
     void FanBeginDragDropSourceComponent( fan::EcsWorld& _world, fan::EcsHandle& _handle, uint32_t _type, ImGuiDragDropFlags _flags = ImGuiDragDropFlags_None );
     ComponentPayload FanBeginDragDropTargetComponent( fan::EcsWorld& _world, uint32_t _type );
-    void FanBeginDragDropSourceTexture( fan::Texture* _texture, ImGuiDragDropFlags _flags = ImGuiDragDropFlags_None );
-    fan::Texture* FanBeginDragDropTargetTexture();
-    void FanBeginDragDropSourceMesh( fan::Mesh* _mesh, ImGuiDragDropFlags _flags = ImGuiDragDropFlags_None );
-    fan::Mesh* FanBeginDragDropTargetMesh();
-    void FanBeginDragDropSourceFont( fan::Font* _font, ImGuiDragDropFlags _flags = ImGuiDragDropFlags_None );
-    fan::Font* FanBeginDragDropTargetFont();
+    void FanBeginDragDropSourceTexture( fan::ResourcePtr<fan::Texture>, ImGuiDragDropFlags _flags = ImGuiDragDropFlags_None );
+    fan::ResourcePtr<fan::Texture> FanBeginDragDropTargetTexture();
+    void FanBeginDragDropSourceMesh( fan::ResourcePtr<fan::Mesh> _mesh, ImGuiDragDropFlags _flags = ImGuiDragDropFlags_None );
+    fan::ResourcePtr<fan::Mesh> FanBeginDragDropTargetMesh();
+    void FanBeginDragDropSourceFont( fan::ResourcePtr<fan::Font> _font, ImGuiDragDropFlags _flags = ImGuiDragDropFlags_None );
+    fan::ResourcePtr<fan::Font> FanBeginDragDropTargetFont();
+
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
     template< typename _componentType >

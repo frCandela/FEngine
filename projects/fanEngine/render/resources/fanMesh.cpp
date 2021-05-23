@@ -28,7 +28,6 @@ namespace fan
             for( SubMesh& subMesh : mSubMeshes )
             {
                 subMesh.OptimizeVertices();
-                subMesh.mBuffersOutdated = true;
             }
             GenerateConvexHull();
 
@@ -53,7 +52,6 @@ namespace fan
 
         // Cleanup
         OptimizeVertices();
-        mBuffersOutdated = true;
 
         return true;
     }
@@ -188,8 +186,6 @@ namespace fan
     //==================================================================================================================================================================================================
     void SubMesh::Create( Device& _device )
     {
-        mBuffersOutdated = false;
-
         if( mIndices.empty() || mVertices.empty() ){ return; }
 
         mCurrentBuffer = ( mCurrentBuffer + 1 ) % SwapChain::sMaxFramesInFlight;

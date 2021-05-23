@@ -31,27 +31,31 @@ namespace fan
         void AddResourceType( const ResourceInfo& _resourceInfo );
 
         template< class ResourceType >
-        ResourceType* Load( const std::string& _path );
+        ResourcePtr <ResourceType> Load( const std::string& _path );
+        ResourcePtrData Load( uint32_t _type, const std::string& _path );
 
         template< class ResourceType >
-        void Add( ResourceType* _resource, const std::string& _path );
+        ResourcePtr <ResourceType> Add( ResourceType* _resource, const std::string& _path );
 
         template< class ResourceType >
-        ResourceType* Get( const std::string& _path ) const;
+        ResourcePtr <ResourceType> Get( const std::string& _path );
+        template< class ResourceType >
+        ResourcePtr <ResourceType> Get( const uint32_t _guid );
+        ResourcePtrData Get( const std::string& _path ) { return Get( DSID( _path.c_str() ) ); };
+        ResourcePtrData Get( const uint32_t _guid );
 
         template< class ResourceType >
-        ResourceType* Get( const uint32_t _guid ) const;
+        void Get( std::vector<ResourcePtr < ResourceType>>
+        & _outResources );
 
         template< class ResourceType >
-        void Get( std::vector<ResourceType*>& _outResources ) const;
-
-        template< class ResourceType >
-        ResourceType* GetOrLoad( const std::string& _path );
+        ResourcePtr <ResourceType> GetOrLoad( const std::string& _path );
+        ResourcePtrData GetOrLoad( const uint32_t _type, const std::string& _path );
 
         bool Remove( const std::string& _path ) { return Remove( DSID( _path.c_str() ) ); }
         bool Remove( const uint32_t _guid );
 
-        bool SetOutdated( const uint32_t _guid );
+        bool SetDirty( const uint32_t _guid );
 
         template< class ResourceType >
         void GetDestroyList( std::vector<ResourceType*>& _destroyedList );
@@ -62,19 +66,21 @@ namespace fan
         template< class ResourceType >
         int Count() const;
 
-        void ResolvePtr( ResourcePtrData& _resourcePtrData );
-
         void Clear();
 
-    private:
-        Resource* Load( const uint32_t _type, const std::string& _path );
-        void Add( const uint32_t _type, Resource* _resource, const std::string& _path );
-        Resource* Get( const uint32_t _type, const uint32_t _guid ) const;
-        Resource* GetOrLoad( const uint32_t _type, const std::string& _path );
-        void DeleteResource( std::map<uint32_t, Resource*>::iterator _iterator );
+        uint32_t GetUniqueID() { return mNextUniqueID++;}
 
-        std::map<uint32_t, Resource*>    mResources;
-        std::map<uint32_t, ResourceInfo> mResourceInfos;
+    private:
+        ResourceHandle* LoadInternal( const uint32_t _type, const std::string& _path );
+        ResourceHandle* AddInternal( const uint32_t _type, Resource* _resource, const std::string& _path );
+        ResourceHandle* GetInternal( const uint32_t _guid );
+        ResourceHandle* GetOrLoadInternal( const uint32_t _type, const std::string& _path );
+        bool DeleteResource( std::map<uint32_t, ResourceHandle*>::iterator _iterator );
+
+        std::map<uint32_t, Resource*>       mResources;
+        std::map<uint32_t, ResourceHandle*> mResourceHandles;
+        std::map<uint32_t, ResourceInfo>    mResourceInfos;
+        uint32_t mNextUniqueID = 0;
     };
 
     //==================================================================================================================================================================================================
@@ -91,23 +97,29 @@ namespace fan
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
     template< class ResourceType >
-    ResourceType* ResourceManager::Load( const std::string& _path )
+    ResourcePtr <ResourceType> ResourceManager::Load( const std::string& _path )
     {
-        return static_cast<ResourceType*>(Load( ResourceType::Info::sType, _path ));
+        ResourcePtr<ResourceType> resourcePtr;
+        resourcePtr.mData.mHandle = LoadInternal( ResourceType::Info::sType, _path );
+        resourcePtr.mData.mGUID   = resourcePtr.mData.mHandle != nullptr ? resourcePtr.mData.mHandle->mResource->mGUID : 0;
+        return resourcePtr;
     }
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
     template< class ResourceType >
-    void ResourceManager::Add( ResourceType* _resource, const std::string& _path )
+    ResourcePtr <ResourceType> ResourceManager::Add( ResourceType* _resource, const std::string& _path )
     {
-        Add( ResourceType::Info::sType, _resource, _path );
+        ResourcePtr<ResourceType> resourcePtr;
+        resourcePtr.mData.mHandle = AddInternal( ResourceType::Info::sType, _resource, _path );
+        resourcePtr.mData.mGUID   = resourcePtr.mData.mHandle != nullptr ? resourcePtr.mData.mHandle->mResource->mGUID : 0;
+        return resourcePtr;
     }
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
     template< class ResourceType >
-    ResourceType* ResourceManager::Get( const std::string& _path ) const
+    ResourcePtr <ResourceType> ResourceManager::Get( const std::string& _path )
     {
         return Get<ResourceType>( DSID( _path.c_str() ) );
     }
@@ -115,17 +127,22 @@ namespace fan
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
     template< class ResourceType >
-    ResourceType* ResourceManager::Get( const uint32_t _guid ) const
+    ResourcePtr <ResourceType> ResourceManager::Get( const uint32_t _guid )
     {
-        return static_cast<ResourceType*>( Get( ResourceType::Info::sType, _guid ) );
+        ResourcePtr<ResourceType> resourcePtr;
+        resourcePtr.mData = Get( _guid );
+        fanAssert( resourcePtr.mData.mHandle == nullptr || resourcePtr.mData.mHandle->mResource == nullptr || ResourceType::Info::sType == resourcePtr.mData.mHandle->mResource->mType );
+        return resourcePtr;
     }
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
     template< class ResourceType >
-    ResourceType* ResourceManager::GetOrLoad( const std::string& _path )
+    ResourcePtr <ResourceType> ResourceManager::GetOrLoad( const std::string& _path )
     {
-        return static_cast<ResourceType*>( GetOrLoad( ResourceType::Info::sType, _path ));
+        ResourcePtr<ResourceType> resourcePtr;
+        resourcePtr.mData = GetOrLoad( ResourceType::Info::sType, _path );
+        return resourcePtr;
     }
 
     //==================================================================================================================================================================================================
@@ -133,7 +150,7 @@ namespace fan
     template< class ResourceType >
     void ResourceManager::GetDestroyList( std::vector<ResourceType*>& _destroyedList )
     {
-        ResourceInfo& info = mResourceInfos[ResourceType::Info::sType];
+        ResourceInfo& info = mResourceInfos.at( ResourceType::Info::sType );
         fanAssert( info.mUseDestroyList );
         _destroyedList.clear();
         for( Resource* resource : info.mDestroyList )
@@ -148,11 +165,13 @@ namespace fan
     template< class ResourceType >
     void ResourceManager::GetDirtyList( std::vector<ResourceType*>& _outdatedList )
     {
-        ResourceInfo& info = mResourceInfos[ResourceType::Info::sType];
+        ResourceInfo& info = mResourceInfos.at( ResourceType::Info::sType );
         fanAssert( info.mUseDirtyList );
         _outdatedList.clear();
         for( Resource* resource : info.mDirtyList )
         {
+            fanAssert( resource->mIsDirty );
+            resource->mIsDirty = false;
             _outdatedList.push_back( static_cast<ResourceType*>(resource) );
         }
         info.mDirtyList.clear();
@@ -170,19 +189,25 @@ namespace fan
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
     template< class ResourceType >
-    void ResourceManager::Get( std::vector<ResourceType*>& _outResources ) const
+    void ResourceManager::Get( std::vector<ResourcePtr < ResourceType>> & _outResources )
     {
         const ResourceInfo& info = mResourceInfos.at( ResourceType::Info::sType );
         _outResources.clear();
-        _outResources.reserve( (size_t)info.mCount );
-        for( auto it : mResources )
-        {
-            Resource* resource = it.second;
-            if( resource->mType == ResourceType::Info::sType )
+        _outResources.reserve( info.mCount );
+            for(auto it : mResourceHandles )
             {
-                _outResources.push_back( static_cast<ResourceType*>(resource) );
+                ResourceHandle* handle = it.second;
+                if( handle->mResource != nullptr && handle->mResource->mType == ResourceType::Info::sType&& handle->mResource != nullptr )
+                {
+                    ResourcePtr <ResourceType> resourcePtr;
+                    resourcePtr.mData.
+                    mHandle = handle;
+                    resourcePtr.mData.
+                    mGUID = resourcePtr.mData.mHandle->mResource->mGUID;
+                    _outResources.
+                    push_back( resourcePtr );
+                }
             }
+            fanAssert( _outResources.size() == info.mCount );
         }
-        fanAssert( _outResources.size() == info.mCount );
     }
-}

@@ -9,8 +9,9 @@ namespace fan
     {
         mSeed         = 42;
         mSimplexNoise = SimplexNoise( mSeed );
+        mInterpolationScale = 1;
+        mClearSides = true;
         m3DOctaves[0] = m3DOctaves[1] = m2DOctave = {};
-        mClearSides = false;
     }
 
     //==================================================================================================================================================================================================

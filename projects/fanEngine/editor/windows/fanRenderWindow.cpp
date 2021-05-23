@@ -48,7 +48,9 @@ namespace fan
 
         if( ImGui::CollapsingHeader( "Loaded 3D meshes : " ) )
         {
-            for( Mesh* mesh : engineResources.mMeshManager->GetMeshes() )
+            std::vector<ResourcePtr<Mesh>> meshes;
+            engineResources.mResources->Get<Mesh>( meshes );
+            for( ResourcePtr<Mesh> mesh : meshes )
             {
                 ImGui::Text( "index: %d name: %s", mesh->mIndex, mesh->mPath.c_str() );
                 ImGui::FanBeginDragDropSourceMesh( mesh, ImGuiDragDropFlags_SourceAllowNullID );
@@ -57,7 +59,9 @@ namespace fan
 
         if( ImGui::CollapsingHeader( "Loaded 2D meshes : " ) )
         {
-            for( Mesh2D* mesh : engineResources.mMesh2DManager->GetMeshes() )
+            std::vector<ResourcePtr<Mesh2D>> meshes2D;
+            engineResources.mResources->Get<Mesh2D>( meshes2D );
+            for( ResourcePtr<Mesh2D> mesh : meshes2D )
             {
                 ImGui::Text( "name: %s", mesh->mPath.c_str() );
             }
@@ -65,20 +69,20 @@ namespace fan
 
         if( ImGui::CollapsingHeader( "Loaded textures : " ) )
         {
-            std::vector<Texture*> textures;
-            engineResources.mResourceManager.Get<Texture>( textures );
-            for( Texture* tex : textures )
+            std::vector<ResourcePtr<Texture>> textures;
+            engineResources.mResources->Get<Texture>( textures );
+            for( ResourcePtr<Texture> tex : textures )
             {
-                ImGui::Text( "ref: %d size: %u x %u name: %s", tex->mRefCount, tex->mExtent.width, tex->mExtent.height, tex->mPath.c_str() );
+                ImGui::Text( "ref: %d size: %u x %u name: %s", tex.mData.mHandle->mRefCount, tex->mExtent.width, tex->mExtent.height, tex->mPath.c_str() );
                 ImGui::FanBeginDragDropSourceTexture( tex, ImGuiDragDropFlags_SourceAllowNullID );
             }
         }
 
         if( ImGui::CollapsingHeader( "Loaded fonts : " ) )
         {
-            std::vector<Font*> fonts;
-            engineResources.mResourceManager->Get<Font>( fonts );
-            for( Font* font : fonts )
+            std::vector<ResourcePtr<Font>> fonts;
+            engineResources.mResources->Get<Font>( fonts );
+            for( fan::ResourcePtr<fan::Font> font : fonts )
             {
                 ImGui::Text( font->mPath.c_str() );
                 ImGui::FanBeginDragDropSourceFont( font, ImGuiDragDropFlags_SourceAllowNullID );
@@ -88,11 +92,11 @@ namespace fan
         // Display mesh list
         if( ImGui::CollapsingHeader( "Loaded prefabs : " ) )
         {
-            std::vector<Prefab*> prefabs;
-            engineResources.mResourceManager->Get<Prefab>( prefabs );
-            for( const Prefab* prefab : prefabs )
+            std::vector<ResourcePtr<Prefab>> prefabs;
+            engineResources.mResources->Get<Prefab>( prefabs );
+            for( const ResourcePtr<Prefab> prefab : prefabs )
             {
-                ImGui::Text( "ref: %d name: %s", prefab->mRefCount, prefab->mPath.c_str() );
+                ImGui::Text( "ref: %d name: %s", prefab.mData.mHandle->mRefCount, prefab->mPath.c_str() );
             }
         }
 

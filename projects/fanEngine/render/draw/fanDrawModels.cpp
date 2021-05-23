@@ -12,8 +12,10 @@ namespace fan
 {
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void DrawModels::Create( Device& _device, uint32_t _imagesCount )
+    void DrawModels::Create( Device& _device, uint32_t _imagesCount, ResourcePtr<Texture> _invalidTexture )
     {
+        mInvalidTexture = _invalidTexture;
+
         mSamplerTextures.Create( _device, 0, 8, VK_FILTER_LINEAR );
         mDescriptorSampler.Create( _device, mSamplerTextures.mSampler );
 
@@ -23,28 +25,11 @@ namespace fan
         mUniforms.mDynamicUniformsMatrices.Resize( initialDrawDataSize );
         mUniforms.mDynamicUniformsMaterial.Resize( initialDrawDataSize );
 
-        mDescriptorUniforms.AddUniformBinding( _device,
-                                               _imagesCount,
-                                               VK_SHADER_STAGE_VERTEX_BIT,
-                                               sizeof( UniformViewProj ) );
-        mDescriptorUniforms.AddDynamicUniformBinding( _device,
-                                                      _imagesCount,
-                                                      VK_SHADER_STAGE_VERTEX_BIT,
-                                                      mUniforms.mDynamicUniformsMatrices.Size(),
-                                                      mUniforms.mDynamicUniformsMatrices.Alignment() );
-        mDescriptorUniforms.AddUniformBinding( _device,
-                                               _imagesCount,
-                                               VK_SHADER_STAGE_FRAGMENT_BIT,
-                                               sizeof( UniformCameraPosition ) );
-        mDescriptorUniforms.AddDynamicUniformBinding( _device,
-                                                      _imagesCount,
-                                                      VK_SHADER_STAGE_FRAGMENT_BIT,
-                                                      mUniforms.mDynamicUniformsMaterial.Size(),
-                                                      mUniforms.mDynamicUniformsMaterial.Alignment() );
-        mDescriptorUniforms.AddUniformBinding( _device,
-                                               _imagesCount,
-                                               VK_SHADER_STAGE_FRAGMENT_BIT,
-                                               sizeof( UniformLights ) );
+        mDescriptorUniforms.AddUniformBinding( _device, _imagesCount, VK_SHADER_STAGE_VERTEX_BIT, sizeof( UniformViewProj ) );
+        mDescriptorUniforms.AddDynamicUniformBinding( _device, _imagesCount, VK_SHADER_STAGE_VERTEX_BIT, mUniforms.mDynamicUniformsMatrices.Size(), mUniforms.mDynamicUniformsMatrices.Alignment() );
+        mDescriptorUniforms.AddUniformBinding( _device, _imagesCount, VK_SHADER_STAGE_FRAGMENT_BIT, sizeof( UniformCameraPosition ) );
+        mDescriptorUniforms.AddDynamicUniformBinding( _device, _imagesCount, VK_SHADER_STAGE_FRAGMENT_BIT, mUniforms.mDynamicUniformsMaterial.Size(), mUniforms.mDynamicUniformsMaterial.Alignment() );
+        mDescriptorUniforms.AddUniformBinding( _device, _imagesCount, VK_SHADER_STAGE_FRAGMENT_BIT, sizeof( UniformLights ) );
         mDescriptorUniforms.Create( _device, _imagesCount );
     }
 
@@ -66,11 +51,7 @@ namespace fan
 
         config.bindingDescription    = Vertex::GetBindingDescription();
         config.attributeDescriptions = Vertex::GetAttributeDescriptions();
-        config.descriptorSetLayouts  = {
-                mDescriptorUniforms.mDescriptorSetLayout,
-                _imagesDescriptor.mDescriptorSetLayout,
-                mDescriptorSampler.mDescriptorSetLayout
-        };
+        config.descriptorSetLayouts  = { mDescriptorUniforms.mDescriptorSetLayout, _imagesDescriptor.mDescriptorSetLayout, mDescriptorSampler.mDescriptorSetLayout };
 
         return config;
     }
@@ -119,10 +100,8 @@ namespace fan
         size_t dynamicAlignmentFrag = sizeof( DynamicUniformsMaterial );
         if( minUboAlignment > 0 )
         {
-            dynamicAlignmentVert = ( ( sizeof( DynamicUniformMatrices ) + minUboAlignment - 1 ) &
-                                     ~( minUboAlignment - 1 ) );
-            dynamicAlignmentFrag = ( ( sizeof( DynamicUniformsMaterial ) + minUboAlignment - 1 ) &
-                                     ~( minUboAlignment - 1 ) );
+            dynamicAlignmentVert = ( ( sizeof( DynamicUniformMatrices ) + minUboAlignment - 1 ) & ~( minUboAlignment - 1 ) );
+            dynamicAlignmentFrag = ( ( sizeof( DynamicUniformsMaterial ) + minUboAlignment - 1 ) & ~( minUboAlignment - 1 ) );
         }
 
         mDynamicUniformsMatrices.SetAlignement( dynamicAlignmentVert );
@@ -143,16 +122,14 @@ namespace fan
     void DrawModels::RecordCommandBuffer( const size_t _index, RenderPass& _renderPass, FrameBuffer& _framebuffer, VkExtent2D _extent, DescriptorImages& _descriptorImages )
     {
         VkCommandBuffer                commandBuffer                = mCommandBuffers.mBuffers[_index];
-        VkCommandBufferInheritanceInfo commandBufferInheritanceInfo = CommandBuffer::GetInheritanceInfo(
-                _renderPass.mRenderPass,
-                _framebuffer.mFrameBuffers[_index] );
-        VkCommandBufferBeginInfo       commandBufferBeginInfo       =
-                                               CommandBuffer::GetBeginInfo( &commandBufferInheritanceInfo );
+        VkCommandBufferInheritanceInfo commandBufferInheritanceInfo = CommandBuffer::GetInheritanceInfo( _renderPass.mRenderPass, _framebuffer.mFrameBuffers[_index] );
+        VkCommandBufferBeginInfo       commandBufferBeginInfo       = CommandBuffer::GetBeginInfo( &commandBufferInheritanceInfo );
+
+        fanAssert( mInvalidTexture != nullptr );
 
         if( vkBeginCommandBuffer( commandBuffer, &commandBufferBeginInfo ) == VK_SUCCESS )
         {
             mPipeline.Bind( commandBuffer, _extent );
-
             for( uint32_t meshIndex = 0; meshIndex < mDrawData.size(); meshIndex++ )
             {
                 DrawData& drawData = mDrawData[meshIndex];
@@ -161,7 +138,7 @@ namespace fan
                 Buffer& buffer = subMesh.mVertexBuffer[subMesh.mCurrentBuffer];
                 if( buffer.mBuffer == VK_NULL_HANDLE ){ continue; }
 
-                const uint32_t textureIndex = drawData.mTexture == nullptr ? 0 : drawData.mTexture->mIndex;
+                const uint32_t textureIndex = drawData.mTexture == nullptr ? mInvalidTexture->mIndex : drawData.mTexture->mIndex;
                 BindTexture( commandBuffer, textureIndex, mDescriptorSampler, _descriptorImages, mPipeline.mPipelineLayout );
                 BindDescriptors( commandBuffer, _index, meshIndex );
                 VkDeviceSize offsets[] = { 0 };

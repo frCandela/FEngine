@@ -50,8 +50,8 @@ namespace fan
         bool LoadBool( const Json& _json, const char* _name, bool& _outBool );
         bool LoadString( const Json& _json, const char* _name, std::string& _outString );
 
-        void SaveResourcePtr( Json& _json, const char* _name, const ResourcePtrData& _ptr );
-        bool LoadResourcePtr( const Json& _json, const char* _name, ResourcePtrData& _outPtr );
+        void SaveResourcePtr( Json& _json, const char* _name, const ResourcePtrData& _ptrData );
+        bool LoadResourcePtr( const Json& _json, const char* _name, ResourcePtrData& _outPtrData );
 
         bool ContainsToken( const Json& _json, const char* _name );
         const Json* FindToken( const Json& _json, const char* _name );

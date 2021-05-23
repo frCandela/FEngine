@@ -21,7 +21,6 @@ namespace fan
         }
 
         // Load the json
-        Debug::Log() << "Loading file : " << _path << Debug::Endl();
         std::ifstream inFile( _path );
         if( !inFile.good() == true )
         {

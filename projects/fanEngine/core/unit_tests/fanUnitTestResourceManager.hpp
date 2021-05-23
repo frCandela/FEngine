@@ -20,7 +20,6 @@ namespace fan
                     { &UnitTestResourceManager::TestGetOrLoad,   "Get or load" },
                     { &UnitTestResourceManager::TestRemove,      "Remove" },
                     { &UnitTestResourceManager::TestCount,       "Count" },
-                    { &UnitTestResourceManager::TestResolvePtr,  "Resolve Ptr" },
                     { &UnitTestResourceManager::TestClear,       "Clear" },
                     { &UnitTestResourceManager::TestDuplicates,  "Duplicates" },
                     { &UnitTestResourceManager::TestDestroyList, "Destroy list" },
@@ -52,6 +51,7 @@ namespace fan
             ResourceInfo info;
             info.mLoad           = loadPrefab;
             info.mUseDestroyList = true;
+            info.mUseDirtyList = true;
             mResources.AddResourceType<Prefab>( info );
         }
 
@@ -80,7 +80,7 @@ namespace fan
             TEST_ASSERT( mResources.Get<Prefab>( sPrefabName0 ) == prefab0 );
             TEST_ASSERT( mResources.Get<Prefab>( sPrefabName1 ) == prefab1 );
 
-            std::vector<Prefab*> prefabs;
+            std::vector<ResourcePtr<Prefab>> prefabs;
             mResources.Get<Prefab>( prefabs );
             TEST_ASSERT( prefabs.size() == 2 );
         }
@@ -109,7 +109,10 @@ namespace fan
             TEST_ASSERT( result );
             result = mResources.Remove( sPrefabName0 );
             TEST_ASSERT( !result );
-            TEST_ASSERT( mResources.Get<Prefab>( sPrefabName0 ) == nullptr );
+            ResourcePtr<Prefab> ptr = mResources.Get<Prefab>( sPrefabName0 );
+            TEST_ASSERT(  ptr == nullptr );
+            TEST_ASSERT(  ptr.mData.mHandle != nullptr );
+            TEST_ASSERT(  ptr.mData.mGUID != 0 );
         }
 
         void TestCount()
@@ -125,24 +128,17 @@ namespace fan
             TEST_ASSERT( mResources.Count<Prefab>() == 0 );
         }
 
-        void TestResolvePtr()
-        {
-            Prefab* prefab = mResources.Load<Prefab>( sPrefabName0 );
-            ResourcePtr<Prefab> rscPtr;
-            TEST_ASSERT( rscPtr.mData.mResource == nullptr );
-            rscPtr.mData.mPath = sPrefabName0;
-            mResources.ResolvePtr( rscPtr.mData );
-            TEST_ASSERT( rscPtr.IsValid() );
-            TEST_ASSERT( prefab == rscPtr );
-        }
-
         void TestClear()
         {
             TEST_ASSERT( mResources.Count<Prefab>() == 0 );
-            mResources.Load<Prefab>( sPrefabName0 );
+            ResourcePtr<Prefab> ptr = mResources.Load<Prefab>( sPrefabName0 );
+            TEST_ASSERT(  ptr.mData.mHandle != nullptr );
+            TEST_ASSERT(  ptr.mData.mHandle->mResource != nullptr );
             TEST_ASSERT( mResources.Count<Prefab>() == 1 );
             mResources.Clear();
             TEST_ASSERT( mResources.Count<Prefab>() == 0 );
+            TEST_ASSERT(  ptr.mData.mHandle != nullptr );
+            TEST_ASSERT(  ptr.mData.mHandle->mResource == nullptr );
         }
 
         void TestDuplicates()
@@ -183,13 +179,18 @@ namespace fan
 
         void TestDirty()
         {
-            Prefab* prefab0 = mResources.Load<Prefab>( sPrefabName0 );
-            TEST_ASSERT( prefab0 != nullptr );
-
             std::vector<Prefab*> dirtyList;
             mResources.GetDirtyList<Prefab>( dirtyList );
             TEST_ASSERT( dirtyList.size() == 0 );
-            mResources.SetOutdated(prefab0->mGUID);
+
+            Prefab* prefab0 = mResources.Load<Prefab>( sPrefabName0 );
+            TEST_ASSERT( prefab0 != nullptr );
+            mResources.GetDirtyList<Prefab>( dirtyList );
+            TEST_ASSERT( dirtyList.size() == 1 );
+            mResources.GetDirtyList<Prefab>( dirtyList );
+            TEST_ASSERT( dirtyList.size() == 0 );
+
+            mResources.SetDirty( prefab0->mGUID );
             mResources.GetDirtyList<Prefab>( dirtyList );
             TEST_ASSERT( dirtyList.size() == 1 );
             TEST_ASSERT( dirtyList[0] == prefab0 );

@@ -115,7 +115,6 @@ namespace fan
 
         const size_t bufferPixelSize = atlas.mGlyphSize * atlas.mSize;
         uint8_t* buffer = new uint8_t[bufferPixelSize * bufferPixelSize * 4];
-        atlas.mTexture = new Texture();
 
         glm::ivec2 glyphCoord( 0, 0 );
         for( int   i   = 0; i < (int)unicodeCharacters.size(); i++ )
@@ -172,8 +171,10 @@ namespace fan
             }
         }
 
-        atlas.mTexture->LoadFromPixels( buffer, { bufferPixelSize, bufferPixelSize }, 1 );
-        _resources.Add<Texture>( atlas.mTexture, mPath + "size_" + std::to_string( _height ) );
+        Texture * atlasTexture = new Texture();
+        atlasTexture->mIsGenerated = true;
+        atlasTexture->LoadFromPixels( buffer, { bufferPixelSize, bufferPixelSize }, 1 );
+        atlas.mTexture = _resources.Add<Texture>( atlasTexture, mPath + "size_" + std::to_string( _height ) );
         mAtlases.push_back( atlas );
         return &*mAtlases.rbegin();
     }

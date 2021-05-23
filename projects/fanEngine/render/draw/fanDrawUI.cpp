@@ -5,6 +5,7 @@
 #include "render/core/fanRenderPass.hpp"
 #include "render/core/fanFrameBuffer.hpp"
 #include "render/resources/fanMesh2D.hpp"
+#include "render/resources/fanTexture.hpp"
 
 namespace fan
 {
@@ -81,8 +82,7 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void
-    DrawUI::RecordCommandBuffer( const size_t _index, RenderPass& _renderPass, FrameBuffer& _framebuffer, VkExtent2D _extent, DescriptorImages& _descriptorTextures )
+    void DrawUI::RecordCommandBuffer( const size_t _index, RenderPass& _renderPass, FrameBuffer& _framebuffer, VkExtent2D _extent, DescriptorImages& _descriptorImages )
     {
         VkCommandBuffer                commandBuffer                = mCommandBuffers.mBuffers[_index];
         VkCommandBufferInheritanceInfo commandBufferInheritanceInfo = CommandBuffer::GetInheritanceInfo( _renderPass.mRenderPass, _framebuffer.mFrameBuffers[_index] );
@@ -99,9 +99,10 @@ namespace fan
                 UIDrawData drawData = mDrawData[meshIndex];
                 Mesh2D* mesh = drawData.mMesh;
                 VkBuffer vertexBuffers[] = { mesh->mVertexBuffer.mBuffer };
+                fanAssert( mesh->mVertexBuffer.mBuffer != VK_NULL_HANDLE );
                 BindDescriptors( commandBuffer, _index, meshIndex );
                 vkCmdBindVertexBuffers( commandBuffer, 0, 1, vertexBuffers, offsets );
-                BindTexture( commandBuffer, drawData.mTextureIndex, mDescriptorSampler, _descriptorTextures, mPipeline.mPipelineLayout );
+                BindTexture( commandBuffer, drawData.mTexture->mIndex, mDescriptorSampler, _descriptorImages, mPipeline.mPipelineLayout );
                 vkCmdDraw( commandBuffer, static_cast<uint32_t>( mesh->mVertices.size() ), 1, 0, 0 );
             }
 
@@ -119,12 +120,12 @@ namespace fan
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
     void
-    DrawUI::BindTexture( VkCommandBuffer _commandBuffer, const uint32_t _textureIndex, DescriptorSampler& _descriptorSampler, DescriptorImages& _descriptorTextures, VkPipelineLayout _pipelineLayout )
+    DrawUI::BindTexture( VkCommandBuffer _commandBuffer, const uint32_t _textureIndex, DescriptorSampler& _descriptorSampler, DescriptorImages& _descriptorImages, VkPipelineLayout _pipelineLayout )
     {
-        fanAssert( _textureIndex < _descriptorTextures.mDescriptorSets.size() );
+        fanAssert( _textureIndex < _descriptorImages.mDescriptorSets.size() );
 
         std::vector<VkDescriptorSet> descriptors = {
-                _descriptorTextures.mDescriptorSets[_textureIndex], _descriptorSampler.mDescriptorSet
+                _descriptorImages.mDescriptorSets[_textureIndex], _descriptorSampler.mDescriptorSet
         };
 
         vkCmdBindDescriptorSets(
@@ -149,7 +150,7 @@ namespace fan
             const RenderDataMesh2D& uiData = _drawData[meshIndex];
 
             mDrawData[meshIndex].mMesh                          = uiData.mMesh;
-            mDrawData[meshIndex].mTextureIndex                  = uiData.mTextureIndex;
+            mDrawData[meshIndex].mTexture                       = uiData.mTexture;
             mUniforms.mDynamicUniformsVert[meshIndex].mPosition = uiData.mPosition;
             mUniforms.mDynamicUniformsVert[meshIndex].mScale    = uiData.mScale;
             mUniforms.mDynamicUniformsVert[meshIndex].mColor    = uiData.mColor;

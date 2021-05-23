@@ -8,7 +8,6 @@
 #include "engine/components/fanMaterial.hpp"
 #include "engine/singletons/fanScene.hpp"
 #include "engine/terrain/fanVoxelTerrain.hpp"
-#include "render/resources/fanMeshManager.hpp"
 
 namespace fan
 {
@@ -57,7 +56,7 @@ namespace fan
         if( _terrain.mSize.x <= 0 || _terrain.mSize.y <= 0 || _terrain.mSize.z <= 0 ){ return; }
 
         EngineResources& engineResources = _world.GetSingleton<EngineResources>();
-        Texture        * texture         = engineResources.mResourceManager->GetOrLoad<Texture>( "_default/texture/white.png" );
+        ResourcePtr<Texture> texture         = engineResources.mResources->GetOrLoad<Texture>( "_default/texture/white.png" );
 
         Scene    & scene       = _world.GetSingleton<Scene>();
         SceneNode& terrainRoot = scene.CreateSceneNode( "terrain", &scene.GetRootNode() );
@@ -87,14 +86,17 @@ namespace fan
                     Transform& transform = _world.AddComponent<Transform>( entity );
                     transform.mPosition = Fixed( VoxelChunk::sSize ) * Vector3( position.x, position.y, position.z );
 
-                    Mesh* mesh = engineResources.mMeshManager->Get( chunkName );
-                    if( !mesh ){ mesh = new Mesh; }
+                    fan::ResourcePtr<fan::Mesh> mesh = engineResources.mResources->Get<Mesh>( chunkName );
+                    if( !mesh )
+                    {
+                        mesh = engineResources.mResources->Add<Mesh>( new Mesh, chunkName );
+                    }
                     MeshRenderer& renderer = _world.AddComponent<MeshRenderer>( entity );
                     mesh->mSubMeshes.resize( 1 );
                     mesh->mSubMeshes[0].mOptimizeVertices = true;
                     mesh->mSubMeshes[0].mHostVisible      = true;
+                    mesh->mPath = chunkName;
                     renderer.mMesh                        = mesh;
-                    engineResources.mMeshManager->Add( mesh, chunkName );
 
                     Material& material = _world.AddComponent<Material>( entity );
                     material.mMaterials[0].mTexture = texture;

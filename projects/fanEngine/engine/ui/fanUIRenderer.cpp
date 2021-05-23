@@ -1,10 +1,9 @@
 #include "fanUIRenderer.hpp"
 #include "core/memory/fanSerializable.hpp"
-#include "render/resources/fanMesh2DManager.hpp"
+#include "core/resources/fanResourceManager.hpp"
 #include "render/fanRenderGlobal.hpp"
 #include "engine/singletons/fanEngineResources.hpp"
 #include "engine/fanSceneTags.hpp"
-#include "editor/fanModals.hpp"
 
 namespace fan
 {
@@ -23,11 +22,11 @@ namespace fan
         EngineResources& engineResources = _world.GetSingleton<EngineResources>();
 
         UIRenderer& uiRenderer = static_cast<UIRenderer&>( _component );
-        uiRenderer.mMesh2D = engineResources.mMesh2DManager->Get( RenderGlobal::sMesh2DQuad );
-        uiRenderer.mColor  = Color::sWhite;
-        uiRenderer.mUvOffset = {0,0};
-        uiRenderer.mTiling = {1,1};
-        uiRenderer.mDepth  = 0;
+        uiRenderer.mMesh2D   = engineResources.mResources->Get<Mesh2D>( RenderGlobal::sMesh2DQuad );
+        uiRenderer.mColor    = Color::sWhite;
+        uiRenderer.mUvOffset = { 0, 0 };
+        uiRenderer.mTiling   = { 1, 1 };
+        uiRenderer.mDepth    = 0;
         fanAssert( uiRenderer.mMesh2D );
 
         _world.AddTag<TagUIVisible>( _entity );
@@ -61,8 +60,6 @@ namespace fan
     //==================================================================================================================================================================================================
     glm::ivec2 UIRenderer::GetTextureSize() const
     {
-        return *mTexture != nullptr ?
-                glm::ivec2( mTexture->mExtent.width, mTexture->mExtent.height ) :
-                glm::ivec2( 0, 0 );
+        return mTexture != nullptr ? glm::ivec2( mTexture->mExtent.width, mTexture->mExtent.height ) : glm::ivec2( 0, 0 );
     }
 }

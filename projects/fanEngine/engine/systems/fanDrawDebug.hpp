@@ -54,7 +54,7 @@ namespace fan
                 const MeshRenderer& meshRenderer = *meshRendererIt;
                 const Transform   & transform    = *transformIt;
 
-                if( *meshRenderer.mMesh != nullptr )
+                if( meshRenderer.mMesh != nullptr )
                 {
                     const glm::mat4 modelMat  = transform.GetModelMatrix();
                     const glm::mat4 normalMat = transform.GetNormalMatrix();
@@ -93,7 +93,7 @@ namespace fan
             {
                 const MeshRenderer& meshRenderer = *meshRendererIt;
                 const Transform   & transform    = *transformIt;
-                if( *meshRenderer.mMesh == nullptr ){ continue; }
+                if( meshRenderer.mMesh == nullptr ){ continue; }
 
                 const glm::mat4 modelMat = transform.GetModelMatrix();
                 for( SubMesh& subMesh : meshRenderer.mMesh->mSubMeshes )
@@ -134,7 +134,7 @@ namespace fan
                 const MeshRenderer& meshRenderer = *meshRendererIt;
                 const Transform   & transform    = *transformIt;
 
-                if( *meshRenderer.mMesh == nullptr ){ continue; }
+                if( meshRenderer.mMesh == nullptr ){ continue; }
 
                 const ConvexHull& hull = meshRenderer.mMesh->mConvexHull;
                 if( hull.mVertices.empty() ){ continue; }

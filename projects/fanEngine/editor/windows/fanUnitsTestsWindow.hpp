@@ -32,8 +32,6 @@ namespace fan
         static void RunTest( const TestArgument& _testArgument );
         static void ClearTest( const TestArgument& _testArgument );
 
-        UnitTestResult mMeshManagerResult;
-        UnitTestResult mMesh2DManagerResult;
         UnitTestResult mFanAssertResult;
         UnitTestResult mGlfwMouseResult;
         UnitTestResult mSignalResult;

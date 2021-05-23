@@ -31,10 +31,7 @@
 #include "editor/fanGuiTestSingleton.hpp"
 #include "editor/fanGuiTestComponent.hpp"
 #include "editor/fanModals.hpp"
-
 #endif
-
-#include "render/fanGLTFExporter.hpp"
 
 namespace fan
 {
@@ -56,9 +53,8 @@ namespace fan
     //==================================================================================================================================================================================================
     void DarkReign3::Start()
     {
-        MeshManager& meshManager = *mWorld.GetSingleton<EngineResources>().mMeshManager;
-        RenderWorld& renderWorld = mWorld.GetSingleton<RenderWorld>();
-        meshManager.Add( renderWorld.mParticlesMesh, "particles_mesh" );
+        /*ResourceManager& resources   = *mWorld.GetSingleton<EngineResources>().mResources;
+        RenderWorld    & renderWorld = mWorld.GetSingleton<RenderWorld>();*/
 
         Scene& scene = mWorld.GetSingleton<Scene>();
         SceneNode cameraNode = scene.CreateSceneNode( "game_camera", &scene.GetRootNode() );
@@ -67,7 +63,7 @@ namespace fan
         mWorld.AddComponent<Camera>( cameraEntity );
         Transform& cameraTransform = mWorld.AddComponent<Transform>( cameraEntity );
 
-        if( scene.mMainCameraHandle != 0)
+        if( scene.mMainCameraHandle != 0 )
         {
             Transform& prevCameraTransform = mWorld.GetComponent<Transform>( mWorld.GetEntity( scene.mMainCameraHandle ) );
             cameraTransform = prevCameraTransform;
@@ -91,7 +87,8 @@ namespace fan
     //============================================================================================================================
     void DarkReign3::StepLoadTerrain()
     {
-        VoxelTerrain& terrain = mWorld.GetSingleton<VoxelTerrain>();
+        VoxelTerrain   & terrain   = mWorld.GetSingleton<VoxelTerrain>();
+        ResourceManager& resources = *mWorld.GetSingleton<EngineResources>().mResources;
         if( !terrain.mIsInitialized ){ return; }
 
         for( int iteration = 0; iteration < chunksPerFrame; ++iteration )
@@ -126,6 +123,7 @@ namespace fan
                     sceneNode.AddFlag( SceneNode::BoundsOutdated );
                     VoxelGenerator::GenerateMesh( terrain, chunk, ( meshRenderer.mMesh )->mSubMeshes[0] );
                     ( meshRenderer.mMesh )->GenerateConvexHull();
+                    resources.SetDirty( meshRenderer.mMesh->mGUID );
                     completionMeshGeneration = i;
                     break;
                 }
@@ -177,7 +175,6 @@ namespace fan
         mWorld.ForceRun<SUpdateRenderWorldPointLights>();
         mWorld.ForceRun<SUpdateRenderWorldDirectionalLights>();
     }
-
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================

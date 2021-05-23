@@ -1,9 +1,10 @@
 #include "core/memory/fanSerializable.hpp"
 #include "core/fanDebug.hpp"
 #include "core/fanColor.hpp"
+#include "core/fanPath.hpp"
 #include "core/math/fanVector3.hpp"
 #include "core/math/fanQuaternion.hpp"
-#include "core/resources/fanResourcePtr.hpp"
+#include "core/resources/fanResourceManager.hpp"
 
 namespace fan
 {
@@ -320,20 +321,21 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void Serializable::SaveResourcePtr( Json& _json, const char* _name, const ResourcePtrData& _ptr )
+    void Serializable::SaveResourcePtr( Json& _json, const char* _name, const ResourcePtrData& _ptrData )
     {
-        _json[_name] = ( _ptr.mResource != nullptr ? _ptr.mPath : "" );
+        bool resourceExists = _ptrData.mHandle != nullptr && _ptrData.mHandle->mResource != nullptr;
+        _json[_name]["resource"] = resourceExists ? _ptrData.mGUID : 0;
     }
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    bool Serializable::LoadResourcePtr( const Json& _json, const char* _name, ResourcePtrData& _outPtr )
+    bool Serializable::LoadResourcePtr( const Json& _json, const char* _name, ResourcePtrData& _outPtrData )
     {
         const Json* token = FindToken( _json, _name );
         if( token != nullptr )
         {
-            _outPtr.mPath = *token;
-            _outPtr.Resolve();
+            const uint32_t guid = (*token)["resource"];
+            _outPtrData = ResourcePtrData::sResourceManager->Get( guid );
             return true;
         }
         return false;

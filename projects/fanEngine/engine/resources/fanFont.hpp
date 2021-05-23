@@ -8,6 +8,7 @@
 #include "fanDisableWarnings.hpp"
 #include "fanGlm.hpp"
 #include "render/resources/fanTexture.hpp"
+#include "core/resources/fanResourcePtr.hpp"
 
 namespace fan
 {
@@ -33,7 +34,7 @@ namespace fan
             int                       mGlyphSize = 0;   // max size of the side of a glyph in pixels
             int                       mSize      = 0;        // number of glyph per row/col
             std::map<uint32_t, Glyph> mGlyphs;
-            Texture* mTexture;
+            fan::ResourcePtr<Texture> mTexture;
 
             int GetPixelSize() const { return mGlyphSize * mSize; }
             const Glyph& GetGlyph( const uint32_t _codePoint ) const;
@@ -49,6 +50,5 @@ namespace fan
 
         FT_Face            mFace;
         std::vector<Atlas> mAtlases;
-        std::string        mPath;
     };
 }

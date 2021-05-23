@@ -3,8 +3,6 @@
 #include "core/fanDebug.hpp"
 #include "core/time/fanProfiler.hpp"
 #include "core/unit_tests/fanUnitTestFanAssert.hpp"
-#include "render/unit_tests/fanUnitTestMeshManager.hpp"
-#include "render/unit_tests/fanUnitTestMesh2DManager.hpp"
 #include "engine/unit_tests/fanUnitTestMouse.hpp"
 #include "core/unit_tests/fanUnitTestSignal.hpp"
 #include "core/unit_tests/fanUnitTestEcs.hpp"
@@ -38,8 +36,6 @@ namespace fan
     std::vector<UnitTestsWindow::TestArgument> UnitTestsWindow::GetTests()
     {
         return {
-                { "Mesh manager", &UnitTestMeshManager::RunTests, mMeshManagerResult },
-                { "Mesh2D manager", &UnitTestMesh2DManager::RunTests, mMesh2DManagerResult },
 #ifndef NDEBUG
                 { "fanAssert", &UnitTestFanAssert::RunTests, mFanAssertResult },
 #endif

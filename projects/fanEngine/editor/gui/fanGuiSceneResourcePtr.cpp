@@ -4,6 +4,7 @@
 #include "engine/components/fanSceneNode.hpp"
 #include "render/fanRenderGlobal.hpp"
 #include "engine/resources/fanFont.hpp"
+#include "core/resources/fanResourceManager.hpp"
 #include "editor/singletons/fanEditorSettings.hpp"
 #include "editor/fanDragnDrop.hpp"
 #include "editor/fanModals.hpp"
@@ -93,7 +94,7 @@ namespace ImGui
     {
         bool returnValue = false;
 
-        fan::Prefab* prefab = *_ptr;
+        fan::Prefab* prefab = _ptr;
         const std::string name = ( prefab == nullptr ? "null" : fan::Path::FileName( prefab->mPath ) );
 
         // Set button icon & modal
@@ -119,7 +120,7 @@ namespace ImGui
         const float width = 0.6f * ImGui::GetWindowWidth() - ImGui::GetCursorPosX() + 8;
         ImGui::Button( name.c_str(), ImVec2( width, 0.f ) );
         ImGui::SameLine();
-        ImGui::FanBeginDragDropSourcePrefab( prefab );
+        ImGui::FanBeginDragDropSourcePrefab( _ptr);
 
         // tooltip
         if( prefab != nullptr )
@@ -131,21 +132,20 @@ namespace ImGui
         fan::Prefab* prefabDrop = ImGui::FanBeginDragDropTargetPrefab();
         if( prefabDrop )
         {
-            _ptr.mData.mResource = prefabDrop;
+            _ptr.mData.mHandle->mResource = prefabDrop;
             returnValue = true;
         }
 
         // Right click = clear
         if( ImGui::IsItemClicked( 1 ) )
         {
-            _ptr.mData.mResource = nullptr;
+            _ptr.mData.mHandle->mResource = nullptr;
             returnValue = true;
         }
 
         if( ImGui::FanLoadFileModal( modalName.c_str(), fan::RenderGlobal::sPrefabExtensions, m_pathBuffer ) )
         {
-            _ptr.mData.mPath = m_pathBuffer;
-            _ptr.mData.Resolve();
+            _ptr = _ptr.mData.sResourceManager->Load<fan::Prefab>(m_pathBuffer);
             returnValue = true;
         }
 
@@ -161,7 +161,7 @@ namespace ImGui
     {
         bool returnValue = false;
 
-        fan::Font* font = *_ptr;
+        fan::Font* font = _ptr;
         const std::string name = ( font == nullptr ) ? "null" : fan::Path::FileName( font->mPath );
 
         // Set button icon & modal
@@ -189,7 +189,7 @@ namespace ImGui
             }
         }
         ImGui::SameLine();
-        ImGui::FanBeginDragDropSourceFont( font );
+        ImGui::FanBeginDragDropSourceFont( _ptr );
 
         // tooltip
         if( font != nullptr )
@@ -198,7 +198,7 @@ namespace ImGui
         }
 
         // dragndrop
-        fan::Font* fontDrop = ImGui::FanBeginDragDropTargetFont();
+        fan::ResourcePtr<fan::Font> fontDrop = ImGui::FanBeginDragDropTargetFont();
         if( fontDrop )
         {
             _ptr        = fontDrop;
@@ -214,8 +214,7 @@ namespace ImGui
 
         if( ImGui::FanLoadFileModal( modalName.c_str(), fan::RenderGlobal::sFontsExtensions, sPathBuffer ) )
         {
-            _ptr.mData.mPath = sPathBuffer;
-            _ptr.mData.Resolve();
+            _ptr = _ptr.mData.sResourceManager->Load<fan::Font>(sPathBuffer);
             returnValue = true;
         }
 

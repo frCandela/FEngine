@@ -62,9 +62,7 @@ namespace fan
     void Instance::Destroy()
     {
         // destroy debug report callback
-        PFN_vkDestroyDebugReportCallbackEXT func = (PFN_vkDestroyDebugReportCallbackEXT)vkGetInstanceProcAddr(
-                mInstance,
-                "vkDestroyDebugReportCallbackEXT" );
+        PFN_vkDestroyDebugReportCallbackEXT func = (PFN_vkDestroyDebugReportCallbackEXT)vkGetInstanceProcAddr( mInstance, "vkDestroyDebugReportCallbackEXT" );
         if( func != nullptr )
         {
             func( mInstance, mDebugReportCallback, nullptr );
@@ -76,8 +74,7 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    bool Instance::IsExtensionAvailable( const std::vector<VkExtensionProperties>& _availableExtensions,
-                                         const std::string _requiredExtension )
+    bool Instance::IsExtensionAvailable( const std::vector<VkExtensionProperties>& _availableExtensions, const std::string _requiredExtension )
     {
         for( int i = 0; i < (int)_availableExtensions.size(); i++ )
         {
@@ -91,8 +88,7 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    bool Instance::IsLayerAvailable( const std::vector<VkLayerProperties>& _availableLayers,
-                                     const std::string _requiredLayer )
+    bool Instance::IsLayerAvailable( const std::vector<VkLayerProperties>& _availableLayers, const std::string _requiredLayer )
     {
         for( int i = 0; i < (int)_availableLayers.size(); i++ )
         {
@@ -158,8 +154,7 @@ namespace fan
         createInfo.pfnCallback = DebugCallback;
         createInfo.pUserData   = _userData;
 
-        auto func = (PFN_vkCreateDebugReportCallbackEXT)
-                vkGetInstanceProcAddr( mInstance, "vkCreateDebugReportCallbackEXT" );
+        auto func = (PFN_vkCreateDebugReportCallbackEXT)vkGetInstanceProcAddr( mInstance, "vkCreateDebugReportCallbackEXT" );
         if( func != nullptr && func( mInstance, &createInfo, nullptr, &mDebugReportCallback ) == VK_SUCCESS )
         {
             Debug::Log() << Debug::Type::Render << std::hex << "VkDebugCallback       " << mDebugReportCallback << std::dec << Debug::Endl();

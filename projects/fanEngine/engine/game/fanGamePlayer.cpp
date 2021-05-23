@@ -29,9 +29,7 @@ namespace fan
         PlayerData::EcsIncludeRender3D( world );
         PlayerData::EcsIncludeRenderUI( world );
 
-        world.GetSingleton<EngineResources>().SetupResources( mData.mResources,
-                                                              mData.mRenderer.mMeshManager,
-                                                              mData.mRenderer.mMesh2DManager);
+        world.GetSingleton<EngineResources>().SetupResources( mData.mResources );
 
         Application& app = world.GetSingleton<Application>();
         app.mOnQuit.Connect( &GamePlayer::Exit, this );

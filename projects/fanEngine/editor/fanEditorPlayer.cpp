@@ -99,9 +99,8 @@ namespace fan
             EditorSettings& editorSerializedValues = world.GetSingleton<EditorSettings>();
             editorSerializedValues.mData = &mEditorSettings;
 
-            world.GetSingleton<EngineResources>().SetupResources( mData.mResources,
-                                                                  mData.mRenderer.mMeshManager,
-                                                                  mData.mRenderer.mMesh2DManager );
+            world.GetSingleton<EngineResources>().SetupResources( mData.mResources );
+
             Cursor        cursor;
             unsigned char pixels[16 * 16 * 4];
             memset( pixels, 0xff, sizeof( pixels ) );

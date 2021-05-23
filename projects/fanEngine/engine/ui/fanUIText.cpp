@@ -1,11 +1,9 @@
-#include "core/ecs/fanEcsWorld.hpp"
+#include "engine/ui/fanUIText.hpp"
+#include "core/resources/fanResourceManager.hpp"
 #include "render/resources/fanMesh2D.hpp"
-#include "render/resources/fanMesh2DManager.hpp"
-#include "fanUIText.hpp"
 #include "engine/fanEngineSerializable.hpp"
 #include "engine/singletons/fanEngineResources.hpp"
 #include "engine/fanSceneTags.hpp"
-#include "core/memory/fanSerializable.hpp"
 
 namespace fan
 {
@@ -21,13 +19,20 @@ namespace fan
     //==================================================================================================================================================================================================
     void UIText::Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
     {
+        ResourceManager& resources = *_world.GetSingleton<EngineResources>().mResources;
+
         UIText& text = static_cast<UIText&>( _component );
         text.mText    = "";
-        text.mMesh2D  = new Mesh2D();
         text.mSize    = 18;
         text.mFontPtr = nullptr;
 
-        _world.GetSingleton<EngineResources>().mMesh2DManager->Add( text.mMesh2D, "text_mesh" );
+        const std::string name = "text_mesh_" + std::to_string( resources.GetUniqueID() );
+        text.mMesh2D = resources.Get<Mesh2D>( name );
+        if( text.mMesh2D == nullptr )
+        {
+            text.mMesh2D = resources.Add<Mesh2D>( new Mesh2D, name );
+        }
+
         _world.AddTag<TagUIModified>( _entity );
     }
 

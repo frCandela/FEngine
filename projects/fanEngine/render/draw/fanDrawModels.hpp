@@ -2,6 +2,7 @@
 
 #include "fanDisableWarnings.hpp"
 #include "fanGlm.hpp"
+#include "core/resources/fanResourcePtr.hpp"
 #include "render/fanRenderGlobal.hpp"
 #include "render/core/fanPipeline.hpp"
 #include "render/core/fanShader.hpp"
@@ -157,9 +158,10 @@ namespace fan
         DescriptorSampler     mDescriptorSampler;
         Sampler               mSamplerTextures;
         CommandBuffer         mCommandBuffers;
+        ResourcePtr<Texture>  mInvalidTexture;
         std::vector<DrawData> mDrawData;
 
-        void Create( Device& _device, uint32_t _imagesCount );
+        void Create( Device& _device, uint32_t _imagesCount, ResourcePtr<Texture> _invalidTexture );
         void Destroy( Device& _device );
         void BindDescriptors( VkCommandBuffer _commandBuffer, const size_t _indexFrame, const uint32_t _indexOffset );
         void UpdateUniformBuffers( Device& _device, const size_t _index );

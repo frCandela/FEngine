@@ -1,47 +1,101 @@
 #include "core/resources/fanResourceManager.hpp"
+#include "core/fanDebug.hpp"
 
 namespace fan
 {
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    Resource* ResourceManager::Load( const uint32_t _type, const std::string& _path )
+    ResourcePtrData ResourceManager::Load( const uint32_t _type, const std::string& _path )
     {
-        ResourceInfo& info = mResourceInfos[_type];
+        ResourcePtrData resourcePtrData;
+        resourcePtrData.mHandle = LoadInternal( _type, _path );
+        resourcePtrData.mGUID   = resourcePtrData.mHandle != nullptr ? resourcePtrData.mHandle->mResource->mGUID : 0;
+        return resourcePtrData;
+    }
+
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    ResourcePtrData ResourceManager::Get( const uint32_t _guid )
+    {
+        ResourcePtrData resourcePtrData;
+        resourcePtrData.mHandle = GetInternal( _guid );
+        resourcePtrData.mGUID   = _guid;
+        return resourcePtrData;
+    }
+
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    ResourcePtrData ResourceManager::GetOrLoad( const uint32_t _type, const std::string& _path )
+    {
+        ResourcePtrData resourcePtrData;
+        resourcePtrData.mGUID   = DSID( _path.c_str() );
+        resourcePtrData.mHandle = GetOrLoadInternal( _type, _path );
+        return resourcePtrData;
+    }
+
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    ResourceHandle* ResourceManager::LoadInternal( const uint32_t _type, const std::string& _path )
+    {
+        ResourceInfo& info = mResourceInfos.at( _type );
         fanAssert( info.mLoad != nullptr );
         Resource* resource = ( *info.mLoad )( _path, info );
         if( resource != nullptr )
         {
-            Add( _type, resource, _path );
+            return AddInternal( _type, resource, _path );
         }
-        return resource;
+        return nullptr;
     }
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void ResourceManager::Add( const uint32_t _type, Resource* _resource, const std::string& _path )
+    ResourceHandle* ResourceManager::AddInternal( const uint32_t _type, Resource* _resource, const std::string& _path )
     {
         _resource->mGUID = DSID( _path.c_str() );
-        _resource->mType = _type;
+        ResourceInfo& info = mResourceInfos.at( _type );
+
+        auto it = mResourceHandles.find( _resource->mGUID );
+        ResourceHandle* resourceHandle = nullptr;
+        if( it != mResourceHandles.end() )
+        {
+            resourceHandle = it->second;
+            if( resourceHandle->mResource != nullptr )
+            {
+                Debug::Log() << Debug::Type::Engine << "reloading resource " << _path << Debug::Endl();
+                fanAssert( !resourceHandle->mResource->mIsDirty );
+                DeleteResource( it );
+            }
+        }
+        else
+        {
+            resourceHandle = new ResourceHandle();
+            mResourceHandles[_resource->mGUID] = resourceHandle;
+        }
+
         mResources[_resource->mGUID] = _resource;
-        ResourceInfo& info = mResourceInfos[_type];
-        info.mCount++;
 
         if( info.mUseDirtyList )
         {
+            _resource->mIsDirty = true;
             info.mDirtyList.push_back( _resource );
         }
+
+        info.mCount++;
+        _resource->mPath          = _path;
+        _resource->mType          = _type;
+        resourceHandle->mResource = _resource;
+        resourceHandle->mRefCount++;
+        return resourceHandle;
     }
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    Resource* ResourceManager::Get( const uint32_t _type, const uint32_t _guid ) const
+    ResourceHandle* ResourceManager::GetInternal( const uint32_t _guid )
     {
-        auto it = mResources.find( _guid );
-        if( it != mResources.end() )
+        auto it = mResourceHandles.find( _guid );
+        if( it != mResourceHandles.end() )
         {
-            Resource* resource = it->second;
-            fanAssert( resource->mType == _type );
-            (void)_type;
+            ResourceHandle* resource = it->second;
             return resource;
         }
         return nullptr;
@@ -49,24 +103,56 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    Resource* ResourceManager::GetOrLoad( const uint32_t _type, const std::string& _path )
+    ResourceHandle* ResourceManager::GetOrLoadInternal( const uint32_t _type, const std::string& _path )
     {
-        Resource* resource = Get( _type, DSID( _path.c_str() ) );
-        if( resource == nullptr )
+        ResourceHandle* handle = GetInternal( DSID( _path.c_str() ) );
+        if( handle == nullptr )
         {
-            return Load( _type, _path );
+            return LoadInternal( _type, _path );
         }
-        return resource;
+        return handle;
     }
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
     bool ResourceManager::Remove( const uint32_t _guid )
     {
-        auto it = mResources.find( _guid );
+        auto it = mResourceHandles.find( _guid );
+        if( it != mResourceHandles.end() )
+        {
+            return DeleteResource( it );
+        }
+        return false;
+    }
+
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    bool ResourceManager::DeleteResource( std::map<uint32_t, ResourceHandle*>::iterator _iterator )
+    {
+        const uint32_t guid = _iterator->first;
+        auto           it   = mResources.find( guid );
+        Resource* resource = nullptr;
         if( it != mResources.end() )
         {
-            DeleteResource( it );
+            resource = it->second;
+            mResources.erase( it );
+        }
+
+        if( resource != nullptr )
+        {
+            ResourceInfo& info = mResourceInfos.at( resource->mType );
+            info.mCount--;
+
+            if( info.mUseDestroyList )
+            {
+                info.mDestroyList.push_back( resource );
+            }
+            else
+            {
+                delete resource;
+            }
+            ResourceHandle* handle = _iterator->second;
+            handle->mResource = nullptr;
             return true;
         }
         return false;
@@ -74,58 +160,42 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void ResourceManager::DeleteResource( std::map<uint32_t, Resource*>::iterator _iterator )
+    bool ResourceManager::SetDirty( const uint32_t _guid )
     {
-        Resource* resource = _iterator->second;
-        mResources.erase( _iterator );
-        ResourceInfo& info = mResourceInfos[resource->mType];
-        info.mCount--;
+        auto it = mResourceHandles.find( _guid );
+        if( it != mResourceHandles.end() )
+        {
+            ResourceHandle* handle = it->second;
+            if( handle->mResource == nullptr )
+            {
+                return false;
+            }
 
-        if( info.mUseDestroyList )
-        {
-            info.mDestroyList.push_back( resource );
-        }
-        else
-        {
-            delete resource;
-        }
-    }
-
-    //==================================================================================================================================================================================================
-    //==================================================================================================================================================================================================
-    bool ResourceManager::SetOutdated( const uint32_t _guid )
-    {
-        auto it = mResources.find( _guid );
-        if( it != mResources.end() )
-        {
-            Resource    * resource = it->second;
-            ResourceInfo& info     = mResourceInfos[resource->mType];
-            info.mDirtyList.push_back( resource );
-            return true;
+            if( !handle->mResource->mIsDirty )
+            {
+                ResourceInfo& info = mResourceInfos.at( handle->mResource->mType );
+                fanAssert( info.mUseDirtyList );
+                handle->mResource->mIsDirty = true;
+                info.mDirtyList.push_back( handle->mResource );
+                return true;
+            }
         }
         return false;
-    }
-
-    //==================================================================================================================================================================================================
-    //==================================================================================================================================================================================================
-    void ResourceManager::ResolvePtr( ResourcePtrData& _resourcePtrData )
-    {
-        _resourcePtrData.mResource = GetOrLoad( _resourcePtrData.mType, _resourcePtrData.mPath );
     }
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
     void ResourceManager::Clear()
     {
-        while( !mResources.empty() )
+        for( auto it = mResourceHandles.begin(); it != mResourceHandles.end(); it++ )
         {
-            DeleteResource( mResources.begin() );
+            DeleteResource( it );
         }
 
         for( auto& pair : mResourceInfos )
         {
             ResourceInfo& resourceInfo = pair.second;
-            fanAssert( resourceInfo.mCount == 0 );
+            fanAssert( resourceInfo.mCount == 0 ); // Some resources have not been destroyed properly
             (void)resourceInfo;
         }
     }

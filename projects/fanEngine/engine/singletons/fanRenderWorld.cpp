@@ -2,6 +2,9 @@
 
 #include "editor/fanModals.hpp"
 #include "core/memory/fanSerializable.hpp"
+#include "engine/singletons/fanEngineResources.hpp"
+#include "core/resources/fanResourceManager.hpp"
+#include "render/resources/fanMesh.hpp"
 
 namespace fan
 {
@@ -11,6 +14,7 @@ namespace fan
     {
         _info.save = &RenderWorld::Save;
         _info.load = &RenderWorld::Load;
+        _info.postInit = &RenderWorld::PostInit;
     }
 
     //==================================================================================================================================================================================================
@@ -40,14 +44,27 @@ namespace fan
         renderWorld.uiDrawData.clear();
         renderWorld.pointLights.clear();
         renderWorld.directionalLights.clear();
-        renderWorld.mTargetSize                       = { 1920, 1080 };
-        renderWorld.mParticlesMesh                    = new Mesh();
-        renderWorld.mParticlesMesh->mSubMeshes.resize(1);
-        renderWorld.mParticlesMesh->mSubMeshes[0].mHostVisible      = true;
-        renderWorld.mParticlesMesh->mSubMeshes[0].mOptimizeVertices = false;
-        renderWorld.mParticlesMesh->mAutoUpdateHull   = false;
-        renderWorld.mIsHeadless                       = false;
-        renderWorld.mClearColor                       = Color::sDarkGrey;
-        renderWorld.mFullscreen                       = FullScreen {};
+        renderWorld.mTargetSize    = { 1920, 1080 };
+        renderWorld.mIsHeadless    = false;
+        renderWorld.mClearColor    = Color::sDarkGrey;
+        renderWorld.mFullscreen    = FullScreen {};
+        renderWorld.mParticlesMesh = nullptr;
+    }
+
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    void RenderWorld::PostInit( EcsWorld& _world, EcsSingleton& _singleton )
+    {
+        RenderWorld& renderWorld = static_cast<RenderWorld&>( _singleton );
+        ResourceManager& resources = *_world.GetSingleton<EngineResources>().mResources;
+        if( renderWorld.mParticlesMesh == nullptr )
+        {
+            renderWorld.mParticlesMesh = resources.Add( new Mesh, "particles_mesh" + std::to_string( resources.GetUniqueID() ) );
+            renderWorld.mParticlesMesh->mSubMeshes.resize( 1 );
+            renderWorld.mParticlesMesh->mSubMeshes[0].mHostVisible      = true;
+            renderWorld.mParticlesMesh->mSubMeshes[0].mOptimizeVertices = false;
+            renderWorld.mParticlesMesh->mAutoUpdateHull                 = false;
+            renderWorld.mParticlesMesh->mIsGenerated = true;
+        }
     }
 }

@@ -119,9 +119,7 @@ namespace fan
         {
             KeyboardEvent& keyEvent = pair.second;
 
-            bool modifiersPressed = ( keyEvent.mod0 == Keyboard::NONE
-                    ? true
-                    : Keyboard::IsKeyDown( keyEvent.mod0 ) ) &&
+            bool modifiersPressed = ( keyEvent.mod0 == Keyboard::NONE ? true : Keyboard::IsKeyDown( keyEvent.mod0 ) ) &&
                                     ( keyEvent.mod1 == Keyboard::NONE ? true : Keyboard::IsKeyDown( keyEvent.mod1 ) ) &&
                                     ( keyEvent.mod2 == Keyboard::NONE ? true : Keyboard::IsKeyDown( keyEvent.mod2 ) );
 

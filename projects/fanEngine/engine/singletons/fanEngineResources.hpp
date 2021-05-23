@@ -6,9 +6,6 @@
 namespace fan
 {
     class ResourceManager;
-    class MeshManager;
-    class Mesh2DManager;
-    struct Mesh2D;
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
@@ -18,11 +15,9 @@ namespace fan
         static void SetInfo( EcsSingletonInfo& _info );
         static void Init( EcsWorld& _world, EcsSingleton& _singleton );
 
-        void SetupResources( ResourceManager& _resourceManager, MeshManager& _meshManager, Mesh2DManager& _mesh2DManager );
+        void SetupResources( ResourceManager& _resourceManager );
 
-        ResourceManager * mResourceManager ;
-        MeshManager   * mMeshManager   ;
-        Mesh2DManager * mMesh2DManager ;
+        ResourceManager * mResources ;
 
         std::vector<Cursor> mCursors;
         Cursor* mCurrentCursor;

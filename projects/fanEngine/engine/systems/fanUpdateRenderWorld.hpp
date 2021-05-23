@@ -38,7 +38,7 @@ namespace fan
                 Transform   & transform    = *transformIt;
                 Material    & material     = *materialIt;
 
-                if( meshRenderer.mMesh.IsValid() && !meshRenderer.mMesh->Empty() )
+                if( meshRenderer.mMesh != nullptr && !meshRenderer.mMesh->Empty() )
                 {
                     const EcsEntity entity = transformIt.GetEntity();
                     const Vector3   scale  = _world.HasComponent<Scale>( entity ) ? _world.GetComponent<Scale>( entity ).mScale : Vector3::sOne;
@@ -90,7 +90,7 @@ namespace fan
                 UIRenderer       & renderer  = *rendererIt;
                 const UITransform& transform = *transformIt;
 
-                if( renderer.GetTexture() == nullptr || renderer.mMesh2D == nullptr )
+                if( renderer.mTexture == nullptr || renderer.mMesh2D == nullptr )
                 {
                     continue;
                 }
@@ -104,7 +104,7 @@ namespace fan
                 data.mUvOffset     = glm::vec2( renderer.mUvOffset ) / textureSize;
                 data.mUvScale      = glm::vec2( renderer.mTiling );
                 data.mColor        = renderer.mColor.ToGLM();
-                data.mTextureIndex = renderer.GetTexture() != nullptr ? renderer.GetTexture()->mIndex : 0;
+                data.mTexture      = renderer.mTexture;
                 data.mDepth        = renderer.mDepth;
                 renderWorld.uiDrawData.push_back( data );
             }

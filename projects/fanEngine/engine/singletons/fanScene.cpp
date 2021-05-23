@@ -4,10 +4,12 @@
 #include <fstream>
 #include "core/fanPath.hpp"
 #include "core/fanDebug.hpp"
+#include "core/resources/fanResourceManager.hpp"
 #include "network/singletons/fanTime.hpp"
 #include "engine/components/fanBounds.hpp"
 #include "engine/components/fanSceneNode.hpp"
 #include "engine/singletons/fanScenePointers.hpp"
+#include "engine/singletons/fanEngineResources.hpp"
 #include "engine/systems/fanUpdateTransforms.hpp"
 
 namespace fan
@@ -170,6 +172,10 @@ namespace fan
             GenerateRemapTable( jRoot, remapTable );
             RemapHandlesRecursively( jScene, remapTable );
 
+            // save resources
+            ResourceManager& resources  = *mWorld->GetSingleton<EngineResources>().mResources;
+            BuildResourceList( resources, jScene, jScene );
+
             outStream << json; // write to disk
             outStream.close();
         }
@@ -292,6 +298,69 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
+    void Scene::BuildResourceList( ResourceManager& _resources, const Json& _json, Json& _outJson )
+    {
+        std::vector<uint32_t> resourceGUIDs;
+
+        std::stack<const Json*> stack;
+        stack.push( &_json );
+        while( !stack.empty() )
+        {
+            const Json& json = *stack.top();
+            stack.pop();
+
+            Json::const_iterator jResourceIt = json.find( "resource" );
+            if( jResourceIt != json.end() )
+            {
+                const uint32_t guid = *jResourceIt;
+                if( guid != 0 )
+                {
+                    resourceGUIDs.push_back( guid );
+                }
+            }
+
+            // push all childs
+            if( json.is_structured() )
+            {
+                for( const Json& element : json )
+                {
+                    stack.push( &element );
+                }
+            }
+        }
+
+        Json& jResources = _outJson["resources"];
+        for( int i = 0; i < (int)resourceGUIDs.size(); i++ )
+        {
+            const Resource* resource  = _resources.Get( resourceGUIDs[i] ).mHandle->mResource;
+            if( !resource->mIsGenerated )
+            {
+                Json& jResource = jResources[i];
+                jResource["type"] = resource->mType;
+                jResource["path"] = resource->mPath;
+            }
+        }
+    }
+
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    void Scene::LoadResourceList( ResourceManager& _resources, const Json& _json )
+    {
+        Json::const_iterator it = _json.find("resources");
+        if( it == _json.end()){ return; }
+
+        const Json& jResources = *it;
+        for( int i = 0; i < (int)jResources.size(); i++ )
+        {
+            const Json& jResource = jResources[i];
+            const uint32_t    type = jResource["type"];
+            const std::string path = jResource["path"];
+            _resources.GetOrLoad( type, path);
+        }
+    }
+
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
     bool Scene::LoadFrom( const std::string _path )
     {
         Clear();
@@ -307,6 +376,10 @@ namespace fan
             {
                 Serializable::LoadString( jScene, "path", mPath );
             }
+
+            //resources
+            ResourceManager& resources = * mWorld->GetSingleton<EngineResources>().mResources;
+            LoadResourceList( resources, jScene);
 
             // load singleton components
             mWorld->InitSingletons();
@@ -357,7 +430,6 @@ namespace fan
             New();
             return false;
         }
-        return false;
     }
 
     //==================================================================================================================================================================================================
@@ -405,7 +477,6 @@ namespace fan
                 }
             }
         }
-
         return node;
     }
 }

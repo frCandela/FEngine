@@ -5,8 +5,6 @@
 #include "fanGlm.hpp"
 #include "glfw/glfw3.h"
 #include "render/fanVertex.hpp"
-#include "render/resources/fanMeshManager.hpp"
-#include "render/resources/fanMesh2DManager.hpp"
 #include "engine/resources/fanFont.hpp"
 #include "render/core/fanCommandBuffer.hpp"
 #include "render/core/fanRenderPass.hpp"
@@ -64,11 +62,9 @@ namespace fan
                                const std::vector<DebugVertex>& _debugTriangles,
                                const std::vector<DebugVertex2D>& _debugLines2D );
 
-        ResourceManager& mResourceManager;
-        MeshManager   mMeshManager;
-        Mesh2DManager mMesh2DManager;
-        Window& mWindow;
-        Device& mDevice;
+        ResourceManager& mResources;
+        Window         & mWindow;
+        Device         & mDevice;
 
         const ViewType mViewType;
         VkExtent2D     mGameExtent = { 1, 1 };
@@ -121,8 +117,13 @@ namespace fan
         void DestroyPipelines();
 
         void UpdateUniformBuffers( Device& _device, const size_t _index );
+        void BuildNewMeshes2D( Device& _device );
+        void BuildNewMeshes( Device& _device );
         bool BuildNewTextures( Device& _device );
+        void ClearDestroyedMesh2D( Device& _device );
+        void ClearDestroyedMesh( Device& _device );
         void ClearDestroyedTextures( Device& _device );
+
         void SubmitCommandBuffers();
     };
 }

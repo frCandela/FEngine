@@ -44,7 +44,7 @@ namespace fan
 
                 Scale* scaling = _world.SafeGetComponent<Scale>( boundsIt.GetEntity() );
 
-                if( *renderer.mMesh != nullptr )
+                if( renderer.mMesh != nullptr )
                 {
                     const Vector3 scale = scaling != nullptr ? scaling->mScale : Vector3 { 1, 1, 1 };
 

@@ -17,12 +17,12 @@ namespace fan
         static void Save( const EcsComponent& _component, Json& _json );
         static void Load( EcsComponent& _component, const Json& _json );
 
-        bool         mEnabled;
-        float        mParticlesPerSecond;
-        float        mSpeed;
-        float        mDuration;                // lifetime of a particle in seconds
-        float        mTimeAccumulator;
-        Color        mColor;
-        EcsSignature mTagsSignature;        // tags added to the particles during instantiation
+        bool               mEnabled;
+        float              mParticlesPerSecond;
+        float              mSpeed;
+        float              mDuration;                // lifetime of a particle in seconds
+        float              mTimeAccumulator;
+        Color              mColor;
+        EcsSignature       mTagsSignature;        // tags added to the particles during instantiation
     };
 }

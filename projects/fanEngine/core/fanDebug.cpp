@@ -14,6 +14,7 @@ namespace fan
         mCurrentType       = Type::Default;
         mTypesPrintedToStd = ~0;
         BIT_CLEAR( mTypesPrintedToStd, (int)Debug::Type::Render );
+        BIT_CLEAR( mTypesPrintedToStd, (int)Debug::Type::Resources );
     }
 
     //==================================================================================================================================================================================================

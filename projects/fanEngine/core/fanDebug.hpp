@@ -18,8 +18,7 @@ namespace fan
 
         enum class Code
         {
-            EndLine,
-            meh
+            EndLine
         };
         enum class Severity
         {
@@ -27,7 +26,7 @@ namespace fan
         };
         enum class Type
         {
-            Default = 0, Render = 1, Engine = 2, Game = 3, Sound = 4, Editor = 5, Count = 6
+            Default = 0, Render=1, Engine=2, Game=3, Sound=4, Editor=5, Resources=6, Count=7
         };
         struct LogItem
         {

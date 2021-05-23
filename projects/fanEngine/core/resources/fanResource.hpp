@@ -1,6 +1,7 @@
 #pragma once
 
 #include "core/fanHash.hpp"
+#include <string>
 
 namespace fan
 {
@@ -21,8 +22,17 @@ namespace fan
     struct Resource
     {
         uint32_t    mGUID;
+        std::string mPath;
         uint32_t    mType;
+        bool        mIsDirty = false;
+        bool        mIsGenerated = false;
+    };
+
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    struct ResourceHandle
+    {
+        Resource *  mResource;
         int16_t     mRefCount = 0;
-        bool        mIsOutdated = false;
     };
 }

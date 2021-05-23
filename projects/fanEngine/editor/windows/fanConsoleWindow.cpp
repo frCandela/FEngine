@@ -28,6 +28,7 @@ namespace fan
         consoleWindow.mGrabFocus        = false;
         consoleWindow.mVisibleLogsTypes = ~0;
         BIT_CLEAR( consoleWindow.mVisibleLogsTypes, int( Debug::Type::Render) );
+        BIT_CLEAR( consoleWindow.mVisibleLogsTypes, int( Debug::Type::Resources) );
         Debug::Get().mOnNewLog.Connect( &ConsoleWindow::OnNewLog, &consoleWindow );
 
         // catch up with already displayed logs
@@ -48,8 +49,8 @@ namespace fan
         // menu bar
         if( ImGui::BeginMenuBar() )
         {
-            static_assert( (int)Debug::Type::Count == 6 );
-            const char* names[6] = { "Default", "Render", "Engine", "Game", "Sound", "Editor" };
+            static_assert( (int)Debug::Type::Count == 7 );
+            const char* names[(int)Debug::Type::Count] = { "Default", "Render", "Engine", "Game", "Sound", "Editor", "Resources" };
 
             if( ImGui::BeginMenu( "View" ) )
             {

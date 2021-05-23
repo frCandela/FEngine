@@ -1,6 +1,7 @@
 #include "editor/gui/fanGuiRenderResources.hpp"
 #include <sstream>
 #include "core/fanPath.hpp"
+#include "core/resources/fanResourceManager.hpp"
 #include "render/fanRenderGlobal.hpp"
 #include "editor/fanDragnDrop.hpp"
 #include "editor/fanModals.hpp"
@@ -19,7 +20,7 @@ namespace ImGui
     {
         bool returnValue = false;
 
-        fan::Texture* texture = *_ptr;
+        fan::Texture* texture = _ptr;
         const std::string name = texture == nullptr ? "null" : fan::Path::FileName( texture->mPath );
 
         // Set button icon & modal
@@ -46,7 +47,7 @@ namespace ImGui
             }
         }
         ImGui::SameLine();
-        ImGui::FanBeginDragDropSourceTexture( texture );
+        ImGui::FanBeginDragDropSourceTexture( _ptr );
 
         // tooltip
         if( texture != nullptr )
@@ -69,7 +70,7 @@ namespace ImGui
         }
 
         // dragndrop
-        fan::Texture* textureDrop = ImGui::FanBeginDragDropTargetTexture();
+        fan::ResourcePtr<fan::Texture> textureDrop = ImGui::FanBeginDragDropTargetTexture();
         if( textureDrop )
         {
             _ptr        = textureDrop;
@@ -86,8 +87,7 @@ namespace ImGui
         // Modal set value
         if( ImGui::FanLoadFileModal( modalName.c_str(), fan::RenderGlobal::sImagesExtensions, sPathBuffer ) )
         {
-            _ptr.mData.mPath = sPathBuffer;
-            _ptr.mData.Resolve();
+            _ptr = _ptr.mData.sResourceManager->Load<fan::Texture>(sPathBuffer);
             returnValue = true;
         }
 
@@ -105,7 +105,7 @@ namespace ImGui
     {
         bool returnValue = false;
 
-        fan::Mesh* mesh = *_ptr;
+        fan::Mesh* mesh = _ptr;
         const std::string name = ( mesh == nullptr ) ? "null" : fan::Path::FileName( mesh->mPath );
 
         // Set button icon & modal
@@ -133,7 +133,7 @@ namespace ImGui
             }
         }
         ImGui::SameLine();
-        ImGui::FanBeginDragDropSourceMesh( mesh );
+        ImGui::FanBeginDragDropSourceMesh( _ptr );
 
         // tooltip
         if( mesh != nullptr && ImGui::IsItemHovered() )
@@ -148,7 +148,7 @@ namespace ImGui
         }
 
         // dragndrop
-        fan::Mesh* meshDrop = ImGui::FanBeginDragDropTargetMesh();
+        fan::ResourcePtr<fan::Mesh> meshDrop = ImGui::FanBeginDragDropTargetMesh();
         if( meshDrop )
         {
             _ptr        = meshDrop;
@@ -164,8 +164,7 @@ namespace ImGui
 
         if( ImGui::FanLoadFileModal( modalName.c_str(), fan::RenderGlobal::sMeshExtensions, sPathBuffer ) )
         {
-            _ptr->mPath = sPathBuffer;
-            _ptr.mData.Resolve();
+            _ptr = _ptr.mData.sResourceManager->Load<fan::Mesh>(sPathBuffer);
             returnValue = true;
         }
 
