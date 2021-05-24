@@ -3,9 +3,11 @@
 #include <fstream>
 #include "core/fanDebug.hpp"
 #include "core/fanPath.hpp"
+#include "core/resources/fanResources.hpp"
 #include "engine/components/fanSceneNode.hpp"
 #include "engine/singletons/fanScene.hpp"
 #include "engine/singletons/fanScenePointers.hpp"
+#include "engine/singletons/fanApplication.hpp"
 
 namespace fan
 {
@@ -69,6 +71,11 @@ namespace fan
         Scene::RemapTable remapTable;
         Scene::GenerateRemapTable( prefabJson, remapTable );
         Scene::RemapHandlesRecursively( prefabJson, remapTable );
+
+        // save resources
+        EcsWorld & world     = *_node.mScene->mWorld;
+        Resources& resources = *world.GetSingleton<Application>().mResources;
+        Scene::BuildResourceList( resources, prefabJson, prefabJson );
     }
 
     //==================================================================================================================================================================================================
@@ -82,10 +89,17 @@ namespace fan
         }
         else
         {
-            EcsWorld& world = *_parent.mScene->mWorld;
-            Scene   & scene = world.GetSingleton<Scene>();
+            const Json& prefabJson = mJson["prefab"];
+            EcsWorld  & world      = *_parent.mScene->mWorld;
+
+            // load resources
+            Resources & resources  = *world.GetSingleton<Application>().mResources;
+            Scene::LoadResourceList( resources, prefabJson );
+
+            Scene& scene = world.GetSingleton<Scene>();
             const EcsHandle handleOffset = world.GetNextHandle() - 1;
-            SceneNode& newNode = Scene::RLoadFromJson( mJson["prefab"], scene, &_parent, handleOffset );
+
+            SceneNode& newNode = Scene::RLoadFromJson( prefabJson, scene, &_parent, handleOffset );
             const EcsHandle maxHandle = Scene::RFindMaximumHandle( _parent );
             world.SetNextHandle( maxHandle + 1 );
             ScenePointers::ResolveComponentPointers( world, handleOffset );
