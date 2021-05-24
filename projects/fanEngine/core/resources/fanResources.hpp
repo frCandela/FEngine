@@ -24,7 +24,7 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    class ResourceManager
+    class Resources
     {
     public:
         template< class ResourceType >
@@ -86,7 +86,7 @@ namespace fan
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
     template< class ResourceType >
-    void ResourceManager::AddResourceType( const ResourceInfo& _resourceInfo )
+    void Resources::AddResourceType( const ResourceInfo& _resourceInfo )
     {
         fanAssert( mResourceInfos.find( ResourceType::Info::sType ) == mResourceInfos.end() );
         ResourceInfo resourceInfo = _resourceInfo;
@@ -97,7 +97,7 @@ namespace fan
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
     template< class ResourceType >
-    ResourcePtr <ResourceType> ResourceManager::Load( const std::string& _path )
+    ResourcePtr <ResourceType> Resources::Load( const std::string& _path )
     {
         ResourcePtr<ResourceType> resourcePtr;
         resourcePtr.mData.mHandle = LoadInternal( ResourceType::Info::sType, _path );
@@ -108,7 +108,7 @@ namespace fan
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
     template< class ResourceType >
-    ResourcePtr <ResourceType> ResourceManager::Add( ResourceType* _resource, const std::string& _path )
+    ResourcePtr <ResourceType> Resources::Add( ResourceType* _resource, const std::string& _path )
     {
         ResourcePtr<ResourceType> resourcePtr;
         resourcePtr.mData.mHandle = AddInternal( ResourceType::Info::sType, _resource, _path );
@@ -119,7 +119,7 @@ namespace fan
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
     template< class ResourceType >
-    ResourcePtr <ResourceType> ResourceManager::Get( const std::string& _path )
+    ResourcePtr <ResourceType> Resources::Get( const std::string& _path )
     {
         return Get<ResourceType>( DSID( _path.c_str() ) );
     }
@@ -127,7 +127,7 @@ namespace fan
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
     template< class ResourceType >
-    ResourcePtr <ResourceType> ResourceManager::Get( const uint32_t _guid )
+    ResourcePtr <ResourceType> Resources::Get( const uint32_t _guid )
     {
         ResourcePtr<ResourceType> resourcePtr;
         resourcePtr.mData = Get( _guid );
@@ -138,7 +138,7 @@ namespace fan
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
     template< class ResourceType >
-    ResourcePtr <ResourceType> ResourceManager::GetOrLoad( const std::string& _path )
+    ResourcePtr <ResourceType> Resources::GetOrLoad( const std::string& _path )
     {
         ResourcePtr<ResourceType> resourcePtr;
         resourcePtr.mData = GetOrLoad( ResourceType::Info::sType, _path );
@@ -148,7 +148,7 @@ namespace fan
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
     template< class ResourceType >
-    void ResourceManager::GetDestroyList( std::vector<ResourceType*>& _destroyedList )
+    void Resources::GetDestroyList( std::vector<ResourceType*>& _destroyedList )
     {
         ResourceInfo& info = mResourceInfos.at( ResourceType::Info::sType );
         fanAssert( info.mUseDestroyList );
@@ -163,7 +163,7 @@ namespace fan
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
     template< class ResourceType >
-    void ResourceManager::GetDirtyList( std::vector<ResourceType*>& _outdatedList )
+    void Resources::GetDirtyList( std::vector<ResourceType*>& _outdatedList )
     {
         ResourceInfo& info = mResourceInfos.at( ResourceType::Info::sType );
         fanAssert( info.mUseDirtyList );
@@ -180,7 +180,7 @@ namespace fan
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
     template< class ResourceType >
-    int ResourceManager::Count() const
+    int Resources::Count() const
     {
         const ResourceInfo& info = mResourceInfos.at( ResourceType::Info::sType );
         return info.mCount;
@@ -189,7 +189,7 @@ namespace fan
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
     template< class ResourceType >
-    void ResourceManager::Get( std::vector<ResourcePtr < ResourceType>> & _outResources )
+    void Resources::Get( std::vector<ResourcePtr < ResourceType>> & _outResources )
     {
         const ResourceInfo& info = mResourceInfos.at( ResourceType::Info::sType );
         _outResources.clear();

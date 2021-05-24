@@ -3,7 +3,7 @@
 #include "fanDisableWarnings.hpp"
 #include "fanGlm.hpp"
 #include "core/ecs/fanSignal.hpp"
-#include "core/resources/fanResourceManager.hpp"
+#include "core/resources/fanResources.hpp"
 #include "engine/game/fanLaunchSettings.hpp"
 #include "render/fanWindow.hpp"
 #include "render/fanRenderer.hpp"
@@ -12,6 +12,7 @@
 namespace fan
 {
     struct IGame;
+    struct Cursor;
 
     //==================================================================================================================================================================================================
     // contains useful data to make a game player
@@ -25,13 +26,14 @@ namespace fan
         const LaunchSettings mLaunchSettings;
         bool                 mApplicationShouldExit;
         Window               mWindow;
-        Renderer             mRenderer;
-        ResourceManager      mResources;
-        FullScreen           mFullScreen;
+        Renderer   mRenderer;
+        Resources  mResources;
+        FullScreen mFullScreen;
         FT_Library           mFreetypeLib;
 
         static void UpdateRenderWorld( Renderer& _renderer, IGame& _game, const glm::vec2 _size );
         static void MatchFullscreenState( const FullScreen& _fullscreen, Window& _window );
+        static void MatchCursor( const Cursor* _cursor, Window& _window );
         static void EcsIncludeEngine( EcsWorld& _world );
         static void EcsIncludePhysics( EcsWorld& _world );
         static void EcsIncludeRender3D( EcsWorld& _world );

@@ -4,7 +4,7 @@
 #include "engine/components/fanSceneNode.hpp"
 #include "render/fanRenderGlobal.hpp"
 #include "engine/resources/fanFont.hpp"
-#include "core/resources/fanResourceManager.hpp"
+#include "core/resources/fanResources.hpp"
 #include "editor/singletons/fanEditorSettings.hpp"
 #include "editor/fanDragnDrop.hpp"
 #include "editor/fanModals.hpp"

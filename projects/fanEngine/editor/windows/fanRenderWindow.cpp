@@ -9,9 +9,9 @@
 #include "render/resources/fanMesh.hpp"
 #include "render/resources/fanMesh2D.hpp"
 #include "engine/singletons/fanRenderWorld.hpp"
-#include "engine/singletons/fanEngineResources.hpp"
-#include "engine/singletons/fanEngineResources.hpp"
-#include "core/resources/fanResourceManager.hpp"
+#include "engine/singletons/fanApplication.hpp"
+#include "engine/singletons/fanApplication.hpp"
+#include "core/resources/fanResources.hpp"
 #include "engine/resources/fanPrefab.hpp"
 #include "editor/fanDragnDrop.hpp"
 
@@ -40,7 +40,7 @@ namespace fan
 
         SCOPED_PROFILE( render );
 
-        const EngineResources& engineResources = _world.GetSingleton<EngineResources>();
+        const Application& app = _world.GetSingleton<Application>();
 
         ImGui::Icon( ImGui::Renderer16, { 16, 16 } );
         ImGui::SameLine();
@@ -49,7 +49,7 @@ namespace fan
         if( ImGui::CollapsingHeader( "Loaded 3D meshes : " ) )
         {
             std::vector<ResourcePtr<Mesh>> meshes;
-            engineResources.mResources->Get<Mesh>( meshes );
+            app.mResources->Get<Mesh>( meshes );
             for( ResourcePtr<Mesh> mesh : meshes )
             {
                 ImGui::Text( "index: %d name: %s", mesh->mIndex, mesh->mPath.c_str() );
@@ -60,7 +60,7 @@ namespace fan
         if( ImGui::CollapsingHeader( "Loaded 2D meshes : " ) )
         {
             std::vector<ResourcePtr<Mesh2D>> meshes2D;
-            engineResources.mResources->Get<Mesh2D>( meshes2D );
+            app.mResources->Get<Mesh2D>( meshes2D );
             for( ResourcePtr<Mesh2D> mesh : meshes2D )
             {
                 ImGui::Text( "name: %s", mesh->mPath.c_str() );
@@ -70,7 +70,7 @@ namespace fan
         if( ImGui::CollapsingHeader( "Loaded textures : " ) )
         {
             std::vector<ResourcePtr<Texture>> textures;
-            engineResources.mResources->Get<Texture>( textures );
+            app.mResources->Get<Texture>( textures );
             for( ResourcePtr<Texture> tex : textures )
             {
                 ImGui::Text( "ref: %d size: %u x %u name: %s", tex.mData.mHandle->mRefCount, tex->mExtent.width, tex->mExtent.height, tex->mPath.c_str() );
@@ -81,7 +81,7 @@ namespace fan
         if( ImGui::CollapsingHeader( "Loaded fonts : " ) )
         {
             std::vector<ResourcePtr<Font>> fonts;
-            engineResources.mResources->Get<Font>( fonts );
+            app.mResources->Get<Font>( fonts );
             for( fan::ResourcePtr<fan::Font> font : fonts )
             {
                 ImGui::Text( font->mPath.c_str() );
@@ -93,7 +93,7 @@ namespace fan
         if( ImGui::CollapsingHeader( "Loaded prefabs : " ) )
         {
             std::vector<ResourcePtr<Prefab>> prefabs;
-            engineResources.mResources->Get<Prefab>( prefabs );
+            app.mResources->Get<Prefab>( prefabs );
             for( const ResourcePtr<Prefab> prefab : prefabs )
             {
                 ImGui::Text( "ref: %d name: %s", prefab.mData.mHandle->mRefCount, prefab->mPath.c_str() );

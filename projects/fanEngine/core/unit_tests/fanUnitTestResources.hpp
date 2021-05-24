@@ -1,7 +1,7 @@
 #pragma once
 
 #include "core/unit_tests/fanUnitTest.hpp"
-#include "core/resources/fanResourceManager.hpp"
+#include "core/resources/fanResources.hpp"
 #include "engine/resources/fanPrefab.hpp"
 #include "engine/resources/fanSceneResourcePtr.hpp"
 
@@ -9,25 +9,25 @@ namespace fan
 {
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    class UnitTestResourceManager : public UnitTest<UnitTestResourceManager>
+    class UnitTestResources : public UnitTest<UnitTestResources>
     {
     public:
         static std::vector<TestMethod> GetTests()
         {
             return {
-                    { &UnitTestResourceManager::TestLoad,        "Load" },
-                    { &UnitTestResourceManager::TestGet,         "Get" },
-                    { &UnitTestResourceManager::TestGetOrLoad,   "Get or load" },
-                    { &UnitTestResourceManager::TestRemove,      "Remove" },
-                    { &UnitTestResourceManager::TestCount,       "Count" },
-                    { &UnitTestResourceManager::TestClear,       "Clear" },
-                    { &UnitTestResourceManager::TestDuplicates,  "Duplicates" },
-                    { &UnitTestResourceManager::TestDestroyList, "Destroy list" },
-                    { &UnitTestResourceManager::TestDirty,       "Dirty" },
+                    { &UnitTestResources::TestLoad,        "Load" },
+                    { &UnitTestResources::TestGet,         "Get" },
+                    { &UnitTestResources::TestGetOrLoad,   "Get or load" },
+                    { &UnitTestResources::TestRemove,      "Remove" },
+                    { &UnitTestResources::TestCount,       "Count" },
+                    { &UnitTestResources::TestClear,       "Clear" },
+                    { &UnitTestResources::TestDuplicates,  "Duplicates" },
+                    { &UnitTestResources::TestDestroyList, "Destroy list" },
+                    { &UnitTestResources::TestDirty,       "Dirty" },
             };
         }
 
-        ResourceManager mResources;
+        Resources mResources;
         static constexpr const char* sPrefabName0 = "_default/prefab/unit_test0.prefab";
         static constexpr const char* sPrefabName1 = "_default/prefab/unit_test1.prefab";
 

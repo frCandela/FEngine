@@ -27,7 +27,7 @@
 namespace fan
 {
     class Window;
-    class ResourceManager;
+    class Resources;
 
     //==================================================================================================================================================================================================
     // Contains all the rendering data
@@ -40,7 +40,7 @@ namespace fan
             Editor, Game
         };
 
-        Renderer( Window& _window, ResourceManager& _resourceManager, const ViewType _viewType );
+        Renderer( Window& _window, Resources& _resourceManager, const ViewType _viewType );
         void Create();
         void Destroy();
 
@@ -62,8 +62,8 @@ namespace fan
                                const std::vector<DebugVertex>& _debugTriangles,
                                const std::vector<DebugVertex2D>& _debugLines2D );
 
-        ResourceManager& mResources;
-        Window         & mWindow;
+        Resources& mResources;
+        Window   & mWindow;
         Device         & mDevice;
 
         const ViewType mViewType;

@@ -31,7 +31,7 @@
 #include "editor/singletons/fanEditorCamera.hpp"
 #include "editor/singletons/fanEditorGrid.hpp"
 #include "engine/singletons/fanRenderWorld.hpp"
-#include "engine/singletons/fanEngineResources.hpp"
+#include "engine/singletons/fanApplication.hpp"
 #include "editor/singletons/fanEditorPlayState.hpp"
 
 namespace fan
@@ -99,13 +99,7 @@ namespace fan
             EditorSettings& editorSerializedValues = world.GetSingleton<EditorSettings>();
             editorSerializedValues.mData = &mEditorSettings;
 
-            world.GetSingleton<EngineResources>().SetupResources( mData.mResources );
-
-            Cursor        cursor;
-            unsigned char pixels[16 * 16 * 4];
-            memset( pixels, 0xff, sizeof( pixels ) );
-            cursor.Create( pixels, { 16, 16 }, { 0, 0 } );
-            mData.mWindow.SetCursor( cursor );
+            world.GetSingleton<Application>().Setup( &mData.mResources );
 
             RenderWorld& renderWorld = world.GetSingleton<RenderWorld>();
             renderWorld.mIsHeadless = ( &game != &GetCurrentGame() );
@@ -283,6 +277,9 @@ namespace fan
             PlayerData::UpdateRenderWorld( mData.mRenderer, currentGame, currentGameViewWindow.mSize );
             mData.mRenderer.DrawFrame();
 
+            Cursor* currentCursor = currentWorld.GetSingleton<GameViewWindow>().mIsHovered ? currentWorld.GetSingleton<Application>().mCurrentCursor : nullptr;
+
+            PlayerData::MatchCursor( currentCursor, mData.mWindow );
             PlayerData::MatchFullscreenState( currentWorld.GetSingleton<RenderWorld>().mFullscreen, mData.mWindow );
 
             Profiler::Get().End();

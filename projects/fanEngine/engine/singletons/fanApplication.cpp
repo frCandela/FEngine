@@ -1,5 +1,5 @@
 #include "core/fanDebug.hpp"
-#include "fanApplication.hpp"
+#include "engine/singletons/fanApplication.hpp"
 
 namespace fan
 {
@@ -7,6 +7,7 @@ namespace fan
     //==================================================================================================================================================================================================
     void Application::SetInfo( EcsSingletonInfo& _info )
     {
+        _info.mFlags |= EcsSingletonFlags::InitOnce;
         _info.mSlots.push_back( new Slot<>( "quit", &Application::OnQuit ) );
     }
 
@@ -14,8 +15,9 @@ namespace fan
     //==================================================================================================================================================================================================
     void Application::Init( EcsWorld& /*_world*/, EcsSingleton& _this )
     {
-        Application& mainMenu = static_cast<Application&>( _this );
-        (void)mainMenu;
+        Application& app = static_cast<Application&>( _this );
+        app.mResources = nullptr;
+        app.mOnQuit.Clear();
     }
 
     //==================================================================================================================================================================================================
@@ -24,5 +26,12 @@ namespace fan
     {
         Application& app = static_cast<Application&>( _this );
         app.mOnQuit.Emmit();
+    }
+
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    void Application::Setup( Resources* _resource )
+    {
+        mResources = _resource;
     }
 }

@@ -4,7 +4,7 @@
 #include "core/fanPath.hpp"
 #include "core/math/fanVector3.hpp"
 #include "core/math/fanQuaternion.hpp"
-#include "core/resources/fanResourceManager.hpp"
+#include "core/resources/fanResources.hpp"
 
 namespace fan
 {

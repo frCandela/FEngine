@@ -21,7 +21,7 @@ namespace fan
             SCOPED_PROFILE( S_GenParticles );
             if( _delta == 0.f ){ return; }
 
-            EngineResources& resources   = _world.GetSingleton<EngineResources>();
+            Application& app   = _world.GetSingleton<Application>();
             RenderWorld    & renderWorld = _world.GetSingleton<RenderWorld>();
             SubMesh        & mesh        = renderWorld.mParticlesMesh->mSubMeshes[0];
             mesh.mVertices.resize( _view.Size() * 3 );
@@ -38,7 +38,7 @@ namespace fan
                 mesh.mVertices.push_back( { particle.mPosition + glm::vec3( size, 0.0f, -size ), glm::vec3( 0.f, 1.f, 0.f ), color, glm::vec2( -0.5f, -0.5f ) } );
             }
             mesh.LoadFromVertices();
-            resources.mResources->SetDirty( renderWorld.mParticlesMesh->mGUID );
+            app.mResources->SetDirty( renderWorld.mParticlesMesh->mGUID );
         }
     };
 }

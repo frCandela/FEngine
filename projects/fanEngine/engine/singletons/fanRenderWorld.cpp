@@ -2,8 +2,8 @@
 
 #include "editor/fanModals.hpp"
 #include "core/memory/fanSerializable.hpp"
-#include "engine/singletons/fanEngineResources.hpp"
-#include "core/resources/fanResourceManager.hpp"
+#include "core/resources/fanResources.hpp"
+#include "engine/singletons/fanApplication.hpp"
 #include "render/resources/fanMesh.hpp"
 
 namespace fan
@@ -56,7 +56,7 @@ namespace fan
     void RenderWorld::PostInit( EcsWorld& _world, EcsSingleton& _singleton )
     {
         RenderWorld& renderWorld = static_cast<RenderWorld&>( _singleton );
-        ResourceManager& resources = *_world.GetSingleton<EngineResources>().mResources;
+        Resources  & resources   = *_world.GetSingleton<Application>().mResources;
         if( renderWorld.mParticlesMesh == nullptr )
         {
             renderWorld.mParticlesMesh = resources.Add( new Mesh, "particles_mesh" + std::to_string( resources.GetUniqueID() ) );

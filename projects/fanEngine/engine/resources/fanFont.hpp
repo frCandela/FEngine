@@ -12,7 +12,7 @@
 
 namespace fan
 {
-    class ResourceManager;
+    class Resources;
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
@@ -42,7 +42,7 @@ namespace fan
 
         Font( FT_Library _ftLib, const std::string _path );
         ~Font() { if( IsValid() ){ FT_Done_Face( mFace ); } }
-        const Atlas* GenerateAtlas( ResourceManager& _resources, int _height );
+        const Atlas* GenerateAtlas( Resources& _resources, int _height );
         const Atlas* FindAtlas( const int _height );
         bool IsValid() const { return !mPath.empty(); }
 

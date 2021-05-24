@@ -7,10 +7,9 @@
 #include "engine/systems/fanUpdateBounds.hpp"
 #include "engine/systems/fanUpdateTransforms.hpp"
 #include "engine/systems/fanUpdateRenderWorld.hpp"
-#include "engine/singletons/fanEngineResources.hpp"
+#include "engine/singletons/fanApplication.hpp"
 #include "engine/singletons/fanScene.hpp"
 #include "engine/singletons/fanRenderDebug.hpp"
-#include "engine/singletons/fanApplication.hpp"
 #include "engine/game/fanIGame.hpp"
 
 namespace fan
@@ -29,7 +28,7 @@ namespace fan
         PlayerData::EcsIncludeRender3D( world );
         PlayerData::EcsIncludeRenderUI( world );
 
-        world.GetSingleton<EngineResources>().SetupResources( mData.mResources );
+        world.GetSingleton<Application>().Setup( &mData.mResources );
 
         Application& app = world.GetSingleton<Application>();
         app.mOnQuit.Connect( &GamePlayer::Exit, this );
@@ -130,6 +129,9 @@ namespace fan
             PlayerData::UpdateRenderWorld( mData.mRenderer, mGame, { mData.mWindow.GetExtent().width, mData.mWindow.GetExtent().height } );
 
             mData.mRenderer.DrawFrame();
+
+            PlayerData::MatchCursor( world.GetSingleton<Application>().mCurrentCursor, mData.mWindow );
+            PlayerData::MatchFullscreenState( world.GetSingleton<RenderWorld>().mFullscreen, mData.mWindow );
 
             Profiler::Get().End();
             Profiler::Get().Begin();

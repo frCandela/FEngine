@@ -7,6 +7,7 @@
 #include "render/core/fanInstance.hpp"
 #include "render/core/fanDevice.hpp"
 #include "engine/singletons/fanMouse.hpp"
+#include "engine/resources/fanCursor.hpp"
 
 namespace fan
 {
@@ -58,5 +59,6 @@ namespace fan
         SwapChain    mSwapchain;
         VkSurfaceKHR mSurface;
         InputData    mInputData;
+        Cursor       mArrowCursor;
     };
 }

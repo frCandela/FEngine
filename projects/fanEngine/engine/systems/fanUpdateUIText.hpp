@@ -1,10 +1,10 @@
 #include "core/ecs/fanEcsSystem.hpp"
 #include "core/ecs/fanEcsWorld.hpp"
-#include "core/resources/fanResourceManager.hpp"
+#include "core/resources/fanResources.hpp"
 #include "engine/ui/fanUITransform.hpp"
 #include "engine/ui/fanUIText.hpp"
 #include "engine/ui/fanUIRenderer.hpp"
-#include "engine/singletons/fanEngineResources.hpp"
+#include "engine/singletons/fanApplication.hpp"
 #include "render/fanRenderGlobal.hpp"
 
 namespace fan
@@ -23,7 +23,7 @@ namespace fan
 
         static void Run( EcsWorld& _world, const EcsView& _view )
         {
-            ResourceManager& resources = *_world.GetSingleton<EngineResources>().mResources;
+            Resources& resources = *_world.GetSingleton<Application>().mResources;
 
             auto textIt      = _view.begin<UIText>();
             auto rendererIt  = _view.begin<UIRenderer>();

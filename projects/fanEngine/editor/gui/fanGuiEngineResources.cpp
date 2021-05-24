@@ -1,7 +1,7 @@
 #include "editor/gui/fanGuiRenderResources.hpp"
 #include <sstream>
 #include "core/fanPath.hpp"
-#include "core/resources/fanResourceManager.hpp"
+#include "core/resources/fanResources.hpp"
 #include "render/fanRenderGlobal.hpp"
 #include "editor/fanDragnDrop.hpp"
 #include "editor/fanModals.hpp"

@@ -1,7 +1,7 @@
 #include "core/memory/fanSerializable.hpp"
-#include "core/resources/fanResourceManager.hpp"
+#include "core/resources/fanResources.hpp"
 #include "core/memory/fanBase64.hpp"
-#include "engine/singletons/fanEngineResources.hpp"
+#include "engine/singletons/fanApplication.hpp"
 #include "engine/components/fanSceneNode.hpp"
 #include "engine/physics/fanTransform.hpp"
 #include "engine/components/fanMeshRenderer.hpp"
@@ -55,8 +55,8 @@ namespace fan
     {
         if( _terrain.mSize.x <= 0 || _terrain.mSize.y <= 0 || _terrain.mSize.z <= 0 ){ return; }
 
-        EngineResources& engineResources = _world.GetSingleton<EngineResources>();
-        ResourcePtr<Texture> texture         = engineResources.mResources->GetOrLoad<Texture>( "_default/texture/white.png" );
+        Application& app = _world.GetSingleton<Application>();
+        ResourcePtr<Texture> texture         = app.mResources->GetOrLoad<Texture>( "_default/texture/white.png" );
 
         Scene    & scene       = _world.GetSingleton<Scene>();
         SceneNode& terrainRoot = scene.CreateSceneNode( "terrain", &scene.GetRootNode() );
@@ -86,10 +86,10 @@ namespace fan
                     Transform& transform = _world.AddComponent<Transform>( entity );
                     transform.mPosition = Fixed( VoxelChunk::sSize ) * Vector3( position.x, position.y, position.z );
 
-                    fan::ResourcePtr<fan::Mesh> mesh = engineResources.mResources->Get<Mesh>( chunkName );
+                    fan::ResourcePtr<fan::Mesh> mesh = app.mResources->Get<Mesh>( chunkName );
                     if( !mesh )
                     {
-                        mesh = engineResources.mResources->Add<Mesh>( new Mesh, chunkName );
+                        mesh = app.mResources->Add<Mesh>( new Mesh, chunkName );
                     }
                     MeshRenderer& renderer = _world.AddComponent<MeshRenderer>( entity );
                     mesh->mSubMeshes.resize( 1 );

@@ -2,7 +2,7 @@
 
 #include "core/fanDebug.hpp"
 #include "core/time/fanProfiler.hpp"
-#include "core/resources/fanResourceManager.hpp"
+#include "core/resources/fanResources.hpp"
 #include "network/singletons/fanTime.hpp"
 #include "render/resources/fanMesh2D.hpp"
 #include "render/resources/fanMesh.hpp"
@@ -13,7 +13,7 @@ namespace fan
 {
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    Renderer::Renderer( Window& _window, ResourceManager& _resourceManager, const ViewType _viewType ) :
+    Renderer::Renderer( Window& _window, Resources& _resourceManager, const ViewType _viewType ) :
             mWindow( _window ),
             mResources( _resourceManager ),
             mDevice( _window.mDevice ),

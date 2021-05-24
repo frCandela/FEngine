@@ -2,5 +2,5 @@
 
 namespace fan
 {
-    ResourceManager* ResourcePtrData::sResourceManager = nullptr;
+    Resources* ResourcePtrData::sResourceManager = nullptr;
 }

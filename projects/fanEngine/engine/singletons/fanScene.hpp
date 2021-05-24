@@ -10,7 +10,7 @@ namespace fan
     class EcsWorld;
     struct SceneNode;
     class Prefab;
-    class ResourceManager;
+    class Resources;
 
     //==================================================================================================================================================================================================
     // contains the scene tree root and a map of scene nodes for fast access
@@ -37,8 +37,8 @@ namespace fan
         using RemapTable = std::map<EcsHandle, EcsHandle>;
         static void GenerateRemapTable( Json& _jsonRootSceneNode, RemapTable& _outRemapTable );
         static void RemapHandlesRecursively( Json& _json, const RemapTable& _remapTable );
-        static void BuildResourceList( ResourceManager& _resources, const Json& _json, Json& _outJson );
-        static void LoadResourceList( ResourceManager& _resources, const Json& jResources );
+        static void BuildResourceList( Resources& _resources, const Json& _json, Json& _outJson );
+        static void LoadResourceList( Resources& _resources, const Json& jResources );
 
         Signal<Scene&>     mOnClear;
         Signal<Scene&>     mOnLoad;

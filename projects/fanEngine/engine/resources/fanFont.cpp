@@ -8,7 +8,7 @@ WARNINGS_SFML_UTF_PUSH()
 WARNINGS_POP()
 #include "core/fanDebug.hpp"
 #include "core/fanPath.hpp"
-#include "core/resources/fanResourceManager.hpp"
+#include "core/resources/fanResources.hpp"
 
 namespace fan
 {
@@ -88,7 +88,7 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    const Font::Atlas* Font::GenerateAtlas( ResourceManager& _resources, const int _height )
+    const Font::Atlas* Font::GenerateAtlas( Resources& _resources, const int _height )
     {
         fanAssert( FindAtlas( _height ) == nullptr );
         fanAssert( _height > 0 );

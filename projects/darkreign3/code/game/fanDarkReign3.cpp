@@ -31,7 +31,10 @@
 #include "editor/fanGuiTestSingleton.hpp"
 #include "editor/fanGuiTestComponent.hpp"
 #include "editor/fanModals.hpp"
+
 #endif
+
+#include "render/fanWindow.hpp"
 
 namespace fan
 {
@@ -47,6 +50,8 @@ namespace fan
         settings.mSingletonInfos[TestSingleton::Info::sType] = GuiTestSingleton::GetInfo();
         settings.mComponentInfos[TestComponent::Info::sType] = GuiTestComponent::GetInfo();
 #endif
+
+        mCursors.Load( *mWorld.GetSingleton<Application>().mResources );
     }
 
     //==================================================================================================================================================================================================
@@ -87,8 +92,8 @@ namespace fan
     //============================================================================================================================
     void DarkReign3::StepLoadTerrain()
     {
-        VoxelTerrain   & terrain   = mWorld.GetSingleton<VoxelTerrain>();
-        ResourceManager& resources = *mWorld.GetSingleton<EngineResources>().mResources;
+        VoxelTerrain& terrain   = mWorld.GetSingleton<VoxelTerrain>();
+        Resources   & resources = *mWorld.GetSingleton<Application>().mResources;
         if( !terrain.mIsInitialized ){ return; }
 
         for( int iteration = 0; iteration < chunksPerFrame; ++iteration )
@@ -187,6 +192,28 @@ namespace fan
             ImGui::SliderInt( "voxels generation", &completionVoxelsGenerationCpy, 0, max );
             int completionMeshGenerationCpy = completionMeshGeneration;
             ImGui::SliderInt( "mesh generation", &completionMeshGenerationCpy, 0, max );
+
+            static bool sTest = false;
+            if( ImGui::Checkbox( "test", &sTest ) )
+            {
+                if( !sTest ){ mWorld.GetSingleton<Application>().mCurrentCursor = nullptr; }
+            }
+            if( sTest )
+            {
+                static int counter  = 0;
+                static int index    = 0;
+                int        types[4] = { DR3Cursors::Attack1, DR3Cursors::Attack2, DR3Cursors::Attack3, DR3Cursors::Attack4 };
+                if( counter++ > 14 )
+                {
+                    counter = 0;
+                    Application& app = mWorld.GetSingleton<Application>();
+                    app.mCurrentCursor = mCursors.mCursors[types[( ++index % 4 )]];
+                }
+            }
+
+            if( ImGui::Button( "test" ) )
+            {
+            }
         }
         ImGui::End();
     }

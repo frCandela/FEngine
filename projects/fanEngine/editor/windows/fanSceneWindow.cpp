@@ -4,8 +4,8 @@
 #include "core/fanPath.hpp"
 #include "core/fanDebug.hpp"
 #include "core/time/fanProfiler.hpp"
-#include "engine/singletons/fanEngineResources.hpp"
-#include "core/resources/fanResourceManager.hpp"
+#include "engine/singletons/fanApplication.hpp"
+#include "core/resources/fanResources.hpp"
 #include "engine/singletons/fanScene.hpp"
 #include "engine/resources/fanPrefab.hpp"
 #include "engine/components/fanMeshRenderer.hpp"
@@ -107,17 +107,17 @@ namespace fan
                 {
                     SceneNode& node = scene.CreateSceneNode( "model", mLastSceneNodeRightClicked );
                     const EcsEntity entity = world.GetEntity( node.mHandle );
-                    EngineResources& engineResources = _world.GetSingleton<EngineResources>();
+                    Application& app = _world.GetSingleton<Application>();
 
                     Transform& transform = world.AddComponent<Transform>( entity );
                     transform.mPosition = origin;
 
                     MeshRenderer& meshRenderer = world.AddComponent<MeshRenderer>( entity );
-                    meshRenderer.mMesh = engineResources.mResources->GetOrLoad<Mesh>( RenderGlobal::sMeshSphere );
+                    meshRenderer.mMesh = app.mResources->GetOrLoad<Mesh>( RenderGlobal::sMeshSphere );
 
                     Material& material = world.AddComponent<Material>( entity );
 
-                    material.mMaterials[0].mTexture = engineResources.mResources->GetOrLoad<Texture>( RenderGlobal::sTextureWhite );
+                    material.mMaterials[0].mTexture = app.mResources->GetOrLoad<Texture>( RenderGlobal::sTextureWhite );
                     onSelectSceneNode.Emmit( &node );
                 }
 
@@ -128,15 +128,15 @@ namespace fan
                 {
                     SceneNode& node = scene.CreateSceneNode( "physics_model", mLastSceneNodeRightClicked );
                     const EcsEntity entity = world.GetEntity( node.mHandle );
-                    EngineResources& engineResources = _world.GetSingleton<EngineResources>();
+                    Application& app = _world.GetSingleton<Application>();
 
                     Transform& transform = world.AddComponent<Transform>( entity );
                     transform.mPosition = origin;
 
                     MeshRenderer& meshRenderer = world.AddComponent<MeshRenderer>( entity );
-                    meshRenderer.mMesh = engineResources.mResources->GetOrLoad<Mesh>( RenderGlobal::sMeshCube );
+                    meshRenderer.mMesh = app.mResources->GetOrLoad<Mesh>( RenderGlobal::sMeshCube );
                     Material& material = world.AddComponent<Material>( entity );
-                    material.mMaterials[0].mTexture = engineResources.mResources->Get<Texture>( RenderGlobal::sTextureWhite );
+                    material.mMaterials[0].mTexture = app.mResources->Get<Texture>( RenderGlobal::sTextureWhite );
                     onSelectSceneNode.Emmit( &node );
 
                     Rigidbody   rb  = world.AddComponent<Rigidbody>( entity );
@@ -419,8 +419,8 @@ namespace fan
     {
         if( ImGui::FanLoadFileModal( "import_prefab", RenderGlobal::sPrefabExtensions, mPathBuffer ) )
         {
-            EngineResources& engineResources = _world.GetSingleton<EngineResources>();
-            Prefab        * prefab           = engineResources.mResources->GetOrLoad<Prefab>( mPathBuffer );
+            Application& app = _world.GetSingleton<Application>();
+            Prefab        * prefab           = app.mResources->GetOrLoad<Prefab>( mPathBuffer );
             if( prefab != nullptr )
             {
                 prefab->Instantiate( *mLastSceneNodeRightClicked );
@@ -445,8 +445,8 @@ namespace fan
             if( outStream.is_open() )
             {
                 // Try to update the existing prefab if it exists
-                EngineResources& engineRes = _world.GetSingleton<EngineResources>();
-                Prefab        * prefab     = engineRes.mResources->Get<Prefab>( Path::MakeRelative( mPathBuffer ) );
+                Application& app = _world.GetSingleton<Application>();
+                Prefab        * prefab     = app.mResources->Get<Prefab>( Path::MakeRelative( mPathBuffer ) );
                 if( prefab != nullptr )
                 {
                     prefab->CreateFromSceneNode( *mLastSceneNodeRightClicked );

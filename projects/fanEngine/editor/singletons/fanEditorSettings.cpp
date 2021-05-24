@@ -53,7 +53,6 @@
 #include "editor/gui/singletons/fanGuiApplication.hpp"
 #include "editor/gui/singletons/fanGuiMouse.hpp"
 #include "editor/gui/singletons/fanGuiRenderDebug.hpp"
-#include "editor/gui/singletons/fanGuiEngineResources.hpp"
 #include "editor/gui/singletons/fanGuiRenderWorld.hpp"
 #include "editor/gui/singletons/fanGuiScene.hpp"
 #include "editor/gui/singletons/fanGuiScenePointers.hpp"
@@ -278,7 +277,6 @@ namespace fan
         _singletonInfos[Application::Info::sType]     = GuiApplication::GetInfo();
         _singletonInfos[Mouse::Info::sType]           = GuiMouse::GetInfo();
         _singletonInfos[RenderDebug::Info::sType]     = GuiRenderDebug::GetInfo();
-        _singletonInfos[EngineResources::Info::sType] = GuiEngineResources::GetInfo();
         _singletonInfos[RenderWorld::Info::sType]     = GuiRenderWorld::GetInfo();
         _singletonInfos[Scene::Info::sType]           = GuiScene::GetInfo();
         _singletonInfos[ScenePointers::Info::sType]   = GuiScenePointers::GetInfo();

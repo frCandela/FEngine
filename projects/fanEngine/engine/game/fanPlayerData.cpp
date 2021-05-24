@@ -7,8 +7,7 @@
 #include "engine/singletons/fanScene.hpp"
 #include "engine/singletons/fanApplication.hpp"
 #include "engine/components/fanCamera.hpp"
-#include "engine/singletons/fanEngineResources.hpp"
-#include "engine/singletons/fanEngineResources.hpp"
+#include "engine/resources/fanCursor.hpp"
 
 // base
 #include "engine/fanSceneTags.hpp"
@@ -18,7 +17,7 @@
 #include "engine/components/fanFollowTransform.hpp"
 #include "engine/components/fanBounds.hpp"
 #include "engine/singletons/fanScene.hpp"
-#include "engine/singletons/fanEngineResources.hpp"
+#include "engine/singletons/fanApplication.hpp"
 #include "engine/singletons/fanScenePointers.hpp"
 #include "engine/singletons/fanMouse.hpp"
 #include "engine/singletons/fanApplication.hpp"
@@ -41,7 +40,7 @@
 #include "engine/components/fanParticleEmitter.hpp"
 #include "engine/components/fanParticle.hpp"
 #include "engine/singletons/fanRenderWorld.hpp"
-#include "engine/singletons/fanEngineResources.hpp"
+#include "engine/singletons/fanApplication.hpp"
 #include "engine/singletons/fanRenderDebug.hpp"
 
 // render ui
@@ -75,6 +74,8 @@
 
 namespace fan
 {
+    Mesh2D* CreateMesh2DQuad();
+
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
     PlayerData::PlayerData( const LaunchSettings& _settings ) :
@@ -93,7 +94,7 @@ namespace fan
             Debug::Error( "Could not init FreeType Library", Debug::Type::Engine );
         }
 
-        fanAssert(  ResourcePtrData::sResourceManager == nullptr );
+        fanAssert( ResourcePtrData::sResourceManager == nullptr );
         ResourcePtrData::sResourceManager = &mResources;
 
         {
@@ -132,7 +133,16 @@ namespace fan
             mResources.AddResourceType<Mesh2D>( info );
         }
 
+        {
+            ResourceInfo info;
+            mResources.AddResourceType<Cursor>( info );
+        }
+
         mResources.Load<Texture>( RenderGlobal::sDefaultTexture );
+        mResources.Load<Font>( RenderGlobal::sDefaultGameFont );
+        mResources.Load<Texture>( RenderGlobal::sWhiteTexture );
+        mResources.Load<Mesh>( RenderGlobal::sDefaultMesh );
+        mResources.Add<Mesh2D>( CreateMesh2DQuad(), RenderGlobal::sMesh2DQuad );
 
         mRenderer.Create();
     }
@@ -217,6 +227,31 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
+    void PlayerData::MatchCursor( const Cursor* _cursor, Window& _window )
+    {
+        _window.SetCursor( _cursor != nullptr ? *_cursor : _window.mArrowCursor );
+    }
+
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    Mesh2D* CreateMesh2DQuad()
+    {
+        Mesh2D* mesh2D = new Mesh2D();
+        std::vector<UIVertex> vertices = {
+                UIVertex( glm::vec2( +2.f, +0.f ), glm::vec2( +1.f, +0.f ) ),
+                UIVertex( glm::vec2( +0.f, +0.f ), glm::vec2( +0.f, +0.f ) ),
+                UIVertex( glm::vec2( +2.f, +2.f ), glm::vec2( +1.f, +1.f ) ),
+                UIVertex( glm::vec2( +0.f, +0.f ), glm::vec2( +0.f, +0.f ) ),
+                UIVertex( glm::vec2( +0.f, +2.f ), glm::vec2( +0.f, +1.f ) ),
+                UIVertex( glm::vec2( +2.f, +2.f ), glm::vec2( +1.f, +1.f ) )
+        };
+        mesh2D->LoadFromVertices( vertices );
+        mesh2D->mPath = RenderGlobal::sMesh2DQuad;
+        return mesh2D;
+    }
+
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
     void PlayerData::EcsIncludeEngine( EcsWorld& _world )
     {
         _world.AddComponentType<SceneNode>();
@@ -229,7 +264,6 @@ namespace fan
         _world.AddComponentType<Scale>();
 
         _world.AddSingletonType<Scene>();
-        _world.AddSingletonType<EngineResources>();
         _world.AddSingletonType<ScenePointers>();
         _world.AddSingletonType<Mouse>();
         _world.AddSingletonType<Application>();
@@ -330,7 +364,7 @@ namespace fan
     //==================================================================================================================================================================================================
     Resource* PlayerData::LoadFont( const std::string& _path, ResourceInfo& _info )
     {
-        Debug::Log() << Debug::Type::Resources  << "Loading font " << _path << Debug::Endl();
+        Debug::Log() << Debug::Type::Resources << "Loading font " << _path << Debug::Endl();
         FT_Library& freetypeLib = *static_cast<FT_Library*>(_info.mDataPtr);
         Font      * font        = new Font( freetypeLib, _path );
         if( !font->IsValid() )
@@ -345,7 +379,7 @@ namespace fan
     //==================================================================================================================================================================================================
     Resource* PlayerData::LoadTexture( const std::string& _path, ResourceInfo& )
     {
-        Debug::Log() << Debug::Type::Resources  << "Loading texture " << _path << Debug::Endl();
+        Debug::Log() << Debug::Type::Resources << "Loading texture " << _path << Debug::Endl();
         Texture* texture = new Texture();
         if( !texture->LoadFromFile( _path ) )
         {
@@ -359,7 +393,7 @@ namespace fan
     //==================================================================================================================================================================================================
     Resource* PlayerData::LoadMesh( const std::string& _path, ResourceInfo& )
     {
-        Debug::Log() << Debug::Type::Resources  << "Loading mesh " << _path << Debug::Endl();
+        Debug::Log() << Debug::Type::Resources << "Loading mesh " << _path << Debug::Endl();
         Mesh* mesh = new Mesh();
         if( !mesh->LoadFromFile( _path ) )
         {

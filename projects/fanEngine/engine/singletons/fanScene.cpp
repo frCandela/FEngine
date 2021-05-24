@@ -4,12 +4,12 @@
 #include <fstream>
 #include "core/fanPath.hpp"
 #include "core/fanDebug.hpp"
-#include "core/resources/fanResourceManager.hpp"
+#include "core/resources/fanResources.hpp"
 #include "network/singletons/fanTime.hpp"
 #include "engine/components/fanBounds.hpp"
 #include "engine/components/fanSceneNode.hpp"
 #include "engine/singletons/fanScenePointers.hpp"
-#include "engine/singletons/fanEngineResources.hpp"
+#include "engine/singletons/fanApplication.hpp"
 #include "engine/systems/fanUpdateTransforms.hpp"
 
 namespace fan
@@ -173,7 +173,7 @@ namespace fan
             RemapHandlesRecursively( jScene, remapTable );
 
             // save resources
-            ResourceManager& resources  = *mWorld->GetSingleton<EngineResources>().mResources;
+            Resources& resources = *mWorld->GetSingleton<Application>().mResources;
             BuildResourceList( resources, jScene, jScene );
 
             outStream << json; // write to disk
@@ -298,7 +298,7 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void Scene::BuildResourceList( ResourceManager& _resources, const Json& _json, Json& _outJson )
+    void Scene::BuildResourceList( Resources& _resources, const Json& _json, Json& _outJson )
     {
         std::vector<uint32_t> resourceGUIDs;
 
@@ -344,7 +344,7 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void Scene::LoadResourceList( ResourceManager& _resources, const Json& _json )
+    void Scene::LoadResourceList( Resources& _resources, const Json& _json )
     {
         Json::const_iterator it = _json.find("resources");
         if( it == _json.end()){ return; }
@@ -378,7 +378,7 @@ namespace fan
             }
 
             //resources
-            ResourceManager& resources = * mWorld->GetSingleton<EngineResources>().mResources;
+            Resources& resources = * mWorld->GetSingleton<Application>().mResources;
             LoadResourceList( resources, jScene);
 
             // load singleton components

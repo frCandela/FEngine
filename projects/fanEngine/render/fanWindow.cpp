@@ -1,5 +1,5 @@
 #include "render/fanWindow.hpp"
-#include "engine/resources/fanCursors.hpp"
+#include "engine/resources/fanCursor.hpp"
 #include "core/fanDebug.hpp"
 #include "core/input/fanInput.hpp"
 #include "render/resources/fanTexture.hpp"
@@ -34,6 +34,8 @@ namespace fan
         glfwSetWindowUserPointer( mWindow, &mInputData );
         mInputData.mWindow = mWindow;
         fanAssert( glfwGetWindowUserPointer( mWindow ) == &mInputData );
+
+        mArrowCursor.CreateStandard( GLFW_ARROW_CURSOR );
     }
 
     //==================================================================================================================================================================================================

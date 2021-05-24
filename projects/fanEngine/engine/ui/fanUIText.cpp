@@ -1,8 +1,8 @@
 #include "engine/ui/fanUIText.hpp"
-#include "core/resources/fanResourceManager.hpp"
+#include "core/resources/fanResources.hpp"
 #include "render/resources/fanMesh2D.hpp"
 #include "engine/fanEngineSerializable.hpp"
-#include "engine/singletons/fanEngineResources.hpp"
+#include "engine/singletons/fanApplication.hpp"
 #include "engine/fanSceneTags.hpp"
 
 namespace fan
@@ -19,7 +19,7 @@ namespace fan
     //==================================================================================================================================================================================================
     void UIText::Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
     {
-        ResourceManager& resources = *_world.GetSingleton<EngineResources>().mResources;
+        Resources& resources = *_world.GetSingleton<Application>().mResources;
 
         UIText& text = static_cast<UIText&>( _component );
         text.mText    = "";

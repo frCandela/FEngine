@@ -6,6 +6,10 @@
 
 namespace fan
 {
+    class Resources;
+    class Window;
+    struct Cursor;
+
     //==================================================================================================================================================================================================
     // interface between the ecs and the rest of the application
     //==================================================================================================================================================================================================
@@ -18,7 +22,11 @@ namespace fan
         // slots
         static void OnQuit( EcsSingleton& _this );
 
+        void Setup( Resources* _resource );
+
         // signals connected to the application
         Signal<> mOnQuit;
+        Resources* mResources;
+        Cursor * mCurrentCursor = nullptr;
     };
 }

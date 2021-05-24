@@ -1,6 +1,7 @@
 #pragma once
 
 #include "engine/game/fanIGame.hpp"
+#include "game/fanDR3Cursors.hpp"
 
 namespace fan
 {
@@ -10,7 +11,7 @@ namespace fan
     //       --------oOO----(_)---------------
     //
     //             If you can read this
-    //            then dark reign 2 code
+    //            then Dark Reign 2 code
     //            have been copy pasted
     //
     //       ----------------------oOO--------
@@ -31,5 +32,7 @@ namespace fan
         void StepLoadTerrain();
 
         EcsWorld mWorld;
+
+        DR3Cursors mCursors;
     };
 }
