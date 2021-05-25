@@ -59,9 +59,6 @@ namespace fan
     //==================================================================================================================================================================================================
     void DarkReign3::Start()
     {
-        /*ResourceManager& resources   = *mWorld.GetSingleton<EngineResources>().mResources;
-        RenderWorld    & renderWorld = mWorld.GetSingleton<RenderWorld>();*/
-
         Scene& scene = mWorld.GetSingleton<Scene>();
         SceneNode cameraNode = scene.CreateSceneNode( "game_camera", &scene.GetRootNode() );
         mGameCameraHandle = cameraNode.mHandle;
@@ -86,7 +83,7 @@ namespace fan
     int max;
     int completionVoxelsGeneration;
     int completionMeshGeneration;
-    int chunksPerFrame = System::GetBuildType() == System::BuildType::Release ? 32 : 4;
+    int chunksPerFrame = System::GetBuildType() == System::BuildType::Release ? 16 : 1;
 
     //============================================================================================================================
     //============================================================================================================================
@@ -135,7 +132,7 @@ namespace fan
                     SceneNode   & sceneNode    = mWorld.GetComponent<SceneNode>( entity );
                     sceneNode.AddFlag( SceneNode::BoundsOutdated );
                     VoxelGenerator::GenerateMesh( terrain, chunk, ( meshRenderer.mMesh )->mSubMeshes[0] );
-                    ( meshRenderer.mMesh )->GenerateConvexHull();
+                    meshRenderer.mMesh->GenerateConvexHull();
                     resources.SetDirty( meshRenderer.mMesh->mGUID );
                     completionMeshGeneration = i;
                     break;
@@ -151,8 +148,6 @@ namespace fan
         SCOPED_PROFILE( step );
 
         StepLoadTerrain();
-
-        //const Time& time = mWorld.GetSingleton<Time>();
 
         // physics & transforms
         mWorld.Run<SIntegrateRigidbodies>( _delta );
@@ -210,7 +205,7 @@ namespace fan
             {
                 static int counter  = 0;
                 static int index    = 0;
-                int        types[4] = { DR3Cursors::Attack1, DR3Cursors::Attack2, DR3Cursors::Attack3, DR3Cursors::Attack4 };
+                int        types[4] = { DR3Cursors::Attack4, DR3Cursors::Attack3, DR3Cursors::Attack2, DR3Cursors::Attack1 };
                 if( counter++ > 14 )
                 {
                     counter = 0;

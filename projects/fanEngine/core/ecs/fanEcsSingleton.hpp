@@ -62,6 +62,8 @@ namespace fan
         void ( * setInfo )( EcsSingletonInfo& ) = nullptr;
         void ( * save )( const EcsSingleton&, Json& ) = nullptr;
         void ( * load )( EcsSingleton&, const Json& ) = nullptr;
+        void ( * saveBinary )( const EcsSingleton&, const char * _path ) = nullptr;
+        void ( * loadBinary )( EcsSingleton&, const char * _path ) = nullptr;
         void ( * netSave )( const EcsSingleton&, sf::Packet& _packet ) = nullptr;
         void ( * netLoad )( EcsSingleton&, sf::Packet& _packet ) = nullptr;
     };

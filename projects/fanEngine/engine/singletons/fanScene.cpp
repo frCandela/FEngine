@@ -144,14 +144,13 @@ namespace fan
 
             // scene global parameters
             Json& jScene = json["scene"];
-            {
-                Serializable::SaveString( jScene, "path", Path::MakeRelative( mPath ) );
-            }
+            Serializable::SaveString( jScene, "path", Path::MakeRelative( mPath ) );
 
             // save singleton components
             Json& jSingletons = jScene["singletons"];
             unsigned nextIndex = 0;
             const std::vector<EcsSingletonInfo>& singletonsInfos = mWorld->GetVectorSingletonInfo();
+            std::string binarySavePath = Path::Directory(mPath) + Path::FileName(mPath);
             for( const EcsSingletonInfo        & info : singletonsInfos )
             {
                 if( info.save != nullptr )
@@ -161,6 +160,10 @@ namespace fan
                     Serializable::SaveString( jSingleton_i, "singleton", info.mName );
                     EcsSingleton& singleton = mWorld->GetSingleton( info.mType );
                     info.save( singleton, jSingleton_i );
+                    if( info.saveBinary != nullptr )
+                    {
+                        info.saveBinary( singleton, binarySavePath.c_str() );
+                    }
                 }
             }
 
@@ -332,7 +335,7 @@ namespace fan
         Json& jResources = _outJson["resources"];
         for( int i = 0; i < (int)resourceGUIDs.size(); i++ )
         {
-            const Resource* resource  = _resources.Get( resourceGUIDs[i] ).mHandle->mResource;
+            const Resource* resource = _resources.Get( resourceGUIDs[i] ).mHandle->mResource;
             if( !resource->mIsGenerated )
             {
                 Json& jResource = jResources[i];
@@ -346,8 +349,8 @@ namespace fan
     //==================================================================================================================================================================================================
     void Scene::LoadResourceList( Resources& _resources, const Json& _json )
     {
-        Json::const_iterator it = _json.find("resources");
-        if( it == _json.end()){ return; }
+        Json::const_iterator it = _json.find( "resources" );
+        if( it == _json.end() ){ return; }
 
         const Json& jResources = *it;
         for( int i = 0; i < (int)jResources.size(); i++ )
@@ -355,7 +358,7 @@ namespace fan
             const Json& jResource = jResources[i];
             const uint32_t    type = jResource["type"];
             const std::string path = jResource["path"];
-            _resources.GetOrLoad( type, path);
+            _resources.GetOrLoad( type, path );
         }
     }
 
@@ -378,11 +381,12 @@ namespace fan
             }
 
             //resources
-            Resources& resources = * mWorld->GetSingleton<Application>().mResources;
-            LoadResourceList( resources, jScene);
+            Resources& resources = *mWorld->GetSingleton<Application>().mResources;
+            LoadResourceList( resources, jScene );
 
             // load singleton components
             mWorld->InitSingletons();
+            std::string binaryLoadPath = Path::Directory( _path ) + Path::FileName( _path );
             if( jScene.find( "singletons" ) != jScene.end() )
             {
                 const Json& jSingletons = jScene["singletons"];
@@ -397,6 +401,10 @@ namespace fan
                     {
                         EcsSingleton& singleton = mWorld->GetSingleton( staticIndex );
                         info->load( singleton, jSingleton_i );
+                        if( info->loadBinary != nullptr )
+                        {
+                            info->loadBinary(singleton, binaryLoadPath.c_str());
+                        }
                     }
                     else
                     {

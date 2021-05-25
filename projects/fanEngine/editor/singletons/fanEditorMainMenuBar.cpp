@@ -326,9 +326,7 @@ namespace fan
 
             // save old selection
             SceneNode* prevSelectionNode = editorSelection.GetSelectedSceneNode();
-            const EcsHandle prevSelectionHandle = prevSelectionNode != nullptr ?
-                    prevSelectionNode->mHandle :
-                    0;
+            const EcsHandle prevSelectionHandle = prevSelectionNode != nullptr ? prevSelectionNode->mHandle : 0;
 
             Debug::Log() << "loading scene: " << scene.mPath << Debug::Endl();
             scene.LoadFrom( scene.mPath );

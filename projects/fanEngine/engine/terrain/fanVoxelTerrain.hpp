@@ -21,6 +21,8 @@ namespace fan
         static void Destroy( EcsWorld& _world, EcsSingleton& _singleton );
         static void Save( const EcsSingleton& _component, Json& _json );
         static void Load( EcsSingleton& _component, const Json& _json );
+        static void SaveBinary( const EcsSingleton& _singleton, const char * _path );
+        static void LoadBinary( EcsSingleton& _singleton, const char * _path );
 
         static void InitializeTerrain( EcsWorld& _world, VoxelTerrain& _terrain );
         static void ClearTerrain( EcsWorld& _world, VoxelTerrain& _terrain );

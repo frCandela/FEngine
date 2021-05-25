@@ -1,13 +1,12 @@
-#include "core/memory/fanSerializable.hpp"
+#include "engine/terrain/fanVoxelTerrain.hpp"
+#include <fstream>
 #include "core/resources/fanResources.hpp"
 #include "core/memory/fanBase64.hpp"
 #include "engine/singletons/fanApplication.hpp"
-#include "engine/components/fanSceneNode.hpp"
 #include "engine/physics/fanTransform.hpp"
 #include "engine/components/fanMeshRenderer.hpp"
 #include "engine/components/fanMaterial.hpp"
 #include "engine/singletons/fanScene.hpp"
-#include "engine/terrain/fanVoxelTerrain.hpp"
 
 namespace fan
 {
@@ -15,10 +14,12 @@ namespace fan
     //==================================================================================================================================================================================================
     void VoxelTerrain::SetInfo( EcsSingletonInfo& _info )
     {
-        _info.save     = &VoxelTerrain::Save;
-        _info.load     = &VoxelTerrain::Load;
-        _info.destroy  = &VoxelTerrain::Destroy;
-        _info.postInit = &VoxelTerrain::PostInit;
+        _info.save       = &VoxelTerrain::Save;
+        _info.load       = &VoxelTerrain::Load;
+        _info.saveBinary = &VoxelTerrain::SaveBinary;
+        _info.loadBinary = &VoxelTerrain::LoadBinary;
+        _info.destroy    = &VoxelTerrain::Destroy;
+        _info.postInit   = &VoxelTerrain::PostInit;
     }
 
     //==================================================================================================================================================================================================
@@ -56,7 +57,7 @@ namespace fan
         if( _terrain.mSize.x <= 0 || _terrain.mSize.y <= 0 || _terrain.mSize.z <= 0 ){ return; }
 
         Application& app = _world.GetSingleton<Application>();
-        ResourcePtr<Texture> texture         = app.mResources->GetOrLoad<Texture>( "_default/texture/white.png" );
+        ResourcePtr<Texture> texture = app.mResources->GetOrLoad<Texture>( "_default/texture/white.png" );
 
         Scene    & scene       = _world.GetSingleton<Scene>();
         SceneNode& terrainRoot = scene.CreateSceneNode( "terrain", &scene.GetRootNode() );
@@ -95,7 +96,7 @@ namespace fan
                     mesh->mSubMeshes.resize( 1 );
                     mesh->mSubMeshes[0].mOptimizeVertices = true;
                     mesh->mSubMeshes[0].mHostVisible      = true;
-                    mesh->mPath = chunkName;
+                    mesh->mPath                           = chunkName;
                     renderer.mMesh                        = mesh;
 
                     Material& material = _world.AddComponent<Material>( entity );
@@ -146,13 +147,6 @@ namespace fan
         NoiseOctave::Save( _json, "3d_octave_0", terrain.mGenerator.m3DOctaves[0] );
         NoiseOctave::Save( _json, "3d_octave_1", terrain.mGenerator.m3DOctaves[1] );
         NoiseOctave::Save( _json, "2d_octave", terrain.mGenerator.m2DOctave );
-
-        Json& chunksJson = _json["chunks"];
-        for( int i = 0; i < terrain.mSize.x * terrain.mSize.y * terrain.mSize.z; ++i )
-        {
-            VoxelChunk& chunk = terrain.mChunks[i];
-            chunksJson[i] = Base64::Encode( (unsigned char*)chunk.mVoxels, VoxelChunk::sSize * VoxelChunk::sSize * VoxelChunk::sSize * sizeof(Fixed));
-        }
     }
 
     //==================================================================================================================================================================================================
@@ -170,17 +164,40 @@ namespace fan
 
         fanAssert( terrain.mChunks == nullptr );
         terrain.mChunks = new VoxelChunk[terrain.mSize.x * terrain.mSize.y * terrain.mSize.z] {};
+    }
 
-        const Json* chunksJson = Serializable::FindToken( _json, "chunks" );
-
-        if( chunksJson != nullptr )
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    void VoxelTerrain::VoxelTerrain::SaveBinary( const EcsSingleton& _singleton, const char* _path )
+    {
+        const VoxelTerrain& terrain = static_cast<const VoxelTerrain&>(_singleton);
+        std::ofstream outStream( std::string( _path ) + ".terrain", std::ios::binary );
+        if( outStream.is_open() )
         {
-            for( int i = 0; i < terrain.mSize.x * terrain.mSize.y * terrain.mSize.z; ++i )
+            const int sizeChunk = VoxelChunk::sSize * VoxelChunk::sSize * VoxelChunk::sSize * sizeof( Fixed );
+            for( int  i         = 0; i < terrain.mSize.x * terrain.mSize.y * terrain.mSize.z; ++i )
             {
                 VoxelChunk& chunk = terrain.mChunks[i];
-                std::string data = Base64::Decode( ( *chunksJson )[i] );
-                fanAssert( data.length() == VoxelChunk::sSize * VoxelChunk::sSize * VoxelChunk::sSize * sizeof(Fixed) );
-                memcpy( chunk.mVoxels, data.data(), data.length() );
+                outStream.write( (const char*)chunk.mVoxels, sizeChunk );
+            }
+            outStream.close();
+        }
+    }
+
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    void VoxelTerrain::VoxelTerrain::LoadBinary( EcsSingleton& _singleton, const char* _path )
+    {
+        VoxelTerrain& terrain = static_cast<VoxelTerrain&>(_singleton);
+        std::ifstream inStream( std::string( _path ) + ".terrain", std::ios::binary );
+        if( inStream.is_open() && inStream.good() )
+        {
+            const int numChunks = terrain.mSize.x * terrain.mSize.y * terrain.mSize.z;
+            const int sizeChunk = VoxelChunk::sSize * VoxelChunk::sSize * VoxelChunk::sSize * sizeof( Fixed );
+            for( int  i         = 0; i < numChunks; ++i )
+            {
+                VoxelChunk& chunk = terrain.mChunks[i];
+                inStream.read( (char*)chunk.mVoxels, sizeChunk );
                 chunk.mIsGenerated = true;
             }
         }
