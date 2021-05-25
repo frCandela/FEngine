@@ -26,6 +26,7 @@ namespace fan
 
         // signals connected to the application
         Signal<> mOnQuit;
+        Signal<> mOnEditorUseGameCamera;
         Resources* mResources;
         Cursor * mCurrentCursor = nullptr;
     };

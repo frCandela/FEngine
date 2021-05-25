@@ -578,7 +578,7 @@ namespace fan
 
         if( scene.mMainCameraHandle == editorCamera.mCameraHandle )
         {
-            world.GetSingleton<Scene>().mOnEditorUseGameCamera.Emmit();
+            world.GetSingleton<Application>().mOnEditorUseGameCamera.Emmit();
         }
         else
         {

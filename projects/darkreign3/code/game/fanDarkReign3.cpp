@@ -52,6 +52,7 @@ namespace fan
 #endif
 
         mCursors.Load( *mWorld.GetSingleton<Application>().mResources );
+        mWorld.GetSingleton<Application>().mOnEditorUseGameCamera.Connect( &DarkReign3::OnEditorUseGameCamera, this );
     }
 
     //==================================================================================================================================================================================================
@@ -63,8 +64,8 @@ namespace fan
 
         Scene& scene = mWorld.GetSingleton<Scene>();
         SceneNode cameraNode = scene.CreateSceneNode( "game_camera", &scene.GetRootNode() );
-
-        EcsEntity cameraEntity = mWorld.GetEntity( cameraNode.mHandle );
+        mGameCameraHandle = cameraNode.mHandle;
+        EcsEntity cameraEntity = mWorld.GetEntity( mGameCameraHandle );
         mWorld.AddComponent<Camera>( cameraEntity );
         Transform& cameraTransform = mWorld.AddComponent<Transform>( cameraEntity );
 
@@ -73,8 +74,7 @@ namespace fan
             Transform& prevCameraTransform = mWorld.GetComponent<Transform>( mWorld.GetEntity( scene.mMainCameraHandle ) );
             cameraTransform = prevCameraTransform;
         }
-
-        scene.SetMainCamera( cameraNode.mHandle );
+        scene.SetMainCamera( mGameCameraHandle );
     }
 
     //==================================================================================================================================================================================================
@@ -87,6 +87,14 @@ namespace fan
     int completionVoxelsGeneration;
     int completionMeshGeneration;
     int chunksPerFrame = System::GetBuildType() == System::BuildType::Release ? 32 : 4;
+
+    //============================================================================================================================
+    //============================================================================================================================
+    void DarkReign3::OnEditorUseGameCamera()
+    {
+        fanAssert( mGameCameraHandle != 0 );
+        mWorld.GetSingleton<Scene>().SetMainCamera( mGameCameraHandle );
+    }
 
     //============================================================================================================================
     //============================================================================================================================
@@ -194,9 +202,9 @@ namespace fan
             ImGui::SliderInt( "mesh generation", &completionMeshGenerationCpy, 0, max );
 
             static bool sTest = false;
-            if( ImGui::Checkbox( "test", &sTest ) )
+            if( ImGui::Checkbox( "test2", &sTest ) )
             {
-                if( !sTest ){ mWorld.GetSingleton<Application>().mCurrentCursor = nullptr; }
+                //if( !sTest ){ mWorld.GetSingleton<Application>().mCurrentCursor = nullptr; }
             }
             if( sTest )
             {
@@ -213,6 +221,8 @@ namespace fan
 
             if( ImGui::Button( "test" ) )
             {
+                Application& app = mWorld.GetSingleton<Application>();
+                app.mCurrentCursor = mCursors.mCursors[DR3Cursors::Nope];
             }
         }
         ImGui::End();

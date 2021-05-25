@@ -30,9 +30,11 @@ namespace fan
         EcsWorld& GetWorld() override { return mWorld; }
 
         void StepLoadTerrain();
+        void OnEditorUseGameCamera();
 
         EcsWorld mWorld;
 
+        EcsHandle mGameCameraHandle = 0;
         DR3Cursors mCursors;
     };
 }
