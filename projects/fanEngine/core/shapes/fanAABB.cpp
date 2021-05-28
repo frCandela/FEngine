@@ -47,6 +47,33 @@ namespace fan
     }
 
     //==================================================================================================================================================================================================
+    // Computes the AABB of a a transformed points cloud
+    //==================================================================================================================================================================================================
+    AABB::AABB( const std::vector<Vector3>& _pointCloud )
+    {
+        if( _pointCloud.empty() )
+        {
+            mLow  = FIXED( -0.5 ) * Vector3::sOne;
+            mHigh = FIXED( 0.5 ) * Vector3::sOne;
+            return;
+        }
+
+        mLow  = Vector3( Fixed::sMaxValue, Fixed::sMaxValue, Fixed::sMaxValue );
+        mHigh = Vector3( Fixed::sMinValue, Fixed::sMinValue, Fixed::sMinValue );
+        for( int index = 0; index < (int)_pointCloud.size(); index++ )
+        {
+            const Vector3 vertex = _pointCloud[index];
+            if( vertex.x < mLow.x ){ mLow.x = vertex.x; }
+            if( vertex.y < mLow.y ){ mLow.y = vertex.y; }
+            if( vertex.z < mLow.z ){ mLow.z = vertex.z; }
+            if( vertex.x > mHigh.x ){ mHigh.x = vertex.x; }
+            if( vertex.y > mHigh.y ){ mHigh.y = vertex.y; }
+            if( vertex.z > mHigh.z ){ mHigh.z = vertex.z; }
+        }
+        fanAssert( mLow.x <= mHigh.x && mLow.y <= mHigh.y && mLow.z <= mHigh.z );
+    }
+
+    //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
     std::vector<Vector3> AABB::GetCorners() const
     {

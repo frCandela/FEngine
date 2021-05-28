@@ -2,10 +2,11 @@
 
 #include "core/shapes/fanConvexHull.hpp"
 #include "core/resources/fanResource.hpp"
+#include "core/resources/fanResourcePtr.hpp"
+#include "core/shapes/fanSphere.hpp"
 #include "render/fanVertex.hpp"
 #include "render/core/fanBuffer.hpp"
 #include "render/core/fanSwapChain.hpp"
-#include "core/resources/fanResourcePtr.hpp"
 
 struct Device;
 
@@ -36,17 +37,19 @@ namespace fan
     //==================================================================================================================================================================================================
     struct Mesh : public Resource
     {
-        FAN_RESOURCE( Mesh );
+    FAN_RESOURCE( Mesh );
 
         bool RayCast( const Vector3 _origin, const Vector3 _dir, Vector3& _outIntersection ) const;
         bool LoadFromFile( const std::string& _path );
 
-        void GenerateConvexHull();
+        void GenerateBoundingVolumes();
         bool Empty() const;
+        int CountVertices() const;
 
-        ConvexHull           mConvexHull;
-        bool                 mAutoUpdateHull = true;
         std::vector<SubMesh> mSubMeshes;
-        int                  mIndex          = -1;
+
+        ConvexHull mConvexHull;
+        Sphere     mBoundingSphere;
+        bool       mAutoGenerateBoundingVolumes = true;
     };
 }

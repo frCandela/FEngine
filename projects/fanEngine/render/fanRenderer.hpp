@@ -57,8 +57,8 @@ namespace fan
         void SetPointLights( const std::vector<RenderDataPointLight>& _lightData );
         void SetDrawData( const std::vector<RenderDataModel>& _drawData );
         void SetUIDrawData( const std::vector<RenderDataMesh2D>& _drawData );
-        void SetDebugDrawData( const std::vector<DebugVertex>& _debugLines,
-                               const std::vector<DebugVertex>& _debugLinesNoDepthTest,
+        void SetDebugDrawData( const std::vector<DebugLineVertex>& _debugLines,
+                               const std::vector<DebugLineVertex>& _debugLinesNoDepthTest,
                                const std::vector<DebugVertex>& _debugTriangles,
                                const std::vector<DebugVertex2D>& _debugLines2D );
 

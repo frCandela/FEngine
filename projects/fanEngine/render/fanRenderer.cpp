@@ -40,7 +40,7 @@ namespace fan
 
         mDrawDebug.Create( mDevice, imagesCount );
         mDrawUI.Create( mDevice, imagesCount );
-        mDrawModels.Create( mDevice, imagesCount, mResources.GetOrLoad<Texture>( RenderGlobal::sDefaultTexture) );
+        mDrawModels.Create( mDevice, imagesCount, mResources.GetOrLoad<Texture>( RenderGlobal::sDefaultTexture ) );
         mDrawPostprocess.Create( mDevice, imagesCount, mImageViewGameColor );
         mDrawImgui.Create( mDevice,
                            imagesCount,
@@ -197,11 +197,7 @@ namespace fan
         }
         else
         {
-            vkWaitForFences( mDevice.mDevice,
-                             1,
-                             mWindow.mSwapchain.GetCurrentInFlightFence(),
-                             VK_TRUE,
-                             std::numeric_limits<uint64_t>::max() );
+            vkWaitForFences( mDevice.mDevice, 1, mWindow.mSwapchain.GetCurrentInFlightFence(), VK_TRUE, std::numeric_limits<uint64_t>::max() );
             vkResetFences( mDevice.mDevice, 1, mWindow.mSwapchain.GetCurrentInFlightFence() );
 
             ClearDestroyedMesh2D( mDevice );
@@ -213,8 +209,7 @@ namespace fan
             textureCreated = BuildNewTextures( mDevice );
         }
 
-        ImGui::GetIO().DisplaySize = ImVec2( static_cast< float >( mWindow.mSwapchain.mExtent.width ),
-                                             static_cast< float >( mWindow.mSwapchain.mExtent.height ) );
+        ImGui::GetIO().DisplaySize = ImVec2( static_cast< float >( mWindow.mSwapchain.mExtent.width ), static_cast< float >( mWindow.mSwapchain.mExtent.height ) );
 
         if( textureCreated )
         {
@@ -450,8 +445,8 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void Renderer::SetDebugDrawData( const std::vector<DebugVertex>& _debugLines,
-                                     const std::vector<DebugVertex>& _debugLinesNoDepthTest,
+    void Renderer::SetDebugDrawData( const std::vector<DebugLineVertex>& _debugLines,
+                                     const std::vector<DebugLineVertex>& _debugLinesNoDepthTest,
                                      const std::vector<DebugVertex>& _debugTriangles,
                                      const std::vector<DebugVertex2D>& _debugLines2D )
     {
@@ -501,12 +496,11 @@ namespace fan
 
         FrameBuffer& finalFramebuffer = mViewType == ViewType::Editor ? mFramebuffersPostprocess : mFramebuffersSwapchain;
 
-        VkRenderPassBeginInfo renderPassInfo            = RenderPass::GetBeginInfo(
-                mRenderPassGame.mRenderPass,
-                mFrameBuffersGame.mFrameBuffers[_index],
-                mGameExtent,
-                clearValues.data(),
-                (uint32_t)clearValues.size() );
+        VkRenderPassBeginInfo renderPassInfo            = RenderPass::GetBeginInfo( mRenderPassGame.mRenderPass,
+                                                                                    mFrameBuffersGame.mFrameBuffers[_index],
+                                                                                    mGameExtent,
+                                                                                    clearValues.data(),
+                                                                                    (uint32_t)clearValues.size() );
         VkRenderPassBeginInfo renderPassInfoPostprocess = RenderPass::GetBeginInfo( mRenderPassPostprocess.mRenderPass,
                                                                                     finalFramebuffer.mFrameBuffers[_index],
                                                                                     mGameExtent,

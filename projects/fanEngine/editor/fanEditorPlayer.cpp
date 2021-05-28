@@ -245,6 +245,7 @@ namespace fan
                 if( mainMenuBar.mShowWireframe ){ currentWorld.Run<SDrawDebugWireframe>(); }
                 if( mainMenuBar.mShowNormals ){ currentWorld.Run<SDrawDebugNormals>(); }
                 if( mainMenuBar.mShowAABB ){ currentWorld.Run<SDrawDebugBounds>(); }
+                if( mainMenuBar.mShowBoundingSphere ){ currentWorld.Run<SDrawDebugBoundingSpheres>(); }
                 if( mainMenuBar.mShowHull ){ currentWorld.Run<SDrawDebugHull>(); }
                 if( mainMenuBar.mShowUiBounds ){ currentWorld.Run<SDrawDebugUiBounds>(); }
                 if( mainMenuBar.mShowLights )

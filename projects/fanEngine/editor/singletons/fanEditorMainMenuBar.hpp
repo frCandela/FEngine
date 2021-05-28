@@ -32,6 +32,7 @@ namespace fan
         bool mShowImguiDemoWindow;
         bool mShowHull;
         bool mShowAABB;
+        bool mShowBoundingSphere;
         bool mShowWireframe;
         bool mShowNormals;
         bool mShowLights;

@@ -132,7 +132,7 @@ namespace fan
                     SceneNode   & sceneNode    = mWorld.GetComponent<SceneNode>( entity );
                     sceneNode.AddFlag( SceneNode::BoundsOutdated );
                     VoxelGenerator::GenerateMesh( terrain, chunk, ( meshRenderer.mMesh )->mSubMeshes[0] );
-                    meshRenderer.mMesh->GenerateConvexHull();
+                    meshRenderer.mMesh->GenerateBoundingVolumes();
                     resources.SetDirty( meshRenderer.mMesh->mGUID );
                     completionMeshGeneration = i;
                     break;
@@ -190,35 +190,11 @@ namespace fan
     {
         if( ImGui::Begin( "testoss" ) )
         {
-            ImGui::DragInt( "chunks per frame", &chunksPerFrame, 1, 1, 100 );
-            int completionVoxelsGenerationCpy = completionVoxelsGeneration;
-            ImGui::SliderInt( "voxels generation", &completionVoxelsGenerationCpy, 0, max );
-            int completionMeshGenerationCpy = completionMeshGeneration;
-            ImGui::SliderInt( "mesh generation", &completionMeshGenerationCpy, 0, max );
-
-            static bool sTest = false;
-            if( ImGui::Checkbox( "test2", &sTest ) )
-            {
-                //if( !sTest ){ mWorld.GetSingleton<Application>().mCurrentCursor = nullptr; }
-            }
-            if( sTest )
-            {
-                static int counter  = 0;
-                static int index    = 0;
-                int        types[4] = { DR3Cursors::Attack4, DR3Cursors::Attack3, DR3Cursors::Attack2, DR3Cursors::Attack1 };
-                if( counter++ > 14 )
-                {
-                    counter = 0;
-                    Application& app = mWorld.GetSingleton<Application>();
-                    app.mCurrentCursor = mCursors.mCursors[types[( ++index % 4 )]];
-                }
-            }
-
-            if( ImGui::Button( "test" ) )
-            {
-                Application& app = mWorld.GetSingleton<Application>();
-                app.mCurrentCursor = mCursors.mCursors[DR3Cursors::Nope];
-            }
+             ImGui::DragInt( "chunks per frame", &chunksPerFrame, 1, 1, 100 );
+             int completionVoxelsGenerationCpy = completionVoxelsGeneration;
+             ImGui::SliderInt( "voxels generation", &completionVoxelsGenerationCpy, 0, max );
+             int completionMeshGenerationCpy = completionMeshGeneration;
+             ImGui::SliderInt( "mesh generation", &completionMeshGenerationCpy, 0, max );
         }
         ImGui::End();
     }

@@ -104,11 +104,7 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    bool Pipeline::Create( Device& _device,
-                           PipelineConfig _pipelineConfig,
-                           VkExtent2D _extent,
-                           VkRenderPass _renderPass,
-                           const bool _createCache )
+    bool Pipeline::Create( Device& _device, PipelineConfig _pipelineConfig, VkExtent2D _extent, VkRenderPass _renderPass, const bool _createCache )
     {
         fanAssert( mPipelineLayout == VK_NULL_HANDLE );
         fanAssert( mPipeline == VK_NULL_HANDLE );
@@ -205,14 +201,7 @@ namespace fan
         graphicsPipelineCreateInfo.basePipelineHandle  = VK_NULL_HANDLE;
         graphicsPipelineCreateInfo.basePipelineIndex   = -1;
 
-        if( vkCreateGraphicsPipelines(
-                _device.mDevice,
-                mPipelineCache,
-                1,
-                &graphicsPipelineCreateInfo,
-                nullptr,
-                &mPipeline
-        ) != VK_SUCCESS )
+        if( vkCreateGraphicsPipelines( _device.mDevice, mPipelineCache, 1, &graphicsPipelineCreateInfo, nullptr, &mPipeline ) != VK_SUCCESS )
         {
             Debug::Error( "Could not allocate graphicsPipelines." );
             return false;
@@ -243,7 +232,6 @@ namespace fan
 
         vkCmdSetScissor( _commandBuffer, 0, 1, &scissor );
         vkCmdSetViewport( _commandBuffer, 0, 1, &viewport );
-
         vkCmdBindPipeline( _commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mPipeline );
     }
 

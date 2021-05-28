@@ -39,6 +39,7 @@ namespace fan
         Matrix3 operator*( const Matrix3& _mat3 ) const;
         Vector3 operator*( const Vector3& _vec3 ) const;
         Matrix3 operator/( const Fixed& _value ) const;
+        Fixed operator()( const int _x, const int _y) const;
 
         Matrix3& operator/=( const Fixed& _value );
         Quaternion ToQuaternion() const;

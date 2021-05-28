@@ -73,16 +73,14 @@ namespace fan
         void UpdateUniformBuffers( Device& _device, const size_t _index );
         bool HasNothingToDraw() const
         {
-            return mNumLines == 0 &&
-                   mNumLinesNDT == 0 &&
-                   mNumTriangles == 0;
+            return mNumLines == 0 && mNumLinesNDT == 0 && mNumTriangles == 0;
         }
         void RecordCommandBuffer( const size_t _index, RenderPass& _renderPass, FrameBuffer& _framebuffer, VkExtent2D _extent );
         void RecordCommandBuffer2D( const size_t _index, RenderPass& _renderPass, FrameBuffer& _framebuffer, VkExtent2D _extent );
         void SetDebugDrawData( const uint32_t _index,
                                Device& _device,
-                               const std::vector<DebugVertex>& _debugLines,
-                               const std::vector<DebugVertex>& _debugLinesNoDepthTest,
+                               const std::vector<DebugLineVertex>& _debugLines,
+                               const std::vector<DebugLineVertex>& _debugLinesNoDepthTest,
                                const std::vector<DebugVertex>& _debugTriangles,
                                const std::vector<DebugVertex2D>& _debugLines2D );
 

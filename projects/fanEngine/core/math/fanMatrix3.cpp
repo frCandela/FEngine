@@ -1,5 +1,6 @@
 #include "core/math/fanMatrix3.hpp"
 #include "core/math/fanQuaternion.hpp"
+#include "core/fanAssert.hpp"
 
 namespace fan
 {
@@ -198,6 +199,38 @@ namespace fan
         return Vector3( e11 * _vec3.x + e12 * _vec3.y + e13 * _vec3.z,
                         e21 * _vec3.x + e22 * _vec3.y + e23 * _vec3.z,
                         e31 * _vec3.x + e32 * _vec3.y + e33 * _vec3.z );
+    }
+
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    Fixed Matrix3::operator()( const int _x, const int _y) const
+    {
+        switch( _x )
+        {
+            case 0:
+                switch( _y )
+                {
+                    case 0: return e11;
+                    case 1: return e12;
+                    case 2: return e13;
+                }
+            case 1:
+                switch( _y )
+                {
+                    case 0: return e21;
+                    case 1: return e22;
+                    case 2: return e23;
+                }
+            case 2:
+                switch( _y )
+                {
+                    case 0: return e31;
+                    case 1: return e32;
+                    case 2: return e33;
+                }
+        }
+        fanAssert(false);
+        return 0;
     }
 
     //==================================================================================================================================================================================================

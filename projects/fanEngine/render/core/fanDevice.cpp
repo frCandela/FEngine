@@ -17,14 +17,10 @@ namespace fan
         std::vector<VkExtensionProperties> availableExtensions;
         SelectPhysicalDevice( _instance, availableFeatures, availableExtensions );
 
-        std::vector<const char*> existingExtensions = GetDesiredExtensions( availableExtensions,
-                                                                            RenderGlobal::sDesiredDeviceExtensions );
+        std::vector<const char*> existingExtensions = GetDesiredExtensions( availableExtensions, RenderGlobal::sDesiredDeviceExtensions );
 
         uint32_t graphicsQueueFamilyIndex = 0, computeQueueFamilyIndex = 0, presentQueueFamilyIndex = 0;
-        GetQueueFamiliesIndices( _surface,
-                                 graphicsQueueFamilyIndex,
-                                 computeQueueFamilyIndex,
-                                 presentQueueFamilyIndex );
+        GetQueueFamiliesIndices( _surface, graphicsQueueFamilyIndex, computeQueueFamilyIndex, presentQueueFamilyIndex );
 
         float                                queuePriority = 1.0f;
         std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
@@ -39,8 +35,10 @@ namespace fan
         queueCreateInfos.push_back( queueCreateInfo );
 
         VkPhysicalDeviceFeatures desiredFeatures = {};
-        desiredFeatures.samplerAnisotropy                       = availableFeatures.samplerAnisotropy == VK_TRUE;
+        desiredFeatures.samplerAnisotropy                       = VK_TRUE;
         desiredFeatures.shaderUniformBufferArrayDynamicIndexing = VK_TRUE;
+        fanAssertMsg( availableFeatures.samplerAnisotropy, "device feature samplerAnisotropy not available" );
+        fanAssertMsg( availableFeatures.depthBiasClamp, "device feature shaderUniformBufferArrayDynamicIndexing not available " );
 
         VkPhysicalDeviceDescriptorIndexingFeaturesEXT indexingFeatures = {};
         indexingFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES_EXT;

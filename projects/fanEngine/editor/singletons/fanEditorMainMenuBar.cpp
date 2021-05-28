@@ -35,6 +35,7 @@ namespace fan
         mainMenuBar.mShowImguiDemoWindow = false;
         mainMenuBar.mShowHull            = false;
         mainMenuBar.mShowAABB            = false;
+        mainMenuBar.mShowBoundingSphere  = false;
         mainMenuBar.mShowWireframe       = false;
         mainMenuBar.mShowNormals         = false;
         mainMenuBar.mShowLights          = false;
@@ -168,13 +169,22 @@ namespace fan
             // Editor
             if( ImGui::BeginMenu( "View" ) )
             {
-                if( ImGui::MenuItem( "show hull", nullptr, &mainMenuBar.mShowHull ) ){}
-                if( ImGui::MenuItem( "show AABB", nullptr, &mainMenuBar.mShowAABB ) ){}
-                if( ImGui::MenuItem( "show wireframe", nullptr, &mainMenuBar.mShowWireframe ) ){}
-                if( ImGui::MenuItem( "show normals", nullptr, &mainMenuBar.mShowNormals ) ){}
-                if( ImGui::MenuItem( "show lights", nullptr, &mainMenuBar.mShowLights ) ){}
-                if( ImGui::MenuItem( "show ui bounds", nullptr, &mainMenuBar.mShowUiBounds ) ){}
+                if( ImGui::BeginMenu( "bounds" ) )
+                {
+                    if( ImGui::MenuItem( "hull", nullptr, &mainMenuBar.mShowHull ) ){}
+                    if( ImGui::MenuItem( "aabb", nullptr, &mainMenuBar.mShowAABB ) ){}
+                    if( ImGui::MenuItem( "sphere", nullptr, &mainMenuBar.mShowBoundingSphere ) ){}
+                    if( ImGui::MenuItem( "ui rect", nullptr, &mainMenuBar.mShowUiBounds ) ){}
+                    ImGui::EndMenu();
+                }
+                if( ImGui::BeginMenu( "geometry" ) )
+                {
+                    if( ImGui::MenuItem( "show wireframe", nullptr, &mainMenuBar.mShowWireframe ) ){}
+                    if( ImGui::MenuItem( "show normals", nullptr, &mainMenuBar.mShowNormals ) ){}
 
+                    ImGui::EndMenu();
+                }
+                if( ImGui::MenuItem( "lights", nullptr, &mainMenuBar.mShowLights ) ){}
                 ImGui::EndMenu();
             }
 

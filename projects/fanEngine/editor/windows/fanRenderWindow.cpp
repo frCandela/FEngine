@@ -52,7 +52,7 @@ namespace fan
             app.mResources->Get<Mesh>( meshes );
             for( ResourcePtr<Mesh> mesh : meshes )
             {
-                ImGui::Text( "index: %d name: %s", mesh->mIndex, mesh->mPath.c_str() );
+                ImGui::Text( "name: %s", mesh->mPath.c_str() );
                 ImGui::FanBeginDragDropSourceMesh( mesh, ImGuiDragDropFlags_SourceAllowNullID );
             }
         }

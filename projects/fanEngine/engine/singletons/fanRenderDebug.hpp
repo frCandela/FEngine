@@ -22,10 +22,10 @@ namespace fan
         static void Init( EcsWorld& _world, EcsSingleton& _component );
 
         // vertex data
-        std::vector<DebugVertex>   mDebugLines;
-        std::vector<DebugVertex>   mDebugLinesNoDepthTest;
-        std::vector<DebugVertex>   mDebugTriangles;
-        std::vector<DebugVertex2D> mDebugLines2D;
+        std::vector<DebugLineVertex> mDebugLines;
+        std::vector<DebugLineVertex> mDebugLinesNoDepthTest;
+        std::vector<DebugVertex>     mDebugTriangles;
+        std::vector<DebugVertex2D>   mDebugLines2D;
 
         void Clear();
         void DebugPoint( const Vector3& _pos, const Fixed size, const Color _color, const bool _depthTestEnable = false );

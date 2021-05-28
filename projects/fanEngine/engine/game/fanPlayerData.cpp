@@ -186,10 +186,7 @@ namespace fan
             _renderer.SetUIDrawData( renderWorld.uiDrawData );
             _renderer.SetPointLights( renderWorld.pointLights );
             _renderer.SetDirectionalLights( renderWorld.directionalLights );
-            _renderer.SetDebugDrawData( renderDebug.mDebugLines,
-                                        renderDebug.mDebugLinesNoDepthTest,
-                                        renderDebug.mDebugTriangles,
-                                        renderDebug.mDebugLines2D );
+            _renderer.SetDebugDrawData( renderDebug.mDebugLines, renderDebug.mDebugLinesNoDepthTest, renderDebug.mDebugTriangles, renderDebug.mDebugLines2D );
         }
 
         // Camera

@@ -4,6 +4,7 @@
 #include "render/core/fanDevice.hpp"
 #include "core/fanDebug.hpp"
 #include "core/shapes/fanTriangle.hpp"
+#include "core/shapes/fanAABB.hpp"
 
 namespace fan
 {
@@ -29,7 +30,7 @@ namespace fan
             {
                 subMesh.OptimizeVertices();
             }
-            GenerateConvexHull();
+            GenerateBoundingVolumes();
 
             mPath = _path;
             return true;
@@ -103,22 +104,27 @@ namespace fan
     }
 
     //==================================================================================================================================================================================================
-    // Creates a convex hull from the mesh geometry
     //==================================================================================================================================================================================================
-    void Mesh::GenerateConvexHull()
+    int Mesh::CountVertices() const
     {
-        if( !mAutoUpdateHull ){ return; }
-
         int numVertices = 0;
-        for( SubMesh& subMesh : mSubMeshes )
+        for( const SubMesh& subMesh : mSubMeshes )
         {
             numVertices += (int)subMesh.mVertices.size();
         }
-        if( numVertices == 0 ){ return; }
+        return numVertices;
+    }
+
+    //==================================================================================================================================================================================================
+    // Creates a convex hull from the mesh geometry
+    //==================================================================================================================================================================================================
+    void Mesh::GenerateBoundingVolumes()
+    {
+        if( !mAutoGenerateBoundingVolumes ){ return; }
 
         // Generate points clouds from vertex list
         std::vector<Vector3> pointCloud;
-        pointCloud.reserve( numVertices );
+        pointCloud.reserve( CountVertices() );
         for( SubMesh& subMesh : mSubMeshes )
         {
             for( int point = 0; point < (int)subMesh.mVertices.size(); point++ )
@@ -127,7 +133,25 @@ namespace fan
                 pointCloud.push_back( Vector3( vertex.mPos ) );
             }
         }
-        mConvexHull.ComputeQuickHull( pointCloud );
+
+        if( !pointCloud.empty() )
+        {
+            mConvexHull.ComputeQuickHull( pointCloud );
+        }
+
+        // compute bounding sphere
+        const AABB aabb( mConvexHull.mVertices );
+        mBoundingSphere.mCenter = aabb.GetCenter();
+        mBoundingSphere.mRadius = 0;
+        for( Vector3 point : mConvexHull.mVertices )
+        {
+            Fixed sqrDistance = Vector3::SqrDistance( point, mBoundingSphere.mCenter );
+            if( sqrDistance > mBoundingSphere.mRadius )
+            {
+                mBoundingSphere.mRadius = sqrDistance;
+            }
+        }
+        mBoundingSphere.mRadius = Fixed::Sqrt( mBoundingSphere.mRadius );
     }
 
     //==================================================================================================================================================================================================

@@ -46,13 +46,13 @@ namespace fan
     {
         if( _depthTestEnable )
         {
-            mDebugLines.push_back( DebugVertex( _start.ToGlm(), glm::vec3( 0, 0, 0 ), _color.ToGLM() ) );
-            mDebugLines.push_back( DebugVertex( _end.ToGlm(), glm::vec3( 0, 0, 0 ), _color.ToGLM() ) );
+            mDebugLines.push_back( DebugLineVertex( _start.ToGlm(), _color.ToGLM() ) );
+            mDebugLines.push_back( DebugLineVertex( _end.ToGlm(), _color.ToGLM() ) );
         }
         else
         {
-            mDebugLinesNoDepthTest.push_back( DebugVertex( _start.ToGlm(), glm::vec3( 0, 0, 0 ), _color.ToGLM() ) );
-            mDebugLinesNoDepthTest.push_back( DebugVertex( _end.ToGlm(), glm::vec3( 0, 0, 0 ), _color.ToGLM() ) );
+            mDebugLinesNoDepthTest.push_back( DebugLineVertex( _start.ToGlm(), _color.ToGLM() ) );
+            mDebugLinesNoDepthTest.push_back( DebugLineVertex( _end.ToGlm(), _color.ToGLM() ) );
         }
     }
 
@@ -87,20 +87,21 @@ namespace fan
     {
         fanAssert( _nbSegments > 2 && _radius >= 0 );
 
-        const Vector3 other      = Vector3( -_axis[1], -_axis[2], _axis[0] );
-        Vector3       orthogonal = _radius * Vector3::Cross( _axis, other ).Normalized();
-        const Fixed   angle      = 2 * Fixed::sPi / _nbSegments;
+        const Vector3 other          = Vector3( -_axis[1], -_axis[2], _axis[0] );
+        const Vector3 orthogonal     = _radius * Vector3::Cross( _axis, other ).Normalized();
+        const Fixed   angleIncrement = Fixed::sTwoPi / _nbSegments;
+        Fixed         angle          = 0;
 
-        std::vector<DebugVertex>& lines = _depthTestEnable ? mDebugLines : mDebugLinesNoDepthTest;
+        std::vector<DebugLineVertex>& lines = _depthTestEnable ? mDebugLines : mDebugLinesNoDepthTest;
         for( uint32_t segmentIndex = 0; segmentIndex < _nbSegments; segmentIndex++ )
         {
 
-            Vector3 start = _pos + orthogonal;
-            orthogonal = Quaternion::AngleAxis( angle, _axis ) * orthogonal;
-            Vector3 end = _pos + orthogonal;
+            Vector3 start = _pos + Quaternion::AngleAxisRadians( angle, _axis ) * orthogonal;
+            angle += angleIncrement;
+            Vector3 end = _pos + Quaternion::AngleAxisRadians( angle, _axis ) * orthogonal;
 
-            lines.push_back( DebugVertex( start.ToGlm(), glm::vec3( 0, 0, 0 ), _color.ToGLM() ) );
-            lines.push_back( DebugVertex( end.ToGlm(), glm::vec3( 0, 0, 0 ), _color.ToGLM() ) );
+            lines.push_back( DebugLineVertex( start.ToGlm(), _color.ToGLM() ) );
+            lines.push_back( DebugLineVertex( end.ToGlm(), _color.ToGLM() ) );
         }
     }
 
@@ -127,34 +128,34 @@ namespace fan
 
         glm::vec4 glmColor = _color.ToGLM();
 
-        std::vector<DebugVertex>& lines = _depthTestEnable ? mDebugLines : mDebugLinesNoDepthTest;
+        std::vector<DebugLineVertex>& lines = _depthTestEnable ? mDebugLines : mDebugLinesNoDepthTest;
 
-        lines.push_back( DebugVertex( cube[0].ToGlm(), glm::vec3( 0, 0, 0 ), glmColor ) );
-        lines.push_back( DebugVertex( cube[1].ToGlm(), glm::vec3( 0, 0, 0 ), glmColor ) );
-        lines.push_back( DebugVertex( cube[1].ToGlm(), glm::vec3( 0, 0, 0 ), glmColor ) );
-        lines.push_back( DebugVertex( cube[3].ToGlm(), glm::vec3( 0, 0, 0 ), glmColor ) );
-        lines.push_back( DebugVertex( cube[3].ToGlm(), glm::vec3( 0, 0, 0 ), glmColor ) );
-        lines.push_back( DebugVertex( cube[2].ToGlm(), glm::vec3( 0, 0, 0 ), glmColor ) );
-        lines.push_back( DebugVertex( cube[2].ToGlm(), glm::vec3( 0, 0, 0 ), glmColor ) );
-        lines.push_back( DebugVertex( cube[0].ToGlm(), glm::vec3( 0, 0, 0 ), glmColor ) );
+        lines.push_back( DebugLineVertex( cube[0].ToGlm(), glmColor ) );
+        lines.push_back( DebugLineVertex( cube[1].ToGlm(), glmColor ) );
+        lines.push_back( DebugLineVertex( cube[1].ToGlm(), glmColor ) );
+        lines.push_back( DebugLineVertex( cube[3].ToGlm(), glmColor ) );
+        lines.push_back( DebugLineVertex( cube[3].ToGlm(), glmColor ) );
+        lines.push_back( DebugLineVertex( cube[2].ToGlm(), glmColor ) );
+        lines.push_back( DebugLineVertex( cube[2].ToGlm(), glmColor ) );
+        lines.push_back( DebugLineVertex( cube[0].ToGlm(), glmColor ) );
 
-        lines.push_back( DebugVertex( cube[4].ToGlm(), glm::vec3( 0, 0, 0 ), glmColor ) );
-        lines.push_back( DebugVertex( cube[5].ToGlm(), glm::vec3( 0, 0, 0 ), glmColor ) );
-        lines.push_back( DebugVertex( cube[5].ToGlm(), glm::vec3( 0, 0, 0 ), glmColor ) );
-        lines.push_back( DebugVertex( cube[7].ToGlm(), glm::vec3( 0, 0, 0 ), glmColor ) );
-        lines.push_back( DebugVertex( cube[7].ToGlm(), glm::vec3( 0, 0, 0 ), glmColor ) );
-        lines.push_back( DebugVertex( cube[6].ToGlm(), glm::vec3( 0, 0, 0 ), glmColor ) );
-        lines.push_back( DebugVertex( cube[6].ToGlm(), glm::vec3( 0, 0, 0 ), glmColor ) );
-        lines.push_back( DebugVertex( cube[4].ToGlm(), glm::vec3( 0, 0, 0 ), glmColor ) );
+        lines.push_back( DebugLineVertex( cube[4].ToGlm(), glmColor ) );
+        lines.push_back( DebugLineVertex( cube[5].ToGlm(), glmColor ) );
+        lines.push_back( DebugLineVertex( cube[5].ToGlm(), glmColor ) );
+        lines.push_back( DebugLineVertex( cube[7].ToGlm(), glmColor ) );
+        lines.push_back( DebugLineVertex( cube[7].ToGlm(), glmColor ) );
+        lines.push_back( DebugLineVertex( cube[6].ToGlm(), glmColor ) );
+        lines.push_back( DebugLineVertex( cube[6].ToGlm(), glmColor ) );
+        lines.push_back( DebugLineVertex( cube[4].ToGlm(), glmColor ) );
 
-        lines.push_back( DebugVertex( cube[0].ToGlm(), glm::vec3( 0, 0, 0 ), glmColor ) );
-        lines.push_back( DebugVertex( cube[4].ToGlm(), glm::vec3( 0, 0, 0 ), glmColor ) );
-        lines.push_back( DebugVertex( cube[1].ToGlm(), glm::vec3( 0, 0, 0 ), glmColor ) );
-        lines.push_back( DebugVertex( cube[5].ToGlm(), glm::vec3( 0, 0, 0 ), glmColor ) );
-        lines.push_back( DebugVertex( cube[3].ToGlm(), glm::vec3( 0, 0, 0 ), glmColor ) );
-        lines.push_back( DebugVertex( cube[7].ToGlm(), glm::vec3( 0, 0, 0 ), glmColor ) );
-        lines.push_back( DebugVertex( cube[2].ToGlm(), glm::vec3( 0, 0, 0 ), glmColor ) );
-        lines.push_back( DebugVertex( cube[6].ToGlm(), glm::vec3( 0, 0, 0 ), glmColor ) );
+        lines.push_back( DebugLineVertex( cube[0].ToGlm(), glmColor ) );
+        lines.push_back( DebugLineVertex( cube[4].ToGlm(), glmColor ) );
+        lines.push_back( DebugLineVertex( cube[1].ToGlm(), glmColor ) );
+        lines.push_back( DebugLineVertex( cube[5].ToGlm(), glmColor ) );
+        lines.push_back( DebugLineVertex( cube[3].ToGlm(), glmColor ) );
+        lines.push_back( DebugLineVertex( cube[7].ToGlm(), glmColor ) );
+        lines.push_back( DebugLineVertex( cube[2].ToGlm(), glmColor ) );
+        lines.push_back( DebugLineVertex( cube[6].ToGlm(), glmColor ) );
     }
 
     //==================================================================================================================================================================================================

@@ -63,8 +63,8 @@ namespace fan
             renderWorld.mParticlesMesh->mSubMeshes.resize( 1 );
             renderWorld.mParticlesMesh->mSubMeshes[0].mHostVisible      = true;
             renderWorld.mParticlesMesh->mSubMeshes[0].mOptimizeVertices = false;
-            renderWorld.mParticlesMesh->mAutoUpdateHull                 = false;
-            renderWorld.mParticlesMesh->mIsGenerated = true;
+            renderWorld.mParticlesMesh->mAutoGenerateBoundingVolumes    = false;
+            renderWorld.mParticlesMesh->mIsGenerated                    = true;
         }
     }
 }
