@@ -63,8 +63,8 @@ namespace fan
             RenderDebug& rd = _world.GetSingleton<RenderDebug>();
             for( int coord = -grid.mLinesCount; coord <= grid.mLinesCount; coord++ )
             {
-                rd.DebugLine( grid.mOffset + Vector3( -count * size, 0, coord * size ), grid.mOffset + Vector3( count * size, 0, coord * size ), grid.mColor, true );
-                rd.DebugLine( grid.mOffset + Vector3( coord * size, 0, -count * size ), grid.mOffset + Vector3( coord * size, 0, count * size ), grid.mColor, true );
+                rd.DrawLine( grid.mOffset + Vector3( -count * size, 0, coord * size ), grid.mOffset + Vector3( count * size, 0, coord * size ), grid.mColor, true );
+                rd.DrawLine( grid.mOffset + Vector3( coord * size, 0, -count * size ), grid.mOffset + Vector3( coord * size, 0, count * size ), grid.mColor, true );
             }
         }
     }

@@ -33,16 +33,16 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void RenderDebug::DebugPoint( const Vector3& _pos, const Fixed size, const Color _color, const bool _depthTestEnable )
+    void RenderDebug::DrawPoint( const Vector3& _pos, const Fixed size, const Color _color, const bool _depthTestEnable )
     {
-        DebugLine( _pos - size * Vector3::sUp, _pos + size * Vector3::sUp, _color, _depthTestEnable );
-        DebugLine( _pos - size * Vector3::sLeft, _pos + size * Vector3::sLeft, _color, _depthTestEnable );
-        DebugLine( _pos - size * Vector3::sForward, _pos + size * Vector3::sForward, _color, _depthTestEnable );
+        DrawLine( _pos - size * Vector3::sUp, _pos + size * Vector3::sUp, _color, _depthTestEnable );
+        DrawLine( _pos - size * Vector3::sLeft, _pos + size * Vector3::sLeft, _color, _depthTestEnable );
+        DrawLine( _pos - size * Vector3::sForward, _pos + size * Vector3::sForward, _color, _depthTestEnable );
     }
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void RenderDebug::DebugLine( const Vector3& _start, const Vector3& _end, const Color _color, const bool _depthTestEnable )
+    void RenderDebug::DrawLine( const Vector3& _start, const Vector3& _end, const Color _color, const bool _depthTestEnable )
     {
         if( _depthTestEnable )
         {
@@ -83,7 +83,7 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void RenderDebug::DebugCircle( const Vector3 _pos, const Fixed _radius, Vector3 _axis, uint32_t _nbSegments, const Color _color, const bool _depthTestEnable )
+    void RenderDebug::DrawCircle( const Vector3 _pos, const Fixed _radius, Vector3 _axis, uint32_t _nbSegments, const Color _color, const bool _depthTestEnable )
     {
         fanAssert( _nbSegments > 2 && _radius >= 0 );
 
@@ -107,7 +107,7 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void RenderDebug::DebugTriangle( const Vector3& _v0, const Vector3& _v1, const Vector3& _v2, const Color _color )
+    void RenderDebug::DrawTriangle( const Vector3& _v0, const Vector3& _v1, const Vector3& _v2, const Color _color )
     {
         const glm::vec3 normal = glm::normalize( Vector3::Cross( _v1 - _v2, _v0 - _v2 ).ToGlm() );
         mDebugTriangles.push_back( DebugVertex( _v0.ToGlm(), normal, _color.ToGLM() ) );
@@ -117,7 +117,7 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void RenderDebug::DebugCube( const Transform& _transform, const Vector3& _halfExtent, const Color _color, const bool _depthTestEnable )
+    void RenderDebug::DrawCube( const Transform& _transform, const Vector3& _halfExtent, const Color _color, const bool _depthTestEnable )
     {
         std::vector<Vector3> cube = GetCube( _halfExtent );
 
@@ -160,7 +160,7 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void RenderDebug::DebugIcoSphere( const Transform& _transform, const Fixed _radius, const int _numSubdivisions, const Color _color, const bool _depthTestEnable )
+    void RenderDebug::DrawIcoSphere( const Transform& _transform, const Fixed _radius, const int _numSubdivisions, const Color _color, const bool _depthTestEnable )
     {
         if( _radius <= 0 )
         {
@@ -180,24 +180,24 @@ namespace fan
             const Vector3 v0 = sphere[3 * triangleIndex + 0];
             const Vector3 v1 = sphere[3 * triangleIndex + 1];
             const Vector3 v2 = sphere[3 * triangleIndex + 2];
-            DebugLine( v0, v1, _color, _depthTestEnable );
-            DebugLine( v1, v2, _color, _depthTestEnable );
-            DebugLine( v2, v0, _color, _depthTestEnable );
+            DrawLine( v0, v1, _color, _depthTestEnable );
+            DrawLine( v1, v2, _color, _depthTestEnable );
+            DrawLine( v2, v0, _color, _depthTestEnable );
         }
     }
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void RenderDebug::DebugSphere( const Vector3 _origin, const Fixed _radius, const Color _color, const bool _depthTestEnable )
+    void RenderDebug::DrawSphere( const Vector3 _origin, const Fixed _radius, const Color _color, const bool _depthTestEnable )
     {
-        DebugCircle( _origin, _radius, Vector3::sUp, 32, _color, _depthTestEnable );
-        DebugCircle( _origin, _radius, Vector3::sLeft, 32, _color, _depthTestEnable );
-        DebugCircle( _origin, _radius, Vector3::sForward, 32, _color, _depthTestEnable );
+        DrawCircle( _origin, _radius, Vector3::sUp, 32, _color, _depthTestEnable );
+        DrawCircle( _origin, _radius, Vector3::sLeft, 32, _color, _depthTestEnable );
+        DrawCircle( _origin, _radius, Vector3::sForward, 32, _color, _depthTestEnable );
     }
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void RenderDebug::DebugCone( const Transform& _transform, const Fixed _radius, const Fixed _height, const int _numSubdivisions, const Color _color )
+    void RenderDebug::DrawCone( const Transform& _transform, const Fixed _radius, const Fixed _height, const int _numSubdivisions, const Color _color )
     {
         std::vector<Vector3> cone = GetCone( _radius, _height, _numSubdivisions );
 
@@ -208,39 +208,39 @@ namespace fan
 
         for( int triangleIndex = 0; triangleIndex < (int)cone.size() / 3; triangleIndex++ )
         {
-            DebugTriangle( cone[3 * triangleIndex + 0],
-                           cone[3 * triangleIndex + 1],
-                           cone[3 * triangleIndex + 2],
-                           _color );
+            DrawTriangle( cone[3 * triangleIndex + 0],
+                          cone[3 * triangleIndex + 1],
+                          cone[3 * triangleIndex + 2],
+                          _color );
         }
     }
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void RenderDebug::DebugAABB( const AABB& _aabb, const Color _color )
+    void RenderDebug::DrawAABB( const AABB& _aabb, const Color _color )
     {
         std::vector<Vector3> corners = _aabb.GetCorners();
         // Top
-        DebugLine( corners[0], corners[1], _color );
-        DebugLine( corners[1], corners[2], _color );
-        DebugLine( corners[2], corners[3], _color );
-        DebugLine( corners[3], corners[0], _color );
+        DrawLine( corners[0], corners[1], _color );
+        DrawLine( corners[1], corners[2], _color );
+        DrawLine( corners[2], corners[3], _color );
+        DrawLine( corners[3], corners[0], _color );
         // Bot
-        DebugLine( corners[4], corners[5], _color );
-        DebugLine( corners[5], corners[6], _color );
-        DebugLine( corners[6], corners[7], _color );
-        DebugLine( corners[7], corners[4], _color );
+        DrawLine( corners[4], corners[5], _color );
+        DrawLine( corners[5], corners[6], _color );
+        DrawLine( corners[6], corners[7], _color );
+        DrawLine( corners[7], corners[4], _color );
         //Vertical sides
-        DebugLine( corners[0], corners[4], _color );
-        DebugLine( corners[1], corners[5], _color );
-        DebugLine( corners[2], corners[6], _color );
-        DebugLine( corners[3], corners[7], _color );
+        DrawLine( corners[0], corners[4], _color );
+        DrawLine( corners[1], corners[5], _color );
+        DrawLine( corners[2], corners[6], _color );
+        DrawLine( corners[3], corners[7], _color );
     }
 
     //==================================================================================================================================================================================================
     // start/end in screen pixels
     //==================================================================================================================================================================================================
-    void RenderDebug::DebugLine2D( const glm::ivec2 _start, const glm::ivec2 _end, const Color _color )
+    void RenderDebug::DrawLine2D( const glm::ivec2 _start, const glm::ivec2 _end, const Color _color )
     {
         mDebugLines2D.push_back( DebugVertex2D( _start, _color.ToGLM() ) );
         mDebugLines2D.push_back( DebugVertex2D( _end, _color.ToGLM() ) );
@@ -248,16 +248,16 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void RenderDebug::DebugQuad2D( const glm::ivec2 _pos, const glm::ivec2 _size, const Color _color )
+    void RenderDebug::DrawQuad2D( const glm::ivec2 _pos, const glm::ivec2 _size, const Color _color )
     {
         const glm::ivec2 tl = _pos;
         const glm::ivec2 tr = _pos + glm::ivec2( _size.x, 0 );
         const glm::ivec2 bl = _pos + glm::ivec2( 0, _size.y );
         const glm::ivec2 br = _pos + _size;
 
-        DebugLine2D( tl, tr, _color );
-        DebugLine2D( tr, br, _color );
-        DebugLine2D( br, bl, _color );
-        DebugLine2D( bl, tl, _color );
+        DrawLine2D( tl, tr, _color );
+        DrawLine2D( tr, br, _color );
+        DrawLine2D( br, bl, _color );
+        DrawLine2D( bl, tl, _color );
     }
 }

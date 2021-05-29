@@ -32,7 +32,7 @@ namespace fan
             for( ; boundsIt != _view.end<Bounds>(); ++boundsIt, ++sceneNodeIt )
             {
                 const Bounds& bounds = *boundsIt;
-                rd.DebugAABB( bounds.mAabb, Color::sRed );
+                rd.DrawAABB( bounds.mAabb, Color::sRed );
             }
         }
     };
@@ -59,7 +59,7 @@ namespace fan
                 const Transform& transform = *transformIt;
                 const Sphere   & sphere    = meshRenderer.mMesh->mBoundingSphere;
 
-                rd.DebugSphere( transform.mPosition + sphere.mCenter, sphere.mRadius, Color::sOrange);
+                rd.DrawSphere( transform.mPosition + sphere.mCenter, sphere.mRadius, Color::sOrange);
             }
         }
     };
@@ -96,7 +96,7 @@ namespace fan
                             const Vertex& vertex = vertices[indices[index]];
                             const Vector3 position = Vector3( modelMat * glm::vec4( vertex.mPos, 1.f ) );
                             const Vector3 normal   = Vector3( normalMat * glm::vec4( vertex.mNormal, 1.f ) );
-                            rd.DebugLine( position, position + FIXED( 0.3 ) * normal, Color::sGreen, true );
+                            rd.DrawLine( position, position + FIXED( 0.3 ) * normal, Color::sGreen, true );
                         }
                     }
                 }
@@ -136,9 +136,9 @@ namespace fan
                         Vector3 v0 = Vector3( modelMat * glm::vec4( vertices[indices[3 * index + 0]].mPos, 1.f ) );
                         Vector3 v1 = Vector3( modelMat * glm::vec4( vertices[indices[3 * index + 1]].mPos, 1.f ) );
                         Vector3 v2 = Vector3( modelMat * glm::vec4( vertices[indices[3 * index + 2]].mPos, 1.f ) );
-                        rd.DebugLine( v0, v1, Color( 1, 1, 0, 0.6f ), true );
-                        rd.DebugLine( v1, v2, Color( 1, 1, 0, 0.6f ), true );
-                        rd.DebugLine( v2, v0, Color( 1, 1, 0, 0.6f ), true );
+                        rd.DrawLine( v0, v1, Color( 1, 1, 0, 0.6f ), true );
+                        rd.DrawLine( v1, v2, Color( 1, 1, 0, 0.6f ), true );
+                        rd.DrawLine( v2, v0, Color( 1, 1, 0, 0.6f ), true );
                     }
                 }
             }
@@ -185,9 +185,9 @@ namespace fan
                     const Vector3 worldVec1 = Vector3( modelMat * glm::vec4( vec1.ToGlm(), 1.f ) );
                     const Vector3 worldVec2 = Vector3( modelMat * glm::vec4( vec2.ToGlm(), 1.f ) );
 
-                    rd.DebugLine( worldVec0, worldVec1, color );
-                    rd.DebugLine( worldVec1, worldVec2, color );
-                    rd.DebugLine( worldVec2, worldVec0, color );
+                    rd.DrawLine( worldVec0, worldVec1, color );
+                    rd.DrawLine( worldVec1, worldVec2, color );
+                    rd.DrawLine( worldVec2, worldVec0, color );
                 }
             }
         }
@@ -220,7 +220,7 @@ namespace fan
             const Fixed lightRange = PointLight::GetLightRange( _light );
             if( lightRange > 0 )
             {
-                _renderDebug.DebugSphere( _transform.mPosition, lightRange, _light.mDiffuse );
+                _renderDebug.DrawSphere( _transform.mPosition, lightRange, _light.mDiffuse );
             }
         }
     };
@@ -261,9 +261,9 @@ namespace fan
             for( int      offsetIndex = 0; offsetIndex < 5; offsetIndex++ )
             {
                 const Vector3 offset = offsets[offsetIndex];
-                _rd.DebugLine( pos + offset, pos + offset + length * dir, color, false );
+                _rd.DrawLine( pos + offset, pos + offset + length * dir, color, false );
             }
-            _rd.DebugIcoSphere( Transform::Make( _transform.mRotation, _transform.mPosition ), radius, 0, color, false );
+            _rd.DrawIcoSphere( Transform::Make( _transform.mRotation, _transform.mPosition ), radius, 0, color, false );
         }
     };
 
@@ -291,7 +291,7 @@ namespace fan
 
         static void Draw( const SphereCollider& _sphere, const Transform& _transform, RenderDebug& _rd )
         {
-            _rd.DebugSphere( _transform.mPosition + _transform.TransformDirection( _sphere.mOffset ), _sphere.mRadius, Color::sGreen, false );
+            _rd.DrawSphere( _transform.mPosition + _transform.TransformDirection( _sphere.mOffset ), _sphere.mRadius, Color::sGreen, false );
         }
     };
 
@@ -320,7 +320,7 @@ namespace fan
         static void Draw( const BoxCollider& _box, const Transform& _transform, RenderDebug& _rd )
         {
             Transform transform = Transform::Make( _transform.mRotation, _transform.mPosition );
-            _rd.DebugCube( transform, _box.mHalfExtents, Color::sGreen, false );
+            _rd.DrawCube( transform, _box.mHalfExtents, Color::sGreen, false );
         }
     };
 
@@ -342,7 +342,7 @@ namespace fan
                 UITransform transform = *transformIt;
                 const glm::ivec2& pos  = transform.mPosition;
                 const glm::ivec2& size = transform.mSize;
-                rd.DebugQuad2D( pos, size, Color::sGreen );
+                rd.DrawQuad2D( pos, size, Color::sGreen );
             }
         }
     };

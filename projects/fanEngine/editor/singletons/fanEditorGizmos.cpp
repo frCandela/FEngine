@@ -97,18 +97,18 @@ namespace fan
             }
 
             // Draw the gizmo cone & lines
-            world.GetSingleton<RenderDebug>().DebugLine( origin,
-                                                         origin +
-                                                         size *
-                                                         ( _transform.TransformPoint( axisDirection[axisIndex] ) - origin ),
-                                                         opaqueColor,
-                                                         false );
+            world.GetSingleton<RenderDebug>().DrawLine( origin,
+                                                        origin +
+                                                        size *
+                                                        ( _transform.TransformPoint( axisDirection[axisIndex] ) - origin ),
+                                                        opaqueColor,
+                                                        false );
             for( int triangleIndex = 0; triangleIndex < (int)coneTris.size() / 3; triangleIndex++ )
             {
-                world.GetSingleton<RenderDebug>().DebugTriangle( coneTris[3 * triangleIndex + 0],
-                                                                 coneTris[3 * triangleIndex + 1],
-                                                                 coneTris[3 * triangleIndex + 2],
-                                                                 clickedColor );
+                world.GetSingleton<RenderDebug>().DrawTriangle( coneTris[3 * triangleIndex + 0],
+                                                                coneTris[3 * triangleIndex + 1],
+                                                                coneTris[3 * triangleIndex + 2],
+                                                                clickedColor );
             }
 
             // Calculate closest point between the mouse ray and the axis selected
