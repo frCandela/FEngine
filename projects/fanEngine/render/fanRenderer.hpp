@@ -60,6 +60,7 @@ namespace fan
         void SetDebugDrawData( const std::vector<DebugLineVertex>& _debugLines,
                                const std::vector<DebugLineVertex>& _debugLinesNoDepthTest,
                                const std::vector<DebugVertex>& _debugTriangles,
+                               const std::vector<DebugVertex>& _debugTrianglesNDT,
                                const std::vector<DebugVertex2D>& _debugLines2D );
 
         Resources& mResources;

@@ -18,7 +18,7 @@ namespace fan
     void RenderDebug::Init( EcsWorld& /*_world*/, EcsSingleton& _component )
     {
         RenderDebug& renderDebug = static_cast<RenderDebug&>( _component );
-        (void)renderDebug;
+        renderDebug.Clear();
     }
 
     //==================================================================================================================================================================================================
@@ -28,6 +28,7 @@ namespace fan
         mDebugLines.clear();
         mDebugLinesNoDepthTest.clear();
         mDebugTriangles.clear();
+        mDebugTrianglesNoDepthTest.clear();
         mDebugLines2D.clear();
     }
 
@@ -61,13 +62,13 @@ namespace fan
     // 3 vertices per triangle
     // 1 color per triangle
     //==================================================================================================================================================================================================
-    void
-    RenderDebug::DebugTriangles( const std::vector<Vector3>& _triangles, const std::vector<Color>& _colors )
+    void RenderDebug::DrawTriangles( const std::vector<Vector3>& _triangles, const std::vector<Color>& _colors, const bool _depthTestEnable )
     {
         fanAssert( _triangles.size() % 3 == 0 );
         fanAssert( _colors.size() == _triangles.size() / 3 );
 
-        mDebugTriangles.resize( mDebugTriangles.size() + _triangles.size() );
+        std::vector<DebugVertex>& triangles = _depthTestEnable ? mDebugTriangles : mDebugTrianglesNoDepthTest;
+        triangles.resize( mDebugTriangles.size() + _triangles.size() );
         for( int triangleIndex = 0; triangleIndex < (int)_triangles.size() / 3; triangleIndex++ )
         {
             const Vector3   v0     = _triangles[3 * triangleIndex + 0];
@@ -75,9 +76,9 @@ namespace fan
             const Vector3   v2     = _triangles[3 * triangleIndex + 2];
             const glm::vec3 normal = glm::normalize( Vector3::Cross( v1 - v2, v0 - v2 ).ToGlm() );
 
-            mDebugTriangles[3 * triangleIndex + 0] = DebugVertex( v0.ToGlm(), normal, _colors[triangleIndex].ToGLM() );
-            mDebugTriangles[3 * triangleIndex + 1] = DebugVertex( v1.ToGlm(), normal, _colors[triangleIndex].ToGLM() );
-            mDebugTriangles[3 * triangleIndex + 2] = DebugVertex( v2.ToGlm(), normal, _colors[triangleIndex].ToGLM() );
+            triangles[3 * triangleIndex + 0] = DebugVertex( v0.ToGlm(), normal, _colors[triangleIndex].ToGLM() );
+            triangles[3 * triangleIndex + 1] = DebugVertex( v1.ToGlm(), normal, _colors[triangleIndex].ToGLM() );
+            triangles[3 * triangleIndex + 2] = DebugVertex( v2.ToGlm(), normal, _colors[triangleIndex].ToGLM() );
         }
     }
 
@@ -107,12 +108,13 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void RenderDebug::DrawTriangle( const Vector3& _v0, const Vector3& _v1, const Vector3& _v2, const Color _color )
+    void RenderDebug::DrawTriangle( const Vector3& _v0, const Vector3& _v1, const Vector3& _v2, const Color _color, const bool _depthTestEnable )
     {
+        std::vector<DebugVertex>& triangles = _depthTestEnable ? mDebugTriangles : mDebugTrianglesNoDepthTest;
         const glm::vec3 normal = glm::normalize( Vector3::Cross( _v1 - _v2, _v0 - _v2 ).ToGlm() );
-        mDebugTriangles.push_back( DebugVertex( _v0.ToGlm(), normal, _color.ToGLM() ) );
-        mDebugTriangles.push_back( DebugVertex( _v1.ToGlm(), normal, _color.ToGLM() ) );
-        mDebugTriangles.push_back( DebugVertex( _v2.ToGlm(), normal, _color.ToGLM() ) );
+        triangles.push_back( DebugVertex( _v0.ToGlm(), normal, _color.ToGLM() ) );
+        triangles.push_back( DebugVertex( _v1.ToGlm(), normal, _color.ToGLM() ) );
+        triangles.push_back( DebugVertex( _v2.ToGlm(), normal, _color.ToGLM() ) );
     }
 
     //==================================================================================================================================================================================================
@@ -197,7 +199,7 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void RenderDebug::DrawCone( const Transform& _transform, const Fixed _radius, const Fixed _height, const int _numSubdivisions, const Color _color )
+    void RenderDebug::DrawCone( const Transform& _transform, const Fixed _radius, const Fixed _height, const int _numSubdivisions, const Color _color, const bool _depthTestEnable )
     {
         std::vector<Vector3> cone = GetCone( _radius, _height, _numSubdivisions );
 
@@ -208,10 +210,7 @@ namespace fan
 
         for( int triangleIndex = 0; triangleIndex < (int)cone.size() / 3; triangleIndex++ )
         {
-            DrawTriangle( cone[3 * triangleIndex + 0],
-                          cone[3 * triangleIndex + 1],
-                          cone[3 * triangleIndex + 2],
-                          _color );
+            DrawTriangle( cone[3 * triangleIndex + 0], cone[3 * triangleIndex + 1], cone[3 * triangleIndex + 2], _color, _depthTestEnable );
         }
     }
 

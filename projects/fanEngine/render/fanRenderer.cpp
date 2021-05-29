@@ -141,6 +141,7 @@ namespace fan
         const PipelineConfig debugLinesPipelineConfig            = mDrawDebug.GetPipelineConfigLines();
         const PipelineConfig debugLinesNoDepthTestPipelineConfig = mDrawDebug.GetPipelineConfigLinesNDT();
         const PipelineConfig debugTrianglesPipelineConfig        = mDrawDebug.GetPipelineConfigTriangles();
+        const PipelineConfig debugTrianglesNDTPipelineConfig     = mDrawDebug.GetPipelineConfigTrianglesNDT();
         const PipelineConfig debugLines2DPipelineConfig          = mDrawDebug.GetPipelineConfigLines2D();
         const PipelineConfig ppPipelineConfig                    = mDrawPostprocess.GetPipelineConfig();
         const PipelineConfig modelsPipelineConfig                = mDrawModels.GetPipelineConfig( mDescriptorTextures );
@@ -149,6 +150,7 @@ namespace fan
         mDrawDebug.mPipelineLines.Create( mDevice, debugLinesPipelineConfig, mGameExtent, mRenderPassGame.mRenderPass );
         mDrawDebug.mPipelineLinesNDT.Create( mDevice, debugLinesNoDepthTestPipelineConfig, mGameExtent, mRenderPassGame.mRenderPass );
         mDrawDebug.mPipelineTriangles.Create( mDevice, debugTrianglesPipelineConfig, mGameExtent, mRenderPassGame.mRenderPass );
+        mDrawDebug.mPipelineTrianglesNDT.Create( mDevice, debugTrianglesNDTPipelineConfig, mGameExtent, mRenderPassGame.mRenderPass );
         mDrawModels.mPipeline.Create( mDevice, modelsPipelineConfig, mGameExtent, mRenderPassGame.mRenderPass );
         mDrawDebug.mPipelineLines2D.Create( mDevice, debugLines2DPipelineConfig, mGameExtent, mRenderPassPostprocess.mRenderPass );
         mDrawUI.mPipeline.Create( mDevice, uiPipelineConfig, mGameExtent, mRenderPassPostprocess.mRenderPass );
@@ -165,6 +167,7 @@ namespace fan
         mDrawDebug.mPipelineLines.Destroy( mDevice );
         mDrawDebug.mPipelineLinesNDT.Destroy( mDevice );
         mDrawDebug.mPipelineTriangles.Destroy( mDevice );
+        mDrawDebug.mPipelineTrianglesNDT.Destroy( mDevice );
         mDrawDebug.mPipelineLines2D.Destroy( mDevice );
     }
 
@@ -448,10 +451,11 @@ namespace fan
     void Renderer::SetDebugDrawData( const std::vector<DebugLineVertex>& _debugLines,
                                      const std::vector<DebugLineVertex>& _debugLinesNoDepthTest,
                                      const std::vector<DebugVertex>& _debugTriangles,
+                                     const std::vector<DebugVertex>& _debugTrianglesNDT,
                                      const std::vector<DebugVertex2D>& _debugLines2D )
     {
         SCOPED_PROFILE( set_debug_draw_data );
-        mDrawDebug.SetDebugDrawData( mWindow.mSwapchain.mCurrentFrame, mDevice, _debugLines, _debugLinesNoDepthTest, _debugTriangles, _debugLines2D );
+        mDrawDebug.SetDebugDrawData( mWindow.mSwapchain.mCurrentFrame, mDevice, _debugLines, _debugLinesNoDepthTest, _debugTriangles, _debugTrianglesNDT, _debugLines2D );
     }
 
     //==================================================================================================================================================================================================
