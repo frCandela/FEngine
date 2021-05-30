@@ -136,6 +136,50 @@ namespace fan
     }
 
     //==================================================================================================================================================================================================
+    // load a number of terrain chunks per frame
+    //==================================================================================================================================================================================================
+    void VoxelTerrain::StepLoadTerrain( EcsWorld& _world, const int _chunksPerFrame )
+    {
+        VoxelTerrain& terrain   = _world.GetSingleton<VoxelTerrain>();
+        Resources   & resources = *_world.GetSingleton<Application>().mResources;
+        if( !terrain.mIsInitialized ){ return; }
+
+        for( int iteration = 0; iteration < _chunksPerFrame; ++iteration )
+        {
+            // load/generate blocks
+            bool     generatedBlocks = false;
+            for( int i               = 0; i < terrain.mSize.x * terrain.mSize.y * terrain.mSize.z; i++ )
+            {
+                VoxelChunk& chunk = terrain.mChunks[i];
+                if( !chunk.mIsGenerated )
+                {
+                    VoxelGenerator::GenerateBlocks( terrain, chunk );
+                    generatedBlocks            = true;
+                    break;
+                }
+            }
+            if( generatedBlocks ){ continue; }
+
+            // generate mesh
+            for( int i = 0; i < terrain.mSize.x * terrain.mSize.y * terrain.mSize.z; i++ )
+            {
+                VoxelChunk& chunk = terrain.mChunks[i];
+                if( chunk.mIsMeshOutdated )
+                {
+                    EcsEntity entity = _world.GetEntity( chunk.mHandle );
+                    MeshRenderer& meshRenderer = _world.GetComponent<MeshRenderer>( entity );
+                    SceneNode   & sceneNode    = _world.GetComponent<SceneNode>( entity );
+                    sceneNode.AddFlag( SceneNode::BoundsOutdated );
+                    VoxelGenerator::GenerateMesh( terrain, chunk, ( meshRenderer.mMesh )->mSubMeshes[0] );
+                    meshRenderer.mMesh->GenerateBoundingVolumes();
+                    resources.SetDirty( meshRenderer.mMesh->mGUID );
+                    break;
+                }
+            }
+        }
+    }
+
+    //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
     void VoxelTerrain::Save( const EcsSingleton& _component, Json& _json )
     {

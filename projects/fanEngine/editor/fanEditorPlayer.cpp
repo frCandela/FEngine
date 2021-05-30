@@ -66,7 +66,7 @@ namespace fan
         Input::Get().Manager().CreateKeyboardAxis( "editor_forward", Keyboard::W, Keyboard::S );
         Input::Get().Manager().CreateKeyboardAxis( "editor_left", Keyboard::A, Keyboard::D );
         Input::Get().Manager().CreateKeyboardAxis( "editor_up", Keyboard::E, Keyboard::Q );
-        Input::Get().Manager().CreateKeyboardAxis( "editor_boost", Keyboard::LEFT_SHIFT, Keyboard::NONE );
+        Input::Get().Manager().CreateKeyboardAxis( "editor_boost", Keyboard::LEFT_SHIFT, Keyboard::LEFT_CONTROL );
 
         // Events linking
         InputManager& manager = Input::Get().Manager();
@@ -216,6 +216,15 @@ namespace fan
 
                 world.ApplyTransitions();
 
+                if( &world == &currentWorld )
+                {
+                    const bool editorCameraActive = currentWorld.GetSingleton<Scene>().mMainCameraHandle == currentWorld.GetSingleton<EditorCamera>().mCameraHandle;
+                    if( editorCameraActive )
+                    {
+                        EditorCamera::Update( currentWorld, currentTime.mLogicDelta );
+                    }
+                }
+
                 currentWorld.GetSingleton<Mouse>().ClearSingleFrameEvents();
             }
         }
@@ -230,6 +239,8 @@ namespace fan
         {
             ImGui::GetIO().DeltaTime    = float( deltaTime );
             currentTime.mLastRenderTime = elapsedTime;
+
+            const bool editorCameraActive = currentWorld.GetSingleton<Scene>().mMainCameraHandle == currentWorld.GetSingleton<EditorCamera>().mCameraHandle;
 
             // don't draw if logic has not executed/cleared the debug buffers
             if( mLastLogicFrameRendered != currentTime.mFrameIndex )
@@ -257,10 +268,8 @@ namespace fan
                 }
                 EditorGrid::Draw( currentWorld );
 
-                EditorCamera& editorCamera = currentWorld.GetSingleton<EditorCamera>();
-                Scene       & scene        = currentWorld.GetSingleton<Scene>();
                 // only update the editor camera when we are using it
-                if( scene.mMainCameraHandle == editorCamera.mCameraHandle )
+                if( editorCameraActive )
                 {
                     EditorCamera::Update( currentWorld, currentTime.mLogicDelta );
                     currentWorld.GetSingleton<EditorSelection>().Update( currentGameViewWindow.mIsHovered );
@@ -280,7 +289,8 @@ namespace fan
             PlayerData::UpdateRenderWorld( mData.mRenderer, currentGame, currentGameViewWindow.mSize );
             mData.mRenderer.DrawFrame();
 
-            Cursor* currentCursor = currentWorld.GetSingleton<GameViewWindow>().mIsHovered ? currentWorld.GetSingleton<Application>().mCurrentCursor : nullptr;
+            const bool gameWindowHovered = currentWorld.GetSingleton<GameViewWindow>().mIsHovered;
+            Cursor* currentCursor = !editorCameraActive && gameWindowHovered ? currentWorld.GetSingleton<Application>().mCurrentCursor : nullptr;
 
             PlayerData::MatchCursor( currentCursor, mData.mWindow );
             PlayerData::MatchFullscreenState( currentWorld.GetSingleton<RenderWorld>().mFullscreen, mData.mWindow );

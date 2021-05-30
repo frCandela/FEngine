@@ -29,7 +29,6 @@ namespace fan
         void OnGui() override;
         EcsWorld& GetWorld() override { return mWorld; }
 
-        void StepLoadTerrain();
         void OnEditorUseGameCamera();
 
         EcsWorld mWorld;

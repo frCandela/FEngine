@@ -23,10 +23,11 @@ namespace fan
     {
         EditorCamera& editorCamera = static_cast<EditorCamera&>( _component );
 
-        editorCamera.mCameraHandle    = 0;
-        editorCamera.mSpeed           = 10;
-        editorCamera.mSpeedMultiplier = 3;
-        editorCamera.mXYSensitivity   = glm::vec2( 0.3f, 0.3f );
+        editorCamera.mCameraHandle  = 0;
+        editorCamera.mSlowSpeed     = 2;
+        editorCamera.mNormalSpeed   = 10;
+        editorCamera.mFastSpeed     = 40;
+        editorCamera.mXYSensitivity = glm::vec2( 0.15f, 0.15f );
     }
 
     //==================================================================================================================================================================================================
@@ -50,16 +51,10 @@ namespace fan
         Fixed   leftAxis    = Fixed::FromFloat( Input::Get().Manager().GetAxis( "editor_left" ) );
         Fixed   boost       = Fixed::FromFloat( Input::Get().Manager().GetAxis( "editor_boost" ) );
 
-        // Calculates speed
-        Fixed realSpeed = editorCamera.mSpeed;
-        if( boost > 0 )
-        {
-            realSpeed *= editorCamera.mSpeedMultiplier;
-        }
-
-        position += _delta * realSpeed * leftAxis * cameraTransform.Left();        // Camera goes left
-        position += _delta * realSpeed * upAxis * cameraTransform.Up();            // Camera goes up
-        position += _delta * realSpeed * forwardAxis * cameraTransform.Forward();    // Camera goes forward
+        const Fixed moveSpeed = boost == 0 ? editorCamera.mNormalSpeed : boost > 0 ? editorCamera.mFastSpeed : editorCamera.mSlowSpeed;
+        position += _delta * moveSpeed * leftAxis * cameraTransform.Left();        // Camera goes left
+        position += _delta * moveSpeed * upAxis * cameraTransform.Up();            // Camera goes up
+        position += _delta * moveSpeed * forwardAxis * cameraTransform.Forward();    // Camera goes forward
 
         // Camera rotation
         const glm::vec2 mouseDelta = mouse.mPositionDelta;

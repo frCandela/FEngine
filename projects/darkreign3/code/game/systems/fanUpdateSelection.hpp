@@ -1,4 +1,7 @@
 #include "core/ecs/fanEcsSystem.hpp"
+#include "game/fanDR3Tags.hpp"
+#include "engine/singletons/fanRenderWorld.hpp"
+#include "engine/ui/fanUITransform.hpp"
 
 namespace fan
 {
@@ -71,12 +74,12 @@ namespace fan
             {
                 Transform   & transform    = *transformIt;
                 MeshRenderer& meshRenderer = *meshRendererIt;
-                const Fixed     radius       = meshRenderer.mMesh != nullptr ? meshRenderer.mMesh->mBoundingSphere.mRadius : 1;
-                const Vector3   offset       = meshRenderer.mMesh != nullptr ? meshRenderer.mMesh->mBoundingSphere.mCenter : Vector3::sZero;
+                const Fixed   radius = meshRenderer.mMesh != nullptr ? meshRenderer.mMesh->mBoundingSphere.mRadius : 1;
+                const Vector3 offset = meshRenderer.mMesh != nullptr ? meshRenderer.mMesh->mBoundingSphere.mCenter : Vector3::sZero;
 
                 const glm::vec2 screenPos    = renderWorld.mTargetSize * camera.WorldPosToScreen( cameraTransform, transform.mPosition + offset );
                 const glm::vec2 screenPosTop = renderWorld.mTargetSize * camera.WorldPosToScreen( cameraTransform, transform.mPosition + offset + radius * cameraTransform.Right() );
-                const float size  = screenPosTop.x - screenPos.x;
+                const float     size         = screenPosTop.x - screenPos.x;
 
                 UITransform& uiTransform = _world.GetComponent<UITransform>( _world.GetEntity( selection.mSelectionFrames[frameIndex] ) );
                 uiTransform.mSize     = size * glm::vec2( 2, 2 ) + glm::vec2( 8, 8 );
