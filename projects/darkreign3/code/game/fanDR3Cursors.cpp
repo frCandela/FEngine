@@ -2,6 +2,8 @@
 
 #include "core/resources/fanResources.hpp"
 #include "render/resources/fanTexture.hpp"
+#include "network/singletons/fanTime.hpp"
+#include "game/singletons/fanSelection.hpp"
 
 namespace fan
 {
@@ -24,17 +26,17 @@ namespace fan
         };
 
         std::vector<CursorMapping> cursorMappings = {
-                { DR3Cursors::Move1,      { 0, 0 }, { 0,          0 } },
-                { DR3Cursors::Move2,      { 1, 0 }, { 0,          0 } },
-                { DR3Cursors::Move3,      { 3, 1 }, { 0,          0 } },
-                { DR3Cursors::Mouse0,     { 2, 0 }, { 0,          0 } },
-                { DR3Cursors::Mouse1,     { 3, 0 }, { 0,          0 } },
-                { DR3Cursors::RallyPoint, { 0, 1 }, { size.x / 2, size.y } },
-                { DR3Cursors::Nope,       { 2, 1 }, size / 2 },
-                { DR3Cursors::Attack1,    { 0, 2 }, size / 2 },
-                { DR3Cursors::Attack2,    { 1, 2 }, size / 2 },
-                { DR3Cursors::Attack3,    { 2, 2 }, size / 2 },
-                { DR3Cursors::Attack4,    { 3, 2 }, size / 2 },
+                { DR3Cursor::Move1,      { 0, 0 }, { 0,          0 } },
+                { DR3Cursor::Move2,      { 1, 0 }, { 0,          0 } },
+                { DR3Cursor::Move3,      { 3, 1 }, { 0,          0 } },
+                { DR3Cursor::Mouse0,     { 2, 0 }, { 0,          0 } },
+                { DR3Cursor::Mouse1,     { 3, 0 }, { 0,          0 } },
+                { DR3Cursor::RallyPoint, { 0, 1 }, { size.x / 2, size.y } },
+                { DR3Cursor::Nope,       { 2, 1 }, size / 2 },
+                { DR3Cursor::Attack1,    { 0, 2 }, size / 2 },
+                { DR3Cursor::Attack2,    { 1, 2 }, size / 2 },
+                { DR3Cursor::Attack3,    { 2, 2 }, size / 2 },
+                { DR3Cursor::Attack4,    { 3, 2 }, size / 2 },
         };
 
         for( CursorMapping mapping :  cursorMappings )
@@ -58,5 +60,48 @@ namespace fan
             mCursors[mapping.mType] = _resources.Add<Cursor>( cursor, "cursor" + std::to_string( _resources.GetUniqueID() ) );
         }
         texture.FreePixels();
+    }
+
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    DR3Cursor PlayCursorAnim( const Time& _time, const Fixed _duration, const DR3Cursor* _cursors, const int _numCursors )
+    {
+        const int animFramesCount = ( _duration / _time.mLogicDelta ).ToInt();
+        const int index           = _time.mFrameIndex % ( _numCursors * animFramesCount );
+        const int animIndex       = index / animFramesCount;
+        fanAssert( animIndex < _numCursors );
+        return _cursors[animIndex];
+    }
+
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    DR3Cursor DR3Cursors::GetCurrentCursor( const Fixed _delta, const Time& _time, const SelectionStatus& _selectionStatus )
+    {
+        if( _delta == 0 )
+        {
+            return DR3Cursor::Count;
+        }
+
+        if( _delta != 0 )
+        {
+            if( _selectionStatus.mNumSelected == 0 )
+            {
+                return _selectionStatus.mHoveringOverAlly ? DR3Cursor::Mouse0 : DR3Cursor::Mouse1;
+            }
+            else
+            {
+                if( _selectionStatus.mHoveringOverEnemy )
+                {
+                    static const DR3Cursor cursors[3] = { DR3Cursor::Attack3, DR3Cursor::Attack2, DR3Cursor::Attack1 };
+                    return PlayCursorAnim( _time, FIXED( 0.13 ), cursors, 3 );
+                }
+                else
+                {
+                    static const DR3Cursor cursors[3] = { DR3Cursor::Move3, DR3Cursor::Move2, DR3Cursor::Move1 };
+                    return PlayCursorAnim( _time, FIXED( 0.13 ), cursors, 3 );
+                }
+            }
+        }
+        return DR3Cursor::Count;
     }
 }

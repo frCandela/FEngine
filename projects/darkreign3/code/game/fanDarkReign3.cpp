@@ -45,6 +45,7 @@ namespace fan
         mWorld.AddComponentType<Unit>();
         mWorld.AddSingletonType<Selection>();
         mWorld.AddTagType<TagSelected>();
+        mWorld.AddTagType<TagEnemy>();
 
 #ifdef FAN_EDITOR
         EditorSettings& settings = mWorld.GetSingleton<EditorSettings>();
@@ -144,29 +145,58 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void SelectUnits( EcsWorld& _world, const Fixed _delta )
+    SelectionStatus SelectUnits( EcsWorld& _world, const Fixed _delta )
     {
-        if( _delta > 0 )
+        if( _delta == 0 ){ return SelectionStatus(); }
+
+        Mouse& mouse = _world.GetSingleton<Mouse>();
+        if( !mouse.mWindowHovered ){ return SelectionStatus(); }
+
+        SelectionStatus selectionStatus;
+        selectionStatus.mNumSelected = _world.Match<SClearSelection>().Size();
+
+        if( Keyboard::IsKeyPressed( Keyboard::ESCAPE ) )
         {
-            Mouse& mouse = _world.GetSingleton<Mouse>();
+            _world.Run<SClearSelection>();
+        }
 
-            if( Keyboard::IsKeyPressed( Keyboard::ESCAPE ))
+        // raycast on all units
+        EcsEntity cameraID = _world.GetEntity( _world.GetSingleton<Scene>().mMainCameraHandle );
+        const Transform& cameraTransform = _world.GetComponent<Transform>( cameraID );
+        const Camera   & camera          = _world.GetComponent<Camera>( cameraID );
+        const Ray              ray = camera.ScreenPosToRay( cameraTransform, mouse.LocalScreenSpacePosition() );
+        std::vector<EcsEntity> results;
+        Raycast<Unit>( _world, ray, results );
+
+        if( !results.empty() )
+        {
+            EcsEntity entity = results[0];
+            if( _world.HasTag<TagEnemy>( entity ) )
             {
-                _world.Run<SClearSelection>();
+                selectionStatus.mHoveringOverEnemy = true;
             }
-
-            if( mouse.mPressed[Mouse::buttonLeft] )
+            else
             {
-                EcsEntity cameraID = _world.GetEntity( _world.GetSingleton<Scene>().mMainCameraHandle );
-                const Transform& cameraTransform = _world.GetComponent<Transform>( cameraID );
-                const Camera   & camera          = _world.GetComponent<Camera>( cameraID );
-                const Ray              ray = camera.ScreenPosToRay( cameraTransform, mouse.LocalScreenSpacePosition() );
-                std::vector<EcsEntity> results;
-                Raycast<Unit>( _world, ray, results );
-                if( !results.empty() )
+                selectionStatus.mHoveringOverAlly = true;
+            }
+        }
+
+        if( mouse.mPressed[Mouse::buttonLeft] )
+        {
+
+            if( results.empty() )
+            {
+                if( !Keyboard::IsKeyDown( Keyboard::LEFT_CONTROL ) )
                 {
-                    EcsEntity entity = results[0];
-                    if( _world.HasTag<TagSelected>( entity ))
+                    _world.Run<SClearSelection>();
+                }
+            }
+            else
+            {
+                EcsEntity entity = results[0];
+                if( !_world.HasTag<TagEnemy>( entity ) )
+                {
+                    if( _world.HasTag<TagSelected>( entity ) )
                     {
                         _world.RemoveTag<TagSelected>( entity );
                     }
@@ -181,6 +211,7 @@ namespace fan
                 }
             }
         }
+        return selectionStatus;
     }
 
     //==================================================================================================================================================================================================
@@ -190,7 +221,12 @@ namespace fan
         SCOPED_PROFILE( step );
 
         StepLoadTerrain();
-        SelectUnits( mWorld, _delta );
+        const SelectionStatus selectionStatus = SelectUnits( mWorld, _delta );
+
+        Application& app = mWorld.GetSingleton<Application>();
+        const DR3Cursor currentCursor = DR3Cursors::GetCurrentCursor( _delta, mWorld.GetSingleton<Time>(), selectionStatus );
+        app.mCurrentCursor = currentCursor == DR3Cursor::Count ? nullptr : mCursors.mCursors[currentCursor];
+
         mWorld.ForceRun<SPlaceSelectionFrames>( _delta );
 
         // physics & transforms
@@ -238,6 +274,16 @@ namespace fan
             ImGui::SliderInt( "voxels generation", &completionVoxelsGenerationCpy, 0, max );
             int completionMeshGenerationCpy = completionMeshGeneration;
             ImGui::SliderInt( "mesh generation", &completionMeshGenerationCpy, 0, max );
+
+            if( ImGui::Button( "test tag" ) )
+            {
+                EcsView view   = mWorld.Match<SClearSelection>();
+                auto    unitIt = view.begin<Unit>();
+                for( ; unitIt != view.end<Unit>(); ++unitIt )
+                {
+                    mWorld.AddTag<TagEnemy>( unitIt.GetEntity() );
+                }
+            }
         }
         ImGui::End();
     }

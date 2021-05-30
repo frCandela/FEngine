@@ -20,10 +20,10 @@ namespace fan
         Fixed mLogicDelta;     // duration of a logic frame in seconds
         Fixed mRenderDelta;    // duration of a physics step in seconds
 
-        FrameIndex mFrameIndex;     // the index of the current logic frame
+        FrameIndex mFrameIndex;         // the index of the current logic frame
         double     mLastLogicTime;      // last time the logic was run
         double     mLastRenderTime;     // last time the frame was drawn
-        double     mAverageFrameTime;
+        double     mAverageFrameTime;   // for calculating framerate
 
         static double ElapsedSinceStartup() { return glfwGetTime(); }
         static void RegisterFrameDrawn( Time& _time, double _frameTime );

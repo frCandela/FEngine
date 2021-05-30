@@ -112,10 +112,10 @@ namespace fan
     // helper function for raycasting
     //==================================================================================================================================================================================================
     template< typename... _IncludeTypes >
-    static void Raycast( EcsWorld& _world, const Ray& _ray, std::vector<EcsEntity>& _outResults )
+    static void Raycast( EcsWorld& _world, const Ray& _ray, std::vector<EcsEntity>& _outResults, const EcsSignature _exclude = EcsSignature( 0 ) )
     {
-        const EcsSignature signature = SRaycast::GetSignature( _world ) | impl::AccumulateSignature<_IncludeTypes...>::Get( _world );
-        EcsView            view      = _world.Match( signature, EcsSignature( 0 ) );
+        const EcsSignature includeSignature = SRaycast::GetSignature( _world ) | impl::AccumulateSignature<_IncludeTypes...>::Get( _world );
+        EcsView            view      = _world.Match( includeSignature, _exclude );
         if( !view.Empty() )
         {
             SRaycast::Run( _world, view, _ray, _outResults );
