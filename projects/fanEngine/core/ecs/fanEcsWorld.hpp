@@ -139,7 +139,7 @@ namespace fan
         void ForceRun( _Args&& ... _args );
         template< typename _SystemType >
         EcsView Match() const;
-        EcsView Match( const EcsSignature& _signature ) const;
+        EcsView Match( const EcsSignature& _include, const EcsSignature& _exclude ) const;
 
         // Const accessors
         const std::unordered_map<EcsHandle, EcsEntity>& GetHandles() const { return mHandles; }
@@ -354,8 +354,7 @@ namespace fan
     template< typename _tagOrComponentType >
     EcsSignature EcsWorld::GetSignature() const
     {
-        static_assert( std::is_base_of<EcsTag, _tagOrComponentType>::value ||
-                       std::is_base_of<EcsComponent, _tagOrComponentType>::value );
+        static_assert( std::is_base_of<EcsTag, _tagOrComponentType>::value || std::is_base_of<EcsComponent, _tagOrComponentType>::value );
         return EcsSignature( 1 ) << mTypeToIndex.at( _tagOrComponentType::Info::sType );
     }
 
@@ -367,6 +366,6 @@ namespace fan
     {
         static_assert( std::is_base_of<EcsSystem, _SystemType>::value );
         const EcsSignature signature = _SystemType::GetSignature( *this );
-        return Match( signature );
+        return Match( signature, EcsSignature(0) );
     }
 }

@@ -1,4 +1,4 @@
-#include "game/components/fanTestComponent.hpp"
+#include "game/components/fanUnit.hpp"
 #include "engine/fanEngineSerializable.hpp"
 
 namespace fan
@@ -6,33 +6,33 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void TestComponent::SetInfo( EcsComponentInfo& _info )
+    void Unit::SetInfo( EcsComponentInfo& _info )
     {
-        _info.load = &TestComponent::Load;
-        _info.save = &TestComponent::Save;
+        _info.load = &Unit::Load;
+        _info.save = &Unit::Save;
     }
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void TestComponent::Init( EcsWorld& /*_world*/, EcsEntity /*_entity*/, EcsComponent& _component )
+    void Unit::Init( EcsWorld& /*_world*/, EcsEntity /*_entity*/, EcsComponent& _component )
     {
-        TestComponent& testComponent = static_cast<TestComponent&>( _component );
-        testComponent.mValue = 42;
+        Unit& testComponent = static_cast<Unit&>( _component );
+        testComponent.mHeightOffset = 0;
     }
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void TestComponent::Save( const EcsComponent& _component, Json& _json )
+    void Unit::Save( const EcsComponent& _component, Json& _json )
     {
-        const TestComponent& testComponent = static_cast<const TestComponent&>( _component );
-        Serializable::SaveInt( _json, "test_value", testComponent.mValue );
+        const Unit& testComponent = static_cast<const Unit&>( _component );
+        Serializable::SaveFixed( _json, "height_offset", testComponent.mHeightOffset );
     }
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void TestComponent::Load( EcsComponent& _component, const Json& _json )
+    void Unit::Load( EcsComponent& _component, const Json& _json )
     {
-        TestComponent& testComponent = static_cast<TestComponent&>( _component );
-        Serializable::LoadInt( _json, "test_value", testComponent.mValue );
+        Unit& testComponent = static_cast<Unit&>( _component );
+        Serializable::LoadFixed( _json, "height_offset", testComponent.mHeightOffset );
     }
 }

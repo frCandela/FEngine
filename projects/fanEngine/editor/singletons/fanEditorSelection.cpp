@@ -105,7 +105,7 @@ namespace fan
     {
         SCOPED_PROFILE( selection );
 
-        bool mouseCaptured = false;
+            bool mouseCaptured = false;
 
         // translation gizmo on selected scene node
         SceneNode* selectedSceneNode = GetSelectedSceneNode();
@@ -126,10 +126,8 @@ namespace fan
             const Ray ray = camera.ScreenPosToRay( cameraTransform, mouse.LocalScreenSpacePosition() );
 
             // raycast on bounds
-            std::vector<EcsEntity> results, resultsFx;
-            world.Run<SRaycastAll>( ray, results );
-            world.Run<SFxRaycastAll>( ray, results );
-            results.insert( results.end(), resultsFx.begin(), resultsFx.end() );
+            std::vector<EcsEntity> results;
+            world.Run<SRaycast>( ray, results );
             if( !results.empty() )
             {
                 // cycle selection

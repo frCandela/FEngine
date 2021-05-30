@@ -94,6 +94,8 @@ namespace fan
             world.Run<SUpdateBoundsFromTransform>();
 
             world.ApplyTransitions();
+
+            world.GetSingleton<Mouse>().ClearSingleFrameEvents();
         }
 
         mData.mOnLPPSynch.Emmit();

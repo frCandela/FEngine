@@ -4,7 +4,7 @@
 #include "core/math/fanVector3.hpp"
 #include "core/math/fanMatrix3.hpp"
 #include "core/math/fanMatrix4.hpp"
-#include "engine/resources/fanSceneResourcePtr.hpp"
+#include "engine/resources/fanComponentPtr.hpp"
 
 namespace fan
 {

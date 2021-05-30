@@ -16,7 +16,7 @@ namespace fan
         {
             return _world.GetSignature<UIButton>() |
                    _world.GetSignature<UITransform>() |
-                   _world.GetSignature<TagUIEnabled>();
+                   _world.GetSignature<TagEnabled>();
         }
 
         static void Run( EcsWorld& _world, const EcsView& _view )

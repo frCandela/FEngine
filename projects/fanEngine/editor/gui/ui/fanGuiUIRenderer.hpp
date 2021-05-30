@@ -60,11 +60,11 @@ namespace fan
                 ImGui::DragInt( "depth", &ui.mDepth, 1, 0, 1024 );
 
                 // enabled
-                bool isEnabled = _world.HasTag<TagUIVisible>( _entity );
+                bool isEnabled = _world.HasTag<TagVisible>( _entity );
                 if( ImGui::Checkbox( "visible", &isEnabled ) )
                 {
-                    if( isEnabled ){ _world.AddTag<TagUIVisible>( _entity ); }
-                    else{ _world.RemoveTag<TagUIVisible>( _entity ); }
+                    if( isEnabled ){ _world.AddTag<TagVisible>( _entity ); }
+                    else{ _world.RemoveTag<TagVisible>( _entity ); }
                 }
             }
             ImGui::PopItemWidth();

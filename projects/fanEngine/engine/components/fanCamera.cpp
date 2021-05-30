@@ -129,6 +129,7 @@ namespace fan
     }
 
     //==================================================================================================================================================================================================
+    // projects a world position to screen space [0,1]
     //==================================================================================================================================================================================================
     glm::vec2 Camera::WorldPosToScreen( const Transform& _cameraTransform, const Vector3& _worldPosition ) const
     {
@@ -137,7 +138,7 @@ namespace fan
             const glm::vec4 pos( _worldPosition.ToGlm(), 1.f );
             glm::vec4       proj = GetProjection() * GetView( _cameraTransform ) * pos;
             proj /= proj.z;
-            return glm::vec2( proj.x, proj.y );
+            return 0.5f * glm::vec2( 1 + proj.x, 1 - proj.y );
         }
         else
         {

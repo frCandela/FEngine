@@ -1,7 +1,7 @@
 #include "engine/fanEngineSerializable.hpp"
 
 #include "core/resources/fanResourcePtr.hpp"
-#include "engine/resources/fanSceneResourcePtr.hpp"
+#include "engine/resources/fanComponentPtr.hpp"
 #include "engine/singletons/fanScenePointers.hpp"
 
 namespace fan

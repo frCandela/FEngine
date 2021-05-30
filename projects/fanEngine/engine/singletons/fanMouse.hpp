@@ -46,6 +46,7 @@ namespace fan
         bool                       mDown[sButtonsCount];
 
         void Clear();
+        void ClearSingleFrameEvents();
         void UpdateData( GLFWwindow* _window );
         glm::vec2 LocalScreenSpacePosition() const;
 

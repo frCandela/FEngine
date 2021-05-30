@@ -28,7 +28,7 @@ namespace fan
         button.mPressed.Clear();
         button.mPressed.Connect( _world, button.mSlotPtr );
 
-        _world.AddTag<TagUIEnabled>( _entity );
+        _world.AddTag<TagEnabled>( _entity );
     }
 
     //==================================================================================================================================================================================================

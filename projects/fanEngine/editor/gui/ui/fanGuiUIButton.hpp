@@ -4,7 +4,7 @@
 #include "engine/fanSceneTags.hpp"
 #include "editor/fanGuiInfos.hpp"
 #include "editor/gui/fanGuiSlot.hpp"
-#include "editor/gui/fanGuiRenderResources.hpp"
+#include "editor/gui/fanGuiResourcePtr.hpp"
 #include "editor/fanModals.hpp"
 
 namespace fan
@@ -31,11 +31,11 @@ namespace fan
             ImGui::PushID( "uibutton" );
             ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() );
 
-            bool isEnabled = _world.HasTag<TagUIEnabled>( _entity );
+            bool isEnabled = _world.HasTag<TagEnabled>( _entity );
             if( ImGui::Checkbox( "enabled", &isEnabled ) )
             {
-                if( isEnabled ){ _world.AddTag<TagUIEnabled>( _entity ); }
-                else{ _world.RemoveTag<TagUIEnabled>( _entity ); }
+                if( isEnabled ){ _world.AddTag<TagEnabled>( _entity ); }
+                else{ _world.RemoveTag<TagEnabled>( _entity ); }
             }
 
             if( ImGui::Button( "##color normal reset" ) ){ button.mColorNormal = Color::sDarkGrey; }

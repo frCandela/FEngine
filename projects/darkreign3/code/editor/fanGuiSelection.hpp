@@ -1,28 +1,30 @@
 #pragma once
 
-#include "game/singletons/fanTestSingleton.hpp"
+#include "game/singletons/fanSelection.hpp"
 #include "editor/fanGuiInfos.hpp"
+#include "editor/fanModals.hpp"
+#include "editor/gui/fanGuiResourcePtr.hpp"
 
 namespace fan
 {
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    struct GuiTestSingleton
+    struct GuiSelection
     {
         static GuiSingletonInfo GetInfo()
         {
             GuiSingletonInfo info;
             info.mIcon       = ImGui::None16;
             info.mGroup      = EngineGroups::Game;
-            info.onGui       = &GuiTestSingleton::OnGui;
-            info.mEditorName = "test singleton";
+            info.onGui       = &GuiSelection::OnGui;
+            info.mEditorName = "selection";
             return info;
         }
 
-        static void OnGui( EcsWorld& /*_world*/, EcsSingleton& _component )
+        static void OnGui( EcsWorld& /*_world*/, EcsSingleton& _singleton )
         {
-            TestSingleton& testSingleton = static_cast<TestSingleton&>( _component );
-            ImGui::DragFloat( "test value ", &testSingleton.mValue );
+            Selection& selection = static_cast<Selection&>( _singleton );
+            ImGui::FanPrefabPtr( "selection frame", selection.mSelectionFramePrefab );
         }
     };
 }

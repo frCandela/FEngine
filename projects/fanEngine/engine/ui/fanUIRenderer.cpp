@@ -29,7 +29,7 @@ namespace fan
         uiRenderer.mDepth    = 0;
         fanAssert( uiRenderer.mMesh2D );
 
-        _world.AddTag<TagUIVisible>( _entity );
+        _world.AddTag<TagVisible>( _entity );
     }
 
     //==================================================================================================================================================================================================

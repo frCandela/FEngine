@@ -1,7 +1,5 @@
-#include <editor/gui/fanGuiRenderResources.hpp>
 #include "game/fanDarkReign3.hpp"
 #include "core/random/fanSimplexNoise.hpp"
-#include "core/math/fanQuaternion.hpp"
 #include "core/time/fanScopedTimer.hpp"
 #include "network/singletons/fanTime.hpp"
 #include "engine/singletons/fanRenderDebug.hpp"
@@ -21,16 +19,17 @@
 #include "engine/physics/fanDetectCollisions.hpp"
 #include "engine/terrain/fanVoxelTerrain.hpp"
 #include "engine/components/fanCamera.hpp"
+#include "engine/systems/fanRaycast.hpp"
 
-#include "game/components/fanTestComponent.hpp"
-#include "game/singletons/fanTestSingleton.hpp"
-#include "game/systems/fanTestSystem.hpp"
+#include "game/components/fanUnit.hpp"
+#include "game/singletons/fanSelection.hpp"
+#include "game/fanDR3Tags.hpp"
+#include "game/systems/fanUpdateSelection.hpp"
 
 #ifdef FAN_EDITOR
 #include "editor/singletons/fanEditorSettings.hpp"
-#include "editor/fanGuiTestSingleton.hpp"
-#include "editor/fanGuiTestComponent.hpp"
-#include "editor/fanModals.hpp"
+#include "editor/fanGuiSelection.hpp"
+#include "editor/fanGuiUnit.hpp"
 
 #endif
 
@@ -42,13 +41,14 @@ namespace fan
     //==================================================================================================================================================================================================
     void DarkReign3::Init()
     {
-        mWorld.AddComponentType<TestComponent>();
-        mWorld.AddSingletonType<TestSingleton>();
+        mWorld.AddComponentType<Unit>();
+        mWorld.AddSingletonType<Selection>();
+        mWorld.AddTagType<TagSelected>();
 
 #ifdef FAN_EDITOR
         EditorSettings& settings = mWorld.GetSingleton<EditorSettings>();
-        settings.mSingletonInfos[TestSingleton::Info::sType] = GuiTestSingleton::GetInfo();
-        settings.mComponentInfos[TestComponent::Info::sType] = GuiTestComponent::GetInfo();
+        settings.mSingletonInfos[Selection::Info::sType] = GuiSelection::GetInfo();
+        settings.mComponentInfos[Unit::Info::sType]      = GuiUnit::GetInfo();
 #endif
 
         mCursors.Load( *mWorld.GetSingleton<Application>().mResources );
@@ -143,16 +143,43 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
+    void SelectUnits( EcsWorld& _world, const Fixed _delta )
+    {
+        if( _delta > 0 )
+        {
+            Mouse& mouse = _world.GetSingleton<Mouse>();
+            if( mouse.mPressed[Mouse::buttonLeft] )
+            {
+                _world.Run<SClearSelection>();
+
+                EcsEntity cameraID = _world.GetEntity( _world.GetSingleton<Scene>().mMainCameraHandle );
+                const Transform& cameraTransform = _world.GetComponent<Transform>( cameraID );
+                const Camera   & camera          = _world.GetComponent<Camera>( cameraID );
+                const Ray              ray = camera.ScreenPosToRay( cameraTransform, mouse.LocalScreenSpacePosition() );
+                std::vector<EcsEntity> results;
+                Raycast<Unit>( _world, ray, results );
+                if( !results.empty() )
+                {
+                    EcsEntity entity = results[0];
+                    _world.AddTag<TagSelected>( entity );
+                }
+            }
+        }
+    }
+
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
     void DarkReign3::Step( const Fixed _delta )
     {
         SCOPED_PROFILE( step );
 
         StepLoadTerrain();
+        SelectUnits( mWorld, _delta );
+        mWorld.ForceRun<SPlaceSelectionFrames>( _delta );
 
         // physics & transforms
         mWorld.Run<SIntegrateRigidbodies>( _delta );
         mWorld.Run<SDetectCollisions>( _delta );
-
         mWorld.Run<SMoveFollowTransforms>();
 
         // ui
@@ -190,11 +217,11 @@ namespace fan
     {
         if( ImGui::Begin( "testoss" ) )
         {
-             ImGui::DragInt( "chunks per frame", &chunksPerFrame, 1, 1, 100 );
-             int completionVoxelsGenerationCpy = completionVoxelsGeneration;
-             ImGui::SliderInt( "voxels generation", &completionVoxelsGenerationCpy, 0, max );
-             int completionMeshGenerationCpy = completionMeshGeneration;
-             ImGui::SliderInt( "mesh generation", &completionMeshGenerationCpy, 0, max );
+            ImGui::DragInt( "chunks per frame", &chunksPerFrame, 1, 1, 100 );
+            int completionVoxelsGenerationCpy = completionVoxelsGeneration;
+            ImGui::SliderInt( "voxels generation", &completionVoxelsGenerationCpy, 0, max );
+            int completionMeshGenerationCpy = completionMeshGeneration;
+            ImGui::SliderInt( "mesh generation", &completionMeshGenerationCpy, 0, max );
         }
         ImGui::End();
     }

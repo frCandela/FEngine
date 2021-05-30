@@ -2,7 +2,7 @@
 
 #include "core/ecs/fanEcsComponent.hpp"
 #include "fanUITransform.hpp"
-#include "engine/resources/fanSceneResourcePtr.hpp"
+#include "engine/resources/fanComponentPtr.hpp"
 
 namespace fan
 {

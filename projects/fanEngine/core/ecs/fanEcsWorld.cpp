@@ -640,15 +640,20 @@ namespace fan
     }
 
     //==================================================================================================================================================================================================
+    // finds all archetypes that match the _include signature
+    // archetypes containing types from the _exclude signature are excluded
     //==================================================================================================================================================================================================
-    EcsView EcsWorld::Match( const EcsSignature& _signature ) const
+    EcsView EcsWorld::Match( const EcsSignature& _include, const EcsSignature& _exclude ) const
     {
-        EcsView   view( mTypeToIndex, _signature );
+        fanAssert( ( _include & _exclude ) == EcsSignature( 0 ) );
+        EcsView   view( mTypeToIndex, _include );
         for( auto it = mArchetypes.begin(); it != mArchetypes.end(); ++it )
         {
-            if( ( it->first & _signature ) == _signature && !it->second->Empty() )
+            const EcsSignature& archetypeSignature = it->first;
+            EcsArchetype      * archetype          = it->second;
+            if( ( archetypeSignature & _include ) == _include && ( archetypeSignature & _exclude ) == EcsSignature( 0 ) && !archetype->Empty() )
             {
-                view.mArchetypes.push_back( it->second );
+                view.mArchetypes.push_back( archetype );
             }
         }
         return view;

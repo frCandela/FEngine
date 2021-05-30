@@ -306,8 +306,8 @@ namespace fan
         _world.AddComponentType<UIText>();
 
         _world.AddTagType<TagUIModified>();
-        _world.AddTagType<TagUIEnabled>();
-        _world.AddTagType<TagUIVisible>();
+        _world.AddTagType<TagEnabled>();
+        _world.AddTagType<TagVisible>();
     }
 
     //==================================================================================================================================================================================================

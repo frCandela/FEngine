@@ -74,7 +74,7 @@ namespace fan
         {
             return _world.GetSignature<UIRenderer>()
                    | _world.GetSignature<UITransform>()
-                   | _world.GetSignature<TagUIVisible>();
+                   | _world.GetSignature<TagVisible>();
         }
 
         static void Run( EcsWorld& _world, const EcsView& _view )

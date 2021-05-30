@@ -2,7 +2,7 @@
 
 #include "engine/ui/fanUIProgressBar.hpp"
 #include "editor/fanGuiInfos.hpp"
-#include "editor/gui/fanGuiSceneResourcePtr.hpp"
+#include "editor/gui/fanGuiComponentPtr.hpp"
 
 namespace fan
 {

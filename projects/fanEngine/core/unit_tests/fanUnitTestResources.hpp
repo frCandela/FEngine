@@ -3,7 +3,7 @@
 #include "core/unit_tests/fanUnitTest.hpp"
 #include "core/resources/fanResources.hpp"
 #include "engine/resources/fanPrefab.hpp"
-#include "engine/resources/fanSceneResourcePtr.hpp"
+#include "engine/resources/fanComponentPtr.hpp"
 
 namespace fan
 {

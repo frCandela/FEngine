@@ -136,9 +136,9 @@ namespace fan
                         Vector3 v0 = Vector3( modelMat * glm::vec4( vertices[indices[3 * index + 0]].mPos, 1.f ) );
                         Vector3 v1 = Vector3( modelMat * glm::vec4( vertices[indices[3 * index + 1]].mPos, 1.f ) );
                         Vector3 v2 = Vector3( modelMat * glm::vec4( vertices[indices[3 * index + 2]].mPos, 1.f ) );
-                        rd.DrawLine( v0, v1, Color( 1, 1, 0, 0.6f ), true );
-                        rd.DrawLine( v1, v2, Color( 1, 1, 0, 0.6f ), true );
-                        rd.DrawLine( v2, v0, Color( 1, 1, 0, 0.6f ), true );
+                        rd.DrawLine( v0, v1, Color(0,1,1,0.6f), true );
+                        rd.DrawLine( v1, v2, Color(0,1,1,0.6f), true );
+                        rd.DrawLine( v2, v0, Color(0,1,1,0.6f), true );
                     }
                 }
             }
@@ -330,7 +330,7 @@ namespace fan
     {
         static EcsSignature GetSignature( const EcsWorld& _world )
         {
-            return _world.GetSignature<UITransform>() | _world.GetSignature<TagUIVisible>();
+            return _world.GetSignature<UITransform>() | _world.GetSignature<TagVisible>();
         }
         static void Run( EcsWorld& _world, const EcsView& _view )
         {

@@ -215,6 +215,8 @@ namespace fan
                 world.Run<SUpdateBoundsFromTransform>();
 
                 world.ApplyTransitions();
+
+                currentWorld.GetSingleton<Mouse>().ClearSingleFrameEvents();
             }
         }
 
@@ -261,8 +263,8 @@ namespace fan
                 if( scene.mMainCameraHandle == editorCamera.mCameraHandle )
                 {
                     EditorCamera::Update( currentWorld, currentTime.mLogicDelta );
+                    currentWorld.GetSingleton<EditorSelection>().Update( currentGameViewWindow.mIsHovered );
                 }
-                currentWorld.GetSingleton<EditorSelection>().Update( currentGameViewWindow.mIsHovered );
 
                 // ImGui render
                 ImGui::NewFrame();
