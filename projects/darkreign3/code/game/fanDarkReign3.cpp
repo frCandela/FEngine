@@ -1,6 +1,7 @@
 #include "game/fanDarkReign3.hpp"
 #include "core/random/fanSimplexNoise.hpp"
 #include "core/time/fanScopedTimer.hpp"
+#include "core/input/fanKeyboard.hpp"
 #include "network/singletons/fanTime.hpp"
 #include "engine/singletons/fanRenderDebug.hpp"
 #include "engine/physics/fanUpdateRigidbodies.hpp"
@@ -148,10 +149,14 @@ namespace fan
         if( _delta > 0 )
         {
             Mouse& mouse = _world.GetSingleton<Mouse>();
-            if( mouse.mPressed[Mouse::buttonLeft] )
+
+            if( Keyboard::IsKeyPressed( Keyboard::ESCAPE ))
             {
                 _world.Run<SClearSelection>();
+            }
 
+            if( mouse.mPressed[Mouse::buttonLeft] )
+            {
                 EcsEntity cameraID = _world.GetEntity( _world.GetSingleton<Scene>().mMainCameraHandle );
                 const Transform& cameraTransform = _world.GetComponent<Transform>( cameraID );
                 const Camera   & camera          = _world.GetComponent<Camera>( cameraID );
@@ -161,7 +166,18 @@ namespace fan
                 if( !results.empty() )
                 {
                     EcsEntity entity = results[0];
-                    _world.AddTag<TagSelected>( entity );
+                    if( _world.HasTag<TagSelected>( entity ))
+                    {
+                        _world.RemoveTag<TagSelected>( entity );
+                    }
+                    else
+                    {
+                        if( !Keyboard::IsKeyDown( Keyboard::LEFT_CONTROL ) )
+                        {
+                            _world.Run<SClearSelection>();
+                        }
+                        _world.AddTag<TagSelected>( entity );
+                    }
                 }
             }
         }
