@@ -23,14 +23,17 @@
 #include "engine/systems/fanRaycast.hpp"
 
 #include "game/components/fanUnit.hpp"
+#include "game/components/fanAnimScale.hpp"
 #include "game/singletons/fanSelection.hpp"
 #include "game/fanDR3Tags.hpp"
 #include "game/systems/fanUpdateSelection.hpp"
+#include "game/systems/fanUpdateAnimScale.hpp"
 
 #ifdef FAN_EDITOR
 #include "editor/singletons/fanEditorSettings.hpp"
 #include "editor/fanGuiSelection.hpp"
 #include "editor/fanGuiUnit.hpp"
+#include "editor/fanGuiAnimScale.hpp"
 
 #endif
 
@@ -43,6 +46,7 @@ namespace fan
     void DarkReign3::Init()
     {
         mWorld.AddComponentType<Unit>();
+        mWorld.AddComponentType<AnimScale>();
         mWorld.AddSingletonType<Selection>();
         mWorld.AddTagType<TagSelected>();
         mWorld.AddTagType<TagEnemy>();
@@ -51,6 +55,7 @@ namespace fan
         EditorSettings& settings = mWorld.GetSingleton<EditorSettings>();
         settings.mSingletonInfos[Selection::Info::sType] = GuiSelection::GetInfo();
         settings.mComponentInfos[Unit::Info::sType]      = GuiUnit::GetInfo();
+        settings.mComponentInfos[AnimScale::Info::sType] = GuiAnimScale::GetInfo();
 #endif
 
         mCursors.Load( *mWorld.GetSingleton<Application>().mResources );
@@ -116,6 +121,7 @@ namespace fan
         mWorld.Run<SMoveFollowTransforms>();
 
         // ui
+        mWorld.Run<SUpdateAnimScale>( _delta );
         mWorld.ForceRun<SPlaceSelectionFrames>( _delta );
         mWorld.Run<SUpdateUIText>();
         mWorld.Run<SAlignUI>();
@@ -151,13 +157,22 @@ namespace fan
     {
         if( ImGui::Begin( "testoss" ) )
         {
-            if( ImGui::Button( "test tag" ) )
+            if( ImGui::Button( "tag enemy" ) )
             {
                 EcsView view   = mWorld.Match<SClearSelection>();
                 auto    unitIt = view.begin<Unit>();
                 for( ; unitIt != view.end<Unit>(); ++unitIt )
                 {
                     mWorld.AddTag<TagEnemy>( unitIt.GetEntity() );
+                }
+            }
+            if( ImGui::Button( "tag terrain" ) )
+            {
+                EcsView view   = mWorld.Match<SClearSelection>();
+                auto    unitIt = view.begin<Unit>();
+                for( ; unitIt != view.end<Unit>(); ++unitIt )
+                {
+                    mWorld.AddTag<TagTerrain>( unitIt.GetEntity() );
                 }
             }
         }

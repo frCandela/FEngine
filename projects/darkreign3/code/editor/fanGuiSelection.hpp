@@ -25,6 +25,7 @@ namespace fan
         {
             Selection& selection = static_cast<Selection&>( _singleton );
             ImGui::FanPrefabPtr( "selection frame", selection.mSelectionFramePrefab );
+            ImGui::FanPrefabPtr( "move to fx", selection.mMoveToFxPrefab );
         }
     };
 }

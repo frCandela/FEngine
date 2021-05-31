@@ -8,6 +8,20 @@
 namespace fan
 {
     //==================================================================================================================================================================================================
+    // Helper class for storing the result of a raycast
+    //==================================================================================================================================================================================================
+    struct RaycastResult
+    {
+        EcsEntity mEntity;
+        Fixed     mDistance;
+
+        static bool Sort( RaycastResult& _resultA, RaycastResult& _resultB )
+        {
+            return _resultA.mDistance < _resultB.mDistance;
+        }
+    };
+
+    //==================================================================================================================================================================================================
     // raycast on entity bounds then on a the convex shape of the mesh when present
     // return true if the raycast
     // output a list of EcsEntity sorted by distance to the ray origin
@@ -16,28 +30,13 @@ namespace fan
     {
         static EcsSignature GetSignature( const EcsWorld& _world )
         {
-            return _world.GetSignature<Bounds>() |
-                   _world.GetSignature<SceneNode>() |
-                   _world.GetSignature<Transform>();
+            return _world.GetSignature<Bounds>() | _world.GetSignature<SceneNode>() | _world.GetSignature<Transform>();
         }
 
-        static void Run( EcsWorld& _world, const EcsView& _view, const Ray& _ray, std::vector<EcsEntity>& _outResults )
+        static void Run( EcsWorld& _world, const EcsView& _view, const Ray& _ray, std::vector<RaycastResult>& _outResults )
         {
-            // Helper class for storing the result of a raycast
-            struct Result
-            {
-                EcsEntity entityID;
-                Fixed     distance;
-
-                static bool Sort( Result& _resultA, Result& _resultB )
-                {
-                    return _resultA.distance < _resultB.distance;
-                }
-            };
-
-            // results
-            std::vector<Result> results;
-            results.reserve( _view.Size() );
+            fanAssert(_outResults.empty());
+            fanAssert( _ray.direction.IsNormalized() );
 
             // raycast
             auto boundsIt    = _view.begin<Bounds>();
@@ -65,26 +64,18 @@ namespace fan
                         const Ray transformedRay( transform.InverseTransformPoint( _ray.origin ), transform.InverseTransformDirection( _ray.direction ) );
                         if( meshRenderer.mMesh != nullptr && meshRenderer.mMesh->mConvexHull.RayCast( transformedRay.origin, transformedRay.direction, intersection ) )
                         {
-                            results.push_back( { entity, Vector3::SqrDistance( intersection, _ray.origin ) } );
+                            _outResults.push_back( { entity, Vector3::Distance( transform * intersection, _ray.origin ) } );
                         }
                     }
                     else
                     {
-                        results.push_back( { entity, Vector3::SqrDistance( intersection, _ray.origin ) } );
+                        _outResults.push_back( { entity, Vector3::SqrDistance( intersection, _ray.origin ) } );
                     }
                 }
             }
 
             // sorting by distance
-            std::sort( results.begin(), results.end(), Result::Sort );
-
-            // generating output
-            _outResults.clear();
-            _outResults.reserve( results.size() );
-            for( Result& result : results )
-            {
-                _outResults.push_back( result.entityID );
-            }
+            std::sort( _outResults.begin(), _outResults.end(), RaycastResult::Sort );
         }
     };
 
@@ -96,13 +87,13 @@ namespace fan
         template< class FirstType, class... NextTypes >
         struct AccumulateSignature
         {
-            static EcsSignature Get( EcsWorld& _world ){ return _world.GetSignature<FirstType>() | AccumulateSignature<NextTypes...>::Get( _world ); }
+            static EcsSignature Get( EcsWorld& _world ) { return _world.GetSignature<FirstType>() | AccumulateSignature<NextTypes...>::Get( _world ); }
         };
 
-        template< class LastType>
+        template< class LastType >
         struct AccumulateSignature<LastType>
         {
-            static EcsSignature Get( EcsWorld& _world ){ return _world.GetSignature<LastType>(); }
+            static EcsSignature Get( EcsWorld& _world ) { return _world.GetSignature<LastType>(); }
         };
     }
 
@@ -112,10 +103,10 @@ namespace fan
     // helper function for raycasting
     //==================================================================================================================================================================================================
     template< typename... _IncludeTypes >
-    static void Raycast( EcsWorld& _world, const Ray& _ray, std::vector<EcsEntity>& _outResults, const EcsSignature _exclude = EcsSignature( 0 ) )
+    static void Raycast( EcsWorld& _world, const Ray& _ray, std::vector<RaycastResult>& _outResults, const EcsSignature _exclude = EcsSignature( 0 ) )
     {
         const EcsSignature includeSignature = SRaycast::GetSignature( _world ) | impl::AccumulateSignature<_IncludeTypes...>::Get( _world );
-        EcsView            view      = _world.Match( includeSignature, _exclude );
+        EcsView            view             = _world.Match( includeSignature, _exclude );
         if( !view.Empty() )
         {
             SRaycast::Run( _world, view, _ray, _outResults );

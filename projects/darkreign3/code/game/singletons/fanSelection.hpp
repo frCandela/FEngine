@@ -31,6 +31,7 @@ namespace fan
         static SelectionStatus SelectUnits( EcsWorld& _world, const Fixed _delta );
 
         ResourcePtr<Prefab> mSelectionFramePrefab;
+        ResourcePtr<Prefab> mMoveToFxPrefab;
         std::vector<EcsHandle> mSelectionFrames;
     };
 

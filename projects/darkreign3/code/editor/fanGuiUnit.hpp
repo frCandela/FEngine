@@ -21,7 +21,7 @@ namespace fan
             return info;
         }
 
-        static void OnGui( EcsWorld& /*_world*/, EcsEntity /*_entityID*/, EcsComponent& _component )
+        static void OnGui( EcsWorld& /*_world*/, EcsEntity /*_entity*/, EcsComponent& _component )
         {
             Unit& unit = static_cast<Unit&>( _component );
             ImGui::DragFixed( "height offset", &unit.mHeightOffset );

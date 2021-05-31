@@ -16,23 +16,23 @@ namespace fan
     //==================================================================================================================================================================================================
     void Unit::Init( EcsWorld& /*_world*/, EcsEntity /*_entity*/, EcsComponent& _component )
     {
-        Unit& testComponent = static_cast<Unit&>( _component );
-        testComponent.mHeightOffset = 0;
+        Unit& unit = static_cast<Unit&>( _component );
+        unit.mHeightOffset = 0;
     }
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
     void Unit::Save( const EcsComponent& _component, Json& _json )
     {
-        const Unit& testComponent = static_cast<const Unit&>( _component );
-        Serializable::SaveFixed( _json, "height_offset", testComponent.mHeightOffset );
+        const Unit& unit = static_cast<const Unit&>( _component );
+        Serializable::SaveFixed( _json, "height_offset", unit.mHeightOffset );
     }
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
     void Unit::Load( EcsComponent& _component, const Json& _json )
     {
-        Unit& testComponent = static_cast<Unit&>( _component );
-        Serializable::LoadFixed( _json, "height_offset", testComponent.mHeightOffset );
+        Unit& unit = static_cast<Unit&>( _component );
+        Serializable::LoadFixed( _json, "height_offset", unit.mHeightOffset );
     }
 }

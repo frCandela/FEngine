@@ -7,6 +7,7 @@
 #include "engine/components/fanMeshRenderer.hpp"
 #include "engine/components/fanMaterial.hpp"
 #include "engine/singletons/fanScene.hpp"
+#include "engine/fanEngineTags.hpp"
 
 namespace fan
 {
@@ -79,6 +80,7 @@ namespace fan
                     const std::string chunkName = "chunk_" + std::to_string( position.x ) + "_" + std::to_string( position.y ) + "_" + std::to_string( position.z );
                     SceneNode& chunkNode = scene.CreateSceneNode( chunkName, &terrainRoot );
                     EcsEntity entity = _world.GetEntity( chunkNode.mHandle );
+                    _world.AddTag<TagTerrain>( entity );
 
                     VoxelChunk& chunk = _terrain.GetChunk( position );
                     chunk.mPosition = position;
@@ -154,7 +156,7 @@ namespace fan
                 if( !chunk.mIsGenerated )
                 {
                     VoxelGenerator::GenerateBlocks( terrain, chunk );
-                    generatedBlocks            = true;
+                    generatedBlocks = true;
                     break;
                 }
             }

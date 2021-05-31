@@ -10,7 +10,7 @@
 #include "engine/resources/fanCursor.hpp"
 
 // base
-#include "engine/fanSceneTags.hpp"
+#include "engine/fanEngineTags.hpp"
 #include "engine/components/fanSceneNode.hpp"
 #include "engine/components/fanCamera.hpp"
 #include "engine/components/fanExpirationTime.hpp"
@@ -266,6 +266,8 @@ namespace fan
         _world.AddSingletonType<Application>();
         _world.AddSingletonType<Time>();
         _world.AddSingletonType<VoxelTerrain>();
+
+        _world.AddTagType<TagTerrain>();
     }
 
     //==================================================================================================================================================================================================

@@ -137,9 +137,7 @@ namespace ImGui
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    bool FanSaveFileModal( const char* _popupName,
-                           const std::set<std::string>& _extensionWhiteList,
-                           std::string& _outCurrentPath )
+    bool FanSaveFileModal( const char* _popupName, const std::set<std::string>& _extensionWhiteList, std::string& _outCurrentPath )
     {
         bool returnValue = false;
 
@@ -158,8 +156,7 @@ namespace ImGui
 
 
             // Input name
-            std::string filename   = fan::Path::IsDirectory( _outCurrentPath ) ? "new_scene" : fan::Path::FileName(
-                    _outCurrentPath );
+            std::string filename   = fan::Path::IsDirectory( _outCurrentPath ) ? "new_scene" : fan::Path::FileName( _outCurrentPath );
             const int   bufferSize = 64;
             char        buffer[bufferSize];
             strcpy_s( buffer, filename.c_str() );

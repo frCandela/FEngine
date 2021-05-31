@@ -126,7 +126,7 @@ namespace fan
             const Ray ray = camera.ScreenPosToRay( cameraTransform, mouse.LocalScreenSpacePosition() );
 
             // raycast on bounds
-            std::vector<EcsEntity> results;
+            std::vector<RaycastResult> results;
             world.Run<SRaycast>( ray, results );
             if( !results.empty() )
             {
@@ -141,7 +141,7 @@ namespace fan
                 lastRay          = ray;
 
                 // selection
-                SceneNode& sceneNode = world.GetComponent<SceneNode>( results[index] );
+                SceneNode& sceneNode = world.GetComponent<SceneNode>( results[index].mEntity );
                 SetSelectedSceneNode( &sceneNode );
             }
         }

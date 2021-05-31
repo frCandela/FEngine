@@ -6,7 +6,7 @@
 #include "core/ecs/fanEcsWorld.hpp"
 #include "core/ecs/fanEcsSystem.hpp"
 #include "core/ecs/fanEcsTag.hpp"
-#include "engine/fanSceneTags.hpp"
+#include "engine/fanEngineTags.hpp"
 #include "editor/fanModals.hpp"
 #include "editor/gui/fanGroupsColors.hpp"
 #include "editor/fanGuiInfos.hpp"

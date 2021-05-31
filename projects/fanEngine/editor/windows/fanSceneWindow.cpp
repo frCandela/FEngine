@@ -419,8 +419,8 @@ namespace fan
     {
         if( ImGui::FanLoadFileModal( "import_prefab", RenderGlobal::sPrefabExtensions, mPathBuffer ) )
         {
-            Application& app = _world.GetSingleton<Application>();
-            Prefab        * prefab           = app.mResources->GetOrLoad<Prefab>( mPathBuffer );
+            Application& app    = _world.GetSingleton<Application>();
+            Prefab     * prefab = app.mResources->GetOrLoad<Prefab>( mPathBuffer );
             if( prefab != nullptr )
             {
                 prefab->Instantiate( *mLastSceneNodeRightClicked );
@@ -445,8 +445,8 @@ namespace fan
             if( outStream.is_open() )
             {
                 // Try to update the existing prefab if it exists
-                Application& app = _world.GetSingleton<Application>();
-                Prefab        * prefab     = app.mResources->Get<Prefab>( Path::MakeRelative( mPathBuffer ) );
+                Application& app    = _world.GetSingleton<Application>();
+                Prefab     * prefab = app.mResources->Get<Prefab>( mPathBuffer );
                 if( prefab != nullptr )
                 {
                     prefab->CreateFromSceneNode( *mLastSceneNodeRightClicked );

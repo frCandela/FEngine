@@ -3,8 +3,10 @@
 #include "engine/singletons/fanMouse.hpp"
 #include "engine/singletons/fanScene.hpp"
 #include "engine/components/fanCamera.hpp"
+#include "engine/components/fanScale.hpp"
 #include "engine/physics/fanTransform.hpp"
 #include "engine/systems/fanRaycast.hpp"
+#include "engine/fanEngineTags.hpp"
 #include "game/components/fanUnit.hpp"
 #include "game/systems/fanUpdateSelection.hpp"
 
@@ -24,6 +26,7 @@ namespace fan
     {
         Selection& selection = static_cast<Selection&>( _singleton );
         selection.mSelectionFramePrefab = nullptr;
+        selection.mMoveToFxPrefab       = nullptr;
         selection.mSelectionFrames.clear();
     }
 
@@ -48,14 +51,14 @@ namespace fan
         EcsEntity cameraID = _world.GetEntity( _world.GetSingleton<Scene>().mMainCameraHandle );
         const Transform& cameraTransform = _world.GetComponent<Transform>( cameraID );
         const Camera   & camera          = _world.GetComponent<Camera>( cameraID );
-        const Ray              ray = camera.ScreenPosToRay( cameraTransform, mouse.LocalScreenSpacePosition() );
-        std::vector<EcsEntity> results;
-        Raycast<Unit>( _world, ray, results );
+        const Ray                  mousePosRay = camera.ScreenPosToRay( cameraTransform, mouse.LocalScreenSpacePosition() );
+        std::vector<RaycastResult> results;
+        Raycast<Unit>( _world, mousePosRay, results );
 
         // set hover target type
         if( !results.empty() )
         {
-            EcsEntity entity = results[0];
+            EcsEntity entity = results[0].mEntity;
             if( _world.HasTag<TagEnemy>( entity ) )
             {
                 selectionStatus.mHoveringOverEnemy = true;
@@ -78,7 +81,7 @@ namespace fan
             }
             else
             {
-                EcsEntity entity = results[0];
+                EcsEntity entity = results[0].mEntity;
                 if( !_world.HasTag<TagEnemy>( entity ) )
                 {
                     if( _world.HasTag<TagSelected>( entity ) )
@@ -96,6 +99,23 @@ namespace fan
                 }
             }
         }
+        else if( mouse.mPressed[Mouse::buttonRight] )
+        {
+            if( selectionStatus.mNumSelected > 0 )
+            {
+                results.clear();
+                Raycast<TagTerrain>( _world, mousePosRay, results );
+                if( !results.empty() )
+                {
+                    const Scene    & scene      = _world.GetSingleton<Scene>();
+                    const Selection& _selection = _world.GetSingleton<Selection>();
+                    SceneNode      * node       = _selection.mMoveToFxPrefab->Instantiate( scene.GetRootNode() );
+                    Transform      & transform  = _world.GetComponent<Transform>( _world.GetEntity( node->mHandle ) );
+                    transform.mPosition = mousePosRay.origin + results[0].mDistance * mousePosRay.direction - 2*mousePosRay.direction;
+                }
+            }
+        }
+
         return selectionStatus;
     }
 
@@ -105,6 +125,7 @@ namespace fan
     {
         const Selection& selection = static_cast<const Selection&>( _singleton );
         Serializable::SaveResourcePtr( _json, "selection_frame", selection.mSelectionFramePrefab.mData );
+        Serializable::SaveResourcePtr( _json, "move_to", selection.mMoveToFxPrefab.mData );
     }
 
     //==================================================================================================================================================================================================
@@ -113,5 +134,6 @@ namespace fan
     {
         Selection& selection = static_cast<Selection&>( _singleton );
         Serializable::LoadResourcePtr( _json, "selection_frame", selection.mSelectionFramePrefab.mData );
+        Serializable::LoadResourcePtr( _json, "move_to", selection.mMoveToFxPrefab.mData );
     }
 }
