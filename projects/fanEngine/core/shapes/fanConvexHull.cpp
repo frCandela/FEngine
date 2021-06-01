@@ -58,24 +58,23 @@ namespace fan
     //==================================================================================================================================================================================================
     // Raycast on all triangles of the convex hull
     //==================================================================================================================================================================================================
-    bool ConvexHull::RayCast( const Vector3& _origin, const Vector3& _direction, Vector3& _outIntersection ) const
+    bool ConvexHull::RayCast( const Ray _ray, RaycastResult& _outResult ) const
     {
-        Vector3  intersection;
-        Fixed    closestDistance = Fixed::sMaxValue;
-        for( int triIndex        = 0; triIndex < (int)mIndices.size() / 3; triIndex++ )
+        RaycastResult result;
+        Fixed         closestDistance = Fixed::sMaxValue;
+        for( int      triIndex        = 0; triIndex < (int)mIndices.size() / 3; triIndex++ )
         {
             const Vector3  v0 = mVertices[mIndices[3 * triIndex + 0]];
             const Vector3  v1 = mVertices[mIndices[3 * triIndex + 1]];
             const Vector3  v2 = mVertices[mIndices[3 * triIndex + 2]];
             const Triangle triangle( v0, v1, v2 );
 
-            if( triangle.RayCast( _origin, _direction, intersection ) )
+            if( triangle.RayCast( _ray, result ) )
             {
-                Fixed distance = Vector3::Distance( intersection, _origin );
-                if( distance < closestDistance )
+                if( result.mDistance < closestDistance )
                 {
-                    closestDistance  = distance;
-                    _outIntersection = intersection;
+                    closestDistance = result.mDistance;
+                    _outResult      = result;
                 }
             }
         }

@@ -24,17 +24,19 @@
 
 #include "game/components/fanUnit.hpp"
 #include "game/components/fanAnimScale.hpp"
+#include "game/components/fanTerrainAgent.hpp"
 #include "game/singletons/fanSelection.hpp"
 #include "game/fanDR3Tags.hpp"
 #include "game/systems/fanUpdateSelection.hpp"
 #include "game/systems/fanUpdateAnimScale.hpp"
+#include "game/systems/fanUpdateAgents.hpp"
 
 #ifdef FAN_EDITOR
 #include "editor/singletons/fanEditorSettings.hpp"
 #include "editor/fanGuiSelection.hpp"
 #include "editor/fanGuiUnit.hpp"
 #include "editor/fanGuiAnimScale.hpp"
-
+#include "editor/fanGuiTerrainAgent.hpp"
 #endif
 
 #include "render/fanWindow.hpp"
@@ -46,6 +48,7 @@ namespace fan
     void DarkReign3::Init()
     {
         mWorld.AddComponentType<Unit>();
+        mWorld.AddComponentType<TerrainAgent>();
         mWorld.AddComponentType<AnimScale>();
         mWorld.AddSingletonType<Selection>();
         mWorld.AddTagType<TagSelected>();
@@ -56,6 +59,7 @@ namespace fan
         settings.mSingletonInfos[Selection::Info::sType] = GuiSelection::GetInfo();
         settings.mComponentInfos[Unit::Info::sType]      = GuiUnit::GetInfo();
         settings.mComponentInfos[AnimScale::Info::sType] = GuiAnimScale::GetInfo();
+        settings.mComponentInfos[TerrainAgent::Info::sType] = GuiTerrainAgent::GetInfo();
 #endif
 
         mCursors.Load( *mWorld.GetSingleton<Application>().mResources );
@@ -107,13 +111,12 @@ namespace fan
 
         // update selection
         const SelectionStatus selectionStatus = Selection::SelectUnits( mWorld, _delta );
+        mWorld.Run<SMoveAgents>(_delta);
 
         // set cursor
         Application& app = mWorld.GetSingleton<Application>();
         const DR3Cursor currentCursor = DR3Cursors::GetCurrentCursor( _delta, mWorld.GetSingleton<Time>(), selectionStatus );
         app.mCurrentCursor = currentCursor == DR3Cursor::Count ? nullptr : mCursors.mCursors[currentCursor];
-
-
 
         // physics & transforms
         mWorld.Run<SIntegrateRigidbodies>( _delta );

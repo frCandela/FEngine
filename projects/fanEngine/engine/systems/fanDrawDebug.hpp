@@ -59,7 +59,7 @@ namespace fan
                 const Transform& transform = *transformIt;
                 const Sphere   & sphere    = meshRenderer.mMesh->mBoundingSphere;
 
-                rd.DrawSphere( transform.mPosition + sphere.mCenter, sphere.mRadius, Color::sOrange);
+                rd.DrawSphere( transform.mPosition + sphere.mCenter, sphere.mRadius, Color::sOrange );
             }
         }
     };
@@ -136,9 +136,9 @@ namespace fan
                         Vector3 v0 = Vector3( modelMat * glm::vec4( vertices[indices[3 * index + 0]].mPos, 1.f ) );
                         Vector3 v1 = Vector3( modelMat * glm::vec4( vertices[indices[3 * index + 1]].mPos, 1.f ) );
                         Vector3 v2 = Vector3( modelMat * glm::vec4( vertices[indices[3 * index + 2]].mPos, 1.f ) );
-                        rd.DrawLine( v0, v1, Color(0,1,1,0.6f), true );
-                        rd.DrawLine( v1, v2, Color(0,1,1,0.6f), true );
-                        rd.DrawLine( v2, v0, Color(0,1,1,0.6f), true );
+                        rd.DrawLine( v0, v1, Color( 0, 1, 1, 0.6f ), true );
+                        rd.DrawLine( v1, v2, Color( 0, 1, 1, 0.6f ), true );
+                        rd.DrawLine( v2, v0, Color( 0, 1, 1, 0.6f ), true );
                     }
                 }
             }
@@ -172,7 +172,7 @@ namespace fan
 
                 const glm::mat4 modelMat = transform.GetModelMatrix();
 
-                Color         color     = Color::sCyan;
+                Color         color     = Color( 0, .7f, 1.f, 0.5f );
                 for( unsigned polyIndex = 0; polyIndex < hull.mIndices.size() / 3; polyIndex++ )
                 {
                     const int     index0    = hull.mIndices[3 * polyIndex + 0];
@@ -185,9 +185,9 @@ namespace fan
                     const Vector3 worldVec1 = Vector3( modelMat * glm::vec4( vec1.ToGlm(), 1.f ) );
                     const Vector3 worldVec2 = Vector3( modelMat * glm::vec4( vec2.ToGlm(), 1.f ) );
 
-                    rd.DrawLine( worldVec0, worldVec1, color );
-                    rd.DrawLine( worldVec1, worldVec2, color );
-                    rd.DrawLine( worldVec2, worldVec0, color );
+                    rd.DrawLine( worldVec0, worldVec1, color, true );
+                    rd.DrawLine( worldVec1, worldVec2, color, true );
+                    rd.DrawLine( worldVec2, worldVec0, color, true );
                 }
             }
         }

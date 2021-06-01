@@ -28,7 +28,7 @@ namespace fan
         void OptimizeVertices();
         void Create( Device& _device );
         void Destroy( Device& _device );
-        bool RayCast( const Vector3 _origin, const Vector3 _dir, Vector3& _outIntersection ) const;
+        bool RayCast( const Ray _ray, RaycastResult& _outResult ) const;
     };
 
     //==================================================================================================================================================================================================
@@ -39,7 +39,7 @@ namespace fan
     {
     FAN_RESOURCE( Mesh );
 
-        bool RayCast( const Vector3 _origin, const Vector3 _dir, Vector3& _outIntersection ) const;
+        bool RayCast( const Ray _ray, RaycastResult& _outResult ) const;
         bool LoadFromFile( const std::string& _path );
 
         void GenerateBoundingVolumes();

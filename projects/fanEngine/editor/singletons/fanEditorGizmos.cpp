@@ -83,8 +83,8 @@ namespace fan
             for( int  triIndex     = 0; triIndex < (int)coneTris.size() / 3; triIndex++ )
             {
                 Triangle triangle( coneTris[3 * triIndex + 0], coneTris[3 * triIndex + 1], coneTris[3 * triIndex + 2] );
-                Vector3  intersection;
-                if( triangle.RayCast( ray.origin, ray.direction, intersection ) )
+                RaycastResult  result;
+                if( triangle.RayCast( ray, result ) )
                 {
                     clickedColor[3] = 0.5f;
                     if( mouse.mPressed[Mouse::buttonLeft] )

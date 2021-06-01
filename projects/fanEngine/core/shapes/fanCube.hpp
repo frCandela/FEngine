@@ -18,7 +18,7 @@ namespace fan
         Fixed GetHalfSize() const { return mHalfSize; }
         Vector3 GetPosition() const { return mPosition; }
 
-        bool RayCast( const Vector3 _origin, const Vector3 _direction, Vector3& outIntersection ) const;
+        bool RayCast( const Ray _ray, RaycastResult& _outResult ) const;
 
         std::array<Triangle, 12> mTriangles;
         Vector3                  mPosition;

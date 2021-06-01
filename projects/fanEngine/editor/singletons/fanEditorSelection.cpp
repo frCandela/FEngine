@@ -126,7 +126,7 @@ namespace fan
             const Ray ray = camera.ScreenPosToRay( cameraTransform, mouse.LocalScreenSpacePosition() );
 
             // raycast on bounds
-            std::vector<RaycastResult> results;
+            std::vector<SRaycast::Result> results;
             world.Run<SRaycast>( ray, results );
             if( !results.empty() )
             {

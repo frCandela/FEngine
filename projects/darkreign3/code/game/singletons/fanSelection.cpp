@@ -1,5 +1,6 @@
 #include "game/singletons/fanSelection.hpp"
 #include "core/input/fanKeyboard.hpp"
+#include "core/math/fanMatrix3.hpp"
 #include "engine/singletons/fanMouse.hpp"
 #include "engine/singletons/fanScene.hpp"
 #include "engine/components/fanCamera.hpp"
@@ -52,7 +53,7 @@ namespace fan
         const Transform& cameraTransform = _world.GetComponent<Transform>( cameraID );
         const Camera   & camera          = _world.GetComponent<Camera>( cameraID );
         const Ray                  mousePosRay = camera.ScreenPosToRay( cameraTransform, mouse.LocalScreenSpacePosition() );
-        std::vector<RaycastResult> results;
+        std::vector<SRaycast::Result> results;
         Raycast<Unit>( _world, mousePosRay, results );
 
         // set hover target type
@@ -111,7 +112,12 @@ namespace fan
                     const Selection& _selection = _world.GetSingleton<Selection>();
                     SceneNode      * node       = _selection.mMoveToFxPrefab->Instantiate( scene.GetRootNode() );
                     Transform      & transform  = _world.GetComponent<Transform>( _world.GetEntity( node->mHandle ) );
-                    transform.mPosition = mousePosRay.origin + results[0].mDistance * mousePosRay.direction - 2*mousePosRay.direction;
+                    transform.mPosition = mousePosRay.origin + results[0].mData.mDistance * mousePosRay.direction - 2 * mousePosRay.direction;
+
+                    const Vector3 up = results[0].mData.mNormal.Normalized();
+                    const Vector3 left = Vector3::Cross( up, transform.Forward() );
+                    const Vector3 forward = Vector3::Cross( left, up );
+                    transform.mRotation = Matrix3(left, up, forward).ToQuaternion();
                 }
             }
         }

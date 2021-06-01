@@ -28,12 +28,12 @@ namespace fan
     //==================================================================================================================================================================================================
     // Moller-Trumbore intersection algorithm
     //==================================================================================================================================================================================================
-    bool Triangle::RayCast( const Vector3 _origin, const Vector3 _dir, Vector3& _outIntersection ) const
+    bool Triangle::RayCast( const Ray _ray, RaycastResult& _outResult ) const
     {
         Fixed   EPSILON = Fixed::sFuzzyZero;
         Vector3 e1      = mV1 - mV0;    // edge 1
         Vector3 e2      = mV2 - mV0;    // edge 2
-        Vector3 h       = Vector3::Cross( _dir, e2 );    //
+        Vector3 h       = Vector3::Cross( _ray.direction, e2 );    //
         Fixed   a       = Vector3::Dot( e1, h );
         if( a > -EPSILON && a < EPSILON )
         {    // d colinear to the e1 e2 plane
@@ -41,7 +41,7 @@ namespace fan
         }
 
         Fixed   f = 1 / a;
-        Vector3 s = _origin - mV0;
+        Vector3 s = _ray.origin - mV0;
         Fixed   u = f * Vector3::Dot( s, h );
         if( u < 0 || u > 1 )
         {
@@ -49,7 +49,7 @@ namespace fan
         }
 
         Vector3 q = Vector3::Cross( s, e1 );
-        Fixed   v = f * Vector3::Dot( _dir, q );
+        Fixed   v = f * Vector3::Dot( _ray.direction, q );
         if( v < 0 || u + v > 1 )
         {
             return false;
@@ -59,7 +59,9 @@ namespace fan
         Fixed t = f * Vector3::Dot( e2, q );
         if( t > EPSILON ) // ray intersection
         {
-            _outIntersection = _origin + _dir * t;
+            _outResult.mPosition = _ray.origin + _ray.direction * t;
+            _outResult.mDistance = t;
+            _outResult.mNormal   = Vector3::Cross( e1, e2 ).Normalized();
             return true;
         }
 

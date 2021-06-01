@@ -1,3 +1,5 @@
+#pragma once
+
 #include "core/ecs/fanEcsSystem.hpp"
 #include "core/shapes/fanRay.hpp"
 #include "engine/components/fanSceneNode.hpp"
@@ -8,35 +10,31 @@
 namespace fan
 {
     //==================================================================================================================================================================================================
-    // Helper class for storing the result of a raycast
-    //==================================================================================================================================================================================================
-    struct RaycastResult
-    {
-        EcsEntity mEntity;
-        Fixed     mDistance;
-
-        static bool Sort( RaycastResult& _resultA, RaycastResult& _resultB )
-        {
-            return _resultA.mDistance < _resultB.mDistance;
-        }
-    };
-
-    //==================================================================================================================================================================================================
     // raycast on entity bounds then on a the convex shape of the mesh when present
     // return true if the raycast
     // output a list of EcsEntity sorted by distance to the ray origin
     //==================================================================================================================================================================================================
     struct SRaycast : EcsSystem
     {
+        struct Result
+        {
+            RaycastResult mData;
+            EcsEntity     mEntity;
+            static bool Sort( Result& _result1, Result& _result2 )
+            {
+                return _result1.mData.mDistance < _result2.mData.mDistance;
+            }
+        };
+
         static EcsSignature GetSignature( const EcsWorld& _world )
         {
             return _world.GetSignature<Bounds>() | _world.GetSignature<SceneNode>() | _world.GetSignature<Transform>();
         }
 
-        static void Run( EcsWorld& _world, const EcsView& _view, const Ray& _ray, std::vector<RaycastResult>& _outResults )
+        static void Run( EcsWorld& _world, const EcsView& _view, const Ray& _ray, std::vector<SRaycast::Result>& _outResults )
         {
-            fanAssert(_outResults.empty());
             fanAssert( _ray.direction.IsNormalized() );
+            _outResults.clear();
 
             // raycast
             auto boundsIt    = _view.begin<Bounds>();
@@ -52,8 +50,8 @@ namespace fan
 
                 // raycast on bounds
                 const Bounds& bounds = *boundsIt;
-                Vector3 intersection;
-                if( bounds.mAabb.RayCast( _ray.origin, _ray.direction, intersection ) == true )
+                RaycastResult result;
+                if( bounds.mAabb.RayCast( _ray.origin, _ray.direction, result.mPosition ) == true )
                 {
                     // raycast on mesh
                     const EcsEntity entity = boundsIt.GetEntity();
@@ -62,20 +60,31 @@ namespace fan
                         const Transform transform = *TransformIt;
                         const MeshRenderer& meshRenderer = _world.GetComponent<MeshRenderer>( entity );
                         const Ray transformedRay( transform.InverseTransformPoint( _ray.origin ), transform.InverseTransformDirection( _ray.direction ) );
-                        if( meshRenderer.mMesh != nullptr && meshRenderer.mMesh->mConvexHull.RayCast( transformedRay.origin, transformedRay.direction, intersection ) )
+                        if( meshRenderer.mMesh != nullptr && meshRenderer.mMesh->mConvexHull.RayCast( transformedRay, result ) )
                         {
-                            _outResults.push_back( { entity, Vector3::Distance( transform * intersection, _ray.origin ) } );
+                            if( meshRenderer.mMesh->RayCast( transformedRay, result ) )
+                            {
+                                SRaycast::Result result1;
+                                result1.mEntity         = entity;
+                                result1.mData.mPosition = transform.TransformPoint(result.mPosition);
+                                result1.mData.mNormal   = transform.TransformDirection(result.mNormal);
+                                result1.mData.mDistance = result.mDistance;
+                                _outResults.push_back( result1 );
+                            }
                         }
                     }
                     else
                     {
-                        _outResults.push_back( { entity, Vector3::SqrDistance( intersection, _ray.origin ) } );
+                        SRaycast::Result result1;
+                        result1.mEntity = entity;
+                        result1.mData   = result;
+                        _outResults.push_back( result1 );
                     }
                 }
             }
 
             // sorting by distance
-            std::sort( _outResults.begin(), _outResults.end(), RaycastResult::Sort );
+            std::sort( _outResults.begin(), _outResults.end(), SRaycast::Result::Sort );
         }
     };
 
@@ -103,7 +112,7 @@ namespace fan
     // helper function for raycasting
     //==================================================================================================================================================================================================
     template< typename... _IncludeTypes >
-    static void Raycast( EcsWorld& _world, const Ray& _ray, std::vector<RaycastResult>& _outResults, const EcsSignature _exclude = EcsSignature( 0 ) )
+    static void Raycast( EcsWorld& _world, const Ray& _ray, std::vector<SRaycast::Result>& _outResults, const EcsSignature _exclude = EcsSignature( 0 ) )
     {
         const EcsSignature includeSignature = SRaycast::GetSignature( _world ) | impl::AccumulateSignature<_IncludeTypes...>::Get( _world );
         EcsView            view             = _world.Match( includeSignature, _exclude );

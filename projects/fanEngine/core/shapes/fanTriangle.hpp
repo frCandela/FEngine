@@ -1,6 +1,7 @@
 #pragma once
 
 #include "core/math/fanVector3.hpp"
+#include "core/shapes/fanRay.hpp"
 
 namespace fan
 {
@@ -16,7 +17,7 @@ namespace fan
         Vector3 GetCenter() const;
         Vector3 GetNormal() const;
 
-        bool RayCast( const Vector3 _origin, const Vector3 _dir, Vector3& _outIntersection ) const;
+        bool RayCast( const Ray _ray, RaycastResult& _outResult ) const;
 
         Vector3 mV0;
         Vector3 mV1;

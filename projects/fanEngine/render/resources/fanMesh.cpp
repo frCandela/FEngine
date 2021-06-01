@@ -157,24 +157,23 @@ namespace fan
     //==================================================================================================================================================================================================
     // Raycast on all triangles of the mesh
     //==================================================================================================================================================================================================
-    bool SubMesh::RayCast( const Vector3 _origin, const Vector3 _direction, Vector3& _outIntersection ) const
+    bool SubMesh::RayCast( const Ray _ray, RaycastResult& _outResult ) const
     {
-        Vector3  intersection;
-        Fixed    closestDistance = Fixed::sMaxValue;
-        for( int triIndex        = 0; triIndex < (int)mIndices.size() / 3; triIndex++ )
+        RaycastResult result;
+        Fixed         closestDistance = Fixed::sMaxValue;
+        for( int      triIndex        = 0; triIndex < (int)mIndices.size() / 3; triIndex++ )
         {
             const Vector3  v0 = Vector3( mVertices[mIndices[3 * triIndex + 0]].mPos );
             const Vector3  v1 = Vector3( mVertices[mIndices[3 * triIndex + 1]].mPos );
             const Vector3  v2 = Vector3( mVertices[mIndices[3 * triIndex + 2]].mPos );
             const Triangle triangle( v0, v1, v2 );
 
-            if( triangle.RayCast( _origin, _direction, intersection ) )
+            if( triangle.RayCast( _ray, result ) )
             {
-                Fixed distance = Vector3::Distance( intersection, _origin );
-                if( distance < closestDistance )
+                if( result.mDistance < closestDistance )
                 {
-                    closestDistance  = distance;
-                    _outIntersection = intersection;
+                    closestDistance = result.mDistance;
+                    _outResult      = result;
                 }
             }
         }
@@ -183,11 +182,11 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    bool Mesh::RayCast( const Vector3 _origin, const Vector3 _direction, Vector3& _outIntersection ) const
+    bool Mesh::RayCast( const Ray _ray, RaycastResult& _outResult ) const
     {
         for( const SubMesh& subMesh : mSubMeshes )
         {
-            if( subMesh.RayCast( _origin, _direction, _outIntersection ) )
+            if( subMesh.RayCast( _ray, _outResult ) )
             {
                 return true;
             }

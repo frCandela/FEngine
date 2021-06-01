@@ -23,19 +23,18 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    bool Cube::RayCast( const Vector3 _origin, const Vector3 _direction, Vector3& _outIntersection ) const
+    bool Cube::RayCast( const Ray _ray, RaycastResult& _outResult ) const
     {
-        Vector3 intersection;
+        RaycastResult result;
         Fixed   closestDistance = Fixed::sMaxValue;
         for( const Triangle& triangle : mTriangles )
         {
-            if( triangle.RayCast( _origin, _direction, intersection ) )
+            if( triangle.RayCast( _ray, result ) )
             {
-                Fixed distance = Vector3::Distance( intersection, _origin );
-                if( distance < closestDistance )
+                if( result.mDistance < closestDistance )
                 {
-                    closestDistance  = distance;
-                    _outIntersection = intersection;
+                    closestDistance  = result.mDistance;
+                    _outResult = result;
                 }
             }
         }
