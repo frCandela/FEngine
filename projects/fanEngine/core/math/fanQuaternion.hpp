@@ -30,6 +30,8 @@ namespace fan
         Vector3 Axis() const { return mAxis.Normalized(); }
         Vector3 Euler() const;
 
+        static Fixed AngleBetween( const Quaternion& _q0, const Quaternion& _q1 );
+        static Quaternion Slerp( const Quaternion& _q0, const Quaternion& _q1, const Fixed _lerp );
         static Quaternion AngleAxis( const Fixed _degrees, const Vector3& _axis );
         static Quaternion AngleAxisRadians( const Fixed _radians, const Vector3& _axis );
         static Quaternion Euler( const Vector3& _degrees );

@@ -240,6 +240,10 @@ namespace fan
         Quaternion q;
         q.mAngle = Fixed::Sqrt( 1 + e11 + e22 + e33 ) / 2;
         Fixed w4 = ( 4 * q.mAngle );
+        if( Fixed::IsFuzzyZero(w4))
+        {
+            return Quaternion::sIdentity;
+        }
         q.mAxis.x = ( e32 - e23 ) / w4;
         q.mAxis.y = ( e13 - e31 ) / w4;
         q.mAxis.z = ( e21 - e12 ) / w4;
