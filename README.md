@@ -1,5 +1,5 @@
 # Dark Reign 3
-This is my attempt at remaking one of my favourite games Dark Reign 2.
+This is my custom game engine written with C++ and Vulkan. I am remaking Dark Reign 2 with it from the original assets. 
 
 ## Target Features
 * online multiplayer mode
