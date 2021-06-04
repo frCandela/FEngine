@@ -48,38 +48,58 @@ namespace fan
                 Transform   & transform = *transformIt;
                 TerrainAgent& agent     = *terrainAgentIt;
 
+                if( agent.mState == TerrainAgent::State::Move )
                 {
+
+                    // raycast on the terrain and place the agent on it
                     Ray ray( transform.mPosition + 4 * Vector3::sUp, Vector3::sDown );
                     Raycast<TagTerrain>( _world, ray, results );
                     if( !results.empty() )
                     {
-                        agent.mTerrainNormal = ( FIXED( 0.7 ) * agent.mTerrainNormal + FIXED( 0.3 ) * results[0].mData.mNormal ).Normalized();
-                        transform.mPosition = results[0].mData.mPosition + Vector3( 0, agent.mHeightOffset, 0 );
+                        agent.mTerrainNormal = results[0].mData.mNormal;
+                        transform.mPosition  = results[0].mData.mPosition + Vector3( 0, agent.mHeightOffset, 0 );
                     }
-                }
 
-                const Vector3 moveDirection = ( agent.mDestination - transform.mPosition ).Normalized();
-                Vector3       forward       = transform.Forward();
-                if( agent.mState == TerrainAgent::State::Move )
-                {
-                    const Vector3 up            = agent.mTerrainNormal;
-                    const Vector3 targetForward = ( moveDirection - Vector3::Dot( moveDirection, up ) * up ).Normalized();
-                    const Fixed   angle         = Vector3::SignedAngle( forward, targetForward, up );
-                    if( Fixed::Abs( angle ) > 10 )
+
+                    // slowly rotates the transform up vector towards the terrain normal
+                    Vector3 up          = transform.Up();
+                    Fixed   angleNormal = Vector3::Angle( up, agent.mTerrainNormal );
+                    if( angleNormal > 3 )
                     {
-                        const Fixed angleDelta = Fixed::Sign( angle ) * agent.mRotationSpeed * _delta;
+                        const Vector3 axis       = Vector3::Cross( up, agent.mTerrainNormal );
+                        const Fixed   angleDelta = 90 * _delta;
+                        up = Quaternion::AngleAxis( angleDelta, axis ) * up;
+                        up.Normalize();
+                    }
+
+                    const Vector3 moveDirection = ( agent.mDestination - transform.mPosition ).Normalized();
+
+                    // slowly rotates the forwards vector toward the target position
+                    Vector3       forward       = transform.Forward();
+                    const Vector3 targetForward = ( moveDirection - Vector3::Dot( moveDirection, up ) * up ).Normalized();
+                    const Fixed   forwardAngle  = Vector3::SignedAngle( forward, targetForward, up );
+                    if( Fixed::Abs( forwardAngle ) > 5 )
+                    {
+                        const Fixed angleDelta = Fixed::Sign( forwardAngle ) * agent.mRotationSpeed * _delta;
                         forward = Quaternion::AngleAxis( angleDelta, up ) * forward;
                     }
 
-                    // align to terrain
+                    // apply new orientation
                     const Vector3 left       = Vector3::Cross( up, forward );
                     const Vector3 newForward = Vector3::Cross( left, up );
-
                     transform.mRotation = Matrix3( left, up, newForward ).ToQuaternion().Normalized();
-                    transform.mPosition += _delta * moveDirection * agent.mMoveSpeed;
+                    if( Fixed::Abs( forwardAngle ) < 30 )
+                    {
+                        transform.mPosition += _delta * moveDirection * agent.mMoveSpeed;
+                    }
 
-                    if( Vector3::SqrDistance( transform.mPosition, agent.mDestination ) < 1 ){ agent.mState = TerrainAgent::State::Stay; }
+                    // stops when reaching the target
+                    if( Vector3::SqrDistance( transform.mPosition, agent.mDestination ) < 1 )
+                    {
+                        agent.mState = TerrainAgent::State::Stay;
+                    }
                 }
+
                 SceneNode& sceneNode = *sceneNodeIt;
                 sceneNode.AddFlag( SceneNode::BoundsOutdated );
             }

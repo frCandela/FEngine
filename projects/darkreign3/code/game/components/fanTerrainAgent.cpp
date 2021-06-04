@@ -20,7 +20,7 @@ namespace fan
         agent.mHeightOffset = 0;
         agent.mDestination = Vector3::sZero;
         agent.mMoveSpeed   = 10;
-        agent.mRotationSpeed = 360;
+        agent.mRotationSpeed = 180;
         agent.mState       = State::Stay;
         agent.mTerrainNormal = Vector3::sUp;
     }
