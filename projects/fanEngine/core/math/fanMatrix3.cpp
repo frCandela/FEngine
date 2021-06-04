@@ -203,50 +203,84 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    Fixed Matrix3::operator()( const int _x, const int _y) const
+    Fixed Matrix3::operator()( const int _x, const int _y ) const
     {
         switch( _x )
         {
             case 0:
                 switch( _y )
                 {
-                    case 0: return e11;
-                    case 1: return e12;
-                    case 2: return e13;
+                    case 0:
+                        return e11;
+                    case 1:
+                        return e12;
+                    case 2:
+                        return e13;
                 }
             case 1:
                 switch( _y )
                 {
-                    case 0: return e21;
-                    case 1: return e22;
-                    case 2: return e23;
+                    case 0:
+                        return e21;
+                    case 1:
+                        return e22;
+                    case 2:
+                        return e23;
                 }
             case 2:
                 switch( _y )
                 {
-                    case 0: return e31;
-                    case 1: return e32;
-                    case 2: return e33;
+                    case 0:
+                        return e31;
+                    case 1:
+                        return e32;
+                    case 2:
+                        return e33;
                 }
         }
-        fanAssert(false);
+        fanAssert( false );
         return 0;
     }
 
     //==================================================================================================================================================================================================
+    // Converts this matrix to a quaternion. The input matrix must represents a pure rotation
     //==================================================================================================================================================================================================
     Quaternion Matrix3::ToQuaternion() const
     {
-        Quaternion q;
-        q.mAngle = Fixed::Sqrt( 1 + e11 + e22 + e33 ) / 2;
-        Fixed w4 = ( 4 * q.mAngle );
-        if( Fixed::IsFuzzyZero(w4))
+        Quaternion  q;
+        const Fixed trace = e11 + e22 + e33;
+        if( trace > 0 )
         {
-            return Quaternion::sIdentity;
+            Fixed S = Fixed::Sqrt( trace + 1 ) * 2; // S=4*qw
+            q.mAngle  = FIXED( 0.25 ) * S;
+            q.mAxis.x = ( e32 - e23 ) / S;
+            q.mAxis.y = ( e13 - e31 ) / S;
+            q.mAxis.z = ( e21 - e12 ) / S;
         }
-        q.mAxis.x = ( e32 - e23 ) / w4;
-        q.mAxis.y = ( e13 - e31 ) / w4;
-        q.mAxis.z = ( e21 - e12 ) / w4;
+        else if( ( e11 > e22 ) && ( e11 > e33 ) )    // If the trace of the matrix is less than or equal to zero then identify which major diagonal element has the greatest value.
+        {
+            Fixed S = Fixed::Sqrt( 1 + e11 - e22 - e33 ) * 2; // S=4*qx
+            q.mAngle  = ( e32 - e23 ) / S;
+            q.mAxis.x = FIXED( 0.25 ) * S;
+            q.mAxis.y = ( e12 + e21 ) / S;
+            q.mAxis.z = ( e13 + e31 ) / S;
+        }
+        else if( e22 > e33 )
+        {
+            Fixed S = Fixed::Sqrt( 1 + e22 - e11 - e33 ) * 2; // S=4*qy
+            q.mAngle  = ( e13 - e31 ) / S;
+            q.mAxis.x = ( e12 + e21 ) / S;
+            q.mAxis.y = FIXED( 0.25 ) * S;
+            q.mAxis.z = ( e23 + e32 ) / S;
+        }
+        else
+        {
+            Fixed S = Fixed::Sqrt( 1 + e33 - e11 - e22 ) * 2; // S=4*qz
+            q.mAngle  = ( e21 - e12 ) / S;
+            q.mAxis.x = ( e13 + e31 ) / S;
+            q.mAxis.y = ( e23 + e32 ) / S;
+            q.mAxis.z = FIXED( 0.25 ) * S;
+        }
         return q;
     }
 

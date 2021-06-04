@@ -59,7 +59,7 @@ namespace fan
                 const Transform& transform = *transformIt;
                 const Sphere   & sphere    = meshRenderer.mMesh->mBoundingSphere;
 
-                rd.DrawSphere( transform.mPosition + sphere.mCenter, sphere.mRadius, Color::sOrange );
+                rd.DrawSphere( transform * sphere.mCenter, sphere.mRadius, Color::sOrange );
             }
         }
     };

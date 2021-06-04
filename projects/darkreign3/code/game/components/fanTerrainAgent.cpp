@@ -18,6 +18,11 @@ namespace fan
     {
         TerrainAgent& agent = static_cast<TerrainAgent&>( _component );
         agent.mHeightOffset = 0;
+        agent.mDestination = Vector3::sZero;
+        agent.mMoveSpeed   = 10;
+        agent.mRotationSpeed = 360;
+        agent.mState       = State::Stay;
+        agent.mTerrainNormal = Vector3::sUp;
     }
 
     //==================================================================================================================================================================================================
@@ -26,6 +31,8 @@ namespace fan
     {
         const TerrainAgent& agent = static_cast<const TerrainAgent&>( _component );
         Serializable::SaveFixed( _json, "height_offset", agent.mHeightOffset );
+        Serializable::SaveFixed( _json, "move_speed", agent.mMoveSpeed );
+        Serializable::SaveFixed( _json, "rotation_speed", agent.mRotationSpeed );
     }
 
     //==================================================================================================================================================================================================
@@ -34,5 +41,7 @@ namespace fan
     {
         TerrainAgent& agent = static_cast<TerrainAgent&>( _component );
         Serializable::LoadFixed( _json, "height_offset", agent.mHeightOffset );
+        Serializable::LoadFixed( _json, "move_speed", agent.mMoveSpeed );
+        Serializable::LoadFixed( _json, "rotation_speed", agent.mRotationSpeed );
     }
 }

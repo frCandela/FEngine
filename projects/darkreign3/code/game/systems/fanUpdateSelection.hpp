@@ -63,10 +63,10 @@ namespace fan
                 uiTransform.mPosition = { 100000, 100000 };
             }
 
+            // move used frames on top of units
             EcsEntity cameraEntity = _world.GetEntity( scene.mMainCameraHandle );
             Camera   & camera          = _world.GetComponent<Camera>( cameraEntity );
             Transform& cameraTransform = _world.GetComponent<Transform>( cameraEntity );
-
             int  frameIndex     = 0;
             auto transformIt    = _view.begin<Transform>();
             auto meshRendererIt = _view.begin<MeshRenderer>();
@@ -77,8 +77,8 @@ namespace fan
                 const Fixed   radius = meshRenderer.mMesh != nullptr ? meshRenderer.mMesh->mBoundingSphere.mRadius : 1;
                 const Vector3 offset = meshRenderer.mMesh != nullptr ? meshRenderer.mMesh->mBoundingSphere.mCenter : Vector3::sZero;
 
-                const glm::vec2 screenPos    = renderWorld.mTargetSize * camera.WorldPosToScreen( cameraTransform, transform.mPosition + offset );
-                const glm::vec2 screenPosTop = renderWorld.mTargetSize * camera.WorldPosToScreen( cameraTransform, transform.mPosition + offset + radius * cameraTransform.Right() );
+                const glm::vec2 screenPos    = renderWorld.mTargetSize * camera.WorldPosToScreen( cameraTransform, transform * offset );
+                const glm::vec2 screenPosTop = renderWorld.mTargetSize * camera.WorldPosToScreen( cameraTransform, transform *  offset + ( radius * cameraTransform.Right() ) );
                 const float     size         = screenPosTop.x - screenPos.x;
 
                 UITransform& uiTransform = _world.GetComponent<UITransform>( _world.GetEntity( selection.mSelectionFrames[frameIndex] ) );

@@ -10,6 +10,7 @@
 #include "engine/fanEngineTags.hpp"
 #include "game/components/fanUnit.hpp"
 #include "game/systems/fanUpdateSelection.hpp"
+#include "game/systems/fanUpdateAgents.hpp"
 
 namespace fan
 {
@@ -102,6 +103,7 @@ namespace fan
         }
         else if( mouse.mPressed[Mouse::buttonRight] )
         {
+            // move unit command
             if( selectionStatus.mNumSelected > 0 )
             {
                 results.clear();
@@ -112,12 +114,14 @@ namespace fan
                     const Selection& _selection = _world.GetSingleton<Selection>();
                     SceneNode      * node       = _selection.mMoveToFxPrefab->Instantiate( scene.GetRootNode() );
                     Transform      & transform  = _world.GetComponent<Transform>( _world.GetEntity( node->mHandle ) );
-                    transform.mPosition = mousePosRay.origin + results[0].mData.mDistance * mousePosRay.direction - 2 * mousePosRay.direction;
+                    transform.mPosition = results[0].mData.mPosition - 2 * mousePosRay.direction;
 
                     const Vector3 up = results[0].mData.mNormal.Normalized();
                     const Vector3 left = Vector3::Cross( up, transform.Forward() );
                     const Vector3 forward = Vector3::Cross( left, up );
                     transform.mRotation = Matrix3(left, up, forward).ToQuaternion();
+
+                    _world.Run<SSetSelectedAgentsDestination>(results[0].mData.mPosition);
                 }
             }
         }
