@@ -5,11 +5,11 @@
 #include "fanDisableWarnings.hpp"
 #include "fanGlm.hpp"
 #include "core/fanColor.hpp"
+#include "render/fanRenderGlobal.hpp"
 
 namespace fan
 {
     //==================================================================================================================================================================================================
-    // vulkan vertex definitions
     //==================================================================================================================================================================================================
     struct Vertex
     {
@@ -25,7 +25,35 @@ namespace fan
         {
             return mPos == _other.mPos &&
                    mNormal == _other.mNormal &&
-                   mColor == _other.mColor && mUv == _other.mUv;
+                   mColor == _other.mColor &&
+                   mUv == _other.mUv;
+        }
+    };
+
+    //==================================================================================================================================================================================================
+    // vulkan vertex definitions
+    //==================================================================================================================================================================================================
+    struct VertexSkinned
+    {
+        glm::vec3  mPos;
+        glm::vec3  mNormal;
+        glm::vec3  mColor;
+        glm::vec2  mUv;
+        glm::ivec4 mBoneIDs;
+        glm::vec4  mBoneWeights;
+        static_assert( RenderGlobal::sMaxBonesInfluences == 4 );
+
+        static std::vector<VkVertexInputBindingDescription> GetBindingDescription();
+        static std::vector<VkVertexInputAttributeDescription> GetAttributeDescriptions();
+
+        bool operator==( const VertexSkinned& _other ) const
+        {
+            return mPos == _other.mPos &&
+                   mNormal == _other.mNormal &&
+                   mColor == _other.mColor &&
+                   mUv == _other.mUv &&
+                   mBoneIDs == _other.mBoneIDs &&
+                   mBoneWeights == _other.mBoneWeights;
         }
     };
 
@@ -89,10 +117,26 @@ namespace std
     {
         size_t operator()( fan::Vertex const& vertex ) const
         {
-            return ( ( hash<glm::vec3>()( vertex.mPos ) ^
-                       ( hash<glm::vec3>()( vertex.mNormal ) << 1 ) ) >> 1 ) ^
-                   ( hash<glm::vec2>()( vertex.mColor ) << 1 ) ^
-                   ( hash<glm::vec2>()( vertex.mUv ) << 1 );
+            return
+                    ( ( (
+                    ( hash<glm::vec3>()( vertex.mPos ) ^
+                    ( hash<glm::vec3>()( vertex.mNormal ) << 1 ) ) >> 1 ) ^
+                    ( hash<glm::vec2>()( vertex.mColor  ) << 1 ) ) >> 1 ) ^
+                    ( hash<glm::vec2>()( vertex.mUv     ) << 1 );
+        }
+    };
+
+    template<> struct hash<fan::VertexSkinned>
+    {
+        size_t operator()( fan::VertexSkinned const& vertex ) const
+        {
+            return ( ( ( ( ( ( (
+                   ( hash<glm::vec3>()( vertex.mPos ) ^
+                   ( hash<glm::vec3>()( vertex.mNormal      ) << 1 ) ) >> 1 ) ^
+                   ( hash<glm::vec2>()( vertex.mColor       ) << 1 ) ) >> 1 ) ^
+                   ( hash<glm::vec2>()( vertex.mUv          ) << 1 ) ) >> 1 ) ^
+                   ( hash<glm::vec2>()( vertex.mBoneIDs     ) << 1 ) ) >> 1 ) ^
+                   ( hash<glm::vec2>()( vertex.mBoneWeights ) << 1 );
         }
     };
 }

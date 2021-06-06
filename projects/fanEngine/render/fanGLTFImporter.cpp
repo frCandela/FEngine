@@ -3,12 +3,14 @@
 #include "core/fanDebug.hpp"
 #include "render/fanGLTFImporter.hpp"
 #include "render/resources/fanMesh.hpp"
+#include "render/resources/fanMeshSkinned.hpp"
 #include "render/fanGLTF.hpp"
 
 namespace fan
 {
     //==================================================================================================================================================================================================
     // Parse and load the gltf into a json
+    // Preprocess buffers into an easy to read state
     //==================================================================================================================================================================================================
     bool GLTFImporter::Load( const std::string& _path )
     {
@@ -33,16 +35,6 @@ namespace fan
         mPath = _path;
         inFile.close();
 
-        return true;
-    }
-
-    //==================================================================================================================================================================================================
-    // Converts gltf into a usable mesh
-    // For a gltf file we only load the first mesh and the first primitive.
-    // All other features are not supported yet
-    //==================================================================================================================================================================================================
-    bool GLTFImporter::GetMesh( Mesh& _mesh )
-    {
         // Get main json lists
         const Json& jMeshes      = mJson["meshes"];
         const Json& jAccessors   = mJson["accessors"];
@@ -58,17 +50,14 @@ namespace fan
             return false;
         }
 
-
         // Loads the first mesh json
         GLTFMesh mesh;
         mesh.Load( jMeshes[0] );
 
-        fanAssert( _mesh.mSubMeshes.empty() );
-        _mesh.mSubMeshes.resize( mesh.mPrimitives.size() );
+        mSubmeshes.resize( mesh.mPrimitives.size() );
         for( int primitiveIndex = 0; primitiveIndex < mesh.mPrimitives.size(); ++primitiveIndex )
         {
-            std::vector<uint32_t>& meshIndices  = _mesh.mSubMeshes[primitiveIndex].mIndices;
-            std::vector<Vertex>  & meshVertices = _mesh.mSubMeshes[primitiveIndex].mVertices;
+            GLTFSubmeshData& submesh = mSubmeshes[primitiveIndex];
 
             // Loads indices
             {
@@ -83,13 +72,9 @@ namespace fan
                 {
                     m_loadedBuffers[viewIndices.mBuffer] = GLTFBuffer::DecodeBuffer( jBuffers[viewIndices.mBuffer]["uri"] );
                 }
-                const std::string buffer = bufferIndices.GetBuffer( viewIndices, m_loadedBuffers[viewIndices.mBuffer] );
-                const unsigned short* indicesArray = (const unsigned short*)buffer.data();
-                meshIndices.resize( accessorIndices.mCount );
-                for( int i = 0; i < (int)meshIndices.size(); ++i )
-                {
-                    meshIndices[i] = indicesArray[i];
-                }
+                submesh.indexBuffer  = bufferIndices.GetBuffer( viewIndices, m_loadedBuffers[viewIndices.mBuffer] );
+                submesh.indicesArray = (unsigned short*)submesh.indexBuffer.data();
+                submesh.indicesCount = accessorIndices.mCount;
             }
 
             // Load positions
@@ -105,13 +90,9 @@ namespace fan
                 {
                     m_loadedBuffers[viewPositions.mBuffer] = GLTFBuffer::DecodeBuffer( jBuffers[viewPositions.mBuffer]["uri"] );
                 }
-                const std::string buffer = bufferPositions.GetBuffer( viewPositions, m_loadedBuffers[viewPositions.mBuffer] );
-                const glm::vec3* positionsArray = (const glm::vec3*)buffer.data();
-                meshVertices.resize( accessorPositions.mCount );
-                for( int i = 0; i < (int)meshVertices.size(); i++ )
-                {
-                    meshVertices[i].mPos = positionsArray[i];
-                }
+                submesh.posBuffer      = bufferPositions.GetBuffer( viewPositions, m_loadedBuffers[viewPositions.mBuffer] );
+                submesh.positionsArray = (glm::vec3*)submesh.posBuffer.data();
+                submesh.verticesCount  = accessorPositions.mCount;
             }
 
             // Load normals
@@ -123,25 +104,14 @@ namespace fan
                 viewNormals.Load( jBufferViews[accessorNormals.mBufferView] );
                 GLTFBuffer bufferNormals;
                 bufferNormals.Load( jBuffers[viewNormals.mBuffer] );
-                fanAssert( accessorNormals.mComponentType == Float );
+                fanAssert( accessorNormals.mComponentType == GLTFComponentType::Float );
                 if( m_loadedBuffers[viewNormals.mBuffer].empty() )
                 {
                     m_loadedBuffers[viewNormals.mBuffer] = GLTFBuffer::DecodeBuffer( jBuffers[viewNormals.mBuffer]["uri"] );
                 }
-                const std::string buffer = bufferNormals.GetBuffer( viewNormals, m_loadedBuffers[viewNormals.mBuffer] );
-                const glm::vec3* normalsArray = (const glm::vec3*)buffer.data();
-                fanAssert( (int)meshVertices.size() == accessorNormals.mCount );
-                for( int i = 0; i < (int)meshVertices.size(); i++ )
-                {
-                    meshVertices[i].mNormal = normalsArray[i];
-                }
-            }
-            else
-            {
-                for( int i = 0; i < (int)meshVertices.size(); i++ )
-                {
-                    meshVertices[i].mNormal = glm::vec3( 0, 0, 1 );
-                }
+                submesh.normalsBuffer = bufferNormals.GetBuffer( viewNormals, m_loadedBuffers[viewNormals.mBuffer] );
+                submesh.normalsArray  = (glm::vec3*)submesh.normalsBuffer.data();
+                fanAssert( submesh.verticesCount == accessorNormals.mCount );
             }
 
             // load textcoords 0
@@ -158,29 +128,75 @@ namespace fan
                 {
                     m_loadedBuffers[viewTexcoords0.mBuffer] = GLTFBuffer::DecodeBuffer( jBuffers[viewTexcoords0.mBuffer]["uri"] );
                 }
-                const std::string buffer = bufferTexcoord0.GetBuffer( viewTexcoords0, m_loadedBuffers[viewTexcoords0.mBuffer] );
-                const glm::vec2* texcoords0Array = (const glm::vec2*)buffer.data();
-                fanAssert( (int)meshVertices.size() == accessorTexcoords0.mCount );
-                for( int i = 0; i < (int)meshVertices.size(); i++ )
-                {
-                    meshVertices[i].mUv = texcoords0Array[i];
-                }
-            }
-            else
-            {
-                for( int i = 0; i < (int)meshVertices.size(); i++ )
-                {
-                    meshVertices[i].mUv = glm::vec2( 0, 0 );
-                }
-            }
-
-            // load colors
-            for( int i = 0; i < (int)meshVertices.size(); i++ )
-            {
-                meshVertices[i].mColor = glm::vec3( 1, 1, 1 );
+                submesh.texcoords0Buffer = bufferTexcoord0.GetBuffer( viewTexcoords0, m_loadedBuffers[viewTexcoords0.mBuffer] );
+                submesh.texcoords0Array  = (glm::vec2*)submesh.texcoords0Buffer.data();
+                fanAssert( submesh.verticesCount == accessorTexcoords0.mCount );
             }
         }
-
         return true;
+    }
+
+    //==================================================================================================================================================================================================
+    // Set _mesh with the previously imported data
+    //==================================================================================================================================================================================================
+    void GLTFImporter::GetMesh( Mesh& _mesh )
+    {
+        fanAssert( _mesh.mSubMeshes.empty() );
+        _mesh.mSubMeshes.resize( mSubmeshes.size() );
+
+        for( int primitiveIndex = 0; primitiveIndex < mSubmeshes.size(); ++primitiveIndex )
+        {
+            const GLTFSubmeshData& submesh     = mSubmeshes[primitiveIndex];
+            std::vector<uint32_t>& meshIndices = _mesh.mSubMeshes[primitiveIndex].mIndices;
+            meshIndices.resize( submesh.indicesCount );
+            std::vector<Vertex>& meshVertices = _mesh.mSubMeshes[primitiveIndex].mVertices;
+            meshVertices.resize( submesh.verticesCount );
+
+            // set indices
+            for( int i = 0; i < (int)meshIndices.size(); ++i )
+            {
+                meshIndices[i] = submesh.indicesArray[i];
+            }
+
+            for( int i = 0; i < (int)meshVertices.size(); i++ )
+            {
+                meshVertices[i].mPos    = submesh.positionsArray[i];
+                meshVertices[i].mNormal = submesh.normalsArray != nullptr ? submesh.normalsArray[i] : glm::vec3( 0, 0, 1 );
+                meshVertices[i].mColor  = Color::sWhite.ToGLM3();
+                meshVertices[i].mUv     = submesh.texcoords0Array != nullptr ? submesh.texcoords0Array[i] : glm::vec2( 0, 0 );
+            }
+        }
+    }
+
+    //==================================================================================================================================================================================================
+    // Set _mesh with the previously imported data
+    //==================================================================================================================================================================================================
+    void GLTFImporter::GetMesh( MeshSkinned& _mesh )
+    {
+        fanAssert( _mesh.mSubMeshes.empty() );
+        _mesh.mSubMeshes.resize( mSubmeshes.size() );
+
+        for( int primitiveIndex = 0; primitiveIndex < mSubmeshes.size(); ++primitiveIndex )
+        {
+            const GLTFSubmeshData& submesh     = mSubmeshes[primitiveIndex];
+            std::vector<uint32_t>& meshIndices = _mesh.mSubMeshes[primitiveIndex].mIndices;
+            meshIndices.resize( submesh.indicesCount );
+            std::vector<VertexSkinned>& meshVertices = _mesh.mSubMeshes[primitiveIndex].mVertices;
+            meshVertices.resize( submesh.verticesCount );
+
+            // set indices
+            for( int i = 0; i < (int)meshIndices.size(); ++i )
+            {
+                meshIndices[i] = submesh.indicesArray[i];
+            }
+
+            for( int i = 0; i < (int)meshVertices.size(); i++ )
+            {
+                meshVertices[i].mPos    = submesh.positionsArray[i];
+                meshVertices[i].mNormal = submesh.normalsArray != nullptr ? submesh.normalsArray[i] : glm::vec3( 0, 0, 1 );
+                meshVertices[i].mColor  = Color::sWhite.ToGLM3();
+                meshVertices[i].mUv     = submesh.texcoords0Array != nullptr ? submesh.texcoords0Array[i] : glm::vec2( 0, 0 );
+            }
+        }
     }
 }

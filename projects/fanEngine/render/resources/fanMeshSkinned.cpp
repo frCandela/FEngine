@@ -1,4 +1,4 @@
-#include "fanMesh.hpp"
+#include "render/resources/fanMeshSkinned.hpp"
 #include "core/fanPath.hpp"
 #include "render/fanGLTFImporter.hpp"
 #include "render/core/fanDevice.hpp"
@@ -10,7 +10,7 @@ namespace fan
 {
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    bool Mesh::LoadFromFile( const std::string& _path )
+    bool MeshSkinned::LoadFromFile( const std::string& _path )
     {
         if( _path.empty() )
         {
@@ -22,7 +22,7 @@ namespace fan
         if( importer.Load( Path::Normalize( _path ) ) )
         {
             importer.GetMesh( *this );
-            for( SubMesh& subMesh : mSubMeshes )
+            for( SubMeshSkinned& subMesh : mSubMeshes )
             {
                 subMesh.OptimizeVertices();
             }
@@ -38,7 +38,7 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    bool SubMesh::LoadFromVertices()
+    bool SubMeshSkinned::LoadFromVertices()
     {
         // Generate fake indices
         mIndices.clear();
@@ -57,20 +57,20 @@ namespace fan
     //==================================================================================================================================================================================================
     // Removes duplicates vertices & generates a corresponding index buffer
     //==================================================================================================================================================================================================
-    void SubMesh::OptimizeVertices()
+    void SubMeshSkinned::OptimizeVertices()
     {
 
         if( !mOptimizeVertices ){ return; }
 
-        std::unordered_map<Vertex, uint32_t> verticesMap = {};
+        std::unordered_map<VertexSkinned, uint32_t> verticesMap = {};
 
-        std::vector<Vertex>   uniqueVertices;
-        std::vector<uint32_t> uniqueIndices;
+        std::vector<VertexSkinned> uniqueVertices;
+        std::vector<uint32_t>      uniqueIndices;
 
         for( int indexIndex = 0; indexIndex < (int)mIndices.size(); indexIndex++ )
         {
-            Vertex vertex = mVertices[mIndices[indexIndex]];
-            auto   it     = verticesMap.find( vertex );
+            VertexSkinned vertex = mVertices[mIndices[indexIndex]];
+            auto          it     = verticesMap.find( vertex );
             if( it == verticesMap.end() )
             {
                 verticesMap[vertex] = static_cast< uint32_t >( uniqueVertices.size() );
@@ -88,9 +88,9 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    bool Mesh::Empty() const
+    bool MeshSkinned::Empty() const
     {
-        for( SubMesh subMesh : mSubMeshes )
+        for( SubMeshSkinned subMesh : mSubMeshes )
         {
             if( !subMesh.mIndices.empty() )
             {
@@ -102,10 +102,10 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    int Mesh::CountVertices() const
+    int MeshSkinned::CountVertices() const
     {
         int numVertices = 0;
-        for( const SubMesh& subMesh : mSubMeshes )
+        for( const SubMeshSkinned& subMesh : mSubMeshes )
         {
             numVertices += (int)subMesh.mVertices.size();
         }
@@ -115,18 +115,18 @@ namespace fan
     //==================================================================================================================================================================================================
     // Creates a convex hull from the mesh geometry
     //==================================================================================================================================================================================================
-    void Mesh::GenerateBoundingVolumes()
+    void MeshSkinned::GenerateBoundingVolumes()
     {
         if( !mAutoGenerateBoundingVolumes ){ return; }
 
         // Generate points clouds from vertex list
         std::vector<Vector3> pointCloud;
         pointCloud.reserve( CountVertices() );
-        for( SubMesh& subMesh : mSubMeshes )
+        for( SubMeshSkinned& subMesh : mSubMeshes )
         {
             for( int point = 0; point < (int)subMesh.mVertices.size(); point++ )
             {
-                Vertex& vertex = subMesh.mVertices[point];
+                VertexSkinned& vertex = subMesh.mVertices[point];
                 pointCloud.push_back( Vector3( vertex.mPos ) );
             }
         }
@@ -154,7 +154,7 @@ namespace fan
     //==================================================================================================================================================================================================
     // Raycast on all triangles of the mesh
     //==================================================================================================================================================================================================
-    bool SubMesh::RayCast( const Ray _ray, RaycastResult& _outResult ) const
+    bool SubMeshSkinned::RayCast( const Ray _ray, RaycastResult& _outResult ) const
     {
         RaycastResult result;
         Fixed         closestDistance = Fixed::sMaxValue;
@@ -179,9 +179,9 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    bool Mesh::RayCast( const Ray _ray, RaycastResult& _outResult ) const
+    bool MeshSkinned::RayCast( const Ray _ray, RaycastResult& _outResult ) const
     {
-        for( const SubMesh& subMesh : mSubMeshes )
+        for( const SubMeshSkinned& subMesh : mSubMeshes )
         {
             if( subMesh.RayCast( _ray, _outResult ) )
             {
@@ -193,88 +193,60 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void SubMesh::Destroy( Device& _device )
+    void SubMeshSkinned::Destroy( Device& _device )
     {
-        for( int i = 0; i < (int)SwapChain::sMaxFramesInFlight; i++ )
-        {
-            mIndexBuffer[i].Destroy( _device );
-            mVertexBuffer[i].Destroy( _device );
-        }
+        mIndexBuffer.Destroy( _device );
+        mVertexBuffer.Destroy( _device );
     }
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void SubMesh::Create( Device& _device )
+    void SubMeshSkinned::Create( Device& _device )
     {
         if( mIndices.empty() || mVertices.empty() ){ return; }
 
-        mCurrentBuffer = ( mCurrentBuffer + 1 ) % SwapChain::sMaxFramesInFlight;
+        const VkMemoryPropertyFlags memPropertyFlags = ( mHostVisible ? VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT : VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT );
 
-        const VkMemoryPropertyFlags memPropertyFlags = ( mHostVisible ?
-                VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT :
-                VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT );
-
-        Buffer& vertexBuffer = mVertexBuffer[mCurrentBuffer];
         const VkDeviceSize requiredVertexSize = sizeof( mVertices[0] ) * mVertices.size();
-        if( vertexBuffer.mBuffer == VK_NULL_HANDLE || vertexBuffer.mSize < requiredVertexSize )
+        if( mVertexBuffer.mBuffer == VK_NULL_HANDLE || mVertexBuffer.mSize < requiredVertexSize )
         {
-            vertexBuffer.Destroy( _device );
-            mVertexBuffer[mCurrentBuffer].Create(
-                    _device,
-                    requiredVertexSize,
-                    VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
-                    memPropertyFlags
-            );
-            _device.AddDebugName( (uint64_t)vertexBuffer.mBuffer, "mesh vertex buffer" );
-            _device.AddDebugName( (uint64_t)vertexBuffer.mMemory, "mesh vertex buffer" );
+            mVertexBuffer.Destroy( _device );
+            mVertexBuffer.Create( _device, requiredVertexSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, memPropertyFlags );
+            _device.AddDebugName( (uint64_t)mVertexBuffer.mBuffer, "skinnned mesh vertex buffer" );
+            _device.AddDebugName( (uint64_t)mVertexBuffer.mMemory, "skinnned mesh vertex buffer" );
         }
 
-        Buffer& indexBuffer = mIndexBuffer[mCurrentBuffer];
         const VkDeviceSize requiredIndexSize = sizeof( mIndices[0] ) * mIndices.size();
-        if( indexBuffer.mBuffer == VK_NULL_HANDLE || indexBuffer.mSize < requiredIndexSize )
+        if( mIndexBuffer.mBuffer == VK_NULL_HANDLE || mIndexBuffer.mSize < requiredIndexSize )
         {
-            indexBuffer.Destroy( _device );
-            indexBuffer.Create( _device,
-                                requiredIndexSize,
-                                VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
-                                memPropertyFlags
-            );
-            _device.AddDebugName( (uint64_t)indexBuffer.mBuffer, "mesh index buffer" );
-            _device.AddDebugName( (uint64_t)indexBuffer.mMemory, "mesh index buffer" );
+            mIndexBuffer.Destroy( _device );
+            mIndexBuffer.Create( _device, requiredIndexSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, memPropertyFlags );
+            _device.AddDebugName( (uint64_t)mIndexBuffer.mBuffer, "mesh index buffer" );
+            _device.AddDebugName( (uint64_t)mIndexBuffer.mMemory, "mesh index buffer" );
         }
 
         if( mHostVisible )
         {
-            indexBuffer.SetData( _device, mIndices.data(), requiredIndexSize );
-            vertexBuffer.SetData( _device, mVertices.data(), requiredVertexSize );
+            mIndexBuffer.SetData( _device, mIndices.data(), requiredIndexSize );
+            mVertexBuffer.SetData( _device, mVertices.data(), requiredVertexSize );
         }
         else
         {
             {
                 Buffer stagingBuffer;
-                stagingBuffer.Create(
-                        _device,
-                        requiredIndexSize,
-                        VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-                        VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
-                );
+                stagingBuffer.Create( _device, requiredIndexSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT );
                 stagingBuffer.SetData( _device, mIndices.data(), requiredIndexSize );
                 VkCommandBuffer cmd = _device.BeginSingleTimeCommands();
-                stagingBuffer.CopyBufferTo( cmd, indexBuffer.mBuffer, requiredIndexSize );
+                stagingBuffer.CopyBufferTo( cmd, mIndexBuffer.mBuffer, requiredIndexSize );
                 _device.EndSingleTimeCommands( cmd );
                 stagingBuffer.Destroy( _device );
             }
             {
                 Buffer stagingBuffer2;
-                stagingBuffer2.Create(
-                        _device,
-                        requiredVertexSize,
-                        VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-                        VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
-                );
+                stagingBuffer2.Create( _device, requiredVertexSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT );
                 stagingBuffer2.SetData( _device, mVertices.data(), requiredVertexSize );
                 VkCommandBuffer cmd2 = _device.BeginSingleTimeCommands();
-                stagingBuffer2.CopyBufferTo( cmd2, vertexBuffer.mBuffer, requiredVertexSize );
+                stagingBuffer2.CopyBufferTo( cmd2, mVertexBuffer.mBuffer, requiredVertexSize );
                 _device.EndSingleTimeCommands( cmd2 );
                 stagingBuffer2.Destroy( _device );
             }

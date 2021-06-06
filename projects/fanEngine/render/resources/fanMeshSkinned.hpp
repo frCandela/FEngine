@@ -14,14 +14,13 @@ namespace fan
 {
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    struct SubMesh
+    struct SubMeshSkinned
     {
-        std::vector<Vertex>   mVertices;
-        std::vector<uint32_t> mIndices;
-        Buffer                mIndexBuffer[SwapChain::sMaxFramesInFlight];
-        Buffer                mVertexBuffer[SwapChain::sMaxFramesInFlight];
+        std::vector<VertexSkinned> mVertices;
+        std::vector<uint32_t>      mIndices;
+        Buffer                mIndexBuffer;
+        Buffer                mVertexBuffer;
         bool                  mOptimizeVertices = true;
-        uint32_t              mCurrentBuffer    = 0;
         bool                  mHostVisible      = false;
 
         bool LoadFromVertices();
@@ -33,9 +32,9 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    struct Mesh : public Resource
+    struct MeshSkinned : public Resource
     {
-    FAN_RESOURCE( Mesh );
+    FAN_RESOURCE( MeshSkinned );
 
         bool RayCast( const Ray _ray, RaycastResult& _outResult ) const;
         bool LoadFromFile( const std::string& _path );
@@ -44,7 +43,7 @@ namespace fan
         bool Empty() const;
         int CountVertices() const;
 
-        std::vector<SubMesh> mSubMeshes;
+        std::vector<SubMeshSkinned> mSubMeshes;
 
         ConvexHull mConvexHull;
         Sphere     mBoundingSphere;

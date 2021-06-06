@@ -135,7 +135,7 @@ namespace fan
     }
 
     //==================================================================================================================================================================================================
-    // Extracts, decodes and returns a segment of buffer from a view
+    // Extracts and returns a segment of buffer from a view
     //==================================================================================================================================================================================================
     std::string GLTFBuffer::GetBuffer( const GLTFBufferView& _view, const std::string& _decodedBuffer ) const
     {

@@ -49,6 +49,64 @@ namespace fan
     }
 
     //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    std::vector<VkVertexInputBindingDescription> VertexSkinned::GetBindingDescription()
+    {
+        std::vector<VkVertexInputBindingDescription> bindingDescription( 1 );
+
+        bindingDescription[0].binding   = 0; // Index of the binding in the array
+        bindingDescription[0].stride    = sizeof( VertexSkinned );// Number of bytes from one entry to the next
+        bindingDescription[0].inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
+
+        return bindingDescription;
+    }
+
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    std::vector<VkVertexInputAttributeDescription> VertexSkinned::GetAttributeDescriptions()
+    {
+        std::vector<VkVertexInputAttributeDescription> attributeDescriptions( 6 );
+
+        // Position
+        attributeDescriptions[0].binding  = 0;  // Tells Vulkan from which binding the per-vertex data comes
+        attributeDescriptions[0].location = 0; // References the location of the input in the vertex shader
+        attributeDescriptions[0].format   = VK_FORMAT_R32G32B32_SFLOAT;    // type of data for the attribute
+        attributeDescriptions[0].offset   = offsetof( VertexSkinned, mPos );
+
+        // Normal
+        attributeDescriptions[1].binding  = 0;
+        attributeDescriptions[1].location = 1;
+        attributeDescriptions[1].format   = VK_FORMAT_R32G32B32_SFLOAT;
+        attributeDescriptions[1].offset   = offsetof( VertexSkinned, mNormal );
+
+        // Color
+        attributeDescriptions[2].binding  = 0;
+        attributeDescriptions[2].location = 2;
+        attributeDescriptions[2].format   = VK_FORMAT_R32G32B32_SFLOAT;
+        attributeDescriptions[2].offset   = offsetof( VertexSkinned, mColor );
+
+        // uvs
+        attributeDescriptions[3].binding  = 0;
+        attributeDescriptions[3].location = 3;
+        attributeDescriptions[3].format   = VK_FORMAT_R32G32_SFLOAT;
+        attributeDescriptions[3].offset   = offsetof( VertexSkinned, mUv );
+
+        // Bone IDs
+        attributeDescriptions[2].binding  = 0;
+        attributeDescriptions[2].location = 4;
+        attributeDescriptions[2].format   = VK_FORMAT_R32G32B32A32_SINT;
+        attributeDescriptions[2].offset   = offsetof( VertexSkinned, mBoneIDs );
+
+        // Bone weights
+        attributeDescriptions[3].binding  = 0;
+        attributeDescriptions[3].location = 5;
+        attributeDescriptions[3].format   = VK_FORMAT_R32G32B32A32_SFLOAT;
+        attributeDescriptions[3].offset   = offsetof( VertexSkinned, mBoneWeights );
+
+        return attributeDescriptions;
+    }
+
+    //==================================================================================================================================================================================================
     // DebugVertex
     //==================================================================================================================================================================================================
     DebugVertex::DebugVertex( const glm::vec3 _pos, const glm::vec3 _normal, const glm::vec4 _color ) :

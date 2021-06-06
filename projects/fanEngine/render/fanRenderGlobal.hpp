@@ -18,10 +18,10 @@ namespace fan
         static const std::set<std::string> sPrefabExtensions;
         static const std::set<std::string> sFontsExtensions;
 
-        static const char* sContentPath;
-        static const char* sFontsPath;
-        static const char* sModelsPath;
-        static const char* sScenesPath;
+        static const char          * sContentPath;
+        static const char          * sFontsPath;
+        static const char          * sModelsPath;
+        static const char          * sScenesPath;
         static constexpr const char* sPrefabsPath = "prefabs/";
 
         static const char* sDefaultMesh;
@@ -50,8 +50,9 @@ namespace fan
         static const char* sImguiVertexShader;
         static const char* sImguiFragmentShader;
 
-        static const uint32_t sMaximumNumPointLights      = 16;
-        static const uint32_t sMaximumNumDirectionalLight = 4;
+        static constexpr const uint32_t sMaxBonesInfluences         = 4;
+        static constexpr const uint32_t sMaximumNumPointLights      = 16;
+        static constexpr const uint32_t sMaximumNumDirectionalLight = 4;
 
         static const std::vector<const char*> sDesiredValidationLayers;
         static const std::vector<const char*> sDesiredInstanceExtensions;
