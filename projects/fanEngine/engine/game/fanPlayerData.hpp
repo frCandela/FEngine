@@ -46,5 +46,6 @@ namespace fan
         static Resource* LoadFont( const std::string& _path, ResourceInfo& _info );
         static Resource* LoadTexture( const std::string& _path, ResourceInfo& _info );
         static Resource* LoadMesh( const std::string& _path, ResourceInfo& _info );
+        static Resource* LoadMeshSkinned( const std::string& _path, ResourceInfo& _info );
     };
 }

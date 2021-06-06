@@ -5,6 +5,7 @@
 #include "engine/resources/fanFont.hpp"
 #include "engine/resources/fanPrefab.hpp"
 #include "render/resources/fanMesh.hpp"
+#include "render/resources/fanMeshSkinned.hpp"
 #include "render/fanRenderGlobal.hpp"
 #include "editor/fanImguiIcons.hpp"
 #include "editor/fanDragnDrop.hpp"
@@ -166,6 +167,81 @@ namespace ImGui
         if( ImGui::FanLoadFileModal( modalName.c_str(), fan::RenderGlobal::sMeshExtensions, sPathBuffer ) )
         {
             _ptr        = _ptr.mData.sResourceManager->Load<fan::Mesh>( sPathBuffer );
+            returnValue = true;
+        }
+
+        ImGui::SameLine();
+        ImGui::Text( _label );
+
+        return returnValue;
+    }
+
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    bool FanMeshSkinnedPtr( const char* _label, fan::ResourcePtr<fan::MeshSkinned>& _ptr )
+    {
+        bool returnValue = false;
+
+        fan::MeshSkinned* mesh = _ptr;
+        const std::string name = ( mesh == nullptr ) ? "null" : fan::Path::FileName( mesh->mPath );
+
+        // Set button icon & modal
+        const std::string  modalName = std::string( "Find skinned mesh (" ) + _label + ")";
+        static std::string sPathBuffer;
+        ImGui::PushID( _label );
+        {
+            if( ImGui::ButtonIcon( ImGui::IconType::Mesh16, { 16, 16 } ) )
+            {
+                _ptr        = nullptr;
+                returnValue = true;
+            }
+        }
+        ImGui::PopID();
+        ImGui::SameLine();
+
+        // name button
+        const float width = 0.6f * ImGui::GetWindowWidth() - ImGui::GetCursorPosX() + 8;
+        if( ImGui::Button( name.c_str(), ImVec2( width, 0.f ) ) )
+        {
+            ImGui::OpenPopup( modalName.c_str() );
+            if( sPathBuffer.empty() )
+            {
+                sPathBuffer = fan::Path::Normalize( fan::RenderGlobal::sModelsPath );
+            }
+        }
+        ImGui::SameLine();
+        ImGui::FanBeginDragDropSourceMeshSkinned( _ptr );
+
+        // tooltip
+        if( mesh != nullptr && ImGui::IsItemHovered() )
+        {
+            ImGui::BeginTooltip();
+            ImGui::Text( mesh->mPath.c_str() );
+            for( fan::SubMeshSkinned& subMesh : mesh->mSubMeshes )
+            {
+                ImGui::Text( "%d triangles", (int)subMesh.mIndices.size() / 3 );
+            }
+            ImGui::EndTooltip();
+        }
+
+        // dragndrop
+        fan::ResourcePtr<fan::MeshSkinned> meshDrop = ImGui::FanBeginDragDropTargetMeshSkinned();
+        if( meshDrop )
+        {
+            _ptr        = meshDrop;
+            returnValue = true;
+        }
+
+        // Right click = clear
+        if( ImGui::IsItemClicked( 1 ) )
+        {
+            _ptr        = nullptr;
+            returnValue = true;
+        }
+
+        if( ImGui::FanLoadFileModal( modalName.c_str(), fan::RenderGlobal::sMeshExtensions, sPathBuffer ) )
+        {
+            _ptr        = _ptr.mData.sResourceManager->Load<fan::MeshSkinned>( sPathBuffer );
             returnValue = true;
         }
 

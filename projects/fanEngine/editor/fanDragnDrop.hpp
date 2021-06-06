@@ -11,6 +11,7 @@ namespace fan
     class EcsWorld;
     struct Texture;
     struct Mesh;
+    struct MeshSkinned;
     class Font;
 }
 
@@ -49,6 +50,8 @@ namespace ImGui
     fan::ResourcePtr<fan::Texture> FanBeginDragDropTargetTexture();
     void FanBeginDragDropSourceMesh( fan::ResourcePtr<fan::Mesh> _mesh, ImGuiDragDropFlags _flags = ImGuiDragDropFlags_None );
     fan::ResourcePtr<fan::Mesh> FanBeginDragDropTargetMesh();
+    void FanBeginDragDropSourceMeshSkinned( fan::ResourcePtr<fan::MeshSkinned> _mesh, ImGuiDragDropFlags _flags = ImGuiDragDropFlags_None );
+    fan::ResourcePtr<fan::MeshSkinned> FanBeginDragDropTargetMeshSkinned();
     void FanBeginDragDropSourceFont( fan::ResourcePtr<fan::Font> _font, ImGuiDragDropFlags _flags = ImGuiDragDropFlags_None );
     fan::ResourcePtr<fan::Font> FanBeginDragDropTargetFont();
 

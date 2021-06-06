@@ -1,5 +1,5 @@
 #include <engine/physics/fanTransform.hpp>
-#include "fanPlayerData.hpp"
+#include "engine/game/fanPlayerData.hpp"
 #include "core/time/fanProfiler.hpp"
 #include "engine/game/fanIGame.hpp"
 #include "engine/singletons/fanRenderWorld.hpp"
@@ -33,9 +33,11 @@
 #include "engine/physics/fanPhysicsWorld.hpp"
 
 //render 3D
+#include "render/resources/fanMeshSkinned.hpp"
 #include "engine/components/fanDirectionalLight.hpp"
 #include "engine/components/fanPointLight.hpp"
 #include "engine/components/fanMeshRenderer.hpp"
+#include "engine/components/fanMeshSkinnedRenderer.hpp"
 #include "engine/components/fanMaterial.hpp"
 #include "engine/components/fanParticleEmitter.hpp"
 #include "engine/components/fanParticle.hpp"
@@ -124,6 +126,14 @@ namespace fan
             info.mUseDirtyList   = true;
             info.mUseDestroyList = true;
             mResources.AddResourceType<Mesh>( info );
+        }
+
+        {
+            ResourceInfo info;
+            info.mLoad           = &LoadMeshSkinned;
+            info.mUseDirtyList   = true;
+            info.mUseDestroyList = true;
+            mResources.AddResourceType<MeshSkinned>( info );
         }
 
         {
@@ -287,6 +297,7 @@ namespace fan
         _world.AddComponentType<DirectionalLight>();
         _world.AddComponentType<PointLight>();
         _world.AddComponentType<MeshRenderer>();
+        _world.AddComponentType<MeshSkinnedRenderer>();
         _world.AddComponentType<Material>();
         _world.AddComponentType<ParticleEmitter>();
         _world.AddComponentType<Particle>();
@@ -394,6 +405,20 @@ namespace fan
     {
         Debug::Log() << Debug::Type::Resources << "Loading mesh " << _path << Debug::Endl();
         Mesh* mesh = new Mesh();
+        if( !mesh->LoadFromFile( _path ) )
+        {
+            delete mesh;
+            return nullptr;
+        }
+        return mesh;
+    }
+
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    Resource* PlayerData::LoadMeshSkinned( const std::string& _path, ResourceInfo& )
+    {
+        Debug::Log() << Debug::Type::Resources << "Loading skinned mesh " << _path << Debug::Endl();
+        MeshSkinned* mesh = new MeshSkinned();
         if( !mesh->LoadFromFile( _path ) )
         {
             delete mesh;

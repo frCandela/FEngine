@@ -63,7 +63,7 @@ namespace fan
                 ImGui::Icon( guiInfo.mIcon, { 16, 16 }, settings.mData->mGroupsColors.GetColor( guiInfo.mGroup ) );
                 ImGui::SameLine();
                 ImGui::FanBeginDragDropSourceComponent( _world, node.mHandle, info.mType, ImGuiDragDropFlags_SourceAllowNullID );
-                ImGui::Text( "%s", info.mName.c_str() );
+                ImGui::Text( "%s", guiInfo.mEditorName.c_str() );
                 ImGui::FanBeginDragDropSourceComponent( _world, node.mHandle, info.mType, ImGuiDragDropFlags_SourceAllowNullID );
 
                 // Delete button
@@ -199,7 +199,7 @@ namespace fan
 
         ImGui::Icon( guiInfo.mIcon, { 16, 16 }, settings.mData->mGroupsColors.GetColor( guiInfo.mGroup ) );
         ImGui::SameLine();
-        if( ImGui::MenuItem( _info.mName.c_str() ) )
+        if( ImGui::MenuItem( guiInfo.mEditorName.c_str() ) )
         {
             // Create new EcsComponent
             EcsHandle handleSelected = _world.GetSingleton<EditorSelection>().mSelectedNodeHandle;
