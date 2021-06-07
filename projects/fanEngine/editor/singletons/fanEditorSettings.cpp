@@ -320,9 +320,9 @@ namespace fan
         _componentInfos[ExpirationTime::Info::sType]        = GuiExpirationTime::GetInfo();
         _componentInfos[FollowTransform::Info::sType]       = GuiFollowTransform::GetInfo();
         _componentInfos[Material::Info::sType]              = GuiMaterial::GetInfo();
-        _componentInfos[MeshRenderer::Info::sType]          = GuiMeshRenderer::GetInfo();
-        _componentInfos[MeshSkinnedRenderer::Info::sType]   = GuiMeshSkinnedRenderer::GetInfo();
-        _componentInfos[Particle::Info::sType]              = GuiParticle::GetInfo();
+        _componentInfos[MeshRenderer::Info::sType]        = GuiMeshRenderer::GetInfo();
+        _componentInfos[SkinnedMeshRenderer::Info::sType] = GuiSkinnedMeshRenderer::GetInfo();
+        _componentInfos[Particle::Info::sType]            = GuiParticle::GetInfo();
         _componentInfos[ParticleEmitter::Info::sType]       = GuiParticleEmitter::GetInfo();
         _componentInfos[PointLight::Info::sType]            = GuiPointLight::GetInfo();
         _componentInfos[SceneNode::Info::sType]             = GuiSceneNode::GetInfo();

@@ -6,6 +6,7 @@
 #include "network/singletons/fanTime.hpp"
 #include "render/resources/fanMesh2D.hpp"
 #include "render/resources/fanMesh.hpp"
+#include "render/resources/fanSkinnedMesh.hpp"
 #include "render/core/fanInstance.hpp"
 #include "render/fanWindow.hpp"
 
@@ -41,13 +42,9 @@ namespace fan
         mDrawDebug.Create( mDevice, imagesCount );
         mDrawUI.Create( mDevice, imagesCount );
         mDrawModels.Create( mDevice, imagesCount, mResources.GetOrLoad<Texture>( RenderGlobal::sDefaultTexture ) );
+        mDrawSkinnedModels.Create( mDevice, imagesCount, mResources.GetOrLoad<Texture>( RenderGlobal::sDefaultTexture ) );
         mDrawPostprocess.Create( mDevice, imagesCount, mImageViewGameColor );
-        mDrawImgui.Create( mDevice,
-                           imagesCount,
-                           finalRenderPass.mRenderPass,
-                           mWindow.mWindow,
-                           mWindow.mSwapchain.mExtent,
-                           mImageViewPostprocessColor );
+        mDrawImgui.Create( mDevice, imagesCount, finalRenderPass.mRenderPass, mWindow.mWindow, mWindow.mSwapchain.mExtent, mImageViewPostprocessColor );
 
         CreatePipelines();
         CreateCommandBuffers();
@@ -62,6 +59,7 @@ namespace fan
 
         mDrawImgui.Destroy( mDevice );
         mDrawModels.Destroy( mDevice );
+        mDrawSkinnedModels.Destroy( mDevice );
         mDrawUI.mPipeline.Destroy( mDevice );
         mDrawDebug.Destroy( mDevice );
         mDrawUI.Destroy( mDevice );
@@ -108,6 +106,8 @@ namespace fan
         mDrawDebug.mFragmentShaderLines2D.Create( mDevice, "shaders/debugLines2D.frag" );
         mDrawModels.mVertexShader.Create( mDevice, "shaders/models.vert" );
         mDrawModels.mFragmentShader.Create( mDevice, "shaders/models.frag" );
+        mDrawSkinnedModels.mVertexShader.Create( mDevice, "shaders/skinnedModels.vert" );
+        mDrawSkinnedModels.mFragmentShader.Create( mDevice, "shaders/skinnedModels.frag" );
         mDrawUI.mVertexShader.Create( mDevice, "shaders/ui.vert" );
         mDrawUI.mFragmentShader.Create( mDevice, "shaders/ui.frag" );
         mDrawPostprocess.mVertexShader.Create( mDevice, "shaders/postprocess.vert" );
@@ -128,6 +128,8 @@ namespace fan
         mDrawDebug.mFragmentShaderLines2D.Destroy( mDevice );
         mDrawModels.mVertexShader.Destroy( mDevice );
         mDrawModels.mFragmentShader.Destroy( mDevice );
+        mDrawSkinnedModels.mVertexShader.Destroy( mDevice );
+        mDrawSkinnedModels.mFragmentShader.Destroy( mDevice );
         mDrawUI.mVertexShader.Destroy( mDevice );
         mDrawUI.mFragmentShader.Destroy( mDevice );
         mDrawPostprocess.mVertexShader.Destroy( mDevice );
@@ -145,6 +147,7 @@ namespace fan
         const PipelineConfig debugLines2DPipelineConfig          = mDrawDebug.GetPipelineConfigLines2D();
         const PipelineConfig ppPipelineConfig                    = mDrawPostprocess.GetPipelineConfig();
         const PipelineConfig modelsPipelineConfig                = mDrawModels.GetPipelineConfig( mDescriptorTextures );
+        const PipelineConfig skinnedModelsPipelineConfig         = mDrawSkinnedModels.GetPipelineConfig( mDescriptorTextures );
         const PipelineConfig uiPipelineConfig                    = mDrawUI.GetPipelineConfig( mDescriptorTextures );
 
         mDrawDebug.mPipelineLines.Create( mDevice, debugLinesPipelineConfig, mGameExtent, mRenderPassGame.mRenderPass );
@@ -152,6 +155,7 @@ namespace fan
         mDrawDebug.mPipelineTriangles.Create( mDevice, debugTrianglesPipelineConfig, mGameExtent, mRenderPassGame.mRenderPass );
         mDrawDebug.mPipelineTrianglesNDT.Create( mDevice, debugTrianglesNDTPipelineConfig, mGameExtent, mRenderPassGame.mRenderPass );
         mDrawModels.mPipeline.Create( mDevice, modelsPipelineConfig, mGameExtent, mRenderPassGame.mRenderPass );
+        mDrawSkinnedModels.mPipeline.Create( mDevice, skinnedModelsPipelineConfig, mGameExtent, mRenderPassGame.mRenderPass );
         mDrawDebug.mPipelineLines2D.Create( mDevice, debugLines2DPipelineConfig, mGameExtent, mRenderPassPostprocess.mRenderPass );
         mDrawUI.mPipeline.Create( mDevice, uiPipelineConfig, mGameExtent, mRenderPassPostprocess.mRenderPass );
         mDrawPostprocess.mPipeline.Create( mDevice, ppPipelineConfig, mGameExtent, mRenderPassPostprocess.mRenderPass );
@@ -163,6 +167,7 @@ namespace fan
     {
         mDrawPostprocess.mPipeline.Destroy( mDevice );
         mDrawModels.mPipeline.Destroy( mDevice );
+        mDrawSkinnedModels.mPipeline.Destroy( mDevice );
         mDrawUI.mPipeline.Destroy( mDevice );
         mDrawDebug.mPipelineLines.Destroy( mDevice );
         mDrawDebug.mPipelineLinesNDT.Destroy( mDevice );
@@ -206,8 +211,6 @@ namespace fan
             ClearDestroyedMesh2D( mDevice );
             ClearDestroyedMesh( mDevice );
             ClearDestroyedTextures( mDevice );
-
-            BuildNewMeshes2D( mDevice );
             BuildNewMeshes( mDevice );
             textureCreated = BuildNewTextures( mDevice );
         }
@@ -301,31 +304,40 @@ namespace fan
     {
         mDrawPostprocess.UpdateUniformBuffers( _device, _index );
         mDrawModels.UpdateUniformBuffers( _device, _index );
+        mDrawSkinnedModels.UpdateUniformBuffers( _device, _index );
         mDrawDebug.UpdateUniformBuffers( _device, _index );
         mDrawUI.UpdateUniformBuffers( _device, _index );
     }
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void Renderer::BuildNewMeshes2D( Device& _device )
+    void Renderer::BuildNewMeshes( Device& _device )
     {
-        std::vector<Mesh2D*> dirtyList;
-        mResources.GetDirtyList<Mesh2D>( dirtyList );
-        for( Mesh2D* mesh : dirtyList )
+        // Mesh 2D
+        std::vector<Mesh2D*> dirtyListMesh2D;
+        mResources.GetDirtyList<Mesh2D>( dirtyListMesh2D );
+        for( Mesh2D* mesh : dirtyListMesh2D )
         {
             mesh->Create( _device );
         }
-    }
 
-    //==================================================================================================================================================================================================
-    //==================================================================================================================================================================================================
-    void Renderer::BuildNewMeshes( Device& _device )
-    {
+        // Mesh
         std::vector<Mesh*> dirtyList;
         mResources.GetDirtyList<Mesh>( dirtyList );
         for( Mesh* mesh : dirtyList )
         {
             for( SubMesh& subMesh : mesh->mSubMeshes )
+            {
+                subMesh.Create( _device );
+            }
+        }
+
+        // Skinned Mesh
+        std::vector<SkinnedMesh*> dirtyListSkinnedMesh;
+        mResources.GetDirtyList<SkinnedMesh>( dirtyListSkinnedMesh );
+        for( SkinnedMesh* mesh : dirtyListSkinnedMesh )
+        {
+            for( SubSkinnedMesh& subMesh : mesh->mSubMeshes )
             {
                 subMesh.Create( _device );
             }
@@ -405,8 +417,12 @@ namespace fan
         mDrawModels.mUniforms.mUniformsProjView.mView = _view;
         mDrawModels.mUniforms.mUniformsProjView.mProj = _projection;
         mDrawModels.mUniforms.mUniformsProjView.mProj[1][1] *= -1;
-
         mDrawModels.mUniforms.mUniformsCameraPosition.mCameraPosition = _position;
+
+        mDrawSkinnedModels.mUniforms.mUniformsProjView.mView = _view;
+        mDrawSkinnedModels.mUniforms.mUniformsProjView.mProj = _projection;
+        mDrawSkinnedModels.mUniforms.mUniformsProjView.mProj[1][1] *= -1;
+        mDrawSkinnedModels.mUniforms.mUniformsCameraPosition.mCameraPosition = _position;
 
         mDrawDebug.mUniformsMVPColor.mModel = glm::mat4( 1.0 );
         mDrawDebug.mUniformsMVPColor.mView  = _view;
@@ -416,31 +432,41 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void Renderer::SetDirectionalLights( const std::vector<RenderDataDirectionalLight>& _lightData )
+    void Renderer::SetDirectionalLights( const std::vector<UniformDirectionalLight>& _lightData )
     {
         SCOPED_PROFILE( set_dir_lights );
         mDrawModels.SetDirectionalLights( _lightData );
+        mDrawSkinnedModels.SetDirectionalLights( _lightData );
     }
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void Renderer::SetPointLights( const std::vector<RenderDataPointLight>& _lightData )
+    void Renderer::SetPointLights( const std::vector<UniformPointLight>& _lightData )
     {
         SCOPED_PROFILE( set_point_lights );
         mDrawModels.SetPointLights( _lightData );
+        mDrawSkinnedModels.SetPointLights( _lightData );
     }
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void Renderer::SetDrawData( const std::vector<RenderDataModel>& _drawData )
+    void Renderer::SetModels( const std::vector<RenderDataModel>& _models )
     {
         SCOPED_PROFILE( set_draw_data );
-        mDrawModels.SetDrawData( mDevice, mWindow.mSwapchain.mImagesCount, _drawData );
+        mDrawModels.SetDrawData( mDevice, mWindow.mSwapchain.mImagesCount, _models );
     }
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void Renderer::SetUIDrawData( const std::vector<RenderDataMesh2D>& _drawData )
+    void Renderer::SetModelsSkinned( const std::vector<RenderDataSkinnedModel>& _models )
+    {
+        SCOPED_PROFILE( set_draw_data );
+        mDrawSkinnedModels.SetDrawData( mDevice, mWindow.mSwapchain.mImagesCount, _models );
+    }
+
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    void Renderer::SetModelsUI( const std::vector<RenderDataMesh2D>& _drawData )
     {
         SCOPED_PROFILE( set_ui_draw_data );
         mDrawUI.SetUIDrawData( _drawData );
@@ -466,6 +492,7 @@ namespace fan
         FrameBuffer& finalFramebuffer = mViewType == ViewType::Editor ? mFramebuffersPostprocess : mFramebuffersSwapchain;
 
         mDrawModels.RecordCommandBuffer( _index, mRenderPassGame, mFrameBuffersGame, mGameExtent, mDescriptorTextures );
+        mDrawSkinnedModels.RecordCommandBuffer( _index, mRenderPassGame, mFrameBuffersGame, mGameExtent, mDescriptorTextures );
         mDrawDebug.RecordCommandBuffer( _index, mRenderPassGame, mFrameBuffersGame, mGameExtent );
         mDrawDebug.RecordCommandBuffer2D( _index, mRenderPassPostprocess, finalFramebuffer, mGameExtent );
         mDrawUI.RecordCommandBuffer( _index, mRenderPassPostprocess, finalFramebuffer, mGameExtent, mDescriptorTextures );
@@ -521,6 +548,7 @@ namespace fan
             vkCmdBeginRenderPass( commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_SECONDARY_COMMAND_BUFFERS );
             {
                 vkCmdExecuteCommands( commandBuffer, 1, &mDrawModels.mCommandBuffers.mBuffers[_index] );
+                vkCmdExecuteCommands( commandBuffer, 1, &mDrawSkinnedModels.mCommandBuffers.mBuffers[_index] );
                 if( !mDrawDebug.HasNothingToDraw() )
                 {
                     vkCmdExecuteCommands( commandBuffer, 1, &mDrawDebug.mCommandBuffers.mBuffers[_index] );
@@ -530,7 +558,6 @@ namespace fan
 
             vkCmdBeginRenderPass( commandBuffer, &renderPassInfoPostprocess, VK_SUBPASS_CONTENTS_SECONDARY_COMMAND_BUFFERS );
             {
-
                 vkCmdExecuteCommands( commandBuffer, 1, &mDrawPostprocess.mCommandBuffers.mBuffers[_index] );
                 vkCmdExecuteCommands( commandBuffer, 1, &mDrawUI.mCommandBuffers.mBuffers[_index] );
                 if( mDrawDebug.mNumLines2D != 0 )
@@ -622,6 +649,7 @@ namespace fan
         mPrimaryCommandBuffers.Create( mDevice, count, VK_COMMAND_BUFFER_LEVEL_PRIMARY );
 
         mDrawModels.mCommandBuffers.Create( mDevice, count, VK_COMMAND_BUFFER_LEVEL_SECONDARY );
+        mDrawSkinnedModels.mCommandBuffers.Create( mDevice, count, VK_COMMAND_BUFFER_LEVEL_SECONDARY );
         mDrawImgui.mCommandBuffers.Create( mDevice, count, VK_COMMAND_BUFFER_LEVEL_SECONDARY );
         mDrawUI.mCommandBuffers.Create( mDevice, count, VK_COMMAND_BUFFER_LEVEL_SECONDARY );
         mDrawPostprocess.mCommandBuffers.Create( mDevice, count, VK_COMMAND_BUFFER_LEVEL_SECONDARY );

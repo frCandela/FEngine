@@ -5,7 +5,7 @@
 #include "engine/resources/fanFont.hpp"
 #include "engine/resources/fanPrefab.hpp"
 #include "render/resources/fanMesh.hpp"
-#include "render/resources/fanMeshSkinned.hpp"
+#include "render/resources/fanSkinnedMesh.hpp"
 #include "render/fanRenderGlobal.hpp"
 #include "editor/fanImguiIcons.hpp"
 #include "editor/fanDragnDrop.hpp"
@@ -178,11 +178,11 @@ namespace ImGui
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    bool FanMeshSkinnedPtr( const char* _label, fan::ResourcePtr<fan::MeshSkinned>& _ptr )
+    bool FanMeshSkinnedPtr( const char* _label, fan::ResourcePtr<fan::SkinnedMesh>& _ptr )
     {
         bool returnValue = false;
 
-        fan::MeshSkinned* mesh = _ptr;
+        fan::SkinnedMesh* mesh = _ptr;
         const std::string name = ( mesh == nullptr ) ? "null" : fan::Path::FileName( mesh->mPath );
 
         // Set button icon & modal
@@ -217,7 +217,7 @@ namespace ImGui
         {
             ImGui::BeginTooltip();
             ImGui::Text( mesh->mPath.c_str() );
-            for( fan::SubMeshSkinned& subMesh : mesh->mSubMeshes )
+            for( fan::SubSkinnedMesh& subMesh : mesh->mSubMeshes )
             {
                 ImGui::Text( "%d triangles", (int)subMesh.mIndices.size() / 3 );
             }
@@ -225,7 +225,7 @@ namespace ImGui
         }
 
         // dragndrop
-        fan::ResourcePtr<fan::MeshSkinned> meshDrop = ImGui::FanBeginDragDropTargetMeshSkinned();
+        fan::ResourcePtr<fan::SkinnedMesh> meshDrop = ImGui::FanBeginDragDropTargetMeshSkinned();
         if( meshDrop )
         {
             _ptr        = meshDrop;
@@ -241,7 +241,7 @@ namespace ImGui
 
         if( ImGui::FanLoadFileModal( modalName.c_str(), fan::RenderGlobal::sMeshExtensions, sPathBuffer ) )
         {
-            _ptr        = _ptr.mData.sResourceManager->Load<fan::MeshSkinned>( sPathBuffer );
+            _ptr        = _ptr.mData.sResourceManager->Load<fan::SkinnedMesh>( sPathBuffer );
             returnValue = true;
         }
 

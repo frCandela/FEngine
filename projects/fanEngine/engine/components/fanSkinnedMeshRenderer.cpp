@@ -1,37 +1,37 @@
-#include "engine/components/fanMeshSkinnedRenderer.hpp"
+#include "engine/components/fanSkinnedMeshRenderer.hpp"
 #include "core/memory/fanSerializable.hpp"
 
 namespace fan
 {
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void MeshSkinnedRenderer::SetInfo( EcsComponentInfo& _info )
+    void SkinnedMeshRenderer::SetInfo( EcsComponentInfo& _info )
     {
-        _info.load = &MeshSkinnedRenderer::Load;
-        _info.save = &MeshSkinnedRenderer::Save;
+        _info.load = &SkinnedMeshRenderer::Load;
+        _info.save = &SkinnedMeshRenderer::Save;
     }
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void MeshSkinnedRenderer::Init( EcsWorld& /*_world*/, EcsEntity /*_entity*/, EcsComponent& _component )
+    void SkinnedMeshRenderer::Init( EcsWorld& /*_world*/, EcsEntity /*_entity*/, EcsComponent& _component )
     {
-        MeshSkinnedRenderer& meshRenderer = static_cast<MeshSkinnedRenderer&>( _component );
+        SkinnedMeshRenderer& meshRenderer = static_cast<SkinnedMeshRenderer&>( _component );
         meshRenderer.mMesh = nullptr;
     }
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void MeshSkinnedRenderer::Save( const EcsComponent& _component, Json& _json )
+    void SkinnedMeshRenderer::Save( const EcsComponent& _component, Json& _json )
     {
-        const MeshSkinnedRenderer& meshRenderer = static_cast<const MeshSkinnedRenderer&>( _component );
+        const SkinnedMeshRenderer& meshRenderer = static_cast<const SkinnedMeshRenderer&>( _component );
         Serializable::SaveResourcePtr( _json, "mesh", meshRenderer.mMesh.mData );
     }
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void MeshSkinnedRenderer::Load( EcsComponent& _component, const Json& _json )
+    void SkinnedMeshRenderer::Load( EcsComponent& _component, const Json& _json )
     {
-        MeshSkinnedRenderer& meshRenderer = static_cast<MeshSkinnedRenderer&>( _component );
+        SkinnedMeshRenderer& meshRenderer = static_cast<SkinnedMeshRenderer&>( _component );
         Serializable::LoadResourcePtr( _json, "mesh", meshRenderer.mMesh.mData );
     }
 }

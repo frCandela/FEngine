@@ -2,7 +2,7 @@
 
 #include "core/ecs/fanEcsComponent.hpp"
 #include "core/resources/fanResourcePtr.hpp"
-#include "render/resources/fanMeshSkinned.hpp"
+#include "render/resources/fanSkinnedMesh.hpp"
 
 namespace fan
 {
@@ -10,14 +10,14 @@ namespace fan
     // allows rendering of a skinned mesh
     // needs a transform and a material
     //==================================================================================================================================================================================================
-    struct MeshSkinnedRenderer : public EcsComponent
+    struct SkinnedMeshRenderer : public EcsComponent
     {
-    ECS_COMPONENT( MeshSkinnedRenderer )
+    ECS_COMPONENT( SkinnedMeshRenderer )
         static void SetInfo( EcsComponentInfo& _info );
         static void Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component );
         static void Save( const EcsComponent& _component, Json& _json );
         static void Load( EcsComponent& _component, const Json& _json );
 
-        ResourcePtr<MeshSkinned> mMesh;
+        ResourcePtr<SkinnedMesh> mMesh;
     };
 }

@@ -3,7 +3,7 @@
 #include "core/fanDebug.hpp"
 #include "render/fanGLTFImporter.hpp"
 #include "render/resources/fanMesh.hpp"
-#include "render/resources/fanMeshSkinned.hpp"
+#include "render/resources/fanSkinnedMesh.hpp"
 #include "render/fanGLTF.hpp"
 
 namespace fan
@@ -171,7 +171,7 @@ namespace fan
     //==================================================================================================================================================================================================
     // Set _mesh with the previously imported data
     //==================================================================================================================================================================================================
-    void GLTFImporter::GetMesh( MeshSkinned& _mesh )
+    void GLTFImporter::GetMesh( SkinnedMesh& _mesh )
     {
         fanAssert( _mesh.mSubMeshes.empty() );
         _mesh.mSubMeshes.resize( mSubmeshes.size() );

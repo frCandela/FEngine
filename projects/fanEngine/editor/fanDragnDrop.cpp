@@ -9,7 +9,7 @@
 #include "editor/fanGuiInfos.hpp"
 #include "render/resources/fanTexture.hpp"
 #include "render/resources/fanMesh.hpp"
-#include "render/resources/fanMeshSkinned.hpp"
+#include "render/resources/fanSkinnedMesh.hpp"
 #include "engine/resources/fanFont.hpp"
 #include "editor/fanImguiIcons.hpp"
 #include "editor/singletons/fanEditorSettings.hpp"
@@ -242,13 +242,13 @@ namespace ImGui
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void FanBeginDragDropSourceMeshSkinned( fan::ResourcePtr<fan::MeshSkinned> _mesh, ImGuiDragDropFlags _flags )
+    void FanBeginDragDropSourceMeshSkinned( fan::ResourcePtr<fan::SkinnedMesh> _mesh, ImGuiDragDropFlags _flags )
     {
         if( _mesh != nullptr )
         {
             if( ImGui::BeginDragDropSource( _flags ) )
             {
-                ImGui::SetDragDropPayload( "dragndrop_mesh_skinned", &_mesh, sizeof( fan::ResourcePtr<fan::MeshSkinned> ) );
+                ImGui::SetDragDropPayload( "dragndrop_mesh_skinned", &_mesh, sizeof( fan::ResourcePtr<fan::SkinnedMesh> ) );
                 ImGui::Icon( ImGui::IconType::Mesh16, { 16, 16 } );
                 ImGui::SameLine();
                 ImGui::Text( _mesh->mPath.c_str() );
@@ -259,15 +259,15 @@ namespace ImGui
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    fan::ResourcePtr<fan::MeshSkinned> FanBeginDragDropTargetMeshSkinned()
+    fan::ResourcePtr<fan::SkinnedMesh> FanBeginDragDropTargetMeshSkinned()
     {
-        fan::ResourcePtr<fan::MeshSkinned> mesh = nullptr;
+        fan::ResourcePtr<fan::SkinnedMesh> mesh = nullptr;
         if( ImGui::BeginDragDropTarget() )
         {
             if( const ImGuiPayload* payload = ImGui::AcceptDragDropPayload( "dragndrop_mesh_skinned" ) )
             {
-                fanAssert( payload->DataSize == sizeof( fan::ResourcePtr<fan::MeshSkinned> ) );
-                mesh = *(fan::ResourcePtr<fan::MeshSkinned>*)payload->Data;
+                fanAssert( payload->DataSize == sizeof( fan::ResourcePtr<fan::SkinnedMesh> ) );
+                mesh = *(fan::ResourcePtr<fan::SkinnedMesh>*)payload->Data;
             }
             ImGui::EndDragDropTarget();
         }

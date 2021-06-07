@@ -23,17 +23,18 @@ namespace fan
         static void Save( const EcsSingleton& _singleton, Json& _json );
         static void Load( EcsSingleton& _singleton, const Json& _json );
 
-        std::vector<RenderDataModel>            drawData;
-        std::vector<RenderDataMesh2D>           uiDrawData;
-        std::vector<RenderDataPointLight>       pointLights;
-        std::vector<RenderDataDirectionalLight> directionalLights;
+        std::vector<RenderDataModel>         mModels;
+        std::vector<RenderDataSkinnedModel>  mSkinnedModels;
+        std::vector<RenderDataMesh2D>        mUIModels;
+        std::vector<UniformPointLight>       mPointLights;
+        std::vector<UniformDirectionalLight> mDirectionalLights;
 
         glm::vec2 mTargetSize; // render target size in pixels
         bool      mIsHeadless;
 
-        ResourcePtr <Mesh> mParticlesMesh;
-        Color mFilterColor;
-        Color mClearColor;
+        ResourcePtr<Mesh> mParticlesMesh;
+        Color             mFilterColor;
+        Color             mClearColor;
 
         FullScreen mFullscreen;
     };

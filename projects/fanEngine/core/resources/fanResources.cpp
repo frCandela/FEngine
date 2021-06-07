@@ -37,7 +37,14 @@ namespace fan
     //==================================================================================================================================================================================================
     ResourceHandle* Resources::LoadInternal( const uint32_t _type, const std::string& _path )
     {
-        ResourceInfo& info = mResourceInfos.at( _type );
+        auto infoIt = mResourceInfos.find( _type );
+        if( infoIt == mResourceInfos.end() )
+        {
+            Debug::Error() << Debug::Type::Engine << "failed to load resource with unknown type ID " << _type << Debug::Endl();
+            return nullptr;
+        }
+
+        ResourceInfo& info = infoIt->second;
         fanAssert( info.mLoad != nullptr );
         Resource* resource = ( *info.mLoad )( _path, info );
         if( resource != nullptr )

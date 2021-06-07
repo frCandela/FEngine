@@ -1,4 +1,4 @@
-#include "render/resources/fanMeshSkinned.hpp"
+#include "render/resources/fanSkinnedMesh.hpp"
 #include "core/fanPath.hpp"
 #include "render/fanGLTFImporter.hpp"
 #include "render/core/fanDevice.hpp"
@@ -10,7 +10,7 @@ namespace fan
 {
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    bool MeshSkinned::LoadFromFile( const std::string& _path )
+    bool SkinnedMesh::LoadFromFile( const std::string& _path )
     {
         if( _path.empty() )
         {
@@ -22,7 +22,7 @@ namespace fan
         if( importer.Load( Path::Normalize( _path ) ) )
         {
             importer.GetMesh( *this );
-            for( SubMeshSkinned& subMesh : mSubMeshes )
+            for( SubSkinnedMesh& subMesh : mSubMeshes )
             {
                 subMesh.OptimizeVertices();
             }
@@ -38,7 +38,7 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    bool SubMeshSkinned::LoadFromVertices()
+    bool SubSkinnedMesh::LoadFromVertices()
     {
         // Generate fake indices
         mIndices.clear();
@@ -57,7 +57,7 @@ namespace fan
     //==================================================================================================================================================================================================
     // Removes duplicates vertices & generates a corresponding index buffer
     //==================================================================================================================================================================================================
-    void SubMeshSkinned::OptimizeVertices()
+    void SubSkinnedMesh::OptimizeVertices()
     {
 
         if( !mOptimizeVertices ){ return; }
@@ -88,9 +88,9 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    bool MeshSkinned::Empty() const
+    bool SkinnedMesh::Empty() const
     {
-        for( SubMeshSkinned subMesh : mSubMeshes )
+        for( SubSkinnedMesh subMesh : mSubMeshes )
         {
             if( !subMesh.mIndices.empty() )
             {
@@ -102,10 +102,10 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    int MeshSkinned::CountVertices() const
+    int SkinnedMesh::CountVertices() const
     {
         int numVertices = 0;
-        for( const SubMeshSkinned& subMesh : mSubMeshes )
+        for( const SubSkinnedMesh& subMesh : mSubMeshes )
         {
             numVertices += (int)subMesh.mVertices.size();
         }
@@ -115,14 +115,14 @@ namespace fan
     //==================================================================================================================================================================================================
     // Creates a convex hull from the mesh geometry
     //==================================================================================================================================================================================================
-    void MeshSkinned::GenerateBoundingVolumes()
+    void SkinnedMesh::GenerateBoundingVolumes()
     {
         if( !mAutoGenerateBoundingVolumes ){ return; }
 
         // Generate points clouds from vertex list
         std::vector<Vector3> pointCloud;
         pointCloud.reserve( CountVertices() );
-        for( SubMeshSkinned& subMesh : mSubMeshes )
+        for( SubSkinnedMesh& subMesh : mSubMeshes )
         {
             for( int point = 0; point < (int)subMesh.mVertices.size(); point++ )
             {
@@ -154,7 +154,7 @@ namespace fan
     //==================================================================================================================================================================================================
     // Raycast on all triangles of the mesh
     //==================================================================================================================================================================================================
-    bool SubMeshSkinned::RayCast( const Ray _ray, RaycastResult& _outResult ) const
+    bool SubSkinnedMesh::RayCast( const Ray _ray, RaycastResult& _outResult ) const
     {
         RaycastResult result;
         Fixed         closestDistance = Fixed::sMaxValue;
@@ -179,9 +179,9 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    bool MeshSkinned::RayCast( const Ray _ray, RaycastResult& _outResult ) const
+    bool SkinnedMesh::RayCast( const Ray _ray, RaycastResult& _outResult ) const
     {
-        for( const SubMeshSkinned& subMesh : mSubMeshes )
+        for( const SubSkinnedMesh& subMesh : mSubMeshes )
         {
             if( subMesh.RayCast( _ray, _outResult ) )
             {
@@ -193,7 +193,7 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void SubMeshSkinned::Destroy( Device& _device )
+    void SubSkinnedMesh::Destroy( Device& _device )
     {
         mIndexBuffer.Destroy( _device );
         mVertexBuffer.Destroy( _device );
@@ -201,7 +201,7 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void SubMeshSkinned::Create( Device& _device )
+    void SubSkinnedMesh::Create( Device& _device )
     {
         if( mIndices.empty() || mVertices.empty() ){ return; }
 

@@ -146,9 +146,11 @@ namespace fan
         SCOPED_PROFILE( update_render_world );
 
         RenderWorld& renderWorld = mWorld.GetSingleton<RenderWorld>();
-        renderWorld.drawData.clear();
+        renderWorld.mModels.clear();
+        renderWorld.mSkinnedModels.clear();
 
         mWorld.Run<SUpdateRenderWorldModels>( renderWorld );
+        mWorld.Run<SUpdateRenderWorldModelsSkinned>( renderWorld );
         mWorld.ForceRun<SUpdateRenderWorldUI>();
         mWorld.ForceRun<SUpdateRenderWorldPointLights>();
         mWorld.ForceRun<SUpdateRenderWorldDirectionalLights>();

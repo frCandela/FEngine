@@ -14,7 +14,7 @@ namespace fan
 {
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    struct SubMeshSkinned
+    struct SubSkinnedMesh
     {
         std::vector<VertexSkinned> mVertices;
         std::vector<uint32_t>      mIndices;
@@ -32,9 +32,9 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    struct MeshSkinned : public Resource
+    struct SkinnedMesh : public Resource
     {
-    FAN_RESOURCE( MeshSkinned );
+    FAN_RESOURCE( SkinnedMesh );
 
         bool RayCast( const Ray _ray, RaycastResult& _outResult ) const;
         bool LoadFromFile( const std::string& _path );
@@ -43,7 +43,7 @@ namespace fan
         bool Empty() const;
         int CountVertices() const;
 
-        std::vector<SubMeshSkinned> mSubMeshes;
+        std::vector<SubSkinnedMesh> mSubMeshes;
 
         ConvexHull mConvexHull;
         Sphere     mBoundingSphere;

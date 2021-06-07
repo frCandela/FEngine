@@ -7,7 +7,7 @@
 namespace fan
 {
     struct Mesh;
-    struct MeshSkinned;
+    struct SkinnedMesh;
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
@@ -15,7 +15,7 @@ namespace fan
     {
         bool Load( const std::string& _relativePath );
         void GetMesh( Mesh& _mesh );
-        void GetMesh( MeshSkinned& _mesh );
+        void GetMesh( SkinnedMesh& _mesh );
 
         std::string mPath;    // file relative path
         Json        mJson;    // gltf json data

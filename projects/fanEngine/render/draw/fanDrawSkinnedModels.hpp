@@ -13,15 +13,15 @@
 
 namespace fan
 {
-    struct SubMesh;
+    struct SubSkinnedMesh;
     struct Texture;
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    struct RenderDataModel
+    struct RenderDataSkinnedModel
     {
-        SubMesh* mMesh;
-        Texture* mTexture;
+        SubSkinnedMesh* mMesh;
+        Texture       * mTexture;
         glm::mat4 mModelMatrix;
         glm::mat4 mNormalMatrix;
         glm::vec4 mColor;
@@ -31,7 +31,7 @@ namespace fan
     //==================================================================================================================================================================================================
     // All uniforms data for the models drawing
     //==================================================================================================================================================================================================
-    struct UniformsModelDraw
+    struct UniformsSkinnedModelDraw
     {
         void Create( const VkDeviceSize _minUniformBufferOffsetAlignment );
 
@@ -49,18 +49,18 @@ namespace fan
     //==================================================================================================================================================================================================
     // Models drawing data for the rendering engine
     //==================================================================================================================================================================================================
-    struct DrawModels
+    struct DrawSkinnedModels
     {
-        Pipeline                     mPipeline;
-        Shader                       mFragmentShader;
-        Shader                       mVertexShader;
-        UniformsModelDraw            mUniforms;
-        DescriptorUniforms           mDescriptorUniforms;
-        DescriptorSampler            mDescriptorSampler;
-        Sampler                      mSamplerTextures;
-        CommandBuffer                mCommandBuffers;
-        ResourcePtr<Texture>         mInvalidTexture;
-        std::vector<RenderDataModel> mDrawData;
+        Pipeline                            mPipeline;
+        Shader                              mFragmentShader;
+        Shader                              mVertexShader;
+        UniformsSkinnedModelDraw            mUniforms;
+        DescriptorUniforms                  mDescriptorUniforms;
+        DescriptorSampler                   mDescriptorSampler;
+        Sampler                             mSamplerTextures;
+        CommandBuffer                       mCommandBuffers;
+        ResourcePtr<Texture>                mInvalidTexture;
+        std::vector<RenderDataSkinnedModel> mDrawData;
 
         void Create( Device& _device, uint32_t _imagesCount, ResourcePtr<Texture> _invalidTexture );
         void Destroy( Device& _device );
@@ -68,7 +68,7 @@ namespace fan
         void UpdateUniformBuffers( Device& _device, const size_t _index );
         void RecordCommandBuffer( const size_t _index, RenderPass& _renderPass, FrameBuffer& _framebuffer, VkExtent2D _extent, DescriptorImages& _descriptorImages );
         void BindTexture( VkCommandBuffer _commandBuffer, const uint32_t _textureIndex, DescriptorSampler& _descriptorSampler, DescriptorImages& _descriptorImages, VkPipelineLayout _pipelineLayout );
-        void SetDrawData( Device& _device, const uint32_t _imagesCount, const std::vector<RenderDataModel>& _drawData );
+        void SetDrawData( Device& _device, const uint32_t _imagesCount, const std::vector<RenderDataSkinnedModel>& _drawData );
         void SetPointLights( const std::vector<UniformPointLight>& _lightData );
         void SetDirectionalLights( const std::vector<UniformDirectionalLight>& _lightData );
         PipelineConfig GetPipelineConfig( DescriptorImages& _imagesDescriptor ) const;

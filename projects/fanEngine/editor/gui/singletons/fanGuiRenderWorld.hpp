@@ -23,10 +23,11 @@ namespace fan
         static void OnGui( EcsWorld&, EcsSingleton& _singleton )
         {
             RenderWorld& renderWorld = static_cast<RenderWorld&>( _singleton );
-            ImGui::Text( "mesh:               %d", (int)renderWorld.drawData.size() );
-            ImGui::Text( "ui mesh:            %d", (int)renderWorld.uiDrawData.size() );
-            ImGui::Text( "pointLights:        %d", (int)renderWorld.pointLights.size() );
-            ImGui::Text( "directionalLights:  %d", (int)renderWorld.directionalLights.size() );
+            ImGui::Text( "models:             %d", (int)renderWorld.mModels.size() );
+            ImGui::Text( "skinned models:     %d", (int)renderWorld.mSkinnedModels.size() );
+            ImGui::Text( "ui mesh:            %d", (int)renderWorld.mUIModels.size() );
+            ImGui::Text( "pointLights:        %d", (int)renderWorld.mPointLights.size() );
+            ImGui::Text( "directionalLights:  %d", (int)renderWorld.mDirectionalLights.size() );
             ImGui::Text( "particles vertices: %d", (int)renderWorld.mParticlesMesh->mSubMeshes[0].mVertices.size() );
             ImGui::Text( "target size:        %d x %d", (int)renderWorld.mTargetSize.x, (int)renderWorld.mTargetSize.y );
             ImGui::Checkbox("fullscreen", &renderWorld.mFullscreen.mIsFullScreen );

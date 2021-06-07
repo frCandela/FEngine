@@ -3,6 +3,7 @@
 #include "engine/fanEngineTags.hpp"
 #include "engine/components/fanBounds.hpp"
 #include "engine/components/fanMeshRenderer.hpp"
+#include "engine/components/fanSkinnedMeshRenderer.hpp"
 #include "engine/components/fanSceneNode.hpp"
 #include "engine/physics/fanTransform.hpp"
 #include "engine/components/fanScale.hpp"
@@ -20,43 +21,56 @@ namespace fan
         {
             return
                     _world.GetSignature<SceneNode>() |
-                    _world.GetSignature<MeshRenderer>() |
                     _world.GetSignature<Transform>() |
                     _world.GetSignature<Bounds>();
         }
 
         static void Run( EcsWorld& _world, const EcsView& _view )
         {
-            auto meshRendererIt = _view.begin<MeshRenderer>();
-            auto transformIt    = _view.begin<Transform>();
-            auto boundsIt       = _view.begin<Bounds>();
-            auto sceneNodeIt    = _view.begin<SceneNode>();
-            for( ; meshRendererIt != _view.end<MeshRenderer>(); ++meshRendererIt, ++transformIt, ++boundsIt, ++sceneNodeIt )
+            auto transformIt = _view.begin<Transform>();
+            auto boundsIt    = _view.begin<Bounds>();
+            auto sceneNodeIt = _view.begin<SceneNode>();
+            for( ; transformIt != _view.end<Transform>(); ++transformIt, ++boundsIt, ++sceneNodeIt )
             {
                 SceneNode& sceneNode = *sceneNodeIt;
                 if( !sceneNode.HasFlag( SceneNode::BoundsOutdated ) )
                 {
                     continue;
                 }
-                const MeshRenderer& renderer  = *meshRendererIt;
-                const Transform   & transform = *transformIt;
-                Bounds            & bounds    = *boundsIt;
 
-                Scale* scaling = _world.SafeGetComponent<Scale>( boundsIt.GetEntity() );
-
-                if( renderer.mMesh != nullptr )
+                // Get hull
+                EcsEntity entity = transformIt.GetEntity();
+                ConvexHull* hull = nullptr;
+                if( _world.HasComponent<MeshRenderer>( entity ) )
                 {
-                    const Vector3 scale = scaling != nullptr ? scaling->mScale : Vector3 { 1, 1, 1 };
-
-                    Matrix4 model( transform.mRotation, transform.mPosition );
-                    Matrix4 scaleMatrix = Matrix4::sIdentity;
-                    scaleMatrix.e11 *= scale.x;
-                    scaleMatrix.e22 *= scale.y;
-                    scaleMatrix.e33 *= scale.z;
-
-                    bounds.mAabb = AABB( renderer.mMesh->mConvexHull.mVertices, model * scaleMatrix );
-                    sceneNode.RemoveFlag( SceneNode::BoundsOutdated );
+                    Mesh* mesh = _world.GetComponent<MeshRenderer>( entity ).mMesh;
+                    if( mesh != nullptr ){ hull = &mesh->mConvexHull; }
                 }
+                else if( _world.HasComponent<SkinnedMeshRenderer>( entity ) )
+                {
+                    SkinnedMesh* mesh = _world.GetComponent<SkinnedMeshRenderer>( entity ).mMesh;
+                    if( mesh != nullptr ){ hull = &mesh->mConvexHull; }
+                }
+
+                if( hull == nullptr )
+                {
+                    continue;
+                }
+
+                const Transform& transform = *transformIt;
+                Bounds         & bounds    = *boundsIt;
+                Scale          * scaling   = _world.SafeGetComponent<Scale>( boundsIt.GetEntity() );
+
+                const Vector3 scale = scaling != nullptr ? scaling->mScale : Vector3 { 1, 1, 1 };
+
+                Matrix4 model( transform.mRotation, transform.mPosition );
+                Matrix4 scaleMatrix = Matrix4::sIdentity;
+                scaleMatrix.e11 *= scale.x;
+                scaleMatrix.e22 *= scale.y;
+                scaleMatrix.e33 *= scale.z;
+
+                bounds.mAabb = AABB( hull->mVertices, model * scaleMatrix );
+                sceneNode.RemoveFlag( SceneNode::BoundsOutdated );
             }
         }
     };

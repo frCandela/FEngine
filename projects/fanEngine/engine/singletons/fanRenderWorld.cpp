@@ -40,10 +40,11 @@ namespace fan
     void RenderWorld::Init( EcsWorld& /*_world*/, EcsSingleton& _singleton )
     {
         RenderWorld& renderWorld = static_cast<RenderWorld&>( _singleton );
-        renderWorld.drawData.clear();
-        renderWorld.uiDrawData.clear();
-        renderWorld.pointLights.clear();
-        renderWorld.directionalLights.clear();
+        renderWorld.mModels.clear();
+        renderWorld.mSkinnedModels.clear();
+        renderWorld.mUIModels.clear();
+        renderWorld.mPointLights.clear();
+        renderWorld.mDirectionalLights.clear();
         renderWorld.mTargetSize    = { 1920, 1080 };
         renderWorld.mIsHeadless    = false;
         renderWorld.mClearColor    = Color::sDarkGrey;

@@ -33,11 +33,11 @@
 #include "engine/physics/fanPhysicsWorld.hpp"
 
 //render 3D
-#include "render/resources/fanMeshSkinned.hpp"
+#include "render/resources/fanSkinnedMesh.hpp"
 #include "engine/components/fanDirectionalLight.hpp"
 #include "engine/components/fanPointLight.hpp"
 #include "engine/components/fanMeshRenderer.hpp"
-#include "engine/components/fanMeshSkinnedRenderer.hpp"
+#include "engine/components/fanSkinnedMeshRenderer.hpp"
 #include "engine/components/fanMaterial.hpp"
 #include "engine/components/fanParticleEmitter.hpp"
 #include "engine/components/fanParticle.hpp"
@@ -133,7 +133,7 @@ namespace fan
             info.mLoad           = &LoadMeshSkinned;
             info.mUseDirtyList   = true;
             info.mUseDestroyList = true;
-            mResources.AddResourceType<MeshSkinned>( info );
+            mResources.AddResourceType<SkinnedMesh>( info );
         }
 
         {
@@ -187,15 +187,16 @@ namespace fan
             particlesDrawData.mColor        = glm::vec4( 1.f, 1.f, 1.f, 1.f );
             particlesDrawData.mShininess    = 1;
             particlesDrawData.mTexture      = nullptr;
-            renderWorld.drawData.push_back( particlesDrawData );
+            renderWorld.mModels.push_back( particlesDrawData );
         }
 
         {
             SCOPED_PROFILE( set_render_data );
-            _renderer.SetDrawData( renderWorld.drawData );
-            _renderer.SetUIDrawData( renderWorld.uiDrawData );
-            _renderer.SetPointLights( renderWorld.pointLights );
-            _renderer.SetDirectionalLights( renderWorld.directionalLights );
+            _renderer.SetModels( renderWorld.mModels );
+            _renderer.SetModelsSkinned( renderWorld.mSkinnedModels );
+            _renderer.SetModelsUI( renderWorld.mUIModels );
+            _renderer.SetPointLights( renderWorld.mPointLights );
+            _renderer.SetDirectionalLights( renderWorld.mDirectionalLights );
             _renderer.SetDebugDrawData( renderDebug.mDebugLines, renderDebug.mDebugLinesNoDepthTest, renderDebug.mDebugTriangles, renderDebug.mDebugTrianglesNoDepthTest, renderDebug.mDebugLines2D );
         }
 
@@ -297,7 +298,7 @@ namespace fan
         _world.AddComponentType<DirectionalLight>();
         _world.AddComponentType<PointLight>();
         _world.AddComponentType<MeshRenderer>();
-        _world.AddComponentType<MeshSkinnedRenderer>();
+        _world.AddComponentType<SkinnedMeshRenderer>();
         _world.AddComponentType<Material>();
         _world.AddComponentType<ParticleEmitter>();
         _world.AddComponentType<Particle>();
@@ -418,7 +419,7 @@ namespace fan
     Resource* PlayerData::LoadMeshSkinned( const std::string& _path, ResourceInfo& )
     {
         Debug::Log() << Debug::Type::Resources << "Loading skinned mesh " << _path << Debug::Endl();
-        MeshSkinned* mesh = new MeshSkinned();
+        SkinnedMesh* mesh = new SkinnedMesh();
         if( !mesh->LoadFromFile( _path ) )
         {
             delete mesh;

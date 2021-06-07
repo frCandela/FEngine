@@ -1,9 +1,9 @@
-#include "render/draw/fanDrawModels.hpp"
+#include "render/draw/fanDrawSkinnedModels.hpp"
 
 #include "core/fanAssert.hpp"
 #include "core/fanDebug.hpp"
 #include "render/fanVertex.hpp"
-#include "render/resources/fanMesh.hpp"
+#include "render/resources/fanSkinnedMesh.hpp"
 #include "render/resources/fanTexture.hpp"
 #include "render/core/fanRenderPass.hpp"
 #include "render/core/fanFrameBuffer.hpp"
@@ -12,7 +12,7 @@ namespace fan
 {
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void DrawModels::Create( Device& _device, uint32_t _imagesCount, ResourcePtr<Texture> _invalidTexture )
+    void DrawSkinnedModels::Create( Device& _device, uint32_t _imagesCount, ResourcePtr<Texture> _invalidTexture )
     {
         mInvalidTexture = _invalidTexture;
 
@@ -35,7 +35,7 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void DrawModels::Destroy( Device& _device )
+    void DrawSkinnedModels::Destroy( Device& _device )
     {
         mPipeline.Destroy( _device );
         mDescriptorUniforms.Destroy( _device );
@@ -45,12 +45,12 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    PipelineConfig DrawModels::GetPipelineConfig( DescriptorImages& _imagesDescriptor ) const
+    PipelineConfig DrawSkinnedModels::GetPipelineConfig( DescriptorImages& _imagesDescriptor ) const
     {
         PipelineConfig config( mVertexShader, mFragmentShader );
 
-        config.bindingDescription    = Vertex::GetBindingDescription();
-        config.attributeDescriptions = Vertex::GetAttributeDescriptions();
+        config.bindingDescription    = VertexSkinned::GetBindingDescription();
+        config.attributeDescriptions = VertexSkinned::GetAttributeDescriptions();
         config.descriptorSetLayouts  = { mDescriptorUniforms.mDescriptorSetLayout, _imagesDescriptor.mDescriptorSetLayout, mDescriptorSampler.mDescriptorSetLayout };
 
         return config;
@@ -58,7 +58,7 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void DrawModels::BindDescriptors( VkCommandBuffer _commandBuffer, const size_t _indexFrame, const uint32_t _indexOffset )
+    void DrawSkinnedModels::BindDescriptors( VkCommandBuffer _commandBuffer, const size_t _indexFrame, const uint32_t _indexOffset )
     {
         std::vector<VkDescriptorSet> descriptors    = {
                 mDescriptorUniforms.mDescriptorSets[_indexFrame]
@@ -81,7 +81,7 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void DrawModels::UpdateUniformBuffers( Device& _device, const size_t _index )
+    void DrawSkinnedModels::UpdateUniformBuffers( Device& _device, const size_t _index )
     {
         mDescriptorUniforms.SetData( _device, 0, _index, &mUniforms.mUniformsProjView, sizeof( UniformViewProj ), 0 );
         mDescriptorUniforms.SetData( _device, 1, _index, &mUniforms.mDynamicUniformsMatrices[0], mUniforms.mDynamicUniformsMatrices.Alignment() * mUniforms.mDynamicUniformsMatrices.Size(), 0 );
@@ -92,7 +92,7 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void UniformsModelDraw::Create( const VkDeviceSize _minUniformBufferOffsetAlignment )
+    void UniformsSkinnedModelDraw::Create( const VkDeviceSize _minUniformBufferOffsetAlignment )
     {
         // Calculate required alignment based on minimum device offset alignment
         size_t minUboAlignment      = (size_t)_minUniformBufferOffsetAlignment;
@@ -119,7 +119,7 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void DrawModels::RecordCommandBuffer( const size_t _index, RenderPass& _renderPass, FrameBuffer& _framebuffer, VkExtent2D _extent, DescriptorImages& _descriptorImages )
+    void DrawSkinnedModels::RecordCommandBuffer( const size_t _index, RenderPass& _renderPass, FrameBuffer& _framebuffer, VkExtent2D _extent, DescriptorImages& _descriptorImages )
     {
         VkCommandBuffer                commandBuffer                = mCommandBuffers.mBuffers[_index];
         VkCommandBufferInheritanceInfo commandBufferInheritanceInfo = CommandBuffer::GetInheritanceInfo( _renderPass.mRenderPass, _framebuffer.mFrameBuffers[_index] );
@@ -132,10 +132,10 @@ namespace fan
             mPipeline.Bind( commandBuffer, _extent );
             for( uint32_t meshIndex = 0; meshIndex < mDrawData.size(); meshIndex++ )
             {
-                RenderDataModel& drawData = mDrawData[meshIndex];
-                SubMesh & subMesh  = *drawData.mMesh;
+                RenderDataSkinnedModel& drawData = mDrawData[meshIndex];
+                SubSkinnedMesh        & subMesh  = *drawData.mMesh;
 
-                Buffer& buffer = subMesh.mVertexBuffer[subMesh.mCurrentBuffer];
+                Buffer& buffer = subMesh.mVertexBuffer;
                 if( buffer.mBuffer == VK_NULL_HANDLE ){ continue; }
 
                 const uint32_t textureIndex = drawData.mTexture == nullptr ? mInvalidTexture->mIndex : drawData.mTexture->mIndex;
@@ -143,8 +143,8 @@ namespace fan
                 BindDescriptors( commandBuffer, _index, meshIndex );
                 VkDeviceSize offsets[] = { 0 };
 
-                vkCmdBindVertexBuffers( commandBuffer, 0, 1, &subMesh.mVertexBuffer[subMesh.mCurrentBuffer].mBuffer, offsets );
-                vkCmdBindIndexBuffer( commandBuffer, subMesh.mIndexBuffer[subMesh.mCurrentBuffer].mBuffer, 0, VK_INDEX_TYPE_UINT32 );
+                vkCmdBindVertexBuffers( commandBuffer, 0, 1, &subMesh.mVertexBuffer.mBuffer, offsets );
+                vkCmdBindIndexBuffer( commandBuffer, subMesh.mIndexBuffer.mBuffer, 0, VK_INDEX_TYPE_UINT32 );
                 vkCmdDrawIndexed( commandBuffer, static_cast<uint32_t>( subMesh.mIndices.size() ), 1, 0, 0, 0 );
             }
 
@@ -161,7 +161,7 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void DrawModels::SetDrawData( Device& _device, const uint32_t _imagesCount, const std::vector<RenderDataModel>& _drawData )
+    void DrawSkinnedModels::SetDrawData( Device& _device, const uint32_t _imagesCount, const std::vector<RenderDataSkinnedModel>& _drawData )
     {
         if( _drawData.size() > mDrawData.capacity() )
         {
@@ -179,7 +179,7 @@ namespace fan
         mDrawData.clear();
         for( int dataIndex = 0; dataIndex < (int)_drawData.size(); dataIndex++ )
         {
-            const RenderDataModel& data = _drawData[dataIndex];
+            const RenderDataSkinnedModel& data = _drawData[dataIndex];
 
             fanAssert( data.mMesh != nullptr );
             fanAssert( !data.mMesh->mIndices.empty() );
@@ -199,7 +199,7 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void DrawModels::SetPointLights( const std::vector<UniformPointLight>& _lightData )
+    void DrawSkinnedModels::SetPointLights( const std::vector<UniformPointLight>& _lightData )
     {
         fanAssert( _lightData.size() < RenderGlobal::sMaximumNumPointLights );
         mUniforms.mUniformsLights.mPointLightNum = (uint32_t)_lightData.size();
@@ -208,7 +208,7 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void DrawModels::SetDirectionalLights( const std::vector<UniformDirectionalLight>& _lightData )
+    void DrawSkinnedModels::SetDirectionalLights( const std::vector<UniformDirectionalLight>& _lightData )
     {
         fanAssert( _lightData.size() < RenderGlobal::sMaximumNumDirectionalLight );
         mUniforms.mUniformsLights.mDirLightsNum = (uint32_t)_lightData.size();
@@ -217,11 +217,11 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void DrawModels::BindTexture( VkCommandBuffer _commandBuffer,
-                                  const uint32_t _textureIndex,
-                                  DescriptorSampler& _descriptorSampler,
-                                  DescriptorImages& _descriptorImages,
-                                  VkPipelineLayout _pipelineLayout )
+    void DrawSkinnedModels::BindTexture( VkCommandBuffer _commandBuffer,
+                                         const uint32_t _textureIndex,
+                                         DescriptorSampler& _descriptorSampler,
+                                         DescriptorImages& _descriptorImages,
+                                         VkPipelineLayout _pipelineLayout )
     {
         fanAssert( _textureIndex < _descriptorImages.mDescriptorSets.size() );
 

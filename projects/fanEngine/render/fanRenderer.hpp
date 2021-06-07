@@ -20,6 +20,7 @@
 #include "render/core/descriptors/fanDescriptorUniforms.hpp"
 #include "render/draw/fanDrawImgui.hpp"
 #include "render/draw/fanDrawModels.hpp"
+#include "render/draw/fanDrawSkinnedModels.hpp"
 #include "render/draw/fanDrawDebug.hpp"
 #include "render/draw/fanDrawUI.hpp"
 #include "render/draw/fanDrawPostprocess.hpp"
@@ -53,10 +54,11 @@ namespace fan
         void ResizeSwapchain();
 
         void SetMainCamera( const glm::mat4 _projection, const glm::mat4 _view, const glm::vec3 _position );
-        void SetDirectionalLights( const std::vector<RenderDataDirectionalLight>& _lightData );
-        void SetPointLights( const std::vector<RenderDataPointLight>& _lightData );
-        void SetDrawData( const std::vector<RenderDataModel>& _drawData );
-        void SetUIDrawData( const std::vector<RenderDataMesh2D>& _drawData );
+        void SetDirectionalLights( const std::vector<UniformDirectionalLight>& _lightData );
+        void SetPointLights( const std::vector<UniformPointLight>& _lightData );
+        void SetModels( const std::vector<RenderDataModel>& _models );
+        void SetModelsSkinned( const std::vector<RenderDataSkinnedModel>& _models );
+        void SetModelsUI( const std::vector<RenderDataMesh2D>& _drawData );
         void SetDebugDrawData( const std::vector<DebugLineVertex>& _debugLines,
                                const std::vector<DebugLineVertex>& _debugLinesNoDepthTest,
                                const std::vector<DebugVertex>& _debugTriangles,
@@ -65,7 +67,7 @@ namespace fan
 
         Resources& mResources;
         Window   & mWindow;
-        Device         & mDevice;
+        Device   & mDevice;
 
         const ViewType mViewType;
         VkExtent2D     mGameExtent = { 1, 1 };
@@ -73,11 +75,12 @@ namespace fan
         CommandBuffer  mPrimaryCommandBuffers;
 
         // draw units
-        DrawModels      mDrawModels;
-        DrawDebug       mDrawDebug;
-        DrawUI          mDrawUI;
-        DrawPostprocess mDrawPostprocess;
-        DrawImgui       mDrawImgui;
+        DrawModels        mDrawModels;
+        DrawSkinnedModels mDrawSkinnedModels;
+        DrawDebug         mDrawDebug;
+        DrawUI            mDrawUI;
+        DrawPostprocess   mDrawPostprocess;
+        DrawImgui         mDrawImgui;
 
         // global descriptors
         DescriptorImages mDescriptorTextures;
@@ -118,7 +121,6 @@ namespace fan
         void DestroyPipelines();
 
         void UpdateUniformBuffers( Device& _device, const size_t _index );
-        void BuildNewMeshes2D( Device& _device );
         void BuildNewMeshes( Device& _device );
         bool BuildNewTextures( Device& _device );
         void ClearDestroyedMesh2D( Device& _device );
