@@ -37,6 +37,7 @@ namespace fan
 
         AlignedMemory<DynamicUniformsMaterial> mDynamicUniformsMaterial;
         AlignedMemory<DynamicUniformMatrices>  mDynamicUniformsMatrices;
+        AlignedMemory<DynamicUniformBones>     mDynamicUniformsBones;
         UniformLights                          mUniformsLights;
         UniformViewProj                        mUniformsProjView;
         UniformCameraPosition                  mUniformsCameraPosition;

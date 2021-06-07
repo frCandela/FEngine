@@ -69,11 +69,7 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void DescriptorUniforms::ResizeDynamicUniformBinding( Device& _device,
-                                                          const size_t _count,
-                                                          VkDeviceSize _bufferSize,
-                                                          VkDeviceSize _alignment,
-                                                          const int _index )
+    void DescriptorUniforms::ResizeDynamicUniformBinding( Device& _device, const size_t _count, VkDeviceSize _bufferSize, VkDeviceSize _alignment, const int _index )
     {
         fanAssert( _index < (int)mBindingData.size() );
         for( int bufferIndex = 0; bufferIndex < (int)_count; bufferIndex++ )
@@ -86,11 +82,7 @@ namespace fan
     //==================================================================================================================================================================================================
     // For uniform buffers only, update buffer data of the binding at _index
     //==================================================================================================================================================================================================
-    void DescriptorUniforms::SetData( Device& _device,
-                                      const size_t _indexBinding,
-                                      const size_t _indexBuffer,
-                                      const void* _data,
-                                      VkDeviceSize _size, VkDeviceSize _offset )
+    void DescriptorUniforms::SetData( Device& _device, const size_t _indexBinding, const size_t _indexBuffer, const void* _data, VkDeviceSize _size, VkDeviceSize _offset )
     {
         fanAssert( _indexBinding < mBindingData.size() );
         mBindingData[_indexBinding].mBuffers[_indexBuffer].SetData( _device, _data, _size, _offset );
@@ -98,9 +90,7 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void DescriptorUniforms::Bind( VkCommandBuffer _commandBuffer,
-                                   VkPipelineLayout _pipelineLayout,
-                                   const size_t _index )
+    void DescriptorUniforms::Bind( VkCommandBuffer _commandBuffer, VkPipelineLayout _pipelineLayout, const size_t _index )
     {
         vkCmdBindDescriptorSets( _commandBuffer,
                                  VK_PIPELINE_BIND_POINT_GRAPHICS,
@@ -158,16 +148,12 @@ namespace fan
             descriptorPoolCreateInfo.maxSets       = _count;
             descriptorPoolCreateInfo.poolSizeCount = static_cast< uint32_t >( poolSizes.size() );
             descriptorPoolCreateInfo.pPoolSizes    = poolSizes.data();
-            if( vkCreateDescriptorPool( _device.mDevice,
-                                        &descriptorPoolCreateInfo,
-                                        nullptr,
-                                        &mDescriptorPool ) != VK_SUCCESS )
+            if( vkCreateDescriptorPool( _device.mDevice, &descriptorPoolCreateInfo, nullptr, &mDescriptorPool ) != VK_SUCCESS )
             {
                 Debug::Error( "Could not allocate descriptor pool." );
                 return false;
             }
-            Debug::Log() << Debug::Type::Render << std::hex << "VkDescriptorPool      " << mDescriptorPool
-                    << std::dec << Debug::Endl();
+            Debug::Log() << Debug::Type::Render << std::hex << "VkDescriptorPool      " << mDescriptorPool << std::dec << Debug::Endl();
         }
 
         // Create descriptor set
@@ -254,20 +240,12 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void DescriptorUniforms::BindingData::CreateBuffers( Device& _device,
-                                                         const size_t _count,
-                                                         VkDeviceSize _sizeBuffer,
-                                                         VkDeviceSize _alignment )
+    void DescriptorUniforms::BindingData::CreateBuffers( Device& _device, const size_t _count, VkDeviceSize _sizeBuffer, VkDeviceSize _alignment )
     {
         fanAssert( _count <= SwapChain::sMaxFramesInFlight );
         for( int bufferIndex = 0; bufferIndex < (int)_count; bufferIndex++ )
         {
-            mBuffers[bufferIndex].Create( _device,
-                                          _sizeBuffer,
-                                          VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-                                          VK_MEMORY_PROPERTY_HOST_COHERENT_BIT |
-                                          VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT,
-                                          _alignment );
+            mBuffers[bufferIndex].Create( _device, _sizeBuffer, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_COHERENT_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, _alignment );
         }
     }
 }

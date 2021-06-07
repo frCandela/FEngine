@@ -51,6 +51,7 @@ namespace fan
         static const char* sImguiFragmentShader;
 
         static constexpr const uint32_t sMaxBonesInfluences         = 4;
+        static constexpr const uint32_t sMaxBones                   = 64;
         static constexpr const uint32_t sMaximumNumPointLights      = 16;
         static constexpr const uint32_t sMaximumNumDirectionalLight = 4;
 

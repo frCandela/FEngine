@@ -25,7 +25,7 @@ namespace fan
         void SetAlignement( const size_t _alignment )
         {
             fanAssert( ( _alignment & ( _alignment - 1 ) ) == 0 );
-            fanAssert( _alignment > sizeof( T ) && mAlignment >> 1 < sizeof( T ) );
+            fanAssert( _alignment >= sizeof( T ) );
 
             mAlignment = _alignment;
         }

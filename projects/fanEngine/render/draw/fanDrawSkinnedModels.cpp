@@ -24,12 +24,14 @@ namespace fan
         mUniforms.Create( _device.mDeviceProperties.limits.minUniformBufferOffsetAlignment );
         mUniforms.mDynamicUniformsMatrices.Resize( initialDrawDataSize );
         mUniforms.mDynamicUniformsMaterial.Resize( initialDrawDataSize );
+        mUniforms.mDynamicUniformsBones.Resize( initialDrawDataSize );
 
         mDescriptorUniforms.AddUniformBinding( _device, _imagesCount, VK_SHADER_STAGE_VERTEX_BIT, sizeof( UniformViewProj ) );
         mDescriptorUniforms.AddDynamicUniformBinding( _device, _imagesCount, VK_SHADER_STAGE_VERTEX_BIT, mUniforms.mDynamicUniformsMatrices.Size(), mUniforms.mDynamicUniformsMatrices.Alignment() );
         mDescriptorUniforms.AddUniformBinding( _device, _imagesCount, VK_SHADER_STAGE_FRAGMENT_BIT, sizeof( UniformCameraPosition ) );
         mDescriptorUniforms.AddDynamicUniformBinding( _device, _imagesCount, VK_SHADER_STAGE_FRAGMENT_BIT, mUniforms.mDynamicUniformsMaterial.Size(), mUniforms.mDynamicUniformsMaterial.Alignment() );
         mDescriptorUniforms.AddUniformBinding( _device, _imagesCount, VK_SHADER_STAGE_FRAGMENT_BIT, sizeof( UniformLights ) );
+        mDescriptorUniforms.AddDynamicUniformBinding( _device, _imagesCount, VK_SHADER_STAGE_VERTEX_BIT, mUniforms.mDynamicUniformsBones.Size(), mUniforms.mDynamicUniformsBones.Alignment() );
         mDescriptorUniforms.Create( _device, _imagesCount );
     }
 
@@ -65,7 +67,8 @@ namespace fan
         };
         std::vector<uint32_t>        dynamicOffsets = {
                 _indexOffset * static_cast<uint32_t>( mUniforms.mDynamicUniformsMatrices.Alignment() ),
-                _indexOffset * static_cast<uint32_t>( mUniforms.mDynamicUniformsMaterial.Alignment() )
+                _indexOffset * static_cast<uint32_t>( mUniforms.mDynamicUniformsMaterial.Alignment() ),
+                _indexOffset * static_cast<uint32_t>( mUniforms.mDynamicUniformsBones.Alignment() ),
         };
         vkCmdBindDescriptorSets(
                 _commandBuffer,
@@ -88,6 +91,7 @@ namespace fan
         mDescriptorUniforms.SetData( _device, 2, _index, &mUniforms.mUniformsCameraPosition, sizeof( UniformCameraPosition ), 0 );
         mDescriptorUniforms.SetData( _device, 3, _index, &mUniforms.mDynamicUniformsMaterial[0], mUniforms.mDynamicUniformsMaterial.Alignment() * mUniforms.mDynamicUniformsMaterial.Size(), 0 );
         mDescriptorUniforms.SetData( _device, 4, _index, &mUniforms.mUniformsLights, sizeof( UniformLights ), 0 );
+        mDescriptorUniforms.SetData( _device, 5, _index, &mUniforms.mDynamicUniformsBones[0], mUniforms.mDynamicUniformsBones.Alignment() * mUniforms.mDynamicUniformsBones.Size(), 0 );
     }
 
     //==================================================================================================================================================================================================
@@ -95,20 +99,24 @@ namespace fan
     void UniformsSkinnedModelDraw::Create( const VkDeviceSize _minUniformBufferOffsetAlignment )
     {
         // Calculate required alignment based on minimum device offset alignment
-        size_t minUboAlignment      = (size_t)_minUniformBufferOffsetAlignment;
-        size_t dynamicAlignmentVert = sizeof( DynamicUniformMatrices );
-        size_t dynamicAlignmentFrag = sizeof( DynamicUniformsMaterial );
+        size_t minUboAlignment       = (size_t)_minUniformBufferOffsetAlignment;
+        size_t dynamicAlignmentVert  = sizeof( DynamicUniformMatrices );
+        size_t dynamicAlignmentFrag  = sizeof( DynamicUniformsMaterial );
+        size_t dynamicAlignmentBones = sizeof( DynamicUniformBones );
         if( minUboAlignment > 0 )
         {
-            dynamicAlignmentVert = ( ( sizeof( DynamicUniformMatrices ) + minUboAlignment - 1 ) & ~( minUboAlignment - 1 ) );
-            dynamicAlignmentFrag = ( ( sizeof( DynamicUniformsMaterial ) + minUboAlignment - 1 ) & ~( minUboAlignment - 1 ) );
+            dynamicAlignmentVert  = ( ( sizeof( DynamicUniformMatrices ) + minUboAlignment - 1 ) & ~( minUboAlignment - 1 ) );
+            dynamicAlignmentFrag  = ( ( sizeof( DynamicUniformsMaterial ) + minUboAlignment - 1 ) & ~( minUboAlignment - 1 ) );
+            dynamicAlignmentBones = ( ( sizeof( DynamicUniformBones ) + minUboAlignment - 1 ) & ~( minUboAlignment - 1 ) );
         }
 
         mDynamicUniformsMatrices.SetAlignement( dynamicAlignmentVert );
         mDynamicUniformsMaterial.SetAlignement( dynamicAlignmentFrag );
+        mDynamicUniformsBones.SetAlignement( dynamicAlignmentBones );
 
         mDynamicUniformsMatrices.Resize( 256 );
         mDynamicUniformsMaterial.Resize( 256 );
+        mDynamicUniformsBones.Resize( 256 );
 
         for( int uniformIndex = 0; uniformIndex < (int)mDynamicUniformsMaterial.Size(); uniformIndex++ )
         {
@@ -171,8 +179,10 @@ namespace fan
             mDrawData.reserve( newSize );
             mUniforms.mDynamicUniformsMatrices.Resize( newSize );
             mUniforms.mDynamicUniformsMaterial.Resize( newSize );
+            mUniforms.mDynamicUniformsBones.Resize( newSize );
             mDescriptorUniforms.ResizeDynamicUniformBinding( _device, _imagesCount, mUniforms.mDynamicUniformsMatrices.Size(), mUniforms.mDynamicUniformsMatrices.Alignment(), 1 );
             mDescriptorUniforms.ResizeDynamicUniformBinding( _device, _imagesCount, mUniforms.mDynamicUniformsMaterial.Size(), mUniforms.mDynamicUniformsMaterial.Alignment(), 3 );
+            mDescriptorUniforms.ResizeDynamicUniformBinding( _device, _imagesCount, mUniforms.mDynamicUniformsBones.Size(), mUniforms.mDynamicUniformsBones.Alignment(), 5 );
             mDescriptorUniforms.UpdateDescriptorSets( _device, _imagesCount );
         }
 
@@ -187,6 +197,8 @@ namespace fan
             // Transform
             mUniforms.mDynamicUniformsMatrices[dataIndex].mModelMat  = data.mModelMatrix;
             mUniforms.mDynamicUniformsMatrices[dataIndex].mNormalMat = data.mNormalMatrix;
+
+            mUniforms.mDynamicUniformsBones[dataIndex].mModelMat[0] = glm::translate( glm::mat4( 1.f ), glm::vec3( 0, 4*dataIndex, 0 ) );
 
             // material
             mUniforms.mDynamicUniformsMaterial[dataIndex].mColor     = data.mColor;
