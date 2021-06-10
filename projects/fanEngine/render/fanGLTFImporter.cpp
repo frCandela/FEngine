@@ -132,6 +132,48 @@ namespace fan
                 submesh.texcoords0Array  = (glm::vec2*)submesh.texcoords0Buffer.data();
                 fanAssert( submesh.verticesCount == accessorTexcoords0.mCount );
             }
+
+            // load joints0
+            if( mesh.mPrimitives[primitiveIndex].HasJoints0() )
+            {
+                GLTFAccessor accessorJoints0;
+                accessorJoints0.Load( jAccessors[mesh.mPrimitives[primitiveIndex].mJoints0] );
+                fanAssert( accessorJoints0.mType == GLTFType::Vec4 );
+                fanAssert( accessorJoints0.mComponentType == GLTFComponentType::UnsignedByte );
+                fanAssert( submesh.verticesCount == accessorJoints0.mCount );
+                GLTFBufferView viewJoints0;
+                viewJoints0.Load( jBufferViews[accessorJoints0.mBufferView] );
+                GLTFBuffer bufferJoints0;
+                bufferJoints0.Load( jBuffers[viewJoints0.mBuffer] );
+
+                if( m_loadedBuffers[viewJoints0.mBuffer].empty() )
+                {
+                    m_loadedBuffers[viewJoints0.mBuffer] = GLTFBuffer::DecodeBuffer( jBuffers[viewJoints0.mBuffer]["uri"] );
+                }
+                submesh.joints0Buffer = bufferJoints0.GetBuffer( viewJoints0, m_loadedBuffers[viewJoints0.mBuffer] );
+                submesh.joints0Array  = (glm::u8vec4*)submesh.joints0Buffer.data();
+            }
+
+            // load weights0
+            if( mesh.mPrimitives[primitiveIndex].HasWeights0() )
+            {
+                GLTFAccessor accessorWeights0;
+                accessorWeights0.Load( jAccessors[mesh.mPrimitives[primitiveIndex].mWeights0] );
+                fanAssert( accessorWeights0.mType == GLTFType::Vec4 );
+                fanAssert( accessorWeights0.mComponentType == GLTFComponentType::Float );
+                fanAssert( submesh.verticesCount == accessorWeights0.mCount );
+                GLTFBufferView viewWeight0;
+                viewWeight0.Load( jBufferViews[accessorWeights0.mBufferView] );
+                GLTFBuffer bufferWeights0;
+                bufferWeights0.Load( jBuffers[viewWeight0.mBuffer] );
+
+                if( m_loadedBuffers[viewWeight0.mBuffer].empty() )
+                {
+                    m_loadedBuffers[viewWeight0.mBuffer] = GLTFBuffer::DecodeBuffer( jBuffers[viewWeight0.mBuffer]["uri"] );
+                }
+                submesh.weights0Buffer = bufferWeights0.GetBuffer( viewWeight0, m_loadedBuffers[viewWeight0.mBuffer] );
+                submesh.weights0Array  = (glm::vec4*)submesh.weights0Buffer.data();
+            }
         }
         return true;
     }
@@ -192,10 +234,12 @@ namespace fan
 
             for( int i = 0; i < (int)meshVertices.size(); i++ )
             {
-                meshVertices[i].mPos    = submesh.positionsArray[i];
-                meshVertices[i].mNormal = submesh.normalsArray != nullptr ? submesh.normalsArray[i] : glm::vec3( 0, 0, 1 );
-                meshVertices[i].mColor  = Color::sWhite.ToGLM3();
-                meshVertices[i].mUv     = submesh.texcoords0Array != nullptr ? submesh.texcoords0Array[i] : glm::vec2( 0, 0 );
+                meshVertices[i].mPos         = submesh.positionsArray[i];
+                meshVertices[i].mNormal      = submesh.normalsArray != nullptr ? submesh.normalsArray[i] : glm::vec3( 0, 0, 1 );
+                meshVertices[i].mColor       = Color::sWhite.ToGLM3();
+                meshVertices[i].mUv          = submesh.texcoords0Array != nullptr ? submesh.texcoords0Array[i] : glm::vec2( 0, 0 );
+                meshVertices[i].mBoneIDs     = submesh.joints0Array != nullptr ? submesh.joints0Array[i] : glm::u8vec4( 0, 0, 0, 42 );
+                meshVertices[i].mBoneWeights = submesh.weights0Array != nullptr ? submesh.weights0Array[i] : glm::vec4( 1, 0, 0, 42 );
             }
         }
     }

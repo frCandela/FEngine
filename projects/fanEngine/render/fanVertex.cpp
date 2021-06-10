@@ -94,7 +94,7 @@ namespace fan
         // Bone IDs
         attributeDescriptions[4].binding  = 0;
         attributeDescriptions[4].location = 4;
-        attributeDescriptions[4].format   = VK_FORMAT_R32G32B32A32_SINT;
+        attributeDescriptions[4].format   = VK_FORMAT_R8G8B8A8_SINT;
         attributeDescriptions[4].offset   = offsetof( VertexSkinned, mBoneIDs );
 
         // Bone weights

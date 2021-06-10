@@ -52,7 +52,8 @@ namespace fan
         Prefab prefab;
         if( prefab.CreateFromJson( pastedJson ) )
         {
-            prefab.Instantiate( *mSelection->GetSelectedSceneNode() );
+            SceneNode* parent = mSelection->GetSelectedSceneNode();
+            prefab.Instantiate( parent != nullptr ? *parent : mSelection->mCurrentScene->GetRootNode() );
         }
     }
 } 

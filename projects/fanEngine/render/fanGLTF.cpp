@@ -9,15 +9,19 @@ namespace fan
     void GLTFPrimitive::Load( const Json& jPrimitive )
     {
         const Json& jAttribute = jPrimitive["attributes"];
+        const bool hasMaterial  = jPrimitive.find( "material" ) != jPrimitive.end();
         const bool hasNormal    = jAttribute.find( "NORMAL" ) != jAttribute.end();
         const bool hasTexcoord0 = jAttribute.find( "TEXCOORD_0" ) != jAttribute.end();
-        const bool hasMaterial  = jPrimitive.find( "material" ) != jPrimitive.end();
+        const bool hasJoints0 = jAttribute.find( "JOINTS_0" ) != jAttribute.end();
+        const bool hasWeights0  = jAttribute.find( "WEIGHTS_0" ) != jAttribute.end();
 
         mIndices   = jPrimitive["indices"];
         mPosition  = jAttribute["POSITION"];
         mMaterial  = hasMaterial ? int( jPrimitive["material"] ) : 0;
         mNormal    = hasNormal ? int( jAttribute["NORMAL"] ) : -1;
         mTexCoord0 = hasTexcoord0 ? int( jAttribute["TEXCOORD_0"] ) : -1;
+        mJoints0    = hasJoints0 ? int( jAttribute["JOINTS_0"] ) : -1;
+        mWeights0   = hasWeights0 ? int( jAttribute["WEIGHTS_0"] ) : -1;
     }
 
     //==================================================================================================================================================================================================
@@ -31,6 +35,8 @@ namespace fan
             if( mPosition >= 0 ){ jAttribute["POSITION"] = mPosition; }
             if( mNormal >= 0 ){ jAttribute["NORMAL"] = mNormal; }
             if( mTexCoord0 >= 0 ){ jAttribute["TEXCOORD_0"] = mTexCoord0; }
+            if( mJoints0 >= 0 ){ jAttribute["JOINTS_0"] = mJoints0; }
+            if( mWeights0 >= 0 ){ jAttribute["WEIGHTS_0"] = mWeights0; }
         }
     }
 

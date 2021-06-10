@@ -56,12 +56,16 @@ namespace fan
         int mPosition  = -1;
         int mNormal    = -1;
         int mTexCoord0 = -1;
+        int mJoints0   = -1;
+        int mWeights0  = -1;
         int mMaterial  = 0;
 
         void Load( const Json& jPrimitive );
         void Save( Json& jPrimitive ) const;
         bool HasNormals() const { return mNormal >= 0; }
         bool HasTexcoords0() const { return mTexCoord0 >= 0; }
+        bool HasJoints0() const { return mJoints0 >= 0; }
+        bool HasWeights0() const { return mWeights0 >= 0; }
     };
 
     //================================================================

@@ -35,6 +35,10 @@ namespace fan
             glm::vec3* normalsArray = nullptr;
             std::string texcoords0Buffer;
             glm::vec2* texcoords0Array = nullptr;
+            std::string joints0Buffer;
+            glm::u8vec4* joints0Array = nullptr;
+            std::string weights0Buffer;
+            glm::vec4* weights0Array = nullptr;
         };
         std::vector<GLTFSubmeshData> mSubmeshes;
     };

@@ -39,7 +39,7 @@ namespace fan
         glm::vec3  mNormal;
         glm::vec3  mColor;
         glm::vec2  mUv;
-        glm::ivec4 mBoneIDs;
+        glm::u8vec4 mBoneIDs;
         glm::vec4  mBoneWeights;
         static_assert( RenderGlobal::sMaxBonesInfluences == 4 );
 

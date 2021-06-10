@@ -198,7 +198,11 @@ namespace fan
             mUniforms.mDynamicUniformsMatrices[dataIndex].mModelMat  = data.mModelMatrix;
             mUniforms.mDynamicUniformsMatrices[dataIndex].mNormalMat = data.mNormalMatrix;
 
-            mUniforms.mDynamicUniformsBones[dataIndex].mModelMat[0] = glm::translate( glm::mat4( 1.f ), glm::vec3( 0, 4*dataIndex, 0 ) );
+            // bones
+            for( int i = 0; i <  RenderGlobal::sMaxBones; ++i )
+            {
+                mUniforms.mDynamicUniformsBones[dataIndex].mModelMat[i] = data.mModelMatrix;
+            }
 
             // material
             mUniforms.mDynamicUniformsMaterial[dataIndex].mColor     = data.mColor;

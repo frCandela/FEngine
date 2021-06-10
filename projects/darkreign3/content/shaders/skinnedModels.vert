@@ -12,9 +12,11 @@ layout (binding = 1) uniform DynamicUniformBufferObject
     mat4 normalMat;
 } dynamicUbo;
 
+const int sMaxBonesInfluences = 4;
+const int sMaxBones = 64;
 layout (binding = 5) uniform DynamicUniformBones
 {
-    mat4 mBones[64];
+    mat4 mBones[sMaxBones];
 } bones;
 
 layout (location = 0) in vec3  inPosition;
@@ -31,11 +33,23 @@ layout (location = 3) out vec2 outTexCoord;
 
 void main()
 {
-    const vec4 worldPos = bones.mBones[0] * dynamicUbo.modelMat * vec4(inPosition, 1.0);
+    vec4 totalPosition = vec4(0.f);
+    vec3 totalNormal = vec3(0.f);
+    for(int i = 0 ; i < sMaxBonesInfluences ; i++)
+    {
+        const float boneWeight = inBoneWeights[i];
+        const int boneID = inBoneIDs[i];
+        vec4 localPosition = bones.mBones[boneID] * vec4(inPosition,1.0f);
+        totalPosition += localPosition * boneWeight;
+        vec3 localNormal = mat3(bones.mBones[boneID]) * inNormal;
+        totalNormal += localNormal * boneWeight;
+    }
+
+    vec4 worldPos = dynamicUbo.modelMat * totalPosition;
     gl_Position = ubo.proj * ubo.view * worldPos;
 
     outColor = inColor;
     outFragPos = worldPos.xyz;
-    outNormal =  (dynamicUbo.normalMat * vec4(inNormal, 1)).xyz;
+    outNormal =  (dynamicUbo.normalMat * vec4(totalNormal, 1)).xyz;
     outTexCoord = inTexCoord;
 }
