@@ -46,6 +46,7 @@ namespace fan
         UnitTestResult mBitsResult;
         UnitTestResult mQueueResult;
         UnitTestResult mResourcesManagerResult;
+        UnitTestResult mStringResult;
     };
 
     //==================================================================================================================================================================================================

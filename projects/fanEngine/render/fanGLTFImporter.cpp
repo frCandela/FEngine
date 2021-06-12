@@ -3,8 +3,8 @@
 #include "core/fanDebug.hpp"
 #include "render/fanGLTFImporter.hpp"
 #include "render/resources/fanMesh.hpp"
-#include "render/resources/fanSkinnedMesh.hpp"
 #include "render/fanGLTF.hpp"
+#include <stack>
 
 namespace fan
 {
@@ -40,6 +40,9 @@ namespace fan
         const Json& jAccessors   = mJson["accessors"];
         const Json& jBufferViews = mJson["bufferViews"];
         const Json& jBuffers     = mJson["buffers"];
+        const Json& jSkins       = mJson["skins"];
+        const Json& jNodes       = mJson["nodes"];
+        const Json& jScenes      = mJson["scenes"];
         std::vector<std::string> m_loadedBuffers;
         m_loadedBuffers.resize( jBuffers.size() );
 
@@ -53,6 +56,39 @@ namespace fan
         // Loads the first mesh json
         GLTFMesh mesh;
         mesh.Load( jMeshes[0] );
+
+        // loads scenes
+        std::vector<GLTFScene> scenes;
+        if( jScenes.is_array() && jScenes.size() != 0 )
+        {
+            scenes.resize( jScenes.size() );
+            for( int i = 0; i < jScenes.size(); i++ )
+            {
+                scenes[i].Load( jScenes[i] );
+            }
+        }
+
+        // load nodes
+        std::vector<GLTFNode> nodes;
+        if( jNodes.is_array() && jNodes.size() != 0 )
+        {
+            nodes.resize( jNodes.size() );
+            for( int i = 0; i < jNodes.size(); i++ )
+            {
+                nodes[i].Load( jNodes[i] );
+            }
+        }
+
+        // set parents of all nodes
+        for( int parentIndex = 0; parentIndex < nodes.size(); ++parentIndex )
+        {
+            GLTFNode& parent = nodes[parentIndex];
+            for( int childIndex : parent.mChildren )
+            {
+                GLTFNode& child = nodes[childIndex];
+                child.mParent = parentIndex;
+            }
+        }
 
         mSubmeshes.resize( mesh.mPrimitives.size() );
         for( int primitiveIndex = 0; primitiveIndex < mesh.mPrimitives.size(); ++primitiveIndex )
@@ -174,6 +210,57 @@ namespace fan
                 submesh.weights0Buffer = bufferWeights0.GetBuffer( viewWeight0, m_loadedBuffers[viewWeight0.mBuffer] );
                 submesh.weights0Array  = (glm::vec4*)submesh.weights0Buffer.data();
             }
+
+            // loads skins
+            if( jSkins.is_array() && jSkins.size() != 0 )
+            {
+                GLTFSkin skin;
+                skin.Load( jSkins[0] );
+                submesh.mSkeleton.mName     = skin.mName;
+                submesh.mSkeleton.mNumBones = (int)skin.mJoints.size();
+
+                std::vector<GLTFNode> skeletonNodes;
+                skeletonNodes.resize( skin.mJoints.size() );
+                fanAssert( skin.mJoints.size() <= RenderGlobal::sMaxBones );
+                std::map<int, int> remapTable;
+                for( int           i   = 0; i < skin.mJoints.size(); i++ )
+                {
+                    const int nodeIndex = skin.mJoints[i];
+                    const GLTFNode& node = nodes[nodeIndex];
+                    remapTable[nodeIndex] = i;
+                    skeletonNodes[i]      = node;
+                }
+
+                for( int nodeIndex = 0; nodeIndex < skeletonNodes.size(); nodeIndex++ )
+                {
+                    const GLTFNode& node = skeletonNodes[nodeIndex];
+                    Bone          & bone = submesh.mSkeleton.mBones[nodeIndex];
+                    bone.mName      = node.mName;
+                    bone.mNumChilds = (int)node.mChildren.size();
+                    fanAssert( bone.mNumChilds < Bone::sMaxChilds );
+                    for( int childIndex = 0; childIndex < node.mChildren.size(); ++childIndex )
+                    {
+                        bone.mChilds[childIndex] = remapTable.at( node.mChildren[childIndex] );
+                    }
+                    bone.mTransform = Matrix4( node.mRotation, node.mPosition, node.mScale );
+                }
+
+                Matrix4 skeletonTransform = Matrix4::sIdentity;
+                GLTFNode& skeletonRoot = nodes[skin.mJoints[0]];
+                if( skeletonRoot.mParent >= 0 )
+                {
+                    GLTFNode* node = &nodes[skeletonRoot.mParent];
+                    while( node != nullptr )
+                    {
+                        Matrix4 relativeTransform( node->mRotation, node->mPosition, node->mScale );
+                        skeletonTransform = relativeTransform * skeletonTransform;
+                        node              = node->mParent >= 0 ? &nodes[node->mParent] : nullptr;
+                    }
+                }
+                Bone& rootBone = submesh.mSkeleton.mBones[0];
+                rootBone.mTransform = skeletonTransform * rootBone.mTransform ;
+
+            }
         }
         return true;
     }
@@ -241,6 +328,8 @@ namespace fan
                 meshVertices[i].mBoneIDs     = submesh.joints0Array != nullptr ? submesh.joints0Array[i] : glm::u8vec4( 0, 0, 0, 42 );
                 meshVertices[i].mBoneWeights = submesh.weights0Array != nullptr ? submesh.weights0Array[i] : glm::vec4( 1, 0, 0, 42 );
             }
+
+            _mesh.mSkeleton = submesh.mSkeleton;
         }
     }
 }

@@ -3,11 +3,11 @@
 #include "fanJson.hpp"
 #include <string>
 #include "fanGlm.hpp"
+#include "render/resources/fanSkinnedMesh.hpp"
 
 namespace fan
 {
     struct Mesh;
-    struct SkinnedMesh;
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
@@ -39,7 +39,9 @@ namespace fan
             glm::u8vec4* joints0Array = nullptr;
             std::string weights0Buffer;
             glm::vec4* weights0Array = nullptr;
+            Skeleton mSkeleton;
         };
         std::vector<GLTFSubmeshData> mSubmeshes;
+
     };
 }

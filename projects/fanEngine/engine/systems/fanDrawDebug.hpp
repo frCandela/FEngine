@@ -1,4 +1,5 @@
 #include "core/ecs/fanEcsSystem.hpp"
+#include <stack>
 #include "engine/components/fanBounds.hpp"
 #include "engine/components/fanMeshRenderer.hpp"
 #include "engine/ui/fanUITransform.hpp"
@@ -9,6 +10,8 @@
 #include "engine/fanEngineTags.hpp"
 #include "engine/physics/fanSphereCollider.hpp"
 #include "engine/physics/fanBoxCollider.hpp"
+#include "engine/components/fanSkinnedMeshRenderer.hpp"
+#include "fanRaycastUI.hpp"
 
 namespace fan
 {
@@ -343,6 +346,59 @@ namespace fan
                 const glm::ivec2& pos  = transform.mPosition;
                 const glm::ivec2& size = transform.mSize;
                 rd.DrawQuad2D( pos, size, Color::sGreen );
+            }
+        }
+    };
+
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    struct SDrawSkeletons : EcsSystem
+    {
+        static EcsSignature GetSignature( const EcsWorld& _world )
+        {
+            return _world.GetSignature<Transform>() | _world.GetSignature<SkinnedMeshRenderer>();
+        }
+
+        static void Run( EcsWorld& _world, const EcsView& _view )
+        {
+            RenderDebug& rd = _world.GetSingleton<RenderDebug>();
+
+            auto transformIt = _view.begin<Transform>();
+            auto rendererIt  = _view.begin<SkinnedMeshRenderer>();
+            for( ; transformIt != _view.end<Transform>(); ++transformIt, ++rendererIt )
+            {
+                Transform           transform = *transformIt;
+                SkinnedMeshRenderer renderer  = *rendererIt;
+
+                if( renderer.mMesh != nullptr )
+                {
+                    struct BoneData
+                    {
+                        Bone& mBone;
+                        Matrix4 mParentTransform;
+                    };
+                    Skeleton& skeleton = renderer.mMesh->mSkeleton;
+                    BoneData             root = { skeleton.mBones[0], Matrix4( transform.mRotation, transform.mPosition ) };
+                    std::stack<BoneData> stack;
+                    stack.push( root );
+
+                    while( !stack.empty() )
+                    {
+                        BoneData bone = stack.top();
+                        stack.pop();
+                        Matrix4 childTransform = bone.mParentTransform * bone.mBone.mTransform;
+                        rd.DrawPoint( childTransform.GetOrigin(), FIXED( 0.05 ), Color::sRed );
+                        if( &bone.mBone != &root.mBone )
+                        {
+                            rd.DrawLine( childTransform.GetOrigin(), bone.mParentTransform.GetOrigin(), Color::sRed );
+                        }
+                        for( int i = 0; i < bone.mBone.mNumChilds; i++ )
+                        {
+                            BoneData childBone = { skeleton.mBones[bone.mBone.mChilds[i]], childTransform };
+                            stack.push( childBone );
+                        }
+                    }
+                }
             }
         }
     };

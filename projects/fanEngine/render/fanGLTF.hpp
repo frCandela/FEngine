@@ -2,6 +2,7 @@
 
 #include "fanJson.hpp"
 #include <string>
+#include "core/math/fanQuaternion.hpp"
 
 namespace fan
 {
@@ -120,7 +121,45 @@ namespace fan
         std::string                mName;
         std::vector<GLTFPrimitive> mPrimitives;
 
-        void Load( const Json& jMesh );
-        void Save( Json& jMesh ) const;
+        void Load( const Json& _jMesh );
+        void Save( Json& _jMesh ) const;
+    };
+
+    //================================================================
+    //================================================================
+    struct GLTFSkin
+    {
+        std::string mName;
+        int         mInverseBindMatrices;
+        std::vector<int> mJoints;
+
+        void Load( const Json& _jSkin );
+        void Save( Json& _jSkin ) const;
+    };
+
+    //================================================================
+    //================================================================
+    struct GLTFNode
+    {
+        std::string mName;
+        std::vector<int> mChildren;
+        int mParent = -1;
+        Vector3 mPosition;
+        Vector3 mScale;
+        Quaternion mRotation;
+
+        void Load( const Json& _jNode );
+        void Save( Json& _jNode ) const;
+    };
+
+    //================================================================
+    //================================================================
+    struct GLTFScene
+    {
+        std::string mName;
+        std::vector<int> mNodes;
+
+        void Load( const Json& _jScene );
+        void Save( Json& _jScene ) const;
     };
 }

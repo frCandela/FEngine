@@ -14,8 +14,9 @@
 #include "core/unit_tests/fanUnitTestQuaternion.hpp"
 #include "core/unit_tests/fanUnitTestBits.hpp"
 #include "core/unit_tests/fanUnitTestResources.hpp"
-#include "engine/unit_tests/fanUnitTestFxTransform.hpp"
 #include "core/unit_tests/fanUnitTestQueue.hpp"
+#include "core/unit_tests/fanUnitTestString.hpp"
+#include "engine/unit_tests/fanUnitTestFxTransform.hpp"
 
 namespace fan
 {
@@ -52,6 +53,7 @@ namespace fan
                 { "Bits", &UnitTestBits::RunTests, mBitsResult },
                 { "Queue", &UnitTestQueue::RunTests, mQueueResult },
                 { "Resource manager", &UnitTestResources::RunTests, mResourcesManagerResult },
+                { "String", &UnitTestString::RunTests, mStringResult },
         };
     }
 
