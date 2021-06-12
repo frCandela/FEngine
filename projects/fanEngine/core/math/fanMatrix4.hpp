@@ -1,6 +1,7 @@
 #pragma once
 
 #include "core/math/fanFixedPoint.hpp"
+#include "fanGlm.hpp"
 
 namespace fan
 {
@@ -25,6 +26,9 @@ namespace fan
                  Fixed _r3c1, Fixed _r3c2, Fixed _r3c3, Fixed _r3c4 );
         Matrix4( const Quaternion& _quat, const Vector3& _position );
         Matrix4( const Quaternion& _quat, const Vector3& _position, const Vector3& _scale );
+        Matrix4( const glm::mat4& _mat );
+
+        glm::mat4 ToGlm() const;
 
         static const Matrix4 sZero;
         static const Matrix4 sIdentity;
