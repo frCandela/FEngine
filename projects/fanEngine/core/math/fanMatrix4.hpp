@@ -24,6 +24,7 @@ namespace fan
                  Fixed _r2c1, Fixed _r2c2, Fixed _r2c3, Fixed _r2c4,
                  Fixed _r3c1, Fixed _r3c2, Fixed _r3c3, Fixed _r3c4 );
         Matrix4( const Quaternion& _quat, const Vector3& _position );
+        Matrix4( const Quaternion& _quat, const Vector3& _position, const Vector3& _scale );
 
         static const Matrix4 sZero;
         static const Matrix4 sIdentity;

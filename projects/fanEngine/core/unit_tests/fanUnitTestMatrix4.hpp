@@ -81,6 +81,12 @@ namespace fan
             TEST_ASSERT( mat3rotate180y * Vector3( 0, 0, 2 ) == Vector3( 0, 0, -2 ) );
             Matrix4 mat3rotate180yTranslateUp = Matrix4( quatRotate180y, Vector3::sUp );
             TEST_ASSERT( mat3rotate180yTranslateUp * Vector3( 0, 0, 2 ) == Vector3( 0, 0, -2 ) + Vector3::sUp );
+
+            // from scale
+            Matrix4 mat4( Quaternion::sIdentity, Vector3( 0, 0, 0 ), Vector3( 1, 1, 1 ) );
+            TEST_ASSERT( mat4 == Matrix4::sIdentity );
+            mat4 = Matrix4( Quaternion::sIdentity, Vector3( 0, 0, 0 ), Vector3( 0, 0, 0 ) );
+            TEST_ASSERT( mat4 == Matrix4::sZero );
         }
 
         void TestDeterminant()
