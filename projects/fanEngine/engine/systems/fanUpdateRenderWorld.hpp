@@ -98,6 +98,7 @@ namespace fan
                         // drawMesh data;
                         RenderDataSkinnedModel data;
                         data.mMesh         = &subMesh;
+                        data.mSkeleton = &meshRenderer.mMesh->mSkeleton;
                         data.mModelMatrix  = transform.GetModelMatrix( scale );
                         data.mNormalMatrix = transform.GetNormalMatrix( scale );
 

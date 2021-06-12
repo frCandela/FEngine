@@ -14,6 +14,7 @@
 namespace fan
 {
     struct SubSkinnedMesh;
+    struct Skeleton;
     struct Texture;
 
     //==================================================================================================================================================================================================
@@ -21,6 +22,7 @@ namespace fan
     struct RenderDataSkinnedModel
     {
         SubSkinnedMesh* mMesh;
+        Skeleton      * mSkeleton;
         Texture       * mTexture;
         glm::mat4 mModelMatrix;
         glm::mat4 mNormalMatrix;
@@ -35,12 +37,12 @@ namespace fan
     {
         void Create( const VkDeviceSize _minUniformBufferOffsetAlignment );
 
-        AlignedMemory<DynamicUniformsMaterial> mDynamicUniformsMaterial;
-        AlignedMemory<DynamicUniformMatrices>  mDynamicUniformsMatrices;
-        AlignedMemory<DynamicUniformBones>     mDynamicUniformsBones;
-        UniformLights                          mUniformsLights;
-        UniformViewProj                        mUniformsProjView;
-        UniformCameraPosition                  mUniformsCameraPosition;
+        AlignedMemory <DynamicUniformsMaterial> mDynamicUniformsMaterial;
+        AlignedMemory <DynamicUniformMatrices>  mDynamicUniformsMatrices;
+        AlignedMemory <DynamicUniformBones>     mDynamicUniformsBones;
+        UniformLights                           mUniformsLights;
+        UniformViewProj                         mUniformsProjView;
+        UniformCameraPosition                   mUniformsCameraPosition;
     };
 
     struct RenderPass;
@@ -60,10 +62,10 @@ namespace fan
         DescriptorSampler                   mDescriptorSampler;
         Sampler                             mSamplerTextures;
         CommandBuffer                       mCommandBuffers;
-        ResourcePtr<Texture>                mInvalidTexture;
+        ResourcePtr <Texture>               mInvalidTexture;
         std::vector<RenderDataSkinnedModel> mDrawData;
 
-        void Create( Device& _device, uint32_t _imagesCount, ResourcePtr<Texture> _invalidTexture );
+        void Create( Device& _device, uint32_t _imagesCount, ResourcePtr <Texture> _invalidTexture );
         void Destroy( Device& _device );
         void BindDescriptors( VkCommandBuffer _commandBuffer, const size_t _indexFrame, const uint32_t _indexOffset );
         void UpdateUniformBuffers( Device& _device, const size_t _index );

@@ -374,28 +374,30 @@ namespace fan
                 {
                     struct BoneData
                     {
-                        Bone& mBone;
+                        int     mIndex;
                         Matrix4 mParentTransform;
                     };
                     Skeleton& skeleton = renderer.mMesh->mSkeleton;
-                    BoneData             root = { skeleton.mBones[0], Matrix4( transform.mRotation, transform.mPosition ) };
+                    BoneData             root = { 0, Matrix4( transform.mRotation, transform.mPosition ) };
                     std::stack<BoneData> stack;
                     stack.push( root );
 
                     while( !stack.empty() )
                     {
-                        BoneData bone = stack.top();
+                        BoneData boneData = stack.top();
                         stack.pop();
-                        Matrix4 childTransform = bone.mParentTransform * bone.mBone.mTransform;
+
+                        Matrix4 childTransform = skeleton.mInverseBindMatrix[boneData.mIndex].Inverse();
                         rd.DrawPoint( childTransform.GetOrigin(), FIXED( 0.05 ), Color::sRed );
-                        if( &bone.mBone != &root.mBone )
+                        if( boneData.mIndex != 0 )
                         {
-                            rd.DrawLine( childTransform.GetOrigin(), bone.mParentTransform.GetOrigin(), Color::sRed );
+                            rd.DrawLine( childTransform.GetOrigin(), boneData.mParentTransform.GetOrigin(), Color::sRed );
                         }
-                        for( int i = 0; i < bone.mBone.mNumChilds; i++ )
+
+                        Bone& bone = skeleton.mBones[boneData.mIndex];
+                        for( int i = 0; i < bone.mNumChilds; i++ )
                         {
-                            BoneData childBone = { skeleton.mBones[bone.mBone.mChilds[i]], childTransform };
-                            stack.push( childBone );
+                            stack.push( { bone.mChilds[i], childTransform } );
                         }
                     }
                 }

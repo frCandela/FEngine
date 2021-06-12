@@ -16,7 +16,7 @@ const int sMaxBonesInfluences = 4;
 const int sMaxBones = 64;
 layout (binding = 5) uniform DynamicUniformBones
 {
-    mat4 mBones[sMaxBones];
+    mat4 mOffsetMatrix[sMaxBones];
 } bones;
 
 layout (location = 0) in vec3  inPosition;
@@ -39,9 +39,9 @@ void main()
     {
         const float boneWeight = inBoneWeights[i];
         const int boneID = inBoneIDs[i];
-        vec4 localPosition = bones.mBones[boneID] * vec4(inPosition,1.0f);
+        vec4 localPosition = bones.mOffsetMatrix[boneID] * vec4(inPosition,1.0f);
         totalPosition += localPosition * boneWeight;
-        vec3 localNormal = mat3(bones.mBones[boneID]) * inNormal;
+        vec3 localNormal = mat3(bones.mOffsetMatrix[boneID]) * inNormal;
         totalNormal += localNormal * boneWeight;
     }
 

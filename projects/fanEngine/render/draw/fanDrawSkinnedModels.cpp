@@ -199,17 +199,16 @@ namespace fan
             mUniforms.mDynamicUniformsMatrices[dataIndex].mNormalMat = data.mNormalMatrix;
 
             // bones
-            for( int i = 0; i < RenderGlobal::sMaxBones; ++i )
+            for( int i = 0; i < data.mSkeleton->mNumBones; ++i )
             {
-                mUniforms.mDynamicUniformsBones[dataIndex].mModelMat[i] = glm::mat4(1);
+                mUniforms.mDynamicUniformsBones[dataIndex].mOffsetMatrix[i] = data.mSkeleton->mOffsetMatrix[i].ToGlm();
             }
 
             // material
             mUniforms.mDynamicUniformsMaterial[dataIndex].mColor     = data.mColor;
             mUniforms.mDynamicUniformsMaterial[dataIndex].mShininess = data.mShininess;
 
-            // Mesh
-            mDrawData.push_back( { data.mMesh, data.mTexture } );
+            mDrawData.push_back( data );
         }
     }
 

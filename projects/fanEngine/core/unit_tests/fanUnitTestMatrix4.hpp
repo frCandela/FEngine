@@ -40,19 +40,19 @@ namespace fan
         void TestConstructors()
         {
             Matrix4 mat;
-            TEST_ASSERT( mat.e11 == 0 )
+            TEST_ASSERT( mat.e11 == 1 )
             TEST_ASSERT( mat.e12 == 0 )
             TEST_ASSERT( mat.e13 == 0 )
             TEST_ASSERT( mat.e14 == 0 )
 
             TEST_ASSERT( mat.e21 == 0 )
-            TEST_ASSERT( mat.e22 == 0 )
+            TEST_ASSERT( mat.e22 == 1 )
             TEST_ASSERT( mat.e23 == 0 )
             TEST_ASSERT( mat.e14 == 0 )
 
             TEST_ASSERT( mat.e31 == 0 )
             TEST_ASSERT( mat.e32 == 0 )
-            TEST_ASSERT( mat.e33 == 0 )
+            TEST_ASSERT( mat.e33 == 1 )
             TEST_ASSERT( mat.e14 == 0 )
 
             Matrix4 mat2( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 );
@@ -85,8 +85,27 @@ namespace fan
             // from scale
             Matrix4 mat4( Quaternion::sIdentity, Vector3( 0, 0, 0 ), Vector3( 1, 1, 1 ) );
             TEST_ASSERT( mat4 == Matrix4::sIdentity );
-            mat4 = Matrix4( Quaternion::sIdentity, Vector3( 0, 0, 0 ), Vector3( 0, 0, 0 ) );
+            mat4                   = Matrix4( Quaternion::sIdentity, Vector3( 0, 0, 0 ), Vector3( 0, 0, 0 ) );
             TEST_ASSERT( mat4 == Matrix4::sZero );
+
+            // glm
+            TEST_ASSERT( glm::mat4( 1 ) == Matrix4( glm::mat4( 1 ) ).ToGlm() );
+            TEST_ASSERT( mat3rotate180y.ToGlm() == glm::mat4( quatRotate180y.ToGlm() ) );
+            glm::mat4 glmMatTest( glm::vec4( 1, 5, 9, 0 ),
+                                  glm::vec4( 2, 6, 10, 0 ),
+                                  glm::vec4( 3, 7, 11, 0 ),
+                                  glm::vec4( 04, 8, 12, 1 ) );
+            glm::mat4 fixedMatTest = Matrix4( 1, 2, 3, 4,
+                                              5, 6, 7, 8,
+                                              9, 10, 11, 12 ).ToGlm();
+            TEST_ASSERT( glmMatTest == fixedMatTest );
+            Matrix4 translateUp = Matrix4( Quaternion::sIdentity, Vector3::sUp );
+            TEST_ASSERT( translateUp.ToGlm() == glm::translate( glm::mat4( 1 ), glm::vec3( 0, 1, 0 ) ) );
+            TEST_ASSERT( mat3rotate180yTranslateUp.ToGlm() == glm::translate( glm::mat4( quatRotate180y.ToGlm() ), Vector3::sUp.ToGlm() ) );
+
+            Matrix4 matRotate180yTranslateUpScale2 = Matrix4( quatRotate180y, Vector3::sUp, 2 * Vector3::sOne );
+            glm::mat4 matGlmRotate180yTranslateUpScale2 = glm::scale( glm::translate( glm::mat4_cast( quatRotate180y.ToGlm() ), glm::vec3( 0, 1, 0 ) ) , glm::vec3(2,2,2) );
+            TEST_ASSERT( matRotate180yTranslateUpScale2.ToGlm() == matGlmRotate180yTranslateUpScale2);
         }
 
         void TestDeterminant()
