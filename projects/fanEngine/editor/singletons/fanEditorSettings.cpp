@@ -78,13 +78,14 @@
 #include "editor/gui/components/fanGuiParticleEmitter.hpp"
 #include "editor/gui/components/fanGuiPointLight.hpp"
 #include "editor/gui/components/fanGuiSceneNode.hpp"
-#include "editor/gui/components/fanGuiFxScale.hpp"
+#include "editor/gui/components/fanGuiScale.hpp"
+#include "editor/gui/components/fanGuiAnimator.hpp"
 
-#include "editor/gui/physics/fanGuiFxTransform.hpp"
-#include "editor/gui/physics/fanGuiFxRigidbody.hpp"
-#include "editor/gui/physics/fanGuiFxSphereCollider.hpp"
-#include "editor/gui/physics/fanGuiFxBoxCollider.hpp"
-#include "editor/gui/physics/fanGuiFxPhysicsWorld.hpp"
+#include "editor/gui/physics/fanGuiTransform.hpp"
+#include "editor/gui/physics/fanGuiRigidbody.hpp"
+#include "editor/gui/physics/fanGuiSphereCollider.hpp"
+#include "editor/gui/physics/fanGuiBoxCollider.hpp"
+#include "editor/gui/physics/fanGuiPhysicsWorld.hpp"
 
 namespace fan
 {
@@ -275,16 +276,16 @@ namespace fan
         _singletonInfos[Time::Info::sType]             = GuiTime::GetInfo();
 
         // engine
-        _singletonInfos[Application::Info::sType]     = GuiApplication::GetInfo();
-        _singletonInfos[Mouse::Info::sType]           = GuiMouse::GetInfo();
-        _singletonInfos[RenderDebug::Info::sType]     = GuiRenderDebug::GetInfo();
-        _singletonInfos[RenderWorld::Info::sType]     = GuiRenderWorld::GetInfo();
-        _singletonInfos[Scene::Info::sType]           = GuiScene::GetInfo();
-        _singletonInfos[ScenePointers::Info::sType]   = GuiScenePointers::GetInfo();
-        _singletonInfos[VoxelTerrain::Info::sType]    = GuiVoxelTerrain::GetInfo();
+        _singletonInfos[Application::Info::sType]   = GuiApplication::GetInfo();
+        _singletonInfos[Mouse::Info::sType]         = GuiMouse::GetInfo();
+        _singletonInfos[RenderDebug::Info::sType]   = GuiRenderDebug::GetInfo();
+        _singletonInfos[RenderWorld::Info::sType]   = GuiRenderWorld::GetInfo();
+        _singletonInfos[Scene::Info::sType]         = GuiScene::GetInfo();
+        _singletonInfos[ScenePointers::Info::sType] = GuiScenePointers::GetInfo();
+        _singletonInfos[VoxelTerrain::Info::sType]  = GuiVoxelTerrain::GetInfo();
 
         // fx physics
-        _singletonInfos[PhysicsWorld::Info::sType] = GuiFxPhysicsWorld::GetInfo();
+        _singletonInfos[PhysicsWorld::Info::sType] = GuiPhysicsWorld::GetInfo();
     }
 
     //==================================================================================================================================================================================================
@@ -314,24 +315,25 @@ namespace fan
         _componentInfos[UIText::Info::sType]        = GuiUIText::GetInfo();
         _componentInfos[UITransform::Info::sType]   = GuiUITransform::GetInfo();
 
-        _componentInfos[Bounds::Info::sType]                = GuiBounds::GetInfo();
-        _componentInfos[Camera::Info::sType]                = GuiCamera::GetInfo();
-        _componentInfos[DirectionalLight::Info::sType]      = GuiDirectionalLight::GetInfo();
-        _componentInfos[ExpirationTime::Info::sType]        = GuiExpirationTime::GetInfo();
-        _componentInfos[FollowTransform::Info::sType]       = GuiFollowTransform::GetInfo();
-        _componentInfos[Material::Info::sType]              = GuiMaterial::GetInfo();
+        _componentInfos[Bounds::Info::sType]              = GuiBounds::GetInfo();
+        _componentInfos[Camera::Info::sType]              = GuiCamera::GetInfo();
+        _componentInfos[DirectionalLight::Info::sType]    = GuiDirectionalLight::GetInfo();
+        _componentInfos[ExpirationTime::Info::sType]      = GuiExpirationTime::GetInfo();
+        _componentInfos[FollowTransform::Info::sType]     = GuiFollowTransform::GetInfo();
+        _componentInfos[Material::Info::sType]            = GuiMaterial::GetInfo();
         _componentInfos[MeshRenderer::Info::sType]        = GuiMeshRenderer::GetInfo();
         _componentInfos[SkinnedMeshRenderer::Info::sType] = GuiSkinnedMeshRenderer::GetInfo();
         _componentInfos[Particle::Info::sType]            = GuiParticle::GetInfo();
-        _componentInfos[ParticleEmitter::Info::sType]       = GuiParticleEmitter::GetInfo();
-        _componentInfos[PointLight::Info::sType]            = GuiPointLight::GetInfo();
-        _componentInfos[SceneNode::Info::sType]             = GuiSceneNode::GetInfo();
+        _componentInfos[ParticleEmitter::Info::sType]     = GuiParticleEmitter::GetInfo();
+        _componentInfos[PointLight::Info::sType]          = GuiPointLight::GetInfo();
+        _componentInfos[SceneNode::Info::sType]           = GuiSceneNode::GetInfo();
+        _componentInfos[Animator::Info::sType]            = GuiAnimator::GetInfo();
 
-        _componentInfos[Rigidbody::Info::sType]      = GuiFxRigidbody::GetInfo();
-        _componentInfos[BoxCollider::Info::sType]    = GuiFxBoxCollider::GetInfo();
-        _componentInfos[SphereCollider::Info::sType] = GuiFxSphereCollider::GetInfo();
-        _componentInfos[Transform::Info::sType]      = GuiFxTransform::GetInfo();
-        _componentInfos[Scale::Info::sType]          = GuiFxScale::GetInfo();
+        _componentInfos[Rigidbody::Info::sType]      = GuiRigidbody::GetInfo();
+        _componentInfos[BoxCollider::Info::sType]    = GuiBoxCollider::GetInfo();
+        _componentInfos[SphereCollider::Info::sType] = GuiSphereCollider::GetInfo();
+        _componentInfos[Transform::Info::sType]      = GuiTransform::GetInfo();
+        _componentInfos[Scale::Info::sType]          = GuiScale::GetInfo();
     }
 
     //==================================================================================================================================================================================================

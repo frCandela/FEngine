@@ -7,7 +7,7 @@ namespace fan
 {
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    struct GuiFxSphereCollider
+    struct GuiSphereCollider
     {
         static GuiComponentInfo GetInfo()
         {
@@ -16,14 +16,14 @@ namespace fan
             info.mGroup      = EngineGroups::ScenePhysics;
             info.onGui       = &OnGui;
             info.mEditorPath = "physics/";
-            info.mEditorName = "fxSphereCollider";
+            info.mEditorName = "SphereCollider";
             return info;
         }
 
         static void OnGui( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
         {
             SphereCollider& sphere = static_cast<SphereCollider&>( _component );
-            ImGui::PushID( "fxSphereCollider" );
+            ImGui::PushID( "sphereCollider" );
             ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() - 16 );
             {
                 // radius
@@ -31,7 +31,7 @@ namespace fan
                 {
                     sphere.mRadius = FIXED( 0.5 );
                     _world.GetComponent<SceneNode>( _entity ).AddFlag( SceneNode::BoundsOutdated );
-                    GuiFxRigidbody::TryUpdateInvInertiaTensorLocal( _world, _entity );
+                    GuiRigidbody::TryUpdateInvInertiaTensorLocal( _world, _entity );
                 }
                 ImGui::SameLine();
                 float radius = sphere.mRadius.ToFloat();
@@ -39,7 +39,7 @@ namespace fan
                 {
                     sphere.mRadius = Fixed::FromFloat( radius );
                     _world.GetComponent<SceneNode>( _entity ).AddFlag( SceneNode::BoundsOutdated );
-                    GuiFxRigidbody::TryUpdateInvInertiaTensorLocal( _world, _entity );
+                    GuiRigidbody::TryUpdateInvInertiaTensorLocal( _world, _entity );
                 }
 
                 // offset

@@ -8,16 +8,16 @@ namespace fan
 {
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    struct GuiFxTransform
+    struct GuiTransform
     {
         static GuiComponentInfo GetInfo()
         {
             GuiComponentInfo info;
             info.mIcon       = ImGui::IconType::Transform16;
             info.mGroup      = EngineGroups::Scene;
-            info.onGui       = &GuiFxTransform::OnGui;
+            info.onGui       = &GuiTransform::OnGui;
             info.mEditorPath = "/";
-            info.mEditorName = "fxTransform";
+            info.mEditorName = "Transform";
             return info;
         }
 
@@ -26,7 +26,7 @@ namespace fan
             Transform& transform = static_cast<Transform&>( _component );
             ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() - 16 );
             {
-                ImGui::PushID( "fixed_transform" );
+                ImGui::PushID( "transform" );
                 SceneNode& sceneNode = _world.GetComponent<SceneNode>( _entityID );
 
                 // Position

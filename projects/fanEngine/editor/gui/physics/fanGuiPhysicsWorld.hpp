@@ -7,15 +7,15 @@ namespace fan
 {
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    struct GuiFxPhysicsWorld
+    struct GuiPhysicsWorld
     {
         static GuiSingletonInfo GetInfo()
         {
             GuiSingletonInfo info;
             info.mIcon       = ImGui::Rigidbody16;
             info.mGroup      = EngineGroups::ScenePhysics;
-            info.onGui       = &GuiFxPhysicsWorld::OnGui;
-            info.mEditorName = "fxPhysicsWorld";
+            info.onGui       = &GuiPhysicsWorld::OnGui;
+            info.mEditorName = "PhysicsWorld";
             return info;
         }
 

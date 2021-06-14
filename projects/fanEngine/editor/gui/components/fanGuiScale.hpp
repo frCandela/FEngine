@@ -8,16 +8,16 @@ namespace fan
 {
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    struct GuiFxScale
+    struct GuiScale
     {
         static GuiComponentInfo GetInfo()
         {
             GuiComponentInfo info;
             info.mIcon       = ImGui::IconType::Transform16;
             info.mGroup      = EngineGroups::Scene;
-            info.onGui       = &GuiFxScale::OnGui;
+            info.onGui       = &GuiScale::OnGui;
             info.mEditorPath = "/";
-            info.mEditorName = "fxScale";
+            info.mEditorName = "Scale";
             return info;
         }
 
@@ -26,7 +26,7 @@ namespace fan
             Scale& scale = static_cast<Scale&>( _component );
             ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() - 16 );
             {
-                ImGui::PushID( "fixed_scale" );
+                ImGui::PushID( "scale" );
                 SceneNode& sceneNode = _world.GetComponent<SceneNode>( _entityID );
 
                 // Scale

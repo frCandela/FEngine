@@ -378,7 +378,8 @@ namespace fan
                         Matrix4 mParentTransform;
                     };
                     Skeleton& skeleton = renderer.mMesh->mSkeleton;
-                    BoneData             root = { 0, Matrix4( transform.mRotation, transform.mPosition ) };
+                    const Matrix4 modelMat = Matrix4( transform.mRotation, transform.mPosition );
+                    BoneData             root = { 0, modelMat };
                     std::stack<BoneData> stack;
                     stack.push( root );
 
@@ -387,7 +388,7 @@ namespace fan
                         BoneData boneData = stack.top();
                         stack.pop();
 
-                        Matrix4 childTransform = skeleton.mInverseBindMatrix[boneData.mIndex].Inverse();
+                        Matrix4 childTransform = modelMat * skeleton.mInverseBindMatrix[boneData.mIndex].Inverse();
                         rd.DrawPoint( childTransform.GetOrigin(), FIXED( 0.05 ), Color::sRed );
                         if( boneData.mIndex != 0 )
                         {

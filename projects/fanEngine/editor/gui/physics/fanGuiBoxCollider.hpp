@@ -7,7 +7,7 @@ namespace fan
 {
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    struct GuiFxBoxCollider
+    struct GuiBoxCollider
     {
         static GuiComponentInfo GetInfo()
         {
@@ -16,14 +16,14 @@ namespace fan
             info.mGroup      = EngineGroups::ScenePhysics;
             info.onGui       = &OnGui;
             info.mEditorPath = "physics/";
-            info.mEditorName = "fxBoxCollider";
+            info.mEditorName = "BoxCollider";
             return info;
         }
 
         static void OnGui( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
         {
             BoxCollider& box = static_cast<BoxCollider&>( _component );
-            ImGui::PushID( "fxBoxCollider" );
+            ImGui::PushID( "boxCollider" );
             ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() - 16 );
             {
                 // Half extents
@@ -31,7 +31,7 @@ namespace fan
                 {
                     box.mHalfExtents = FIXED( 0.5 ) * Vector3::sOne;
                     _world.GetComponent<SceneNode>( _entity ).AddFlag( SceneNode::BoundsOutdated );
-                    GuiFxRigidbody::TryUpdateInvInertiaTensorLocal( _world, _entity );
+                    GuiRigidbody::TryUpdateInvInertiaTensorLocal( _world, _entity );
                 }
                 ImGui::SameLine();
                 glm::vec3 halfExtents = box.mHalfExtents.ToGlm();
@@ -39,7 +39,7 @@ namespace fan
                 {
                     box.mHalfExtents = Vector3( halfExtents );
                     _world.GetComponent<SceneNode>( _entity ).AddFlag( SceneNode::BoundsOutdated );
-                    GuiFxRigidbody::TryUpdateInvInertiaTensorLocal( _world, _entity );
+                    GuiRigidbody::TryUpdateInvInertiaTensorLocal( _world, _entity );
                 }
             }
             ImGui::PopID();

@@ -33,7 +33,7 @@
 #include "engine/physics/fanPhysicsWorld.hpp"
 
 //render 3D
-#include "render/resources/fanSkinnedMesh.hpp"
+#include"render/resources/fanSkinnedMesh.hpp"
 #include "engine/components/fanDirectionalLight.hpp"
 #include "engine/components/fanPointLight.hpp"
 #include "engine/components/fanMeshRenderer.hpp"
@@ -41,9 +41,7 @@
 #include "engine/components/fanMaterial.hpp"
 #include "engine/components/fanParticleEmitter.hpp"
 #include "engine/components/fanParticle.hpp"
-#include "engine/singletons/fanRenderWorld.hpp"
-#include "engine/singletons/fanApplication.hpp"
-#include "engine/singletons/fanRenderDebug.hpp"
+#include "engine/components/fanAnimator.hpp"
 
 // render ui
 #include "engine/ui/fanUITransform.hpp"
@@ -302,7 +300,7 @@ namespace fan
         _world.AddComponentType<Material>();
         _world.AddComponentType<ParticleEmitter>();
         _world.AddComponentType<Particle>();
-
+        _world.AddComponentType<Animator>();
         _world.AddSingletonType<RenderWorld>();
         _world.AddSingletonType<RenderDebug>();
     }

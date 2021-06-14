@@ -9,7 +9,7 @@ namespace fan
 {
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    struct GuiFxRigidbody
+    struct GuiRigidbody
     {
         static GuiComponentInfo GetInfo()
         {
@@ -18,14 +18,14 @@ namespace fan
             info.mGroup      = EngineGroups::ScenePhysics;
             info.onGui       = &OnGui;
             info.mEditorPath = "physics/";
-            info.mEditorName = "fxRigidbody";
+            info.mEditorName = "Rigidbody";
             return info;
         }
 
         static void OnGui( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
         {
             Rigidbody& rb = static_cast<Rigidbody&>( _component );
-            ImGui::PushID( "FxRigidbody" );
+            ImGui::PushID( "rigidbody" );
             ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() - 16 );
             {
                 // Mass
