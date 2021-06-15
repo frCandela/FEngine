@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+
+    <Type Name="fan::String&lt;*&gt;">
+        <DisplayString>{mData}</DisplayString>
+    </Type>
+
+    <Type Name="fan::Fixed">
+        <DisplayString>{float( mData ) / sFixed_One}</DisplayString>
+    </Type>
+
+    <Type Name="fan::Vector3">
+        <DisplayString>[{x} {y} {z}]</DisplayString>
+    </Type>
+
+       <Type Name="fan::Quaternion">
+           <DisplayString>[{mAngle} {mAxis.x} {mAxis.y} {mAxis.z}]</DisplayString>
+       </Type>
+
+</AutoVisualizer>
