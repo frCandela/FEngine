@@ -1,6 +1,8 @@
 #pragma once
 
 #include "core/ecs/fanEcsComponent.hpp"
+#include "core/resources/fanResourcePtr.hpp"
+#include "render/resources/fanAnimation.hpp"
 
 namespace fan
 {
@@ -14,6 +16,6 @@ namespace fan
         static void Save( const EcsComponent& _component, Json& _json );
         static void Load( EcsComponent& _component, const Json& _json );
 
-        int a;
+        ResourcePtr<Animation> mAnimation;
     };
 }

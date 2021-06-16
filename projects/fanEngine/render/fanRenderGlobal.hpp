@@ -17,38 +17,40 @@ namespace fan
         static const std::set<std::string> sSceneExtensions;
         static const std::set<std::string> sPrefabExtensions;
         static const std::set<std::string> sFontsExtensions;
+        static const std::set<std::string> sAnimationsExtensions;
 
-        static const char          * sContentPath;
-        static const char          * sFontsPath;
-        static const char          * sModelsPath;
-        static const char          * sScenesPath;
-        static constexpr const char* sPrefabsPath = "prefabs/";
+        static constexpr const char* sContentPath    = "/";
+        static constexpr const char* sFontsPath      = "fonts/";
+        static constexpr const char* sModelsPath     = "models/";
+        static constexpr const char* sScenesPath     = "scenes/";
+        static constexpr const char* sAnimationsPath = "animations/";
+        static constexpr const char* sPrefabsPath    = "prefabs/";
 
-        static const char* sDefaultMesh;
-        static const char* sDefaultTexture;
-        static const char* sWhiteTexture;
+        static constexpr const char* sEditorIcon = "_default/editorIcon.png";
+        static constexpr const char* sGameIcon = "_default/gameIcon.png";
+        static constexpr const char* sDefaultIcons = "_default/texture/icons.png";
+        static constexpr const char* sDefaultImguiFont = "_default/imgui_font.ttf";
+        static constexpr const char* sDefaultGameFont = "fonts/Vera.ttf";
 
-        static const char* sEditorIcon;
-        static const char* sGameIcon;
-        static const char* sDefaultIcons;
-        static const char* sDefaultImguiFont;
-        static const char* sDefaultGameFont;
+        static constexpr const char* sMeshCone = "_default/mesh/cone.gltf";
+        static constexpr const char* sMeshCube = "_default/mesh/cube.gltf";
+        static constexpr const char* sMeshPlane = "_default/mesh/plane.gltf";
+        static constexpr const char* sMeshSphere = "_default/mesh/sphere.gltf";
+        static constexpr const char* sMeshAxisCheck = "_default/mesh/axis_check_yup.gltf";
 
-        static const char* sMeshCone;
-        static const char* sMeshCube;
-        static const char* sMeshPlane;
-        static const char* sMeshSphere;
-        static const char* sMeshAxisCheck;
+        static constexpr const char* sDefaultMesh = "_default/mesh/cube.gltf";
+        static constexpr const char* sDefaultTexture = "_default/texture/texture.png";
+        static constexpr const char* sWhiteTexture = "_default/texture/white32.png";
 
-        static const char* sMesh2DQuad;
+        static constexpr const char* sMesh2DQuad = "2Dquad";
 
-        static const char* sTextureUVCheck;
-        static const char* sTextureWhite;
+        static constexpr const char* sTextureUVCheck = "_default/texture/uv_checker.png";
+        static constexpr const char* sTextureWhite = "_default/texture/white.png";
 
-        static const char* sDefaultVertexShader;
-        static const char* sDefaultFragmentShader;
-        static const char* sImguiVertexShader;
-        static const char* sImguiFragmentShader;
+        static constexpr const char* sDefaultVertexShader = "shaders/empty.vert";
+        static constexpr const char* sDefaultFragmentShader = "shaders/empty.frag";
+        static constexpr const char* sImguiVertexShader = "shaders/imgui.vert";
+        static constexpr const char* sImguiFragmentShader = "shaders/imgui.frag";
 
         static constexpr const uint32_t sMaxBonesInfluences         = 4;
         static constexpr const uint32_t sMaxBones                   = 64;

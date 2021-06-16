@@ -12,6 +12,7 @@ namespace fan
     struct Texture;
     struct Mesh;
     struct SkinnedMesh;
+    struct Animation;
     class Font;
 }
 
@@ -54,6 +55,8 @@ namespace ImGui
     fan::ResourcePtr<fan::SkinnedMesh> FanBeginDragDropTargetMeshSkinned();
     void FanBeginDragDropSourceFont( fan::ResourcePtr<fan::Font> _font, ImGuiDragDropFlags _flags = ImGuiDragDropFlags_None );
     fan::ResourcePtr<fan::Font> FanBeginDragDropTargetFont();
+    void FanBeginDragDropSourceAnimation( fan::ResourcePtr<fan::Animation> _font, ImGuiDragDropFlags _flags = ImGuiDragDropFlags_None );
+    fan::ResourcePtr<fan::Animation> FanBeginDragDropTargetAnimation();
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================

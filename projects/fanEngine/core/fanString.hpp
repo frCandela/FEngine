@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include "fanJson.hpp"
 
 namespace fan
 {
@@ -15,8 +16,9 @@ namespace fan
         int                        mSize;
 
         String();
-        String( const char * _str );
+        String( const char* _str );
         String( const std::string& _str );
+        String( const Json& _json ) : String( static_cast<std::string>(_json) ) {}
         bool Empty() const { return mSize == 0; }
 
         operator const char*() const { return mData; }

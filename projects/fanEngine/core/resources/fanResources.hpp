@@ -13,9 +13,12 @@ namespace fan
     {
         Resource* (* mLoad)( const std::string& _path, ResourceInfo& _info ) = nullptr;
 
+        // set this to change behaviour
         bool mUseDestroyList = false;
         bool mUseDirtyList   = false;
         void* mDataPtr = nullptr;
+
+        // internal data
         int mCount = 0;
 
         std::vector<Resource*> mDestroyList;

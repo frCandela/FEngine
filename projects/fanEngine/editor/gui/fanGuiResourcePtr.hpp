@@ -9,6 +9,7 @@ namespace fan
     struct SkinnedMesh;
     class Prefab;
     class Font;
+    struct Animation;
 }
 
 //============================================================================================================
@@ -21,4 +22,5 @@ namespace ImGui
     bool FanMeshSkinnedPtr( const char* _label, fan::ResourcePtr<fan::SkinnedMesh>& _ptr );
     bool FanPrefabPtr( const char* _label, fan::ResourcePtr<fan::Prefab>& _ptr );
     bool FanFontPtr( const char* _label, fan::ResourcePtr<fan::Font>& _ptr );
+    bool FanAnimationPtr( const char* _label, fan::ResourcePtr<fan::Animation>& _ptr );
 }

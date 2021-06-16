@@ -22,12 +22,14 @@ namespace fan
             return info;
         }
 
-        static void OnGui( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
+        static void OnGui( EcsWorld& , EcsEntity , EcsComponent& _component )
         {
             Animator& animator = static_cast<Animator&>( _component );
             ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() - 16 );
             {
-                ImGui::PushID( "animator" );
+                ImGui::FanAnimationPtr("animation", animator.mAnimation );
+
+/*::PushID( "animator" );
                 (void)animator;
                 if( _world.HasComponent<SkinnedMeshRenderer>( _entity ) )
                 {
@@ -51,7 +53,7 @@ namespace fan
                         }
                     }
                 }
-                ImGui::PopID();
+                ImGui::PopID();*/
             }
             ImGui::PopItemWidth();
         }

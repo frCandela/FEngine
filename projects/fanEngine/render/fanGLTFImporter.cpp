@@ -3,6 +3,7 @@
 #include "core/fanDebug.hpp"
 #include "render/fanGLTFImporter.hpp"
 #include "render/resources/fanMesh.hpp"
+#include "render/resources/fanSkinnedMesh.hpp"
 #include "render/fanGLTF.hpp"
 #include <stack>
 
@@ -43,19 +44,15 @@ namespace fan
         const Json& jSkins       = mJson["skins"];
         const Json& jNodes       = mJson["nodes"];
         const Json& jScenes      = mJson["scenes"];
+        const Json& jAnimations  = mJson["animations"];
+
+        // decode buffers
         std::vector<std::string> loadedBuffers;
         loadedBuffers.resize( jBuffers.size() );
-
-        // Returns if there is no mesh
-        if( jMeshes.is_null() || jMeshes.empty() )
+        for( int i = 0; i < jBuffers.size(); ++i )
         {
-            Debug::Error() << "mesh is empty : " << mPath << Debug::Endl();
-            return false;
+            loadedBuffers[i] = GLTFBuffer::DecodeBuffer( jBuffers[i]["uri"] );
         }
-
-        // Loads the first mesh json
-        GLTFMesh mesh;
-        mesh.Load( jMeshes[0] );
 
         // loads scenes
         std::vector<GLTFScene> scenes;
@@ -90,6 +87,154 @@ namespace fan
             }
         }
 
+        // loads skins
+        std::map<int, int> bonesRemapTable; // node index -> bone index
+        if( jSkins.is_array() && jSkins.size() != 0 )
+        {
+            GLTFSkin skin;
+            skin.Load( jSkins[0] );
+            mSkeleton.mName     = skin.mName;
+            mSkeleton.mNumBones = (int)skin.mJoints.size();
+
+            // load inverse bind matrices
+            GLTFAccessor bindMatricesAccessor;
+            bindMatricesAccessor.Load( jAccessors[skin.mInverseBindMatrices] );
+            fanAssert( bindMatricesAccessor.mComponentType == GLTFComponentType::Float );
+            fanAssert( bindMatricesAccessor.mType == GLTFType::Mat4 );
+            fanAssert( bindMatricesAccessor.mCount == mSkeleton.mNumBones );
+            GLTFBufferView viewBindMatrices;
+            viewBindMatrices.Load( jBufferViews[bindMatricesAccessor.mBufferView] );
+            fanAssert( viewBindMatrices.mByteLength == sizeof( glm::mat4 ) * bindMatricesAccessor.mCount );
+            GLTFBuffer bufferBindMatrices;
+            bufferBindMatrices.Load( jBuffers[viewBindMatrices.mBuffer] );
+            std::string bindMatricesBuffer = bufferBindMatrices.GetBuffer( viewBindMatrices, loadedBuffers[viewBindMatrices.mBuffer] );
+            glm::mat4* bindMatricesArray = (glm::mat4*)bindMatricesBuffer.data();
+
+            // generate a remap table to generate the bones in a contiguous array
+            std::vector<GLTFNode> skeletonNodes;
+            skeletonNodes.resize( skin.mJoints.size() );
+            fanAssert( skin.mJoints.size() <= RenderGlobal::sMaxBones );
+            for( int i = 0; i < skin.mJoints.size(); i++ )
+            {
+                const int nodeIndex = skin.mJoints[i];
+                const GLTFNode& node = nodes[nodeIndex];
+                bonesRemapTable[nodeIndex] = i;
+                skeletonNodes[i]           = node;
+            }
+
+            // generate the bones
+            for( int nodeIndex = 0; nodeIndex < skeletonNodes.size(); nodeIndex++ )
+            {
+                const GLTFNode& node = skeletonNodes[nodeIndex];
+                Bone          & bone = mSkeleton.mBones[nodeIndex];
+                bone.mName      = node.mName;
+                bone.mNumChilds = (int)node.mChildren.size();
+                fanAssert( bone.mNumChilds < Bone::sMaxChilds );
+                for( int childIndex                     = 0; childIndex < node.mChildren.size(); ++childIndex )
+                {
+                    bone.mChilds[childIndex] = bonesRemapTable.at( node.mChildren[childIndex] );
+                }
+                mSkeleton.mInverseBindMatrix[nodeIndex] = Matrix4( bindMatricesArray[nodeIndex] );
+            }
+        }
+
+        // load animations
+        mAnimations.resize( jAnimations.size() );
+        for( int animIndex = 0; animIndex < jAnimations.size(); ++animIndex )
+        {
+            GLTFAnimation anim;
+            anim.Load( jAnimations[animIndex] );
+
+            Animation& animation = mAnimations[animIndex];
+            animation.mNumBones = mSkeleton.mNumBones;
+            fanAssert( mSkeleton.mNumBones > 0 );
+            for( int channelIndex = 0; channelIndex < anim.mChannels.size(); ++channelIndex )
+            {
+                const GLTFAnimation::Channel& channel = anim.mChannels[channelIndex];
+                const GLTFAnimation::Sampler& sampler = anim.mSamplers[channel.mSampler];
+                GLTFAccessor accessorTime;
+                accessorTime.Load( jAccessors[sampler.mInput] );
+                fanAssert( accessorTime.mComponentType == GLTFComponentType::Float );
+                fanAssert( accessorTime.mType == GLTFType::Scalar );
+                GLTFBufferView viewTime;
+                viewTime.Load( jBufferViews[accessorTime.mBufferView] );
+                GLTFBuffer bufferTime;
+                bufferTime.Load( jBuffers[viewTime.mBuffer] );
+
+                std::string timeBufferStr = bufferTime.GetBuffer( viewTime, loadedBuffers[viewTime.mBuffer] );
+                float* timeBuffer = (float*)timeBufferStr.data();
+
+                GLTFAccessor accessorProperty;
+                accessorProperty.Load( jAccessors[sampler.mOutput] );
+                fanAssert( accessorProperty.mComponentType == GLTFComponentType::Float );
+                GLTFBufferView viewProperty;
+                viewProperty.Load( jBufferViews[accessorProperty.mBufferView] );
+                fanAssert( accessorTime.mCount == accessorProperty.mCount );
+                GLTFBuffer bufferProperty;
+                bufferProperty.Load( jBuffers[viewProperty.mBuffer] );
+
+                const int boneIndex = bonesRemapTable[channel.mTargetNode];
+                Animation::BoneAnimation& boneAnimation = animation.mBoneKeys[boneIndex];
+                switch( channel.mTargetPath )
+                {
+                    case GLTFAnimationPath::Translation:
+                    {
+                        fanAssert( accessorProperty.mType == GLTFType::Vec3 );
+                        fanAssert( boneAnimation.mPositions.empty() );
+                        glm::vec3* positionBuffer = (glm::vec3*)bufferProperty.GetBuffer( viewProperty, loadedBuffers[viewProperty.mBuffer] ).data();
+                        boneAnimation.mPositions.resize( accessorProperty.mCount );
+                        for( int keyIndex = 0; keyIndex < accessorProperty.mCount; ++keyIndex )
+                        {
+                            boneAnimation.mPositions[keyIndex].mTime     = Fixed::FromFloat( timeBuffer[keyIndex] );
+                            boneAnimation.mPositions[keyIndex].mPosition = Vector3( positionBuffer[keyIndex] );
+                        }
+                        break;
+                    }
+                    case GLTFAnimationPath::Rotation:
+                    {
+                        fanAssert( accessorProperty.mType == GLTFType::Vec4 );
+                        fanAssert( boneAnimation.mRotations.empty() );
+                        glm::quat* rotationBuffer = (glm::quat*)bufferProperty.GetBuffer( viewProperty, loadedBuffers[viewProperty.mBuffer] ).data();
+                        boneAnimation.mRotations.resize( accessorProperty.mCount );
+                        for( int keyIndex = 0; keyIndex < accessorProperty.mCount; ++keyIndex )
+                        {
+                            boneAnimation.mRotations[keyIndex].mTime     = Fixed::FromFloat( timeBuffer[keyIndex] );
+                            boneAnimation.mRotations[keyIndex].mRotation = Quaternion( rotationBuffer[keyIndex] );
+                        }
+                        break;
+                    }
+                    case GLTFAnimationPath::Scale:
+                    {
+                        fanAssert( accessorProperty.mType == GLTFType::Vec3 );
+                        fanAssert( boneAnimation.mScales.empty() );
+                        glm::vec3* scaleBuffer = (glm::vec3*)bufferProperty.GetBuffer( viewProperty, loadedBuffers[viewProperty.mBuffer] ).data();
+                        boneAnimation.mScales.resize( accessorProperty.mCount );
+                        for( int keyIndex = 0; keyIndex < accessorProperty.mCount; ++keyIndex )
+                        {
+                            boneAnimation.mScales[keyIndex].mTime  = Fixed::FromFloat( timeBuffer[keyIndex] );
+                            boneAnimation.mScales[keyIndex].mScale = Vector3( scaleBuffer[keyIndex] );
+                        }
+                        break;
+                    }
+                    default:
+                        fanAssert( false );
+                        break;
+                }
+            }
+        }
+
+        // Returns if there is no mesh
+        if( jMeshes.is_null() || jMeshes.empty() )
+        {
+            Debug::Error() << "mesh is empty : " << mPath << Debug::Endl();
+            return false;
+        }
+
+        // Loads the first mesh json
+        GLTFMesh mesh;
+        mesh.Load( jMeshes[0] );
+
+        // Load submeshes vertices
         mSubmeshes.resize( mesh.mPrimitives.size() );
         for( int primitiveIndex = 0; primitiveIndex < mesh.mPrimitives.size(); ++primitiveIndex )
         {
@@ -104,10 +249,6 @@ namespace fan
                 GLTFBuffer bufferIndices;
                 bufferIndices.Load( jBuffers[viewIndices.mBuffer] );
                 fanAssert( accessorIndices.mComponentType == GLTFComponentType::UnsignedShort );
-                if( loadedBuffers[viewIndices.mBuffer].empty() )
-                {
-                    loadedBuffers[viewIndices.mBuffer] = GLTFBuffer::DecodeBuffer( jBuffers[viewIndices.mBuffer]["uri"] );
-                }
                 submesh.indexBuffer  = bufferIndices.GetBuffer( viewIndices, loadedBuffers[viewIndices.mBuffer] );
                 submesh.indicesArray = (unsigned short*)submesh.indexBuffer.data();
                 submesh.indicesCount = accessorIndices.mCount;
@@ -122,10 +263,6 @@ namespace fan
                 GLTFBuffer bufferPositions;
                 bufferPositions.Load( jBuffers[viewPositions.mBuffer] );
                 fanAssert( accessorPositions.mComponentType == GLTFComponentType::Float );
-                if( loadedBuffers[viewPositions.mBuffer].empty() )
-                {
-                    loadedBuffers[viewPositions.mBuffer] = GLTFBuffer::DecodeBuffer( jBuffers[viewPositions.mBuffer]["uri"] );
-                }
                 submesh.posBuffer      = bufferPositions.GetBuffer( viewPositions, loadedBuffers[viewPositions.mBuffer] );
                 submesh.positionsArray = (glm::vec3*)submesh.posBuffer.data();
                 submesh.verticesCount  = accessorPositions.mCount;
@@ -141,10 +278,6 @@ namespace fan
                 GLTFBuffer bufferNormals;
                 bufferNormals.Load( jBuffers[viewNormals.mBuffer] );
                 fanAssert( accessorNormals.mComponentType == GLTFComponentType::Float );
-                if( loadedBuffers[viewNormals.mBuffer].empty() )
-                {
-                    loadedBuffers[viewNormals.mBuffer] = GLTFBuffer::DecodeBuffer( jBuffers[viewNormals.mBuffer]["uri"] );
-                }
                 submesh.normalsBuffer = bufferNormals.GetBuffer( viewNormals, loadedBuffers[viewNormals.mBuffer] );
                 submesh.normalsArray  = (glm::vec3*)submesh.normalsBuffer.data();
                 fanAssert( submesh.verticesCount == accessorNormals.mCount );
@@ -160,10 +293,6 @@ namespace fan
                 GLTFBuffer bufferTexcoord0;
                 bufferTexcoord0.Load( jBuffers[viewTexcoords0.mBuffer] );
                 fanAssert( accessorTexcoords0.mComponentType == GLTFComponentType::Float );
-                if( loadedBuffers[viewTexcoords0.mBuffer].empty() )
-                {
-                    loadedBuffers[viewTexcoords0.mBuffer] = GLTFBuffer::DecodeBuffer( jBuffers[viewTexcoords0.mBuffer]["uri"] );
-                }
                 submesh.texcoords0Buffer = bufferTexcoord0.GetBuffer( viewTexcoords0, loadedBuffers[viewTexcoords0.mBuffer] );
                 submesh.texcoords0Array  = (glm::vec2*)submesh.texcoords0Buffer.data();
                 fanAssert( submesh.verticesCount == accessorTexcoords0.mCount );
@@ -181,11 +310,6 @@ namespace fan
                 viewJoints0.Load( jBufferViews[accessorJoints0.mBufferView] );
                 GLTFBuffer bufferJoints0;
                 bufferJoints0.Load( jBuffers[viewJoints0.mBuffer] );
-
-                if( loadedBuffers[viewJoints0.mBuffer].empty() )
-                {
-                    loadedBuffers[viewJoints0.mBuffer] = GLTFBuffer::DecodeBuffer( jBuffers[viewJoints0.mBuffer]["uri"] );
-                }
                 submesh.joints0Buffer = bufferJoints0.GetBuffer( viewJoints0, loadedBuffers[viewJoints0.mBuffer] );
                 submesh.joints0Array  = (glm::u8vec4*)submesh.joints0Buffer.data();
             }
@@ -202,68 +326,8 @@ namespace fan
                 viewWeight0.Load( jBufferViews[accessorWeights0.mBufferView] );
                 GLTFBuffer bufferWeights0;
                 bufferWeights0.Load( jBuffers[viewWeight0.mBuffer] );
-
-                if( loadedBuffers[viewWeight0.mBuffer].empty() )
-                {
-                    loadedBuffers[viewWeight0.mBuffer] = GLTFBuffer::DecodeBuffer( jBuffers[viewWeight0.mBuffer]["uri"] );
-                }
                 submesh.weights0Buffer = bufferWeights0.GetBuffer( viewWeight0, loadedBuffers[viewWeight0.mBuffer] );
                 submesh.weights0Array  = (glm::vec4*)submesh.weights0Buffer.data();
-            }
-
-            // loads skins
-            if( jSkins.is_array() && jSkins.size() != 0 )
-            {
-                GLTFSkin skin;
-                skin.Load( jSkins[0] );
-                submesh.mSkeleton.mName     = skin.mName;
-                submesh.mSkeleton.mNumBones = (int)skin.mJoints.size();
-
-                // load inverse bind matrices
-                GLTFAccessor bindMatricesAccessor;
-                bindMatricesAccessor.Load( jAccessors[skin.mInverseBindMatrices] );
-                fanAssert( bindMatricesAccessor.mComponentType == GLTFComponentType::Float );
-                fanAssert( bindMatricesAccessor.mType == GLTFType::Mat4 );
-                fanAssert( bindMatricesAccessor.mCount == submesh.mSkeleton.mNumBones );
-                GLTFBufferView viewBindMatrices;
-                viewBindMatrices.Load( jBufferViews[bindMatricesAccessor.mBufferView] );
-                fanAssert( viewBindMatrices.mByteLength == sizeof( glm::mat4 ) * bindMatricesAccessor.mCount );
-                GLTFBuffer bufferBindMatrices;
-                bufferBindMatrices.Load( jBuffers[viewBindMatrices.mBuffer] );
-                if( loadedBuffers[viewBindMatrices.mBuffer].empty() )
-                {
-                    loadedBuffers[viewBindMatrices.mBuffer] = GLTFBuffer::DecodeBuffer( jBuffers[viewBindMatrices.mBuffer]["uri"] );
-                }
-                std::string bindMatricesBuffer = bufferBindMatrices.GetBuffer( viewBindMatrices, loadedBuffers[viewBindMatrices.mBuffer] );
-                glm::mat4* bindMatricesArray = (glm::mat4*)bindMatricesBuffer.data();
-
-                // generate a remap table to generate the bones in a contiguous array
-                std::vector<GLTFNode> skeletonNodes;
-                skeletonNodes.resize( skin.mJoints.size() );
-                fanAssert( skin.mJoints.size() <= RenderGlobal::sMaxBones );
-                std::map<int, int> remapTable;
-                for( int           i         = 0; i < skin.mJoints.size(); i++ )
-                {
-                    const int nodeIndex = skin.mJoints[i];
-                    const GLTFNode& node = nodes[nodeIndex];
-                    remapTable[nodeIndex] = i;
-                    skeletonNodes[i]      = node;
-                }
-
-                // generate the bones
-                for( int nodeIndex = 0; nodeIndex < skeletonNodes.size(); nodeIndex++ )
-                {
-                    const GLTFNode& node = skeletonNodes[nodeIndex];
-                    Bone          & bone = submesh.mSkeleton.mBones[nodeIndex];
-                    bone.mName      = node.mName;
-                    bone.mNumChilds = (int)node.mChildren.size();
-                    fanAssert( bone.mNumChilds < Bone::sMaxChilds );
-                    for( int childIndex = 0; childIndex < node.mChildren.size(); ++childIndex )
-                    {
-                        bone.mChilds[childIndex] = remapTable.at( node.mChildren[childIndex] );
-                    }
-                    submesh.mSkeleton.mInverseBindMatrix[nodeIndex] = Matrix4( bindMatricesArray[nodeIndex] );
-                }
             }
         }
         return true;
@@ -332,8 +396,17 @@ namespace fan
                 meshVertices[i].mBoneIDs     = submesh.joints0Array != nullptr ? submesh.joints0Array[i] : glm::u8vec4( 0, 0, 0, 42 );
                 meshVertices[i].mBoneWeights = submesh.weights0Array != nullptr ? submesh.weights0Array[i] : glm::vec4( 1, 0, 0, 42 );
             }
+        }
+        _mesh.mSkeleton         = mSkeleton;
+    }
 
-            _mesh.mSkeleton = submesh.mSkeleton;
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    void GLTFImporter::GetAnimation( Animation& _animation )
+    {
+        if( !mAnimations.empty() )
+        {
+            _animation = mAnimations[0];
         }
     }
 }

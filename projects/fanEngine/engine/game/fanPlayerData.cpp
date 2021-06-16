@@ -146,6 +146,12 @@ namespace fan
             mResources.AddResourceType<Cursor>( info );
         }
 
+        {
+            ResourceInfo info;
+            info.mLoad = &LoadAnimation;
+            mResources.AddResourceType<Animation>( info );
+        }
+
         mResources.Load<Texture>( RenderGlobal::sDefaultTexture );
         mResources.Load<Font>( RenderGlobal::sDefaultGameFont );
         mResources.Load<Texture>( RenderGlobal::sWhiteTexture );
@@ -424,5 +430,19 @@ namespace fan
             return nullptr;
         }
         return mesh;
+    }
+
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    Resource* PlayerData::LoadAnimation( const std::string& _path, ResourceInfo& )
+    {
+        Debug::Log() << Debug::Type::Resources << "Loading animation " << _path << Debug::Endl();
+        Animation* animation = new Animation();
+        if( !animation->LoadFromFile( _path ) )
+        {
+            delete animation;
+            return nullptr;
+        }
+        return animation;
     }
 }

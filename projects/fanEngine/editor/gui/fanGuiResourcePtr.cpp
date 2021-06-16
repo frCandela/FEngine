@@ -6,6 +6,7 @@
 #include "engine/resources/fanPrefab.hpp"
 #include "render/resources/fanMesh.hpp"
 #include "render/resources/fanSkinnedMesh.hpp"
+#include "render/resources/fanAnimation.hpp"
 #include "render/fanRenderGlobal.hpp"
 #include "editor/fanImguiIcons.hpp"
 #include "editor/fanDragnDrop.hpp"
@@ -59,13 +60,13 @@ namespace ImGui
                 ImGui::BeginTooltip();
 
                 // path
-                ImGui::Text( texture->mPath.c_str() );
+                ImGui::Text( "%s", texture->mPath.c_str() );
 
                 // size
                 std::stringstream ss;
                 ss << texture->mExtent.width << " x " << texture->mExtent.height
                         << " x " << texture->mLayerCount;
-                ImGui::Text( ss.str().c_str() );
+                ImGui::Text( "%s", ss.str().c_str() );
 
                 ImGui::EndTooltip();
             }
@@ -94,7 +95,7 @@ namespace ImGui
         }
 
         ImGui::SameLine();
-        ImGui::Text( _label );
+        ImGui::Text( "%s", _label );
 
         return returnValue;
     }
@@ -141,7 +142,7 @@ namespace ImGui
         if( mesh != nullptr && ImGui::IsItemHovered() )
         {
             ImGui::BeginTooltip();
-            ImGui::Text( mesh->mPath.c_str() );
+            ImGui::Text( "%s", mesh->mPath.c_str() );
             for( fan::SubMesh& subMesh : mesh->mSubMeshes )
             {
                 ImGui::Text( "%d triangles", (int)subMesh.mIndices.size() / 3 );
@@ -171,7 +172,7 @@ namespace ImGui
         }
 
         ImGui::SameLine();
-        ImGui::Text( _label );
+        ImGui::Text( "%s", _label );
 
         return returnValue;
     }
@@ -216,7 +217,7 @@ namespace ImGui
         if( mesh != nullptr && ImGui::IsItemHovered() )
         {
             ImGui::BeginTooltip();
-            ImGui::Text( mesh->mPath.c_str() );
+            ImGui::Text( "%s", mesh->mPath.c_str() );
             for( fan::SubSkinnedMesh& subMesh : mesh->mSubMeshes )
             {
                 ImGui::Text( "%d triangles", (int)subMesh.mIndices.size() / 3 );
@@ -246,7 +247,7 @@ namespace ImGui
         }
 
         ImGui::SameLine();
-        ImGui::Text( _label );
+        ImGui::Text( "%s", _label );
 
         return returnValue;
     }
@@ -384,7 +385,76 @@ namespace ImGui
         }
 
         ImGui::SameLine();
-        ImGui::Text( _label );
+        ImGui::Text( "%s", _label );
+
+        return returnValue;
+    }
+
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    bool FanAnimationPtr( const char* _label, fan::ResourcePtr<fan::Animation>& _ptr )
+    {
+        bool returnValue = false;
+
+        fan::Animation* animation = _ptr;
+        const std::string name = ( animation == nullptr ) ? "null" : fan::Path::FileName( animation->mPath );
+
+        // Set button icon & modal
+        const std::string  modalName = std::string( "Find animation (" ) + _label + ")";
+        static std::string sPathBuffer;
+        ImGui::PushID( _label );
+        {
+            if( ImGui::ButtonIcon( ImGui::IconType::None16, { 16, 16 } ) )
+            {
+                _ptr        = nullptr;
+                returnValue = true;
+            }
+        }
+        ImGui::PopID();
+        ImGui::SameLine();
+
+        // name button
+        const float width = 0.6f * ImGui::GetWindowWidth() - ImGui::GetCursorPosX() + 23;
+        if( ImGui::Button( name.c_str(), ImVec2( width, 0.f ) ) )
+        {
+            ImGui::OpenPopup( modalName.c_str() );
+            if( sPathBuffer.empty() )
+            {
+                sPathBuffer = fan::Path::Normalize( fan::RenderGlobal::sAnimationsPath );
+            }
+        }
+        ImGui::SameLine();
+        ImGui::FanBeginDragDropSourceAnimation( _ptr );
+
+        // tooltip
+        if( animation != nullptr )
+        {
+            ImGui::FanToolTip( animation->mPath.c_str() );
+        }
+
+        // dragndrop
+        fan::ResourcePtr<fan::Animation> animationDrop = ImGui::FanBeginDragDropTargetAnimation();
+        if( animationDrop )
+        {
+            _ptr        = animationDrop;
+            returnValue = true;
+        }
+
+        // Right click = clear
+        if( ImGui::IsItemClicked( 1 ) )
+        {
+            _ptr        = nullptr;
+            returnValue = true;
+        }
+
+        if( ImGui::FanLoadFileModal( modalName.c_str(), fan::RenderGlobal::sAnimationsExtensions, sPathBuffer ) )
+        {
+            _ptr        = _ptr.mData.sResourceManager->Load<fan::Animation>( sPathBuffer );
+            returnValue = true;
+        }
+
+        ImGui::SameLine();
+        ImGui::Text( "%s", _label );
 
         return returnValue;
     }

@@ -3,6 +3,7 @@
 #include "fanJson.hpp"
 #include <string>
 #include "core/math/fanQuaternion.hpp"
+#include "core/fanString.hpp"
 
 namespace fan
 {
@@ -24,7 +25,7 @@ namespace fan
 
     //================================================================
     //================================================================
-    enum GLTFType
+    enum class GLTFType
     {
         Scalar = 0,
         Vec2,
@@ -36,7 +37,15 @@ namespace fan
         Count,
     };
 
-    static const char* sGLTFTypeStr[GLTFType::Count] =
+    enum class GLTFAnimationPath
+    {
+        Translation,
+        Rotation,
+        Scale,
+        Weights
+    };
+
+    static const char* sGLTFTypeStr[(int)GLTFType::Count] =
                              {
                                      "SCALAR",// num components = 1
                                      "VEC2",  // num components = 2
@@ -45,6 +54,17 @@ namespace fan
                                      "MAT2",  // num components = 4
                                      "MAT3",  // num components = 9
                                      "MAT4",  // num components = 16
+                             };
+
+    static const int sGLTFTypeByteSize[(int)GLTFType::Count] =
+                             {
+                                     4,// SCALAR
+                                     8,// VEC2
+                                     12,// VEC3
+                                     16,// VEC4
+                                     16,// MAT2
+                                     36,// MAT3
+                                     64,// MAT4
                              };
 
     //================================================================
@@ -129,8 +149,8 @@ namespace fan
     //================================================================
     struct GLTFSkin
     {
-        std::string mName;
-        int         mInverseBindMatrices;
+        std::string      mName;
+        int              mInverseBindMatrices;
         std::vector<int> mJoints;
 
         void Load( const Json& _jSkin );
@@ -141,12 +161,12 @@ namespace fan
     //================================================================
     struct GLTFNode
     {
-        std::string mName;
+        std::string      mName;
         std::vector<int> mChildren;
-        int mParent = -1;
-        Vector3 mPosition;
-        Vector3 mScale;
-        Quaternion mRotation;
+        int              mParent = -1;
+        Vector3          mPosition;
+        Vector3          mScale;
+        Quaternion       mRotation;
 
         void Load( const Json& _jNode );
         void Save( Json& _jNode ) const;
@@ -156,10 +176,36 @@ namespace fan
     //================================================================
     struct GLTFScene
     {
-        std::string mName;
+        std::string      mName;
         std::vector<int> mNodes;
 
         void Load( const Json& _jScene );
         void Save( Json& _jScene ) const;
+    };
+
+    //================================================================
+    //================================================================
+    struct GLTFAnimation
+    {
+        struct Channel
+        {
+            int               mSampler;
+            int               mTargetNode;
+            GLTFAnimationPath mTargetPath;
+        };
+
+        struct Sampler
+        {
+            int        mInput;
+            int        mOutput;
+            String<16> mInterpolation;
+        };
+
+        String<128>          mName;
+        std::vector<Channel> mChannels;
+        std::vector<Sampler> mSamplers;
+
+        void Load( const Json& _jAnimation );
+        void Save( Json& _jAnimation ) const;
     };
 }

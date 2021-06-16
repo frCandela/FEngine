@@ -96,7 +96,7 @@ namespace fan
         mCount         = _jAccessor["count"];
 
         const std::string strType = _jAccessor["type"];
-        for( int          i       = 0; i < GLTFType::Count; ++i )
+        for( int          i       = 0; i < (int)GLTFType::Count; ++i )
         {
             if( strType == sGLTFTypeStr[i] )
             {
@@ -112,7 +112,7 @@ namespace fan
         _jAccessor["bufferView"]    = mBufferView;
         _jAccessor["componentType"] = mComponentType;
         _jAccessor["count"]         = mCount;
-        _jAccessor["type"]          = sGLTFTypeStr[mType];
+        _jAccessor["type"]          = sGLTFTypeStr[(int)mType];
     }
 
     //==================================================================================================================================================================================================
@@ -265,6 +265,49 @@ namespace fan
         {
             jNodes[i] = mNodes[i] + 1;
         }
+    }
+
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    void GLTFAnimation::Load( const Json& _jAnimation )
+    {
+        mName = _jAnimation["name"];
+
+        // channels
+        const Json& jChannels = _jAnimation["channels"];
+        mChannels.resize( jChannels.size() );
+        for( int i = 0; i < mChannels.size(); i++ )
+        {
+            const Json& jChannel = jChannels[i];
+            Channel   & channel  = mChannels[i];
+            channel.mSampler    = jChannel["sampler"];
+            channel.mTargetNode = jChannel["target"]["node"];
+
+            String<16> targetPathStr = jChannel["target"]["path"];
+            if( targetPathStr == "translation" ){ channel.mTargetPath = GLTFAnimationPath::Translation; }
+            else if( targetPathStr == "rotation" ){ channel.mTargetPath = GLTFAnimationPath::Rotation; }
+            else if( targetPathStr == "scale" ){ channel.mTargetPath = GLTFAnimationPath::Scale; }
+            else{ channel.mTargetPath = GLTFAnimationPath::Weights; }
+        }
+
+        // samplers
+        const Json& jSamplers = _jAnimation["samplers"];
+        mSamplers.resize( jSamplers.size() );
+        for( int i = 0; i < mSamplers.size(); i++ )
+        {
+            const Json& jSampler = jSamplers[i];
+            Sampler   & sampler  = mSamplers[i];
+            sampler.mInput         = jSampler["input"];
+            sampler.mInterpolation = jSampler["interpolation"];
+            sampler.mOutput        = jSampler["output"];
+        }
+    }
+
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    void GLTFAnimation::Save( Json& _jAnimation ) const
+    {
+        (void)_jAnimation;
     }
 
     //==================================================================================================================================================================================================

@@ -16,7 +16,7 @@ namespace fan
     void Animator::Init( EcsWorld& /*_world*/, EcsEntity /*_entity*/, EcsComponent& _component )
     {
         Animator& animator = static_cast<Animator&>( _component );
-        animator.a = 1;
+        animator.mAnimation = {};
     }
 
     //==================================================================================================================================================================================================
@@ -24,7 +24,7 @@ namespace fan
     void Animator::Save( const EcsComponent& _component, Json& _json )
     {
         const Animator& animator = static_cast<const Animator&>( _component );
-        Serializable::SaveInt( _json, "a", animator.a );
+        Serializable::SaveResourcePtr( _json, "animation", animator.mAnimation.mData );
     }
 
     //==================================================================================================================================================================================================
@@ -32,6 +32,6 @@ namespace fan
     void Animator::Load( EcsComponent& _component, const Json& _json )
     {
         Animator& animator = static_cast<Animator&>( _component );
-        Serializable::LoadInt(_json, "a", animator.a );
+        Serializable::LoadResourcePtr( _json, "animation", animator.mAnimation.mData );
     }
 }
