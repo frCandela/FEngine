@@ -2,6 +2,7 @@
 
 #include <stdint.h>
 #include "core/math/fanFixedPointImpl.hpp"
+#include "core/fanAssert.hpp"
 
 namespace fan
 {
@@ -43,11 +44,14 @@ namespace fan
         static const Fixed sBias;
         static const Fixed sFuzzyZero;
 
-        #define FIXED( str ) ([]() { constexpr Fixed x = Fixed(#str); return x; }())
+        #define FIXED( str ) ([]() { static_assert( impl::IsValidNumberString(#str) ); constexpr Fixed x = Fixed(#str);   return x; }())
 
         constexpr Fixed() {}
         constexpr Fixed( const int _integer ) : mData( static_cast<DataType>(_integer << sFractionalSize) ) {}
-        constexpr explicit Fixed( const char* _str ) : mData( impl::StringToFixed( _str, sFractionalSize, sFractionalMask, sFixed_One ) ) {}
+        constexpr explicit Fixed( const char* _str ) : mData( impl::StringToFixed( _str, sFractionalSize, sFractionalMask, sFixed_One ) )
+        {
+            fanAssert( impl::IsValidNumberString( _str ) );
+        }
 
         constexpr void SetData( const DataType _data ) { mData = _data; }
 
@@ -345,7 +349,7 @@ namespace fan
             // M. Abramowitz and I.A. Stegun, Ed.
             Fixed negate = _value < 0 ? 1 : 0;
             Fixed x      = Fixed::Abs( _value );
-            Fixed ret    = FIXED( -0.0187293 );
+            Fixed ret    = FIXED( 0.0187293 );
             ret *= x;
             ret += FIXED( 0.0742610 );
             ret *= x;

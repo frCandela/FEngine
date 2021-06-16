@@ -38,6 +38,46 @@ namespace fan
             return isNegative ? -val : val;
         }
 
+        static constexpr bool IsValidNumberString( const char* _str )
+        {
+            const char* iterator = _str;
+
+            // check first letter is 0123456789+-.
+            char firstChar = *iterator++;
+            if( ( firstChar < '0' || firstChar > '9' ) && firstChar != '.' && firstChar != '+' && firstChar != '-' )
+            {
+                return false;
+            }
+
+            // check other letters are 0123456789.
+            while( *iterator != '\0' )
+            {
+                char c = *iterator++;
+                if( ( c < '0' || c > '9' ) && c != '.' )
+                {
+                    return false;
+                }
+            }
+
+            // check that there is only one '.'
+            iterator = _str;
+            int numDots = 0;
+            while( *iterator != '\0' )
+            {
+                char c = *iterator++;
+                if( c == '.' )
+                {
+                    numDots++;
+                }
+            }
+            if( numDots > 1 )
+            {
+                return false;
+            }
+
+            return true;
+        }
+
         //==============================================================================================================================================================================================
         //==============================================================================================================================================================================================
         constexpr uint64_t Pow10( uint64_t _pow )
@@ -96,10 +136,7 @@ namespace fan
 
         //==============================================================================================================================================================================================
         //==============================================================================================================================================================================================
-        constexpr int32_t StringToFixed( const char* _str,
-                                         const int32_t _fractionalSize,
-                                         const int32_t _fractionalMask,
-                                         const int32_t _fixedOne )
+        constexpr int32_t StringToFixed( const char* _str, const int32_t _fractionalSize, const int32_t _fractionalMask, const int32_t _fixedOne )
         {
             const bool isNegative = _str[0] == '-';
             const char* dotStr = Strchr( _str, '.' );
