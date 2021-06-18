@@ -17,5 +17,6 @@ namespace fan
         static void Load( EcsComponent& _component, const Json& _json );
 
         ResourcePtr<Animation> mAnimation;
+        int mKeyframe = 0;
     };
 }

@@ -26,4 +26,28 @@ namespace fan
         Debug::Warning() << "Failed to load animation : " << mPath << Debug::Endl();
         return false;
     }
+
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    Vector3 Animation::SamplePosition( const int _boneIndex, const Fixed _time )
+    {
+        const std::vector<Animation::KeyPosition>& positions = mBoneKeys[_boneIndex].mPositions;
+        if( _time.ToInt() >= positions.size() )
+        {
+            return Vector3::sZero;
+        }
+        return positions.empty() ? Vector3::sZero : positions[_time.ToInt()].mPosition;
+    }
+
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    Quaternion Animation::SampleRotation( const int _boneIndex, const Fixed _time )
+    {
+        const std::vector<Animation::KeyRotation>& rotations = mBoneKeys[_boneIndex].mRotations;
+        if( _time.ToInt() >= rotations.size() )
+        {
+            return Quaternion::sIdentity;
+        }
+        return rotations.empty() ? Quaternion::sIdentity : rotations[_time.ToInt()].mRotation;
+    }
 }

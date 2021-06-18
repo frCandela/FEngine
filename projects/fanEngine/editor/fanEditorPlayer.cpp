@@ -261,7 +261,7 @@ namespace fan
                 if( mainMenuBar.mShowBoundingSphere ){ currentWorld.Run<SDrawDebugBoundingSpheres>(); }
                 if( mainMenuBar.mShowHull ){ currentWorld.Run<SDrawDebugHull>(); }
                 if( mainMenuBar.mShowUiBounds ){ currentWorld.Run<SDrawDebugUiBounds>(); }
-                currentWorld.Run<SDrawSkeletons>();
+                if( mainMenuBar.mShowSkeletons ){ currentWorld.Run<SDrawSkeletons>(); }
                 if( mainMenuBar.mShowLights )
                 {
                     currentWorld.Run<SDrawDebugPointLights>();

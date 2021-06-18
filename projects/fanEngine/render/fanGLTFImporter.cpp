@@ -135,6 +135,16 @@ namespace fan
                     bone.mChilds[childIndex] = bonesRemapTable.at( node.mChildren[childIndex] );
                 }
                 mSkeleton.mInverseBindMatrix[nodeIndex] = Matrix4( bindMatricesArray[nodeIndex] );
+                //mSkeleton.mRelativeTransform[nodeIndex] = Matrix4( node.mRotation, node.mPosition, node.mScale );
+            }
+
+            // transforms root node to make it absolute
+            GLTFNode * node = &nodes[skin.mJoints[0]];
+            mSkeleton.mRootTransform = Matrix4::sIdentity;
+            while(  node->mParent >= 0 )
+            {
+                node = &nodes[node->mParent];
+                mSkeleton.mRootTransform = Matrix4( node->mRotation, node->mPosition, node->mScale ) * mSkeleton.mRootTransform;
             }
         }
 
@@ -181,7 +191,8 @@ namespace fan
                     {
                         fanAssert( accessorProperty.mType == GLTFType::Vec3 );
                         fanAssert( boneAnimation.mPositions.empty() );
-                        glm::vec3* positionBuffer = (glm::vec3*)bufferProperty.GetBuffer( viewProperty, loadedBuffers[viewProperty.mBuffer] ).data();
+                        std::string positionBufferStr = bufferProperty.GetBuffer( viewProperty, loadedBuffers[viewProperty.mBuffer] );
+                        glm::vec3* positionBuffer = (glm::vec3*)positionBufferStr.data();
                         boneAnimation.mPositions.resize( accessorProperty.mCount );
                         for( int keyIndex = 0; keyIndex < accessorProperty.mCount; ++keyIndex )
                         {
@@ -194,7 +205,8 @@ namespace fan
                     {
                         fanAssert( accessorProperty.mType == GLTFType::Vec4 );
                         fanAssert( boneAnimation.mRotations.empty() );
-                        glm::quat* rotationBuffer = (glm::quat*)bufferProperty.GetBuffer( viewProperty, loadedBuffers[viewProperty.mBuffer] ).data();
+                        std::string rotationBufferStr = bufferProperty.GetBuffer( viewProperty, loadedBuffers[viewProperty.mBuffer] );
+                        glm::quat* rotationBuffer = (glm::quat*)rotationBufferStr.data();
                         boneAnimation.mRotations.resize( accessorProperty.mCount );
                         for( int keyIndex = 0; keyIndex < accessorProperty.mCount; ++keyIndex )
                         {
@@ -207,7 +219,8 @@ namespace fan
                     {
                         fanAssert( accessorProperty.mType == GLTFType::Vec3 );
                         fanAssert( boneAnimation.mScales.empty() );
-                        glm::vec3* scaleBuffer = (glm::vec3*)bufferProperty.GetBuffer( viewProperty, loadedBuffers[viewProperty.mBuffer] ).data();
+                        std::string scaleBufferStr = bufferProperty.GetBuffer( viewProperty, loadedBuffers[viewProperty.mBuffer] );
+                        glm::vec3* scaleBuffer = (glm::vec3*)scaleBufferStr.data();
                         boneAnimation.mScales.resize( accessorProperty.mCount );
                         for( int keyIndex = 0; keyIndex < accessorProperty.mCount; ++keyIndex )
                         {

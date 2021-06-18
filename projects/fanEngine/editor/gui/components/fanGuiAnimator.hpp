@@ -15,7 +15,7 @@ namespace fan
         {
             GuiComponentInfo info;
             info.mIcon       = ImGui::IconType::None16;
-            info.mGroup      = EngineGroups::Scene;
+            info.mGroup      = EngineGroups::SceneRender;
             info.onGui       = &GuiAnimator::OnGui;
             info.mEditorPath = "/";
             info.mEditorName = "animator";
@@ -29,31 +29,10 @@ namespace fan
             {
                 ImGui::FanAnimationPtr("animation", animator.mAnimation );
 
-/*::PushID( "animator" );
-                (void)animator;
-                if( _world.HasComponent<SkinnedMeshRenderer>( _entity ) )
+                if( animator.mAnimation != nullptr )
                 {
-                    SkinnedMeshRenderer& meshRenderer = _world.GetComponent<SkinnedMeshRenderer>( _entity );
-                    if( meshRenderer.mMesh != nullptr )
-                    {
-                        Skeleton& skeleton = meshRenderer.mMesh->mSkeleton;
-                        for( int i = 0; i < skeleton.mNumBones; ++i )
-                        {
-                            ImGui::PushID( i );
-                            static Fixed f = 0;
-                            if( ImGui::DragFixed( skeleton.mBones[i].mName, &f ) )
-                            {
-                                const Matrix4& ibm       = skeleton.mInverseBindMatrix[i];
-                                Matrix4      & offsetMat = skeleton.mOffsetMatrix[i];
-
-                                offsetMat = ibm.Inverse() * Matrix4( Quaternion::AngleAxis( f, Vector3::sUp ), Vector3::sZero ) * ibm;
-                            }
-                            ImGui::PopID();
-                            ImGui::Separator();
-                        }
-                    }
+                    ImGui::SliderInt( "keyframe", &animator.mKeyframe, 0, animator.mAnimation->mNumBones );
                 }
-                ImGui::PopID();*/
             }
             ImGui::PopItemWidth();
         }

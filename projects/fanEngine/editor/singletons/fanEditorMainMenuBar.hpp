@@ -37,6 +37,7 @@ namespace fan
         bool mShowNormals;
         bool mShowLights;
         bool mShowUiBounds;
+        bool mShowSkeletons;
 
         bool mOpenNewScenePopupLater;
         bool mOpenLoadScenePopupLater;

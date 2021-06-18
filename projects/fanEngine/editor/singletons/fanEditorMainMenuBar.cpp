@@ -40,6 +40,7 @@ namespace fan
         mainMenuBar.mShowNormals         = false;
         mainMenuBar.mShowLights          = false;
         mainMenuBar.mShowUiBounds        = false;
+        mainMenuBar.mShowSkeletons       = false;
 
         mainMenuBar.mOpenNewScenePopupLater  = false;
         mainMenuBar.mOpenLoadScenePopupLater = false;
@@ -181,6 +182,7 @@ namespace fan
                 {
                     if( ImGui::MenuItem( "show wireframe", nullptr, &mainMenuBar.mShowWireframe ) ){}
                     if( ImGui::MenuItem( "show normals", nullptr, &mainMenuBar.mShowNormals ) ){}
+                    if( ImGui::MenuItem( "show skeletons", nullptr, &mainMenuBar.mShowSkeletons ) ){}
 
                     ImGui::EndMenu();
                 }

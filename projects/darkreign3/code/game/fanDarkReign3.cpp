@@ -17,6 +17,7 @@
 #include "engine/systems/fanEmitParticles.hpp"
 #include "engine/systems/fanGenerateParticles.hpp"
 #include "engine/systems/fanUpdateRenderWorld.hpp"
+#include "engine/systems/fanUpdateAnimators.hpp"
 #include "engine/physics/fanDetectCollisions.hpp"
 #include "engine/terrain/fanVoxelTerrain.hpp"
 #include "engine/components/fanCamera.hpp"
@@ -122,6 +123,8 @@ namespace fan
         mWorld.Run<SIntegrateRigidbodies>( _delta );
         mWorld.Run<SDetectCollisions>( _delta );
         mWorld.Run<SMoveFollowTransforms>();
+
+        mWorld.Run<SUpdateAnimators>( _delta );
 
         // ui
         mWorld.Run<SUpdateAnimScale>( _delta );

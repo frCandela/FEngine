@@ -49,5 +49,7 @@ namespace fan
         int           mNumBones = 0;
 
         bool LoadFromFile( const std::string& _path );
+        Vector3 SamplePosition( const int _boneIndex, const Fixed _time );
+        Quaternion SampleRotation( const int _boneIndex, const Fixed _time );
     };
 }
