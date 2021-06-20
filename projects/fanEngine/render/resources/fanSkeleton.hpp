@@ -10,7 +10,7 @@ namespace fan
     //==================================================================================================================================================================================================
     struct Bone
     {
-        static const int sMaxChilds = 4;
+        static const int sMaxChilds = 8;
         int              mChilds[sMaxChilds];
         int              mNumChilds = 0;
         String<32>       mName;

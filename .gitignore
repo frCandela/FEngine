@@ -24,3 +24,4 @@ content/kenney
 *.exe
 build
 *.spv
+*.blend

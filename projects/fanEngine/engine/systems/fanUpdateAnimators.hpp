@@ -15,14 +15,13 @@ namespace fan
                    _world.GetSignature<SkinnedMeshRenderer>();
         }
 
-        static void Run( EcsWorld&, const EcsView& _view, const Fixed )
+        static void Run( EcsWorld&, const EcsView& _view, const Fixed _delta )
         {
             auto animatorIt     = _view.begin<Animator>();
             auto meshRendererIt = _view.begin<SkinnedMeshRenderer>();
 
             for( ; animatorIt != _view.end<Animator>(); ++animatorIt, ++meshRendererIt )
             {
-
                 Animator           & animator     = *animatorIt;
                 SkinnedMeshRenderer& meshRenderer = *meshRendererIt;
                 if( animator.mAnimation != nullptr && meshRenderer.mMesh != nullptr && meshRenderer.mMesh->mSkeleton.mNumBones == animator.mAnimation->mNumBones )
@@ -37,7 +36,11 @@ namespace fan
                             Matrix4 mParentAbsoluteTransform;
                         };
 
-                        BoneData             root = { 0, skeleton.mRootTransform };
+                        const Matrix4& ttt = Matrix4( animation.SampleRotation( skeleton.mNumBones - 1, animator.mTime ),
+                                                      animation.SamplePosition( skeleton.mNumBones - 1, animator.mTime ),
+                                                      animation.SampleScale( skeleton.mNumBones - 1, animator.mTime ) );
+
+                        BoneData             root = { 0, skeleton.mRootTransform * ttt };
                         std::stack<BoneData> stack;
                         stack.push( root );
                         while( !stack.empty() )
@@ -45,9 +48,11 @@ namespace fan
                             BoneData boneData = stack.top();
                             stack.pop();
 
-                            const Matrix4& animatedRelativeTransform = Matrix4( animation.SampleRotation(boneData.mIndex, animator.mKeyframe), animation.SamplePosition(boneData.mIndex, animator.mKeyframe) );
-                            const Matrix4 animatedAbsoluteTransform = boneData.mParentAbsoluteTransform * animatedRelativeTransform;
+                            const Matrix4 animatedRelativeTransform = Matrix4( animation.SampleRotation( boneData.mIndex, animator.mTime ),
+                                                                               animation.SamplePosition( boneData.mIndex, animator.mTime ),
+                                                                               animation.SampleScale( boneData.mIndex, animator.mTime ) );
                             const Matrix4 ibm                       = skeleton.mInverseBindMatrix[boneData.mIndex];
+                            const Matrix4 animatedAbsoluteTransform = boneData.mParentAbsoluteTransform * animatedRelativeTransform;
 
                             skeleton.mOffsetMatrix[boneData.mIndex] = animatedAbsoluteTransform * ibm;
 
@@ -55,6 +60,15 @@ namespace fan
                             for( int i = 0; i < bone.mNumChilds; i++ )
                             {
                                 stack.push( { bone.mChilds[i], animatedAbsoluteTransform } );
+                            }
+                        }
+
+                        if( animator.mLoop )
+                        {
+                            animator.mTime += _delta;
+                            if( animator.mTime >= animation.mDuration )
+                            {
+                                animator.mTime = 0;
                             }
                         }
                     }

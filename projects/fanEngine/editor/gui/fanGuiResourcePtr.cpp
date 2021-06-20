@@ -221,6 +221,7 @@ namespace ImGui
             for( fan::SubSkinnedMesh& subMesh : mesh->mSubMeshes )
             {
                 ImGui::Text( "%d triangles", (int)subMesh.mIndices.size() / 3 );
+                ImGui::Text( "%d bones", (int)mesh->mSkeleton.mNumBones );
             }
             ImGui::EndTooltip();
         }
@@ -427,9 +428,12 @@ namespace ImGui
         ImGui::FanBeginDragDropSourceAnimation( _ptr );
 
         // tooltip
-        if( animation != nullptr )
+        if( animation != nullptr && ImGui::IsItemHovered() )
         {
-            ImGui::FanToolTip( animation->mPath.c_str() );
+            ImGui::BeginTooltip();
+            ImGui::Text( "%s", animation->mPath.c_str() );
+            ImGui::Text( "%d bones", (int)animation->mNumBones );
+            ImGui::EndTooltip();
         }
 
         // dragndrop
