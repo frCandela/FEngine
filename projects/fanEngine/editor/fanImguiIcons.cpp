@@ -56,6 +56,14 @@ namespace ImGui
             , DECL_ICON( 16.f, 8, 0 )  // SIGNAL_SLOT16,
             , DECL_ICON( 16.f, 9, 0 )  // PLUS16,
             , DECL_ICON( 16.f, 10, 0 ) // MINUS16
+            , DECL_ICON( 16.f, 11, 0 ) // Up16,
+            , DECL_ICON( 16.f, 12, 0 ) // Down16,
+            , DECL_ICON( 16.f, 13, 0 ) // In16,
+            , DECL_ICON( 16.f, 14, 0 ) // Out16,
+            , DECL_ICON( 16.f, 15, 0 ) // Undo16,
+            , DECL_ICON( 16.f, 16, 0 ) // Redo16,
+            , DECL_ICON( 16.f, 17, 0 ) // Left16,
+            , DECL_ICON( 16.f, 18, 0 ) // Right16,
 
             // small
             , DECL_ICON( 8.f, 0, 2 )  // PLUS8,
@@ -84,7 +92,7 @@ namespace ImGui
             , DECL_ICON( 16.f, 19, 8 ) // Text16,
             , DECL_ICON( 16.f, 20, 8 ) // Layout16
             , DECL_ICON( 16.f, 21, 8 ) // Align16
-
+            , DECL_ICON( 16.f, 22, 8 ) // Animator16
 
             , DECL_ICON( 16.f, 0, 2 ) // TIME16
             , DECL_ICON( 16.f, 1, 2 ) // SPAWN16
@@ -113,5 +121,8 @@ namespace ImGui
             //network
             , DECL_ICON( 16.f, 0, 12 )  // RELIABILITY_LAYER16,
             , DECL_ICON( 16.f, 1, 12 )  // GAME_DATA16,
+
+            // game
+            , DECL_ICON( 16.f, 0, 14 )  // StickMan16
     };
 }

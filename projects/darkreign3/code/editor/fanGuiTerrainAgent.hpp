@@ -13,10 +13,10 @@ namespace fan
         static GuiComponentInfo GetInfo()
         {
             GuiComponentInfo info;
-            info.mIcon       = ImGui::IconType::None16;
+            info.mIcon       = ImGui::IconType::Terrain16;
             info.mGroup      = EngineGroups::Game;
             info.onGui       = &GuiTerrainAgent::OnGui;
-            info.mEditorName = "terrain agent";
+            info.mEditorName = "Terrain agent";
             info.mEditorPath = "game/";
             return info;
         }

@@ -13,10 +13,10 @@ namespace fan
         static GuiComponentInfo GetInfo()
         {
             GuiComponentInfo info;
-            info.mIcon       = ImGui::IconType::None16;
+            info.mIcon       = ImGui::IconType::StickMan16;
             info.mGroup      = EngineGroups::Game;
             info.onGui       = &GuiUnit::OnGui;
-            info.mEditorName = "unit";
+            info.mEditorName = "Unit";
             info.mEditorPath = "game/";
             return info;
         }
@@ -25,7 +25,7 @@ namespace fan
         {
             Unit& unit = static_cast<Unit&>( _component );
             ImGui::PushID("Unit");
-            ImGui::DragFixed( "tmp", &unit.mHeightOffset );
+            ImGui::DragFixed( "height offset", &unit.mHeightOffset );
             ImGui::PopID();
         }
     };

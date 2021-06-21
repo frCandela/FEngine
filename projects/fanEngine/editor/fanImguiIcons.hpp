@@ -45,6 +45,14 @@ namespace ImGui
         SignalSlot16,
         Plus16,
         Minus16,
+        Up16,
+        Down16,
+        In16,
+        Out16,
+        Undo16,
+        Redo16,
+        Left16,
+        Right16,
 
         // small
         Plus8,
@@ -73,6 +81,7 @@ namespace ImGui
         Text16,
         Layout16,
         Align16,
+        Animator16,
 
         // singletons
         Time16,
@@ -102,6 +111,10 @@ namespace ImGui
         // network
         ReliabilityLayer16,
         GameData16,
+
+        //game @todo make a mecanism for games to add custom icons
+        StickMan16,
+
         NumIcons
     };
 
