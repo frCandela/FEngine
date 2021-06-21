@@ -29,22 +29,44 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
+    Fixed GetSampleRatio( const Fixed _prevTime, const Fixed _nextTime, const Fixed _time )
+    {
+        const Fixed framesDiff = _nextTime - _prevTime;
+        const Fixed length     = Fixed::Clamp( _time - _prevTime, 0, framesDiff );
+        const Fixed ratio      = length / framesDiff;
+        fanAssert( ratio >= 0 && ratio <= 1 );
+        return ratio;
+    }
+
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
     Vector3 Animation::SamplePosition( const int _boneIndex, const Fixed _time )
     {
         const std::vector<Animation::KeyPosition>& positions = mBoneKeys[_boneIndex].mPositions;
-        int index = (int)positions.size() - 2;
-        for( int i = 0; i < (int)positions.size() - 1; i++ )
+        if( positions.empty() )
         {
-            if( _time < positions[i + 1].mTime )
-            {
-                index = i;
-                break;
-            }
+            return Vector3::sZero;
         }
-        const Animation::KeyPosition prevKey = positions[index];
-        const Animation::KeyPosition nextKey = positions[index + 1];
-         Fixed                  ratio   = ( _time - prevKey.mTime ) / ( nextKey.mTime - prevKey.mTime );
-        return ( 1 - ratio ) * prevKey.mPosition + ratio * nextKey.mPosition;
+        else if( positions.size() == 1 )
+        {
+            return positions[0].mPosition;
+        }
+        else
+        {
+            int                          index       = (int)positions.size() - 2;
+            for( int                     i           = 0; i < (int)positions.size() - 1; i++ )
+            {
+                if( _time < positions[i + 1].mTime )
+                {
+                    index = i;
+                    break;
+                }
+            }
+            const Animation::KeyPosition prevKey     = positions[index];
+            const Animation::KeyPosition nextKey     = positions[index + 1];
+            const Fixed                  sampleRatio = GetSampleRatio( prevKey.mTime, nextKey.mTime, _time );
+            return ( 1 - sampleRatio ) * prevKey.mPosition + sampleRatio * nextKey.mPosition;
+        }
     }
 
     //==================================================================================================================================================================================================
@@ -52,19 +74,30 @@ namespace fan
     Quaternion Animation::SampleRotation( const int _boneIndex, const Fixed _time )
     {
         const std::vector<Animation::KeyRotation>& rotations = mBoneKeys[_boneIndex].mRotations;
-        int index = (int)rotations.size() - 2;
-        for( int i = 0; i < (int)rotations.size() - 1; i++ )
+        if( rotations.empty() )
         {
-            if( _time < rotations[i + 1].mTime )
-            {
-                index = i;
-                break;
-            }
+            return Quaternion::sIdentity;
         }
-        const Animation::KeyRotation prevKey = rotations[index];
-        const Animation::KeyRotation nextKey = rotations[index + 1];
-        const Fixed                  ratio   = ( _time - prevKey.mTime ) / ( nextKey.mTime - prevKey.mTime );
-        return Quaternion::Slerp( prevKey.mRotation, nextKey.mRotation, ratio );
+        else if( rotations.size() == 1 )
+        {
+            return rotations[0].mRotation;
+        }
+        else
+        {
+            int                          index       = (int)rotations.size() - 2;
+            for( int                     i           = 0; i < (int)rotations.size() - 1; i++ )
+            {
+                if( _time < rotations[i + 1].mTime )
+                {
+                    index = i;
+                    break;
+                }
+            }
+            const Animation::KeyRotation prevKey     = rotations[index];
+            const Animation::KeyRotation nextKey     = rotations[index + 1];
+            const Fixed                  sampleRatio = GetSampleRatio( prevKey.mTime, nextKey.mTime, _time );
+            return Quaternion::Slerp( prevKey.mRotation, nextKey.mRotation, sampleRatio );
+        }
     }
 
     //==================================================================================================================================================================================================
@@ -72,18 +105,29 @@ namespace fan
     Vector3 Animation::SampleScale( const int _boneIndex, const Fixed _time )
     {
         const std::vector<Animation::KeyScale>& scales = mBoneKeys[_boneIndex].mScales;
-        int index = (int)scales.size() - 2;
-        for( int i = 0; i < (int)scales.size() - 1; i++ )
+        if( scales.empty() )
         {
-            if( _time < scales[i + 1].mTime )
-            {
-                index = i;
-                break;
-            }
+            return Vector3::sOne;
         }
-        const Animation::KeyScale prevKey = scales[index];
-        const Animation::KeyScale nextKey = scales[index + 1];
-        const Fixed               ratio   = ( _time - prevKey.mTime ) / ( nextKey.mTime - prevKey.mTime );
-        return ( 1 - ratio ) * prevKey.mScale + ratio * nextKey.mScale;
+        else if( scales.size() == 1 )
+        {
+            return scales[0].mScale;
+        }
+        else
+        {
+            int                       index       = (int)scales.size() - 2;
+            for( int                  i           = 0; i < (int)scales.size() - 1; i++ )
+            {
+                if( _time < scales[i + 1].mTime )
+                {
+                    index = i;
+                    break;
+                }
+            }
+            const Animation::KeyScale prevKey     = scales[index];
+            const Animation::KeyScale nextKey     = scales[index + 1];
+            const Fixed               sampleRatio = GetSampleRatio( prevKey.mTime, nextKey.mTime, _time );
+            return ( 1 - sampleRatio ) * prevKey.mScale + sampleRatio * nextKey.mScale;
+        }
     }
 }

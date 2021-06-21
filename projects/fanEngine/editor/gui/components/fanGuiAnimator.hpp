@@ -14,11 +14,11 @@ namespace fan
         static GuiComponentInfo GetInfo()
         {
             GuiComponentInfo info;
-            info.mIcon       = ImGui::IconType::None16;
+            info.mIcon       = ImGui::IconType::Animator16;
             info.mGroup      = EngineGroups::SceneRender;
             info.onGui       = &GuiAnimator::OnGui;
             info.mEditorPath = "/";
-            info.mEditorName = "animator";
+            info.mEditorName = "Animator";
             return info;
         }
 
@@ -31,7 +31,13 @@ namespace fan
 
                 if( animator.mAnimation != nullptr )
                 {
-                    ImGui::SliderFixed( "keyframe", &animator.mTime, 0, animator.mAnimation->mDuration );
+                    if( ImGui::ButtonIcon( ImGui::Left16, { 16, 16 } ) ){ animator.mTime = 0; }
+                    ImGui::SameLine();
+                    if( ImGui::ButtonIcon( ImGui::Right16, { 16, 16 } ) ){ animator.mTime = animator.mAnimation->mDuration; }
+                    ImGui::SameLine();
+                    ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() - 48 );
+                    ImGui::SliderFixed( "time", &animator.mTime, 0, animator.mAnimation->mDuration );
+                    ImGui::PopItemWidth();
                 }
                 ImGui::Checkbox( "loop", &animator.mLoop );
             }

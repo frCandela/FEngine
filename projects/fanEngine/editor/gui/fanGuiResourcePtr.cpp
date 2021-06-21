@@ -405,7 +405,7 @@ namespace ImGui
         static std::string sPathBuffer;
         ImGui::PushID( _label );
         {
-            if( ImGui::ButtonIcon( ImGui::IconType::None16, { 16, 16 } ) )
+            if( ImGui::ButtonIcon( ImGui::IconType::Animator16, { 16, 16 } ) )
             {
                 _ptr        = nullptr;
                 returnValue = true;

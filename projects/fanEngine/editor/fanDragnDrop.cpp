@@ -318,7 +318,7 @@ namespace ImGui
             if( ImGui::BeginDragDropSource( _flags ) )
             {
                 ImGui::SetDragDropPayload( "dragndrop_animation", &_animation, sizeof( fan::ResourcePtr<fan::Animation> ) );
-                ImGui::Icon( ImGui::IconType::None16, { 16, 16 } );
+                ImGui::Icon( ImGui::IconType::Animator16, { 16, 16 } );
                 ImGui::SameLine();
                 ImGui::Text( "%s", _animation->mPath.c_str() );
                 ImGui::EndDragDropSource();

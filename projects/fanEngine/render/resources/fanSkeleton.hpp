@@ -23,7 +23,6 @@ namespace fan
         Bone       mBones[RenderGlobal::sMaxBones];
         Matrix4    mOffsetMatrix[RenderGlobal::sMaxBones];
         Matrix4    mInverseBindMatrix[RenderGlobal::sMaxBones];
-        Matrix4    mRootTransform;
         int        mNumBones = 0;
         String<32> mName;
     };

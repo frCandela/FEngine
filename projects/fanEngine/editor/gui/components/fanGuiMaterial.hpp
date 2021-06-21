@@ -30,7 +30,7 @@ namespace fan
                 material.mMaterials.push_back({});
             }
             ImGui::SameLine();
-            if( ImGui::ButtonIcon(ImGui::IconType::Minus16, {8,8}) &&  material.mMaterials.size() > 1)
+            if( ImGui::ButtonIcon(ImGui::IconType::Minus8, {8,8}) &&  material.mMaterials.size() > 1)
             {
                 material.mMaterials.pop_back();
             }

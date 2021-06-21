@@ -112,7 +112,7 @@ namespace fan
 
             // generate a remap table to generate the bones in a contiguous array
             std::vector<GLTFNode> skeletonNodes;
-            skeletonNodes.resize( skin.mJoints.size());
+            skeletonNodes.resize( skin.mJoints.size() );
             fanAssert( skin.mJoints.size() <= RenderGlobal::sMaxBones );
             for( int i = 0; i < skin.mJoints.size(); i++ )
             {
@@ -138,20 +138,20 @@ namespace fan
             }
 
             // transforms root node to make it absolute
-            GLTFNode * node = &nodes[skin.mJoints[0]];
+            /*GLTFNode* node = &nodes[skin.mJoints[0]];
             Matrix4 rootTransform = Matrix4::sIdentity;
-            while(  node->mParent >= 0 )
+            while( node->mParent >= 0 )
             {
-                node = &nodes[node->mParent];
+                node          = &nodes[node->mParent];
                 rootTransform = Matrix4( node->mRotation, node->mPosition, node->mScale ) * rootTransform;
             }
-            mSkeleton.mRootTransform = rootTransform;
+            mSkeleton.mRootTransform = rootTransform;*/
 
             // adds the skeleton root node...
             const int skeletonRootIndex = skeletonNodes[0].mParent;
             const GLTFNode& skeletonRoot = nodes[skeletonRootIndex];
-            Bone          & rootBone =  mSkeleton.mBones[mSkeleton.mNumBones];
-            bonesRemapTable[skeletonRootIndex] = mSkeleton.mNumBones;
+            Bone          & rootBone     = mSkeleton.mBones[mSkeleton.mNumBones];
+            bonesRemapTable[skeletonRootIndex]                = mSkeleton.mNumBones;
             mSkeleton.mInverseBindMatrix[mSkeleton.mNumBones] = Matrix4::sIdentity;
             mSkeleton.mNumBones++;
             rootBone.mNumChilds = 1;
@@ -194,7 +194,7 @@ namespace fan
                 GLTFBuffer bufferProperty;
                 bufferProperty.Load( jBuffers[viewProperty.mBuffer] );
 
-                const int boneIndex = bonesRemapTable.at(channel.mTargetNode);
+                const int boneIndex = bonesRemapTable.at( channel.mTargetNode );
                 Animation::BoneAnimation& boneAnimation = animation.mBoneKeys[boneIndex];
                 switch( channel.mTargetPath )
                 {
@@ -250,12 +250,21 @@ namespace fan
             for( int boneIndex = 0; boneIndex < animation.mNumBones; boneIndex++ )
             {
                 Animation::BoneAnimation& boneAnimation = animation.mBoneKeys[boneIndex];
-                Animation::KeyPosition& lastPosition = *boneAnimation.mPositions.rbegin();
-                Animation::KeyScale& lastScale = *boneAnimation.mScales.rbegin();
-                Animation::KeyRotation& lastRotation = *boneAnimation.mRotations.rbegin();
-                animation.mDuration = Fixed::Max( animation.mDuration, lastPosition.mTime );
-                animation.mDuration = Fixed::Max( animation.mDuration, lastScale.mTime );
-                animation.mDuration = Fixed::Max( animation.mDuration, lastRotation.mTime );
+                if( !boneAnimation.mPositions.empty() )
+                {
+                    Animation::KeyPosition& lastPosition = *boneAnimation.mPositions.rbegin();
+                    animation.mDuration = Fixed::Max( animation.mDuration, lastPosition.mTime );
+                }
+                if( !boneAnimation.mScales.empty() )
+                {
+                    Animation::KeyScale& lastScale = *boneAnimation.mScales.rbegin();
+                    animation.mDuration            = Fixed::Max( animation.mDuration, lastScale.mTime );
+                }
+                if( !boneAnimation.mRotations.empty() )
+                {
+                    Animation::KeyRotation& lastRotation = *boneAnimation.mRotations.rbegin();
+                    animation.mDuration = Fixed::Max( animation.mDuration, lastRotation.mTime );
+                }
             }
         }
 

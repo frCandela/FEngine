@@ -24,7 +24,12 @@ namespace fan
             {
                 Animator           & animator     = *animatorIt;
                 SkinnedMeshRenderer& meshRenderer = *meshRendererIt;
-                if( animator.mAnimation != nullptr && meshRenderer.mMesh != nullptr && meshRenderer.mMesh->mSkeleton.mNumBones == animator.mAnimation->mNumBones )
+                if( meshRenderer.mMesh == nullptr )
+                {
+                    continue;
+                }
+
+                if( animator.mAnimation != nullptr && meshRenderer.mMesh->mSkeleton.mNumBones == animator.mAnimation->mNumBones )
                 {
                     Skeleton & skeleton  = meshRenderer.mMesh->mSkeleton;
                     Animation& animation = *animator.mAnimation;
@@ -36,11 +41,7 @@ namespace fan
                             Matrix4 mParentAbsoluteTransform;
                         };
 
-                        const Matrix4& ttt = Matrix4( animation.SampleRotation( skeleton.mNumBones - 1, animator.mTime ),
-                                                      animation.SamplePosition( skeleton.mNumBones - 1, animator.mTime ),
-                                                      animation.SampleScale( skeleton.mNumBones - 1, animator.mTime ) );
-
-                        BoneData             root = { 0, skeleton.mRootTransform * ttt };
+                        BoneData             root = { skeleton.mNumBones - 1, Matrix4::sIdentity };
                         std::stack<BoneData> stack;
                         stack.push( root );
                         while( !stack.empty() )
@@ -48,9 +49,12 @@ namespace fan
                             BoneData boneData = stack.top();
                             stack.pop();
 
-                            const Matrix4 animatedRelativeTransform = Matrix4( animation.SampleRotation( boneData.mIndex, animator.mTime ),
-                                                                               animation.SamplePosition( boneData.mIndex, animator.mTime ),
-                                                                               animation.SampleScale( boneData.mIndex, animator.mTime ) );
+                            Vector3    scale    = animation.SampleScale( boneData.mIndex, animator.mTime );
+                            Vector3    position = animation.SamplePosition( boneData.mIndex, animator.mTime );
+                            Quaternion rotation = animation.SampleRotation( boneData.mIndex, animator.mTime );
+                            Matrix4 animatedRelativeTransform = Matrix4(Quaternion::sIdentity, position) * Matrix4( rotation, Vector3::sZero ) * Matrix4(Quaternion::sIdentity, Vector3::sZero, scale);
+                            animatedRelativeTransform = Matrix4(rotation, position, scale );
+
                             const Matrix4 ibm                       = skeleton.mInverseBindMatrix[boneData.mIndex];
                             const Matrix4 animatedAbsoluteTransform = boneData.mParentAbsoluteTransform * animatedRelativeTransform;
 
@@ -66,11 +70,19 @@ namespace fan
                         if( animator.mLoop )
                         {
                             animator.mTime += _delta;
-                            if( animator.mTime >= animation.mDuration )
+                            if( animator.mTime > animation.mDuration )
                             {
                                 animator.mTime = 0;
                             }
                         }
+                    }
+                }
+                else
+                {
+                    Skeleton& skeleton = meshRenderer.mMesh->mSkeleton;
+                    for( int i = 0; i < RenderGlobal::sMaxBones; i++ )
+                    {
+                        skeleton.mOffsetMatrix[i] = Matrix4::sIdentity;
                     }
                 }
             }

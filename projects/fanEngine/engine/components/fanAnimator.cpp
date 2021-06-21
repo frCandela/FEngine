@@ -25,6 +25,7 @@ namespace fan
     {
         const Animator& animator = static_cast<const Animator&>( _component );
         Serializable::SaveResourcePtr( _json, "animation", animator.mAnimation.mData );
+        Serializable::SaveBool( _json, "loop", animator.mLoop );
     }
 
     //==================================================================================================================================================================================================
@@ -33,5 +34,6 @@ namespace fan
     {
         Animator& animator = static_cast<Animator&>( _component );
         Serializable::LoadResourcePtr( _json, "animation", animator.mAnimation.mData );
+        Serializable::LoadBool( _json, "loop", animator.mLoop );
     }
 }
