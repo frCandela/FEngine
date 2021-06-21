@@ -49,8 +49,16 @@ namespace fan
     //==================================================================================================================================================================================================
     Matrix4::Matrix4( const Quaternion& _quat, const Vector3& _position, const Vector3& _scale ) : Matrix4( _quat, _position )
     {
-        e11 *= _scale.x;
+         e11 *= _scale.x;
+         e21 *= _scale.x;
+         e31 *= _scale.x;
+
+        e12 *= _scale.y;
         e22 *= _scale.y;
+        e32 *= _scale.y;
+
+        e13 *= _scale.z;
+        e23 *= _scale.z;
         e33 *= _scale.z;
     }
 
