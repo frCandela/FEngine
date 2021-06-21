@@ -18,7 +18,7 @@ namespace fan
             info.mGroup      = EngineGroups::SceneUI;
             info.onGui       = &GuiUIRenderer::OnGui;
             info.mEditorPath = "ui/";
-            info.mEditorName = "ui renderer";
+            info.mEditorName = "Ui renderer";
             return info;
         }
 

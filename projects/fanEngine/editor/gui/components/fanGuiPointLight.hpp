@@ -17,7 +17,7 @@ namespace fan
             info.mGroup      = EngineGroups::SceneRender;
             info.onGui       = &GuiPointLight::OnGui;
             info.mEditorPath = "lights/";
-            info.mEditorName = "point light";
+            info.mEditorName = "Point light";
             return info;
         }
 

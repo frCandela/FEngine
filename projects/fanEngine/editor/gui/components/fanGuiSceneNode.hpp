@@ -16,8 +16,8 @@ namespace fan
             info.mIcon       = ImGui::IconType::Gameobject16;
             info.mGroup      = EngineGroups::Scene;
             info.onGui       = &GuiSceneNode::OnGui;
-            info.mEditorPath = "/";
-            info.mEditorName = "scene node";
+            info.mEditorPath = "";
+            info.mEditorName = "Scene node";
             return info;
         }
 

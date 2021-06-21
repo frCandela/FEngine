@@ -16,7 +16,7 @@ namespace fan
             info.mIcon       = ImGui::IconType::Transform16;
             info.mGroup      = EngineGroups::Game;
             info.onGui       = &GuiAnimScale::OnGui;
-            info.mEditorName = "anim scale";
+            info.mEditorName = "Anim scale";
             info.mEditorPath = "game/";
             return info;
         }

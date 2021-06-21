@@ -16,7 +16,7 @@ namespace fan
             info.mGroup      = EngineGroups::SceneRender;
             info.onGui       = &GuiMeshRenderer::OnGui;
             info.mEditorPath = "/";
-            info.mEditorName = "mesh renderer";
+            info.mEditorName = "Mesh renderer";
             return info;
         }
 

@@ -17,7 +17,7 @@ namespace fan
             info.mGroup      = EngineGroups::Scene;
             info.onGui       = &GuiParticleEmitter::OnGui;
             info.mEditorPath = "/";
-            info.mEditorName = "particle emitter";
+            info.mEditorName = "Particle emitter";
 
             return info;
         }

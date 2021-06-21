@@ -169,7 +169,7 @@ namespace fan
 
         void TestAngle()
         {
-            const Fixed angleMinDelta = FIXED( .02 );
+            const Fixed angleMinDelta = FIXED( 1 );
             Fixed       angle         = Fixed::Degrees( Quaternion::Euler( 10, 0, 0 ).Angle() );
             TEST_ASSERT( Fixed::Abs( angle - 10 ) < angleMinDelta )
 

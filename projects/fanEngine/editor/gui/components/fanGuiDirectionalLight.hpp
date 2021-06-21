@@ -17,7 +17,7 @@ namespace fan
             info.mGroup      = EngineGroups::SceneRender;
             info.onGui       = &GuiDirectionalLight::OnGui;
             info.mEditorPath = "lights/";
-            info.mEditorName = "directional light";
+            info.mEditorName = "Directional light";
             return info;
         }
 

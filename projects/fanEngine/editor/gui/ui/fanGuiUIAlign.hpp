@@ -16,7 +16,7 @@ namespace fan
             info.mGroup      = EngineGroups::SceneUI;
             info.onGui       = &GuiUIAlign::OnGui;
             info.mEditorPath = "ui/";
-            info.mEditorName = "ui align";
+            info.mEditorName = "Ui align";
             return info;
         }
 

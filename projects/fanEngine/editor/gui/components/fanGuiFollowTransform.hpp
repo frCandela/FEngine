@@ -17,7 +17,7 @@ namespace fan
             info.mGroup      = EngineGroups::Scene;
             info.onGui       = &GuiFollowTransform::OnGui;
             info.mEditorPath = "/";
-            info.mEditorName = "follow transform";
+            info.mEditorName = "Follow transform";
             return info;
         }
 

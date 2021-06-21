@@ -16,7 +16,7 @@ namespace fan
             info.mGroup      = EngineGroups::Scene;
             info.onGui       = &GuiCamera::OnGui;
             info.mEditorPath = "/";
-            info.mEditorName = "camera";
+            info.mEditorName = "Camera";
             return info;
         }
 

@@ -16,7 +16,7 @@ namespace fan
             info.mGroup      = EngineGroups::Scene;
             info.onGui       = &GuiExpirationTime::OnGui;
             info.mEditorPath = "/";
-            info.mEditorName = "expiration time";
+            info.mEditorName = "Expiration time";
             return info;
         }
 

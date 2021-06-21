@@ -17,7 +17,7 @@ namespace fan
             info.mGroup      = EngineGroups::SceneRender;
             info.onGui       = &GuiMaterial::OnGui;
             info.mEditorPath = "/";
-            info.mEditorName = "material";
+            info.mEditorName = "Material";
             return info;
         }
 

@@ -20,7 +20,7 @@ namespace fan
             info.mGroup      = EngineGroups::SceneUI;
             info.onGui       = &GuiUIButton::OnGui;
             info.mEditorPath = "ui/";
-            info.mEditorName = "ui button";
+            info.mEditorName = "Ui button";
             return info;
         }
 

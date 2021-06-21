@@ -17,7 +17,7 @@ namespace fan
             info.mGroup      = EngineGroups::SceneUI;
             info.onGui       = &GuiUIProgressBar::OnGui;
             info.mEditorPath = "ui/";
-            info.mEditorName = "ui progress bar";
+            info.mEditorName = "Ui progress bar";
             return info;
         }
 
