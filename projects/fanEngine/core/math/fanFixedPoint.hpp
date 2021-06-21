@@ -249,6 +249,7 @@ namespace fan
         }
         static constexpr Fixed Max( const Fixed& _a, const Fixed& _b ) { return _a > _b ? _a : _b; }
         static constexpr Fixed Min( const Fixed& _a, const Fixed& _b ) { return _a < _b ? _a : _b; }
+        static constexpr Fixed Clamp( const Fixed& _value, const Fixed& _min, const Fixed& _max ) { return _value < _min ? _min : _value > _max ? _max : _value; }
         static constexpr Fixed PowI( const Fixed& _value, const int _power )
         {
             if( _power == 0 ){ return Fixed( 1 ); }

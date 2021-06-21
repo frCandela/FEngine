@@ -33,6 +33,7 @@ namespace fan
                      { &UnitTestFixedPoint::TestAbs,            "Abs" },
                      { &UnitTestFixedPoint::TestMin,            "Min" },
                      { &UnitTestFixedPoint::TestMax,            "Max" },
+                     { &UnitTestFixedPoint::TestClamp,            "Clamp" },
                      { &UnitTestFixedPoint::TestPowI,           "PowI" },
                      { &UnitTestFixedPoint::TestSin,            "Sin" },
                      { &UnitTestFixedPoint::TestASin,           "ASin" },
@@ -351,6 +352,16 @@ namespace fan
             TEST_ASSERT( Fixed::Max( 0, 0 ) == 0 )
         }
 
+        void TestClamp()
+        {
+            static_assert( Fixed::Clamp( 0, -1, 1 ) == 0 );
+
+            TEST_ASSERT( Fixed::Clamp( 0, 1, 2 ) == 1 )
+            TEST_ASSERT( Fixed::Clamp( 0, -2, -1 ) == -1 )
+            TEST_ASSERT( Fixed::Clamp( 1, 1, 2 ) == 1 )
+            TEST_ASSERT( Fixed::Clamp( 2, 1, 2 ) == 2 )
+        }
+
         void TestPowI()
         {
             static_assert( Fixed::PowI( FIXED( 4 ), 2 ) == FIXED( 16 ) );
@@ -417,7 +428,7 @@ namespace fan
             FixedFunction  fxACos     = &Fixed::ACos;
             DoubleFunction doubleACos = &std::acos;
             double         error      = MaxErrorFixedVsDouble( fxACos, doubleACos, -0.99, 0.99, 0.0001 );
-            TEST_ASSERT( error < 0.0005 ) // [-1,1]
+            TEST_ASSERT( error < 0.01 ) // [-1,1]
         }
 
         void TestTan()
