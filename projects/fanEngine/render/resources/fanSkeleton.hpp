@@ -21,7 +21,6 @@ namespace fan
     struct Skeleton
     {
         Bone       mBones[RenderGlobal::sMaxBones];
-        Matrix4    mOffsetMatrix[RenderGlobal::sMaxBones];
         Matrix4    mInverseBindMatrix[RenderGlobal::sMaxBones];
         int        mNumBones = 0;
         String<32> mName;

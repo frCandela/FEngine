@@ -58,7 +58,7 @@ namespace fan
                             const Matrix4 ibm                       = skeleton.mInverseBindMatrix[boneData.mIndex];
                             const Matrix4 animatedAbsoluteTransform = boneData.mParentAbsoluteTransform * animatedRelativeTransform;
 
-                            skeleton.mOffsetMatrix[boneData.mIndex] = animatedAbsoluteTransform * ibm;
+                            meshRenderer.mOffsetMatrix[boneData.mIndex] = animatedAbsoluteTransform * ibm;
 
                             Bone& bone = skeleton.mBones[boneData.mIndex];
                             for( int i = 0; i < bone.mNumChilds; i++ )
@@ -80,9 +80,9 @@ namespace fan
                 else
                 {
                     Skeleton& skeleton = meshRenderer.mMesh->mSkeleton;
-                    for( int i = 0; i < RenderGlobal::sMaxBones; i++ )
+                    for( int i = 0; i < skeleton.mNumBones; i++ )
                     {
-                        skeleton.mOffsetMatrix[i] = Matrix4::sIdentity;
+                        meshRenderer.mOffsetMatrix[i] = Matrix4::sIdentity;
                     }
                 }
             }

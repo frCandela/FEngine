@@ -2,6 +2,7 @@
 
 #include "core/ecs/fanEcsComponent.hpp"
 #include "core/resources/fanResourcePtr.hpp"
+#include "core/math/fanMatrix4.hpp"
 #include "render/resources/fanAnimation.hpp"
 
 namespace fan
@@ -17,6 +18,7 @@ namespace fan
         static void Load( EcsComponent& _component, const Json& _json );
 
         ResourcePtr<Animation> mAnimation;
+
         Fixed mTime = 0;
         bool mLoop = false;
     };

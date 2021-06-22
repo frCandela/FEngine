@@ -98,9 +98,10 @@ namespace fan
                         // drawMesh data;
                         RenderDataSkinnedModel data;
                         data.mMesh         = &subMesh;
-                        data.mSkeleton = &meshRenderer.mMesh->mSkeleton;
+                        data.mSkeleton     = &meshRenderer.mMesh->mSkeleton;
                         data.mModelMatrix  = transform.GetModelMatrix( scale );
                         data.mNormalMatrix = transform.GetNormalMatrix( scale );
+                        memcpy( data.mOffsetMatrix, meshRenderer.mOffsetMatrix, meshRenderer.mMesh->mSkeleton.mNumBones * sizeof( Matrix4 ) );
 
                         SubMaterial& subMaterial = i < material.mMaterials.size() ? material.mMaterials[i] : material.mMaterials[material.mMaterials.size() - 1];
                         data.mTexture   = subMaterial.mTexture;

@@ -201,7 +201,7 @@ namespace fan
             // bones
             for( int i = 0; i < data.mSkeleton->mNumBones; ++i )
             {
-                mUniforms.mDynamicUniformsBones[dataIndex].mOffsetMatrix[i] = data.mSkeleton->mOffsetMatrix[i].ToGlm();
+                mUniforms.mDynamicUniformsBones[dataIndex].mOffsetMatrix[i] = data.mOffsetMatrix[i].ToGlm();
             }
 
             // material
