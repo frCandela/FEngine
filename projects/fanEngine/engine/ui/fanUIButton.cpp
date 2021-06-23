@@ -23,10 +23,8 @@ namespace fan
         button.mColorNormal  = Color::sWhite;
         button.mColorHovered = Color::sGrey;
         button.mImageNormal  = nullptr;
-        button.mImagePressed = nullptr;
-        button.mSlotPtr.Init( _world, button.mPressed.GetType() );
+        button.mImagePressed = nullptr;;
         button.mPressed.Clear();
-        button.mPressed.Connect( _world, button.mSlotPtr );
 
         _world.AddTag<TagEnabled>( _entity );
     }
@@ -41,7 +39,6 @@ namespace fan
         Serializable::SaveColor( _json, "color_hovered", button.mColorHovered );
         Serializable::SaveResourcePtr( _json, "image_normal", button.mImageNormal );
         Serializable::SaveResourcePtr( _json, "image_pressed", button.mImagePressed );
-        Serializable::SaveSlotPtr( _json, "pressed_slot_ptr", button.mSlotPtr );
     }
 
     //==================================================================================================================================================================================================
@@ -53,6 +50,5 @@ namespace fan
         Serializable::LoadColor( _json, "color_hovered", button.mColorHovered );
         Serializable::LoadResourcePtr( _json, "image_normal", button.mImageNormal );
         Serializable::LoadResourcePtr( _json, "image_pressed", button.mImagePressed );
-        Serializable::LoadSlotPtr( _json, "pressed_slot_ptr", button.mSlotPtr );
     }
 }

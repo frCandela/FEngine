@@ -1,4 +1,3 @@
-#include "core/ecs/fanSlot.hpp"
 #include "engine/singletons/fanScenePointers.hpp"
 #include "engine/singletons/fanScene.hpp"
 #include "engine/resources/fanComponentPtr.hpp"
@@ -40,12 +39,5 @@ namespace fan
             componentPtr->mHandle += _idOffset;
         }
         scenePointers.mUnresolvedComponentPtr.clear();
-
-        for( SlotPtr* slotPtr : scenePointers.mUnresolvedSlotPtr )
-        {
-            const SlotPtr::SlotCallData& data = slotPtr->Data();
-            slotPtr->SetComponentSlot( data.mHandle + _idOffset, data.mType, data.mSlot );
-        }
-        scenePointers.mUnresolvedSlotPtr.clear();
     }
 }

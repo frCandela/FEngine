@@ -8,7 +8,7 @@
 #include "core/ecs/fanEcsTag.hpp"
 #include "engine/fanEngineTags.hpp"
 #include "editor/fanModals.hpp"
-#include "editor/gui/fanGroupsColors.hpp"
+#include "editor/fanGroupsColors.hpp"
 #include "editor/fanGuiInfos.hpp"
 #include "editor/singletons/fanEditorSettings.hpp"
 

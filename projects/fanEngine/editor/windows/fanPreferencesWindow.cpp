@@ -8,7 +8,7 @@
 #include "engine/fanFullscreen.hpp"
 #include "render/fanRenderer.hpp"
 #include "editor/fanModals.hpp"
-#include "editor/gui/fanGroupsColors.hpp"
+#include "editor/fanGroupsColors.hpp"
 #include "editor/gui/fanGuiAxis.hpp"
 #include "editor/gui/fanGuiInputManager.hpp"
 

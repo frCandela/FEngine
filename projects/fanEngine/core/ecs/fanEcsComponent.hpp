@@ -38,7 +38,6 @@ namespace fan
     };                                                                                                \
     using Info = EcsComponentInfoImpl< _ComponentType >;
 
-    struct SlotBase;
     class EcsWorld;
 
     //==================================================================================================================================================================================================
@@ -57,7 +56,6 @@ namespace fan
         uint32_t               mSize;
         uint32_t               mAlignment;
         int                    mFlags = ComponentFlags::None;
-        std::vector<SlotBase*> mSlots;                         // callable methods
 
         void ( * init )( EcsWorld&, EcsEntity, EcsComponent& ) = nullptr;              // called once at creation
         void ( * setInfo )( EcsComponentInfo& ) = nullptr;                            // called once at startup

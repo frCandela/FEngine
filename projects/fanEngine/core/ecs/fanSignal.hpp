@@ -5,7 +5,6 @@
 #include <functional>
 #include "core/fanAssert.hpp"
 #include "core/ecs/fanEcsWorld.hpp"
-#include "core/ecs/fanSlot.hpp"
 
 namespace fan
 {
@@ -13,7 +12,7 @@ namespace fan
     class EcsWorld;
 
     //==================================================================================================================================================================================================
-    // A signal is used for communication between objects ( ~similar to qt Signals & Slots )
+    // A signal is a callback system used for communication between objects ( ~similar to qt Signals & Slots )
     //==================================================================================================================================================================================================
     template< typename ...Args > struct Signal
     {
@@ -31,11 +30,7 @@ namespace fan
         void Connect( void( _Object::* _method )( Args... ), _Object* _object );
 
         template< typename _ComponentType >
-        void Connect( void( _ComponentType::* _method )( Args... ),
-                      EcsWorld& _world,
-                      const EcsHandle _handle );
-
-        bool Connect( EcsWorld& _world, SlotPtr& _slotPtr );
+        void Connect( void( _ComponentType::* _method )( Args... ), EcsWorld& _world, const EcsHandle _handle );
 
         void Emmit( Args... _args );
         void Clear();
@@ -83,47 +78,6 @@ namespace fan
             ( ( component ).*( _method ) )( _args... );
         };
         mConnections.push_back( connection );
-    }
-    //==================================================================================================================================================================================================
-    //==================================================================================================================================================================================================
-    template< typename... Args >
-    bool Signal<Args...>::Connect( EcsWorld& _world, SlotPtr& _slotPtr )
-    {
-        if( _slotPtr.GetArgsType() != GetType() ){ return false; }
-
-        const SlotPtr::SlotCallData* _callData = &_slotPtr.Data();
-
-        Connection connection;
-        connection.mID     = (size_t)_callData;
-        connection.mLambda = [&_world, _callData]( Args... _args )
-        {
-            if( _callData->mSlot == nullptr ){ return; }
-
-            Slot<Args...>* slot = static_cast< Slot<Args...>* >(_callData->mSlot);
-            switch( slot->mTargetType )
-            {
-                case SlotBase::TargetType::Component:
-                    if( _callData->mHandle != 0 )
-                    {
-                        EcsEntity entity = _world.GetEntity( _callData->mHandle );
-                        EcsComponent& component = _world.GetComponent( entity, _callData->mType );
-                        ( *slot->mMethod.mMethodComponent )( component, _args... );
-                    }
-                    break;
-                case SlotBase::TargetType::Singleton:
-                {
-                    EcsSingleton& singleton = _world.GetSingleton( _callData->mType );
-                    ( *slot->mMethod.mMethodSingleton )( singleton, _args... );
-                }
-                    break;
-                default :
-                    fanAssert( false );
-                    break;
-            }
-        };
-
-        mConnections.push_back( connection );
-        return true;
     }
 
     //==================================================================================================================================================================================================

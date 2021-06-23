@@ -3,7 +3,7 @@
 #include "core/fanDebug.hpp"
 #include "core/time/fanProfiler.hpp"
 #include "editor/fanDragnDrop.hpp"
-#include "editor/gui/fanGroupsColors.hpp"
+#include "editor/fanGroupsColors.hpp"
 #include "editor/singletons/fanEditorSettings.hpp"
 
 namespace fan

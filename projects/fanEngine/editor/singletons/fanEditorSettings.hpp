@@ -6,7 +6,7 @@
 #include "fanDisableWarnings.hpp"
 #include "fanGlm.hpp"
 #include "editor/fanGuiInfos.hpp"
-#include "editor/gui/fanGroupsColors.hpp"
+#include "editor/fanGroupsColors.hpp"
 
 namespace fan
 {

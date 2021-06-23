@@ -30,7 +30,6 @@ namespace fan
     };
 
     class EcsWorld;
-    struct SlotBase;
 
     enum EcsSingletonFlags
     {
@@ -54,7 +53,6 @@ namespace fan
         std::string            mName;
         uint32_t               mType;
         uint32_t               mFlags = EcsSingletonFlags::None;
-        std::vector<SlotBase*> mSlots;                         // callable methods
 
         void ( * init )( EcsWorld&, EcsSingleton& ) = nullptr; // called at creation and rebuild
         void ( * postInit )( EcsWorld&, EcsSingleton& ) = nullptr;  // call after all singletons have been initialized

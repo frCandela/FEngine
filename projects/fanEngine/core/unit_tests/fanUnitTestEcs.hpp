@@ -1,7 +1,6 @@
 #pragma once
 
 #include "core/unit_tests/fanUnitTest.hpp"
-#include "core/ecs/fanSlot.hpp"
 #include "core/ecs/fanEcsWorld.hpp"
 #include "core/ecs/fanEcsComponent.hpp"
 #include "core/ecs/fanEcsSingleton.hpp"

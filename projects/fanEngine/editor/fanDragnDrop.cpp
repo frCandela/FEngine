@@ -4,7 +4,7 @@
 #include "engine/components/fanSceneNode.hpp"
 #include "engine/singletons/fanScene.hpp"
 #include "render/resources/fanAnimation.hpp"
-#include "editor/gui/fanGroupsColors.hpp"
+#include "fanGroupsColors.hpp"
 #include "editor/fanGuiInfos.hpp"
 #include "editor/fanResourceInfos.hpp"
 #include "editor/singletons/fanEditorSettings.hpp"

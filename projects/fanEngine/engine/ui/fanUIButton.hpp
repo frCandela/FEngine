@@ -1,7 +1,6 @@
 #pragma once
 
 #include "core/ecs/fanEcsComponent.hpp"
-#include "core/ecs/fanSlot.hpp"
 #include "core/resources/fanResourcePtr.hpp"
 #include "core/fanColor.hpp"
 #include "render/resources/fanTexture.hpp"
@@ -26,6 +25,5 @@ namespace fan
         ResourcePtr<Texture> mImagePressed;
 
         Signal<> mPressed;
-        SlotPtr  mSlotPtr;
     };
 }

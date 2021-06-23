@@ -9,7 +9,6 @@ namespace fan
     struct Scene;
     class Prefab;
     struct ComponentPtrBase;
-    class SlotPtr;
 
     //==================================================================================================================================================================================================
     // Contains all scene pointers that need to be resolved
@@ -21,7 +20,6 @@ namespace fan
         static void SetInfo( EcsSingletonInfo& _info );
         static void Init( EcsWorld& _world, EcsSingleton& _component );
 
-        std::vector<SlotPtr*>          mUnresolvedSlotPtr;
         std::vector<ComponentPtrBase*> mUnresolvedComponentPtr;
 
         static void Clear( ScenePointers& _scenePointers );

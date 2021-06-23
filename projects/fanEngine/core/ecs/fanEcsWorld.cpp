@@ -256,13 +256,6 @@ namespace fan
         for( auto it = mSingletonInfos.begin(); it != mSingletonInfos.end(); it++ )
         {
             EcsSingletonInfo& info = it->second;
-
-            ( *info.setInfo )( info );
-        }
-
-        for( EcsComponentInfo& info : mComponentsInfo )
-        {
-            info.mSlots.clear();
             ( *info.setInfo )( info );
         }
     }
@@ -278,6 +271,8 @@ namespace fan
         return entity.mHandle;
     }
 
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
     EcsHandle EcsWorld::GetHandle( const EcsEntity _entity ) const
     {
         EcsEntityData& entity = _entity.mArchetype->GetEntityData( _entity.mIndex );

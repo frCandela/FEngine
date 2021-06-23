@@ -18,10 +18,6 @@ namespace fan
     ECS_SINGLETON( Application )
         static void SetInfo( EcsSingletonInfo& _info );
         static void Init( EcsWorld& _world, EcsSingleton& _this );
-
-        // slots
-        static void OnQuit( EcsSingleton& _this );
-
         void Setup( Resources* _resource );
 
         // signals connected to the application

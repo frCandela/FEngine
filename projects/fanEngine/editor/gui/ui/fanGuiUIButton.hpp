@@ -3,7 +3,6 @@
 #include "engine/ui/fanUIButton.hpp"
 #include "engine/fanEngineTags.hpp"
 #include "editor/fanGuiInfos.hpp"
-#include "editor/gui/fanGuiSlot.hpp"
 #include "editor/gui/fanGuiResourcePtr.hpp"
 #include "editor/fanModals.hpp"
 
@@ -48,7 +47,6 @@ namespace fan
 
             ImGui::FanResourcePtr<Texture>( "idle", button.mImageNormal);
             ImGui::FanResourcePtr<Texture>( "pressed", button.mImagePressed );
-            ImGui::FanSlotPtr( "on pressed", _world, button.mSlotPtr );
 
             ImGui::PopItemWidth();
 

@@ -8,7 +8,7 @@
 #include "core/time/fanProfiler.hpp"
 #include "editor/singletons/fanEditorSelection.hpp"
 #include "editor/fanGuiInfos.hpp"
-#include "editor/gui/fanGroupsColors.hpp"
+#include "editor/fanGroupsColors.hpp"
 #include "editor/singletons/fanEditorSettings.hpp"
 
 namespace fan
