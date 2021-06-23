@@ -1,3 +1,4 @@
+#include <editor/fanResourceInfos.hpp>
 #include "editor/windows/fanRenderWindow.hpp"
 
 #include "editor/fanModals.hpp"
@@ -53,7 +54,7 @@ namespace fan
             for( ResourcePtr<Mesh> mesh : meshes )
             {
                 ImGui::Text( "name: %s", mesh->mPath.c_str() );
-                ImGui::FanBeginDragDropSourceMesh( mesh, ImGuiDragDropFlags_SourceAllowNullID );
+                ImGui::FanBeginDragDropSourceResource( mesh, Mesh::Info::sType, ImGuiDragDropFlags_SourceAllowNullID );
             }
         }
 
@@ -74,7 +75,7 @@ namespace fan
             for( ResourcePtr<Texture> tex : textures )
             {
                 ImGui::Text( "ref: %d size: %u x %u name: %s", tex.mData.mHandle->mRefCount, tex->mExtent.width, tex->mExtent.height, tex->mPath.c_str() );
-                ImGui::FanBeginDragDropSourceTexture( tex, ImGuiDragDropFlags_SourceAllowNullID );
+                ImGui::FanBeginDragDropSourceResource( tex, Texture::Info::sType, ImGuiDragDropFlags_SourceAllowNullID );
             }
         }
 
@@ -85,7 +86,7 @@ namespace fan
             for( fan::ResourcePtr<fan::Font> font : fonts )
             {
                 ImGui::Text( font->mPath.c_str() );
-                ImGui::FanBeginDragDropSourceFont( font, ImGuiDragDropFlags_SourceAllowNullID );
+                ImGui::FanBeginDragDropSourceResource( font, Mesh::Info::sType, ImGuiDragDropFlags_SourceAllowNullID );
             }
         }
 

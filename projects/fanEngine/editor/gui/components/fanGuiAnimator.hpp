@@ -27,7 +27,7 @@ namespace fan
             Animator& animator = static_cast<Animator&>( _component );
             ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() - 16 );
             {
-                ImGui::FanAnimationPtr( "animation", animator.mAnimation );
+                ImGui::FanResourcePtr<Animation>( "animation", animator.mAnimation );
 
                 if( animator.mAnimation != nullptr )
                 {

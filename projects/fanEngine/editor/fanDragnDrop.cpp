@@ -1,19 +1,12 @@
 #include "fanDragnDrop.hpp"
 
-#include "core/fanAssert.hpp"
 #include "core/fanDebug.hpp"
 #include "engine/components/fanSceneNode.hpp"
-#include "engine/resources/fanPrefab.hpp"
 #include "engine/singletons/fanScene.hpp"
-#include "render/resources/fanTexture.hpp"
-#include "render/resources/fanMesh.hpp"
-#include "render/resources/fanSkinnedMesh.hpp"
-#include "engine/resources/fanFont.hpp"
 #include "render/resources/fanAnimation.hpp"
 #include "editor/gui/fanGroupsColors.hpp"
 #include "editor/fanGuiInfos.hpp"
 #include "editor/fanResourceInfos.hpp"
-#include "editor/fanImguiIcons.hpp"
 #include "editor/singletons/fanEditorSettings.hpp"
 
 
@@ -21,12 +14,13 @@ namespace ImGui
 {
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void FanBeginDragDropSourceResource( fan::ResourcePtrData& _resourcePtrData, const fan::EditorResourceInfo _info, ImGuiDragDropFlags _flags )
+    void FanBeginDragDropSourceResource( fan::ResourcePtrData& _resourcePtrData, const uint32_t _infoType, ImGuiDragDropFlags _flags )
     {
         if( ImGui::BeginDragDropSource( _flags ) )
         {
-            ImGui::SetDragDropPayload( _info.mResourceName, &_resourcePtrData, sizeof( fan::ResourcePtrData ) );
-            ImGui::Icon( _info.mIcon, { 16, 16 } );
+            const fan::EditorResourceInfo& resourceInfo = fan::EditorResourceInfo::sResourceInfos.at(_infoType);
+            ImGui::SetDragDropPayload( resourceInfo.mResourceName, &_resourcePtrData, sizeof( fan::ResourcePtrData ) );
+            ImGui::Icon( resourceInfo.mIcon, { 16, 16 } );
             ImGui::SameLine();
             ImGui::Text( "%s", _resourcePtrData.mHandle->mResource->mPath.c_str() );
             ImGui::EndDragDropSource();
@@ -35,12 +29,13 @@ namespace ImGui
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    fan::ResourcePtrData FanBeginDragDropTargetResource( const fan::EditorResourceInfo _info )
+    fan::ResourcePtrData FanBeginDragDropTargetResource( const uint32_t _infoType  )
     {
         fan::ResourcePtrData resourcePtrData;
         if( ImGui::BeginDragDropTarget() )
         {
-            if( const ImGuiPayload* payload = ImGui::AcceptDragDropPayload( _info.mResourceName ) )
+            const fan::EditorResourceInfo& resourceInfo = fan::EditorResourceInfo::sResourceInfos.at(_infoType);
+            if( const ImGuiPayload* payload = ImGui::AcceptDragDropPayload( resourceInfo.mResourceName ) )
             {
                 fanAssert( payload->DataSize == sizeof( fan::ResourcePtrData ) );
                 resourcePtrData = *(fan::ResourcePtrData*)payload->Data;
@@ -52,40 +47,6 @@ namespace ImGui
 
     const std::string ComponentPayload::sPrefix = "cpnt_";
     const std::string SingletonPayload::sPrefix = "sing_";
-
-    //==================================================================================================================================================================================================
-    //==================================================================================================================================================================================================
-    void FanBeginDragDropSourcePrefab( fan::ResourcePtr<fan::Prefab> _prefab, ImGuiDragDropFlags _flags )
-    {
-        if( _prefab != nullptr )
-        {
-            if( ImGui::BeginDragDropSource( _flags ) )
-            {
-                ImGui::SetDragDropPayload( "dragndrop_prefab", &_prefab, sizeof( fan::ResourcePtr<fan::Prefab> ) );
-                ImGui::Icon( ImGui::IconType::Prefab16, { 16, 16 } );
-                ImGui::SameLine();
-                ImGui::Text( "%s", ( _prefab->mPath ).c_str() );
-                ImGui::EndDragDropSource();
-            }
-        }
-    }
-
-    //==================================================================================================================================================================================================
-    //==================================================================================================================================================================================================
-    fan::ResourcePtr<fan::Prefab> FanBeginDragDropTargetPrefab()
-    {
-        fan::ResourcePtr<fan::Prefab> prefab = nullptr;
-        if( ImGui::BeginDragDropTarget() )
-        {
-            if( const ImGuiPayload* payload = ImGui::AcceptDragDropPayload( "dragndrop_prefab" ) )
-            {
-                fanAssert( payload->DataSize == sizeof( fan::ResourcePtr<fan::Prefab> ) );
-                prefab = *(fan::ResourcePtr<fan::Prefab>*)payload->Data;
-            }
-            ImGui::EndDragDropTarget();
-        }
-        return prefab;
-    }
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
@@ -204,175 +165,5 @@ namespace ImGui
             ImGui::EndDragDropTarget();
         }
         return ComponentPayload();
-    }
-
-    //==================================================================================================================================================================================================
-    //==================================================================================================================================================================================================
-    void FanBeginDragDropSourceTexture( fan::ResourcePtr<fan::Texture> _texture, ImGuiDragDropFlags _flags )
-    {
-        if( _texture != nullptr )
-        {
-            if( ImGui::BeginDragDropSource( _flags ) )
-            {
-                ImGui::SetDragDropPayload( "dragndrop_texture", &_texture, sizeof( fan::ResourcePtr<fan::Texture> ) );
-                ImGui::Icon( ImGui::IconType::Image16, { 16, 16 } );
-                ImGui::SameLine();
-                ImGui::Text( "%s", _texture->mPath.c_str() );
-                ImGui::EndDragDropSource();
-            }
-        }
-    }
-
-    //==================================================================================================================================================================================================
-    //==================================================================================================================================================================================================
-    fan::ResourcePtr<fan::Texture> FanBeginDragDropTargetTexture()
-    {
-        fan::ResourcePtr<fan::Texture> texture = nullptr;
-        if( ImGui::BeginDragDropTarget() )
-        {
-            if( const ImGuiPayload* payload = ImGui::AcceptDragDropPayload( "dragndrop_texture" ) )
-            {
-                fanAssert( payload->DataSize == sizeof( fan::ResourcePtr<fan::Texture> ) );
-                texture = *(fan::ResourcePtr<fan::Texture>*)payload->Data;
-            }
-            ImGui::EndDragDropTarget();
-        }
-        return texture;
-    }
-
-    //==================================================================================================================================================================================================
-    //==================================================================================================================================================================================================
-    void FanBeginDragDropSourceMesh( fan::ResourcePtr<fan::Mesh> _mesh, ImGuiDragDropFlags _flags )
-    {
-        if( _mesh != nullptr )
-        {
-            if( ImGui::BeginDragDropSource( _flags ) )
-            {
-                ImGui::SetDragDropPayload( "dragndrop_mesh", &_mesh, sizeof( fan::ResourcePtr<fan::Mesh> ) );
-                ImGui::Icon( ImGui::IconType::Mesh16, { 16, 16 } );
-                ImGui::SameLine();
-                ImGui::Text( "%s", _mesh->mPath.c_str() );
-                ImGui::EndDragDropSource();
-            }
-        }
-    }
-
-    //==================================================================================================================================================================================================
-    //==================================================================================================================================================================================================
-    fan::ResourcePtr<fan::Mesh> FanBeginDragDropTargetMesh()
-    {
-        fan::ResourcePtr<fan::Mesh> mesh = nullptr;
-        if( ImGui::BeginDragDropTarget() )
-        {
-            if( const ImGuiPayload* payload = ImGui::AcceptDragDropPayload( "dragndrop_mesh" ) )
-            {
-                fanAssert( payload->DataSize == sizeof( fan::ResourcePtr<fan::Mesh> ) );
-                mesh = *(fan::ResourcePtr<fan::Mesh>*)payload->Data;
-            }
-            ImGui::EndDragDropTarget();
-        }
-        return mesh;
-    }
-
-    //==================================================================================================================================================================================================
-    //==================================================================================================================================================================================================
-    void FanBeginDragDropSourceMeshSkinned( fan::ResourcePtr<fan::SkinnedMesh> _mesh, ImGuiDragDropFlags _flags )
-    {
-        if( _mesh != nullptr )
-        {
-            if( ImGui::BeginDragDropSource( _flags ) )
-            {
-                ImGui::SetDragDropPayload( "dragndrop_mesh_skinned", &_mesh, sizeof( fan::ResourcePtr<fan::SkinnedMesh> ) );
-                ImGui::Icon( ImGui::IconType::Mesh16, { 16, 16 } );
-                ImGui::SameLine();
-                ImGui::Text( "%s", _mesh->mPath.c_str() );
-                ImGui::EndDragDropSource();
-            }
-        }
-    }
-
-    //==================================================================================================================================================================================================
-    //==================================================================================================================================================================================================
-    fan::ResourcePtr<fan::SkinnedMesh> FanBeginDragDropTargetMeshSkinned()
-    {
-        fan::ResourcePtr<fan::SkinnedMesh> mesh = nullptr;
-        if( ImGui::BeginDragDropTarget() )
-        {
-            if( const ImGuiPayload* payload = ImGui::AcceptDragDropPayload( "dragndrop_mesh_skinned" ) )
-            {
-                fanAssert( payload->DataSize == sizeof( fan::ResourcePtr<fan::SkinnedMesh> ) );
-                mesh = *(fan::ResourcePtr<fan::SkinnedMesh>*)payload->Data;
-            }
-            ImGui::EndDragDropTarget();
-        }
-        return mesh;
-    }
-
-    //==================================================================================================================================================================================================
-    //==================================================================================================================================================================================================
-    void FanBeginDragDropSourceFont( fan::ResourcePtr<fan::Font> _font, ImGuiDragDropFlags _flags )
-    {
-        if( _font != nullptr )
-        {
-            if( ImGui::BeginDragDropSource( _flags ) )
-            {
-                ImGui::SetDragDropPayload( "dragndrop_font", &_font, sizeof( fan::ResourcePtr<fan::Font> ) );
-                ImGui::Icon( ImGui::IconType::Font16, { 16, 16 } );
-                ImGui::SameLine();
-                ImGui::Text( "%s", _font->mPath.c_str() );
-                ImGui::EndDragDropSource();
-            }
-        }
-    }
-
-    //==================================================================================================================================================================================================
-    //==================================================================================================================================================================================================
-    fan::ResourcePtr<fan::Font> FanBeginDragDropTargetFont()
-    {
-        fan::ResourcePtr<fan::Font> font = nullptr;
-        if( ImGui::BeginDragDropTarget() )
-        {
-            if( const ImGuiPayload* payload = ImGui::AcceptDragDropPayload( "dragndrop_font" ) )
-            {
-                fanAssert( payload->DataSize == sizeof( fan::ResourcePtr<fan::Font> ) );
-                font = *(fan::ResourcePtr<fan::Font>*)payload->Data;
-            }
-            ImGui::EndDragDropTarget();
-        }
-        return font;
-    }
-
-    //==================================================================================================================================================================================================
-    //==================================================================================================================================================================================================
-    void FanBeginDragDropSourceAnimation( fan::ResourcePtr<fan::Animation> _animation, ImGuiDragDropFlags _flags )
-    {
-        if( _animation != nullptr )
-        {
-            if( ImGui::BeginDragDropSource( _flags ) )
-            {
-                ImGui::SetDragDropPayload( "dragndrop_animation", &_animation, sizeof( fan::ResourcePtr<fan::Animation> ) );
-                ImGui::Icon( ImGui::IconType::Animator16, { 16, 16 } );
-                ImGui::SameLine();
-                ImGui::Text( "%s", _animation->mPath.c_str() );
-                ImGui::EndDragDropSource();
-            }
-        }
-    }
-
-    //==================================================================================================================================================================================================
-    //==================================================================================================================================================================================================
-    fan::ResourcePtr<fan::Animation> FanBeginDragDropTargetAnimation()
-    {
-        fan::ResourcePtr<fan::Animation> animation = nullptr;
-        if( ImGui::BeginDragDropTarget() )
-        {
-            if( const ImGuiPayload* payload = ImGui::AcceptDragDropPayload( "dragndrop_animation" ) )
-            {
-                fanAssert( payload->DataSize == sizeof( fan::ResourcePtr<fan::Animation> ) );
-                animation = *(fan::ResourcePtr<fan::Animation>*)payload->Data;
-            }
-            ImGui::EndDragDropTarget();
-        }
-        return animation;
     }
 }

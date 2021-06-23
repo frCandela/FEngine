@@ -23,7 +23,7 @@ namespace fan
         static void OnGui( EcsWorld& /*_world*/, EcsEntity /*_entityID*/, EcsComponent& _component )
         {
             SkinnedMeshRenderer& meshRenderer = static_cast<SkinnedMeshRenderer&>( _component );
-            ImGui::FanMeshSkinnedPtr( "mesh", meshRenderer.mMesh );
+            ImGui::FanResourcePtr<SkinnedMesh>( "mesh", meshRenderer.mMesh );
         }
     };
 }

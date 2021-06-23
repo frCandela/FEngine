@@ -163,8 +163,14 @@ namespace fan
     //==================================================================================================================================================================================================
     void DarkReign3::OnGui()
     {
+        static ResourcePtr<Texture> tex2 = nullptr;
+        static ResourcePtr<Animation> tex3 = nullptr;
+
         if( ImGui::Begin( "testoss" ) )
         {
+            ImGui::FanResourcePtr<Texture>("texture2", tex2 );
+            ImGui::FanResourcePtr<Animation>("Animation", tex3 );
+
             if( ImGui::Button( "tag enemy" ) )
             {
                 EcsView view   = mWorld.Match<SClearSelection>();
