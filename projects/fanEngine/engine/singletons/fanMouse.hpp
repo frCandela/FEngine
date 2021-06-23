@@ -3,7 +3,7 @@
 #include "glfw/glfw3.h"
 #include "fanDisableWarnings.hpp"
 #include "fanGlm.hpp"
-#include "core/ecs/fanEcsSingleton.hpp"
+#include "ecs/fanEcsSingleton.hpp"
 
 struct GLFWwindow;
 

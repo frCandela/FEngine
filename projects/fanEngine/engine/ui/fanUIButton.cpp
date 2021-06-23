@@ -1,6 +1,6 @@
 #include "engine/ui/fanUIButton.hpp"
 
-#include "core/ecs/fanEcsWorld.hpp"
+#include "ecs/fanEcsWorld.hpp"
 #include "engine/fanEngineSerializable.hpp"
 #include "engine/fanEngineTags.hpp"
 

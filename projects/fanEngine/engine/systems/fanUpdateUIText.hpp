@@ -1,5 +1,5 @@
-#include "core/ecs/fanEcsSystem.hpp"
-#include "core/ecs/fanEcsWorld.hpp"
+#include "ecs/fanEcsSystem.hpp"
+#include "ecs/fanEcsWorld.hpp"
 #include "core/resources/fanResources.hpp"
 #include "engine/ui/fanUITransform.hpp"
 #include "engine/ui/fanUIText.hpp"

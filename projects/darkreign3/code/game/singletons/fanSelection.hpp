@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/ecs/fanEcsSingleton.hpp"
+#include "ecs/fanEcsSingleton.hpp"
 #include "core/math/fanFixedPoint.hpp"
 #include "core/resources/fanResourcePtr.hpp"
 #include "engine/resources/fanPrefab.hpp"

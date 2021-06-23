@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/ecs/fanEcsWorld.hpp"
+#include "ecs/fanEcsWorld.hpp"
 #include "core/shapes/fanRay.hpp"
 #include "engine/components/fanSceneNode.hpp"
 #include "engine/components/fanBounds.hpp"

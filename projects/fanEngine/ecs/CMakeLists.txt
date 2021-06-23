@@ -1,0 +1,6 @@
+﻿file(GLOB_RECURSE FAN_ECS_SRC *.cpp)
+file(GLOB_RECURSE FAN_ECS_H *.hpp)
+
+set(LIBRARY_NAME fanEcs)
+
+add_library(${LIBRARY_NAME} STATIC ${FAN_ECS_SRC} ${FAN_ECS_H})

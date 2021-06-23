@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/ecs/fanEcsTag.hpp"
+#include "ecs/fanEcsTag.hpp"
 
 namespace fan
 {

@@ -3,7 +3,7 @@
 #include <string>
 #include "fanJson.hpp"
 #include "core/fanHash.hpp"
-#include "core/ecs/fanEcsTypes.hpp"
+#include "fanEcsTypes.hpp"
 
 namespace sf { class Packet; }
 

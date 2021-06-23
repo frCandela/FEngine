@@ -1,4 +1,4 @@
-#include "core/ecs/fanEcsArchetype.hpp"
+#include "fanEcsArchetype.hpp"
 
 namespace fan
 {

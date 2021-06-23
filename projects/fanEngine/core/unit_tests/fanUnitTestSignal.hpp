@@ -1,9 +1,9 @@
 #pragma once
 
 #include "core/unit_tests/fanUnitTest.hpp"
-#include "core/ecs/fanEcsWorld.hpp"
-#include "core/ecs/fanEcsComponent.hpp"
-#include "core/ecs/fanEcsSingleton.hpp"
+#include "ecs/fanEcsWorld.hpp"
+#include "ecs/fanEcsComponent.hpp"
+#include "ecs/fanEcsSingleton.hpp"
 
 namespace fan
 {

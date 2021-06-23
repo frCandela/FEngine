@@ -1,7 +1,7 @@
 #pragma once
 
 #include <map>
-#include "core/ecs/fanEcsSingleton.hpp"
+#include "ecs/fanEcsSingleton.hpp"
 #include "core/math/fanVector3.hpp"
 #include "editor/fanGuiInfos.hpp"
 

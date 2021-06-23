@@ -1,4 +1,4 @@
-#include "core/ecs/fanEcsSystem.hpp"
+#include "ecs/fanEcsSystem.hpp"
 #include "engine/ui/fanUIButton.hpp"
 #include "engine/ui/fanUITransform.hpp"
 #include "engine/ui/fanUIRenderer.hpp"

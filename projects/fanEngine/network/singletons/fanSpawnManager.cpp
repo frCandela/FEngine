@@ -1,6 +1,6 @@
 #include "network/singletons/fanSpawnManager.hpp"
 
-#include "core/ecs/fanEcsWorld.hpp"
+#include "ecs/fanEcsWorld.hpp"
 #include "network/singletons/fanTime.hpp"
 #include "network/singletons/fanLinkingContext.hpp"
 

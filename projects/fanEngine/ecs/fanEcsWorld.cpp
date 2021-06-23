@@ -1,5 +1,5 @@
 #include "core/fanBits.hpp"
-#include "core/ecs/fanEcsWorld.hpp"
+#include "fanEcsWorld.hpp"
 #include "core/time/fanProfiler.hpp"
 #include "core/fanDebug.hpp"
 

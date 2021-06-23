@@ -1,4 +1,4 @@
-#include "core/ecs/fanEcsSystem.hpp"
+#include "ecs/fanEcsSystem.hpp"
 #include "core/random/fanRandom.hpp"
 #include "engine/physics/fanTransform.hpp"
 #include "engine/components/fanParticleEmitter.hpp"

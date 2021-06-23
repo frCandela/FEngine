@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/ecs/fanEcsWorld.hpp"
+#include "ecs/fanEcsWorld.hpp"
 #include "engine/game/fanPlayerData.hpp"
 #include "network/fanNetConfig.hpp"
 

@@ -1,6 +1,6 @@
 #include "network/singletons/fanHostManager.hpp"
 
-#include "core/ecs/fanEcsWorld.hpp"
+#include "ecs/fanEcsWorld.hpp"
 #include "engine/singletons/fanScene.hpp"
 #include "engine/components/fanSceneNode.hpp"
 #include "network/components/fanHostGameData.hpp"

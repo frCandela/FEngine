@@ -1,8 +1,8 @@
 #pragma once
 
 #include <unordered_map>
-#include "core/ecs/fanEcsSingleton.hpp"
-#include "core/ecs/fanEcsComponent.hpp"
+#include "ecs/fanEcsSingleton.hpp"
+#include "ecs/fanEcsComponent.hpp"
 #include "editor/fanImguiIcons.hpp"
 #include "editor/fanGuiInfos.hpp"
 

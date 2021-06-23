@@ -1,7 +1,7 @@
 #include "fanSceneNode.hpp"
 
 #include <stack>
-#include "core/ecs/fanEcsWorld.hpp"
+#include "ecs/fanEcsWorld.hpp"
 #include "core/fanDebug.hpp"
 #include "engine/singletons/fanScene.hpp"
 

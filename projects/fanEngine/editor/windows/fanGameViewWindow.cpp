@@ -1,6 +1,6 @@
 #include "editor/windows/fanGameViewWindow.hpp"
 
-#include "core/ecs/fanEcsWorld.hpp"
+#include "ecs/fanEcsWorld.hpp"
 #include "network/singletons/fanTime.hpp"
 #include "engine/singletons/fanScene.hpp"
 #include "editor/singletons/fanEditorPlayState.hpp"

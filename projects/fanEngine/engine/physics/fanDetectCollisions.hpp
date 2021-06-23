@@ -1,4 +1,4 @@
-#include "core/ecs/fanEcsSystem.hpp"
+#include "ecs/fanEcsSystem.hpp"
 #include "core/time/fanProfiler.hpp"
 #include "engine/physics/fanPhysicsWorld.hpp"
 #include "engine/physics/fanRigidbody.hpp"

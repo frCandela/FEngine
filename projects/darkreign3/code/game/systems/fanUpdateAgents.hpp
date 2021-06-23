@@ -1,4 +1,4 @@
-#include "core/ecs/fanEcsSystem.hpp"
+#include "ecs/fanEcsSystem.hpp"
 #include "engine/physics/fanTransform.hpp"
 #include "engine/systems/fanRaycast.hpp"
 #include "game/components/fanTerrainAgent.hpp"

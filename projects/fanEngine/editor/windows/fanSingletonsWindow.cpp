@@ -1,7 +1,7 @@
 #include "editor/windows/fanSingletonsWindow.hpp"
 
 #include "core/fanDebug.hpp"
-#include "core/ecs/fanEcsWorld.hpp"
+#include "ecs/fanEcsWorld.hpp"
 #include "core/time/fanProfiler.hpp"
 #include "editor/fanDragnDrop.hpp"
 #include "editor/fanGroupsColors.hpp"

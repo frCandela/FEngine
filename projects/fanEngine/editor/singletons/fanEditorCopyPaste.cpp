@@ -2,7 +2,7 @@
 
 #include <sstream>
 #include "imgui/imgui.h"
-#include "core/ecs/fanEcsWorld.hpp"
+#include "ecs/fanEcsWorld.hpp"
 #include "editor/singletons/fanEditorSelection.hpp"
 #include "engine/resources/fanPrefab.hpp"
 #include "engine/singletons/fanScene.hpp"

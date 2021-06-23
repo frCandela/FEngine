@@ -1,7 +1,7 @@
 #pragma once
 
-#include "core/ecs/fanSignal.hpp"
-#include "core/ecs/fanEcsWorld.hpp"
+#include "ecs/fanSignal.hpp"
+#include "ecs/fanEcsWorld.hpp"
 #include "core/math/fanFixedPoint.hpp"
 
 namespace fan

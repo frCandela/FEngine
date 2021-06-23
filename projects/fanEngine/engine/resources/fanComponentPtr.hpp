@@ -1,7 +1,7 @@
 #pragma once
 
 #include "core/resources/fanResourcePtr.hpp"
-#include "core/ecs/fanEcsWorld.hpp"
+#include "ecs/fanEcsWorld.hpp"
 #include "fanPrefab.hpp"
 
 namespace fan

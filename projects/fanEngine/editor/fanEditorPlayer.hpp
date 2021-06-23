@@ -1,7 +1,7 @@
 #pragma once
 
 #include "network/fanNetConfig.hpp"
-#include "core/ecs/fanEcsWorld.hpp"
+#include "ecs/fanEcsWorld.hpp"
 #include "engine/game/fanPlayerData.hpp"
 #include "editor/singletons/fanEditorSettings.hpp"
 

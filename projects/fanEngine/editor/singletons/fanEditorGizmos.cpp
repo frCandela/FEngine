@@ -3,7 +3,7 @@
 #include "core/shapes/fanRay.hpp"
 #include "core/shapes/fanTriangle.hpp"
 #include "core/math/fanBasicModels.hpp"
-#include "core/ecs/fanEcsWorld.hpp"
+#include "ecs/fanEcsWorld.hpp"
 #include "engine/components/fanSceneNode.hpp"
 #include "engine/physics/fanTransform.hpp"
 #include "engine/components/fanCamera.hpp"

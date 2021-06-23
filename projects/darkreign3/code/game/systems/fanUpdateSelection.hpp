@@ -1,4 +1,4 @@
-#include "core/ecs/fanEcsSystem.hpp"
+#include "ecs/fanEcsSystem.hpp"
 #include "game/fanDR3Tags.hpp"
 #include "engine/singletons/fanRenderWorld.hpp"
 #include "engine/ui/fanUITransform.hpp"

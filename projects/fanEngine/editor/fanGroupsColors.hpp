@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/ecs/fanEcsTypes.hpp"
+#include "ecs/fanEcsTypes.hpp"
 #include "editor/fanImguiIcons.hpp"
 
 namespace fan

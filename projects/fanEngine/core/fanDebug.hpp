@@ -2,7 +2,7 @@
 
 #include <sstream>
 #include "core/fanSingleton.hpp"
-#include "core/ecs/fanSignal.hpp"
+#include "ecs/fanSignal.hpp"
 #include "core/math/fanFixedPoint.hpp"
 
 namespace fan

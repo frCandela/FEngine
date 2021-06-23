@@ -1,6 +1,6 @@
 #include "editor/windows/fanPreferencesWindow.hpp"
 
-#include "core/ecs/fanEcsWorld.hpp"
+#include "ecs/fanEcsWorld.hpp"
 #include "core/input/fanInput.hpp"
 #include "core/time/fanProfiler.hpp"
 #include "core/fanDebug.hpp"

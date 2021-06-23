@@ -1,7 +1,7 @@
 #pragma once
 
 #include <unordered_map>
-#include "core/ecs/fanEcsSingleton.hpp"
+#include "ecs/fanEcsSingleton.hpp"
 #include "fanJson.hpp"
 #include "fanDisableWarnings.hpp"
 #include "fanGlm.hpp"

@@ -1,4 +1,4 @@
-#include "core/ecs/fanEcsSystem.hpp"
+#include "ecs/fanEcsSystem.hpp"
 #include "engine/singletons/fanRenderWorld.hpp"
 #include "engine/components/fanMeshRenderer.hpp"
 #include "engine/components/fanSkinnedMeshRenderer.hpp"

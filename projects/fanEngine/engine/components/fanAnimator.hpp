@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/ecs/fanEcsComponent.hpp"
+#include "ecs/fanEcsComponent.hpp"
 #include "core/resources/fanResourcePtr.hpp"
 #include "core/math/fanMatrix4.hpp"
 #include "render/resources/fanAnimation.hpp"

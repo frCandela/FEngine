@@ -1,7 +1,7 @@
 #pragma once
 
 #include <glfw/glfw3.h>
-#include "core/ecs/fanEcsSingleton.hpp"
+#include "ecs/fanEcsSingleton.hpp"
 #include "network/fanNetConfig.hpp"
 #include "core/math/fanFixedPoint.hpp"
 

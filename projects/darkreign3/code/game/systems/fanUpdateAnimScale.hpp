@@ -1,4 +1,4 @@
-#include "core/ecs/fanEcsSystem.hpp"
+#include "ecs/fanEcsSystem.hpp"
 #include "engine/components/fanScale.hpp"
 #include "game/components/fanAnimScale.hpp"
 

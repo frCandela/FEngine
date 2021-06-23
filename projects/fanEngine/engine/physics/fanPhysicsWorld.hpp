@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/ecs/fanEcsSingleton.hpp"
+#include "ecs/fanEcsSingleton.hpp"
 #include "engine/physics/fanContactSolver.hpp"
 #include "engine/physics/fanCollisionDetection.hpp"
 

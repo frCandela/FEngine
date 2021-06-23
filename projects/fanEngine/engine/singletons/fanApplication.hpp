@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/ecs/fanEcsSingleton.hpp"
+#include "ecs/fanEcsSingleton.hpp"
 #include "engine/resources/fanComponentPtr.hpp"
 #include "engine/components/fanSceneNode.hpp"
 

@@ -1,6 +1,6 @@
 #include "fanDragnDrop.hpp"
 
-#include "core/ecs/fanEcsWorld.hpp"
+#include "ecs/fanEcsWorld.hpp"
 #include "core/fanDebug.hpp"
 #include "engine/components/fanSceneNode.hpp"
 #include "engine/singletons/fanScene.hpp"

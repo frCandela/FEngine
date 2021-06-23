@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/ecs/fanEcsComponent.hpp"
+#include "ecs/fanEcsComponent.hpp"
 #include "fanUITransform.hpp"
 #include "engine/resources/fanComponentPtr.hpp"
 

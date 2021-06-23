@@ -2,7 +2,7 @@
 
 #include "core/fanDebug.hpp"
 #include "core/fanPath.hpp"
-#include "core/ecs/fanEcsWorld.hpp"
+#include "ecs/fanEcsWorld.hpp"
 #include "core/time/fanProfiler.hpp"
 #include "network/singletons/fanTime.hpp"
 #include "engine/singletons/fanScene.hpp"

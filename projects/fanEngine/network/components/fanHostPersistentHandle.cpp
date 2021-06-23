@@ -1,5 +1,5 @@
 #include "network/components/fanHostPersistentHandle.hpp"
-#include "core/ecs/fanEcsWorld.hpp"
+#include "ecs/fanEcsWorld.hpp"
 
 namespace fan
 {

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/ecs/fanEcsSingleton.hpp"
+#include "ecs/fanEcsSingleton.hpp"
 #include "fanDisableWarnings.hpp"
 #include "fanGlm.hpp"
 #include "core/math/fanFixedPoint.hpp"

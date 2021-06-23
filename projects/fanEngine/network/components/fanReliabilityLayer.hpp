@@ -1,7 +1,7 @@
 #pragma  once
 
 #include <queue>
-#include "core/ecs/fanEcsComponent.hpp"
+#include "ecs/fanEcsComponent.hpp"
 #include "network/fanPacket.hpp"
 
 namespace fan

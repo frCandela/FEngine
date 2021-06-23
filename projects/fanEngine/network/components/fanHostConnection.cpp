@@ -1,6 +1,6 @@
 #include "network/components/fanHostConnection.hpp"
 
-#include "core/ecs/fanEcsWorld.hpp"
+#include "ecs/fanEcsWorld.hpp"
 #include "network/singletons/fanTime.hpp"
 
 namespace fan

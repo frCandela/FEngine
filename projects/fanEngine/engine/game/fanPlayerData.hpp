@@ -2,7 +2,7 @@
 
 #include "fanDisableWarnings.hpp"
 #include "fanGlm.hpp"
-#include "core/ecs/fanSignal.hpp"
+#include "ecs/fanSignal.hpp"
 #include "core/resources/fanResources.hpp"
 #include "engine/game/fanLaunchSettings.hpp"
 #include "render/fanWindow.hpp"

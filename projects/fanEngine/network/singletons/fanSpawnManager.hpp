@@ -1,7 +1,7 @@
 #pragma once
 
 #include <unordered_map>
-#include "core/ecs/fanEcsSingleton.hpp"
+#include "ecs/fanEcsSingleton.hpp"
 #include "network/components/fanClientRPC.hpp"
 #include "network/fanPacket.hpp"
 

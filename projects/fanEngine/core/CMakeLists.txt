@@ -5,6 +5,7 @@ set(FAN_CORE_LIBS
         imgui
         glfw
         quickhull
+        fanEcs
         )
 
 set(LIBRARY_NAME fanCore)

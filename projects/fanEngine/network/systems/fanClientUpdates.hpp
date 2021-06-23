@@ -1,4 +1,4 @@
-#include "core/ecs/fanEcsSystem.hpp"
+#include "ecs/fanEcsSystem.hpp"
 #include "network/components/fanClientReplication.hpp"
 #include "network/components/fanClientConnection.hpp"
 #include "network/components/fanClientGameData.hpp"

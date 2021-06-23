@@ -2,10 +2,11 @@
 file(GLOB_RECURSE FAN_EDITOR_H *.hpp)
 
 set(FAN_EDITOR_LIBS
-        fanEngine
-        fanRender
-        fanNetwork
+        fanEcs
         fanCore
+        fanNetwork
+        fanRender
+        fanEngine
         )
 
 set(LIBRARY_NAME fanEditor)

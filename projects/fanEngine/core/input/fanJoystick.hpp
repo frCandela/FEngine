@@ -2,7 +2,7 @@
 
 #include "glfw/glfw3.h"
 #include "core/fanSingleton.hpp"
-#include "core/ecs/fanSignal.hpp"
+#include "ecs/fanSignal.hpp"
 
 namespace fan
 {

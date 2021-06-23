@@ -3,7 +3,7 @@
 #include <iostream>
 #include <limits>
 #include <type_traits>
-#include "core/ecs/fanSignal.hpp"
+#include "ecs/fanSignal.hpp"
 #include "core/fanDebug.hpp"
 #include "network/fanNetConfig.hpp"
 #include "core/math/fanVector3.hpp"

@@ -1,6 +1,6 @@
 #include "network/components/fanClientGameData.hpp"
 
-#include "core/ecs/fanEcsWorld.hpp"
+#include "ecs/fanEcsWorld.hpp"
 
 namespace fan
 {

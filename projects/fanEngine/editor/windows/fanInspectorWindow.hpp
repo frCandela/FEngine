@@ -1,8 +1,8 @@
 #pragma once
 
 #include <set>
-#include "core/ecs/fanEcsSingleton.hpp"
-#include "core/ecs/fanEcsTypes.hpp"
+#include "ecs/fanEcsSingleton.hpp"
+#include "ecs/fanEcsTypes.hpp"
 #include "editor/fanGuiInfos.hpp"
 
 namespace fan

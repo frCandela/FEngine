@@ -1,7 +1,7 @@
 #pragma once
 
 #include "core/shapes/fanAABB.hpp"
-#include "core/ecs/fanEcsSingleton.hpp"
+#include "ecs/fanEcsSingleton.hpp"
 #include "render/fanRenderer.hpp"
 #include "render/resources/fanMesh.hpp"
 #include "render/fanVertex.hpp"

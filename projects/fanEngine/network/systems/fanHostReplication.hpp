@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/ecs/fanEcsSystem.hpp"
+#include "ecs/fanEcsSystem.hpp"
 #include "network/singletons/fanHostManager.hpp"
 #include "network/components/fanHostReplication.hpp"
 #include "network/components/fanEntityReplication.hpp"

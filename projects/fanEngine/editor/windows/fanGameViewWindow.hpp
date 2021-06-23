@@ -1,8 +1,8 @@
 #pragma once
 
 #include "glfw/glfw3.h"
-#include "core/ecs/fanEcsSingleton.hpp"
-#include "core/ecs/fanSignal.hpp"
+#include "ecs/fanEcsSingleton.hpp"
+#include "ecs/fanSignal.hpp"
 #include "engine/game/fanLaunchSettings.hpp"
 #include "editor/fanGuiInfos.hpp"
 

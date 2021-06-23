@@ -1,6 +1,6 @@
 #include "editor/windows/fanTerrainWindow.hpp"
 
-#include "core/ecs/fanEcsWorld.hpp"
+#include "ecs/fanEcsWorld.hpp"
 #include "engine/terrain/fanVoxelTerrain.hpp"
 #include "editor/fanModals.hpp"
 

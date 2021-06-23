@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/ecs/fanEcsSingleton.hpp"
+#include "ecs/fanEcsSingleton.hpp"
 #include "core/unit_tests/fanUnitTest.hpp"
 #include "editor/fanGuiInfos.hpp"
 

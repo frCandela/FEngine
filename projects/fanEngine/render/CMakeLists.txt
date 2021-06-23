@@ -2,8 +2,8 @@
 file(GLOB_RECURSE FAN_RENDER_H *.hpp)
 
 set(FAN_RENDER_LIBS
-        fanCore
         vulkan-1
+        fanCore
         )
 
 set(LIBRARY_NAME fanRender)

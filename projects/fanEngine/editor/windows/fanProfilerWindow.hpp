@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/ecs/fanEcsSingleton.hpp"
+#include "ecs/fanEcsSingleton.hpp"
 #include "core/time/fanProfiler.hpp"
 #include "core/fanColor.hpp"
 #include "editor/fanGuiInfos.hpp"
