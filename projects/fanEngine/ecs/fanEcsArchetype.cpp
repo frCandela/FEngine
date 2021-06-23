@@ -1,4 +1,4 @@
-#include "fanEcsArchetype.hpp"
+#include "ecs/fanEcsArchetype.hpp"
 
 namespace fan
 {
@@ -31,9 +31,7 @@ namespace fan
     //==================================================================================================================================================================================================
     void EcsArchetype::AddComponentType( const EcsComponentInfo& _componentsInfo )
     {
-        mChunkVectors[_componentsInfo.mIndex].Create( _componentsInfo.copy,
-                                                      _componentsInfo.mSize,
-                                                      _componentsInfo.mAlignment );
+        mChunkVectors[_componentsInfo.mIndex].Create( _componentsInfo.copy, _componentsInfo.mSize, _componentsInfo.mAlignment );
     }
 
     //==================================================================================================================================================================================================

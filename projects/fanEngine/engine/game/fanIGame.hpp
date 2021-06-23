@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ecs/fanSignal.hpp"
+#include "core/fanSignal.hpp"
 #include "ecs/fanEcsWorld.hpp"
 #include "core/math/fanFixedPoint.hpp"
 

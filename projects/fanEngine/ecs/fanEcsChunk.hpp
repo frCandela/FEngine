@@ -1,7 +1,7 @@
 #pragma once
 
 #include <memory>
-#include "fanEcsChunkAllocator.hpp"
+#include "ecs/fanEcsChunkAllocator.hpp"
 
 namespace fan
 {

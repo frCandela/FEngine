@@ -4,8 +4,8 @@ file(GLOB_RECURSE FAN_NETWORK_H *.hpp)
 set(FAN_NETWORK_LIBS
         sfml-system
         sfml-network
-        fanEcs
         fanCore
+        fanEcs
         )
 
 set(LIBRARY_NAME fanNetwork)

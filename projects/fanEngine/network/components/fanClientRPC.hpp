@@ -2,7 +2,7 @@
 
 #include <unordered_map>
 #include "ecs/fanEcsComponent.hpp"
-#include "ecs/fanSignal.hpp"
+#include "core/fanSignal.hpp"
 #include "network/fanPacket.hpp"
 
 namespace fan

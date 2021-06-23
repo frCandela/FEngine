@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ecs/fanEcsSingleton.hpp"
-#include "ecs/fanSignal.hpp"
+#include "core/fanSignal.hpp"
 #include "editor/fanGuiInfos.hpp"
 
 namespace fan

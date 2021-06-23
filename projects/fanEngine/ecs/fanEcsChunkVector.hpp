@@ -1,7 +1,7 @@
 #pragma once
 
 #include <vector>
-#include "fanEcsChunk.hpp"
+#include "ecs/fanEcsChunk.hpp"
 
 namespace fan
 {

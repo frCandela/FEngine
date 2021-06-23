@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ecs/fanSignal.hpp"
+#include "core/fanSignal.hpp"
 #include "ecs/fanEcsSingleton.hpp"
 #include "editor/fanGuiInfos.hpp"
 
