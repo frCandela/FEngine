@@ -1,4 +1,6 @@
 #include "network/components/fanHostReplication.hpp"
+
+#include "core/ecs/fanEcsWorld.hpp"
 #include "network/singletons/fanLinkingContext.hpp"
 
 namespace fan
@@ -109,8 +111,10 @@ namespace fan
             {
                 mPendingReplication.insert( { _packet.mTag, data } );
                 const EcsHandle& handle = _world.GetHandle( _entity );
-                _packet.mOnSuccess.Connect( &HostReplication::OnReplicationSuccess, _world, handle );
-                _packet.mOnFail.Connect( &HostReplication::OnReplicationFail, _world, handle );
+                (void)handle;
+                fanAssert( false );
+                //_packet.mOnSuccess.Connect( &HostReplication::OnReplicationSuccess, _world, handle );
+                //_packet.mOnFail.Connect( &HostReplication::OnReplicationFail, _world, handle );
             }
         }
         mNextReplication.clear();

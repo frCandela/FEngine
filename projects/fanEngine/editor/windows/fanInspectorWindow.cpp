@@ -1,15 +1,14 @@
 #include "editor/windows/fanInspectorWindow.hpp"
 
 #include <sstream>
-#include <core/fanPath.hpp>
-#include "editor/fanDragnDrop.hpp"
+#include "core/fanPath.hpp"
+#include "core/ecs/fanEcsWorld.hpp"
+#include "core/time/fanProfiler.hpp"
 #include "engine/singletons/fanScene.hpp"
 #include "engine/components/fanSceneNode.hpp"
-#include "core/time/fanProfiler.hpp"
 #include "editor/singletons/fanEditorSelection.hpp"
-#include "editor/fanGuiInfos.hpp"
-#include "editor/fanGroupsColors.hpp"
 #include "editor/singletons/fanEditorSettings.hpp"
+#include "editor/fanDragnDrop.hpp"
 
 namespace fan
 {

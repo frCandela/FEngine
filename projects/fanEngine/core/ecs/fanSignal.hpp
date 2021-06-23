@@ -4,7 +4,6 @@
 #include <iostream>
 #include <functional>
 #include "core/fanAssert.hpp"
-#include "core/ecs/fanEcsWorld.hpp"
 
 namespace fan
 {
@@ -26,12 +25,9 @@ namespace fan
             size_t mID;
         };
 
+
         template< typename _Object >
         void Connect( void( _Object::* _method )( Args... ), _Object* _object );
-
-        template< typename _ComponentType >
-        void Connect( void( _ComponentType::* _method )( Args... ), EcsWorld& _world, const EcsHandle _handle );
-
         void Emmit( Args... _args );
         void Clear();
         int ConnectionsCount() const { return (int)mConnections.size(); }
@@ -51,31 +47,10 @@ namespace fan
         static_assert( !std::is_base_of<EcsComponent, _Object>::value );
 
         Connection connection;
-        connection.mID     = size_t( _object );
+        connection.mID     = (size_t)_object ;
         connection.mLambda = [_method, _object]( Args... _args )
         {
             ( ( *_object ).*( _method ) )( _args... );
-        };
-        mConnections.push_back( connection );
-    }
-
-    //==================================================================================================================================================================================================
-    //==================================================================================================================================================================================================
-    template< typename... Args >
-    template< typename _ComponentType >
-    void Signal<Args...>::Connect( void (_ComponentType::* _method)( Args... ),
-                                   EcsWorld& _world,
-                                   EcsHandle _handle )
-    {
-        static_assert( std::is_base_of<EcsComponent, _ComponentType>::value );
-        fanAssert( _handle != 0 );
-
-        Connection connection;
-        connection.mID     = _handle;
-        connection.mLambda = [_method, &_world, _handle]( Args... _args )
-        {
-            _ComponentType& component = _world.GetComponent<_ComponentType>( _world.GetEntity( _handle ) );
-            ( ( component ).*( _method ) )( _args... );
         };
         mConnections.push_back( connection );
     }

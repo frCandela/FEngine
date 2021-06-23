@@ -1,5 +1,6 @@
 #include "render/core/fanInstance.hpp"
 
+#include <map>
 #include <iostream>
 #include "core/fanDebug.hpp"
 #include "render/fanRenderGlobal.hpp"

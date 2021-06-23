@@ -1,4 +1,4 @@
-#include "core/ecs/fanEcsSystem.hpp"
+#include "core/ecs/fanEcsWorld.hpp"
 #include "core/math/fanMatrix4.hpp"
 #include "engine/fanEngineTags.hpp"
 #include "engine/components/fanBounds.hpp"

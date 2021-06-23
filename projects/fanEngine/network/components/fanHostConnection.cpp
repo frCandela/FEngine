@@ -1,4 +1,6 @@
 #include "network/components/fanHostConnection.hpp"
+
+#include "core/ecs/fanEcsWorld.hpp"
 #include "network/singletons/fanTime.hpp"
 
 namespace fan
@@ -50,8 +52,9 @@ namespace fan
             PacketLoginSuccess packetLogin;
             packetLogin.mPlayerId = handle;
             packetLogin.Write( _packet );
-            _packet.mOnSuccess.Connect( &HostConnection::OnLoginSuccess, _world, handle );
-            _packet.mOnFail.Connect( &HostConnection::OnLoginFail, _world, handle );
+            fanAssert( false );
+            //_packet.mOnSuccess.Connect( &HostConnection::OnLoginSuccess, _world, handle );
+            //_packet.mOnFail.Connect( &HostConnection::OnLoginFail, _world, handle );
             mState = HostConnection::PendingApprouval;
         }
         else if( mState == HostConnection::Connected )

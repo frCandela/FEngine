@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/ecs/fanEcsSystem.hpp"
+#include "core/ecs/fanEcsWorld.hpp"
 #include "core/shapes/fanRay.hpp"
 #include "engine/components/fanSceneNode.hpp"
 #include "engine/components/fanBounds.hpp"
@@ -66,8 +66,8 @@ namespace fan
                             {
                                 SRaycast::Result result1;
                                 result1.mEntity         = entity;
-                                result1.mData.mPosition = transform.TransformPoint(result.mPosition);
-                                result1.mData.mNormal   = transform.TransformDirection(result.mNormal);
+                                result1.mData.mPosition = transform.TransformPoint( result.mPosition );
+                                result1.mData.mNormal   = transform.TransformDirection( result.mNormal );
                                 result1.mData.mDistance = result.mDistance;
                                 _outResults.push_back( result1 );
                             }

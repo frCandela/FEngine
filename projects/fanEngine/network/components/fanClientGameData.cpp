@@ -1,5 +1,6 @@
 #include "network/components/fanClientGameData.hpp"
-#include "network/singletons/fanTime.hpp"
+
+#include "core/ecs/fanEcsWorld.hpp"
 
 namespace fan
 {
@@ -77,7 +78,7 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void ClientGameData::Write( EcsWorld& _world, EcsEntity _entity, Packet& _packet )
+    void ClientGameData::Write( EcsWorld& /*_world*/, EcsEntity /*_entity*/, Packet& _packet )
     {
         // calculates the number of inputs to send
         int numInputs = (int)mPreviousInputs.size();
@@ -89,7 +90,8 @@ namespace fan
         if( numInputs > 0 )
         {
             // registers packet success
-            _packet.mOnSuccess.Connect( &ClientGameData::OnInputReceived, _world, _world.GetHandle( _entity ) );
+            fanAssert( false );
+            //_packet.mOnSuccess.Connect( &ClientGameData::OnInputReceived, _world, _world.GetHandle( _entity ) );
             mInputsSent.push_front( { _packet.mTag, mPreviousInputs.front().mFrameIndex } );
 
             // generate & send inputs

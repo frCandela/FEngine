@@ -1,7 +1,8 @@
 #include "editor/windows/fanTerrainWindow.hpp"
-#include "editor/fanModals.hpp"
-#include "engine/terrain/fanVoxelGeneration.hpp"
+
+#include "core/ecs/fanEcsWorld.hpp"
 #include "engine/terrain/fanVoxelTerrain.hpp"
+#include "editor/fanModals.hpp"
 
 namespace fan
 {

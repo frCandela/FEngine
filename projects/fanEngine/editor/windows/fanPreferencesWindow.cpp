@@ -1,16 +1,15 @@
 #include "editor/windows/fanPreferencesWindow.hpp"
 
-#include "core/fanColor.hpp"
+#include "core/ecs/fanEcsWorld.hpp"
 #include "core/input/fanInput.hpp"
-#include "editor/singletons/fanEditorSettings.hpp"
 #include "core/time/fanProfiler.hpp"
 #include "core/fanDebug.hpp"
-#include "engine/fanFullscreen.hpp"
 #include "render/fanRenderer.hpp"
 #include "editor/fanModals.hpp"
-#include "editor/fanGroupsColors.hpp"
 #include "editor/gui/fanGuiAxis.hpp"
+#include "editor/fanGroupsColors.hpp"
 #include "editor/gui/fanGuiInputManager.hpp"
+#include "editor/singletons/fanEditorSettings.hpp"
 
 namespace fan
 {

@@ -1,4 +1,6 @@
 #include "network/components/fanLinkingContextUnregisterer.hpp"
+
+#include "core/ecs/fanEcsWorld.hpp"
 #include "network/singletons/fanLinkingContext.hpp"
 
 namespace fan

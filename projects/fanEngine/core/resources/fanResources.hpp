@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <map>
 #include "core/fanHash.hpp"
 #include "core/resources/fanResource.hpp"
 #include "core/resources/fanResourcePtr.hpp"

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "fanJson.hpp"
 #include "core/input/fanKeyboard.hpp"
 #include "core/input/fanJoystick.hpp"
 
