@@ -13,6 +13,7 @@ namespace fan
     struct Mesh;
     struct SkinnedMesh;
     struct Animation;
+    struct EditorResourceInfo;
     class Font;
 }
 
@@ -41,6 +42,14 @@ namespace ImGui
 
         static bool IsSingletonPayload( const ImGuiPayload* _payload );
     };
+
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    void FanBeginDragDropSourceResource( fan::ResourcePtrData& _resourcePtrData, const fan::EditorResourceInfo _info, ImGuiDragDropFlags _flags = ImGuiDragDropFlags_None );
+
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    fan::ResourcePtrData FanBeginDragDropTargetResource( const fan::EditorResourceInfo _info );
 
     void FanBeginDragDropSourcePrefab( fan::ResourcePtr<fan::Prefab> _prefab, ImGuiDragDropFlags _flags = ImGuiDragDropFlags_None );
     fan::ResourcePtr<fan::Prefab> FanBeginDragDropTargetPrefab();

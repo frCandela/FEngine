@@ -38,7 +38,7 @@ namespace fan
     {
         const UIRenderer& ui = static_cast<const UIRenderer&>( _component );
         Serializable::SaveColor( _json, "color", ui.mColor );
-        Serializable::SaveResourcePtr( _json, "texture_path", ui.mTexture.mData );
+        Serializable::SaveResourcePtr( _json, "texture_path", ui.mTexture );
         Serializable::SaveInt( _json, "depth", ui.mDepth );
         Serializable::SaveIVec2( _json, "uv_offset", ui.mUvOffset );
         Serializable::SaveIVec2( _json, "tiling", ui.mTiling );
@@ -50,7 +50,7 @@ namespace fan
     {
         UIRenderer& ui = static_cast<UIRenderer&>( _component );
         Serializable::LoadColor( _json, "color", ui.mColor );
-        Serializable::LoadResourcePtr( _json, "texture_path", ui.mTexture.mData );
+        Serializable::LoadResourcePtr( _json, "texture_path", ui.mTexture );
         Serializable::LoadInt( _json, "depth", ui.mDepth );
         Serializable::LoadIVec2( _json, "uv_offset", ui.mUvOffset );
         Serializable::LoadIVec2( _json, "tiling", ui.mTiling );

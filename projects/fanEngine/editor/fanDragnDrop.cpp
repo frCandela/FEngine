@@ -5,18 +5,51 @@
 #include "engine/components/fanSceneNode.hpp"
 #include "engine/resources/fanPrefab.hpp"
 #include "engine/singletons/fanScene.hpp"
-#include "editor/gui/fanGroupsColors.hpp"
-#include "editor/fanGuiInfos.hpp"
 #include "render/resources/fanTexture.hpp"
 #include "render/resources/fanMesh.hpp"
 #include "render/resources/fanSkinnedMesh.hpp"
 #include "engine/resources/fanFont.hpp"
 #include "render/resources/fanAnimation.hpp"
+#include "editor/gui/fanGroupsColors.hpp"
+#include "editor/fanGuiInfos.hpp"
+#include "editor/fanResourceInfos.hpp"
 #include "editor/fanImguiIcons.hpp"
 #include "editor/singletons/fanEditorSettings.hpp"
 
+
 namespace ImGui
 {
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    void FanBeginDragDropSourceResource( fan::ResourcePtrData& _resourcePtrData, const fan::EditorResourceInfo _info, ImGuiDragDropFlags _flags )
+    {
+        if( ImGui::BeginDragDropSource( _flags ) )
+        {
+            ImGui::SetDragDropPayload( _info.mResourceName, &_resourcePtrData, sizeof( fan::ResourcePtrData ) );
+            ImGui::Icon( _info.mIcon, { 16, 16 } );
+            ImGui::SameLine();
+            ImGui::Text( "%s", _resourcePtrData.mHandle->mResource->mPath.c_str() );
+            ImGui::EndDragDropSource();
+        }
+    }
+
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    fan::ResourcePtrData FanBeginDragDropTargetResource( const fan::EditorResourceInfo _info )
+    {
+        fan::ResourcePtrData resourcePtrData;
+        if( ImGui::BeginDragDropTarget() )
+        {
+            if( const ImGuiPayload* payload = ImGui::AcceptDragDropPayload( _info.mResourceName ) )
+            {
+                fanAssert( payload->DataSize == sizeof( fan::ResourcePtrData ) );
+                resourcePtrData = *(fan::ResourcePtrData*)payload->Data;
+            }
+            ImGui::EndDragDropTarget();
+        }
+        return resourcePtrData;
+    }
+
     const std::string ComponentPayload::sPrefix = "cpnt_";
     const std::string SingletonPayload::sPrefix = "sing_";
 

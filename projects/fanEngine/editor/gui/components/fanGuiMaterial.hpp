@@ -55,7 +55,7 @@ namespace fan
                         ImGui::FanShowHelpMarker( "sharpness of the specular reflection" );
                     }
                     ImGui::PopItemWidth();
-                    ImGui::FanTexturePtr( "mat texture", subMaterial.mTexture );
+                    ImGui::FanResourcePtr<Texture>( "mat texture", subMaterial.mTexture );
                     ImGui::Unindent();
                     ImGui::PopID();
                 }

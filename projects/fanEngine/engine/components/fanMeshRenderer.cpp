@@ -26,7 +26,7 @@ namespace fan
     void MeshRenderer::Save( const EcsComponent& _component, Json& _json )
     {
         const MeshRenderer& meshRenderer = static_cast<const MeshRenderer&>( _component );
-        Serializable::SaveResourcePtr( _json, "path", meshRenderer.mMesh.mData );
+        Serializable::SaveResourcePtr( _json, "path", meshRenderer.mMesh );
     }
 
     //==================================================================================================================================================================================================
@@ -34,6 +34,6 @@ namespace fan
     void MeshRenderer::Load( EcsComponent& _component, const Json& _json )
     {
         MeshRenderer& meshRenderer = static_cast<MeshRenderer&>( _component );
-        Serializable::LoadResourcePtr( _json, "path", meshRenderer.mMesh.mData );
+        Serializable::LoadResourcePtr( _json, "path", meshRenderer.mMesh );
     }
 }

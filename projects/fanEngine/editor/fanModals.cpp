@@ -236,12 +236,8 @@ namespace ImGui
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    bool FanLoadFileModal(
-            const char* _popupName,
-            const std::set<std::string>& _extensionWhiteList,
-            std::string& _path )
+    bool FanLoadFileModal( const char* _popupName, const std::set<std::string>& _extensionWhiteList, std::string& _path )
     {
-
         bool returnValue = false;
 
         ImGui::SetNextWindowSize( { 316, 400 } );

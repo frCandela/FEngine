@@ -14,90 +14,93 @@
 
 namespace ImGui
 {
-
-    //==================================================================================================================================================================================================
-    // Draws a ImGui widget for displaying a TexturePtr
-    // Returns true if the value (TexturePtr) was edited
-    //==================================================================================================================================================================================================
-    bool FanTexturePtr( const char* _label, fan::ResourcePtr<fan::Texture>& _ptr )
+    namespace impl
     {
-        bool returnValue = false;
-
-        fan::Texture* texture = _ptr;
-        const std::string name = texture == nullptr ? "null" : fan::Path::FileName( texture->mPath );
-
-        // Set button icon & modal
-        const std::string  modalName   = std::string( "Find texture (" ) + _label + ")";
-        static std::string sPathBuffer = fan::Path::Normalize( "/" );
-        ImGui::PushID( _label );
+        //==================================================================================================================================================================================================
+        //==================================================================================================================================================================================================
+        bool FanResourcePtr( const char* _label, fan::ResourcePtrData& _resourcePtrData, const fan::EditorResourceInfo& _info )
         {
-            if( ImGui::ButtonIcon( ImGui::IconType::Image16, { 16, 16 } ) )
+            ImGui::PushID( _label );
+            bool returnValue = false;
+
+            fan::Resource* const resource = _resourcePtrData.mHandle != nullptr && _resourcePtrData.mHandle->mResource != nullptr ? _resourcePtrData.mHandle->mResource : nullptr;
+            const std::string name = resource == nullptr ? "null" : fan::Path::FileName( resource->mPath );
+
+            // icon
             {
-                _ptr        = nullptr;
+                if( ImGui::ButtonIcon( _info.mIcon, { 16, 16 } ) )
+                {
+                    _resourcePtrData.mHandle = nullptr;
+                    _resourcePtrData.mGUID   = 0;
+                    returnValue = true;
+                }
+            }
+
+            ImGui::SameLine();
+            // name button
+            const std::string  modalName = std::string( "Find " + std::string( _info.mResourceName ) + " (" ) + _label + ")";
+            static std::string sPathBuffer;
+            const float        width     = 0.6f * ImGui::GetWindowWidth() - ImGui::GetCursorPosX() + 23;
+            if( ImGui::Button( name.c_str(), ImVec2( width, 0.f ) ) )
+            {
+                ImGui::OpenPopup( modalName.c_str() );
+                sPathBuffer = fan::Path::Normalize( resource == nullptr || resource->mPath.empty() ? std::string( _info.mDefaultPath ) : resource->mPath );
+            }
+
+            // Dragndrop source
+            if( resource != nullptr )
+            {
+                ImGui::FanBeginDragDropSourceResource( _resourcePtrData, _info );
+            }
+
+            // tooltip
+            if( resource != nullptr )
+            {
+                if( ImGui::IsItemHovered() )
+                {
+                    ImGui::BeginTooltip();
+                    if( _info.mDrawTooltip != nullptr )
+                    {
+                        ( *_info.mDrawTooltip )( resource );
+                    }
+                    else
+                    {
+                        ImGui::Text( "%s", resource->mPath.c_str() );
+                    }
+                    ImGui::EndTooltip();
+                }
+            }
+
+            // dragndrop
+            fan::ResourcePtrData textureDrop = ImGui::FanBeginDragDropTargetResource( _info );
+            if( textureDrop.mHandle != nullptr )
+            {
+                _resourcePtrData = textureDrop;
+                returnValue      = true;
+            }
+
+            // Right click = clear
+            if( ImGui::IsItemClicked( 1 ) )
+            {
+                _resourcePtrData.mGUID   = 0;
+                _resourcePtrData.mHandle = nullptr;
                 returnValue = true;
             }
-        }
-        ImGui::PopID();
-        ImGui::SameLine();
-        // name button
-        const float width = 0.6f * ImGui::GetWindowWidth() - ImGui::GetCursorPosX() + 23;
-        if( ImGui::Button( name.c_str(), ImVec2( width, 0.f ) ) )
-        {
-            ImGui::OpenPopup( modalName.c_str() );
-            if( sPathBuffer.empty() )
+
+            // Modal set value
+            if( ImGui::FanLoadFileModal( modalName.c_str(), *_info.mExtensions, sPathBuffer ) )
             {
-                sPathBuffer = fan::Path::Normalize( fan::RenderGlobal::sContentPath );
+                fan::ResourcePtr<fan::Texture> r = _resourcePtrData.sResourceManager->Load<fan::Texture>( sPathBuffer );
+                _resourcePtrData = r.mData;
+                returnValue      = true;
             }
+
+            ImGui::SameLine();
+            ImGui::Text( "%s", _label );
+
+            ImGui::PopID();
+            return returnValue;
         }
-        ImGui::SameLine();
-        ImGui::FanBeginDragDropSourceTexture( _ptr );
-
-        // tooltip
-        if( texture != nullptr )
-        {
-            if( ImGui::IsItemHovered() )
-            {
-                ImGui::BeginTooltip();
-
-                // path
-                ImGui::Text( "%s", texture->mPath.c_str() );
-
-                // size
-                std::stringstream ss;
-                ss << texture->mExtent.width << " x " << texture->mExtent.height
-                        << " x " << texture->mLayerCount;
-                ImGui::Text( "%s", ss.str().c_str() );
-
-                ImGui::EndTooltip();
-            }
-        }
-
-        // dragndrop
-        fan::ResourcePtr<fan::Texture> textureDrop = ImGui::FanBeginDragDropTargetTexture();
-        if( textureDrop )
-        {
-            _ptr        = textureDrop;
-            returnValue = true;
-        }
-
-        // Right click = clear
-        if( ImGui::IsItemClicked( 1 ) )
-        {
-            _ptr        = nullptr;
-            returnValue = true;
-        }
-
-        // Modal set value
-        if( ImGui::FanLoadFileModal( modalName.c_str(), fan::RenderGlobal::sImagesExtensions, sPathBuffer ) )
-        {
-            _ptr        = _ptr.mData.sResourceManager->Load<fan::Texture>( sPathBuffer );
-            returnValue = true;
-        }
-
-        ImGui::SameLine();
-        ImGui::Text( "%s", _label );
-
-        return returnValue;
     }
 
     //==================================================================================================================================================================================================

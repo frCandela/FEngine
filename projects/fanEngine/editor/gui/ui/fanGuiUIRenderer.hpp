@@ -29,7 +29,7 @@ namespace fan
             ImGui::PushID( "ui_renderer" );
             ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() );
             {
-                ImGui::FanTexturePtr( "ui texture", ui.mTexture );
+                ImGui::FanResourcePtr<Texture>( "ui texture", ui.mTexture.mData );
 
                 // color
                 if( ImGui::Button( "##TransPos" ) )

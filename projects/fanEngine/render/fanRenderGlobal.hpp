@@ -25,6 +25,7 @@ namespace fan
         static constexpr const char* sScenesPath     = "scenes/";
         static constexpr const char* sAnimationsPath = "animations/";
         static constexpr const char* sPrefabsPath    = "prefabs/";
+        static constexpr const char* sImagesPath     = "images/";
 
         static constexpr const char* sEditorIcon = "_default/editorIcon.png";
         static constexpr const char* sGameIcon = "_default/gameIcon.png";

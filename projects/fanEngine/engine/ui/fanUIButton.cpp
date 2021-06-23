@@ -39,8 +39,8 @@ namespace fan
 
         Serializable::SaveColor( _json, "color_normal", button.mColorNormal );
         Serializable::SaveColor( _json, "color_hovered", button.mColorHovered );
-        Serializable::SaveResourcePtr( _json, "image_normal", button.mImageNormal.mData );
-        Serializable::SaveResourcePtr( _json, "image_pressed", button.mImagePressed.mData );
+        Serializable::SaveResourcePtr( _json, "image_normal", button.mImageNormal );
+        Serializable::SaveResourcePtr( _json, "image_pressed", button.mImagePressed );
         Serializable::SaveSlotPtr( _json, "pressed_slot_ptr", button.mSlotPtr );
     }
 
@@ -51,8 +51,8 @@ namespace fan
         UIButton& button = static_cast<UIButton&>( _component );
         Serializable::LoadColor( _json, "color_normal", button.mColorNormal );
         Serializable::LoadColor( _json, "color_hovered", button.mColorHovered );
-        Serializable::LoadResourcePtr( _json, "image_normal", button.mImageNormal.mData );
-        Serializable::LoadResourcePtr( _json, "image_pressed", button.mImagePressed.mData );
+        Serializable::LoadResourcePtr( _json, "image_normal", button.mImageNormal );
+        Serializable::LoadResourcePtr( _json, "image_pressed", button.mImagePressed );
         Serializable::LoadSlotPtr( _json, "pressed_slot_ptr", button.mSlotPtr );
     }
 }

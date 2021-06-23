@@ -24,7 +24,7 @@ namespace fan
     void SkinnedMeshRenderer::Save( const EcsComponent& _component, Json& _json )
     {
         const SkinnedMeshRenderer& meshRenderer = static_cast<const SkinnedMeshRenderer&>( _component );
-        Serializable::SaveResourcePtr( _json, "mesh", meshRenderer.mMesh.mData );
+        Serializable::SaveResourcePtr( _json, "mesh", meshRenderer.mMesh );
     }
 
     //==================================================================================================================================================================================================
@@ -32,6 +32,6 @@ namespace fan
     void SkinnedMeshRenderer::Load( EcsComponent& _component, const Json& _json )
     {
         SkinnedMeshRenderer& meshRenderer = static_cast<SkinnedMeshRenderer&>( _component );
-        Serializable::LoadResourcePtr( _json, "mesh", meshRenderer.mMesh.mData );
+        Serializable::LoadResourcePtr( _json, "mesh", meshRenderer.mMesh );
     }
 }

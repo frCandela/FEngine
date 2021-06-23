@@ -134,8 +134,8 @@ namespace fan
     void Selection::Save( const EcsSingleton& _singleton, Json& _json )
     {
         const Selection& selection = static_cast<const Selection&>( _singleton );
-        Serializable::SaveResourcePtr( _json, "selection_frame", selection.mSelectionFramePrefab.mData );
-        Serializable::SaveResourcePtr( _json, "move_to", selection.mMoveToFxPrefab.mData );
+        Serializable::SaveResourcePtr( _json, "selection_frame", selection.mSelectionFramePrefab );
+        Serializable::SaveResourcePtr( _json, "move_to", selection.mMoveToFxPrefab );
     }
 
     //==================================================================================================================================================================================================
@@ -143,7 +143,7 @@ namespace fan
     void Selection::Load( EcsSingleton& _singleton, const Json& _json )
     {
         Selection& selection = static_cast<Selection&>( _singleton );
-        Serializable::LoadResourcePtr( _json, "selection_frame", selection.mSelectionFramePrefab.mData );
-        Serializable::LoadResourcePtr( _json, "move_to", selection.mMoveToFxPrefab.mData );
+        Serializable::LoadResourcePtr( _json, "selection_frame", selection.mSelectionFramePrefab );
+        Serializable::LoadResourcePtr( _json, "move_to", selection.mMoveToFxPrefab );
     }
 }

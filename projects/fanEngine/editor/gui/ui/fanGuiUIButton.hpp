@@ -46,8 +46,8 @@ namespace fan
             ImGui::SameLine();
             ImGui::ColorEdit4( "color hovered", (float*)&button.mColorHovered[0], ImGui::fanColorEditFlags );
 
-            ImGui::FanTexturePtr( "idle", button.mImageNormal );
-            ImGui::FanTexturePtr( "pressed", button.mImagePressed );
+            ImGui::FanResourcePtr<Texture>( "idle", button.mImageNormal);
+            ImGui::FanResourcePtr<Texture>( "pressed", button.mImagePressed );
             ImGui::FanSlotPtr( "on pressed", _world, button.mSlotPtr );
 
             ImGui::PopItemWidth();
