@@ -21,7 +21,7 @@
 #include "engine/physics/fanDetectCollisions.hpp"
 #include "engine/terrain/fanVoxelTerrain.hpp"
 #include "engine/components/fanCamera.hpp"
-#include "engine/systems/fanRaycast.hpp"
+
 
 #include "game/components/fanUnit.hpp"
 #include "game/components/fanAnimScale.hpp"
@@ -31,6 +31,8 @@
 #include "game/systems/fanUpdateSelection.hpp"
 #include "game/systems/fanUpdateAnimScale.hpp"
 #include "game/systems/fanUpdateAgents.hpp"
+#include "game/units/fanJudas.hpp"
+#include "game/systems/fanUpdateJudas.hpp"
 
 #ifdef FAN_EDITOR
 #include "editor/singletons/fanEditorSettings.hpp"
@@ -38,6 +40,7 @@
 #include "editor/fanGuiUnit.hpp"
 #include "editor/fanGuiAnimScale.hpp"
 #include "editor/fanGuiTerrainAgent.hpp"
+#include "editor/fanGuiJudas.hpp"
 #endif
 
 #include "render/fanWindow.hpp"
@@ -51,6 +54,7 @@ namespace fan
         mWorld.AddComponentType<Unit>();
         mWorld.AddComponentType<TerrainAgent>();
         mWorld.AddComponentType<AnimScale>();
+        mWorld.AddComponentType<Judas>();
         mWorld.AddSingletonType<Selection>();
         mWorld.AddTagType<TagSelected>();
         mWorld.AddTagType<TagEnemy>();
@@ -61,6 +65,7 @@ namespace fan
         settings.mComponentInfos[Unit::Info::sType]      = GuiUnit::GetInfo();
         settings.mComponentInfos[AnimScale::Info::sType] = GuiAnimScale::GetInfo();
         settings.mComponentInfos[TerrainAgent::Info::sType] = GuiTerrainAgent::GetInfo();
+        settings.mComponentInfos[Judas::Info::sType] = GuiJudas::GetInfo();
 #endif
 
         mCursors.Load( *mWorld.GetSingleton<Application>().mResources );
@@ -124,6 +129,7 @@ namespace fan
         mWorld.Run<SDetectCollisions>( _delta );
         mWorld.Run<SMoveFollowTransforms>();
 
+        mWorld.Run<SUpdateJudasAnimation>();
         mWorld.Run<SUpdateAnimators>( _delta );
 
         // ui

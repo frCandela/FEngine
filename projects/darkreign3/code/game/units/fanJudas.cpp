@@ -1,52 +1,44 @@
-#include "game/components/fanTerrainAgent.hpp"
+#include "game/units/fanJudas.hpp"
 #include "engine/fanEngineSerializable.hpp"
+
 
 namespace fan
 {
-
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void TerrainAgent::SetInfo( EcsComponentInfo& _info )
+    void Judas::SetInfo( EcsComponentInfo& _info )
     {
-        _info.load = &TerrainAgent::Load;
-        _info.save = &TerrainAgent::Save;
+        _info.load = &Judas::Load;
+        _info.save = &Judas::Save;
     }
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void TerrainAgent::Init( EcsWorld& /*_world*/, EcsEntity /*_entity*/, EcsComponent& _component )
+    void Judas::Init( EcsWorld& /*_world*/, EcsEntity /*_entity*/, EcsComponent& _component )
     {
-        TerrainAgent& agent = static_cast<TerrainAgent&>( _component );
-        agent.mHeightOffset = 0;
-        agent.mDestination = Vector3::sZero;
-        agent.mMoveSpeed   = 10;
-        agent.mRotationSpeed = 180;
-        agent.mState       = State::Stay;
-        agent.mAlignWithTerrain = true;
-        agent.mTerrainNormal              = Vector3::sUp;
-        agent.mSqrDistanceFromDestination = 0;
-        agent.mForwardAngle = 0;
+        Judas& judas = static_cast<Judas&>( _component );
+        judas.mAnimIdle = nullptr;
+        judas.mAnimWalk = nullptr;
+        judas.mAnimRun = nullptr;
     }
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void TerrainAgent::Save( const EcsComponent& _component, Json& _json )
+    void Judas::Save( const EcsComponent& _component, Json& _json )
     {
-        const TerrainAgent& agent = static_cast<const TerrainAgent&>( _component );
-        Serializable::SaveFixed( _json, "height_offset", agent.mHeightOffset );
-        Serializable::SaveFixed( _json, "move_speed", agent.mMoveSpeed );
-        Serializable::SaveFixed( _json, "rotation_speed", agent.mRotationSpeed );
-        Serializable::SaveBool( _json, "align_with_terrain", agent.mAlignWithTerrain );
+        const Judas& judas = static_cast<const Judas&>( _component );
+        Serializable::SaveResourcePtr( _json, "anim_idle", judas.mAnimIdle );
+        Serializable::SaveResourcePtr( _json, "anim_walk", judas.mAnimWalk );
+        Serializable::SaveResourcePtr( _json, "anim_run", judas.mAnimRun );
     }
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void TerrainAgent::Load( EcsComponent& _component, const Json& _json )
+    void Judas::Load( EcsComponent& _component, const Json& _json )
     {
-        TerrainAgent& agent = static_cast<TerrainAgent&>( _component );
-        Serializable::LoadFixed( _json, "height_offset", agent.mHeightOffset );
-        Serializable::LoadFixed( _json, "move_speed", agent.mMoveSpeed );
-        Serializable::LoadFixed( _json, "rotation_speed", agent.mRotationSpeed );
-        Serializable::LoadBool( _json, "align_with_terrain", agent.mAlignWithTerrain );
+        Judas& judas = static_cast<Judas&>( _component );
+        Serializable::LoadResourcePtr( _json, "anim_idle", judas.mAnimIdle );
+        Serializable::LoadResourcePtr( _json, "anim_walk", judas.mAnimWalk );
+        Serializable::LoadResourcePtr( _json, "anim_run", judas.mAnimRun );
     }
 }

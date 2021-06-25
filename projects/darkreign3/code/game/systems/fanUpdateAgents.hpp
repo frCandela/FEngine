@@ -1,9 +1,10 @@
 #include "ecs/fanEcsSystem.hpp"
 #include "engine/physics/fanTransform.hpp"
 #include "engine/systems/fanRaycast.hpp"
+#include "engine/singletons/fanRenderDebug.hpp"
+#include "engine/components/fanAnimator.hpp"
 #include "game/components/fanTerrainAgent.hpp"
 #include "game/fanDR3Tags.hpp"
-#include "engine/singletons/fanRenderDebug.hpp"
 
 namespace fan
 {
@@ -13,10 +14,11 @@ namespace fan
     {
         static EcsSignature GetSignature( const EcsWorld& _world )
         {
-            return _world.GetSignature<TerrainAgent>() | _world.GetSignature<TagSelected>();
+            return _world.GetSignature<TerrainAgent>()
+                   | _world.GetSignature<TagSelected>();
         }
 
-        static void Run( EcsWorld&, const EcsView& _view, const Vector3 _destination )
+        static void Run( EcsWorld& _world, const EcsView& _view, const Vector3 _destination )
         {
             auto agentIt = _view.begin<TerrainAgent>();
             for( ; agentIt != _view.end<TerrainAgent>(); ++agentIt )
@@ -24,6 +26,12 @@ namespace fan
                 TerrainAgent& agent = *agentIt;
                 agent.mDestination = _destination;
                 agent.mState       = TerrainAgent::State::Move;
+
+                EcsEntity entity = agentIt.GetEntity();
+                if( _world.HasComponent<Animator>( entity ) )
+                {
+                    _world.GetComponent<Animator>( entity ).mTime = 0;
+                }
             }
         }
     };
@@ -50,7 +58,6 @@ namespace fan
 
                 if( agent.mState == TerrainAgent::State::Move )
                 {
-
                     // raycast on the terrain and place the agent on it
                     Ray ray( transform.mPosition + 4 * Vector3::sUp, Vector3::sDown );
                     Raycast<TagTerrain>( _world, ray, results );
@@ -60,27 +67,32 @@ namespace fan
                         transform.mPosition  = results[0].mData.mPosition + Vector3( 0, agent.mHeightOffset, 0 );
                     }
 
-
                     // slowly rotates the transform up vector towards the terrain normal
-                    Vector3 up          = transform.Up();
-                    Fixed   angleNormal = Vector3::Angle( up, agent.mTerrainNormal );
-                    if( angleNormal > 3 )
+                    Vector3 up = transform.Up();
+                    if( agent.mAlignWithTerrain )
                     {
-                        const Vector3 axis       = Vector3::Cross( up, agent.mTerrainNormal );
-                        const Fixed   angleDelta = 90 * _delta;
-                        up = Quaternion::AngleAxis( angleDelta, axis ) * up;
-                        up.Normalize();
+                        Fixed angleNormal = Vector3::Angle( up, agent.mTerrainNormal );
+                        if( angleNormal > 3 )
+                        {
+                            const Vector3 axis       = Vector3::Cross( up, agent.mTerrainNormal );
+                            const Fixed   angleDelta = 90 * _delta;
+                            up = Quaternion::AngleAxis( angleDelta, axis ) * up;
+                            up.Normalize();
+                        }
+                    }
+                    else
+                    {
+                        up = Vector3::sUp;
                     }
 
-                    const Vector3 moveDirection = ( agent.mDestination - transform.mPosition ).Normalized();
-
                     // slowly rotates the forwards vector toward the target position
+                    const Vector3 moveDirection = ( agent.mDestination - transform.mPosition ).Normalized();
                     Vector3       forward       = transform.Forward();
                     const Vector3 targetForward = ( moveDirection - Vector3::Dot( moveDirection, up ) * up ).Normalized();
-                    const Fixed   forwardAngle  = Vector3::SignedAngle( forward, targetForward, up );
-                    if( Fixed::Abs( forwardAngle ) > 5 )
+                    agent.mForwardAngle = Vector3::SignedAngle( forward, targetForward, up );
+                    if( Fixed::Abs( agent.mForwardAngle ) > 5 )
                     {
-                        const Fixed angleDelta = Fixed::Sign( forwardAngle ) * agent.mRotationSpeed * _delta;
+                        const Fixed angleDelta = Fixed::Sign( agent.mForwardAngle ) * agent.mRotationSpeed * _delta;
                         forward = Quaternion::AngleAxis( angleDelta, up ) * forward;
                     }
 
@@ -88,13 +100,14 @@ namespace fan
                     const Vector3 left       = Vector3::Cross( up, forward );
                     const Vector3 newForward = Vector3::Cross( left, up );
                     transform.mRotation = Matrix3( left, up, newForward ).ToQuaternion().Normalized();
-                    if( Fixed::Abs( forwardAngle ) < 30 )
+                    if( Fixed::Abs( agent.mForwardAngle ) < 30 )
                     {
                         transform.mPosition += _delta * moveDirection * agent.mMoveSpeed;
                     }
 
                     // stops when reaching the target
-                    if( Vector3::SqrDistance( transform.mPosition, agent.mDestination ) < 1 )
+                    agent.mSqrDistanceFromDestination = Vector3::SqrDistance( transform.mPosition, agent.mDestination );
+                    if( agent.mSqrDistanceFromDestination < 1 )
                     {
                         agent.mState = TerrainAgent::State::Stay;
                     }

@@ -27,6 +27,7 @@ namespace fan
             ImGui::DragFixed( "height offset", &agent.mHeightOffset, 0.05f, -2, 20 );
             ImGui::DragFixed( "move speed", &agent.mMoveSpeed, 0.1f, 0, 100 );
             ImGui::DragFixed( "rotation speed", &agent.mRotationSpeed, 0.1f, 0, 720 );
+            ImGui::Checkbox( "align with terrain", &agent.mAlignWithTerrain );
             ImGui::PushReadOnly();
             ImGui::DragFixed3( "target position", &agent.mDestination.x );
             ImGui::PopReadOnly();

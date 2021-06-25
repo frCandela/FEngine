@@ -6,7 +6,7 @@
 
 namespace fan
 {
-    static constexpr uint32_t ecsSignatureLength = 64;
+    static constexpr uint32_t ecsSignatureLength = 128;
     using EcsSignature = std::bitset<ecsSignatureLength>;
     using EcsHandle = uint32_t;
 

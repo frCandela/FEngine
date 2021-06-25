@@ -2,6 +2,7 @@
 #include "game/fanDR3Tags.hpp"
 #include "engine/singletons/fanRenderWorld.hpp"
 #include "engine/ui/fanUITransform.hpp"
+#include "engine/components/fanSkinnedMeshRenderer.hpp"
 
 namespace fan
 {
@@ -32,7 +33,7 @@ namespace fan
     {
         static EcsSignature GetSignature( const EcsWorld& _world )
         {
-            return _world.GetSignature<Transform>() | _world.GetSignature<MeshRenderer>() | _world.GetSignature<TagSelected>();
+            return _world.GetSignature<Transform>() | _world.GetSignature<TagSelected>();
         }
 
         static void Run( EcsWorld& _world, const EcsView& _view, const Fixed _delta )
@@ -69,18 +70,37 @@ namespace fan
             Transform& cameraTransform = _world.GetComponent<Transform>( cameraEntity );
             int  frameIndex     = 0;
             auto transformIt    = _view.begin<Transform>();
-            auto meshRendererIt = _view.begin<MeshRenderer>();
-            for( ; transformIt != _view.end<Transform>(); ++transformIt, ++meshRendererIt )
+            for( ; transformIt != _view.end<Transform>(); ++transformIt )
             {
                 Transform   & transform    = *transformIt;
-                MeshRenderer& meshRenderer = *meshRendererIt;
-                const Fixed   radius = meshRenderer.mMesh != nullptr ? meshRenderer.mMesh->mBoundingSphere.mRadius : 1;
-                const Vector3 offset = meshRenderer.mMesh != nullptr ? meshRenderer.mMesh->mBoundingSphere.mCenter : Vector3::sZero;
+                EcsEntity entity = transformIt.GetEntity();
 
+                // get geometry informations
+                Fixed   radius = 1;
+                Vector3 offset = Vector3::sZero;
+                if( _world.HasComponent<MeshRenderer>(entity))
+                {
+                    MeshRenderer& meshRenderer = _world.GetComponent<MeshRenderer>(entity);
+                    if( meshRenderer.mMesh != nullptr )
+                    {
+                       radius = meshRenderer.mMesh->mBoundingSphere.mRadius;
+                       offset = meshRenderer.mMesh->mBoundingSphere.mCenter;
+                    }
+                }
+                else if( _world.HasComponent<SkinnedMeshRenderer>(entity))
+                {
+                    SkinnedMeshRenderer& meshRenderer = _world.GetComponent<SkinnedMeshRenderer>(entity);
+                    if( meshRenderer.mMesh != nullptr )
+                    {
+                        radius = meshRenderer.mMesh->mBoundingSphere.mRadius;
+                        offset = meshRenderer.mMesh->mBoundingSphere.mCenter;
+                    }
+                }
+
+                // moves selection frame
                 const glm::vec2 screenPos    = renderWorld.mTargetSize * camera.WorldPosToScreen( cameraTransform, transform * offset );
                 const glm::vec2 screenPosTop = renderWorld.mTargetSize * camera.WorldPosToScreen( cameraTransform, transform *  offset + ( radius * cameraTransform.Right() ) );
                 const float     size         = screenPosTop.x - screenPos.x;
-
                 UITransform& uiTransform = _world.GetComponent<UITransform>( _world.GetEntity( selection.mSelectionFrames[frameIndex] ) );
                 uiTransform.mSize     = size * glm::vec2( 2, 2 ) + glm::vec2( 8, 8 );
                 uiTransform.mPosition = screenPos - 0.5f * glm::vec2( uiTransform.mSize );
