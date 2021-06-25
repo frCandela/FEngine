@@ -32,8 +32,6 @@ namespace fan
         void OnEditorUseGameCamera();
 
         EcsWorld mWorld;
-
-        EcsHandle mGameCameraHandle = 0;
         DR3Cursors mCursors;
     };
 }

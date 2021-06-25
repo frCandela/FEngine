@@ -26,17 +26,19 @@
 #include "game/components/fanUnit.hpp"
 #include "game/components/fanAnimScale.hpp"
 #include "game/components/fanTerrainAgent.hpp"
+#include "game/units/fanJudas.hpp"
 #include "game/singletons/fanSelection.hpp"
-#include "game/fanDR3Tags.hpp"
+#include "game/singletons/fanRTSCamera.hpp"
 #include "game/systems/fanUpdateSelection.hpp"
 #include "game/systems/fanUpdateAnimScale.hpp"
 #include "game/systems/fanUpdateAgents.hpp"
-#include "game/units/fanJudas.hpp"
 #include "game/systems/fanUpdateJudas.hpp"
+#include "game/fanDR3Tags.hpp"
 
 #ifdef FAN_EDITOR
 #include "editor/singletons/fanEditorSettings.hpp"
 #include "editor/fanGuiSelection.hpp"
+#include "editor/fanGuiRTSCamera.hpp"
 #include "editor/fanGuiUnit.hpp"
 #include "editor/fanGuiAnimScale.hpp"
 #include "editor/fanGuiTerrainAgent.hpp"
@@ -56,12 +58,14 @@ namespace fan
         mWorld.AddComponentType<AnimScale>();
         mWorld.AddComponentType<Judas>();
         mWorld.AddSingletonType<Selection>();
+        mWorld.AddSingletonType<RTSCamera>();
         mWorld.AddTagType<TagSelected>();
         mWorld.AddTagType<TagEnemy>();
 
 #ifdef FAN_EDITOR
         EditorSettings& settings = mWorld.GetSingleton<EditorSettings>();
         settings.mSingletonInfos[Selection::Info::sType] = GuiSelection::GetInfo();
+        settings.mSingletonInfos[RTSCamera::Info::sType] = GuiRTSCamera::GetInfo();
         settings.mComponentInfos[Unit::Info::sType]      = GuiUnit::GetInfo();
         settings.mComponentInfos[AnimScale::Info::sType] = GuiAnimScale::GetInfo();
         settings.mComponentInfos[TerrainAgent::Info::sType] = GuiTerrainAgent::GetInfo();
@@ -76,19 +80,7 @@ namespace fan
     //==================================================================================================================================================================================================
     void DarkReign3::Start()
     {
-        Scene& scene = mWorld.GetSingleton<Scene>();
-        SceneNode cameraNode = scene.CreateSceneNode( "game_camera", &scene.GetRootNode() );
-        mGameCameraHandle = cameraNode.mHandle;
-        EcsEntity cameraEntity = mWorld.GetEntity( mGameCameraHandle );
-        mWorld.AddComponent<Camera>( cameraEntity );
-        Transform& cameraTransform = mWorld.AddComponent<Transform>( cameraEntity );
-
-        if( scene.mMainCameraHandle != 0 )
-        {
-            Transform& prevCameraTransform = mWorld.GetComponent<Transform>( mWorld.GetEntity( scene.mMainCameraHandle ) );
-            cameraTransform = prevCameraTransform;
-        }
-        scene.SetMainCamera( mGameCameraHandle );
+        RTSCamera::CreateCamera( mWorld );
     }
 
     //==================================================================================================================================================================================================
@@ -101,8 +93,9 @@ namespace fan
     //============================================================================================================================
     void DarkReign3::OnEditorUseGameCamera()
     {
-        fanAssert( mGameCameraHandle != 0 );
-        mWorld.GetSingleton<Scene>().SetMainCamera( mGameCameraHandle );
+        RTSCamera& rtsCamera = mWorld.GetSingleton<RTSCamera>();
+        fanAssert( rtsCamera.mCameraHandle != 0 );
+        mWorld.GetSingleton<Scene>().SetMainCamera( rtsCamera.mCameraHandle );
     }
 
     //==================================================================================================================================================================================================
@@ -114,6 +107,8 @@ namespace fan
         // load terrain
         static const int chunksPerFrame = System::GetBuildType() == System::BuildType::Release ? 16 : 1;
         VoxelTerrain::StepLoadTerrain( mWorld, chunksPerFrame );
+
+        RTSCamera::Update( mWorld, _delta );
 
         // update selection
         const SelectionStatus selectionStatus = Selection::SelectUnits( mWorld, _delta );
