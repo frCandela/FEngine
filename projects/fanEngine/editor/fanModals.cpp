@@ -274,6 +274,7 @@ namespace ImGui
                 if( fan::Path::IsFile( _path ) )
                 {
                     ImGui::CloseCurrentPopup();
+                    _path = fan::Path::MakeRelative( _path );
                     returnValue = true;
                 }
             }

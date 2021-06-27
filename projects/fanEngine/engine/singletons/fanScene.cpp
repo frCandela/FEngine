@@ -150,8 +150,8 @@ namespace fan
             Json& jSingletons = jScene["singletons"];
             unsigned nextIndex = 0;
             const std::vector<EcsSingletonInfo>& singletonsInfos = mWorld->GetVectorSingletonInfo();
-            std::string binarySavePath = Path::Directory(mPath) + Path::FileName(mPath);
-            for( const EcsSingletonInfo        & info : singletonsInfos )
+            std::string binarySavePath = Path::Directory( mPath ) + Path::FileName( mPath );
+            for( const EcsSingletonInfo& info : singletonsInfos )
             {
                 if( info.save != nullptr )
                 {
@@ -303,8 +303,8 @@ namespace fan
     //==================================================================================================================================================================================================
     void Scene::BuildResourceList( Resources& _resources, const Json& _json, Json& _outJson )
     {
-        std::vector<uint32_t> resourceGUIDs;
 
+        std::vector<uint32_t>   resourcesGuids;
         std::stack<const Json*> stack;
         stack.push( &_json );
         while( !stack.empty() )
@@ -318,7 +318,7 @@ namespace fan
                 const uint32_t guid = *jResourceIt;
                 if( guid != 0 )
                 {
-                    resourceGUIDs.push_back( guid );
+                    resourcesGuids.push_back( guid );
                 }
             }
 
@@ -333,12 +333,16 @@ namespace fan
         }
 
         Json& jResources = _outJson["resources"];
-        for( int i = 0; i < (int)resourceGUIDs.size(); i++ )
+        int           resourceIndex = 0;
+        for( uint32_t guid : resourcesGuids )
         {
-            const Resource* resource = _resources.Get( resourceGUIDs[i] ).mHandle->mResource;
-            if( !resource->mIsGenerated )
+            ResourcePtrData data = _resources.Get( guid );
+            if( !data.mHandle->mResource->mIsGenerated )
             {
-                Json& jResource = jResources[i];
+                fanAssert( data.mHandle != nullptr );
+                const Resource* resource = data.mHandle->mResource;
+                fanAssert( !Path::IsAbsolute( resource->mPath ) );
+                Json& jResource = jResources[resourceIndex++];
                 jResource["type"] = resource->mType;
                 jResource["path"] = resource->mPath;
             }
@@ -403,7 +407,7 @@ namespace fan
                         info->load( singleton, jSingleton_i );
                         if( info->loadBinary != nullptr )
                         {
-                            info->loadBinary(singleton, binaryLoadPath.c_str());
+                            info->loadBinary( singleton, binaryLoadPath.c_str() );
                         }
                     }
                     else

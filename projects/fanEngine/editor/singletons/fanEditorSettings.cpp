@@ -49,6 +49,16 @@
 #include "editor/gui/network/fanGuiLinkingContextUnregisterer.hpp"
 #include "editor/gui/network/fanGuiReliabilityLayer.hpp"
 
+//UI
+#include "editor/gui/ui/fanGuiUIAlign.hpp"
+#include "editor/gui/ui/fanGuiUIButton.hpp"
+#include "editor/gui/ui/fanGuiUILayout.hpp"
+#include "editor/gui/ui/fanGuiUIProgressBar.hpp"
+#include "editor/gui/ui/fanGuiUIRenderer.hpp"
+#include "editor/gui/ui/fanGuiUIText.hpp"
+#include "editor/gui/ui/fanGuiUITransform.hpp"
+#include "editor/gui/ui/fanGuiUIScaler.hpp"
+
 // ENGINE
 #include "editor/gui/singletons/fanGuiApplication.hpp"
 #include "editor/gui/singletons/fanGuiMouse.hpp"
@@ -57,15 +67,6 @@
 #include "editor/gui/singletons/fanGuiScene.hpp"
 #include "editor/gui/singletons/fanGuiScenePointers.hpp"
 #include "editor/gui/singletons/fanGuiVoxelTerrain.hpp"
-
-#include "editor/gui/ui/fanGuiUIAlign.hpp"
-#include "editor/gui/ui/fanGuiUIButton.hpp"
-#include "editor/gui/ui/fanGuiUILayout.hpp"
-#include "editor/gui/ui/fanGuiUIProgressBar.hpp"
-#include "editor/gui/ui/fanGuiUIRenderer.hpp"
-#include "editor/gui/ui/fanGuiUIText.hpp"
-#include "editor/gui/ui/fanGuiUITransform.hpp"
-
 #include "editor/gui/components/fanGuiBounds.hpp"
 #include "editor/gui/components/fanGuiCamera.hpp"
 #include "editor/gui/components/fanGuiDirectionalLight.hpp"
@@ -314,6 +315,7 @@ namespace fan
         _componentInfos[UIRenderer::Info::sType]    = GuiUIRenderer::GetInfo();
         _componentInfos[UIText::Info::sType]        = GuiUIText::GetInfo();
         _componentInfos[UITransform::Info::sType]   = GuiUITransform::GetInfo();
+        _componentInfos[UIScaler::Info::sType]      = GuiUIScaler::GetInfo();
 
         _componentInfos[Bounds::Info::sType]              = GuiBounds::GetInfo();
         _componentInfos[Camera::Info::sType]              = GuiCamera::GetInfo();

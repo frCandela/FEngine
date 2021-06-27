@@ -27,9 +27,7 @@ namespace fan
             ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() + 16 );
 
             ImGui::Combo( "corner", (int*)&align.mCorner, "TopLeft\0TopRight\0BottomLeft\0BottomRight\0\0" );
-            ImGui::Combo( "direction",
-                          (int*)&align.mDirection,
-                          "Horizontal\0Vertical\0HorizontalVertical\0\0" );
+            ImGui::Combo( "direction", (int*)&align.mDirection, "Horizontal\0Vertical\0HorizontalVertical\0\0" );
             ImGui::Combo( "unit type", (int*)&align.mUnitType, "Ratio\0Pixels\0\0" );
             ImGui::PopItemWidth();
 

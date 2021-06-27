@@ -17,7 +17,7 @@ namespace fan
     {
         UILayout& layout = static_cast<UILayout&>( _component );
         layout.mType = Type::Vertical;
-        layout.mGap  = 10;
+        layout.mGap  = {0,0};
     }
 
     //==================================================================================================================================================================================================
@@ -26,7 +26,7 @@ namespace fan
     {
         const UILayout& layout = static_cast<const UILayout&>( _component );
         Serializable::SaveInt( _json, "type", (int)layout.mType );
-        Serializable::SaveInt( _json, "gap", layout.mGap );
+        Serializable::SaveInt2( _json, "gap", layout.mGap );
     }
 
     //==================================================================================================================================================================================================
@@ -34,10 +34,7 @@ namespace fan
     void UILayout::Load( EcsComponent& _component, const Json& _json )
     {
         UILayout& layout = static_cast<UILayout&>( _component );
-        int layoutType;
-        Serializable::LoadInt( _json, "type", layoutType );
-        Serializable::LoadInt( _json, "gap", layout.mGap );
-
-        layout.mType = Type( layoutType );
+        Serializable::LoadInt( _json, "type", (int&)layout.mType );
+        Serializable::LoadInt2( _json, "gap", layout.mGap );
     }
 }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ecs/fanEcsComponent.hpp"
+#include "fanGlm.hpp"
 
 namespace fan
 {
@@ -20,10 +21,10 @@ namespace fan
 
         enum Type : int
         {
-            Horizontal, Vertical
+            Horizontal, Vertical, Grid, FilledGrid
         };
 
-        Type mType;
-        int  mGap;
+        Type       mType;
+        glm::ivec2 mGap;
     };
 }

@@ -51,6 +51,7 @@
 #include "engine/ui/fanUILayout.hpp"
 #include "engine/ui/fanUIAlign.hpp"
 #include "engine/ui/fanUIText.hpp"
+#include "engine/ui/fanUIScaler.hpp"
 
 // network client
 #include "network/components/fanReliabilityLayer.hpp"
@@ -322,6 +323,7 @@ namespace fan
         _world.AddComponentType<UILayout>();
         _world.AddComponentType<UIAlign>();
         _world.AddComponentType<UIText>();
+        _world.AddComponentType<UIScaler>();
 
         _world.AddTagType<TagUIModified>();
         _world.AddTagType<TagEnabled>();

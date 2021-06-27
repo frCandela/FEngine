@@ -255,7 +255,7 @@ namespace fan
         // load prefab popup
         if( loadPrefabPopup )
         {
-            mPathBuffer = Path::Normalize( "/" );
+            mPathBuffer = Path::Normalize( RenderGlobal::sPrefabsPath );
             ImGui::OpenPopup( "import_prefab" );
         }
         ImportPrefabModal( _world );

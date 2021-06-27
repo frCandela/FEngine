@@ -1,5 +1,6 @@
 #include "core/resources/fanResources.hpp"
 #include "core/fanDebug.hpp"
+#include "core/fanPath.hpp"
 
 namespace fan
 {
@@ -27,6 +28,7 @@ namespace fan
     //==================================================================================================================================================================================================
     ResourcePtrData Resources::GetOrLoad( const uint32_t _type, const std::string& _path )
     {
+        fanAssert( !Path::IsAbsolute( _path ) );
         ResourcePtrData resourcePtrData;
         resourcePtrData.mGUID   = DSID( _path.c_str() );
         resourcePtrData.mHandle = GetOrLoadInternal( _type, _path );
@@ -58,6 +60,7 @@ namespace fan
     //==================================================================================================================================================================================================
     ResourceHandle* Resources::AddInternal( const uint32_t _type, Resource* _resource, const std::string& _path )
     {
+        fanAssert( !Path::IsAbsolute( _path ) );
         _resource->mGUID = DSID( _path.c_str() );
 
         // Create resource handle
@@ -113,6 +116,7 @@ namespace fan
     //==================================================================================================================================================================================================
     ResourceHandle* Resources::GetOrLoadInternal( const uint32_t _type, const std::string& _path )
     {
+        fanAssert( !Path::IsAbsolute( _path ) );
         ResourceHandle* handle = GetInternal( DSID( _path.c_str() ) );
         if( handle == nullptr )
         {
