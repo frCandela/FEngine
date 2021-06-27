@@ -16,7 +16,8 @@ namespace fan
     void UIScaler::Init( EcsWorld& /*_world*/, EcsEntity /*_entity*/, EcsComponent& _component )
     {
         UIScaler& scaler = static_cast<UIScaler&>( _component );
-        scaler.mScaleDirection = HorizontalVertical;
+        scaler.mScaleDirection  = HorizontalVertical;
+        scaler.mAdditionalScale = { 0, 0 };
     }
 
     //==================================================================================================================================================================================================
@@ -25,6 +26,7 @@ namespace fan
     {
         const UIScaler& scaler = static_cast<const UIScaler&>( _component );
         Serializable::SaveInt( _json, "scale_direction", scaler.mScaleDirection );
+        Serializable::SaveInt2( _json, "add_scale", scaler.mAdditionalScale );
     }
 
     //==================================================================================================================================================================================================
@@ -33,5 +35,6 @@ namespace fan
     {
         UIScaler& scaler = static_cast<UIScaler&>( _component );
         Serializable::LoadInt( _json, "scale_direction", (int&)scaler.mScaleDirection );
+        Serializable::LoadInt2( _json, "add_scale", scaler.mAdditionalScale );
     }
 }

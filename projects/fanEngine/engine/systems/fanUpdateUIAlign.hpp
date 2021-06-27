@@ -116,13 +116,13 @@ namespace fan
                     switch( scaler.mScaleDirection )
                     {
                         case UIScaler::Horizontal:
-                            childTransform.mSize.x = parentTransform.mSize.x;
+                            childTransform.mSize.x = parentTransform.mSize.x + scaler.mAdditionalScale.x;
                             break;
                         case UIScaler::Vertical:
-                            childTransform.mSize.y = parentTransform.mSize.y;
+                            childTransform.mSize.y = parentTransform.mSize.y + scaler.mAdditionalScale.y;
                             break;
                         case UIScaler::HorizontalVertical:
-                            childTransform.mSize = parentTransform.mSize;
+                            childTransform.mSize = parentTransform.mSize + scaler.mAdditionalScale;
                             break;
                         default:
                             fanAssert( false );

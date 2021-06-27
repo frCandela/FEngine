@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ecs/fanEcsComponent.hpp"
+#include "fanGlm.hpp"
 
 namespace fan
 {
@@ -21,5 +22,6 @@ namespace fan
         };
 
         ScaleDirection mScaleDirection;
+        glm::ivec2     mAdditionalScale;
     };
 }

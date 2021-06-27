@@ -26,6 +26,7 @@ namespace fan
             ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() + 16 );
             ImGui::Combo( "scale direction", (int*)&scaler.mScaleDirection, "Horizontal\0Vertical\0HorizontalVertical\0\0" );
             ImGui::FanToolTip( "Copies the scale of its parent" );
+            ImGui::DragInt2( "add scale", &scaler.mAdditionalScale.x, 1, 0 );
             ImGui::PopItemWidth();
         }
     };

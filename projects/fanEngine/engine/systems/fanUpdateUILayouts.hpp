@@ -42,23 +42,22 @@ namespace fan
                     if( childTransform != nullptr )
                     {
                         totalSize += childTransform->mSize;
-                        maxSize.x = std::max( childTransform->mSize.x, maxSize.x );
-                        maxSize.y = std::max( childTransform->mSize.y, maxSize.y );
+                        maxSize = glm::max( childTransform->mSize, maxSize );
                         transforms.push_back( childTransform );
                     }
                 }
                 if( transforms.empty() ){ continue; }
 
-                if( layout.mType == UILayout::Grid || layout.mType == UILayout::FilledGrid )
+                if( layout.mType == UILayout::Grid )
                 {
                     glm::ivec2 gridSize = layout.mGap;
 
                     // resize elements to same size
-                    if( layout.mType == UILayout::FilledGrid && transforms.size() == 9 )
+                    if( layout.mFill && transforms.size() == 9 )
                     {
                         gridSize = { 3, 3 };
                         const UITransform& transformTL = *transforms[0 * gridSize.x + 0];
-                        UITransform& transformMM = *transforms[1 * gridSize.x + 1];
+                        UITransform      & transformMM = *transforms[1 * gridSize.x + 1];
                         transformMM.mSize = parentTransform.mSize - 2 * transformTL.mSize;
 
                         UITransform& transformTR = *transforms[0 * gridSize.x + 2];
@@ -118,7 +117,7 @@ namespace fan
                             maxHeight = std::max( maxHeight, transform.mSize.y );
                         }
 
-                        // set horizontal positions
+                        // set vertical positions
                         for( int x = 0; x < gridSize.x; ++x )
                         {
                             const int index = y * gridSize.x + x;
@@ -132,10 +131,33 @@ namespace fan
                 }
                 else
                 {
+                    if( layout.mFill && transforms.size() == 3 )
+                    {
+                        transforms[transforms.size() - 1]->mSize = transforms[0]->mSize;
+                        const glm::ivec2 sizeToFill = parentTransform.mSize - 2 * transforms[0]->mSize;
+                        int a = sizeToFill.x;
+                        int b = sizeToFill.y;
+                        (void)a;(void)b;
+                        switch( layout.mType )
+                        {
+                            case UILayout::Horizontal:
+                                transforms[1]->mSize.x = sizeToFill.x;
+                                parentTransform.mSize.y = maxSize.y;
+                                break;
+                            case UILayout::Vertical:
+                                transforms[1]->mSize.y = sizeToFill.y;
+                                parentTransform.mSize.x = maxSize.x;
+                                break;
+                            default:
+                                fanAssert( false );
+                                break;
+                        }
+                    }
+
                     // calculates gap size
                     const bool isAutoGap = ( layout.mGap.x < 0 );
                     glm::ivec2 gap;
-                    if( isAutoGap ) // auto gap
+                    if( isAutoGap || layout.mFill ) // auto gap
                     {
                         gap = ( parentTransform.mSize - totalSize );
                         gap /= ( transforms.size() + 1 );
@@ -147,8 +169,7 @@ namespace fan
                     }
 
                     const glm::ivec2 totalInternalGapSize = ( int( transforms.size() ) - 1 ) * gap;
-                    const glm::ivec2 externalGapSize      = ( ( parentTransform.mSize - totalSize ) -
-                                                              totalInternalGapSize ) / 2;
+                    const glm::ivec2 externalGapSize      = ( ( parentTransform.mSize - totalSize ) - totalInternalGapSize ) / 2;
 
                     // calculate the position of the first child in the layout
                     glm::ivec2 origin = parentTransform.mPosition;
@@ -185,32 +206,22 @@ namespace fan
                         }
                     }
 
-                    if( !isAutoGap )
+                    if( !isAutoGap && !layout.mFill )
                     {
-                        // calculates the origin & bounds of the layout
+                        // set the size of the parent to fit the layout size
                         const glm::ivec2 maxExternalGap = ( parentTransform.mSize - maxSize ) / 2;
-                        glm::ivec2       layoutPosition;
-                        glm::ivec2       layoutSize;
                         switch( layout.mType )
                         {
                             case UILayout::Horizontal:
-                                layoutPosition = parentTransform.mPosition + glm::ivec2( externalGapSize.x, maxExternalGap.y );
-                                layoutSize     = glm::ivec2( totalSize.x + totalInternalGapSize.x, maxSize.y );
+                                parentTransform.mSize = glm::ivec2( totalSize.x + totalInternalGapSize.x, maxSize.y );
                                 break;
                             case UILayout::Vertical:
-                                layoutPosition = parentTransform.mPosition + glm::ivec2( maxExternalGap.x, externalGapSize.y );
-                                layoutSize     = glm::ivec2( maxSize.x, totalSize.y + totalInternalGapSize.y );
+                                parentTransform.mSize = glm::ivec2( maxSize.x, totalSize.y + totalInternalGapSize.y );
                                 break;
                             default:
-                                layoutPosition = { 0, 0 };
-                                layoutSize     = { 0, 0 };
                                 fanAssert( false );
                                 break;
                         }
-
-                        // set the size & position of the parent to fit the layout bounds
-                        parentTransform.mPosition = layoutPosition;
-                        parentTransform.mSize     = layoutSize;
                     }
                 }
             }

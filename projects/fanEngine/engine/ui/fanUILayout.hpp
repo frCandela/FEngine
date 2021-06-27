@@ -21,10 +21,11 @@ namespace fan
 
         enum Type : int
         {
-            Horizontal, Vertical, Grid, FilledGrid
+            Horizontal, Vertical, Grid
         };
 
         Type       mType;
         glm::ivec2 mGap;
+        bool       mFill;
     };
 }

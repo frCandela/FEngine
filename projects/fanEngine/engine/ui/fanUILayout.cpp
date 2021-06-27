@@ -17,7 +17,8 @@ namespace fan
     {
         UILayout& layout = static_cast<UILayout&>( _component );
         layout.mType = Type::Vertical;
-        layout.mGap  = {0,0};
+        layout.mGap  = { 0, 0 };
+        layout.mFill = false;
     }
 
     //==================================================================================================================================================================================================
@@ -27,6 +28,7 @@ namespace fan
         const UILayout& layout = static_cast<const UILayout&>( _component );
         Serializable::SaveInt( _json, "type", (int)layout.mType );
         Serializable::SaveInt2( _json, "gap", layout.mGap );
+        Serializable::SaveBool( _json, "fill", layout.mFill );
     }
 
     //==================================================================================================================================================================================================
@@ -36,5 +38,6 @@ namespace fan
         UILayout& layout = static_cast<UILayout&>( _component );
         Serializable::LoadInt( _json, "type", (int&)layout.mType );
         Serializable::LoadInt2( _json, "gap", layout.mGap );
+        Serializable::LoadBool( _json, "fill", layout.mFill );
     }
 }
