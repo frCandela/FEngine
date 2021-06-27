@@ -22,13 +22,13 @@
 #include "engine/terrain/fanVoxelTerrain.hpp"
 #include "engine/components/fanCamera.hpp"
 
-
 #include "game/components/fanUnit.hpp"
 #include "game/components/fanAnimScale.hpp"
 #include "game/components/fanTerrainAgent.hpp"
 #include "game/units/fanJudas.hpp"
 #include "game/singletons/fanSelection.hpp"
 #include "game/singletons/fanRTSCamera.hpp"
+#include "game/singletons/fanPauseMenu.hpp"
 #include "game/systems/fanUpdateSelection.hpp"
 #include "game/systems/fanUpdateAnimScale.hpp"
 #include "game/systems/fanUpdateAgents.hpp"
@@ -39,6 +39,7 @@
 #include "editor/singletons/fanEditorSettings.hpp"
 #include "editor/fanGuiSelection.hpp"
 #include "editor/fanGuiRTSCamera.hpp"
+#include "editor/fanGuiPauseMenu.hpp"
 #include "editor/fanGuiUnit.hpp"
 #include "editor/fanGuiAnimScale.hpp"
 #include "editor/fanGuiTerrainAgent.hpp"
@@ -59,17 +60,19 @@ namespace fan
         mWorld.AddComponentType<Judas>();
         mWorld.AddSingletonType<Selection>();
         mWorld.AddSingletonType<RTSCamera>();
+        mWorld.AddSingletonType<PauseMenu>();
         mWorld.AddTagType<TagSelected>();
         mWorld.AddTagType<TagEnemy>();
 
 #ifdef FAN_EDITOR
         EditorSettings& settings = mWorld.GetSingleton<EditorSettings>();
-        settings.mSingletonInfos[Selection::Info::sType] = GuiSelection::GetInfo();
-        settings.mSingletonInfos[RTSCamera::Info::sType] = GuiRTSCamera::GetInfo();
-        settings.mComponentInfos[Unit::Info::sType]      = GuiUnit::GetInfo();
-        settings.mComponentInfos[AnimScale::Info::sType] = GuiAnimScale::GetInfo();
+        settings.mSingletonInfos[Selection::Info::sType]    = GuiSelection::GetInfo();
+        settings.mSingletonInfos[RTSCamera::Info::sType]    = GuiRTSCamera::GetInfo();
+        settings.mSingletonInfos[PauseMenu::Info::sType]    = GuiPauseMenu::GetInfo();
+        settings.mComponentInfos[Unit::Info::sType]         = GuiUnit::GetInfo();
+        settings.mComponentInfos[AnimScale::Info::sType]    = GuiAnimScale::GetInfo();
         settings.mComponentInfos[TerrainAgent::Info::sType] = GuiTerrainAgent::GetInfo();
-        settings.mComponentInfos[Judas::Info::sType] = GuiJudas::GetInfo();
+        settings.mComponentInfos[Judas::Info::sType]        = GuiJudas::GetInfo();
 #endif
 
         mCursors.Load( *mWorld.GetSingleton<Application>().mResources );
@@ -112,7 +115,7 @@ namespace fan
 
         // update selection
         const SelectionStatus selectionStatus = Selection::SelectUnits( mWorld, _delta );
-        mWorld.Run<SMoveAgents>(_delta);
+        mWorld.Run<SMoveAgents>( _delta );
 
         // set cursor
         Application& app = mWorld.GetSingleton<Application>();
@@ -132,6 +135,7 @@ namespace fan
         mWorld.ForceRun<SPlaceSelectionFrames>( _delta );
         mWorld.Run<SUpdateUIText>();
         mWorld.Run<SAlignUI>();
+        mWorld.Run<SUpdateScalers>();
         mWorld.Run<SUpdateUILayouts>();
         mWorld.Run<SHoverButtons>();
         mWorld.Run<SHighlightButtons>();
@@ -166,24 +170,6 @@ namespace fan
     {
         if( ImGui::Begin( "testoss" ) )
         {
-            if( ImGui::Button( "tag enemy" ) )
-            {
-                EcsView view   = mWorld.Match<SClearSelection>();
-                auto    unitIt = view.begin<Unit>();
-                for( ; unitIt != view.end<Unit>(); ++unitIt )
-                {
-                    mWorld.AddTag<TagEnemy>( unitIt.GetEntity() );
-                }
-            }
-            if( ImGui::Button( "tag terrain" ) )
-            {
-                EcsView view   = mWorld.Match<SClearSelection>();
-                auto    unitIt = view.begin<Unit>();
-                for( ; unitIt != view.end<Unit>(); ++unitIt )
-                {
-                    mWorld.AddTag<TagTerrain>( unitIt.GetEntity() );
-                }
-            }
         }
         ImGui::End();
     }

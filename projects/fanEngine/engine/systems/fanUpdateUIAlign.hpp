@@ -1,6 +1,7 @@
 #include "ecs/fanEcsSystem.hpp"
 #include "engine/ui/fanUITransform.hpp"
 #include "engine/ui/fanUIAlign.hpp"
+#include "engine/ui/fanUIScaler.hpp"
 #include "engine/singletons/fanRenderWorld.hpp"
 
 namespace fan
@@ -70,9 +71,7 @@ namespace fan
                 }
 
                 // offset the position
-                glm::vec2 offsetMultiplier = align.mUnitType == UIAlign::UnitType::Ratio ?
-                        glm::vec2( pSize - cSize ) :
-                        glm::vec2( 1.f, 1.f );
+                glm::vec2 offsetMultiplier = align.mUnitType == UIAlign::UnitType::Ratio ? glm::vec2( pSize - cSize ) : glm::vec2( 1.f, 1.f );
                 switch( align.mDirection )
                 {
                     case UIAlign::Horizontal:
@@ -84,6 +83,51 @@ namespace fan
                     case UIAlign::HorizontalVertical:
                         cPos += glm::ivec2( align.mOffset * offsetMultiplier );
                         break;
+                }
+            }
+        }
+    };
+
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    struct SUpdateScalers : EcsSystem
+    {
+        static EcsSignature GetSignature( const EcsWorld& _world )
+        {
+            return _world.GetSignature<UITransform>() |
+                   _world.GetSignature<UIScaler>() |
+                   _world.GetSignature<SceneNode>();
+        }
+
+        static void Run( EcsWorld& _world, const EcsView& _view )
+        {
+            auto sceneNodeIt   = _view.begin<SceneNode>();
+            auto transformUIIt = _view.begin<UITransform>();
+            auto scalerIt      = _view.begin<UIScaler>();
+            for( ; sceneNodeIt != _view.end<SceneNode>(); ++transformUIIt, ++sceneNodeIt, ++scalerIt )
+            {
+                SceneNode& sceneNode = *sceneNodeIt;
+                const EcsEntity parentEntity = _world.GetEntity( sceneNode.mParentHandle );
+                if( _world.HasComponent<UITransform>( parentEntity ) )
+                {
+                    const UITransform parentTransform = _world.GetComponent<UITransform>( parentEntity );
+                    UITransform& childTransform = *transformUIIt;
+                    UIScaler   & scaler         = *scalerIt;
+                    switch( scaler.mScaleDirection )
+                    {
+                        case UIScaler::Horizontal:
+                            childTransform.mSize.x = parentTransform.mSize.x;
+                            break;
+                        case UIScaler::Vertical:
+                            childTransform.mSize.y = parentTransform.mSize.y;
+                            break;
+                        case UIScaler::HorizontalVertical:
+                            childTransform.mSize = parentTransform.mSize;
+                            break;
+                        default:
+                            fanAssert( false );
+                            break;
+                    }
                 }
             }
         }

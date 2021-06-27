@@ -73,6 +73,7 @@ namespace fan
         // ui
         mWorld.Run<SUpdateUIText>();
         mWorld.Run<SAlignUI>();
+        mWorld.Run<SUpdateScalers>();
         mWorld.Run<SUpdateUILayouts>();
         mWorld.Run<SHoverButtons>();
         mWorld.Run<SHighlightButtons>();
