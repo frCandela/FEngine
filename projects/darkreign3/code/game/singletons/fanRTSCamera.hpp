@@ -21,9 +21,10 @@ namespace fan
         static void Update( EcsWorld& _world, const Fixed _delta );
 
         EcsHandle mCameraHandle;
-        Fixed mMaxHeight;
-        Fixed mMinHeight;
-        Fixed mZoomSpeed;
-        Fixed mTranslationSpeed;
+        Fixed     mMaxHeight;
+        Fixed     mMinHeight;
+        Fixed     mZoomSpeed;
+        Fixed     mTranslationSpeed;    // units per second
+        Fixed     mRotationSpeed;       // degrees per second
     };
 }

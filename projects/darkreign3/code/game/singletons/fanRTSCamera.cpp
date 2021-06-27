@@ -1,9 +1,11 @@
 #include "game/singletons/fanRTSCamera.hpp"
+#include "core/fanDebug.hpp"
 #include "core/input/fanKeyboard.hpp"
 #include "engine/fanEngineSerializable.hpp"
 #include "engine/physics/fanTransform.hpp"
 #include "engine/components/fanCamera.hpp"
 #include "engine/components/fanSceneNode.hpp"
+#include "engine/singletons/fanRenderWorld.hpp"
 #include "engine/singletons/fanScene.hpp"
 #include "engine/singletons/fanMouse.hpp"
 #include "ecs/fanEcsWorld.hpp"
@@ -28,6 +30,7 @@ namespace fan
         rtsCamera.mCameraHandle     = 0;
         rtsCamera.mZoomSpeed        = 500;
         rtsCamera.mTranslationSpeed = 50;
+        rtsCamera.mRotationSpeed    = 30;
     }
 
     //==================================================================================================================================================================================================
@@ -77,14 +80,32 @@ namespace fan
                 }
             }
 
-            // pan with arrows
-            Vector3 horizontalForward = transform.Forward();
-            horizontalForward.y = 0;
-            horizontalForward.Normalize();
-            const Fixed xAxis = Keyboard::IsKeyDown( Keyboard::LEFT ) ? 1 : Keyboard::IsKeyDown( Keyboard::RIGHT ) ? -1 : 0;
-            const Fixed yAxis = Keyboard::IsKeyDown( Keyboard::UP ) ? 1 : Keyboard::IsKeyDown( Keyboard::DOWN ) ? -1 : 0;
-            transform.mPosition += _delta * rtsCamera.mTranslationSpeed * xAxis * transform.Left();
-            transform.mPosition += _delta * rtsCamera.mTranslationSpeed * yAxis * horizontalForward;
+            // rotate with middle mouse
+            if( mouse.mDown[Mouse::buttonMiddle] )
+            {
+                const Fixed rotation = _delta * rtsCamera.mRotationSpeed * Fixed::FromFloat( mouse.mPositionDelta.x );
+                transform.mRotation = Quaternion::AngleAxis( rotation, Vector3::sUp ) * transform.mRotation;
+            }
+            else
+            {
+                // move with arrows
+                Vector3 horizontalForward = transform.Forward();
+                horizontalForward.y = 0;
+                horizontalForward.Normalize();
+                Fixed xAxis = Keyboard::IsKeyDown( Keyboard::LEFT ) ? 1 : Keyboard::IsKeyDown( Keyboard::RIGHT ) ? -1 : 0;
+                Fixed yAxis = Keyboard::IsKeyDown( Keyboard::UP ) ? 1 : Keyboard::IsKeyDown( Keyboard::DOWN ) ? -1 : 0;
+
+                // move with mouse
+                const int pixelSize = 10;
+                if( xAxis == 0 && yAxis == 0 )
+                {
+                    xAxis = mouse.mLocalPosition.x < pixelSize ? 1 : mouse.mLocalPosition.x > mouse.mScreenSize.x - pixelSize ? -1 : 0;
+                    yAxis = mouse.mLocalPosition.y < pixelSize ? 1 : mouse.mLocalPosition.y > mouse.mScreenSize.y - pixelSize ? -1 : 0;
+                }
+
+                transform.mPosition += _delta * rtsCamera.mTranslationSpeed * xAxis * transform.Left();
+                transform.mPosition += _delta * rtsCamera.mTranslationSpeed * yAxis * horizontalForward;
+            }
         }
     }
 
