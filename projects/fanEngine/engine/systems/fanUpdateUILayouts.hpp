@@ -5,6 +5,7 @@
 
 namespace fan
 {
+
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
     struct SUpdateUILayouts : EcsSystem
@@ -25,27 +26,22 @@ namespace fan
             std::vector<UITransform*> transforms;
             for( ; layoutIt != _view.end<UILayout>(); ++layoutIt, ++transformUIIt, ++sceneNodeIt )
             {
-
                 UILayout   & layout          = *layoutIt;
                 UITransform& parentTransform = *transformUIIt;
                 SceneNode  & sceneNode       = *sceneNodeIt;
 
                 // collects child transforms
                 fanAssert( sceneNode.mParentHandle != 0 );
-                glm::ivec2 totalSize( 0, 0 );
-                glm::ivec2 maxSize( 0, 0 );
                 transforms.clear();
                 for( EcsHandle child : sceneNode.mChilds )
                 {
-                    EcsEntity childEntity = _world.GetEntity( child );
-                    UITransform* childTransform = _world.SafeGetComponent<UITransform>( childEntity );
+                    UITransform* childTransform = _world.SafeGetComponent<UITransform>( _world.GetEntity( child ) );
                     if( childTransform != nullptr )
                     {
-                        totalSize += childTransform->mSize;
-                        maxSize = glm::max( childTransform->mSize, maxSize );
                         transforms.push_back( childTransform );
                     }
                 }
+
                 if( transforms.empty() ){ continue; }
 
                 if( layout.mType == UILayout::Grid )
@@ -56,96 +52,27 @@ namespace fan
                     if( layout.mFill && transforms.size() == 9 )
                     {
                         gridSize = { 3, 3 };
-                        const UITransform& transformTL = *transforms[0 * gridSize.x + 0];
-                        UITransform      & transformMM = *transforms[1 * gridSize.x + 1];
-                        transformMM.mSize = parentTransform.mSize - 2 * transformTL.mSize;
-
-                        UITransform& transformTR = *transforms[0 * gridSize.x + 2];
-                        UITransform& transformBL = *transforms[2 * gridSize.x + 0];
-                        UITransform& transformBR = *transforms[2 * gridSize.x + 2];
-                        transformTR.mSize = transformTL.mSize;
-                        transformBL.mSize = transformTL.mSize;
-                        transformBR.mSize = transformTL.mSize;
-
-                        UITransform& transformTM = *transforms[0 * gridSize.x + 1];
-                        UITransform& transformBM = *transforms[2 * gridSize.x + 1];
-                        transformTM.mSize = { transformMM.mSize.x, transformTL.mSize.y };
-                        transformBM.mSize = { transformMM.mSize.x, transformTL.mSize.y };
-
-                        UITransform& transformML = *transforms[1 * gridSize.x + 0];
-                        UITransform& transformMR = *transforms[1 * gridSize.x + 2];
-                        transformML.mSize = { transformTL.mSize.x, transformMM.mSize.y };
-                        transformMR.mSize = { transformTL.mSize.x, transformMM.mSize.y };
+                        RescaleGridToFillParent( gridSize, parentTransform, transforms );
                     }
 
-                    // set horizontal positions
-                    int      xOffset = 0;
-                    for( int x       = 0; x < gridSize.x; ++x )
-                    {
-                        // find max width
-                        int      maxWidth = 0;
-                        for( int y        = 0; y < gridSize.y; ++y )
-                        {
-                            const int index = y * gridSize.x + x;
-                            if( index >= (int)transforms.size() ){ continue; }
-                            const UITransform& transform = *transforms[index];
-                            maxWidth = std::max( maxWidth, transform.mSize.x );
-                        }
+                    const int totalWidth  = SetHorizontalPositionsForGrid( gridSize, parentTransform, transforms );
+                    const int totalHeight = SetVerticalPositionsForGrid( gridSize, parentTransform, transforms );
 
-                        // set horizontal positions
-                        for( int y = 0; y < gridSize.y; ++y )
-                        {
-                            const int index = y * gridSize.x + x;
-                            if( index >= (int)transforms.size() ){ continue; }
-                            UITransform& transform = *transforms[index];
-                            transform.mPosition.x = parentTransform.mPosition.x + xOffset + ( maxWidth - transform.mSize.x ) / 2;
-                        }
-                        xOffset += maxWidth;
-                    }
-
-                    // set vertical positions
-                    int      yOffset = 0;
-                    for( int y       = 0; y < gridSize.y; ++y )
-                    {
-                        // find max width
-                        int      maxHeight = 0;
-                        for( int x         = 0; x < gridSize.x; ++x )
-                        {
-                            const int index = y * gridSize.x + x;
-                            if( index >= (int)transforms.size() ){ continue; }
-                            const UITransform& transform = *transforms[index];
-                            maxHeight = std::max( maxHeight, transform.mSize.y );
-                        }
-
-                        // set vertical positions
-                        for( int x = 0; x < gridSize.x; ++x )
-                        {
-                            const int index = y * gridSize.x + x;
-                            if( index >= (int)transforms.size() ){ continue; }
-                            UITransform& transform = *transforms[index];
-                            transform.mPosition.y = parentTransform.mPosition.y + yOffset + ( maxHeight - transform.mSize.y ) / 2;
-                        }
-                        yOffset += maxHeight;
-                    }
-                    parentTransform.mSize = { xOffset, yOffset };
+                    parentTransform.mSize = { totalWidth, totalHeight };
                 }
                 else
                 {
+                    const glm::ivec2 maxSize   = CalculateMaxSize( transforms );
+                    const glm::ivec2 totalSize = CalculateTotalSize( transforms );
                     if( layout.mFill && transforms.size() == 3 )
                     {
-                        transforms[transforms.size() - 1]->mSize = transforms[0]->mSize;
-                        const glm::ivec2 sizeToFill = parentTransform.mSize - 2 * transforms[0]->mSize;
-                        int a = sizeToFill.x;
-                        int b = sizeToFill.y;
-                        (void)a;(void)b;
-                        switch( layout.mType )
+                        RescaleLayoutToFillParent( layout.mType, parentTransform, transforms );
+                        switch( layout.mType ) // rescale the other axis of the parent to fit the childs
                         {
                             case UILayout::Horizontal:
-                                transforms[1]->mSize.x = sizeToFill.x;
                                 parentTransform.mSize.y = maxSize.y;
                                 break;
                             case UILayout::Vertical:
-                                transforms[1]->mSize.y = sizeToFill.y;
                                 parentTransform.mSize.x = maxSize.x;
                                 break;
                             default:
@@ -157,7 +84,7 @@ namespace fan
                     // calculates gap size
                     const bool isAutoGap = ( layout.mGap.x < 0 );
                     glm::ivec2 gap;
-                    if( isAutoGap || layout.mFill ) // auto gap
+                    if( isAutoGap || layout.mFill )
                     {
                         gap = ( parentTransform.mSize - totalSize );
                         gap /= ( transforms.size() + 1 );
@@ -171,44 +98,36 @@ namespace fan
                     const glm::ivec2 totalInternalGapSize = ( int( transforms.size() ) - 1 ) * gap;
                     const glm::ivec2 externalGapSize      = ( ( parentTransform.mSize - totalSize ) - totalInternalGapSize ) / 2;
 
-                    // calculate the position of the first child in the layout
+                    // Aligns all transforms on both axis
                     glm::ivec2 origin = parentTransform.mPosition;
                     switch( layout.mType )
                     {
                         case UILayout::Horizontal:
-                            origin.x += externalGapSize.x;
+                            origin.x += externalGapSize.x; // calculate the position of the first child in the layout
+                            for( UITransform* transform : transforms )
+                            {
+                                transform->mPosition = origin;
+                                origin.x += transform->mSize.x + gap.x;
+                                transform->mPosition.y += ( parentTransform.mSize.y - transform->mSize.y ) / 2;
+                            }
                             break;
                         case UILayout::Vertical:
-                            origin.y += externalGapSize.y;
+                            origin.y += externalGapSize.y; // calculate the position of the first child in the layout
+                            for( UITransform* transform : transforms ) // aligns all transforms on both axis
+                            {
+                                transform->mPosition = origin;
+                                origin.y += transform->mSize.y + gap.y;
+                                transform->mPosition.x += ( parentTransform.mSize.x - transform->mSize.x ) / 2;
+                            }
                             break;
                         default:
                             fanAssert( false );
                             break;
                     }
 
-                    // aligns all transforms on the other axis
-                    for( UITransform* transform : transforms )
-                    {
-                        transform->mPosition = origin;
-                        switch( layout.mType )
-                        {
-                            case UILayout::Horizontal:
-                                origin.x += transform->mSize.x + gap.x;
-                                transform->mPosition.y += ( parentTransform.mSize.y - transform->mSize.y ) / 2;
-                                break;
-                            case UILayout::Vertical:
-                                origin.y += transform->mSize.y + gap.y;
-                                transform->mPosition.x += ( parentTransform.mSize.x - transform->mSize.x ) / 2;
-                                break;
-                            default:
-                                fanAssert( false );
-                                break;
-                        }
-                    }
-
+                    // set the size of the parent to fit the layout size
                     if( !isAutoGap && !layout.mFill )
                     {
-                        // set the size of the parent to fit the layout size
                         const glm::ivec2 maxExternalGap = ( parentTransform.mSize - maxSize ) / 2;
                         switch( layout.mType )
                         {
@@ -225,6 +144,139 @@ namespace fan
                     }
                 }
             }
+        }
+
+    private:
+        //==============================================================================================================================================================================================
+        //==============================================================================================================================================================================================
+        static void RescaleGridToFillParent( const glm::ivec2& _gridSize, const UITransform& _parentTransform, std::vector<UITransform*>& _transforms )
+        {
+            const UITransform& transformTL = *_transforms[0 * _gridSize.x + 0];
+            UITransform      & transformMM = *_transforms[1 * _gridSize.x + 1];
+            transformMM.mSize = _parentTransform.mSize - 2 * transformTL.mSize;
+
+            UITransform& transformTR = *_transforms[0 * _gridSize.x + 2];
+            UITransform& transformBL = *_transforms[2 * _gridSize.x + 0];
+            UITransform& transformBR = *_transforms[2 * _gridSize.x + 2];
+            transformTR.mSize = transformTL.mSize;
+            transformBL.mSize = transformTL.mSize;
+            transformBR.mSize = transformTL.mSize;
+
+            UITransform& transformTM = *_transforms[0 * _gridSize.x + 1];
+            UITransform& transformBM = *_transforms[2 * _gridSize.x + 1];
+            transformTM.mSize = { transformMM.mSize.x, transformTL.mSize.y };
+            transformBM.mSize = { transformMM.mSize.x, transformTL.mSize.y };
+
+            UITransform& transformML = *_transforms[1 * _gridSize.x + 0];
+            UITransform& transformMR = *_transforms[1 * _gridSize.x + 2];
+            transformML.mSize = { transformTL.mSize.x, transformMM.mSize.y };
+            transformMR.mSize = { transformTL.mSize.x, transformMM.mSize.y };
+        }
+
+        //==============================================================================================================================================================================================
+        //==============================================================================================================================================================================================
+        static int SetHorizontalPositionsForGrid( const glm::ivec2& _gridSize, const UITransform& _parentTransform, std::vector<UITransform*>& _transforms )
+        {
+            // set horizontal positions
+            int      xOffset = 0;
+            for( int x       = 0; x < _gridSize.x; ++x )
+            {
+                // find max width
+                int      maxWidth = 0;
+                for( int y        = 0; y < _gridSize.y; ++y )
+                {
+                    const int index = y * _gridSize.x + x;
+                    if( index >= (int)_transforms.size() ){ continue; }
+                    const UITransform& transform = *_transforms[index];
+                    maxWidth = std::max( maxWidth, transform.mSize.x );
+                }
+
+                // set horizontal positions
+                for( int y = 0; y < _gridSize.y; ++y )
+                {
+                    const int index = y * _gridSize.x + x;
+                    if( index >= (int)_transforms.size() ){ continue; }
+                    UITransform& transform = *_transforms[index];
+                    transform.mPosition.x = _parentTransform.mPosition.x + xOffset + ( maxWidth - transform.mSize.x ) / 2;
+                }
+                xOffset += maxWidth;
+            }
+            return xOffset;
+        }
+
+        //==============================================================================================================================================================================================
+        //==============================================================================================================================================================================================
+        static int SetVerticalPositionsForGrid( const glm::ivec2& _gridSize, const UITransform& _parentTransform, std::vector<UITransform*>& _transforms )
+        {
+            // set vertical positions
+            int      yOffset = 0;
+            for( int y       = 0; y < _gridSize.y; ++y )
+            {
+                // find max width
+                int      maxHeight = 0;
+                for( int x         = 0; x < _gridSize.x; ++x )
+                {
+                    const int index = y * _gridSize.x + x;
+                    if( index >= (int)_transforms.size() ){ continue; }
+                    const UITransform& transform = *_transforms[index];
+                    maxHeight = std::max( maxHeight, transform.mSize.y );
+                }
+
+                // set vertical positions
+                for( int x = 0; x < _gridSize.x; ++x )
+                {
+                    const int index = y * _gridSize.x + x;
+                    if( index >= (int)_transforms.size() ){ continue; }
+                    UITransform& transform = *_transforms[index];
+                    transform.mPosition.y = _parentTransform.mPosition.y + yOffset + ( maxHeight - transform.mSize.y ) / 2;
+                }
+                yOffset += maxHeight;
+            }
+            return yOffset;
+        }
+
+        //==================================================================================================================================================================================================
+        //==================================================================================================================================================================================================
+        static void RescaleLayoutToFillParent( const UILayout::Type _type, const UITransform& _parentTransform, std::vector<UITransform*>& _transforms )
+        {
+            _transforms[_transforms.size() - 1]->mSize = _transforms[0]->mSize;
+            const glm::ivec2 sizeToFill                = _parentTransform.mSize - 2 * _transforms[0]->mSize;
+            switch( _type )
+            {
+                case UILayout::Horizontal:
+                    _transforms[1]->mSize.x = sizeToFill.x;
+                    break;
+                case UILayout::Vertical:
+                    _transforms[1]->mSize.y = sizeToFill.y;
+                    break;
+                default:
+                    fanAssert( false );
+                    break;
+            }
+        }
+
+        //==================================================================================================================================================================================================
+        //==================================================================================================================================================================================================
+        static glm::ivec2 CalculateMaxSize( const std::vector<UITransform*>& _transforms )
+        {
+            glm::ivec2 maxSize = _transforms[0]->mSize;
+            for( int   i       = 1; i < (int)_transforms.size(); ++i )
+            {
+                maxSize = glm::max( _transforms[i]->mSize, maxSize );
+            }
+            return maxSize;
+        }
+
+        //==================================================================================================================================================================================================
+        //==================================================================================================================================================================================================
+        static glm::ivec2 CalculateTotalSize( const std::vector<UITransform*>& _transforms )
+        {
+            glm::ivec2 totalSize = _transforms[0]->mSize;
+            for( int   i         = 1; i < (int)_transforms.size(); ++i )
+            {
+                totalSize += _transforms[i]->mSize;
+            }
+            return totalSize;
         }
     };
 }
