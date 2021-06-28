@@ -1,4 +1,5 @@
 #include "ecs/fanEcsSystem.hpp"
+#include "ecs/fanEcsWorld.hpp"
 #include "engine/components/fanAnimator.hpp"
 #include "engine/components/fanSkinnedMeshRenderer.hpp"
 #include <stack>
@@ -11,8 +12,7 @@ namespace fan
     {
         static EcsSignature GetSignature( const EcsWorld& _world )
         {
-            return _world.GetSignature<Animator>() |
-                   _world.GetSignature<SkinnedMeshRenderer>();
+            return _world.GetSignature<Animator>() |                   _world.GetSignature<SkinnedMeshRenderer>();
         }
 
         static void Run( EcsWorld&, const EcsView& _view, const Fixed _delta )

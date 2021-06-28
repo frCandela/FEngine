@@ -116,10 +116,8 @@ namespace fan
         _settings.mWindow_size.y         = std::atoi( _args[3].c_str() );
         _settings.mForceWindowDimensions = true;
 
-        std::cout << "cmd : window position(" << _settings.mWindow_position.x
-                << "," << _settings.mWindow_position.y << ")";
-        std::cout << ", size(" << _settings.mWindow_size.x
-                << "," << _settings.mWindow_size.y << ")" << std::endl;
+        std::cout << "cmd : window position(" << _settings.mWindow_position.x << "," << _settings.mWindow_position.y << ")";
+        std::cout << ", size(" << _settings.mWindow_size.x << "," << _settings.mWindow_size.y << ")" << std::endl;
         return true;
     }
 
@@ -127,8 +125,7 @@ namespace fan
     // command: -autoplay <0-1>"
     // if a scene is loaded at startup, plays it directly
     //==================================================================================================================================================================================================
-    bool LaunchArgs::CMD_AutoPlay( const std::vector<std::string>& _args,
-                                   LaunchSettings& _settings )
+    bool LaunchArgs::CMD_AutoPlay( const std::vector<std::string>& _args, LaunchSettings& _settings )
     {
         if( _args.size() != 1 ){ return false; }
 

@@ -1,15 +1,27 @@
+#include "editor/fanEditorPlayer.hpp"
 
-#include <engine/systems/fanUpdateBounds.hpp>
 #include "core/input/fanInputManager.hpp"
 #include "core/input/fanInput.hpp"
-
 #include "network/singletons/fanTime.hpp"
 
+#include "engine/game/fanIGame.hpp"
 #include "engine/components/fanPointLight.hpp"
 #include "engine/components/fanDirectionalLight.hpp"
-#include "engine/game/fanIGame.hpp"
+#include "engine/physics/fanUpdateRigidbodies.hpp"
+#include "engine/physics/fanDetectCollisions.hpp"
+#include "engine/singletons/fanRenderWorld.hpp"
+#include "engine/singletons/fanApplication.hpp"
 #include "engine/systems/fanUpdateTransforms.hpp"
 #include "engine/systems/fanDrawDebug.hpp"
+#include "engine/systems/fanUpdateAnimators.hpp"
+#include "engine/systems/fanUpdateUIText.hpp"
+#include "engine/systems/fanUpdateUILayouts.hpp"
+#include "engine/systems/fanUpdateUIAlign.hpp"
+#include "engine/systems/fanUpdateBounds.hpp"
+#include "engine/systems/fanUpdateTimers.hpp"
+#include "engine/systems/fanUpdateParticles.hpp"
+#include "engine/systems/fanEmitParticles.hpp"
+#include "engine/systems/fanGenerateParticles.hpp"
 
 #include "editor/windows/fanPreferencesWindow.hpp"
 #include "editor/windows/fanUnitsTestsWindow.hpp"
@@ -24,14 +36,11 @@
 #include "editor/windows/fanTerrainWindow.hpp"
 
 #include "editor/singletons/fanEditorMainMenuBar.hpp"
-#include "editor/fanEditorPlayer.hpp"
 #include "editor/singletons/fanEditorSelection.hpp"
 #include "editor/singletons/fanEditorCopyPaste.hpp"
 #include "editor/singletons/fanEditorGizmos.hpp"
 #include "editor/singletons/fanEditorCamera.hpp"
 #include "editor/singletons/fanEditorGrid.hpp"
-#include "engine/singletons/fanRenderWorld.hpp"
-#include "engine/singletons/fanApplication.hpp"
 #include "editor/singletons/fanEditorPlayState.hpp"
 
 namespace fan
@@ -201,18 +210,43 @@ namespace fan
                 time.mLastLogicTime += time.mLogicDelta.ToDouble();
                 time.mFrameIndex++;
 
-                world.GetSingleton<RenderDebug>().Clear();
 
                 const EditorPlayState& playState = world.GetSingleton<EditorPlayState>();
                 const Fixed delta = playState.mState == EditorPlayState::PLAYING ? time.mLogicDelta : 0;
-                game.Step( delta );
+
+                world.GetSingleton<RenderDebug>().Clear();
+
+                game.PreStep( delta );
+
+                // physics & transforms
+                world.Run<SIntegrateRigidbodies>( delta );
+                world.Run<SDetectCollisions>( delta );
+                world.Run<SMoveFollowTransforms>();
 
                 // bounds
-                world.Run<SMoveFollowTransforms>();
                 world.Run<SUpdateBoundsFromFxBoxColliders>();
                 world.Run<SUpdateBoundsFromFxSphereColliders>();
                 world.Run<SUpdateBoundsFromModel>();
                 world.Run<SUpdateBoundsFromTransform>();
+
+                game.Step( delta );
+
+                // animation
+                world.Run<SUpdateAnimators>( delta );
+
+                // ui
+                world.Run<SUpdateUIText>();
+                world.Run<SUpdateScalers>();
+                world.Run<SAlignUI>();
+                world.Run<SUpdateUILayouts>();
+                world.Run<SHoverButtons>();
+                world.Run<SHighlightButtons>();
+
+                // gameplay
+                world.Run<SUpdateExpirationTimes>( delta.ToFloat() );
+                world.Run<SUpdateParticles>( delta.ToFloat() );
+                world.Run<SEmitParticles>( delta.ToFloat() );
+                world.Run<SGenerateParticles>( delta.ToFloat() );
 
                 world.ApplyTransitions();
 

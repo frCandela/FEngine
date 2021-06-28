@@ -371,12 +371,14 @@ namespace fan
     bool Scene::LoadFrom( const std::string _path )
     {
         Clear();
-        std::ifstream inStream( _path );
-        if( inStream.is_open() && inStream.good() )
+        std::ifstream inStream( Path::Normalize( _path ) );
+        if( inStream.is_open() )
         {
+            fanAssert( inStream.good() );
             // Load scene
             Json sceneJson;
             inStream >> sceneJson;
+            inStream.close();
 
             // scene global parameters
             const Json& jScene = sceneJson["scene"];
@@ -424,7 +426,6 @@ namespace fan
             mRootNodeHandle = rootNode.mHandle;
 
             mPath = _path;
-            inStream.close();
             const EcsHandle maxHandle = RFindMaximumHandle( rootNode ) + 1;
             mWorld->SetNextHandle( maxHandle );
 

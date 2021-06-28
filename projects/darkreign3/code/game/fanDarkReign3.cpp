@@ -6,12 +6,9 @@
 #include "engine/singletons/fanRenderDebug.hpp"
 #include "engine/physics/fanUpdateRigidbodies.hpp"
 #include "engine/systems/fanUpdateBounds.hpp"
-#include "engine/systems/fanUpdateUIText.hpp"
-#include "engine/systems/fanRaycastUI.hpp"
-#include "engine/systems/fanUpdateUILayouts.hpp"
-#include "engine/systems/fanUpdateUIAlign.hpp"
 #include "engine/systems/fanUpdateTransforms.hpp"
 #include "engine/singletons/fanScene.hpp"
+#include "engine/singletons/fanApplication.hpp"
 #include "engine/systems/fanUpdateTimers.hpp"
 #include "engine/systems/fanUpdateParticles.hpp"
 #include "engine/systems/fanEmitParticles.hpp"
@@ -103,11 +100,17 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
+    void DarkReign3::PreStep( const Fixed _delta )
+    {
+        (void)_delta;
+    };
+
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
     void DarkReign3::Step( const Fixed _delta )
     {
         SCOPED_PROFILE( step );
 
-        // load terrain
         static const int chunksPerFrame = System::GetBuildType() == System::BuildType::Release ? 16 : 1;
         VoxelTerrain::StepLoadTerrain( mWorld, chunksPerFrame );
 
@@ -122,29 +125,11 @@ namespace fan
         const DR3Cursor currentCursor = DR3Cursors::GetCurrentCursor( _delta, mWorld.GetSingleton<Time>(), selectionStatus );
         app.mCurrentCursor = currentCursor == DR3Cursor::Count ? nullptr : mCursors.mCursors[currentCursor];
 
-        // physics & transforms
-        mWorld.Run<SIntegrateRigidbodies>( _delta );
-        mWorld.Run<SDetectCollisions>( _delta );
-        mWorld.Run<SMoveFollowTransforms>();
-
         mWorld.Run<SUpdateJudasAnimation>();
-        mWorld.Run<SUpdateAnimators>( _delta );
 
         // ui
         mWorld.Run<SUpdateAnimScale>( _delta );
         mWorld.ForceRun<SPlaceSelectionFrames>( _delta );
-        mWorld.Run<SUpdateUIText>();
-        mWorld.Run<SAlignUI>();
-        mWorld.Run<SUpdateScalers>();
-        mWorld.Run<SUpdateUILayouts>();
-        mWorld.Run<SHoverButtons>();
-        mWorld.Run<SHighlightButtons>();
-
-        // gameplay
-        mWorld.Run<SUpdateExpirationTimes>( _delta.ToFloat() );
-        mWorld.Run<SUpdateParticles>( _delta.ToFloat() );
-        mWorld.Run<SEmitParticles>( _delta.ToFloat() );
-        mWorld.Run<SGenerateParticles>( _delta.ToFloat() );
     }
 
     //==================================================================================================================================================================================================

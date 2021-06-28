@@ -4,13 +4,24 @@
 #include "core/time/fanProfiler.hpp"
 #include "core/input/fanInput.hpp"
 #include "network/singletons/fanTime.hpp"
-#include "engine/systems/fanUpdateBounds.hpp"
-#include "engine/systems/fanUpdateTransforms.hpp"
-#include "engine/systems/fanUpdateRenderWorld.hpp"
 #include "engine/singletons/fanApplication.hpp"
 #include "engine/singletons/fanScene.hpp"
 #include "engine/singletons/fanRenderDebug.hpp"
 #include "engine/game/fanIGame.hpp"
+#include "engine/systems/fanEmitParticles.hpp"
+#include "engine/physics/fanUpdateRigidbodies.hpp"
+#include "engine/physics/fanDetectCollisions.hpp"
+#include "engine/systems/fanUpdateAnimators.hpp"
+#include "engine/systems/fanUpdateTimers.hpp"
+#include "engine/systems/fanUpdateParticles.hpp"
+#include "engine/systems/fanGenerateParticles.hpp"
+#include "engine/systems/fanUpdateBounds.hpp"
+#include "engine/systems/fanUpdateTransforms.hpp"
+#include "engine/systems/fanUpdateRenderWorld.hpp"
+#include "engine/systems/fanUpdateUIText.hpp"
+#include "engine/systems/fanUpdateUILayouts.hpp"
+#include "engine/systems/fanUpdateUIAlign.hpp"
+#include "engine/systems/fanRaycastUI.hpp"
 
 namespace fan
 {
@@ -33,6 +44,9 @@ namespace fan
         Application& app = world.GetSingleton<Application>();
         app.mOnQuit.Connect( &GamePlayer::Exit, this );
 
+        mGame.Init();
+        world.PostInitSingletons();
+
         // load scene
         Scene& scene = world.GetSingleton<Scene>();
         scene.New();
@@ -41,8 +55,6 @@ namespace fan
             scene.LoadFrom( _settings.mLoadScene );
         }
 
-        mGame.Init();
-        world.PostInitSingletons();
         mGame.Start();
     }
 
@@ -85,13 +97,37 @@ namespace fan
 
             world.GetSingleton<RenderDebug>().Clear();
 
-            mGame.Step( time.mLogicDelta );
+            mGame.PreStep( time.mLogicDelta );
 
+            // physics & transforms
+            world.Run<SIntegrateRigidbodies>( time.mLogicDelta );
+            world.Run<SDetectCollisions>( time.mLogicDelta );
             world.Run<SMoveFollowTransforms>();
+
+            // bounds
             world.Run<SUpdateBoundsFromFxSphereColliders>();
             world.Run<SUpdateBoundsFromFxBoxColliders>();
             world.Run<SUpdateBoundsFromModel>();
             world.Run<SUpdateBoundsFromTransform>();
+
+            mGame.Step( time.mLogicDelta );
+
+            // animation
+            world.Run<SUpdateAnimators>( time.mLogicDelta );
+
+            // ui
+            world.Run<SUpdateUIText>();
+            world.Run<SUpdateScalers>();
+            world.Run<SAlignUI>();
+            world.Run<SUpdateUILayouts>();
+            world.Run<SHoverButtons>();
+            world.Run<SHighlightButtons>();
+
+            // gameplay
+            world.Run<SUpdateExpirationTimes>( time.mLogicDelta.ToFloat() );
+            world.Run<SUpdateParticles>( time.mLogicDelta.ToFloat() );
+            world.Run<SEmitParticles>( time.mLogicDelta.ToFloat() );
+            world.Run<SGenerateParticles>( time.mLogicDelta.ToFloat() );
 
             world.ApplyTransitions();
 

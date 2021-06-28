@@ -68,21 +68,7 @@ namespace fan
     void GameEmpty::Step( const Fixed _delta )
     {
         SCOPED_PROFILE( step );
-        mWorld.Run<SMoveFollowTransforms>();
-
-        // ui
-        mWorld.Run<SUpdateUIText>();
-        mWorld.Run<SAlignUI>();
-        mWorld.Run<SUpdateScalers>();
-        mWorld.Run<SUpdateUILayouts>();
-        mWorld.Run<SHoverButtons>();
-        mWorld.Run<SHighlightButtons>();
-
-        // gameplay
-        mWorld.Run<SUpdateExpirationTimes>( _delta.ToFloat() );
-        mWorld.Run<SUpdateParticles>( _delta.ToFloat() );
-        mWorld.Run<SEmitParticles>( _delta.ToFloat() );
-        mWorld.Run<SGenerateParticles>( _delta.ToFloat() );
+        (void)_delta;
     }
 
     //==================================================================================================================================================================================================

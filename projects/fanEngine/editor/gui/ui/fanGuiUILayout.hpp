@@ -25,20 +25,19 @@ namespace fan
             UILayout& layout = static_cast<UILayout&>( _component );
             ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() + 16 );
             ImGui::Combo( "type", (int*)&layout.mType, "horizontal\0vertical\0grid\0\0" );
-
+            ImGui::Checkbox( "fill", &layout.mFill );
+            ImGui::FanToolTip( "The center transforms are scaled so that the total size matches the size of the parent transform.Corners are kept at the same size." );
             if( layout.mType == UILayout::Grid )
             {
                 ImGui::DragInt2( "size", &layout.mGap.x, 1.f, 0, 10 );
             }
             else
             {
-                ImGui::DragInt( "gap", &layout.mGap.x, 1.f, -1, 100 );
+                if( !layout.mFill )
+                {
+                    ImGui::DragInt( "gap", &layout.mGap.x, 1.f, -1, 100 );
+                }
             }
-
-            ImGui::Checkbox( "fill", &layout.mFill );
-
-            ImGui::FanToolTip( "The center transforms are scaled so that the total size matches the size of the parent transform.Corners are kept at the same size." );
-
             ImGui::PopItemWidth();
         }
     };

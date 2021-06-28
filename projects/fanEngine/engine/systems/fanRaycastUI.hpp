@@ -1,3 +1,5 @@
+#pragma once
+
 #include "ecs/fanEcsSystem.hpp"
 #include "engine/ui/fanUIButton.hpp"
 #include "engine/ui/fanUITransform.hpp"
