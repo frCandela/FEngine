@@ -41,7 +41,7 @@ namespace fan
     void UIText::Save( const EcsComponent& _component, Json& _json )
     {
         const UIText& text = static_cast<const UIText&>( _component );
-        Serializable::SaveString( _json, "text", text.mText );
+        Serializable::SaveStr( _json, "text", text.mText );
         Serializable::SaveInt( _json, "size", text.mSize );
         Serializable::SaveResourcePtr( _json, "font", text.mFontPtr );
     }
@@ -51,7 +51,7 @@ namespace fan
     void UIText::Load( EcsComponent& _component, const Json& _json )
     {
         UIText& text = static_cast<UIText&>( _component );
-        Serializable::LoadString( _json, "text", text.mText );
+        Serializable::LoadStr( _json, "text", text.mText );
         Serializable::LoadInt( _json, "size", text.mSize );
         Serializable::LoadResourcePtr( _json, "font", text.mFontPtr );
     }

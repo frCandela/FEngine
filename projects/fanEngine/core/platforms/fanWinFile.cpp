@@ -39,13 +39,7 @@ namespace fan
                 break;
         }
 
-        mHandle = (size_t)CreateFileA( _path.c_str(),
-                                       readMode,
-                                       FILE_SHARE_WRITE | FILE_SHARE_READ,
-                                       &sa,
-                                       openMode,
-                                       FILE_ATTRIBUTE_NORMAL,
-                                       NULL );
+        mHandle = (size_t)CreateFileA( _path.c_str(), readMode, FILE_SHARE_WRITE | FILE_SHARE_READ, &sa, openMode, FILE_ATTRIBUTE_NORMAL, NULL );
     }
 
     //==================================================================================================================================================================================================

@@ -34,7 +34,7 @@ namespace fan
         void SaveUInt( Json& _json, const char* _name, const unsigned& _int );
         void SaveUInt64( Json& _json, const char* _name, const uint64_t& _uint64 );
         void SaveBool( Json& _json, const char* _name, const bool& _bool );
-        void SaveString( Json& _json, const char* _name, const std::string& _string );
+        void SaveStr( Json& _json, const char* _name, const std::string& _string );
 
         bool LoadIVec2( const Json& _json, const char* _name, glm::ivec2& _outVec2 );
         bool LoadVec2( const Json& _json, const char* _name, glm::vec2& _outVec2 );
@@ -50,7 +50,7 @@ namespace fan
         bool LoadUInt( const Json& _json, const char* _name, unsigned& _outUInt );
         bool LoadUInt64( const Json& _json, const char* _name, uint64_t& _outUInt64 );
         bool LoadBool( const Json& _json, const char* _name, bool& _outBool );
-        bool LoadString( const Json& _json, const char* _name, std::string& _outString );
+        bool LoadStr( const Json& _json, const char* _name, std::string& _outString );
 
         void SaveResourcePtr( Json& _json, const char* _name, const ResourcePtrData& _ptrData );
         bool LoadResourcePtr( const Json& _json, const char* _name, ResourcePtrData& _outPtrData );

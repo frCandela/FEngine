@@ -1,6 +1,7 @@
 #include "core/fanDebug.hpp"
 
 #include <iostream>
+#include "fanWindowsH.hpp"
 #include "glfw/glfw3.h"
 #include "core/fanBits.hpp"
 

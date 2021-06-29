@@ -1,6 +1,7 @@
 #include "core/input/fanInput.hpp"
 #include "core/input/fanKeyboard.hpp"
 #include "core/input/fanInputManager.hpp"
+#include "glfw/glfw3.h"
 
 namespace fan
 {

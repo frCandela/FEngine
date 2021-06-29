@@ -144,7 +144,7 @@ namespace fan
 
             // scene global parameters
             Json& jScene = json["scene"];
-            Serializable::SaveString( jScene, "path", Path::MakeRelative( mPath ) );
+            Serializable::SaveStr( jScene, "path", Path::MakeRelative( mPath ) );
 
             // save singleton components
             Json& jSingletons = jScene["singletons"];
@@ -157,7 +157,7 @@ namespace fan
                 {
                     Json& jSingleton_i = jSingletons[nextIndex++];
                     Serializable::SaveUInt( jSingleton_i, "singleton_id", info.mType );
-                    Serializable::SaveString( jSingleton_i, "singleton", info.mName );
+                    Serializable::SaveStr( jSingleton_i, "singleton", info.mName );
                     EcsSingleton& singleton = mWorld->GetSingleton( info.mType );
                     info.save( singleton, jSingleton_i );
                     if( info.saveBinary != nullptr )
@@ -189,7 +189,7 @@ namespace fan
     void Scene::RSaveToJson( const SceneNode& _node, Json& _json )
     {
         EcsWorld& world = *_node.mScene->mWorld;
-        Serializable::SaveString( _json, "name", _node.mName );
+        Serializable::SaveStr( _json, "name", _node.mName );
         Serializable::SaveUInt( _json, "handle", _node.mHandle );
 
         // save components
@@ -207,7 +207,7 @@ namespace fan
                 {
                     Json& jComponent_i = jComponents[nextIndex++];
                     Serializable::SaveUInt( jComponent_i, "component_type", info.mType );
-                    Serializable::SaveString( jComponent_i, "type_name", info.mName );
+                    Serializable::SaveStr( jComponent_i, "type_name", info.mName );
                     info.save( component, jComponent_i );
                 }
             }
@@ -383,7 +383,7 @@ namespace fan
             // scene global parameters
             const Json& jScene = sceneJson["scene"];
             {
-                Serializable::LoadString( jScene, "path", mPath );
+                Serializable::LoadStr( jScene, "path", mPath );
             }
 
             //resources
@@ -455,7 +455,7 @@ namespace fan
         EcsHandle nodeHandle;
         Serializable::LoadUInt( _json, "handle", nodeHandle );
         SceneNode& node = _scene.CreateSceneNode( "tmp", _parent, nodeHandle + _handleOffset );
-        Serializable::LoadString( _json, "name", node.mName );
+        Serializable::LoadStr( _json, "name", node.mName );
 
         // append id
         _scene.mNodes.insert( node.mHandle );

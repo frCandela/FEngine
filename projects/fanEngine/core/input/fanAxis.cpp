@@ -44,7 +44,7 @@ namespace fan
         {
             mType = Type( type );
 
-            Serializable::LoadString( _json, "name", mName );
+            Serializable::LoadStr( _json, "name", mName );
             Serializable::LoadBool( _json, "invert", mInvert );
 
             switch( mType )
@@ -77,7 +77,7 @@ namespace fan
     bool Axis::Save( Json& _json ) const
     {
         Serializable::SaveInt( _json, "type", mType );
-        Serializable::SaveString( _json, "name", mName );
+        Serializable::SaveStr( _json, "name", mName );
         Serializable::SaveBool( _json, "invert", mInvert );
 
         switch( mType )

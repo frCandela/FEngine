@@ -1,6 +1,5 @@
 #pragma once
 
-#include "glfw/glfw3.h"
 #include "core/fanSingleton.hpp"
 #include "core/fanSignal.hpp"
 
@@ -45,38 +44,38 @@ namespace fan
 
     public:
         //Joysticks
-        static const JoystickID JOYSTICK_ANY = GLFW_JOYSTICK_LAST + 1;
-        static const JoystickID NUM_JOYSTICK = GLFW_JOYSTICK_LAST + 1;
+        static const JoystickID JOYSTICK_ANY;
+        static const JoystickID NUM_JOYSTICK;
 
         // Button
-        static const Button BUTTON_NONE  = -1;
-        static const Button A            = GLFW_GAMEPAD_BUTTON_A;
-        static const Button B            = GLFW_GAMEPAD_BUTTON_B;
-        static const Button X            = GLFW_GAMEPAD_BUTTON_X;
-        static const Button Y            = GLFW_GAMEPAD_BUTTON_Y;
-        static const Button LEFT_BUMPER  = GLFW_GAMEPAD_BUTTON_LEFT_BUMPER;
-        static const Button RIGHT_BUMPER = GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER;
-        static const Button BACK         = GLFW_GAMEPAD_BUTTON_BACK;
-        static const Button START        = GLFW_GAMEPAD_BUTTON_START;
-        static const Button GUIDE        = GLFW_GAMEPAD_BUTTON_GUIDE;
-        static const Button LEFT_THUMB   = GLFW_GAMEPAD_BUTTON_LEFT_THUMB;
-        static const Button RIGHT_THUMB  = GLFW_GAMEPAD_BUTTON_RIGHT_THUMB;
-        static const Button DPAD_UP      = GLFW_GAMEPAD_BUTTON_DPAD_UP;
-        static const Button DPAD_RIGHT   = GLFW_GAMEPAD_BUTTON_DPAD_RIGHT;
-        static const Button DPAD_DOWN    = GLFW_GAMEPAD_BUTTON_DPAD_DOWN;
-        static const Button DPAD_LEFT    = GLFW_GAMEPAD_BUTTON_DPAD_LEFT;
-        static const char* sButtonsNames[GLFW_GAMEPAD_BUTTON_LAST + 1];
+        static const Button                      BUTTON_NONE;
+        static const Button                      A;
+        static const Button                      B;
+        static const Button                      X;
+        static const Button                      Y;
+        static const Button                      LEFT_BUMPER;
+        static const Button                      RIGHT_BUMPER;
+        static const Button                      BACK;
+        static const Button                      START;
+        static const Button                      GUIDE;
+        static const Button                      LEFT_THUMB;
+        static const Button                      RIGHT_THUMB;
+        static const Button                      DPAD_UP;
+        static const Button                      DPAD_RIGHT;
+        static const Button                      DPAD_DOWN;
+        static const Button                      DPAD_LEFT;
+        static const std::vector<const char*>    sButtonsNames;
         static const std::vector<Joystick::Axis> sAxesList;
 
         // Axis
-        static const Axis AXIS_NONE     = -1;
-        static const Axis LEFT_X        = GLFW_GAMEPAD_AXIS_LEFT_X;
-        static const Axis LEFT_Y        = GLFW_GAMEPAD_AXIS_LEFT_Y;
-        static const Axis RIGHT_X       = GLFW_GAMEPAD_AXIS_RIGHT_X;
-        static const Axis RIGHT_Y       = GLFW_GAMEPAD_AXIS_RIGHT_Y;
-        static const Axis LEFT_TRIGGER  = GLFW_GAMEPAD_AXIS_LEFT_TRIGGER;
-        static const Axis RIGHT_TRIGGER = GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER;
-        static const char* sAxisNames[GLFW_GAMEPAD_AXIS_LAST + 1];
+        static const Axis                          AXIS_NONE;
+        static const Axis                          LEFT_X;
+        static const Axis                          LEFT_Y;
+        static const Axis                          RIGHT_X;
+        static const Axis                          RIGHT_Y;
+        static const Axis                          LEFT_TRIGGER;
+        static const Axis                          RIGHT_TRIGGER;
+        static const std::vector<const char*>      sAxisNames;
         static const std::vector<Joystick::Button> sButtonsList;
     };
 }

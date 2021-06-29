@@ -39,11 +39,8 @@ namespace fan
         bool Save( Json& _json ) const;
 
         void SetFromKeyboardKeys( const Keyboard::Key _keyPositive, const Keyboard::Key _keyNegative );
-        void SetFromJoystickButtons( const Joystick::JoystickID _joystickID,
-                                     const Joystick::Button _buttonPositive,
-                                     const Joystick::Button _buttonNegative );
-        void SetFromJoystickAxis( const Joystick::JoystickID _joystickID,
-                                  const Joystick::Axis _joystickAxis );
+        void SetFromJoystickButtons( const Joystick::JoystickID _joystickID, const Joystick::Button _buttonPositive, const Joystick::Button _buttonNegative );
+        void SetFromJoystickAxis( const Joystick::JoystickID _joystickID, const Joystick::Axis _joystickAxis );
 
     private:
         bool        mInvert;

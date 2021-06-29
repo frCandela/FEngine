@@ -1,5 +1,7 @@
 #include "core/input/fanJoystick.hpp"
 #include "core/fanDebug.hpp"
+#include "fanWindowsH.hpp"
+#include "glfw/glfw3.h"
 
 namespace fan
 {
@@ -205,7 +207,7 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    const char* Joystick::sAxisNames[GLFW_GAMEPAD_AXIS_LAST + 1] =
+    const std::vector<const char*> Joystick::sAxisNames =
                       {
                               "LEFT_X         ",
                               "LEFT_Y         ",
@@ -215,7 +217,7 @@ namespace fan
                               "RIGHT_TRIGGER  ",
                       };
 
-    const char* Joystick::sButtonsNames[GLFW_GAMEPAD_BUTTON_LAST + 1] =
+    const std::vector<const char*> Joystick::sButtonsNames=
                       {
                               "A              ",
                               "B              ",
@@ -262,4 +264,34 @@ namespace fan
                                                         Joystick::DPAD_DOWN,
                                                         Joystick::DPAD_LEFT,
                                                 };
+
+    const Joystick::JoystickID Joystick::JOYSTICK_ANY = GLFW_JOYSTICK_LAST + 1;
+    const Joystick::JoystickID Joystick::NUM_JOYSTICK = GLFW_JOYSTICK_LAST + 1;
+
+    // Button
+    const Joystick::Button Joystick::BUTTON_NONE  = -1;
+    const Joystick::Button Joystick::A            = GLFW_GAMEPAD_BUTTON_A;
+    const Joystick::Button Joystick::B            = GLFW_GAMEPAD_BUTTON_B;
+    const Joystick::Button Joystick::X            = GLFW_GAMEPAD_BUTTON_X;
+    const Joystick::Button Joystick::Y            = GLFW_GAMEPAD_BUTTON_Y;
+    const Joystick::Button Joystick::LEFT_BUMPER  = GLFW_GAMEPAD_BUTTON_LEFT_BUMPER;
+    const Joystick::Button Joystick::RIGHT_BUMPER = GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER;
+    const Joystick::Button Joystick::BACK         = GLFW_GAMEPAD_BUTTON_BACK;
+    const Joystick::Button Joystick::START        = GLFW_GAMEPAD_BUTTON_START;
+    const Joystick::Button Joystick::GUIDE        = GLFW_GAMEPAD_BUTTON_GUIDE;
+    const Joystick::Button Joystick::LEFT_THUMB   = GLFW_GAMEPAD_BUTTON_LEFT_THUMB;
+    const Joystick::Button Joystick::RIGHT_THUMB  = GLFW_GAMEPAD_BUTTON_RIGHT_THUMB;
+    const Joystick::Button Joystick::DPAD_UP      = GLFW_GAMEPAD_BUTTON_DPAD_UP;
+    const Joystick::Button Joystick::DPAD_RIGHT   = GLFW_GAMEPAD_BUTTON_DPAD_RIGHT;
+    const Joystick::Button Joystick::DPAD_DOWN    = GLFW_GAMEPAD_BUTTON_DPAD_DOWN;
+    const Joystick::Button Joystick::DPAD_LEFT    = GLFW_GAMEPAD_BUTTON_DPAD_LEFT;
+
+    // Axis
+    const Joystick::Axis Joystick::AXIS_NONE     = -1;
+    const Joystick::Axis Joystick::LEFT_X        = GLFW_GAMEPAD_AXIS_LEFT_X;
+    const Joystick::Axis Joystick::LEFT_Y        = GLFW_GAMEPAD_AXIS_LEFT_Y;
+    const Joystick::Axis Joystick::RIGHT_X       = GLFW_GAMEPAD_AXIS_RIGHT_X;
+    const Joystick::Axis Joystick::RIGHT_Y       = GLFW_GAMEPAD_AXIS_RIGHT_Y;
+    const Joystick::Axis Joystick::LEFT_TRIGGER  = GLFW_GAMEPAD_AXIS_LEFT_TRIGGER;
+    const Joystick::Axis Joystick::RIGHT_TRIGGER = GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER;
 }

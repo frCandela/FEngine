@@ -56,7 +56,7 @@ namespace fan
         EditorSettingsData::LoadSettingsFromJson( mEditorSettings );
 
         // Creates keyboard events
-        Input::Get().Manager().CreateKeyboardEvent( "delete", Keyboard::DELETE );
+        Input::Get().Manager().CreateKeyboardEvent( "delete", Keyboard::DEL );
         Input::Get().Manager().CreateKeyboardEvent( "open_scene", Keyboard::O, Keyboard::LEFT_CONTROL );
         Input::Get().Manager().CreateKeyboardEvent( "save_scene", Keyboard::S, Keyboard::LEFT_CONTROL );
         Input::Get().Manager().CreateKeyboardEvent( "reload_scene", Keyboard::R, Keyboard::LEFT_CONTROL );

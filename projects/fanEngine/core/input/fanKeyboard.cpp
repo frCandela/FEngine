@@ -1,9 +1,13 @@
 #include "core/input/fanKeyboard.hpp"
 
 #include <cctype>
+#include "fanWindowsH.hpp"
+#include "glfw/glfw3.h"
 #include "imgui/imgui.h"
 #include "core/input/fanInput.hpp"
 #include "core/fanAssert.hpp"
+
+#undef max
 
 namespace fan
 {
@@ -11,6 +15,8 @@ namespace fan
     //==================================================================================================================================================================================================
     Keyboard::Keyboard()
     {
+        mKeysPressed.resize(GLFW_KEY_LAST + 1);
+        mKeysReleased.resize(GLFW_KEY_LAST + 1);
         fanAssert( mKeysPressed.size() == mKeysReleased.size() );
         const uint64_t max         = std::numeric_limits<uint64_t>::max();
         for( int       buttonIndex = 0; buttonIndex < (int)mKeysPressed.size(); buttonIndex++ )
@@ -88,11 +94,7 @@ namespace fan
     //==================================================================================================================================================================================================
     // Modifiers are not reliable across systems
     //==================================================================================================================================================================================================
-    void Keyboard::KeyCallback( GLFWwindow* /*_window*/,
-                                int _key,
-                                int /*_scancode*/,
-                                int _action, int
-                                /*_mods*/ )
+    void Keyboard::KeyCallback( GLFWwindow* /*_window*/, int _key, int /*_scancode*/, int _action, int                                /*_mods*/ )
     {
         if( _key == GLFW_KEY_UNKNOWN ){ return; }
 
@@ -140,7 +142,7 @@ namespace fan
         }
     }
 
-    const char* Keyboard::keyName[NONE + 1] = {
+    const std::vector<const char *> Keyboard::keyName = {
             "",
             "",
             "",
@@ -510,6 +512,128 @@ namespace fan
             "               "/*349*/
     };
 
+    const Keyboard::Key Keyboard::SPACE         = GLFW_KEY_SPACE;
+    const Keyboard::Key Keyboard::APOSTROPHE    = GLFW_KEY_APOSTROPHE;
+    const Keyboard::Key Keyboard::COMMA         = GLFW_KEY_COMMA;
+    const Keyboard::Key Keyboard::MINUS         = GLFW_KEY_MINUS;
+    const Keyboard::Key Keyboard::PERIOD        = GLFW_KEY_PERIOD;
+    const Keyboard::Key Keyboard::SLASH         = GLFW_KEY_SLASH;
+    const Keyboard::Key Keyboard::KEY0          = GLFW_KEY_0;
+    const Keyboard::Key Keyboard::KEY1          = GLFW_KEY_1;
+    const Keyboard::Key Keyboard::KEY2          = GLFW_KEY_2;
+    const Keyboard::Key Keyboard::KEY3          = GLFW_KEY_3;
+    const Keyboard::Key Keyboard::KEY4          = GLFW_KEY_4;
+    const Keyboard::Key Keyboard::KEY5          = GLFW_KEY_5;
+    const Keyboard::Key Keyboard::KEY6          = GLFW_KEY_6;
+    const Keyboard::Key Keyboard::KEY7          = GLFW_KEY_7;
+    const Keyboard::Key Keyboard::KEY8          = GLFW_KEY_8;
+    const Keyboard::Key Keyboard::KEY9          = GLFW_KEY_9;
+    const Keyboard::Key Keyboard::SEMICOLON     = GLFW_KEY_SEMICOLON;
+    const Keyboard::Key Keyboard::EQUAL         = GLFW_KEY_EQUAL;
+    const Keyboard::Key Keyboard::A             = GLFW_KEY_A;
+    const Keyboard::Key Keyboard::B             = GLFW_KEY_B;
+    const Keyboard::Key Keyboard::C             = GLFW_KEY_C;
+    const Keyboard::Key Keyboard::D             = GLFW_KEY_D;
+    const Keyboard::Key Keyboard::E             = GLFW_KEY_E;
+    const Keyboard::Key Keyboard::F             = GLFW_KEY_F;
+    const Keyboard::Key Keyboard::G             = GLFW_KEY_G;
+    const Keyboard::Key Keyboard::H             = GLFW_KEY_H;
+    const Keyboard::Key Keyboard::I             = GLFW_KEY_I;
+    const Keyboard::Key Keyboard::J             = GLFW_KEY_J;
+    const Keyboard::Key Keyboard::K             = GLFW_KEY_K;
+    const Keyboard::Key Keyboard::L             = GLFW_KEY_L;
+    const Keyboard::Key Keyboard::M             = GLFW_KEY_M;
+    const Keyboard::Key Keyboard::N             = GLFW_KEY_N;
+    const Keyboard::Key Keyboard::O             = GLFW_KEY_O;
+    const Keyboard::Key Keyboard::P             = GLFW_KEY_P;
+    const Keyboard::Key Keyboard::Q             = GLFW_KEY_Q;
+    const Keyboard::Key Keyboard::R             = GLFW_KEY_R;
+    const Keyboard::Key Keyboard::S             = GLFW_KEY_S;
+    const Keyboard::Key Keyboard::T             = GLFW_KEY_T;
+    const Keyboard::Key Keyboard::U             = GLFW_KEY_U;
+    const Keyboard::Key Keyboard::V             = GLFW_KEY_V;
+    const Keyboard::Key Keyboard::W             = GLFW_KEY_W;
+    const Keyboard::Key Keyboard::X             = GLFW_KEY_X;
+    const Keyboard::Key Keyboard::Y             = GLFW_KEY_Y;
+    const Keyboard::Key Keyboard::Z             = GLFW_KEY_Z;
+    const Keyboard::Key Keyboard::LEFT_BRACKET  = GLFW_KEY_LEFT_BRACKET;
+    const Keyboard::Key Keyboard::BACKSLASH     = GLFW_KEY_BACKSLASH;
+    const Keyboard::Key Keyboard::RIGHT_BRACKET = GLFW_KEY_RIGHT_BRACKET;
+    const Keyboard::Key Keyboard::GRAVE_ACCENT  = GLFW_KEY_GRAVE_ACCENT;
+    const Keyboard::Key Keyboard::WORLD_1       = GLFW_KEY_WORLD_1;
+    const Keyboard::Key Keyboard::WORLD_2       = GLFW_KEY_WORLD_2;
+    const Keyboard::Key Keyboard::ESCAPE        = GLFW_KEY_ESCAPE;
+    const Keyboard::Key Keyboard::ENTER         = GLFW_KEY_ENTER;
+    const Keyboard::Key Keyboard::TAB           = GLFW_KEY_TAB;
+    const Keyboard::Key Keyboard::BACKSPACE     = GLFW_KEY_BACKSPACE;
+    const Keyboard::Key Keyboard::INSERT        = GLFW_KEY_INSERT;
+    const Keyboard::Key Keyboard::DEL           = GLFW_KEY_DELETE;
+    const Keyboard::Key Keyboard::RIGHT         = GLFW_KEY_RIGHT;
+    const Keyboard::Key Keyboard::LEFT          = GLFW_KEY_LEFT;
+    const Keyboard::Key Keyboard::DOWN          = GLFW_KEY_DOWN;
+    const Keyboard::Key Keyboard::UP            = GLFW_KEY_UP;
+    const Keyboard::Key Keyboard::PAGE_UP       = GLFW_KEY_PAGE_UP;
+    const Keyboard::Key Keyboard::PAGE_DOWN     = GLFW_KEY_PAGE_DOWN;
+    const Keyboard::Key Keyboard::HOME          = GLFW_KEY_HOME;
+    const Keyboard::Key Keyboard::END           = GLFW_KEY_END;
+    const Keyboard::Key Keyboard::CAPS_LOCK     = GLFW_KEY_CAPS_LOCK;
+    const Keyboard::Key Keyboard::SCROLL_LOCK   = GLFW_KEY_SCROLL_LOCK;
+    const Keyboard::Key Keyboard::NUM_LOCK      = GLFW_KEY_NUM_LOCK;
+    const Keyboard::Key Keyboard::PRINT_SCREEN  = GLFW_KEY_PRINT_SCREEN;
+    const Keyboard::Key Keyboard::PAUSE         = GLFW_KEY_PAUSE;
+    const Keyboard::Key Keyboard::F1            = GLFW_KEY_F1;
+    const Keyboard::Key Keyboard::F2            = GLFW_KEY_F2;
+    const Keyboard::Key Keyboard::F3            = GLFW_KEY_F3;
+    const Keyboard::Key Keyboard::F4            = GLFW_KEY_F4;
+    const Keyboard::Key Keyboard::F5            = GLFW_KEY_F5;
+    const Keyboard::Key Keyboard::F6            = GLFW_KEY_F6;
+    const Keyboard::Key Keyboard::F7            = GLFW_KEY_F7;
+    const Keyboard::Key Keyboard::F8            = GLFW_KEY_F8;
+    const Keyboard::Key Keyboard::F9            = GLFW_KEY_F9;
+    const Keyboard::Key Keyboard::F10           = GLFW_KEY_F10;
+    const Keyboard::Key Keyboard::F11           = GLFW_KEY_F11;
+    const Keyboard::Key Keyboard::F12           = GLFW_KEY_F12;
+    const Keyboard::Key Keyboard::F13           = GLFW_KEY_F13;
+    const Keyboard::Key Keyboard::F14           = GLFW_KEY_F14;
+    const Keyboard::Key Keyboard::F15           = GLFW_KEY_F15;
+    const Keyboard::Key Keyboard::F16           = GLFW_KEY_F16;
+    const Keyboard::Key Keyboard::F17           = GLFW_KEY_F17;
+    const Keyboard::Key Keyboard::F18           = GLFW_KEY_F18;
+    const Keyboard::Key Keyboard::F19           = GLFW_KEY_F19;
+    const Keyboard::Key Keyboard::F20           = GLFW_KEY_F20;
+    const Keyboard::Key Keyboard::F21           = GLFW_KEY_F21;
+    const Keyboard::Key Keyboard::F22           = GLFW_KEY_F22;
+    const Keyboard::Key Keyboard::F23           = GLFW_KEY_F23;
+    const Keyboard::Key Keyboard::F24           = GLFW_KEY_F24;
+    const Keyboard::Key Keyboard::F25           = GLFW_KEY_F25;
+    const Keyboard::Key Keyboard::KP_0          = GLFW_KEY_KP_0;
+    const Keyboard::Key Keyboard::KP_1          = GLFW_KEY_KP_1;
+    const Keyboard::Key Keyboard::KP_2          = GLFW_KEY_KP_2;
+    const Keyboard::Key Keyboard::KP_3          = GLFW_KEY_KP_3;
+    const Keyboard::Key Keyboard::KP_4          = GLFW_KEY_KP_4;
+    const Keyboard::Key Keyboard::KP_5          = GLFW_KEY_KP_5;
+    const Keyboard::Key Keyboard::KP_6          = GLFW_KEY_KP_6;
+    const Keyboard::Key Keyboard::KP_7          = GLFW_KEY_KP_7;
+    const Keyboard::Key Keyboard::KP_8          = GLFW_KEY_KP_8;
+    const Keyboard::Key Keyboard::KP_9          = GLFW_KEY_KP_9;
+    const Keyboard::Key Keyboard::KP_DECIMAL    = GLFW_KEY_KP_DECIMAL;
+    const Keyboard::Key Keyboard::KP_DIVIDE     = GLFW_KEY_KP_DIVIDE;
+    const Keyboard::Key Keyboard::KP_MULTIPLY   = GLFW_KEY_KP_MULTIPLY;
+    const Keyboard::Key Keyboard::KP_SUBTRACT   = GLFW_KEY_KP_SUBTRACT;
+    const Keyboard::Key Keyboard::KP_ADD        = GLFW_KEY_KP_ADD;
+    const Keyboard::Key Keyboard::KP_ENTER      = GLFW_KEY_KP_ENTER;
+    const Keyboard::Key Keyboard::KP_EQUAL      = GLFW_KEY_KP_EQUAL;
+    const Keyboard::Key Keyboard::LEFT_SHIFT    = GLFW_KEY_LEFT_SHIFT;
+    const Keyboard::Key Keyboard::LEFT_CONTROL  = GLFW_KEY_LEFT_CONTROL;
+    const Keyboard::Key Keyboard::LEFT_ALT      = GLFW_KEY_LEFT_ALT;
+    const Keyboard::Key Keyboard::LEFT_SUPER    = GLFW_KEY_LEFT_SUPER;
+    const Keyboard::Key Keyboard::RIGHT_SHIFT   = GLFW_KEY_RIGHT_SHIFT;
+    const Keyboard::Key Keyboard::RIGHT_CONTROL = GLFW_KEY_RIGHT_CONTROL;
+    const Keyboard::Key Keyboard::RIGHT_ALT     = GLFW_KEY_RIGHT_ALT;
+    const Keyboard::Key Keyboard::RIGHT_SUPER   = GLFW_KEY_RIGHT_SUPER;
+    const Keyboard::Key Keyboard::MENU          = GLFW_KEY_MENU;
+    const Keyboard::Key Keyboard::NONE          = GLFW_KEY_MENU + 1;
+
     const std::vector<Keyboard::Key> Keyboard::s_keysList =
                                              { SPACE,
                                                APOSTROPHE,
@@ -566,7 +690,7 @@ namespace fan
                                                TAB,
                                                BACKSPACE,
                                                INSERT,
-                                               DELETE,
+                                               DEL,
                                                RIGHT,
                                                LEFT,
                                                DOWN,

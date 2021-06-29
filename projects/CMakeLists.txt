@@ -4,6 +4,7 @@ set(CMAKE_CXX_STANDARD 20)
 set(VULKAN_DIR C:/VulkanSDK/1.2.162.0)
 set(LIVEPP_DIR C:/LivePP)
 set(LIVEPP_ENABLE ON)
+set(FAN_ENABLE_UNITY_BUILD ON)
 
 link_directories("${VULKAN_DIR}/Lib")
 if (${CMAKE_BUILD_TYPE} MATCHES Debug)

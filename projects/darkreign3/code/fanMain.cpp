@@ -1,6 +1,5 @@
 #ifdef FAN_WIN32
 #include <windows.h>
-
 #endif
 
 #include "engine/game/fanLiveppLauncher.hpp"
@@ -10,7 +9,6 @@
 
 #ifdef FAN_EDITOR
     #include "editor/fanEditorPlayer.hpp"
-
 #else
     #include "engine/game/fanGamePlayer.hpp"
 #endif

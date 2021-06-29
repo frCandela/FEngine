@@ -13,3 +13,4 @@ set(LIBRARY_NAME fanEngine)
 
 add_library(${LIBRARY_NAME} STATIC ${FAN_ENGINE_SRC} ${FAN_ENGINE_H})
 target_link_libraries(${LIBRARY_NAME} ${FAN_ENGINE_LIBS})
+set_target_properties(${LIBRARY_NAME} PROPERTIES UNITY_BUILD ${FAN_ENABLE_UNITY_BUILD})

@@ -149,7 +149,7 @@ namespace fan
                 std::string   name;
                 KeyboardEvent keyEvent;
 
-                Serializable::LoadString( jEvent_i, "name", name );
+                Serializable::LoadStr( jEvent_i, "name", name );
                 Serializable::LoadInt( jEvent_i, "key", keyEvent.key );
                 Serializable::LoadInt( jEvent_i, "mod0", keyEvent.mod0 );
                 Serializable::LoadInt( jEvent_i, "mod1", keyEvent.mod1 );
@@ -189,7 +189,7 @@ namespace fan
             for( auto keyEvent : mKeyboardEvents )
             {
                 Json& jEvent_i = jEvents[index];
-                Serializable::SaveString( jEvent_i, "name", keyEvent.first );
+                Serializable::SaveStr( jEvent_i, "name", keyEvent.first );
                 Serializable::SaveInt( jEvent_i, "key", keyEvent.second.key );
                 Serializable::SaveInt( jEvent_i, "mod0", keyEvent.second.mod0 );
                 Serializable::SaveInt( jEvent_i, "mod1", keyEvent.second.mod1 );

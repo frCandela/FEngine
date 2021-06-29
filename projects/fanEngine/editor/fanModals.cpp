@@ -225,7 +225,7 @@ namespace ImGui
 
             // Cancel button
             ImGui::SameLine();
-            if( ImGui::Button( "Cancel" ) || ImGui::IsKeyPressed( GLFW_KEY_ESCAPE, false ) )
+            if( ImGui::Button( "Cancel" ) || ImGui::IsKeyPressed( fan::Keyboard::ESCAPE, false ) )
             {
                 ImGui::CloseCurrentPopup();
             }
@@ -269,7 +269,7 @@ namespace ImGui
             ImGui::Text( _path.c_str() );
             ImGui::Separator();
 
-            if( itemDoubleClicked == true || ImGui::Button( "Ok" ) || ImGui::IsKeyPressed( GLFW_KEY_ENTER, false ) )
+            if( itemDoubleClicked == true || ImGui::Button( "Ok" ) || ImGui::IsKeyPressed( fan::Keyboard::ENTER, false ) )
             {
                 if( fan::Path::IsFile( _path ) )
                 {
@@ -279,7 +279,7 @@ namespace ImGui
                 }
             }
             ImGui::SameLine();
-            if( ImGui::Button( "Cancel" ) || ImGui::IsKeyPressed( GLFW_KEY_ESCAPE, false ) )
+            if( ImGui::Button( "Cancel" ) || ImGui::IsKeyPressed( fan::Keyboard::ESCAPE, false ) )
             {
                 ImGui::CloseCurrentPopup();
             }

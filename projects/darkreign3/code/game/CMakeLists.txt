@@ -10,3 +10,5 @@
 
  target_link_libraries(${GAME_NAME} ${GAME_LIBS})
  target_compile_options(${GAME_NAME} PRIVATE ${COMPILATION_FLAGS})
+ set_target_properties(${GAME_NAME} PROPERTIES UNITY_BUILD ${FAN_ENABLE_UNITY_BUILD})
+

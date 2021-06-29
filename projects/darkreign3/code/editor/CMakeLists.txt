@@ -16,3 +16,5 @@
  target_link_libraries(${EDITOR_NAME} ${GAME_EDITOR_LIBS})
  target_compile_options(${EDITOR_NAME} PRIVATE ${COMPILATION_FLAGS})
  add_compile_definitions(FAN_EDITOR)
+ set_target_properties(${EDITOR_NAME} PROPERTIES UNITY_BUILD ${FAN_ENABLE_UNITY_BUILD})
+

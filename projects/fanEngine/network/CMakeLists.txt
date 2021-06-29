@@ -12,3 +12,5 @@ set(LIBRARY_NAME fanNetwork)
 
 add_library(${LIBRARY_NAME} STATIC ${FAN_NETWORK_SRC} ${FAN_NETWORK_H})
 target_link_libraries(${LIBRARY_NAME} ${FAN_NETWORK_LIBS})
+set_target_properties(${LIBRARY_NAME} PROPERTIES UNITY_BUILD ${FAN_ENABLE_UNITY_BUILD})
+
