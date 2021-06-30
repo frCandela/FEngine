@@ -1,11 +1,10 @@
-#include "core/fanSystem.hpp"
-#include "core/fanDebug.hpp"
-
 #ifdef FAN_WIN32
-#include <windows.h>
-#include "core/fanFile.hpp"
 
-#endif
+#include <windows.h>
+#include "glfw/glfw3.h"
+#include "platform/fanSystem.hpp"
+#include "platform/fanFile.hpp"
+#include "core/fanDebug.hpp"
 
 namespace fan
 {
@@ -13,34 +12,29 @@ namespace fan
     //==================================================================================================================================================================================================
     uint64_t System::LastModified( const std::string& _path )
     {
-        #ifdef FAN_WIN32
         File file;
         file.Open( _path, File::ReadMode::Read, File::OpenMode::OpenExisting );
         FILETIME creationTime, lastAccessTime, lastWriteTime;
         GetFileTime( (HANDLE)file.Handle(), &creationTime, &lastAccessTime, &lastWriteTime );
         static_assert( sizeof( FILETIME ) == 8 );
         return uint64_t( lastWriteTime.dwHighDateTime ) << 32 | uint64_t( lastWriteTime.dwLowDateTime );
-        #endif
     }
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
     bool System::Exists( const std::string& _path )
     {
-        #ifdef FAN_WIN32
         DWORD      fileType    = GetFileAttributes( _path.c_str() );
         const bool isDirectory = fileType & FILE_ATTRIBUTE_DIRECTORY;
         const bool invalid     = INVALID_FILE_ATTRIBUTES == GetFileAttributes( _path.c_str() ) &&
                                  GetLastError() == ERROR_FILE_NOT_FOUND;
         return !invalid && !isDirectory;
-        #endif
     }
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
     std::vector<std::string> System::ListDirectory( const std::string& _directoryPath )
     {
-        #ifdef  FAN_WIN32
         if( _directoryPath.size() > ( MAX_PATH - 3 ) )
         {
             Debug::Error() << "ListDirectory: directory is too long: " << _directoryPath << Debug::Endl();
@@ -76,18 +70,13 @@ namespace fan
         } while( FindNextFile( hFind, &ffd ) != 0 );
 
         return result;
-        #endif
     }
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
     bool System::HasDebugger()
     {
-        #ifdef  FAN_WIN32
         return IsDebuggerPresent();
-        #else
-        return false;
-        #endif
     }
 
     //==================================================================================================================================================================================================
@@ -108,7 +97,6 @@ namespace fan
     //==================================================================================================================================================================================================
     bool System::StartProcessAndWait( const std::string& _path, const std::string& _args, const std::string& _logsPath )
     {
-        #ifdef  FAN_WIN32
         File logsFile;
         logsFile.Open( _logsPath, File::ReadMode::Append, File::OpenMode::CreateNew );
 
@@ -137,6 +125,13 @@ namespace fan
             Debug::Error() << "Process creation failed: " << argsConcat << Debug::Endl();
             return false;
         }
-        #endif
+    }
+
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    double System::GetTime()
+    {
+        return glfwGetTime();
     }
 }
+#endif

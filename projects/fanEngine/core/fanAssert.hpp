@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/fanSystem.hpp"
+#include "platform/fanSystem.hpp"
 
 namespace fan
 {

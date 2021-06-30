@@ -1,7 +1,7 @@
 #include "game/fanDarkReign3.hpp"
+#include "platform/input/fanKeyboard.hpp"
 #include "core/random/fanSimplexNoise.hpp"
 #include "core/time/fanScopedTimer.hpp"
-#include "core/input/fanKeyboard.hpp"
 #include "network/singletons/fanTime.hpp"
 #include "engine/singletons/fanRenderDebug.hpp"
 #include "engine/physics/fanUpdateRigidbodies.hpp"
@@ -70,10 +70,10 @@ namespace fan
         settings.mComponentInfos[AnimScale::Info::sType]    = GuiAnimScale::GetInfo();
         settings.mComponentInfos[TerrainAgent::Info::sType] = GuiTerrainAgent::GetInfo();
         settings.mComponentInfos[Judas::Info::sType]        = GuiJudas::GetInfo();
+        mWorld.GetSingleton<Application>().mOnEditorUseGameCamera.Connect( &DarkReign3::OnEditorUseGameCamera, this );
 #endif
 
         mCursors.Load( *mWorld.GetSingleton<Application>().mResources );
-        mWorld.GetSingleton<Application>().mOnEditorUseGameCamera.Connect( &DarkReign3::OnEditorUseGameCamera, this );
     }
 
     //==================================================================================================================================================================================================

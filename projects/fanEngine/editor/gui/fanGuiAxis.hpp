@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/input/fanAxis.hpp"
+#include "platform/input/fanAxis.hpp"
 
 namespace ImGui
 {

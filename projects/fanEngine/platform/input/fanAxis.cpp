@@ -1,8 +1,7 @@
-#include "core/input/fanAxis.hpp"
+#include "fanAxis.hpp"
 
 #include "core/fanDebug.hpp"
 #include "core/memory/fanSerializable.hpp"
-#include "editor/fanModals.hpp"
 
 namespace fan
 {

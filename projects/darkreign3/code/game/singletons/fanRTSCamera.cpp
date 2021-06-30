@@ -1,6 +1,6 @@
 #include "game/singletons/fanRTSCamera.hpp"
+#include "platform/input/fanKeyboard.hpp"
 #include "core/fanDebug.hpp"
-#include "core/input/fanKeyboard.hpp"
 #include "engine/fanEngineSerializable.hpp"
 #include "engine/physics/fanTransform.hpp"
 #include "engine/components/fanCamera.hpp"

@@ -1,9 +1,9 @@
 #pragma once
 
 #include "fanJson.hpp"
+#include "platform/input/fanAxis.hpp"
 #include "core/fanSingleton.hpp"
 #include "core/memory/fanSerializable.hpp"
-#include "core/input/fanAxis.hpp"
 
 namespace fan
 {

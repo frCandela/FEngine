@@ -1,9 +1,9 @@
 #include "editor/singletons/fanEditorCamera.hpp"
 
-#include "ecs/fanEcsWorld.hpp"
-#include "core/input/fanInput.hpp"
-#include "core/input/fanInputManager.hpp"
+#include "platform/input/fanInput.hpp"
+#include "platform/input/fanInputManager.hpp"
 #include "core/shapes/fanRay.hpp"
+#include "ecs/fanEcsWorld.hpp"
 #include "engine/physics/fanTransform.hpp"
 #include "engine/components/fanCamera.hpp"
 #include "engine/components/fanSceneNode.hpp"

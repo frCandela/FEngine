@@ -1,7 +1,7 @@
 #include "render/fanWindow.hpp"
-#include "engine/resources/fanCursor.hpp"
+#include "platform/input/fanInput.hpp"
 #include "core/fanDebug.hpp"
-#include "core/input/fanInput.hpp"
+#include "engine/resources/fanCursor.hpp"
 #include "render/resources/fanTexture.hpp"
 
 namespace fan

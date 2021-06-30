@@ -1,7 +1,7 @@
-#include "core/input/fanJoystick.hpp"
+#include "platform/input/fanJoystick.hpp"
+#include <windows.h>
+#include "GLFW/glfw3.h"
 #include "core/fanDebug.hpp"
-#include "fanWindowsH.hpp"
-#include "glfw/glfw3.h"
 
 namespace fan
 {

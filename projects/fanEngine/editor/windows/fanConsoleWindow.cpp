@@ -1,5 +1,5 @@
 #include "editor/windows/fanConsoleWindow.hpp"
-#include "core/input/fanKeyboard.hpp"
+#include "platform/input/fanKeyboard.hpp"
 #include "core/time/fanProfiler.hpp"
 #include "core/fanBits.hpp"
 #include "network/singletons/fanTime.hpp"

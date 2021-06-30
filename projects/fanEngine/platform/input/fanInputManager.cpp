@@ -1,4 +1,4 @@
-#include "core/input/fanInputManager.hpp"
+#include "platform/input/fanInputManager.hpp"
 
 #include "fanJson.hpp"
 #include "core/fanDebug.hpp"
@@ -7,11 +7,7 @@ namespace fan
 {
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    Signal<>* InputManager::CreateKeyboardEvent( const std::string& _name,
-                                                 const Keyboard::Key _key,
-                                                 const Keyboard::Key _mod0,
-                                                 const Keyboard::Key _mod1,
-                                                 const Keyboard::Key _mod2 )
+    Signal<>* InputManager::CreateKeyboardEvent( const std::string& _name, const Keyboard::Key _key, const Keyboard::Key _mod0, const Keyboard::Key _mod1, const Keyboard::Key _mod2 )
     {
         // Already exists
         Signal<>* keyEvent = FindEvent( _name );
@@ -33,9 +29,7 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void InputManager::CreateKeyboardAxis( const std::string& _name,
-                                           const Keyboard::Key _keyPositive,
-                                           const Keyboard::Key _keyNegative )
+    void InputManager::CreateKeyboardAxis( const std::string& _name, const Keyboard::Key _keyPositive, const Keyboard::Key _keyNegative )
     {
         // Already exists
         if( mAxis.find( _name ) != mAxis.end() )
@@ -51,9 +45,7 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void InputManager::CreateJoystickAxis( const std::string& _name,
-                                           const Joystick::JoystickID _GLFW_JOYSTICK,
-                                           const Joystick::Axis _axis )
+    void InputManager::CreateJoystickAxis( const std::string& _name, const Joystick::JoystickID _GLFW_JOYSTICK, const Joystick::Axis _axis )
     {
         // Already exists
         if( mAxis.find( _name ) != mAxis.end() )
@@ -70,10 +62,7 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void InputManager::CreateJoystickButtons( const std::string& _name,
-                                              const Joystick::JoystickID _GLFW_JOYSTICK,
-                                              const Joystick::Button _positive,
-                                              const Joystick::Button _negative )
+    void InputManager::CreateJoystickButtons( const std::string& _name, const Joystick::JoystickID _GLFW_JOYSTICK, const Joystick::Button _positive, const Joystick::Button _negative )
     {
         // Already exists
         if( mAxis.find( _name ) != mAxis.end() )

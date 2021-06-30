@@ -1,9 +1,9 @@
 #include "editor/windows/fanPreferencesWindow.hpp"
 
-#include "ecs/fanEcsWorld.hpp"
-#include "core/input/fanInput.hpp"
+#include "platform/input/fanInput.hpp"
 #include "core/time/fanProfiler.hpp"
 #include "core/fanDebug.hpp"
+#include "ecs/fanEcsWorld.hpp"
 #include "render/fanRenderer.hpp"
 #include "editor/fanModals.hpp"
 #include "editor/gui/fanGuiAxis.hpp"

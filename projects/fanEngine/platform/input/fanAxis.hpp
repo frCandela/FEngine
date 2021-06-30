@@ -1,8 +1,8 @@
 #pragma once
 
 #include "fanJson.hpp"
-#include "core/input/fanKeyboard.hpp"
-#include "core/input/fanJoystick.hpp"
+#include "platform/input/fanKeyboard.hpp"
+#include "platform/input/fanJoystick.hpp"
 
 namespace fan
 {

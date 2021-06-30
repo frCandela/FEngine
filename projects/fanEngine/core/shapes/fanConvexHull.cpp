@@ -1,6 +1,5 @@
 #include "core/shapes/fanConvexHull.hpp"
 
-#undef max
 #include "quickhull/QuickHull.hpp"
 #include "core/fanDebug.hpp"
 #include "core/shapes/fanTriangle.hpp"

@@ -1,9 +1,9 @@
 #include "editor/windows/fanProfilerWindow.hpp"
 
 #include <sstream>
+#include "platform/input/fanInputManager.hpp"
+#include "platform/input/fanInput.hpp"
 #include "editor/fanModals.hpp"
-#include "core/input/fanInputManager.hpp"
-#include "core/input/fanInput.hpp"
 
 namespace fan
 {

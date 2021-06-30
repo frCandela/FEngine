@@ -1,8 +1,8 @@
 #include "editor/singletons/fanEditorSelection.hpp"
 
 #include "editor/singletons/fanEditorGizmos.hpp"
-#include "core/input/fanInput.hpp"
-#include "core/input/fanInputManager.hpp"
+#include "platform/input/fanInput.hpp"
+#include "platform/input/fanInputManager.hpp"
 #include "core/time/fanProfiler.hpp"
 #include "core/shapes/fanRay.hpp"
 #include "core/fanDebug.hpp"

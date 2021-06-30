@@ -3,6 +3,7 @@ file(GLOB_RECURSE FAN_RENDER_H *.hpp)
 
 set(FAN_RENDER_LIBS
         vulkan-1
+        fanPlatform
         fanCore
         )
 

@@ -20,6 +20,8 @@ namespace fan
         static uint64_t LastModified( const std::string& _path );
         static bool Exists( const std::string& _path );
         static std::vector<std::string> ListDirectory( const std::string& _directoryPath );
+
+        static double GetTime();
     };
 }
 

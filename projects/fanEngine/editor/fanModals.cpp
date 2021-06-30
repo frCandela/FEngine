@@ -1,14 +1,12 @@
 #include "editor/fanModals.hpp"
 
 #include <sstream>
-#include <core/fanDebug.hpp>
-#include <core/fanPath.hpp>
-#include <fanDisableWarnings.hpp>
-#include "core/input/fanKeyboard.hpp"
-
+#include "platform/input/fanKeyboard.hpp"
+#include "core/fanDebug.hpp"
+#include "core/fanPath.hpp"
+#include "fanDisableWarnings.hpp"
 WARNINGS_IMGUI_PUSH()
 #include "imgui/imgui_internal.h"
-
 WARNINGS_POP()
 
 namespace ImGui

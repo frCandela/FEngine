@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/input/fanInputManager.hpp"
+#include "platform/input/fanInputManager.hpp"
 
 namespace ImGui
 {

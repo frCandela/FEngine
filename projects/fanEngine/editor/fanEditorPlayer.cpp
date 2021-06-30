@@ -1,7 +1,7 @@
 #include "editor/fanEditorPlayer.hpp"
 
-#include "core/input/fanInputManager.hpp"
-#include "core/input/fanInput.hpp"
+#include "platform/input/fanInputManager.hpp"
+#include "platform/input/fanInput.hpp"
 #include "network/singletons/fanTime.hpp"
 
 #include "engine/game/fanIGame.hpp"

@@ -1,24 +1,31 @@
 #pragma once
 
-#ifdef FAN_WIN32
-
-#include "core/platforms/fanIFile.hpp"
+#include <string>
 
 namespace fan
 {
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    class WinFile : public IFile
+    class File
     {
     public:
-        void Open( const std::string& _path, const ReadMode _readMode, const OpenMode _openMode ) override;
-        void Close() override;
-        size_t Handle() override { return mHandle; }
-        ~WinFile() override;
+        enum class ReadMode
+        {
+            Read, Write, Append
+        };
+        enum class OpenMode
+        {
+            OpenExisting, CreateNew
+        };
+
+        ~File();
+        void Open( const std::string& _path, const ReadMode _readMode, const OpenMode _openMode );
+        void Close();
+        size_t Handle() { return mHandle; }
 
     private:
-        size_t mHandle = 0;
+        #ifdef  FAN_WIN32
+        size_t mHandle = 0; //win32
+        #endif
     };
 }
-
-#endif

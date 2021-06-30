@@ -1,6 +1,6 @@
 #pragma once
 
-// remove old macro to remove warning with std::numeric_limits>>::max() 
+// remove old macro to remove warning with std::numeric_limits>>::max()
 #ifdef max
 #undef max
 #endif

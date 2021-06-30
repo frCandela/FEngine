@@ -1,5 +1,5 @@
 #include "game/singletons/fanSelection.hpp"
-#include "core/input/fanKeyboard.hpp"
+#include "platform/input/fanKeyboard.hpp"
 #include "core/math/fanMatrix3.hpp"
 #include "engine/singletons/fanMouse.hpp"
 #include "engine/singletons/fanScene.hpp"

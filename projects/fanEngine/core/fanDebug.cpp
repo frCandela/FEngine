@@ -1,8 +1,6 @@
 #include "core/fanDebug.hpp"
 
 #include <iostream>
-#include "fanWindowsH.hpp"
-#include "glfw/glfw3.h"
 #include "core/fanBits.hpp"
 
 namespace fan
@@ -27,7 +25,7 @@ namespace fan
         item.mMessage  = mStringstream.str();
         item.mSeverity = mCurrentSeverity;
         item.mType     = mCurrentType;
-        item.mTime     = glfwGetTime();
+        item.mTime     = System::GetTime();
         mLogBuffer.push_back( item );
 
         // stdio

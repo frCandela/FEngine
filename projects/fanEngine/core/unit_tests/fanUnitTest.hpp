@@ -3,7 +3,7 @@
 #include <vector>
 #include <string>
 #include <exception>
-#include "core/fanSystem.hpp"
+#include "platform/fanSystem.hpp"
 
 namespace fan
 {

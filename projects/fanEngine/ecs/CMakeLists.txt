@@ -2,6 +2,7 @@
 file(GLOB_RECURSE FAN_ECS_H *.hpp)
 
 set(FAN_ECS_LIBS
+        fanPlatform
         fanCore
         )
 

@@ -1,9 +1,9 @@
 #include "fanEditorSettings.hpp"
 
 #include <fstream>
+#include "platform/input/fanInputManager.hpp"
+#include "platform/input/fanInput.hpp"
 #include "core/memory/fanSerializable.hpp"
-#include "core/input/fanInputManager.hpp"
-#include "core/input/fanInput.hpp"
 #include "core/fanDebug.hpp"
 #include "core/math/fanVector3.hpp"
 #include "core/fanColor.hpp"

@@ -4,6 +4,7 @@ file(GLOB_RECURSE FAN_ENGINE_H *.hpp)
 set(FAN_ENGINE_LIBS
         sfml-network
         sfml-system
+        fanPlatform
         fanCore
         fanEcs
         fanRender

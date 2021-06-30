@@ -1,7 +1,8 @@
-#include "core/input/fanInput.hpp"
-#include "core/input/fanKeyboard.hpp"
-#include "core/input/fanInputManager.hpp"
-#include "glfw/glfw3.h"
+#include <windows.h>
+#include "GLFW/glfw3.h"
+#include "platform/input/fanInput.hpp"
+#include "platform/input/fanKeyboard.hpp"
+#include "platform/input/fanInputManager.hpp"
 
 namespace fan
 {
