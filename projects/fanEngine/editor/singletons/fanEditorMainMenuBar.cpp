@@ -377,7 +377,6 @@ namespace fan
 
         if( !scene.mPath.empty() )
         {
-            Debug::Log() << "saving scene: " << scene.mPath << Debug::Endl();
             scene.Save();
         }
         else

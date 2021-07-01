@@ -21,7 +21,7 @@ namespace fan
         bool CreateFromFile( const std::string& _path );
         void CreateFromSceneNode( const SceneNode& _node );
         bool Save( const std::string& _path );
-        SceneNode* Instantiate( SceneNode& _parent ) const;
+        SceneNode* Instantiate( SceneNode& _parent, const int _childIndex = -1 ) const;
 
         bool IsEmpty() const { return !mJson.contains( "prefab" ); }
         void Clear() { mJson = Json(); }

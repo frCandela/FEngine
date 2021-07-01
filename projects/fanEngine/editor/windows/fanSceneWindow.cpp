@@ -247,7 +247,7 @@ namespace fan
         // export to prefab modal
         if( exportToPrefabPopup )
         {
-            mPathBuffer = Path::Normalize( "new_prefab" );
+            mPathBuffer = Path::Normalize( RenderGlobal::sPrefabsPath + std::string( "new_prefab" ) );
             ImGui::OpenPopup( "export_prefab" );
         }
         ExportPrefabModal( _world );
@@ -324,8 +324,20 @@ namespace fan
         {
             for( int childIndex = 0; childIndex < (int)_node.mChilds.size(); childIndex++ )
             {
-                SceneNode& child = world.GetComponent<SceneNode>( world.GetEntity( _node.mChilds[childIndex] ) );
-                R_DrawSceneTree( child, _nodeRightClicked );
+                EcsHandle handle = _node.mChilds[childIndex];
+                if( handle != 0 )
+                {
+                    SceneNode& child = world.GetComponent<SceneNode>( world.GetEntity( handle ) );
+                    R_DrawSceneTree( child, _nodeRightClicked );
+                }
+                else
+                {
+                    // prefab instantiation during scene load went wrong
+                    ImGui::PushStyleColor( ImGuiCol_Text, IM_COL32( 255, 0, 0, 255 ) );
+                    ImGui::Selectable( "<error>", false );
+                    ImGui::PopStyleColor();
+                    ImGui::FanToolTip( "please don't save" );
+                }
             }
 
             ImGui::TreePop();
@@ -387,10 +399,7 @@ namespace fan
                 ImGui::SetKeyboardFocusHere();
             }
             bool enterPressed = false;
-            if( ImGui::InputText( "New Name ",
-                                  mTextBuffer,
-                                  IM_ARRAYSIZE( mTextBuffer ),
-                                  ImGuiInputTextFlags_EnterReturnsTrue ) )
+            if( ImGui::InputText( "New Name ", mTextBuffer, IM_ARRAYSIZE( mTextBuffer ), ImGuiInputTextFlags_EnterReturnsTrue ) )
             {
                 enterPressed = true;
             }

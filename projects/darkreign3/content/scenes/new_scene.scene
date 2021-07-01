@@ -1,1 +1,150 @@
-{"scene":{"path":"scenes/new_scene.scene","resources":[{"path":"animations/spr_judas_idle.gltf","type":1503650634},{"path":"images/textures/objects/sprawler/spr-judasa_HD.png","type":4181654779},{"path":"models/sprawler/spr_judas_skinned.gltf","type":1192704963},{"path":"models/cube_skinned_anim.gltf","type":1503650634},{"path":"_default/texture/uv_checker.png","type":4181654779},{"path":"models/cube_skinned.gltf","type":1192704963},{"path":"_default/texture/uv_checker.png","type":4181654779}],"root":{"childs":[{"childs":null,"components":[{"component_type":1269105190,"position":{"x":0,"y":93882,"z":431989},"rotation":{"n":65536,"x":0,"y":0,"z":0},"type_name":"Transform"},{"component_type":2472396462,"path":{"resource":0},"type_name":"MeshRenderer"},{"component_type":1828911513,"materials":[{"color":{"a":1.0,"b":1.0,"g":1.0,"r":1.0},"material":{"resource":1871703055},"shininess":1}],"type_name":"Material"}],"handle":5,"name":"test_cube"},{"childs":null,"components":[{"component_type":1269105190,"position":{"x":0,"y":93882,"z":0},"rotation":{"n":65536,"x":0,"y":0,"z":0},"type_name":"Transform"},{"component_type":3936277306,"mesh":{"resource":669492610},"type_name":"SkinnedMeshRenderer"},{"component_type":1828911513,"materials":[{"color":{"a":1.0,"b":1.0,"g":1.0,"r":1.0},"material":{"resource":1871703055},"shininess":1}],"type_name":"Material"},{"animation":{"resource":3949096678},"component_type":696317989,"loop":false,"type_name":"Animator"}],"handle":4,"name":"test_cube"},{"childs":null,"components":[{"component_type":1269105190,"position":{"x":0,"y":0,"z":0},"rotation":{"n":21233,"x":5722,"y":59683,"z":-15995},"type_name":"Transform"},{"ambiant":{"a":1.0,"b":0.832730233669281,"g":0.832730233669281,"r":0.8328135013580322},"component_type":944608624,"diffuse":{"a":1.0,"b":1.0,"g":1.0,"r":1.0},"specular":{"a":1.0,"b":0.25,"g":0.25,"r":0.25},"type_name":"DirectionalLight"}],"handle":3,"name":"directional_light"},{"childs":null,"components":[{"component_type":1269105190,"position":{"x":367095,"y":0,"z":0},"rotation":{"n":65536,"x":0,"y":0,"z":0},"type_name":"Transform"},{"component_type":3936277306,"mesh":{"resource":426961581},"type_name":"SkinnedMeshRenderer"},{"component_type":1828911513,"materials":[{"color":{"a":1.0,"b":0.9998999834060669,"g":1.0,"r":0.9999092221260071},"material":{"resource":4085364850},"shininess":1}],"type_name":"Material"},{"animation":{"resource":4260459855},"component_type":696317989,"loop":true,"type_name":"Animator"},{"component_type":52986698,"height_offset":0,"type_name":"Unit"}],"handle":2,"name":"spr_judas"}],"components":null,"handle":1,"name":"root"},"singletons":[{"logic_delta":546,"render_delta":455,"singleton":"Time","singleton_id":52945433},{"alnlp":6553,"angular_damping":65273,"friction":13107,"gravity":{"x":0,"y":-655360,"z":0},"linear_damping":65273,"pos iterations":6,"resting_velocity":9830,"restitution":32768,"singleton":"PhysicsWorld","singleton_id":2057302101,"vel iterations":6},{"2d_octave":{"amplitude":52428,"frequency":3932,"height_offset":0,"height_weight":32768,"weight":65536},"3d_octave_0":{"amplitude":52428,"frequency":3932,"height_offset":0,"height_weight":32768,"weight":65536},"3d_octave_1":{"amplitude":52428,"frequency":3932,"height_offset":0,"height_weight":32768,"weight":65536},"clear_sides":true,"interpolation_scale":65536,"seed":42,"singleton":"VoxelTerrain","singleton_id":107085517,"size":{"x":0,"y":0,"z":0}},{"clear_color":{"a":1.0,"b":0.25,"g":0.25,"r":0.25},"filter_color":{"a":1.0,"b":1.0,"g":1.0,"r":1.0},"singleton":"RenderWorld","singleton_id":503680530},{"move_to":{"resource":0},"selection_frame":{"resource":0},"singleton":"Selection","singleton_id":276364208},{"color":{"a":1.0,"b":0.5,"g":0.5,"r":0.5},"count":10,"offset":{"x":0,"y":0,"z":0},"singleton":"EditorGrid","singleton_id":1278427063,"spacing":65536,"visible":true},{"max height":6553600,"min height":3276800,"singleton":"RTSCamera","singleton_id":397802284,"translation_speed":3276800,"zoom speed":32768000},{"header":{"resource":0},"singleton":"PauseMenu","singleton_id":3615452637}]}}
+{
+  "scene": {
+    "path": "scenes/new_scene.scene",
+    "resources": [
+      {
+        "guid": 463240776,
+        "path": "prefabs/ui/pause_menu/background.prefab",
+        "type": 1676850298
+      }
+    ],
+    "root": {
+      "childs": [
+        {
+          "childs": null,
+          "components": [
+            {
+              "component_type": 3215706671,
+              "prefab": {
+                "resource": 463240776
+              },
+              "type_name": "PrefabInstance"
+            }
+          ],
+          "handle": 2,
+          "name": "background"
+        }
+      ],
+      "components": null,
+      "handle": 1,
+      "name": "root"
+    },
+    "singletons": [
+      {
+        "logic_delta": 546,
+        "render_delta": 455,
+        "singleton": "Time",
+        "singleton_id": 52945433
+      },
+      {
+        "alnlp": 6553,
+        "angular_damping": 65273,
+        "friction": 13107,
+        "gravity": {
+          "x": 0,
+          "y": -655360,
+          "z": 0
+        },
+        "linear_damping": 65273,
+        "pos iterations": 6,
+        "resting_velocity": 9830,
+        "restitution": 32768,
+        "singleton": "PhysicsWorld",
+        "singleton_id": 2057302101,
+        "vel iterations": 6
+      },
+      {
+        "2d_octave": {
+          "amplitude": 52428,
+          "frequency": 3932,
+          "height_offset": 0,
+          "height_weight": 32768,
+          "weight": 65536
+        },
+        "3d_octave_0": {
+          "amplitude": 52428,
+          "frequency": 3932,
+          "height_offset": 0,
+          "height_weight": 32768,
+          "weight": 65536
+        },
+        "3d_octave_1": {
+          "amplitude": 52428,
+          "frequency": 3932,
+          "height_offset": 0,
+          "height_weight": 32768,
+          "weight": 65536
+        },
+        "clear_sides": true,
+        "interpolation_scale": 65536,
+        "seed": 42,
+        "singleton": "VoxelTerrain",
+        "singleton_id": 107085517,
+        "size": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        }
+      },
+      {
+        "clear_color": {
+          "a": 1.0,
+          "b": 0.25,
+          "g": 0.25,
+          "r": 0.25
+        },
+        "filter_color": {
+          "a": 1.0,
+          "b": 1.0,
+          "g": 1.0,
+          "r": 1.0
+        },
+        "singleton": "RenderWorld",
+        "singleton_id": 503680530
+      },
+      {
+        "move_to": {
+          "resource": 0
+        },
+        "selection_frame": {
+          "resource": 0
+        },
+        "singleton": "Selection",
+        "singleton_id": 276364208
+      },
+      {
+        "color": {
+          "a": 1.0,
+          "b": 0.5,
+          "g": 0.5,
+          "r": 0.5
+        },
+        "count": 10,
+        "offset": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        "singleton": "EditorGrid",
+        "singleton_id": 1278427063,
+        "spacing": 65536,
+        "visible": true
+      },
+      {
+        "max height": 6553600,
+        "min height": 3276800,
+        "singleton": "RTSCamera",
+        "singleton_id": 397802284,
+        "translation_speed": 3276800,
+        "zoom speed": 32768000
+      },
+      {
+        "header": {
+          "resource": 0
+        },
+        "singleton": "PauseMenu",
+        "singleton_id": 3615452637
+      }
+    ]
+  }
+}

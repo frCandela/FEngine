@@ -4,6 +4,7 @@
 #include "core/fanSignal.hpp"
 #include "engine/fanEngineSerializable.hpp"
 #include "ecs/fanEcsSingleton.hpp"
+#include "core/resources/fanResourcePtr.hpp"
 
 namespace fan
 {
@@ -22,7 +23,7 @@ namespace fan
         static void SetInfo( EcsSingletonInfo& _info );
         static void Init( EcsWorld& _world, EcsSingleton& _component );
 
-        SceneNode& CreateSceneNode( const std::string _name, SceneNode* const _parentNode, EcsHandle _handle = 0 );
+        SceneNode& CreateSceneNode( const std::string _name, SceneNode* const _parentNode, EcsHandle _handle = 0, int _childIndex = -1 );
 
         void New();
         void Save() const;
@@ -30,9 +31,15 @@ namespace fan
         void Clear();
         void SetMainCamera( const EcsHandle _cameraHandle );
 
+        struct ChildPrefab
+        {
+            ResourcePtr<Prefab> mPrefab;
+            SceneNode* mParent;
+            int mChildIndex;
+        };
+        static SceneNode* RLoadFromJson( const Json& _json, Scene& _scene, SceneNode* _parent, const uint32_t _handleOffset, std::vector<ChildPrefab>& _prefabs, int _childIndex = -1 );
         static EcsHandle RFindMaximumHandle( SceneNode& _node );
-        static void RSaveToJson( const SceneNode& _node, Json& _json );
-        static SceneNode& RLoadFromJson( const Json& _json, Scene& _scene, SceneNode* _parent, const uint32_t _handleOffset );
+        static void RSaveToJson( const SceneNode& _node, Json& _json, bool _inlinePrefabs = false );
 
         using RemapTable = std::map<EcsHandle, EcsHandle>;
         static void GenerateRemapTable( Json& _jsonRootSceneNode, RemapTable& _outRemapTable );
@@ -44,7 +51,7 @@ namespace fan
         Signal<Scene&>     mOnLoad;
         Signal<SceneNode*> mOnDeleteSceneNode;
 
-        EcsWorld* const     mWorld = nullptr;
+        EcsWorld* const mWorld = nullptr;
         std::string         mPath;
         EcsHandle           mRootNodeHandle;
         EcsHandle           mMainCameraHandle;

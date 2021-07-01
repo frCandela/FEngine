@@ -68,7 +68,7 @@ namespace fan
         Clear();
 
         Json& prefabJson = mJson["prefab"];
-        Scene::RSaveToJson( _node, prefabJson );
+        Scene::RSaveToJson( _node, prefabJson, true );
         Scene::RemapTable remapTable;
         Scene::GenerateRemapTable( prefabJson, remapTable );
         Scene::RemapHandlesRecursively( prefabJson, remapTable );
@@ -97,7 +97,7 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    SceneNode* Prefab::Instantiate( SceneNode& _parent ) const
+    SceneNode* Prefab::Instantiate( SceneNode& _parent, const int _childIndex ) const
     {
         if( IsEmpty() )
         {
@@ -116,16 +116,18 @@ namespace fan
             Scene& scene = world.GetSingleton<Scene>();
             const EcsHandle handleOffset = world.GetNextHandle() - 1;
 
-            SceneNode& newNode = Scene::RLoadFromJson( prefabJson, scene, &_parent, handleOffset );
+            std::vector<Scene::ChildPrefab> prefabs;
+            SceneNode* newNode = Scene::RLoadFromJson( prefabJson, scene, &_parent, handleOffset, prefabs, _childIndex );
+            fanAssert( newNode != nullptr );
             const EcsHandle maxHandle = Scene::RFindMaximumHandle( _parent );
             world.SetNextHandle( maxHandle + 1 );
             ScenePointers::ResolveComponentPointers( world, handleOffset );
 
-            EcsEntity entity = world.GetEntity( newNode.mHandle );
+            EcsEntity entity = world.GetEntity( newNode->mHandle );
             PrefabInstance& prefabInstance = world.AddComponent<PrefabInstance>( entity );
             prefabInstance.mPrefab = ResourcePtrData::sResourceManager->Get<Prefab>( mGUID );
 
-            return &newNode;
+            return newNode;
         }
     }
 }

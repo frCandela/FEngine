@@ -26,13 +26,13 @@ namespace fan
         static void Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component );
         static void Destroy( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component );
 
-        void Build( const std::string& _name, Scene& _scene, const EcsHandle _handle, SceneNode* const _parent );
+        void Build( const std::string& _name, Scene& _scene, const EcsHandle _handle, SceneNode* const _parent, int _childIndex = -1 );
 
         bool IsRoot() const { return mParentHandle == 0; }
         bool IsAncestorOf( const SceneNode& _node ) const;
         void RemoveChild( const SceneNode& _child );
         bool HasChild( const SceneNode& _child );
-        void AddChild( SceneNode& _child );
+        void AddChild( SceneNode& _child, int _childIndex = -1 );
         void SetParent( SceneNode* _parent );
         SceneNode& GetParent() const;
         void InsertBelow( SceneNode& _brother );

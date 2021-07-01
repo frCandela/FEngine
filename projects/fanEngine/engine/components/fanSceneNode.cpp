@@ -73,17 +73,14 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void SceneNode::Build( const std::string& _name,
-                           Scene& _scene,
-                           const EcsHandle _handle,
-                           SceneNode* const _parent )
+    void SceneNode::Build( const std::string& _name, Scene& _scene, const EcsHandle _handle, SceneNode* const _parent, int _childIndex )
     {
         mScene  = &_scene;
         mHandle = _handle;
         mName   = _name;
         if( _parent != nullptr )
         {
-            _parent->AddChild( *this );
+            _parent->AddChild( *this, _childIndex );
         }
     }
 
@@ -139,7 +136,7 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void SceneNode::AddChild( SceneNode& _child )
+    void SceneNode::AddChild( SceneNode& _child, int _childIndex )
     {
         if( _child.IsAncestorOf( *this ) )
         {
@@ -159,7 +156,18 @@ namespace fan
             {
                 _child.GetParent().RemoveChild( _child );
             }
-            mChilds.push_back( _child.mHandle );
+
+            const bool childIndexIsValid = _childIndex < 0 || mChilds[_childIndex] == 0;
+            fanAssertMsg( childIndexIsValid, "invalid child index override when parenting scene node" );
+            if( _childIndex >= 0 && childIndexIsValid )
+            {
+                mChilds[_childIndex] = _child.mHandle;
+            }
+            else
+            {
+                mChilds.push_back( _child.mHandle );
+            }
+
             _child.mParentHandle = mHandle;
         }
     }

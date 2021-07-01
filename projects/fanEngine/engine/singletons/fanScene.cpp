@@ -2,6 +2,7 @@
 
 #include <stack>
 #include <fstream>
+#include <engine/components/fanPrefabInstance.hpp>
 #include "core/fanPath.hpp"
 #include "core/fanDebug.hpp"
 #include "core/resources/fanResources.hpp"
@@ -44,7 +45,7 @@ namespace fan
     // _handle can be used to force the handle of scene node entity,
     // if _handle=0 (by default), generate a new handle
     //==================================================================================================================================================================================================
-    SceneNode& Scene::CreateSceneNode( const std::string _name, SceneNode* const _parentNode, EcsHandle _handle )
+    SceneNode& Scene::CreateSceneNode( const std::string _name, SceneNode* const _parentNode, EcsHandle _handle, int _childIndex )
     {
         fanAssert( _parentNode != nullptr || mRootNodeHandle == 0 ); // we can have only one root node
 
@@ -73,7 +74,7 @@ namespace fan
             sceneNode.AddFlag( SceneNode::NoDelete );
         }
 
-        sceneNode.Build( _name, *this, handle, _parentNode );
+        sceneNode.Build( _name, *this, handle, _parentNode, _childIndex  );
         return sceneNode;
     }
 
@@ -87,11 +88,14 @@ namespace fan
         const std::vector<EcsHandle>& childs = _node.mChilds;
         for( int childIndex = 0; childIndex < (int)childs.size(); childIndex++ )
         {
-            SceneNode& node = world.GetComponent<SceneNode>( world.GetEntity( childs[childIndex] ) );
-            EcsHandle childHandle = RFindMaximumHandle( node );
-            if( childHandle > handle )
+            if(  childs[childIndex] != 0 ) // can be zero when serializing prefabs
             {
-                handle = childHandle;
+                SceneNode& node = world.GetComponent<SceneNode>( world.GetEntity( childs[childIndex] ) );
+                EcsHandle childHandle = RFindMaximumHandle( node );
+                if( childHandle > handle )
+                {
+                    handle = childHandle;
+                }
             }
         }
         return handle;
@@ -176,55 +180,73 @@ namespace fan
         Resources& resources = *mWorld->GetSingleton<Application>().mResources;
         BuildResourceList( resources, jScene, jScene );
 
-        std::ofstream outStream( mPath );
+        std::ofstream outStream( Path::Normalize( mPath ) );
         if( outStream.is_open() )
         {
-            outStream << json; // write to disk
+            outStream << json;
             outStream.close();
+            Debug::Highlight() << "saved scene: " << mPath << Debug::Endl();
+        }
+        else
+        {
+            Debug::Error() << "Failed to save scene: " << mPath << Debug::Endl();
         }
     }
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void Scene::RSaveToJson( const SceneNode& _node, Json& _json )
+    void Scene::RSaveToJson( const SceneNode& _node, Json& _json, bool _inlinePrefabs )
     {
         EcsWorld& world = *_node.mScene->mWorld;
         Serializable::SaveStr( _json, "name", _node.mName );
         Serializable::SaveUInt( _json, "handle", _node.mHandle );
 
-        // save components
+        EcsEntity entity = world.GetEntity( _node.mHandle );
         Json& jComponents = _json["components"];
+        Json& jchilds     = _json["childs"];
+        if( !_inlinePrefabs && world.HasComponent<PrefabInstance>( entity ) )
         {
-            EcsEntity entity    = world.GetEntity( _node.mHandle );
-            unsigned  nextIndex = 0;
-            for( const EcsComponentInfo& info : world.GetComponentInfos() )
-            {
-                if( !world.HasComponent( entity, info.mType ) ){ continue; }
+            PrefabInstance        & prefabInstance = world.GetComponent<PrefabInstance>( entity );
+            const EcsComponentInfo& info           = world.GetComponentInfo( PrefabInstance::Info::sType );
+            Json                  & jComponent     = jComponents[0];
+            Serializable::SaveUInt( jComponent, "component_type", info.mType );
+            Serializable::SaveStr( jComponent, "type_name", info.mName );
+            PrefabInstance::Save( prefabInstance, jComponent );
+        }
+        else
+        {
+            // save components
 
-                // if a save method is provided, saves the component
-                EcsComponent& component = world.GetComponent( entity, info.mType );
-                if( info.save != nullptr )
+            {
+                unsigned nextIndex = 0;
+                for( const EcsComponentInfo& info : world.GetComponentInfos() )
                 {
-                    Json& jComponent_i = jComponents[nextIndex++];
-                    Serializable::SaveUInt( jComponent_i, "component_type", info.mType );
-                    Serializable::SaveStr( jComponent_i, "type_name", info.mName );
-                    info.save( component, jComponent_i );
+                    if( !world.HasComponent( entity, info.mType ) ){ continue; }
+
+                    // if a save method is provided, saves the component
+                    EcsComponent& component = world.GetComponent( entity, info.mType );
+                    if( info.save != nullptr )
+                    {
+                        Json& jComponent_i = jComponents[nextIndex++];
+                        Serializable::SaveUInt( jComponent_i, "component_type", info.mType );
+                        Serializable::SaveStr( jComponent_i, "type_name", info.mName );
+                        info.save( component, jComponent_i );
+                    }
                 }
             }
-        }
 
-        // save childs
-        Json& jchilds = _json["childs"];
-        unsigned childIndex     = 0;
-        for( int sceneNodeIndex = 0; sceneNodeIndex < (int)_node.mChilds.size(); sceneNodeIndex++ )
-        {
-            const EcsHandle childHandle = _node.mChilds[sceneNodeIndex];
-            SceneNode& childNode = world.GetComponent<SceneNode>( world.GetEntity( childHandle ) );
-            if( !childNode.HasFlag( SceneNode::NoSave ) )
+            // save childs
+            unsigned childIndex     = 0;
+            for( int sceneNodeIndex = 0; sceneNodeIndex < (int)_node.mChilds.size(); sceneNodeIndex++ )
             {
-                Json& jchild = jchilds[childIndex];
-                RSaveToJson( childNode, jchild );
-                ++childIndex;
+                const EcsHandle childHandle = _node.mChilds[sceneNodeIndex];
+                SceneNode& childNode = world.GetComponent<SceneNode>( world.GetEntity( childHandle ) );
+                if( !childNode.HasFlag( SceneNode::NoSave ) )
+                {
+                    Json& jchild = jchilds[childIndex];
+                    RSaveToJson( childNode, jchild );
+                    ++childIndex;
+                }
             }
         }
     }
@@ -303,7 +325,6 @@ namespace fan
     //==================================================================================================================================================================================================
     void Scene::BuildResourceList( Resources& _resources, const Json& _json, Json& _outJson )
     {
-
         std::vector<uint32_t>   resourcesGuids;
         std::stack<const Json*> stack;
         stack.push( &_json );
@@ -345,6 +366,7 @@ namespace fan
                 Json& jResource = jResources[resourceIndex++];
                 jResource["type"] = resource->mType;
                 jResource["path"] = resource->mPath;
+                jResource["guid"] = resource->mGUID;
             }
         }
     }
@@ -421,13 +443,19 @@ namespace fan
 
             // loads all nodes recursively
             const Json& jRoot = jScene["root"];
-            const EcsHandle handleOffset = 0;
-            SceneNode& rootNode = RLoadFromJson( jRoot, *this, nullptr, handleOffset );
+            const EcsHandle                 handleOffset = 0;
+            std::vector<ChildPrefab> prefabs;
+            SceneNode& rootNode = *RLoadFromJson( jRoot, *this, nullptr, handleOffset, prefabs );
             mRootNodeHandle = rootNode.mHandle;
 
             mPath = _path;
             const EcsHandle maxHandle = RFindMaximumHandle( rootNode ) + 1;
             mWorld->SetNextHandle( maxHandle );
+
+            for( ChildPrefab childPrefab : prefabs )
+            {
+                childPrefab.mPrefab->Instantiate( *childPrefab.mParent, childPrefab.mChildIndex );
+            }
 
             ScenePointers::ResolveComponentPointers( *mWorld, handleOffset );
             mWorld->Run<SInitFollowTransforms>();
@@ -447,22 +475,30 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    SceneNode& Scene::RLoadFromJson( const Json& _json, Scene& _scene, SceneNode* _parent, const uint32_t _handleOffset )
+    SceneNode* Scene::RLoadFromJson( const Json& _json, Scene& _scene, SceneNode* _parent, const uint32_t _handleOffset, std::vector<ChildPrefab>& _prefabs, int _childIndex )
     {
-        //ScopedTimer timer("load scene");
         EcsWorld& world = *_scene.mWorld;
 
-        EcsHandle nodeHandle;
-        Serializable::LoadUInt( _json, "handle", nodeHandle );
-        SceneNode& node = _scene.CreateSceneNode( "tmp", _parent, nodeHandle + _handleOffset );
-        Serializable::LoadStr( _json, "name", node.mName );
-
-        // append id
-        _scene.mNodes.insert( node.mHandle );
-
-        // components
         const Json& jComponents = _json["components"];
+        if( jComponents.size() == 1 && jComponents[0]["component_type"] == PrefabInstance::Info::sType )
         {
+            PrefabInstance prefabInstance; // off world load
+            PrefabInstance::Load( prefabInstance, jComponents[0] );
+            _prefabs.push_back( { prefabInstance.mPrefab, _parent, (int)_parent->mChilds.size(), } );
+            _parent->mChilds.push_back( 0 );
+            return nullptr;
+        }
+        else
+        {
+            // components
+            EcsHandle nodeHandle;
+            Serializable::LoadUInt( _json, "handle", nodeHandle );
+            SceneNode& node = _scene.CreateSceneNode( "tmp", _parent, nodeHandle + _handleOffset, _childIndex );
+            Serializable::LoadStr( _json, "name", node.mName );
+
+            // append id
+            _scene.mNodes.insert( node.mHandle );
+
             const EcsEntity entity     = world.GetEntity( node.mHandle );
             for( int        childIndex = 0; childIndex < (int)jComponents.size(); childIndex++ )
             {
@@ -477,19 +513,19 @@ namespace fan
                     info->load( component, jComponent_i );
                 }
             }
-        }
 
-        // Load childs
-        const Json& jchilds = _json["childs"];
-        {
-            for( int childIndex = 0; childIndex < (int)jchilds.size(); childIndex++ )
+            // Load childs
+            const Json& jchilds = _json["childs"];
             {
-                const Json& jchild_i = jchilds[childIndex];
+                for( int childIndex = 0; childIndex < (int)jchilds.size(); childIndex++ )
                 {
-                    RLoadFromJson( jchild_i, _scene, &node, _handleOffset );
+                    const Json& jchild_i = jchilds[childIndex];
+                    {
+                        RLoadFromJson( jchild_i, _scene, &node, _handleOffset, _prefabs );
+                    }
                 }
             }
+            return &node;
         }
-        return node;
     }
 }
