@@ -45,7 +45,7 @@ namespace fan
         ResourcePtr <ResourceType> Get( const std::string& _path );
         template< class ResourceType >
         ResourcePtr <ResourceType> Get( const uint32_t _guid );
-        ResourcePtrData Get( const std::string& _path ) { return Get( DSID( _path.c_str() ) ); };
+        ResourcePtrData Get( const std::string& _path );
         ResourcePtrData Get( const uint32_t _guid );
 
         template< class ResourceType >
@@ -56,7 +56,7 @@ namespace fan
         ResourcePtr <ResourceType> GetOrLoad( const std::string& _path );
         ResourcePtrData GetOrLoad( const uint32_t _type, const std::string& _path );
 
-        bool Remove( const std::string& _path ) { return Remove( DSID( _path.c_str() ) ); }
+        bool Remove( const std::string& _path );
         bool Remove( const uint32_t _guid );
 
         bool SetDirty( const uint32_t _guid );

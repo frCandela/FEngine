@@ -5,8 +5,10 @@
 #include "core/fanDebug.hpp"
 #include "core/fanPath.hpp"
 #include "fanDisableWarnings.hpp"
+
 WARNINGS_IMGUI_PUSH()
 #include "imgui/imgui_internal.h"
+
 WARNINGS_POP()
 
 namespace ImGui
@@ -217,7 +219,8 @@ namespace ImGui
                 if( !fan::Path::IsDirectory( _outCurrentPath ) )
                 {
                     ImGui::CloseCurrentPopup();
-                    returnValue = true;
+                    _outCurrentPath = fan::Path::MakeRelative( _outCurrentPath );
+                    returnValue     = true;
                 }
             }
 
@@ -272,7 +275,7 @@ namespace ImGui
                 if( fan::Path::IsFile( _path ) )
                 {
                     ImGui::CloseCurrentPopup();
-                    _path = fan::Path::MakeRelative( _path );
+                    _path       = fan::Path::MakeRelative( _path );
                     returnValue = true;
                 }
             }

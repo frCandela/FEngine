@@ -4,6 +4,7 @@
 #include "core/fanDebug.hpp"
 #include "core/fanPath.hpp"
 #include "core/resources/fanResources.hpp"
+#include "engine/components/fanPrefabInstance.hpp"
 #include "engine/components/fanSceneNode.hpp"
 #include "engine/singletons/fanScene.hpp"
 #include "engine/singletons/fanScenePointers.hpp"
@@ -80,6 +81,22 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
+    bool Prefab::Save( const std::string& _path )
+    {
+        Debug::Log() << Debug::Type::Resources << "Exporting prefab to " << _path << Debug::Endl();
+        std::ofstream outStream( Path::Normalize( _path ) );
+        if( outStream.is_open() )
+        {
+            outStream << mJson;
+            outStream.close();
+            return true;
+        }
+        Debug::Warning() << "Prefab export failed : " << _path << Debug::Endl();
+        return false;
+    }
+
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
     SceneNode* Prefab::Instantiate( SceneNode& _parent ) const
     {
         if( IsEmpty() )
@@ -93,7 +110,7 @@ namespace fan
             EcsWorld  & world      = *_parent.mScene->mWorld;
 
             // load resources
-            Resources & resources  = *world.GetSingleton<Application>().mResources;
+            Resources& resources = *world.GetSingleton<Application>().mResources;
             Scene::LoadResourceList( resources, prefabJson );
 
             Scene& scene = world.GetSingleton<Scene>();
@@ -103,6 +120,11 @@ namespace fan
             const EcsHandle maxHandle = Scene::RFindMaximumHandle( _parent );
             world.SetNextHandle( maxHandle + 1 );
             ScenePointers::ResolveComponentPointers( world, handleOffset );
+
+            EcsEntity entity = world.GetEntity( newNode.mHandle );
+            PrefabInstance& prefabInstance = world.AddComponent<PrefabInstance>( entity );
+            prefabInstance.mPrefab = ResourcePtrData::sResourceManager->Get<Prefab>( mGUID );
+
             return &newNode;
         }
     }

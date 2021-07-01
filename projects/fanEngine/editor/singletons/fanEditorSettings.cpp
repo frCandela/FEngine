@@ -81,6 +81,7 @@
 #include "editor/gui/components/fanGuiSceneNode.hpp"
 #include "editor/gui/components/fanGuiScale.hpp"
 #include "editor/gui/components/fanGuiAnimator.hpp"
+#include "editor/gui/components/fanGuiPrefabInstance.hpp"
 
 #include "editor/gui/physics/fanGuiTransform.hpp"
 #include "editor/gui/physics/fanGuiRigidbody.hpp"
@@ -330,6 +331,7 @@ namespace fan
         _componentInfos[PointLight::Info::sType]          = GuiPointLight::GetInfo();
         _componentInfos[SceneNode::Info::sType]           = GuiSceneNode::GetInfo();
         _componentInfos[Animator::Info::sType]            = GuiAnimator::GetInfo();
+        _componentInfos[PrefabInstance::Info::sType]      = GuiPrefabInstance::GetInfo();
 
         _componentInfos[Rigidbody::Info::sType]      = GuiRigidbody::GetInfo();
         _componentInfos[BoxCollider::Info::sType]    = GuiBoxCollider::GetInfo();

@@ -6,7 +6,7 @@ set(LIVEPP_DIR C:/LivePP)
 set(PCH_DIR "${CMAKE_SOURCE_DIR}/projects/fanPCH.hpp")
 set(LIVEPP_ENABLE ON)
 set(FAN_ENABLE_UNITY_BUILD ON)
-set(FAN_ENABLE_PCH ON)
+set(FAN_ENABLE_PCH OFF)
 
 link_directories("${VULKAN_DIR}/Lib")
 if (${CMAKE_BUILD_TYPE} MATCHES Debug)

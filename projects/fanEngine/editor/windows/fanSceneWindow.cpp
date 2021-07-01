@@ -439,30 +439,20 @@ namespace fan
 
         if( ImGui::FanSaveFileModal( "export_prefab", RenderGlobal::sPrefabExtensions, mPathBuffer ) )
         {
-            Debug::Log() << "Exporting prefab to " << mPathBuffer << Debug::Endl();
-
-            std::ofstream outStream( mPathBuffer );
-            if( outStream.is_open() )
+            // Try to update the existing prefab if it exists
+            Application& app    = _world.GetSingleton<Application>();
+            Prefab     * prefab = app.mResources->Get<Prefab>( mPathBuffer );
+            if( prefab != nullptr )
             {
-                // Try to update the existing prefab if it exists
-                Application& app    = _world.GetSingleton<Application>();
-                Prefab     * prefab = app.mResources->Get<Prefab>( mPathBuffer );
-                if( prefab != nullptr )
-                {
-                    prefab->CreateFromSceneNode( *mLastSceneNodeRightClicked );
-                    outStream << prefab->mJson;
-                }
-                else
-                {
-                    Prefab newprefab;
-                    newprefab.CreateFromSceneNode( *mLastSceneNodeRightClicked );
-                    outStream << newprefab.mJson;
-                }
-                outStream.close();
+                prefab->CreateFromSceneNode( *mLastSceneNodeRightClicked );
+                prefab->Save( mPathBuffer );
             }
             else
             {
-                Debug::Warning() << "Prefab export failed : " << mPathBuffer << Debug::Endl();
+                prefab = new Prefab;
+                prefab->CreateFromSceneNode( *mLastSceneNodeRightClicked );
+                prefab->Save( mPathBuffer );
+                app.mResources->Add<Prefab>( prefab, mPathBuffer );
             }
         }
     }

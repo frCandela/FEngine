@@ -16,6 +16,7 @@
 #include "engine/components/fanExpirationTime.hpp"
 #include "engine/components/fanFollowTransform.hpp"
 #include "engine/components/fanBounds.hpp"
+#include "engine/components/fanPrefabInstance.hpp"
 #include "engine/singletons/fanScene.hpp"
 #include "engine/singletons/fanApplication.hpp"
 #include "engine/singletons/fanScenePointers.hpp"
@@ -272,7 +273,7 @@ namespace fan
         _world.AddComponentType<ExpirationTime>();
         _world.AddComponentType<FollowTransform>();
         _world.AddComponentType<Bounds>();
-
+        _world.AddComponentType<PrefabInstance>();
         _world.AddComponentType<Transform>();
         _world.AddComponentType<Scale>();
 

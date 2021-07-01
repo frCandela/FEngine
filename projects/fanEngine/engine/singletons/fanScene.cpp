@@ -137,48 +137,48 @@ namespace fan
     //==================================================================================================================================================================================================
     void Scene::Save() const
     {
+        Json json;
+
+        // scene global parameters
+        Json& jScene = json["scene"];
+        Serializable::SaveStr( jScene, "path", Path::MakeRelative( mPath ) );
+
+        // save singleton components
+        Json& jSingletons = jScene["singletons"];
+        unsigned nextIndex = 0;
+        const std::vector<EcsSingletonInfo>& singletonsInfos = mWorld->GetVectorSingletonInfo();
+        std::string binarySavePath = Path::Directory( mPath ) + Path::FileName( mPath );
+        for( const EcsSingletonInfo& info : singletonsInfos )
+        {
+            if( info.save != nullptr )
+            {
+                Json& jSingleton_i = jSingletons[nextIndex++];
+                Serializable::SaveUInt( jSingleton_i, "singleton_id", info.mType );
+                Serializable::SaveStr( jSingleton_i, "singleton", info.mName );
+                EcsSingleton& singleton = mWorld->GetSingleton( info.mType );
+                info.save( singleton, jSingleton_i );
+                if( info.saveBinary != nullptr )
+                {
+                    info.saveBinary( singleton, binarySavePath.c_str() );
+                }
+            }
+        }
+
+        // saves all scene nodes recursively
+        Json& jRoot = jScene["root"];
+        RSaveToJson( GetRootNode(), jRoot );
+
+        Scene::RemapTable remapTable;
+        GenerateRemapTable( jRoot, remapTable );
+        RemapHandlesRecursively( jScene, remapTable );
+
+        // save resources
+        Resources& resources = *mWorld->GetSingleton<Application>().mResources;
+        BuildResourceList( resources, jScene, jScene );
+
         std::ofstream outStream( mPath );
         if( outStream.is_open() )
         {
-            Json json;
-
-            // scene global parameters
-            Json& jScene = json["scene"];
-            Serializable::SaveStr( jScene, "path", Path::MakeRelative( mPath ) );
-
-            // save singleton components
-            Json& jSingletons = jScene["singletons"];
-            unsigned nextIndex = 0;
-            const std::vector<EcsSingletonInfo>& singletonsInfos = mWorld->GetVectorSingletonInfo();
-            std::string binarySavePath = Path::Directory( mPath ) + Path::FileName( mPath );
-            for( const EcsSingletonInfo& info : singletonsInfos )
-            {
-                if( info.save != nullptr )
-                {
-                    Json& jSingleton_i = jSingletons[nextIndex++];
-                    Serializable::SaveUInt( jSingleton_i, "singleton_id", info.mType );
-                    Serializable::SaveStr( jSingleton_i, "singleton", info.mName );
-                    EcsSingleton& singleton = mWorld->GetSingleton( info.mType );
-                    info.save( singleton, jSingleton_i );
-                    if( info.saveBinary != nullptr )
-                    {
-                        info.saveBinary( singleton, binarySavePath.c_str() );
-                    }
-                }
-            }
-
-            // saves all scene nodes recursively
-            Json& jRoot = jScene["root"];
-            RSaveToJson( GetRootNode(), jRoot );
-
-            Scene::RemapTable remapTable;
-            GenerateRemapTable( jRoot, remapTable );
-            RemapHandlesRecursively( jScene, remapTable );
-
-            // save resources
-            Resources& resources = *mWorld->GetSingleton<Application>().mResources;
-            BuildResourceList( resources, jScene, jScene );
-
             outStream << json; // write to disk
             outStream.close();
         }
