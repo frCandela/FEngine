@@ -23,6 +23,7 @@
 #include "editor/singletons/fanEditorSettings.hpp"
 #include "editor/fanGuiTestSingleton.hpp"
 #include "editor/fanGuiTestComponent.hpp"
+
 #endif
 
 namespace fan
@@ -45,10 +46,6 @@ namespace fan
     //==================================================================================================================================================================================================
     void GameEmpty::Start()
     {
-        MeshManager& meshManager = *mWorld.GetSingleton<RenderResources>().mMeshManager;
-        RenderWorld& renderWorld = mWorld.GetSingleton<RenderWorld>();
-        meshManager.Add( renderWorld.mParticlesMesh, "particles_mesh" );
-
         Scene& scene = mWorld.GetSingleton<Scene>();
         SceneNode cameraNode = scene.CreateSceneNode( "game_camera", &scene.GetRootNode() );
         scene.SetMainCamera( cameraNode.mHandle );
@@ -65,6 +62,13 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
+    void GameEmpty::PreStep( const Fixed _delta )
+    {
+        (void)_delta;
+    };
+
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
     void GameEmpty::Step( const Fixed _delta )
     {
         SCOPED_PROFILE( step );
@@ -78,13 +82,11 @@ namespace fan
         SCOPED_PROFILE( update_render_world );
 
         RenderWorld& renderWorld = mWorld.GetSingleton<RenderWorld>();
-        renderWorld.mModels.clear();
-        renderWorld.mSkinnedModels.clear();
-
         mWorld.ForceRun<SUpdateRenderWorldModels>( renderWorld );
-        mWorld.ForceRun<SUpdateRenderWorldUI>();
-        mWorld.ForceRun<SUpdateRenderWorldPointLights>();
-        mWorld.ForceRun<SUpdateRenderWorldDirectionalLights>();
+        mWorld.ForceRun<SUpdateRenderWorldModelsSkinned>( renderWorld );
+        mWorld.ForceRun<SUpdateRenderWorldUI>( renderWorld );
+        mWorld.ForceRun<SUpdateRenderWorldPointLights>( renderWorld );
+        mWorld.ForceRun<SUpdateRenderWorldDirectionalLights>( renderWorld );
     }
 
     //==================================================================================================================================================================================================

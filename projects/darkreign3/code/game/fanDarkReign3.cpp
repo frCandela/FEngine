@@ -137,16 +137,12 @@ namespace fan
     void DarkReign3::Render()
     {
         SCOPED_PROFILE( update_render_world );
-
         RenderWorld& renderWorld = mWorld.GetSingleton<RenderWorld>();
-        renderWorld.mModels.clear();
-        renderWorld.mSkinnedModels.clear();
-
-        mWorld.Run<SUpdateRenderWorldModels>( renderWorld );
-        mWorld.Run<SUpdateRenderWorldModelsSkinned>( renderWorld );
-        mWorld.ForceRun<SUpdateRenderWorldUI>();
-        mWorld.ForceRun<SUpdateRenderWorldPointLights>();
-        mWorld.ForceRun<SUpdateRenderWorldDirectionalLights>();
+        mWorld.ForceRun<SUpdateRenderWorldModels>( renderWorld );
+        mWorld.ForceRun<SUpdateRenderWorldModelsSkinned>( renderWorld );
+        mWorld.ForceRun<SUpdateRenderWorldUI>(renderWorld);
+        mWorld.ForceRun<SUpdateRenderWorldPointLights>(renderWorld);
+        mWorld.ForceRun<SUpdateRenderWorldDirectionalLights>(renderWorld);
     }
 
     //==================================================================================================================================================================================================

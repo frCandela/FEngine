@@ -30,6 +30,9 @@ namespace fan
             auto meshRendererIt = _view.begin<MeshRenderer>();
             auto transformIt    = _view.begin<Transform>();
             auto materialIt     = _view.begin<Material>();
+
+            _renderWorld.mModels.clear();
+
             // get all mesh and adds them to the render world
             for( ; meshRendererIt != _view.end<MeshRenderer>(); ++meshRendererIt, ++transformIt, ++materialIt )
             {
@@ -79,6 +82,9 @@ namespace fan
             auto meshRendererIt = _view.begin<SkinnedMeshRenderer>();
             auto transformIt    = _view.begin<Transform>();
             auto materialIt     = _view.begin<Material>();
+
+            _renderWorld.mSkinnedModels.clear();
+
             // get all mesh and adds them to the render world
             for( ; meshRendererIt != _view.end<SkinnedMeshRenderer>(); ++meshRendererIt, ++transformIt, ++materialIt )
             {
@@ -127,10 +133,9 @@ namespace fan
                    | _world.GetSignature<TagVisible>();
         }
 
-        static void Run( EcsWorld& _world, const EcsView& _view )
+        static void Run( EcsWorld&, const EcsView& _view, RenderWorld& _renderWorld )
         {
-            RenderWorld& renderWorld = _world.GetSingleton<RenderWorld>();
-            renderWorld.mUIModels.clear();
+            _renderWorld.mUIModels.clear();
 
             auto rendererIt  = _view.begin<UIRenderer>();
             auto transformIt = _view.begin<UITransform>();
@@ -149,21 +154,21 @@ namespace fan
 
                 RenderDataMesh2D data;
                 data.mMesh     = renderer.mMesh2D;
-                data.mPosition = glm::vec2( transform.mPosition ) / renderWorld.mTargetSize * 2.f - glm::vec2( 1.f, 1.f );
-                data.mScale    = glm::vec2( transform.mSize ) / renderWorld.mTargetSize;
+                data.mPosition = glm::vec2( transform.mPosition ) / _renderWorld.mTargetSize * 2.f - glm::vec2( 1.f, 1.f );
+                data.mScale    = glm::vec2( transform.mSize ) / _renderWorld.mTargetSize;
                 data.mUvOffset = glm::vec2( renderer.mUvOffset ) / textureSize;
                 data.mUvScale  = glm::vec2( renderer.mTiling );
                 data.mColor    = renderer.mColor.ToGLM();
                 data.mTexture  = renderer.mTexture;
                 data.mDepth    = renderer.mDepth;
-                renderWorld.mUIModels.push_back( data );
+                _renderWorld.mUIModels.push_back( data );
             }
 
             auto sortFunc = []( RenderDataMesh2D& _a, RenderDataMesh2D& _b )
             {
                 return _a.mDepth > _b.mDepth;
             };
-            std::sort( renderWorld.mUIModels.begin(), renderWorld.mUIModels.end(), sortFunc );
+            std::sort( _renderWorld.mUIModels.begin(), _renderWorld.mUIModels.end(), sortFunc );
         }
     };
 
@@ -174,14 +179,12 @@ namespace fan
     {
         static EcsSignature GetSignature( const EcsWorld& _world )
         {
-            return _world.GetSignature<Transform>()
-                   | _world.GetSignature<PointLight>();
+            return _world.GetSignature<Transform>() | _world.GetSignature<PointLight>();
         }
 
-        static void Run( EcsWorld& _world, const EcsView& _view )
+        static void Run( EcsWorld&, const EcsView& _view, RenderWorld& _renderWorld )
         {
-            RenderWorld& renderWorld = _world.GetSingleton<RenderWorld>();
-            renderWorld.mPointLights.clear();
+            _renderWorld.mPointLights.clear();
 
             auto transformIt = _view.begin<Transform>();
             auto lightIt     = _view.begin<PointLight>();
@@ -199,7 +202,7 @@ namespace fan
                 pointLight.mLinear    = light.mAttenuation[PointLight::Linear].ToFloat();
                 pointLight.mQuadratic = light.mAttenuation[PointLight::Quadratic].ToFloat();
 
-                renderWorld.mPointLights.push_back( pointLight );
+                _renderWorld.mPointLights.push_back( pointLight );
             }
         }
     };
@@ -211,14 +214,12 @@ namespace fan
     {
         static EcsSignature GetSignature( const EcsWorld& _world )
         {
-            return _world.GetSignature<Transform>()
-                   | _world.GetSignature<DirectionalLight>();
+            return _world.GetSignature<Transform>() | _world.GetSignature<DirectionalLight>();
         }
 
-        static void Run( EcsWorld& _world, const EcsView& _view )
+        static void Run( EcsWorld&, const EcsView& _view, RenderWorld& _renderWorld )
         {
-            RenderWorld& renderWorld = _world.GetSingleton<RenderWorld>();
-            renderWorld.mDirectionalLights.clear();
+            _renderWorld.mDirectionalLights.clear();
 
             auto transformIt = _view.begin<Transform>();
             auto lightIt     = _view.begin<DirectionalLight>();
@@ -233,7 +234,7 @@ namespace fan
                 light.mDiffuse   = directionalLight.mDiffuse.ToGLM();
                 light.mSpecular  = directionalLight.mSpecular.ToGLM();
 
-                renderWorld.mDirectionalLights.push_back( light );
+                _renderWorld.mDirectionalLights.push_back( light );
             }
         }
     };

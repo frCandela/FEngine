@@ -11,6 +11,7 @@ namespace fan
         void Init() override;
         void Start() override;
         void Stop() override;
+        void PreStep( const Fixed _delta ) override;
         void Step( const Fixed _delta ) override;
         void Render() override;
         void OnGui() override;
