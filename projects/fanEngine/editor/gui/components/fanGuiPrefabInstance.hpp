@@ -40,10 +40,13 @@ namespace fan
             {
                 SceneNode& node   = _world.GetComponent<SceneNode>( _entity );
                 SceneNode& parent = _world.GetComponent<SceneNode>( _world.GetEntity( node.mParentHandle ) );
+                PrefabInstance::CreateOverride( prefabInstance, _world, _entity );
                 prefabInstance.mPrefab->CreateFromFile( prefabInstance.mPrefab->mPath );
                 SceneNode* reloadedPrefab = prefabInstance.mPrefab->Instantiate( parent );
                 if( reloadedPrefab != nullptr )
                 {
+                    EcsEntity reloadedEntity = _world.GetEntity( reloadedPrefab->mHandle );
+                    PrefabInstance::ApplyOverride( prefabInstance, _world, reloadedEntity );
                     _world.Kill( _entity );
                     EditorSelection& editorSelection = _world.GetSingleton<EditorSelection>();
                     editorSelection.mSelectedNodeHandle = reloadedPrefab->mHandle;

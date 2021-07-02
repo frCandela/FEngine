@@ -2,9 +2,10 @@
 
 #include <set>
 #include "core/fanSignal.hpp"
-#include "engine/fanEngineSerializable.hpp"
-#include "ecs/fanEcsSingleton.hpp"
 #include "core/resources/fanResourcePtr.hpp"
+#include "ecs/fanEcsSingleton.hpp"
+#include "engine/fanEngineSerializable.hpp"
+#include "engine/components/fanPrefabInstance.hpp"
 
 namespace fan
 {
@@ -33,7 +34,7 @@ namespace fan
 
         struct ChildPrefab
         {
-            ResourcePtr<Prefab> mPrefab;
+            PrefabInstance mPrefabInstance;
             SceneNode* mParent;
             int mChildIndex;
         };
