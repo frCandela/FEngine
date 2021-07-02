@@ -77,6 +77,17 @@ namespace fan
         EcsWorld & world     = *_node.mScene->mWorld;
         Resources& resources = *world.GetSingleton<Application>().mResources;
         Scene::BuildResourceList( resources, prefabJson, prefabJson );
+
+        EcsEntity entity = world.GetEntity( _node.mHandle );
+        if( world.HasComponent<PrefabInstance>( entity ) )
+        {
+            PrefabInstance& prefabInstance = world.GetComponent<PrefabInstance>( entity );
+            if( prefabInstance.mPrefab != nullptr )
+            {
+                prefabJson["path"] = prefabInstance.mPrefab->mPath;
+                prefabJson["guid"] = prefabInstance.mPrefab->mGUID;
+            }
+        }
     }
 
     //==================================================================================================================================================================================================
@@ -123,9 +134,29 @@ namespace fan
             world.SetNextHandle( maxHandle + 1 );
             ScenePointers::ResolveComponentPointers( world, handleOffset );
 
-            EcsEntity entity = world.GetEntity( newNode->mHandle );
-            PrefabInstance& prefabInstance = world.AddComponent<PrefabInstance>( entity );
-            prefabInstance.mPrefab = ResourcePtrData::sResourceManager->Get<Prefab>( mGUID );
+            uint32_t    guid = mGUID;
+            std::string path = mPath;
+            if( mGUID == 0 || mPath.empty() )
+            {
+                Json::const_iterator jGuid = prefabJson.find( "guid" );
+                Json::const_iterator jPath = prefabJson.find( "path" );
+                if( jPath != prefabJson.end() && jGuid != prefabJson.end() )
+                {
+                    guid = *jGuid;
+                    path = *jPath;
+                }
+            }
+
+            if( !path.empty() && guid != 0 )
+            {
+                ResourcePtr<Prefab> prefabPtr = ResourcePtrData::sResourceManager->Get<Prefab>( guid );
+                if( prefabPtr != nullptr )
+                {
+                    EcsEntity entity = world.GetEntity( newNode->mHandle );
+                    PrefabInstance& prefabInstance = world.AddComponent<PrefabInstance>( entity );
+                    prefabInstance.mPrefab = prefabPtr;
+                }
+            }
 
             return newNode;
         }

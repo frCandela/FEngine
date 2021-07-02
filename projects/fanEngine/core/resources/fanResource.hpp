@@ -21,10 +21,10 @@ namespace fan
     //==================================================================================================================================================================================================
     struct Resource
     {
-        uint32_t    mGUID;
+        uint32_t    mGUID        = 0;
         std::string mPath;
-        uint32_t    mType;
-        bool        mIsDirty = false;
+        uint32_t    mType        = 0;
+        bool        mIsDirty     = false;
         bool        mIsGenerated = false;
     };
 
@@ -32,7 +32,7 @@ namespace fan
     //==================================================================================================================================================================================================
     struct ResourceHandle
     {
-        Resource *  mResource;
-        int16_t     mRefCount = 0;
+        Resource* mResource;
+        int16_t mRefCount = 0;
     };
 }
