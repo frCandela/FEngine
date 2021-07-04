@@ -95,13 +95,15 @@ namespace fan
             time.mLastLogicTime += time.mLogicDelta.ToDouble();
             time.mFrameIndex++;
 
+            const Fixed scaledDelta = time.mLogicTimeScale * time.mLogicDelta;
+
             world.GetSingleton<RenderDebug>().Clear();
 
             mGame.PreStep( time.mLogicDelta );
 
             // physics & transforms
-            world.Run<SIntegrateRigidbodies>( time.mLogicDelta );
-            world.Run<SDetectCollisions>( time.mLogicDelta );
+            world.Run<SIntegrateRigidbodies>( scaledDelta );
+            world.Run<SDetectCollisions>( scaledDelta );
             world.Run<SMoveFollowTransforms>();
 
             // bounds
@@ -110,10 +112,10 @@ namespace fan
             world.Run<SUpdateBoundsFromModel>();
             world.Run<SUpdateBoundsFromTransform>();
 
-            mGame.Step( time.mLogicDelta );
+            mGame.Step( scaledDelta );
 
             // animation
-            world.Run<SUpdateAnimators>( time.mLogicDelta );
+            world.Run<SUpdateAnimators>( scaledDelta );
 
             // ui
             world.Run<SUpdateUIText>();
@@ -124,10 +126,10 @@ namespace fan
             world.Run<SHighlightButtons>();
 
             // gameplay
-            world.Run<SUpdateExpirationTimes>( time.mLogicDelta.ToFloat() );
-            world.Run<SUpdateParticles>( time.mLogicDelta.ToFloat() );
-            world.Run<SEmitParticles>( time.mLogicDelta.ToFloat() );
-            world.Run<SGenerateParticles>( time.mLogicDelta.ToFloat() );
+            world.Run<SUpdateExpirationTimes>( scaledDelta.ToFloat() );
+            world.Run<SUpdateParticles>( scaledDelta.ToFloat() );
+            world.Run<SEmitParticles>( scaledDelta.ToFloat() );
+            world.Run<SGenerateParticles>( scaledDelta.ToFloat() );
 
             world.ApplyTransitions();
 

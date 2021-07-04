@@ -19,6 +19,7 @@ namespace fan
 
         Fixed mLogicDelta;     // duration of a logic frame in seconds
         Fixed mRenderDelta;    // duration of a physics step in seconds
+        Fixed mLogicTimeScale; // multiplier for the logic delta
 
         FrameIndex mFrameIndex;         // the index of the current logic frame
         double     mLastLogicTime;      // last time the logic was run

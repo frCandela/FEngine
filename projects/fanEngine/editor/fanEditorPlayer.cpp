@@ -210,17 +210,17 @@ namespace fan
                 time.mLastLogicTime += time.mLogicDelta.ToDouble();
                 time.mFrameIndex++;
 
-
                 const EditorPlayState& playState = world.GetSingleton<EditorPlayState>();
-                const Fixed delta = playState.mState == EditorPlayState::PLAYING ? time.mLogicDelta : 0;
+                const Fixed delta       = playState.mState == EditorPlayState::PLAYING ? time.mLogicDelta : 0;
+                const Fixed scaledDelta = time.mLogicTimeScale * delta;
 
                 world.GetSingleton<RenderDebug>().Clear();
 
-                game.PreStep( delta );
+                game.PreStep( scaledDelta );
 
                 // physics & transforms
-                world.Run<SIntegrateRigidbodies>( delta );
-                world.Run<SDetectCollisions>( delta );
+                world.Run<SIntegrateRigidbodies>( scaledDelta );
+                world.Run<SDetectCollisions>( scaledDelta );
                 world.Run<SMoveFollowTransforms>();
 
                 // bounds
@@ -229,10 +229,10 @@ namespace fan
                 world.Run<SUpdateBoundsFromModel>();
                 world.Run<SUpdateBoundsFromTransform>();
 
-                game.Step( delta );
+                game.Step( scaledDelta );
 
                 // animation
-                world.Run<SUpdateAnimators>( delta );
+                world.Run<SUpdateAnimators>( scaledDelta );
 
                 // ui
                 world.Run<SUpdateUIText>();
@@ -243,10 +243,10 @@ namespace fan
                 world.Run<SHighlightButtons>();
 
                 // gameplay
-                world.Run<SUpdateExpirationTimes>( delta.ToFloat() );
-                world.Run<SUpdateParticles>( delta.ToFloat() );
-                world.Run<SEmitParticles>( delta.ToFloat() );
-                world.Run<SGenerateParticles>( delta.ToFloat() );
+                world.Run<SUpdateExpirationTimes>( scaledDelta.ToFloat() );
+                world.Run<SUpdateParticles>( scaledDelta.ToFloat() );
+                world.Run<SEmitParticles>( scaledDelta.ToFloat() );
+                world.Run<SGenerateParticles>( scaledDelta.ToFloat() );
 
                 world.ApplyTransitions();
 

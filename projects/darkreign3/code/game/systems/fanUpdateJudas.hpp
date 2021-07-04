@@ -10,13 +10,13 @@ namespace fan
     {
         static EcsSignature GetSignature( const EcsWorld& _world )
         {
-            return _world.GetSignature<TerrainAgent>()
-                   | _world.GetSignature<Animator>()
-                   | _world.GetSignature<Judas>();
+            return _world.GetSignature<TerrainAgent>() | _world.GetSignature<Animator>() | _world.GetSignature<Judas>();
         }
 
-        static void Run( EcsWorld&, const EcsView& _view )
+        static void Run( EcsWorld&, const EcsView& _view, const Fixed _delta )
         {
+            if( _delta <= 0 ){ return; }
+
             auto animatorIt = _view.begin<Animator>();
             auto agentIt    = _view.begin<TerrainAgent>();
             auto judasIt    = _view.begin<Judas>();

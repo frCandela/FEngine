@@ -19,6 +19,7 @@ namespace fan
         time.mFrameIndex  = 0;
         time.mLogicDelta  = FIXED( 1 ) / 120;
         time.mRenderDelta = FIXED( 1 ) / 144;
+        time.mLogicTimeScale = 1;
 
         time.mLastLogicTime    = ElapsedSinceStartup();
         time.mLastRenderTime   = ElapsedSinceStartup();

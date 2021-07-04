@@ -131,6 +131,7 @@ namespace fan
         if( !mPaused )
         {
             mPaused = true;
+            mWorld.GetSingleton<Time>().mLogicTimeScale = 0;
             PauseMenu::Show( mWorld );
         }
     }
@@ -142,6 +143,7 @@ namespace fan
         if( mPaused )
         {
             mPaused = false;
+            mWorld.GetSingleton<Time>().mLogicTimeScale = 1;
             PauseMenu::Hide( mWorld );
         }
     }
@@ -162,10 +164,7 @@ namespace fan
         static const int chunksPerFrame = System::GetBuildType() == System::BuildType::Release ? 16 : 1;
         VoxelTerrain::StepLoadTerrain( mWorld, chunksPerFrame );
 
-        if( !mPaused )
-        {
-            RTSCamera::Update( mWorld, _delta );
-        }
+        RTSCamera::Update( mWorld, _delta );
 
         // update selection
         const SelectionStatus selectionStatus = Selection::SelectUnits( mWorld, _delta );
@@ -176,7 +175,7 @@ namespace fan
         const DR3Cursor currentCursor = DR3Cursors::GetCurrentCursor( _delta, mWorld.GetSingleton<Time>(), selectionStatus );
         app.mCurrentCursor = currentCursor == DR3Cursor::Count ? nullptr : mCursors.mCursors[currentCursor];
 
-        mWorld.Run<SUpdateJudasAnimation>();
+        mWorld.Run<SUpdateJudasAnimation>( _delta );
 
         // ui
         mWorld.Run<SUpdateAnimScale>( _delta );
