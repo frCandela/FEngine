@@ -205,6 +205,7 @@ namespace fan
         EcsEntity entity = world.GetEntity( _node.mHandle );
         Json& jComponents = _json["components"];
         Json& jchilds     = _json["childs"];
+        Json& jTags       = _json["tags"];
 
         // if the node is a prefab, only save the prefab instance component and an optional transform/ui transform
         if( !_inlinePrefabs && world.HasComponent<PrefabInstance>( entity ) )
@@ -223,6 +224,16 @@ namespace fan
         }
         else
         {
+            // save tags
+            {
+                unsigned nextIndex = 0;
+                for( const EcsTagInfo& info : world.GetTagsInfos() )
+                {
+                    if( !world.HasTag( entity, info.mType ) ){ continue; }
+                    jTags[nextIndex++] = info.mType;
+                }
+            }
+
             // save components
             {
                 unsigned nextIndex = 0;
@@ -469,11 +480,13 @@ namespace fan
             }
 
             ScenePointers::ResolveComponentPointers( *mWorld, handleOffset );
-            mWorld->Run<SInitFollowTransforms>();
 
             mOnLoad.Emmit( *this );
             mWorld->ApplyTransitions();
             mWorld->PostInitSingletons();
+
+            mWorld->Run<SInitFollowTransforms>();
+
             return true;
         }
         else
@@ -491,8 +504,9 @@ namespace fan
         EcsWorld& world = *_scene.mWorld;
 
         const Json& jComponents = _json["components"];
+        const Json& jTags       = _json["tags"];
 
-        // If a PrefabInstance component is present, push in the prefab list and add a null child. Prefab will be instanced later
+        // if a PrefabInstance component is present, push in the prefab list and add a null child. Prefab will be instanced later
         if( jComponents.size() == 1 && jComponents[0]["component_type"] == PrefabInstance::Info::sType )
         {
             ChildPrefab childPrefab;
@@ -504,17 +518,29 @@ namespace fan
             return nullptr;
         }
 
-        // components
+        // load globals
         EcsHandle nodeHandle;
         Serializable::LoadUInt( _json, "handle", nodeHandle );
         SceneNode& node = _scene.CreateSceneNode( "tmp", _parent, nodeHandle + _handleOffset, _childIndex );
         Serializable::LoadStr( _json, "name", node.mName );
-
-        // append id
         _scene.mNodes.insert( node.mHandle );
 
-        const EcsEntity entity     = world.GetEntity( node.mHandle );
-        for( int        childIndex = 0; childIndex < (int)jComponents.size(); childIndex++ )
+        const EcsEntity entity = world.GetEntity( node.mHandle );
+
+        // load tags
+        {
+            for( int i = 0; i < jTags.size(); i++ )
+            {
+                const uint32_t tagType = jTags[i];
+                if( world.SafeGetTagInfo( tagType ) )
+                {
+                    world.AddTag( entity, tagType );
+                }
+            }
+        }
+
+        // load components
+        for( int childIndex = 0; childIndex < (int)jComponents.size(); childIndex++ )
         {
             const Json& jComponent_i = jComponents[childIndex];
             unsigned staticIndex = 0;

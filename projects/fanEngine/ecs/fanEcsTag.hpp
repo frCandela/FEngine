@@ -24,5 +24,6 @@ namespace fan
     struct EcsTagInfo
     {
         std::string mName;
+        uint32_t    mType;
     };
 }

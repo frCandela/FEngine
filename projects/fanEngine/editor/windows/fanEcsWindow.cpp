@@ -40,8 +40,7 @@ namespace fan
         if( ImGui::CollapsingHeader( "Global" ) )
         {
             ImGui::Text( "num chunks     : %d", (int)EcsChunk::sAllocator.Size() );
-            ImGui::Text( "total size (Mo): %.1f",
-                         float( EcsChunk::sAllocator.Size() * EcsChunk::sAllocator.sChunkSize ) * 0.000001f );
+            ImGui::Text( "total size (Mo): %.1f", float( EcsChunk::sAllocator.Size() * EcsChunk::sAllocator.sChunkSize ) * 0.000001f );
         }
 
         // Archetypes

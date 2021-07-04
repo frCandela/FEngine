@@ -124,7 +124,9 @@ namespace fan
         const EcsComponentInfo& IndexedGetComponentInfo( const int _componentIndex ) const;
         const EcsComponentInfo& GetComponentInfo( const uint32_t _type ) const;
         const EcsComponentInfo* SafeGetComponentInfo( const uint32_t _type ) const;
+        const EcsTagInfo* SafeGetTagInfo( const uint32_t _type ) const;
         const std::vector<EcsComponentInfo>& GetComponentInfos() const { return mComponentsInfo; }
+        const std::vector<EcsTagInfo>& GetTagsInfos() const { return mTagsInfo; }
 
         // Entities
         EcsEntity CreateEntity();
@@ -218,7 +220,10 @@ namespace fan
         mTypeToIndex[_TagType::Info::sType] = newTagIndex;
 
         mTagsMask[newTagIndex] = 1;
-        mTagsInfo.push_back( { _TagType::Info::sName } );
+        EcsTagInfo info;
+        info.mName = _TagType::Info::sName;
+        info.mType = _TagType::Info::sType;
+        mTagsInfo.push_back( info );
     }
 
     //==================================================================================================================================================================================================
@@ -366,6 +371,6 @@ namespace fan
     {
         static_assert( std::is_base_of<EcsSystem, _SystemType>::value );
         const EcsSignature signature = _SystemType::GetSignature( *this );
-        return Match( signature, EcsSignature(0) );
+        return Match( signature, EcsSignature( 0 ) );
     }
 }
