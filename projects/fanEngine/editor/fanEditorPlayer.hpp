@@ -17,9 +17,10 @@ namespace fan
     struct EditorPlayer
     {
         std::vector<IGame*> mGames;
-        int                 mCurrentGame = 0;
-        bool                mShowUi      = true;
+        int                 mCurrentGame           = 0;
+        bool                mShowUi                = true;
         FrameIndex          mLastLogicFrameRendered;
+        bool                mStopPlayingEndOfFrame = false;
         EditorSettingsData  mEditorSettings;
         PlayerData          mData;
         IGame& GetCurrentGame() { return *mGames[mCurrentGame]; }
@@ -33,7 +34,7 @@ namespace fan
         void OnCycleCurrentGame();
         void OnSwitchPlayStop();
         void OnStart();
-        void OnStop() { Stop( GetCurrentGame() ); }
+        void OnStop() { mStopPlayingEndOfFrame = true; }
         void OnPause() { Pause( GetCurrentGame() ); }
         void OnResume() { Resume( GetCurrentGame() ); }
         void OnStep();

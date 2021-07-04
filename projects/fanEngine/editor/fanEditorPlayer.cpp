@@ -109,7 +109,9 @@ namespace fan
             EditorSettings& editorSerializedValues = world.GetSingleton<EditorSettings>();
             editorSerializedValues.mData = &mEditorSettings;
 
-            world.GetSingleton<Application>().Setup( &mData.mResources );
+            Application& application = world.GetSingleton<Application>();
+            application.Setup( &mData.mResources );
+            application.mOnQuit.Connect( &EditorPlayer::OnStop, this );
 
             RenderWorld& renderWorld = world.GetSingleton<RenderWorld>();
             renderWorld.mIsHeadless = ( &game != &GetCurrentGame() );
@@ -262,6 +264,13 @@ namespace fan
 
                 currentWorld.GetSingleton<Mouse>().ClearSingleFrameEvents();
             }
+        }
+
+        // stop playing
+        if( mStopPlayingEndOfFrame )
+        {
+            mStopPlayingEndOfFrame = false;
+            Stop( currentGame );
         }
 
         mData.mOnLPPSynch.Emmit();

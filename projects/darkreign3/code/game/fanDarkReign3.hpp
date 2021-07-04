@@ -33,6 +33,7 @@ namespace fan
         void OnTogglePause();
         void OnPause();
         void OnResume();
+        void OnQuit();
 
         EcsWorld mWorld;
         DR3Cursors mCursors;
