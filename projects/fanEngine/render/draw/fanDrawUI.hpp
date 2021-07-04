@@ -24,7 +24,7 @@ namespace fan
         glm::vec2 mPosition;
         glm::vec2 mScale;
         glm::vec2 mUvOffset;
-        glm::vec2 mUvScale;
+        glm::vec2 mTiling;
         glm::vec4 mColor;
         int       mDepth = 0;
     };
@@ -43,7 +43,7 @@ namespace fan
     struct DynamicUniformUIFrag
     {
         glm::vec2 mUvOffset;
-        glm::vec2 mUvScale;
+        glm::vec2 mTiling;
     };
 
     //==================================================================================================================================================================================================

@@ -19,10 +19,22 @@ namespace fan
         static void Load( EcsSingleton& _component, const Json& _json );
 
         static void Instantiate( EcsWorld& _world );
+        static void Show( EcsWorld& _world );
+        static void Hide( EcsWorld& _world );
+        static void Destroy( EcsWorld& _world );
+        void OnResume();
+        void OnOptions();
+        void OnQuit();
 
         EcsHandle mHandle = 0;
 
-        ResourcePtr<Prefab> mHeader;
-        ResourcePtr<Prefab> mBackground;
+        ResourcePtr <Prefab> mBackground;
+        ResourcePtr <Prefab> mButton;
+        ResourcePtr <Prefab> mHeader;
+        ResourcePtr <Prefab> mCloseButton;
+
+        Signal<> mOnResume;
+        Signal<> mOnOptions;
+        Signal<> mOnQuit;
     };
 }

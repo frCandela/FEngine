@@ -16,6 +16,6 @@ layout (binding = 1) uniform DynamicUniformBufferObject
 
 void main()
 {
-    vec4 textureColor = texture(sampler2D(diffuseTexture, diffuseSampler), inTexCoord / data.tiling + data.uvoffset );
+    vec4 textureColor = texture(sampler2D(diffuseTexture, diffuseSampler), inTexCoord / data.tiling  +  data.uvoffset );
     outColor = textureColor *inColor;
 }

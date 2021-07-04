@@ -31,8 +31,13 @@ namespace fan
         EcsWorld& GetWorld() override { return mWorld; }
 
         void OnEditorUseGameCamera();
+        void OnTogglePause();
+        void OnPause();
+        void OnResume();
 
         EcsWorld mWorld;
         DR3Cursors mCursors;
+
+        bool mPaused;
     };
 }

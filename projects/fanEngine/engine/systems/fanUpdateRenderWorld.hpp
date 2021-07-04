@@ -151,13 +151,14 @@ namespace fan
                 }
 
                 const glm::vec2 textureSize = glm::vec2( renderer.mTexture != nullptr ? glm::ivec2( renderer.mTexture->mExtent.width, renderer.mTexture->mExtent.height ) : glm::ivec2 { 1, 1 } );
+                const glm::vec2 tilingSize  = textureSize / glm::vec2( renderer.mTiling );
 
                 RenderDataMesh2D data;
                 data.mMesh     = renderer.mMesh2D;
                 data.mPosition = glm::vec2( transform.mPosition ) / _renderWorld.mTargetSize * 2.f - glm::vec2( 1.f, 1.f );
                 data.mScale    = glm::vec2( transform.mSize ) / _renderWorld.mTargetSize;
-                data.mUvOffset = glm::vec2( renderer.mUvOffset ) / textureSize;
-                data.mUvScale  = glm::vec2( renderer.mTiling );
+                data.mUvOffset = glm::vec2( renderer.mTileIndex ) * tilingSize / textureSize;
+                data.mTiling   = glm::vec2( renderer.mTiling );
                 data.mColor    = renderer.mColor.ToGLM();
                 data.mTexture  = renderer.mTexture;
                 data.mDepth    = renderer.mDepth;

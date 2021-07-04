@@ -156,7 +156,7 @@ namespace fan
             mUniforms.mDynamicUniformsVert[meshIndex].mColor    = uiData.mColor;
 
             mUniforms.mDynamicUniformsFrag[meshIndex].mUvOffset = uiData.mUvOffset;
-            mUniforms.mDynamicUniformsFrag[meshIndex].mUvScale  = uiData.mUvScale;
+            mUniforms.mDynamicUniformsFrag[meshIndex].mTiling   = uiData.mTiling;
         }
     }
 

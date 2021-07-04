@@ -71,12 +71,20 @@ namespace ImGui
                 returnValue      = true;
             }
 
-            // Right click = clear
+            // Right click
             if( ImGui::IsItemClicked( 1 ) )
             {
-                _resourcePtrData.mGUID   = 0;
-                _resourcePtrData.mHandle = nullptr;
-                returnValue = true;
+                ImGui::OpenPopup( "resource_menu_popup" );
+            }
+
+            // Right click popup
+            if( ImGui::BeginPopup( "resource_menu_popup" ) )
+            {
+                if( ImGui::Selectable( "Reload" ) )
+                {
+                    _resourcePtrData.sResourceManager->Load( _resourceType, resource->mPath );
+                }
+                ImGui::EndPopup();
             }
 
             // Modal set value

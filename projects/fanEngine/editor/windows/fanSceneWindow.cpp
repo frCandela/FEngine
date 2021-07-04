@@ -463,6 +463,14 @@ namespace fan
                 prefab->Save( mPathBuffer );
                 app.mResources->Add<Prefab>( prefab, mPathBuffer );
             }
+
+            EcsEntity entity = _world.GetEntity( mLastSceneNodeRightClicked->mHandle );
+            if( !_world.HasComponent<PrefabInstance>( entity ) )
+            {
+                PrefabInstance& prefabInstance = _world.AddComponent<PrefabInstance>( entity );
+                prefabInstance.mPrefab = app.mResources->Get<Prefab>( mPathBuffer );
+                PrefabInstance::CreateOverride( prefabInstance, _world, entity );
+            }
         }
     }
 }

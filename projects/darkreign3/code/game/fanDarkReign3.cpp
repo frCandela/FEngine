@@ -1,5 +1,7 @@
 #include "game/fanDarkReign3.hpp"
 #include "platform/input/fanKeyboard.hpp"
+#include "platform/input/fanInput.hpp"
+#include "platform/input/fanInputManager.hpp"
 #include "core/random/fanSimplexNoise.hpp"
 #include "core/time/fanScopedTimer.hpp"
 #include "network/singletons/fanTime.hpp"
@@ -41,6 +43,7 @@
 #include "editor/fanGuiAnimScale.hpp"
 #include "editor/fanGuiTerrainAgent.hpp"
 #include "editor/fanGuiJudas.hpp"
+
 #endif
 
 #include "render/fanWindow.hpp"
@@ -74,28 +77,73 @@ namespace fan
 #endif
 
         mCursors.Load( *mWorld.GetSingleton<Application>().mResources );
+        Input::Get().Manager().CreateKeyboardEvent( "game_pause", Keyboard::ESCAPE )->Connect( &DarkReign3::OnTogglePause, this );
     }
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
     void DarkReign3::Start()
     {
-        RTSCamera::CreateCamera( mWorld );
+        RTSCamera::Instantiate( mWorld );
+        PauseMenu::Instantiate( mWorld );
+        PauseMenu::Hide( mWorld );
+        mPaused = false;
+
+        PauseMenu& pauseMenu = mWorld.GetSingleton<PauseMenu>();
+        pauseMenu.mOnResume.Connect( &DarkReign3::OnResume, this );
     }
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
     void DarkReign3::Stop()
     {
+        PauseMenu::Destroy( mWorld );
     }
 
-    //============================================================================================================================
-    //============================================================================================================================
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
     void DarkReign3::OnEditorUseGameCamera()
     {
         RTSCamera& rtsCamera = mWorld.GetSingleton<RTSCamera>();
         fanAssert( rtsCamera.mCameraHandle != 0 );
         mWorld.GetSingleton<Scene>().SetMainCamera( rtsCamera.mCameraHandle );
+    }
+
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    void DarkReign3::OnTogglePause()
+    {
+        Debug::Log( "DarkReign3::OnTogglePause" );
+        if( mPaused )
+        {
+            OnResume();
+        }
+        else
+        {
+            OnPause();
+        }
+    }
+
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    void DarkReign3::OnPause()
+    {
+        if( !mPaused )
+        {
+            mPaused = true;
+            PauseMenu::Show( mWorld );
+        }
+    }
+
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    void DarkReign3::OnResume()
+    {
+        if( mPaused )
+        {
+            mPaused = false;
+            PauseMenu::Hide( mWorld );
+        }
     }
 
     //==================================================================================================================================================================================================
@@ -114,7 +162,10 @@ namespace fan
         static const int chunksPerFrame = System::GetBuildType() == System::BuildType::Release ? 16 : 1;
         VoxelTerrain::StepLoadTerrain( mWorld, chunksPerFrame );
 
-        RTSCamera::Update( mWorld, _delta );
+        if( !mPaused )
+        {
+            RTSCamera::Update( mWorld, _delta );
+        }
 
         // update selection
         const SelectionStatus selectionStatus = Selection::SelectUnits( mWorld, _delta );
@@ -140,9 +191,9 @@ namespace fan
         RenderWorld& renderWorld = mWorld.GetSingleton<RenderWorld>();
         mWorld.ForceRun<SUpdateRenderWorldModels>( renderWorld );
         mWorld.ForceRun<SUpdateRenderWorldModelsSkinned>( renderWorld );
-        mWorld.ForceRun<SUpdateRenderWorldUI>(renderWorld);
-        mWorld.ForceRun<SUpdateRenderWorldPointLights>(renderWorld);
-        mWorld.ForceRun<SUpdateRenderWorldDirectionalLights>(renderWorld);
+        mWorld.ForceRun<SUpdateRenderWorldUI>( renderWorld );
+        mWorld.ForceRun<SUpdateRenderWorldPointLights>( renderWorld );
+        mWorld.ForceRun<SUpdateRenderWorldDirectionalLights>( renderWorld );
     }
 
     //==================================================================================================================================================================================================

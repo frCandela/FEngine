@@ -42,11 +42,24 @@ namespace fan
 
         static void GetDescendantsOf( const SceneNode& _root, std::vector<SceneNode*>& _outList );
 
+        template< class _ComponentType >
+        static _ComponentType* FindComponentInChildren( const SceneNode& _sceneNode )
+        {
+            static_assert( std::is_base_of<EcsComponent, _ComponentType>::value );
+            return static_cast<_ComponentType*>(FindComponentInChildren( _sceneNode, _ComponentType::Info::sType ));
+        }
+        static EcsComponent* FindComponentInChildren( const SceneNode& _node, const uint32_t _componentType );
+        static void ExecuteInChildren( SceneNode& _sceneNode, void (* _visitor)( SceneNode& _sceneNode ) );
+
         EcsHandle mHandle;
         EcsHandle mParentHandle;
         uint32_t  mFlags;
         Scene* mScene;
         std::vector<EcsHandle> mChilds;
         std::string            mName;
+
+    private:
+        static EcsComponent* RFindComponentInChildren( EcsWorld& _world, const SceneNode& _node, const uint32_t _componentIndex );
+        static void RExecuteInChildren( EcsWorld& _world, SceneNode& _sceneNode, void (* _visitor)( SceneNode& _sceneNode ) );
     };
 }

@@ -26,15 +26,42 @@ namespace fan
             PauseMenu& pauseMenu = static_cast<PauseMenu&>( _singleton );
             ImGui::FanResourcePtr<Prefab>( "header", pauseMenu.mHeader );
             ImGui::FanResourcePtr<Prefab>( "background", pauseMenu.mBackground );
+            ImGui::FanResourcePtr<Prefab>( "button", pauseMenu.mButton );
+            ImGui::FanResourcePtr<Prefab>( "close button", pauseMenu.mCloseButton );
 
-            if( ImGui::Button( "build pause menu" ) )
+            if( ImGui::Button( "Build" ) )
             {
                 PauseMenu::Instantiate( _world );
             }
-            ImGui::PushReadOnly();
-            int handleCpy = (int)pauseMenu.mHandle;
-            ImGui::DragInt( "handle", &handleCpy );
-            ImGui::PopReadOnly();
+
+            if( pauseMenu.mHandle != 0 )
+            {
+                ImGui::SameLine();
+
+                if( ImGui::Button( "Destroy" ) )
+                {
+                    PauseMenu::Destroy( _world );
+                }
+
+                ImGui::SameLine();
+
+                if( ImGui::Button( "Show" ) )
+                {
+                    PauseMenu::Show( _world );
+                }
+
+                ImGui::SameLine();
+
+                if( ImGui::Button( "Hide" ) )
+                {
+                    PauseMenu::Hide( _world );
+                }
+
+                ImGui::PushReadOnly();
+                int handleCpy = (int)pauseMenu.mHandle;
+                ImGui::DragInt( "handle", &handleCpy );
+                ImGui::PopReadOnly();
+            }
         }
     };
 }

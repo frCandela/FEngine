@@ -240,4 +240,58 @@ namespace fan
             }
         }
     }
+
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    EcsComponent* SceneNode::FindComponentInChildren( const SceneNode& _node, const uint32_t _componentType )
+    {
+        EcsWorld& world = *_node.mScene->mWorld;
+        const uint32_t componentIndex = world.GetIndex( _componentType );
+        return RFindComponentInChildren( world, _node, componentIndex );
+    }
+
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    EcsComponent* SceneNode::RFindComponentInChildren( EcsWorld& _world, const SceneNode& _node, const uint32_t _componentIndex )
+    {
+        EcsEntity entity = _world.GetEntity( _node.mHandle );
+        if( _world.IndexedHasComponent( entity, _componentIndex ) )
+        {
+            return &_world.IndexedGetComponent( entity, _componentIndex );
+        }
+        else
+        {
+            for( int i = 0; i < _node.mChilds.size(); ++i )
+            {
+                EcsEntity childEntity = _world.GetEntity( _node.mChilds[i] );
+                EcsComponent* component = RFindComponentInChildren( _world, _world.GetComponent<SceneNode>( childEntity ), _componentIndex );
+                if( component != nullptr )
+                {
+                    return component;
+                }
+            }
+        }
+        return nullptr;
+    }
+
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    void SceneNode::ExecuteInChildren( SceneNode& _sceneNode, void (* _visitor)( SceneNode& _sceneNode ) )
+    {
+        EcsWorld& world = *_sceneNode.mScene->mWorld;
+        RExecuteInChildren( world, _sceneNode, _visitor );
+    }
+
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    void SceneNode::RExecuteInChildren( EcsWorld& _world, SceneNode& _sceneNode, void (* _visitor)( SceneNode& _sceneNode ) )
+    {
+        ( *_visitor )( _sceneNode );
+        for( int i = 0; i < _sceneNode.mChilds.size(); ++i )
+        {
+            EcsEntity childEntity = _world.GetEntity( _sceneNode.mChilds[i] );
+            SceneNode& childSceneNode = _world.GetComponent<SceneNode>( childEntity );
+            RExecuteInChildren( _world, childSceneNode, _visitor );
+        }
+    }
 }

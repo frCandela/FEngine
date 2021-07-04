@@ -17,11 +17,11 @@ namespace fan
         static void Save( const EcsComponent& _component, Json& _json );
         static void Load( EcsComponent& _component, const Json& _json );
 
-        ResourcePtr<Mesh2D>    mMesh2D;
-        Color      mColor;
-        glm::ivec2 mUvOffset;
-        glm::ivec2 mTiling;
-        int        mDepth;
+        ResourcePtr<Mesh2D>  mMesh2D;
+        Color                mColor;
+        glm::ivec2           mTileIndex;
+        glm::ivec2           mTiling;
+        int                  mDepth;
         ResourcePtr<Texture> mTexture;
 
         glm::ivec2 GetTextureSize() const;

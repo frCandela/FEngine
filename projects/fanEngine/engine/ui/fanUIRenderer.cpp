@@ -24,7 +24,7 @@ namespace fan
         UIRenderer& uiRenderer = static_cast<UIRenderer&>( _component );
         uiRenderer.mMesh2D   = app.mResources->Get<Mesh2D>( RenderGlobal::sMesh2DQuad );
         uiRenderer.mColor    = Color::sWhite;
-        uiRenderer.mUvOffset = { 0, 0 };
+        uiRenderer.mTileIndex = { 0, 0 };
         uiRenderer.mTiling   = { 1, 1 };
         uiRenderer.mDepth    = 0;
         fanAssert( uiRenderer.mMesh2D );
@@ -40,7 +40,7 @@ namespace fan
         Serializable::SaveColor( _json, "color", ui.mColor );
         Serializable::SaveResourcePtr( _json, "texture_path", ui.mTexture );
         Serializable::SaveInt( _json, "depth", ui.mDepth );
-        Serializable::SaveIVec2( _json, "uv_offset", ui.mUvOffset );
+        Serializable::SaveIVec2( _json, "tile_index", ui.mTileIndex );
         Serializable::SaveIVec2( _json, "tiling", ui.mTiling );
     }
 
@@ -52,7 +52,7 @@ namespace fan
         Serializable::LoadColor( _json, "color", ui.mColor );
         Serializable::LoadResourcePtr( _json, "texture_path", ui.mTexture );
         Serializable::LoadInt( _json, "depth", ui.mDepth );
-        Serializable::LoadIVec2( _json, "uv_offset", ui.mUvOffset );
+        Serializable::LoadIVec2( _json, "tile_index", ui.mTileIndex );
         Serializable::LoadIVec2( _json, "tiling", ui.mTiling );
     }
 

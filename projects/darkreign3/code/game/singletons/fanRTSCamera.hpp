@@ -17,7 +17,7 @@ namespace fan
         static void Save( const EcsSingleton& _component, Json& _json );
         static void Load( EcsSingleton& _component, const Json& _json );
 
-        static void CreateCamera( EcsWorld& _world );
+        static void Instantiate( EcsWorld& _world );
         static void Update( EcsWorld& _world, const Fixed _delta );
 
         EcsHandle mCameraHandle;

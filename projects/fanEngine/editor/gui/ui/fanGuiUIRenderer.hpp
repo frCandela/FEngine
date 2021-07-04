@@ -42,10 +42,10 @@ namespace fan
                 // uv offset
                 if( ImGui::Button( "##uv_offset" ) )
                 {
-                    ui.mUvOffset = { 0, 0 };
+                    ui.mTileIndex = { 0, 0 };
                 }
                 ImGui::SameLine();
-                ImGui::DragInt2( "uv offset", &ui.mUvOffset[0] );
+                ImGui::DragInt2( "tile index", &ui.mTileIndex[0], 1, 0, glm::max( ui.mTiling.x, ui.mTiling.y ) - 1 );
 
                 // tiling
                 if( ImGui::Button( "##tiling" ) )

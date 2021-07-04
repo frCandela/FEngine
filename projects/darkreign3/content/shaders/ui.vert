@@ -17,9 +17,9 @@ layout (binding = 0) uniform DynamicUniformBufferObject
 void main()
 {
 
-	vec2 transformdPos = transform.scale * inPosition + transform.position;
+	vec2 transformedPos = transform.scale * inPosition + transform.position;
 
-	gl_Position = vec4( transformdPos, 0, 1);
+	gl_Position = vec4( transformedPos, 0, 1);
 
 	outColor = transform.color;
 	outTexCoord = inUV;
