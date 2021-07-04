@@ -93,16 +93,24 @@ namespace fan
             mouse.mPressed[i]  = false;
             mouse.mReleased[i] = false;
         }
-        mouse.mLocalPosition = mouse.mPosition - mouse.mScreenPosition;
+
+        double xPosition, yPosition;
+        glfwGetCursorPos( _window, &xPosition, &yPosition );
+        MouseCallback( _window, xPosition, yPosition );
+        
         mouse.mWindowHovered = mouse.IsWindowHovered();
-        if( mouse.sLocked ){ glfwSetCursorPos( inputData.mWindow, mouse.mPosition.x, mouse.mPosition.y ); }
+        if( mouse.sLocked )
+        {
+            glfwSetCursorPos( inputData.mWindow, mouse.mPosition.x, mouse.mPosition.y );
+        }
+
     }
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
     void Mouse::SetCallbacks( GLFWwindow* _window )
     {
-        glfwSetCursorPosCallback( _window, Mouse::MouseCallback );
+        //glfwSetCursorPosCallback( _window, Mouse::MouseCallback ); // we update manually in NextFrame() to get updates even when the mouse is not over the window
         glfwSetMouseButtonCallback( _window, Mouse::MouseButtonCallback );
         glfwSetScrollCallback( _window, Mouse::ScrollCallback );
     }
