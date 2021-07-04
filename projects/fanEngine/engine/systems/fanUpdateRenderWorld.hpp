@@ -16,7 +16,7 @@
 namespace fan
 {
     //==================================================================================================================================================================================================
-    // Update the render world rendered meshes
+    // Gets all the rendered models and push them in a list
     //==================================================================================================================================================================================================
     struct SUpdateRenderWorldModels : EcsSystem
     {
@@ -25,13 +25,13 @@ namespace fan
             return _world.GetSignature<MeshRenderer>() | _world.GetSignature<Transform>() | _world.GetSignature<Material>();
         }
 
-        static void Run( EcsWorld& _world, const EcsView& _view, RenderWorld& _renderWorld )
+        static void Run( EcsWorld& _world, const EcsView& _view, std::vector<RenderDataModel>& _outModels )
         {
             auto meshRendererIt = _view.begin<MeshRenderer>();
             auto transformIt    = _view.begin<Transform>();
             auto materialIt     = _view.begin<Material>();
 
-            _renderWorld.mModels.clear();
+            _outModels.clear();
 
             // get all mesh and adds them to the render world
             for( ; meshRendererIt != _view.end<MeshRenderer>(); ++meshRendererIt, ++transformIt, ++materialIt )
@@ -60,7 +60,7 @@ namespace fan
                         data.mColor     = subMaterial.mColor.ToGLM();
                         data.mShininess = subMaterial.mShininess;
 
-                        _renderWorld.mModels.push_back( data );
+                        _outModels.push_back( data );
                     }
                 }
             }

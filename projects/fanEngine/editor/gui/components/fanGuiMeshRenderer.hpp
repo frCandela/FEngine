@@ -20,10 +20,21 @@ namespace fan
             return info;
         }
 
-        static void OnGui( EcsWorld& /*_world*/, EcsEntity /*_entityID*/, EcsComponent& _component )
+        static void OnGui( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
         {
             MeshRenderer& meshRenderer = static_cast<MeshRenderer&>( _component );
             ImGui::FanResourcePtr<Mesh>( "mesh", meshRenderer.mMesh );
+            if( ImGui::Checkbox( "transparent", &meshRenderer.mTransparent )  )
+            {
+                if( meshRenderer.mTransparent )
+                {
+                    _world.AddTag<TagTransparent>( _entity );
+                }
+                else
+                {
+                    _world.RemoveTag<TagTransparent>( _entity );
+                }
+            }
         }
     };
 }

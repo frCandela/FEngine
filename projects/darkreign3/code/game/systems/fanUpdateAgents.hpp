@@ -106,8 +106,10 @@ namespace fan
                     }
 
                     // stops when reaching the target
-                    agent.mSqrDistanceFromDestination = Vector3::SqrDistance( transform.mPosition, agent.mDestination );
-                    if( agent.mSqrDistanceFromDestination < 1 )
+                    const Vector3 horizontalAgentPosition(transform.mPosition.x,0,transform.mPosition.z);
+                    const Vector3 horizontalDestinationPosition(agent.mDestination.x,0,agent.mDestination.z);
+                    agent.mSqrHorizontalDistanceFromDestination = Vector3::SqrDistance( horizontalAgentPosition, horizontalDestinationPosition );
+                    if( agent.mSqrHorizontalDistanceFromDestination < 1 )
                     {
                         agent.mState = TerrainAgent::State::Stay;
                     }

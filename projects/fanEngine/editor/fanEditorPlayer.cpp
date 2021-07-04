@@ -318,12 +318,7 @@ namespace fan
                 ImGui::Render();
             }
 
-            RenderWorld& renderWorld = currentWorld.GetSingleton<RenderWorld>();
-            currentWorld.ForceRun<SUpdateRenderWorldModels>( renderWorld );
-            currentWorld.ForceRun<SUpdateRenderWorldModelsSkinned>( renderWorld );
-            currentWorld.ForceRun<SUpdateRenderWorldUI>( renderWorld );
-            currentWorld.ForceRun<SUpdateRenderWorldPointLights>( renderWorld );
-            currentWorld.ForceRun<SUpdateRenderWorldDirectionalLights>( renderWorld );
+            RenderWorld::Update( currentWorld );
 
             Time::RegisterFrameDrawn( currentTime, deltaTime );
 
@@ -334,7 +329,7 @@ namespace fan
             Cursor* currentCursor = !editorCameraActive && gameWindowHovered ? currentWorld.GetSingleton<Application>().mCurrentCursor : nullptr;
 
             PlayerData::MatchCursor( currentCursor, mData.mWindow );
-            PlayerData::MatchFullscreenState( renderWorld.mFullscreen, mData.mWindow );
+            PlayerData::MatchFullscreenState( currentWorld.GetSingleton<RenderWorld>().mFullscreen, mData.mWindow );
 
             Profiler::Get().End();
             Profiler::Get().Begin();

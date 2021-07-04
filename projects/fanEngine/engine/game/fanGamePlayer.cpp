@@ -17,7 +17,6 @@
 #include "engine/systems/fanGenerateParticles.hpp"
 #include "engine/systems/fanUpdateBounds.hpp"
 #include "engine/systems/fanUpdateTransforms.hpp"
-#include "engine/systems/fanUpdateRenderWorld.hpp"
 #include "engine/systems/fanUpdateUIText.hpp"
 #include "engine/systems/fanUpdateUILayouts.hpp"
 #include "engine/systems/fanUpdateUIAlign.hpp"
@@ -150,12 +149,7 @@ namespace fan
             {
                 mLastLogicFrameRendered = time.mFrameIndex;
 
-                RenderWorld& renderWorld = world.GetSingleton<RenderWorld>();
-                world.ForceRun<SUpdateRenderWorldModels>( renderWorld );
-                world.ForceRun<SUpdateRenderWorldModelsSkinned>( renderWorld );
-                world.ForceRun<SUpdateRenderWorldUI>( renderWorld );
-                world.ForceRun<SUpdateRenderWorldPointLights>( renderWorld );
-                world.ForceRun<SUpdateRenderWorldDirectionalLights>( renderWorld );
+                RenderWorld::Update( world );
 
                 const VkExtent2D extent     = mData.mWindow.GetExtent();
                 const glm::vec2  windowSize = glm::vec2( (float)extent.width, (float)extent.height );

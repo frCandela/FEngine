@@ -32,7 +32,7 @@ namespace fan
                 }
                 else
                 {
-                    if( agent.mSqrDistanceFromDestination < distanceWalk * distanceWalk || Fixed::Abs( agent.mForwardAngle ) > 30 )
+                    if( agent.mSqrHorizontalDistanceFromDestination < distanceWalk * distanceWalk || Fixed::Abs( agent.mForwardAngle ) > 30 )
                     {
                         animator.mAnimation = judas.mAnimWalk;
                     }

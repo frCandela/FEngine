@@ -27,7 +27,7 @@ namespace fan
 
         // runtime only
         Vector3 mTerrainNormal;
-        Fixed   mSqrDistanceFromDestination;
+        Fixed   mSqrHorizontalDistanceFromDestination;
         Fixed   mForwardAngle;
     };
 }

@@ -19,5 +19,6 @@ namespace fan
         static void Load( EcsComponent& _component, const Json& _json );
 
         ResourcePtr<Mesh> mMesh;
+        bool mTransparent;
     };
 }

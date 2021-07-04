@@ -56,7 +56,13 @@ vec3 CalcDirLight  ( const DirectionalLight light, const vec3 normal, const vec3
 
 //reference: https://learnopengl.com/Lighting/Multiple-lights
 void main() 
-{  
+{
+	float alpha = texture( sampler2D( diffuseTexture, diffuseSampler ), inTexCoord ).a * material.color.a;
+	if( alpha == 0)
+	{
+		discard;
+	}
+
 	//Needed data
 	vec3 goodNormal = normalize(inNormal);
 	const vec3 viewDir = normalize(uniforms.cameraPosition - inFragPos);
@@ -69,7 +75,7 @@ void main()
 		lightColor += CalcPointLight( lights.pointLights[lightIndex], goodNormal, inFragPos, viewDir );
 	}
 
-	float alpha = texture( sampler2D( diffuseTexture, diffuseSampler ), inTexCoord ).a * material.color.a;
+
 	outColor = vec4(inColor * lightColor, alpha);
 }
 

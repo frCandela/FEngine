@@ -4,6 +4,7 @@
 #include "core/memory/fanSerializable.hpp"
 #include "core/resources/fanResources.hpp"
 #include "engine/singletons/fanApplication.hpp"
+#include "engine/systems/fanUpdateRenderWorld.hpp"
 #include "render/resources/fanMesh.hpp"
 
 namespace fan
@@ -12,9 +13,27 @@ namespace fan
     //==================================================================================================================================================================================================
     void RenderWorld::SetInfo( EcsSingletonInfo& _info )
     {
-        _info.save = &RenderWorld::Save;
-        _info.load = &RenderWorld::Load;
+        _info.save     = &RenderWorld::Save;
+        _info.load     = &RenderWorld::Load;
         _info.postInit = &RenderWorld::PostInit;
+    }
+
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    void RenderWorld::Update( EcsWorld& _world )
+    {
+        RenderWorld& renderWorld = _world.GetSingleton<RenderWorld>();
+
+        EcsView transparentsView = _world.Match( SUpdateRenderWorldModels::GetSignature( _world ) | _world.GetSignature<TagTransparent>(), EcsSignature( 0 ) );
+        SUpdateRenderWorldModels::Run( _world, transparentsView, renderWorld.mTransparentModels );
+
+        EcsView opaquesView = _world.Match( SUpdateRenderWorldModels::GetSignature( _world ), _world.GetSignature<TagTransparent>() );
+        SUpdateRenderWorldModels::Run( _world, opaquesView, renderWorld.mOpaqueModels );
+
+        _world.ForceRun<SUpdateRenderWorldModelsSkinned>( renderWorld );
+        _world.ForceRun<SUpdateRenderWorldUI>( renderWorld );
+        _world.ForceRun<SUpdateRenderWorldPointLights>( renderWorld );
+        _world.ForceRun<SUpdateRenderWorldDirectionalLights>( renderWorld );
     }
 
     //==================================================================================================================================================================================================
@@ -40,7 +59,8 @@ namespace fan
     void RenderWorld::Init( EcsWorld& /*_world*/, EcsSingleton& _singleton )
     {
         RenderWorld& renderWorld = static_cast<RenderWorld&>( _singleton );
-        renderWorld.mModels.clear();
+        renderWorld.mTransparentModels.clear();
+        renderWorld.mOpaqueModels.clear();
         renderWorld.mSkinnedModels.clear();
         renderWorld.mUIModels.clear();
         renderWorld.mPointLights.clear();

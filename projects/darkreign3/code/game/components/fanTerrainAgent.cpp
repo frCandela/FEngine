@@ -23,9 +23,9 @@ namespace fan
         agent.mRotationSpeed = 180;
         agent.mState       = State::Stay;
         agent.mAlignWithTerrain = true;
-        agent.mTerrainNormal              = Vector3::sUp;
-        agent.mSqrDistanceFromDestination = 0;
-        agent.mForwardAngle = 0;
+        agent.mTerrainNormal                        = Vector3::sUp;
+        agent.mSqrHorizontalDistanceFromDestination = 0;
+        agent.mForwardAngle                         = 0;
     }
 
     //==================================================================================================================================================================================================

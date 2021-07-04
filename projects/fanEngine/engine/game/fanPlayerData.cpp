@@ -181,6 +181,10 @@ namespace fan
         SCOPED_PROFILE( update_RW );
         RenderWorld      & renderWorld = world.GetSingleton<RenderWorld>();
         const RenderDebug& renderDebug = world.GetSingleton<RenderDebug>();
+        const Scene      & scene       = world.GetSingleton<Scene>();
+        EcsEntity cameraEntity = world.GetEntity( scene.mMainCameraHandle );
+        Transform& cameraTransform = world.GetComponent<Transform>( cameraEntity );
+        Camera   & camera          = world.GetComponent<Camera>( cameraEntity );
         renderWorld.mTargetSize = _size;
 
         // particles mesh
@@ -193,12 +197,28 @@ namespace fan
             particlesDrawData.mColor        = glm::vec4( 1.f, 1.f, 1.f, 1.f );
             particlesDrawData.mShininess    = 1;
             particlesDrawData.mTexture      = nullptr;
-            renderWorld.mModels.push_back( particlesDrawData );
+            renderWorld.mTransparentModels.push_back( particlesDrawData );
+        }
+
+        // sort transparent models
+        {
+            const glm::vec3 cameraPosition = cameraTransform.mPosition.ToGlm();
+            const glm::vec3 cameraForward = cameraTransform.Forward().ToGlm();
+            for( RenderDataModel& renderDataModel : renderWorld.mTransparentModels )
+            {
+                const glm::vec3 position = glm::vec3(renderDataModel.mModelMatrix[3]);
+                renderDataModel.mDepth = glm::dot( position - cameraPosition, cameraForward );
+            }
+            std::sort( renderWorld.mTransparentModels.begin(), renderWorld.mTransparentModels.end(), []( const RenderDataModel& _model1, const RenderDataModel& _model2 )
+            {
+                return _model1.mDepth > _model2.mDepth;
+            } );
         }
 
         {
             SCOPED_PROFILE( set_render_data );
-            _renderer.SetModels( renderWorld.mModels );
+            renderWorld.mOpaqueModels.insert( renderWorld.mOpaqueModels.end(), renderWorld.mTransparentModels.begin(), renderWorld.mTransparentModels.end() );
+            _renderer.SetModels( renderWorld.mOpaqueModels );
             _renderer.SetModelsSkinned( renderWorld.mSkinnedModels );
             _renderer.SetModelsUI( renderWorld.mUIModels );
             _renderer.SetPointLights( renderWorld.mPointLights );
@@ -209,12 +229,7 @@ namespace fan
         // Camera
         {
             SCOPED_PROFILE( update_camera );
-            Scene& scene = world.GetSingleton<Scene>();
-            EcsEntity cameraID = world.GetEntity( scene.mMainCameraHandle );
-            Camera& camera = world.GetComponent<Camera>( cameraID );
             camera.mAspectRatio = Fixed::FromFloat( _size[0] / _size[1] );
-
-            Transform& cameraTransform = world.GetComponent<Transform>( cameraID );
             _renderer.SetMainCamera( camera.GetProjection(), camera.GetView( cameraTransform ), cameraTransform.mPosition.ToGlm() );
         }
 
@@ -311,6 +326,7 @@ namespace fan
         _world.AddComponentType<Animator>();
         _world.AddSingletonType<RenderWorld>();
         _world.AddSingletonType<RenderDebug>();
+        _world.AddTagType<TagTransparent>();
     }
 
     //==================================================================================================================================================================================================

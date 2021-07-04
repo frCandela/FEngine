@@ -23,7 +23,10 @@ namespace fan
         static void Save( const EcsSingleton& _singleton, Json& _json );
         static void Load( EcsSingleton& _singleton, const Json& _json );
 
-        std::vector<RenderDataModel>         mModels;
+        static void Update( EcsWorld& _world );
+
+        std::vector<RenderDataModel>         mOpaqueModels;
+        std::vector<RenderDataModel>         mTransparentModels;
         std::vector<RenderDataSkinnedModel>  mSkinnedModels;
         std::vector<RenderDataMesh2D>        mUIModels;
         std::vector<UniformPointLight>       mPointLights;

@@ -19,6 +19,7 @@ namespace fan
     {
         MeshRenderer& meshRenderer = static_cast<MeshRenderer&>( _component );
         meshRenderer.mMesh = nullptr;
+        meshRenderer.mTransparent = false;
     }
 
     //==================================================================================================================================================================================================
@@ -27,6 +28,7 @@ namespace fan
     {
         const MeshRenderer& meshRenderer = static_cast<const MeshRenderer&>( _component );
         Serializable::SaveResourcePtr( _json, "path", meshRenderer.mMesh );
+        Serializable::SaveBool( _json, "is_transparent", meshRenderer.mTransparent );
     }
 
     //==================================================================================================================================================================================================
@@ -35,5 +37,6 @@ namespace fan
     {
         MeshRenderer& meshRenderer = static_cast<MeshRenderer&>( _component );
         Serializable::LoadResourcePtr( _json, "path", meshRenderer.mMesh );
+        Serializable::LoadBool( _json, "is_transparent", meshRenderer.mTransparent );
     }
 }

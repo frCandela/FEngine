@@ -23,7 +23,8 @@ namespace fan
         static void OnGui( EcsWorld&, EcsSingleton& _singleton )
         {
             RenderWorld& renderWorld = static_cast<RenderWorld&>( _singleton );
-            ImGui::Text( "models:             %d", (int)renderWorld.mModels.size() );
+            ImGui::Text( "opaque models:      %d", (int)renderWorld.mOpaqueModels.size() );
+            ImGui::Text( "transparent models: %d", (int)renderWorld.mTransparentModels.size() );
             ImGui::Text( "skinned models:     %d", (int)renderWorld.mSkinnedModels.size() );
             ImGui::Text( "ui mesh:            %d", (int)renderWorld.mUIModels.size() );
             ImGui::Text( "pointLights:        %d", (int)renderWorld.mPointLights.size() );
