@@ -50,8 +50,7 @@ namespace fan
                 mEnabledExtensions.data() :
                 nullptr;
 
-        if( vkCreateInstance( &instanceCreateInfo, nullptr, &mInstance ) != VK_SUCCESS ||
-            mInstance == VK_NULL_HANDLE )
+        if( vkCreateInstance( &instanceCreateInfo, nullptr, &mInstance ) != VK_SUCCESS || mInstance == VK_NULL_HANDLE )
         {
             Debug::Error( "ouch, this is going to be messy" );
         }
@@ -180,8 +179,7 @@ namespace fan
         std::stringstream ss;
         ss << "######## VkError";
 
-        std::map<uint64_t, std::string>& debugNames = *static_cast<std::map<uint64_t,
-                                                                            std::string>*>( _userData );
+        std::map<uint64_t, std::string>& debugNames = *static_cast<std::map<uint64_t, std::string>*>( _userData );
         auto it = debugNames.find( _obj );
         if( it != debugNames.end() )
         {
@@ -191,6 +189,7 @@ namespace fan
         ss << _msg;
 
         std::cout << ss.str() << std::endl;
+        fanAssert( false );
         return VK_FALSE;
     }
 }

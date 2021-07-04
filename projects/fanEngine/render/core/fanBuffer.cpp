@@ -26,11 +26,7 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    bool Buffer::Create( Device& _device,
-                         VkDeviceSize _size,
-                         VkBufferUsageFlags _usage,
-                         VkMemoryPropertyFlags _memoryProperties,
-                         VkDeviceSize _alignement )
+    bool Buffer::Create( Device& _device, VkDeviceSize _size, VkBufferUsageFlags _usage, VkMemoryPropertyFlags _memoryProperties, VkDeviceSize _alignement )
     {
         fanAssert( mBuffer == VK_NULL_HANDLE );
         fanAssert( mMemory == VK_NULL_HANDLE );

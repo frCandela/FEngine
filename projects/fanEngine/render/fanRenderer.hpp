@@ -125,6 +125,7 @@ namespace fan
         bool BuildNewTextures( Device& _device );
         void ClearDestroyedMesh2D( Device& _device );
         void ClearDestroyedMesh( Device& _device );
+        void ClearDestroyedSkinnedMesh( Device& _device );
         void ClearDestroyedTextures( Device& _device );
 
         void SubmitCommandBuffers();

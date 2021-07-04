@@ -66,6 +66,7 @@ namespace fan
         mDrawPostprocess.Destroy( mDevice );
 
         ClearDestroyedMesh( mDevice );
+        ClearDestroyedSkinnedMesh( mDevice );
         ClearDestroyedMesh2D( mDevice );
         ClearDestroyedTextures( mDevice );
         mDescriptorTextures.Destroy( mDevice );
@@ -210,6 +211,7 @@ namespace fan
 
             ClearDestroyedMesh2D( mDevice );
             ClearDestroyedMesh( mDevice );
+            ClearDestroyedSkinnedMesh( mDevice );
             ClearDestroyedTextures( mDevice );
             BuildNewMeshes( mDevice );
             textureCreated = BuildNewTextures( mDevice );
@@ -381,6 +383,22 @@ namespace fan
         for( Mesh* mesh : destroyList )
         {
             for( SubMesh& subMesh : mesh->mSubMeshes )
+            {
+                subMesh.Destroy( _device );
+            }
+            delete mesh;
+        }
+    }
+
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    void Renderer::ClearDestroyedSkinnedMesh( Device& _device )
+    {
+        std::vector<SkinnedMesh*> destroyList;
+        mResources.GetDestroyList<SkinnedMesh>( destroyList );
+        for( SkinnedMesh* mesh : destroyList )
+        {
+            for( SubSkinnedMesh& subMesh : mesh->mSubMeshes )
             {
                 subMesh.Destroy( _device );
             }
