@@ -15,7 +15,6 @@
 #include "engine/systems/fanUpdateParticles.hpp"
 #include "engine/systems/fanEmitParticles.hpp"
 #include "engine/systems/fanGenerateParticles.hpp"
-#include "engine/systems/fanUpdateRenderWorld.hpp"
 #include "engine/systems/fanUpdateAnimators.hpp"
 #include "engine/physics/fanDetectCollisions.hpp"
 #include "engine/terrain/fanVoxelTerrain.hpp"
@@ -180,19 +179,6 @@ namespace fan
         // ui
         mWorld.Run<SUpdateAnimScale>( _delta );
         mWorld.ForceRun<SPlaceSelectionFrames>( _delta );
-    }
-
-    //==================================================================================================================================================================================================
-    //==================================================================================================================================================================================================
-    void DarkReign3::Render()
-    {
-        SCOPED_PROFILE( update_render_world );
-        RenderWorld& renderWorld = mWorld.GetSingleton<RenderWorld>();
-        mWorld.ForceRun<SUpdateRenderWorldModels>( renderWorld );
-        mWorld.ForceRun<SUpdateRenderWorldModelsSkinned>( renderWorld );
-        mWorld.ForceRun<SUpdateRenderWorldUI>( renderWorld );
-        mWorld.ForceRun<SUpdateRenderWorldPointLights>( renderWorld );
-        mWorld.ForceRun<SUpdateRenderWorldDirectionalLights>( renderWorld );
     }
 
     //==================================================================================================================================================================================================

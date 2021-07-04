@@ -77,20 +77,6 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void GameEmpty::Render()
-    {
-        SCOPED_PROFILE( update_render_world );
-
-        RenderWorld& renderWorld = mWorld.GetSingleton<RenderWorld>();
-        mWorld.ForceRun<SUpdateRenderWorldModels>( renderWorld );
-        mWorld.ForceRun<SUpdateRenderWorldModelsSkinned>( renderWorld );
-        mWorld.ForceRun<SUpdateRenderWorldUI>( renderWorld );
-        mWorld.ForceRun<SUpdateRenderWorldPointLights>( renderWorld );
-        mWorld.ForceRun<SUpdateRenderWorldDirectionalLights>( renderWorld );
-    }
-
-    //==================================================================================================================================================================================================
-    //==================================================================================================================================================================================================
     void GameEmpty::OnGui()
     {
         if( ImGui::Begin( "testoss" ) )

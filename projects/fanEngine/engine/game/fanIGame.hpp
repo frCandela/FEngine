@@ -16,7 +16,6 @@ namespace fan
         virtual void Stop() = 0;
         virtual void PreStep( const Fixed _delta ) = 0;     // called immediately before physics step
         virtual void Step( const Fixed _delta ) = 0;        // called after physics step
-        virtual void Render() = 0;
         virtual void OnGui() = 0;
         virtual EcsWorld& GetWorld() = 0;
     };
