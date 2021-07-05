@@ -44,7 +44,7 @@ namespace fan
         EcsEntity cameraEntity = _world.GetEntity( rtsCamera.mCameraHandle );
         _world.AddComponent<Camera>( cameraEntity );
         Transform& cameraTransform = _world.AddComponent<Transform>( cameraEntity );
-        cameraTransform.mPosition = Vector3( 0, 75, 0 );
+        cameraTransform.mPosition = Vector3( -75, 75, -100 );
         cameraTransform.mRotation = Quaternion::Euler( 45, 0, 0 );
         scene.SetMainCamera( rtsCamera.mCameraHandle );
     }
