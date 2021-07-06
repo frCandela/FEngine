@@ -4,6 +4,7 @@
 #include "ecs/fanEcsWorld.hpp"
 #include "engine/game/fanPlayerData.hpp"
 #include "editor/singletons/fanEditorSettings.hpp"
+#include "editor/fanFilesWatcher.hpp"
 
 namespace fan
 {
@@ -23,8 +24,11 @@ namespace fan
         bool                mStopPlayingEndOfFrame = false;
         EditorSettingsData  mEditorSettings;
         PlayerData          mData;
+        FilesWatcher        mFilesWatcher;
+
         IGame& GetCurrentGame() { return *mGames[mCurrentGame]; }
         LaunchSettings& AdaptSettings( LaunchSettings& _settings );
+        void HotReloadFiles();
 
         EditorPlayer( LaunchSettings& _settings, const std::vector<IGame*>& _games );
         void Run();

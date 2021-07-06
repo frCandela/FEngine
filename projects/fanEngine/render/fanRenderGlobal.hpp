@@ -18,6 +18,7 @@ namespace fan
         static const std::set<std::string> sPrefabExtensions;
         static const std::set<std::string> sFontsExtensions;
         static const std::set<std::string> sAnimationsExtensions;
+        static const std::set<std::string> sShadersExtensions;
 
         static constexpr const char* sContentPath    = "/";
         static constexpr const char* sFontsPath      = "fonts/";

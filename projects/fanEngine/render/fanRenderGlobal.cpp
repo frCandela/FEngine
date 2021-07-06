@@ -3,12 +3,13 @@
 
 namespace fan
 {
-    const std::set<std::string>    RenderGlobal::sMeshExtensions   = { "gltf" };
-    const std::set<std::string>    RenderGlobal::sImagesExtensions = { "png" };
-    const std::set<std::string>    RenderGlobal::sSceneExtensions  = { "scene" };
-    const std::set<std::string>    RenderGlobal::sPrefabExtensions = { "prefab" };
-    const std::set<std::string>    RenderGlobal::sFontsExtensions  = { "ttf" };
-    const std::set<std::string>    RenderGlobal::sAnimationsExtensions  = { "gltf" };
+    const std::set<std::string>    RenderGlobal::sMeshExtensions       = { "gltf" };
+    const std::set<std::string>    RenderGlobal::sImagesExtensions     = { "png" };
+    const std::set<std::string>    RenderGlobal::sSceneExtensions      = { "scene" };
+    const std::set<std::string>    RenderGlobal::sPrefabExtensions     = { "prefab" };
+    const std::set<std::string>    RenderGlobal::sFontsExtensions      = { "ttf" };
+    const std::set<std::string>    RenderGlobal::sAnimationsExtensions = { "gltf" };
+    const std::set<std::string>    RenderGlobal::sShadersExtensions    = { "frag", "vert" };
 
     const std::vector<const char*> RenderGlobal::sDesiredValidationLayers = {
 #ifndef NDEBUG

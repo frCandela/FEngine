@@ -49,8 +49,7 @@ namespace fan
         ResourcePtrData Get( const uint32_t _guid );
 
         template< class ResourceType >
-        void Get( std::vector<ResourcePtr < ResourceType>>
-        & _outResources );
+        void Get( std::vector<ResourcePtr < ResourceType>>        & _outResources );
 
         template< class ResourceType >
         ResourcePtr <ResourceType> GetOrLoad( const std::string& _path );

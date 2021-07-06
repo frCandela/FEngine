@@ -1,6 +1,8 @@
 #ifdef FAN_WIN32
 
 #include <windows.h>
+#include <tchar.h>
+#include <mutex>
 #include "glfw/glfw3.h"
 #include "platform/fanSystem.hpp"
 #include "platform/fanFile.hpp"
@@ -132,6 +134,87 @@ namespace fan
     double System::GetTime()
     {
         return glfwGetTime();
+    }
+
+    //==================================================================================================================================================================================================
+    // https://developersarea.wordpress.com/2014/09/26/win32-file-watcher-api-to-monitor-directory-changes/
+    //==================================================================================================================================================================================================
+    bool System::WatchDirectory( const std::string _path, const bool* _enabled, std::vector<std::string>* _outFilesChanged, std::mutex* _mutex )
+    {
+        fanAssert( _enabled != nullptr && *_enabled == true );
+        fanAssert( _outFilesChanged != nullptr && _outFilesChanged->empty() );
+        fanAssert( _mutex != nullptr );
+
+        HANDLE hDir = ::CreateFile( _path.c_str(),
+                                    FILE_LIST_DIRECTORY,
+                                    FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+                                    NULL,
+                                    OPEN_EXISTING,
+                                    FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OVERLAPPED,
+                                    NULL );
+        if( hDir == INVALID_HANDLE_VALUE )
+        {
+            return false;
+        }
+
+        OVERLAPPED ovl = { 0 };
+        ovl.hEvent = ::CreateEvent( NULL, TRUE, FALSE, NULL );
+        if( ovl.hEvent == NULL )
+        {
+            return false;
+        }
+
+        char buffer[1024];
+
+        const DWORD notifyFilter = FILE_NOTIFY_CHANGE_LAST_WRITE | FILE_NOTIFY_CHANGE_CREATION;
+        const BOOL  watchSubtree = TRUE;
+        ::ReadDirectoryChangesW( hDir, buffer, sizeof( buffer ), watchSubtree, notifyFilter, NULL, &ovl, NULL );
+
+        while( *_enabled )
+        {
+            DWORD dw;
+            DWORD result = ::WaitForSingleObject( ovl.hEvent, 100 );
+
+            switch( result )
+            {
+                case WAIT_OBJECT_0:
+
+                    ::GetOverlappedResult( hDir, &ovl, &dw, FALSE );
+                    {
+                        DWORD offset             = 0;
+                        char  fileName[MAX_PATH] = "";
+                        FILE_NOTIFY_INFORMATION* fni = NULL;
+                        std::vector<std::string> filesChanged;
+                        do
+                        {
+                            fni = (FILE_NOTIFY_INFORMATION*)( &buffer[offset] );
+                            //since we do not use UNICODE, we must convert fni->FileName from UNICODE to multibyte
+                            ::WideCharToMultiByte( CP_ACP, 0, fni->FileName, fni->FileNameLength / sizeof( WCHAR ), fileName, sizeof( fileName ), NULL, NULL );
+
+                            switch( fni->Action )
+                            {
+                                case FILE_ACTION_MODIFIED:
+                                    filesChanged.push_back( fileName );
+                                    break;
+                                default:
+                                    filesChanged.push_back( fileName );
+                                    break;
+                            }
+
+                            ::memset( fileName, '\0', sizeof( fileName ) );
+                            offset += fni->NextEntryOffset;
+                        } while( fni->NextEntryOffset != 0 );
+
+                        _mutex->lock();
+                        _outFilesChanged->insert( _outFilesChanged->end(), filesChanged.begin(), filesChanged.end() );
+                        _mutex->unlock();
+                    }
+                    ::ResetEvent( ovl.hEvent );
+                    ::ReadDirectoryChangesW( hDir, buffer, sizeof( buffer ), watchSubtree, notifyFilter, NULL, &ovl, NULL );
+                    break;
+            }
+        }
+        return true;
     }
 }
 #endif

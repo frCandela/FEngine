@@ -2,6 +2,7 @@
 
 #include "platform/input/fanInputManager.hpp"
 #include "platform/input/fanInput.hpp"
+#include "core/fanPath.hpp"
 #include "network/singletons/fanTime.hpp"
 
 #include "engine/game/fanIGame.hpp"
@@ -144,6 +145,10 @@ namespace fan
             game.Init();
             world.PostInitSingletons( true );
 
+            const std::string watchPath = Path::Normalize( "/" );
+            mFilesWatcher.Start( watchPath );
+            Debug::Log() << "Files watcher started watching path: " << watchPath << Debug::Endl();
+
             // load scene
             scene.New();
             if( !_settings.mLoadScene.empty() )
@@ -186,6 +191,7 @@ namespace fan
 
         Debug::Log( "Exit application", Debug::Type::Editor );
 
+        mFilesWatcher.Stop();
         EditorSettingsData::SaveSettingsToJson( mEditorSettings );
         EditorSettingsData::SaveWindowSizeAndPosition( mEditorSettings.mJson, mData.mRenderer.mWindow.GetSize(), mData.mRenderer.mWindow.GetPosition() );
         EditorSettingsData::SaveJsonToDisk( mEditorSettings.mJson );
@@ -265,6 +271,8 @@ namespace fan
                 currentWorld.GetSingleton<Mouse>().ClearSingleFrameEvents();
             }
         }
+
+        HotReloadFiles();
 
         // stop playing
         if( mStopPlayingEndOfFrame )
@@ -455,6 +463,65 @@ namespace fan
         {
             Debug::Highlight() << "game  resumed" << Debug::Endl();
             playState.mState = EditorPlayState::PLAYING;
+        }
+    }
+
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    void EditorPlayer::HotReloadFiles()
+    {
+        std::vector<std::string> filesChanged = mFilesWatcher.GetFilesChanged();
+        if( filesChanged.empty() )
+        {
+            return;
+        }
+
+        Resources& resources = mData.mResources;
+        bool                   reloadShaders = false;
+        for( const std::string rawPath : filesChanged )
+        {
+            const std::string absolutePath = Path::Normalize( rawPath );
+            const std::string relativePath = Path::MakeRelative( absolutePath );
+            const std::string extension = Path::Extension( relativePath );
+            if( RenderGlobal::sShadersExtensions.contains( extension ) )
+            {
+                Debug::Log() << "Shader modified " << relativePath << Debug::Endl();
+                reloadShaders = true;
+            }
+            else
+            {
+                // reload individual files
+                Resource* resource =  resources.Get(relativePath).GetResource();
+                if( resource != nullptr )
+                {
+                    switch( resource->mType )
+                    {
+                        case Texture::Info::sType:
+                            Debug::Log() << "Image modified " << relativePath << Debug::Endl();
+                            mData.mResources.Load<Texture>( Path::MakeRelative( relativePath ) );
+                            break;
+                        case Mesh::Info::sType:
+                            Debug::Log() << "Mesh modified " << relativePath << Debug::Endl();
+                            mData.mResources.Load<Mesh>( Path::MakeRelative( relativePath ) );
+                            break;
+                        case SkinnedMesh::Info::sType:
+                            Debug::Log() << "Skinned Mesh modified " << relativePath << Debug::Endl();
+                            mData.mResources.Load<SkinnedMesh>( Path::MakeRelative( relativePath ) );
+                            break;
+                        case Animation::Info::sType:
+                            Debug::Log() << "Animation modified " << relativePath << Debug::Endl();
+                            mData.mResources.Load<Animation>( Path::MakeRelative( relativePath ) );
+                            break;
+
+                    }
+                }
+            }
+        }
+
+        // recompile and reload all shaders
+        if( reloadShaders )
+        {
+            mData.mRenderer.ReloadShaders();
         }
     }
 
