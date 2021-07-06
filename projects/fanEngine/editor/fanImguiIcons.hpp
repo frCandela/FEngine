@@ -53,6 +53,7 @@ namespace ImGui
         Redo16,
         Left16,
         Right16,
+        Trash16,
 
         // small
         Plus8,
@@ -133,35 +134,18 @@ namespace ImGui
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    inline void Icon( const IconType _id,
-                      const ImVec2& _size,
-                      const ImVec4& _tintColor = ImVec4( 1, 1, 1, 1 ),
-                      const ImVec4& _borderColor = ImVec4( 0, 0, 0, 0 ) )
+    inline void Icon( const IconType _id, const ImVec2& _size, const ImVec4& _tintColor = ImVec4( 1, 1, 1, 1 ), const ImVec4& _borderColor = ImVec4( 0, 0, 0, 0 ) )
     {
         // @todo remove this hardcoded 42 that tells imgui renderer to bind the icons descriptors
-        ImGui::Image( (void*)42,
-                      _size,
-                      IconImpl::sIconsList[_id].mUv0,
-                      IconImpl::sIconsList[_id].mUv1,
-                      _tintColor, _borderColor );
+        ImGui::Image( (void*)42, _size, IconImpl::sIconsList[_id].mUv0, IconImpl::sIconsList[_id].mUv1, _tintColor, _borderColor );
     }
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    inline bool ButtonIcon( const IconType _id,
-                            const ImVec2& _size,
-                            const int _framePadding = -1,
-                            const ImVec4& _bgColor = ImVec4( 0, 0, 0, 0 ),
-                            const ImVec4& _tintColor = ImVec4( 1, 1, 1, 1 ) )
+    inline bool ButtonIcon( const IconType _id, const ImVec2& _size, const int _framePadding = -1, const ImVec4& _bgColor = ImVec4( 0, 0, 0, 0 ), const ImVec4& _tintColor = ImVec4( 1, 1, 1, 1 ) )
     {
         ImGui::PushID( _id );
-        bool result = ImGui::ImageButton( (void*)42,
-                                          _size,
-                                          IconImpl::sIconsList[_id].mUv0,
-                                          IconImpl::sIconsList[_id].mUv1,
-                                          _framePadding,
-                                          _bgColor,
-                                          _tintColor );
+        bool result = ImGui::ImageButton( (void*)42, _size, IconImpl::sIconsList[_id].mUv0, IconImpl::sIconsList[_id].mUv1, _framePadding, _bgColor, _tintColor );
         ImGui::PopID();
         return result;
     }

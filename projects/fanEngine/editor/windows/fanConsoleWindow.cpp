@@ -108,7 +108,7 @@ namespace fan
 
         // Input
         bool pressed = false;
-        ImGui::PushItemWidth( ImGui::GetWindowWidth() - 90 );
+        ImGui::PushItemWidth( ImGui::GetWindowWidth() - 90 - 16 );
         if( ImGui::InputText( "##input_console", console.mInputBuffer, IM_ARRAYSIZE( console.mInputBuffer ), ImGuiInputTextFlags_EnterReturnsTrue ) )
         {
             pressed = true;
@@ -121,6 +121,13 @@ namespace fan
         {
             pressed = true;
         }
+        ImGui::SameLine();
+
+        if(  ImGui::ButtonIcon( ImGui::Trash16, { 16, 16 } ))
+        {
+            Debug::Get().Clear();
+            console.mLogBuffer.clear();
+        }
         if( pressed == true )
         {
             const std::string message = console.mInputBuffer;
@@ -132,7 +139,6 @@ namespace fan
                 }
                 else
                 {
-                    Debug::Log( "Clearing logs ", Debug::Type::Editor );
                     Debug::Get().Clear();
                     console.mLogBuffer.clear();
                 }

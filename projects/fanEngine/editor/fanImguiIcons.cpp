@@ -64,6 +64,7 @@ namespace ImGui
             , DECL_ICON( 16.f, 16, 0 ) // Redo16,
             , DECL_ICON( 16.f, 17, 0 ) // Left16,
             , DECL_ICON( 16.f, 18, 0 ) // Right16,
+            , DECL_ICON( 16.f, 19, 0 ) // Trash16,
 
             // small
             , DECL_ICON( 8.f, 0, 2 )  // PLUS8,
