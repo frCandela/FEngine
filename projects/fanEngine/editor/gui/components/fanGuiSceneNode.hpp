@@ -34,6 +34,13 @@ namespace fan
             ImGui::Text( "entity id : %u", (int)entity.mIndex );
 
             ImGui::Text( "tags: " );
+            if( ImGui::IsItemClicked( ImGuiMouseButton_Right ) )
+            {
+                Debug::Log( "test" );
+                ImGui::OpenPopup( "set_tag_popup_menu" );
+            }
+
+            // display entity tags
             for( int tagIndex = _world.GetFistTagIndex(); tagIndex < (int)ecsSignatureLength; tagIndex++ )
             {
                 if( _world.IndexedHasTag( _entity, tagIndex ) )
@@ -41,6 +48,28 @@ namespace fan
                     ImGui::SameLine();
                     ImGui::Text( "%s ", _world.IndexedGetTagInfo( tagIndex ).mName.c_str() );
                 }
+            }
+
+            // set tags popup
+            if( ImGui::BeginPopup( "set_tag_popup_menu" ) )
+            {
+                for( int tagIndex = _world.GetFistTagIndex(); tagIndex < (int)ecsSignatureLength; tagIndex++ )
+                {
+                    bool hasTag = _world.IndexedHasTag( _entity, tagIndex );
+                    const EcsTagInfo& tagInfo = world.IndexedGetTagInfo( tagIndex );
+                    if( ImGui::MenuItem( tagInfo.mName.c_str(), nullptr, &hasTag ) )
+                    {
+                        if( hasTag )
+                        {
+                            _world.AddTag( _entity, tagInfo.mType );
+                        }
+                        else
+                        {
+                            _world.RemoveTag( _entity, tagInfo.mType );
+                        }
+                    }
+                }
+                ImGui::EndPopup();
             }
         }
     };
