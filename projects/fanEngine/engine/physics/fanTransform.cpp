@@ -91,31 +91,34 @@ namespace fan
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    Vector3 Transform::TransformPoint( const Vector3 _point ) const
+    Vector3 Transform::TransformPoint( const Vector3 _point, const Vector3 _scale ) const
     {
-        return mRotation * _point + mPosition;
+        return mRotation * Vector3::Multiply( _scale, _point ) + mPosition;
     }
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    Vector3 Transform::InverseTransformPoint( const Vector3 _point ) const
+    Vector3 Transform::InverseTransformPoint( const Vector3 _point, const Vector3 _scale ) const
     {
-        return mRotation.Inverse() * ( _point - mPosition );
+        fanAssert( !Vector3::IsFuzzyZero( _scale ) );
+        Vector3 inverseScale( 1 / _scale.x, 1 / _scale.y, 1 / _scale.z );
+        return Vector3::Multiply( inverseScale, mRotation.Inverse() * ( _point - mPosition ) );
     }
 
     //==================================================================================================================================================================================================
     // No translation applied
     //==================================================================================================================================================================================================
-    Vector3 Transform::TransformDirection( const Vector3 _point ) const
+    Vector3 Transform::TransformDirection( const Vector3 _point, const Vector3 _scale ) const
     {
-        return mRotation * _point;
+        return mRotation * Vector3::Multiply( _scale, _point );
     }
 
     //==================================================================================================================================================================================================
     // No translation applied
     //========================================================================================================*
-    Vector3 Transform::InverseTransformDirection( const Vector3 _point ) const
+    Vector3 Transform::InverseTransformDirection( const Vector3 _point, const Vector3 _scale ) const
     {
-        return mRotation.Inverse() * _point;
+        Vector3 inverseScale( 1 / _scale.x, 1 / _scale.y, 1 / _scale.z );
+        return Vector3::Multiply( inverseScale, mRotation.Inverse() * _point );
     }
 }

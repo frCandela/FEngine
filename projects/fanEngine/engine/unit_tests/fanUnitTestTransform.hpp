@@ -70,9 +70,12 @@ namespace fan
             TEST_ASSERT( mTransform.InverseTransformPoint( mTransform.TransformPoint( point ) ) == point )
 
             mTransform.mRotation = Quaternion::Euler( 0, 90, 0 );
-            Vector3 v = mTransform.TransformPoint( point );
-            TEST_ASSERT( v == Vector3( 3, 2, 0 ) )
+            TEST_ASSERT( mTransform.TransformPoint( point ) == Vector3( 3, 2, 0 ) )
             TEST_ASSERT( mTransform.InverseTransformPoint( mTransform.TransformPoint( point ) ) == point )
+
+            const Vector3 scaledPoint = mTransform.TransformPoint( point, Vector3( 10, 20, 30 ) );
+            TEST_ASSERT( Vector3::IsFuzzyZero( scaledPoint - Vector3( 90, 40, -9 ) ) )
+            TEST_ASSERT( Fixed::IsFuzzyZero( ( mTransform.InverseTransformPoint( scaledPoint, Vector3( 10, 20, 30 ) ) - Vector3( 1, 2, 3 ) ).Magnitude() ) )
         }
 
         void TestTransformDirection()
@@ -87,6 +90,10 @@ namespace fan
             mTransform.mRotation = Quaternion::Euler( 0, 90, 0 );
             TEST_ASSERT( mTransform.TransformDirection( point ) == Vector3( 3, 2, -1 ) )
             TEST_ASSERT( mTransform.InverseTransformDirection( mTransform.TransformDirection( point ) ) == point )
+
+            const Vector3 scaledDirection = mTransform.TransformDirection( point, Vector3( 10, 20, 30 ) );
+            TEST_ASSERT( Vector3::IsFuzzyZero( scaledDirection - Vector3( 90, 40, -10 ) ) )
+            TEST_ASSERT( Fixed::IsFuzzyZero( ( mTransform.InverseTransformDirection( scaledDirection, Vector3( 10, 20, 30 ) ) - Vector3( 1, 2, 3 ) ).Magnitude() ) )
         }
 
         void TestLookAt()

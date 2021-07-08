@@ -1,5 +1,6 @@
 #include "ecs/fanEcsSystem.hpp"
 #include <stack>
+#include "engine/components/fanScale.hpp"
 #include "engine/components/fanBounds.hpp"
 #include "engine/components/fanMeshRenderer.hpp"
 #include "engine/ui/fanUITransform.hpp"
@@ -128,7 +129,9 @@ namespace fan
                 const Transform   & transform    = *transformIt;
                 if( meshRenderer.mMesh == nullptr ){ continue; }
 
-                const glm::mat4 modelMat = transform.GetModelMatrix();
+                EcsEntity entity = transformIt.GetEntity();
+                Vector3 scale = _world.HasComponent<Scale>( entity ) ? _world.GetComponent<Scale>( entity ).mScale : Vector3::sOne;
+                const glm::mat4 modelMat = transform.GetModelMatrix( scale );
                 for( SubMesh& subMesh : meshRenderer.mMesh->mSubMeshes )
                 {
                     const std::vector<uint32_t>& indices  = subMesh.mIndices;
@@ -173,7 +176,11 @@ namespace fan
                 const ConvexHull& hull = meshRenderer.mMesh->mConvexHull;
                 if( hull.mVertices.empty() ){ continue; }
 
-                const glm::mat4 modelMat = transform.GetModelMatrix();
+
+                EcsEntity entity = transformIt.GetEntity();
+                Vector3 scale = _world.HasComponent<Scale>( entity ) ? _world.GetComponent<Scale>( entity ).mScale : Vector3::sOne;
+
+                const glm::mat4 modelMat = transform.GetModelMatrix( scale );
 
                 Color         color     = Color( 0, .7f, 1.f, 0.5f );
                 for( unsigned polyIndex = 0; polyIndex < hull.mIndices.size() / 3; polyIndex++ )

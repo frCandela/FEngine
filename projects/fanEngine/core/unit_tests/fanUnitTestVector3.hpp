@@ -127,7 +127,7 @@ namespace fan
             TEST_ASSERT( value * vec3 == ( vec3 *= value ) )
             TEST_ASSERT( value * vec3 == vec3 * value )
 
-            TEST_ASSERT( Vector3::Mult( Vector3( 2, -3, 4 ), Vector3( 5, 6, 7 ) ) == Vector3( 10, -18, 28 ) )
+            TEST_ASSERT( Vector3::Multiply( Vector3( 2, -3, 4 ), Vector3( 5, 6, 7 ) ) == Vector3( 10, -18, 28 ) )
         }
 
         void TestDivision()

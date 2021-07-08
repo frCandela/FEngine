@@ -36,10 +36,10 @@ namespace fan
         Vector3 Down() const { return mRotation * Vector3::sDown; }
 
         Transform Inverse() const;
-        Vector3 TransformPoint( const Vector3 _point ) const;
-        Vector3 TransformDirection( const Vector3 _point ) const;
-        Vector3 InverseTransformPoint( const Vector3 _point ) const;
-        Vector3 InverseTransformDirection( const Vector3 _point ) const;
+        Vector3 TransformPoint( const Vector3 _point, const Vector3 _scale = Vector3::sOne ) const;
+        Vector3 TransformDirection( const Vector3 _point, const Vector3 _scale = Vector3::sOne ) const;
+        Vector3 InverseTransformPoint( const Vector3 _point, const Vector3 _scale = Vector3::sOne ) const;
+        Vector3 InverseTransformDirection( const Vector3 _point, const Vector3 _scale = Vector3::sOne ) const;
 
         Quaternion mRotation;
         Vector3    mPosition;

@@ -5,6 +5,7 @@
 #include "engine/components/fanSceneNode.hpp"
 #include "engine/components/fanBounds.hpp"
 #include "engine/components/fanMeshRenderer.hpp"
+#include "engine/components/fanScale.hpp"
 #include "engine/physics/fanTransform.hpp"
 
 namespace fan
@@ -59,15 +60,16 @@ namespace fan
                     {
                         const Transform transform = *TransformIt;
                         const MeshRenderer& meshRenderer = _world.GetComponent<MeshRenderer>( entity );
-                        const Ray transformedRay( transform.InverseTransformPoint( _ray.origin ), transform.InverseTransformDirection( _ray.direction ) );
+                        Vector3 scale = _world.HasComponent<Scale>( entity ) ? _world.GetComponent<Scale>( entity ).mScale : Vector3::sOne;
+                        const Ray transformedRay( transform.InverseTransformPoint( _ray.origin, scale ), transform.InverseTransformDirection( _ray.direction, scale ) );
                         if( meshRenderer.mMesh != nullptr && meshRenderer.mMesh->mConvexHull.RayCast( transformedRay, result ) )
                         {
                             if( meshRenderer.mMesh->RayCast( transformedRay, result ) )
                             {
                                 SRaycast::Result result1;
                                 result1.mEntity         = entity;
-                                result1.mData.mPosition = transform.TransformPoint( result.mPosition );
-                                result1.mData.mNormal   = transform.TransformDirection( result.mNormal );
+                                result1.mData.mPosition = transform.TransformPoint( result.mPosition, scale );
+                                result1.mData.mNormal   = transform.TransformDirection( result.mNormal, scale );
                                 result1.mData.mDistance = result.mDistance;
                                 _outResults.push_back( result1 );
                             }

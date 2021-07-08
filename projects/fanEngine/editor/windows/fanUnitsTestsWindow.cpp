@@ -16,7 +16,7 @@
 #include "core/unit_tests/fanUnitTestResources.hpp"
 #include "core/unit_tests/fanUnitTestQueue.hpp"
 #include "core/unit_tests/fanUnitTestString.hpp"
-#include "engine/unit_tests/fanUnitTestFxTransform.hpp"
+#include "engine/unit_tests/fanUnitTestTransform.hpp"
 
 namespace fan
 {
