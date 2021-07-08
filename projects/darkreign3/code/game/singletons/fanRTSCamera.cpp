@@ -44,7 +44,8 @@ namespace fan
         EcsEntity cameraEntity = _world.GetEntity( rtsCamera.mCameraHandle );
         _world.AddComponent<Camera>( cameraEntity );
         Transform& cameraTransform = _world.AddComponent<Transform>( cameraEntity );
-        cameraTransform.mPosition = Vector3( -75, 75, -100 );
+        const Fixed height = rtsCamera.mMinHeight + ( rtsCamera.mMaxHeight - rtsCamera.mMinHeight ) / 2;
+        cameraTransform.mPosition = Vector3( 0, height, -25 );
         cameraTransform.mRotation = Quaternion::Euler( 45, 0, 0 );
         scene.SetMainCamera( rtsCamera.mCameraHandle );
     }
@@ -114,8 +115,8 @@ namespace fan
     void RTSCamera::Save( const EcsSingleton& _singleton, Json& _json )
     {
         const RTSCamera& rtsCamera = static_cast<const RTSCamera&>( _singleton );
-        Serializable::SaveFixed( _json, "min height", rtsCamera.mMinHeight );
-        Serializable::SaveFixed( _json, "max height", rtsCamera.mMaxHeight );
+        Serializable::SaveFixed( _json, "min_height", rtsCamera.mMinHeight );
+        Serializable::SaveFixed( _json, "max_height", rtsCamera.mMaxHeight );
         Serializable::SaveFixed( _json, "zoom speed", rtsCamera.mZoomSpeed );
         Serializable::SaveFixed( _json, "translation_speed", rtsCamera.mTranslationSpeed );
     }
@@ -125,8 +126,8 @@ namespace fan
     void RTSCamera::Load( EcsSingleton& _singleton, const Json& _json )
     {
         RTSCamera& rtsCamera = static_cast<RTSCamera&>( _singleton );
-        Serializable::LoadFixed( _json, "min height", rtsCamera.mMinHeight );
-        Serializable::LoadFixed( _json, "max height", rtsCamera.mMaxHeight );
+        Serializable::LoadFixed( _json, "min_height", rtsCamera.mMinHeight );
+        Serializable::LoadFixed( _json, "max_height", rtsCamera.mMaxHeight );
         Serializable::LoadFixed( _json, "zoom speed", rtsCamera.mZoomSpeed );
         Serializable::LoadFixed( _json, "translation_speed", rtsCamera.mTranslationSpeed );
     }
