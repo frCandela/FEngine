@@ -20,5 +20,6 @@ namespace fan
         ResourcePtr<Animation> mAnimIdle;
         ResourcePtr<Animation> mAnimWalk;
         ResourcePtr<Animation> mAnimRun;
+        ResourcePtr<Animation> mAnimFire;
     };
 }

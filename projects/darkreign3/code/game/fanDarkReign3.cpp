@@ -30,6 +30,7 @@
 #include "game/systems/fanUpdateSelection.hpp"
 #include "game/systems/fanUpdateAnimScale.hpp"
 #include "game/systems/fanUpdateAgents.hpp"
+#include "game/systems/fanUpdateUnits.hpp"
 #include "game/systems/fanUpdateJudas.hpp"
 #include "game/fanDR3Tags.hpp"
 
@@ -42,7 +43,6 @@
 #include "editor/fanGuiAnimScale.hpp"
 #include "editor/fanGuiTerrainAgent.hpp"
 #include "editor/fanGuiJudas.hpp"
-
 #endif
 
 #include "render/fanWindow.hpp"
@@ -62,6 +62,7 @@ namespace fan
         mWorld.AddSingletonType<PauseMenu>();
         mWorld.AddTagType<TagSelected>();
         mWorld.AddTagType<TagEnemy>();
+        mWorld.AddTagType<TagUnitStateNeedsUpdate>();
 
 #ifdef FAN_EDITOR
         EditorSettings& settings = mWorld.GetSingleton<EditorSettings>();
@@ -77,8 +78,6 @@ namespace fan
 
         mCursors.Load( *mWorld.GetSingleton<Application>().mResources );
         Input::Get().Manager().CreateKeyboardEvent( "game_pause", Keyboard::ESCAPE )->Connect( &DarkReign3::OnTogglePause, this );
-
-
     }
 
     //==================================================================================================================================================================================================
@@ -176,6 +175,7 @@ namespace fan
 
         // update selection
         const SelectionStatus selectionStatus = Selection::SelectUnits( mWorld, _delta );
+        mWorld.Run<SUpdateUnitsState>();
         mWorld.Run<SMoveAgents>( _delta );
 
         // set cursor
@@ -194,8 +194,32 @@ namespace fan
     //==================================================================================================================================================================================================
     void DarkReign3::OnGui()
     {
-        if( ImGui::Begin( "testoss" ) )
+        if( ImGui::Begin( "testosss" ) )
         {
+            if( Keyboard::Get().IsKeyPressed( Keyboard::T ) )
+            {
+                EcsEntity cameraID = mWorld.GetEntity( mWorld.GetSingleton<Scene>().mMainCameraHandle );
+                Mouse          & mouse           = mWorld.GetSingleton<Mouse>();
+                const Transform& cameraTransform = mWorld.GetComponent<Transform>( cameraID );
+                const Camera   & camera          = mWorld.GetComponent<Camera>( cameraID );
+                const Ray                     mousePosRay = camera.ScreenPosToRay( cameraTransform, mouse.LocalScreenSpacePosition() );
+                std::vector<SRaycast::Result> results;
+                Raycast<MeshRenderer>( mWorld, mousePosRay, results );
+                if( !results.empty() )
+                {
+                    SRaycast::Result result = results[0];
+                    if( mWorld.HasTag<TagEnemy>( result.mEntity ) )
+                    {
+                        mWorld.RemoveTag<TagEnemy>( result.mEntity );
+                        Debug::Log( "untag" );
+                    }
+                    else
+                    {
+                        mWorld.AddTag<TagEnemy>( result.mEntity );
+                        Debug::Log( "tag" );
+                    }
+                }
+            }
         }
         ImGui::End();
     }

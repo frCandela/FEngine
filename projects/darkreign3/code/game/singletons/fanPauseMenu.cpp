@@ -11,6 +11,7 @@
 #include "engine/ui/fanUIScaler.hpp"
 #include "engine/ui/fanUIText.hpp"
 #include "engine/ui/fanUIButton.hpp"
+#include "engine/fanEngineTags.hpp"
 
 namespace fan
 {

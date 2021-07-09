@@ -10,7 +10,7 @@ namespace fan
     {
         static EcsSignature GetSignature( const EcsWorld& _world )
         {
-            return _world.GetSignature<TerrainAgent>() | _world.GetSignature<Animator>() | _world.GetSignature<Judas>();
+            return _world.GetSignature<Unit>() | _world.GetSignature<TerrainAgent>() | _world.GetSignature<Animator>() | _world.GetSignature<Judas>();
         }
 
         static void Run( EcsWorld&, const EcsView& _view, const Fixed _delta )
@@ -19,27 +19,36 @@ namespace fan
 
             auto animatorIt = _view.begin<Animator>();
             auto agentIt    = _view.begin<TerrainAgent>();
+            auto unitIt     = _view.begin<Unit>();
             auto judasIt    = _view.begin<Judas>();
-            for( ; agentIt != _view.end<TerrainAgent>(); ++agentIt, ++judasIt, ++animatorIt )
+            for( ; agentIt != _view.end<TerrainAgent>(); ++agentIt, ++judasIt, ++animatorIt, ++unitIt )
             {
                 TerrainAgent& agent    = *agentIt;
                 Judas       & judas    = *judasIt;
                 Animator    & animator = *animatorIt;
+                Unit        & unit     = *unitIt;
                 const Fixed distanceWalk = 10;
-                if( agent.mState == TerrainAgent::State::Stay )
+                switch( unit.mState )
                 {
-                    animator.mAnimation = judas.mAnimIdle;
-                }
-                else
-                {
-                    if( agent.mSqrHorizontalDistanceFromDestination < distanceWalk * distanceWalk || Fixed::Abs( agent.mForwardAngle ) > 30 )
-                    {
-                        animator.mAnimation = judas.mAnimWalk;
-                    }
-                    else
-                    {
-                        animator.mAnimation = judas.mAnimRun;
-                    }
+                    case Unit::Wait:
+                        animator.mAnimation = judas.mAnimIdle;
+                        break;
+                    case Unit::Move:
+                        if( agent.mSqrDistanceFromDestination < distanceWalk * distanceWalk || Fixed::Abs( agent.mForwardAngle ) > 30 )
+                        {
+                            animator.mAnimation = judas.mAnimWalk;
+                        }
+                        else
+                        {
+                            animator.mAnimation = judas.mAnimRun;
+                        }
+                        break;
+                    case Unit::Attack:
+                        animator.mAnimation = judas.mAnimFire;
+                        break;
+                    default:
+                        fanAssert( false );
+                        break;
                 }
             }
         }

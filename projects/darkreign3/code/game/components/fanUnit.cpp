@@ -17,7 +17,9 @@ namespace fan
     void Unit::Init( EcsWorld& /*_world*/, EcsEntity /*_entity*/, EcsComponent& _component )
     {
         Unit& unit = static_cast<Unit&>( _component );
-        unit.mHeightOffset = 0;
+        unit.mAttackRange   = 1;
+        unit.mState         = State::Wait;
+        unit.mLastOrder     = {};
     }
 
     //==================================================================================================================================================================================================
@@ -25,7 +27,7 @@ namespace fan
     void Unit::Save( const EcsComponent& _component, Json& _json )
     {
         const Unit& unit = static_cast<const Unit&>( _component );
-        Serializable::SaveFixed( _json, "height_offset", unit.mHeightOffset );
+        Serializable::SaveFixed( _json, "attack_range", unit.mAttackRange );
     }
 
     //==================================================================================================================================================================================================
@@ -33,6 +35,6 @@ namespace fan
     void Unit::Load( EcsComponent& _component, const Json& _json )
     {
         Unit& unit = static_cast<Unit&>( _component );
-        Serializable::LoadFixed( _json, "height_offset", unit.mHeightOffset );
+        Serializable::LoadFixed( _json, "attack_range", unit.mAttackRange );
     }
 }

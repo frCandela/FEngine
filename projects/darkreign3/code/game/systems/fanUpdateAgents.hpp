@@ -10,34 +10,6 @@ namespace fan
 {
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    struct SSetSelectedAgentsDestination : EcsSystem
-    {
-        static EcsSignature GetSignature( const EcsWorld& _world )
-        {
-            return _world.GetSignature<TerrainAgent>()
-                   | _world.GetSignature<TagSelected>();
-        }
-
-        static void Run( EcsWorld& _world, const EcsView& _view, const Vector3 _destination )
-        {
-            auto agentIt = _view.begin<TerrainAgent>();
-            for( ; agentIt != _view.end<TerrainAgent>(); ++agentIt )
-            {
-                TerrainAgent& agent = *agentIt;
-                agent.mDestination = _destination;
-                agent.mState       = TerrainAgent::State::Move;
-
-                EcsEntity entity = agentIt.GetEntity();
-                if( _world.HasComponent<Animator>( entity ) )
-                {
-                    _world.GetComponent<Animator>( entity ).mTime = 0;
-                }
-            }
-        }
-    };
-
-    //==================================================================================================================================================================================================
-    //==================================================================================================================================================================================================
     struct SMoveAgents : EcsSystem
     {
         static EcsSignature GetSignature( const EcsWorld& _world )
@@ -63,8 +35,9 @@ namespace fan
                     Raycast<TagTerrain>( _world, ray, results );
                     if( !results.empty() )
                     {
-                        agent.mTerrainNormal = results[0].mData.mNormal;
-                        transform.mPosition  = results[0].mData.mPosition + Vector3( 0, agent.mHeightOffset, 0 );
+                        agent.mTerrainNormal   = results[0].mData.mNormal;
+                        agent.mTerrainPosition = results[0].mData.mPosition;
+                        transform.mPosition    = results[0].mData.mPosition + Vector3( 0, agent.mHeightOffset, 0 );
                     }
 
                     // slowly rotates the transform up vector towards the terrain normal
@@ -106,12 +79,12 @@ namespace fan
                     }
 
                     // stops when reaching the target
-                    const Vector3 horizontalAgentPosition(transform.mPosition.x,0,transform.mPosition.z);
-                    const Vector3 horizontalDestinationPosition(agent.mDestination.x,0,agent.mDestination.z);
-                    agent.mSqrHorizontalDistanceFromDestination = Vector3::SqrDistance( horizontalAgentPosition, horizontalDestinationPosition );
-                    if( agent.mSqrHorizontalDistanceFromDestination < 1 )
+                    agent.mSqrDistanceFromDestination = Vector3::SqrDistance( agent.mTerrainPosition, agent.mDestination );
+                    if( agent.mSqrDistanceFromDestination < agent.mRange * agent.mRange )
                     {
                         agent.mState = TerrainAgent::State::Stay;
+                        EcsEntity entity = transformIt.GetEntity();
+                        _world.AddTag<TagUnitStateNeedsUpdate>( entity );
                     }
                 }
 

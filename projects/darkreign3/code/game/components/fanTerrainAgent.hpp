@@ -15,19 +15,24 @@ namespace fan
         static void Save( const EcsComponent& _component, Json& _json );
         static void Load( EcsComponent& _component, const Json& _json );
 
-        enum class State { Stay, Move };
+        enum State
+        {
+            Stay, Move
+        };
 
         // Serialized
-        Vector3 mDestination;
-        Fixed   mHeightOffset;
-        Fixed   mMoveSpeed;     // unit/s
-        Fixed   mRotationSpeed; // degrees/s
-        State   mState;
-        bool    mAlignWithTerrain;
+        Fixed mHeightOffset;
+        Fixed mMoveSpeed;     // unit/s
+        Fixed mRotationSpeed; // degrees/s
+        Fixed mRange;           // distance of target at which the unit will stop moving
+        bool  mAlignWithTerrain;
 
         // runtime only
+        State   mState;
+        Vector3 mDestination;
+        Vector3 mTerrainPosition;
         Vector3 mTerrainNormal;
-        Fixed   mSqrHorizontalDistanceFromDestination;
+        Fixed   mSqrDistanceFromDestination;
         Fixed   mForwardAngle;
     };
 }

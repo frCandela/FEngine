@@ -8,6 +8,8 @@
 namespace fan
 {
     class EcsWorld;
+    struct RaycastResult;
+    struct Ray;
 
     //=================================================================================================
     //=================================================================================================
@@ -29,6 +31,7 @@ namespace fan
         static void Load( EcsSingleton& _component, const Json& _json );
 
         static SelectionStatus SelectUnits( EcsWorld& _world, const Fixed _delta );
+        static void InstantiateMoveToFx( EcsWorld& _world, const Ray& _ray, const RaycastResult& _raycastResult );
 
         ResourcePtr<Prefab> mSelectionFramePrefab;
         ResourcePtr<Prefab> mMoveToFxPrefab;

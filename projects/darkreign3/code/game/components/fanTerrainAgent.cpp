@@ -17,15 +17,18 @@ namespace fan
     void TerrainAgent::Init( EcsWorld& /*_world*/, EcsEntity /*_entity*/, EcsComponent& _component )
     {
         TerrainAgent& agent = static_cast<TerrainAgent&>( _component );
-        agent.mHeightOffset = 0;
-        agent.mDestination = Vector3::sZero;
-        agent.mMoveSpeed   = 10;
-        agent.mRotationSpeed = 180;
-        agent.mState       = State::Stay;
+        agent.mHeightOffset     = 0;
+        agent.mMoveSpeed        = 10;
+        agent.mRotationSpeed    = 180;
+        agent.mRange            = 10;
         agent.mAlignWithTerrain = true;
-        agent.mTerrainNormal                        = Vector3::sUp;
-        agent.mSqrHorizontalDistanceFromDestination = 0;
-        agent.mForwardAngle                         = 0;
+
+        agent.mState                      = State::Stay;
+        agent.mDestination                = Vector3::sZero;
+        agent.mTerrainPosition            = Vector3::sZero;
+        agent.mTerrainNormal              = Vector3::sUp;
+        agent.mSqrDistanceFromDestination = 0;
+        agent.mForwardAngle               = 0;
     }
 
     //==================================================================================================================================================================================================
@@ -36,6 +39,7 @@ namespace fan
         Serializable::SaveFixed( _json, "height_offset", agent.mHeightOffset );
         Serializable::SaveFixed( _json, "move_speed", agent.mMoveSpeed );
         Serializable::SaveFixed( _json, "rotation_speed", agent.mRotationSpeed );
+        Serializable::SaveFixed( _json, "range", agent.mRange );
         Serializable::SaveBool( _json, "align_with_terrain", agent.mAlignWithTerrain );
     }
 
@@ -47,6 +51,7 @@ namespace fan
         Serializable::LoadFixed( _json, "height_offset", agent.mHeightOffset );
         Serializable::LoadFixed( _json, "move_speed", agent.mMoveSpeed );
         Serializable::LoadFixed( _json, "rotation_speed", agent.mRotationSpeed );
+        Serializable::LoadFixed( _json, "range", agent.mRange );
         Serializable::LoadBool( _json, "align_with_terrain", agent.mAlignWithTerrain );
     }
 }

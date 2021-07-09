@@ -28,6 +28,7 @@ namespace fan
             ImGui::FanResourcePtr<Animation>( "anim idle", judas.mAnimIdle );
             ImGui::FanResourcePtr<Animation>( "anim walk", judas.mAnimWalk );
             ImGui::FanResourcePtr<Animation>( "anim run", judas.mAnimRun );
+            ImGui::FanResourcePtr<Animation>( "anim fire", judas.mAnimFire );
             ImGui::PopID();
         }
     };

@@ -5,6 +5,19 @@
 
 namespace fan
 {
+    struct UnitOrder
+    {
+        enum Type
+        {
+            None,
+            Attack,
+            Move
+        };
+        Type    mType = Type::None;
+        bool    mWasExecuted = false;
+        Vector3 mPosition;
+    };
+
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
     struct Unit : public EcsComponent
@@ -15,6 +28,17 @@ namespace fan
         static void Save( const EcsComponent& _component, Json& _json );
         static void Load( EcsComponent& _component, const Json& _json );
 
-        Fixed mHeightOffset;
+        enum State
+        {
+            Wait,
+            Move,
+            Attack,
+        };
+
+        Fixed mAttackRange;
+
+        // non serialized
+        State     mState;
+        UnitOrder mLastOrder;
     };
 }

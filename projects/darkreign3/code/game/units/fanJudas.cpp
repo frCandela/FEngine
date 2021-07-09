@@ -20,6 +20,7 @@ namespace fan
         judas.mAnimIdle = nullptr;
         judas.mAnimWalk = nullptr;
         judas.mAnimRun = nullptr;
+        judas.mAnimFire = nullptr;
     }
 
     //==================================================================================================================================================================================================
@@ -30,6 +31,7 @@ namespace fan
         Serializable::SaveResourcePtr( _json, "anim_idle", judas.mAnimIdle );
         Serializable::SaveResourcePtr( _json, "anim_walk", judas.mAnimWalk );
         Serializable::SaveResourcePtr( _json, "anim_run", judas.mAnimRun );
+        Serializable::SaveResourcePtr( _json, "anim_fire", judas.mAnimFire );
     }
 
     //==================================================================================================================================================================================================
@@ -40,5 +42,6 @@ namespace fan
         Serializable::LoadResourcePtr( _json, "anim_idle", judas.mAnimIdle );
         Serializable::LoadResourcePtr( _json, "anim_walk", judas.mAnimWalk );
         Serializable::LoadResourcePtr( _json, "anim_run", judas.mAnimRun );
+        Serializable::LoadResourcePtr( _json, "anim_fire", judas.mAnimFire );
     }
 }
