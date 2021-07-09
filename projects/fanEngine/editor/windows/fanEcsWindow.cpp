@@ -43,6 +43,33 @@ namespace fan
             ImGui::Text( "total size (Mo): %.1f", float( EcsChunk::sAllocator.Size() * EcsChunk::sAllocator.sChunkSize ) * 0.000001f );
         }
 
+        const std::vector<EcsComponentInfo>& infos    = _world.GetComponentInfos();
+        const fan::EditorSettings          & settings = _world.GetSingleton<fan::EditorSettings>();
+
+        // Components
+        if( ImGui::CollapsingHeader( "Components" ) )
+        {
+            ImGui::Columns( 3 );
+            ImGui::Text("");
+            ImGui::NextColumn();
+            ImGui::Text("name");
+            ImGui::NextColumn();
+            ImGui::Text("size");
+            ImGui::NextColumn();
+            ImGui::Separator();
+            for( const EcsComponentInfo& info : _world.GetComponentInfos() )
+            {
+                const fan::GuiComponentInfo& guiInfo = settings.GetComponentInfo( info.mType );
+                ImGui::Icon( guiInfo.mIcon, { 16, 16 }, settings.mData->mGroupsColors.GetColor( guiInfo.mGroup ) );
+                ImGui::NextColumn();
+                ImGui::Text( guiInfo.mEditorName.c_str() );
+                ImGui::NextColumn();
+                ImGui::Text("%d", info.mSize );
+                ImGui::NextColumn();
+            }
+            ImGui::Columns( 1 );
+        }
+
         // Archetypes
         if( ImGui::CollapsingHeader( "Archetypes" ) )
         {
@@ -87,8 +114,6 @@ namespace fan
 
 
                 // chunks
-                const fan::EditorSettings          & settings = _world.GetSingleton<fan::EditorSettings>();
-                const std::vector<EcsComponentInfo>& infos    = _world.GetComponentInfos();
                 for( int componentIndex = 0; componentIndex < _world.NumComponents(); componentIndex++ )
                 {
                     if( archetype->GetSignature()[componentIndex] )
