@@ -30,7 +30,8 @@ namespace fan
         rtsCamera.mCameraHandle     = 0;
         rtsCamera.mZoomSpeed        = 500;
         rtsCamera.mTranslationSpeed = 50;
-        rtsCamera.mRotationSpeed    = 30;
+        rtsCamera.mRotationSpeed = 30;
+        rtsCamera.mLock          = false;
     }
 
     //==================================================================================================================================================================================================
@@ -54,9 +55,9 @@ namespace fan
     //==================================================================================================================================================================================================
     void RTSCamera::Update( EcsWorld& _world, const Fixed _delta )
     {
-        if( _delta > 0 )
+        RTSCamera& rtsCamera = _world.GetSingleton<RTSCamera>();
+        if( _delta > 0 && !rtsCamera.mLock )
         {
-            RTSCamera& rtsCamera = _world.GetSingleton<RTSCamera>();
             EcsEntity entity = _world.GetEntity( rtsCamera.mCameraHandle );
             Transform& transform = _world.GetComponent<Transform>( entity );
             Mouse    & mouse     = _world.GetSingleton<Mouse>();

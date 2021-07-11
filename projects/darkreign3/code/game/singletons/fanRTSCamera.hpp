@@ -26,5 +26,6 @@ namespace fan
         Fixed     mZoomSpeed;
         Fixed     mTranslationSpeed;    // units per second
         Fixed     mRotationSpeed;       // degrees per second
+        bool mLock;
     };
 }

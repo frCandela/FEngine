@@ -196,6 +196,13 @@ namespace fan
     {
         if( ImGui::Begin( "testosss" ) )
         {
+            if( Keyboard::Get().IsKeyPressed( Keyboard::L ) )
+            {
+                RTSCamera& rtsCamera = mWorld.GetSingleton<RTSCamera>();
+                rtsCamera.mLock = !rtsCamera.mLock;
+                Debug::Log( rtsCamera.mLock ? "camera locked" : "camera unlocked" );
+            }
+
             if( Keyboard::Get().IsKeyPressed( Keyboard::T ) )
             {
                 EcsEntity cameraID = mWorld.GetEntity( mWorld.GetSingleton<Scene>().mMainCameraHandle );
