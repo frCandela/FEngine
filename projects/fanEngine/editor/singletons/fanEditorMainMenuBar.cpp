@@ -197,10 +197,12 @@ namespace fan
                 ImGui::PushItemWidth( 150.f );
 
                 const EditorSettings       & settings = _world.GetSingleton<EditorSettings>();
-                const fan::GuiSingletonInfo& guiInfo  = settings.GetSingletonInfo( EditorGrid::Info::sType );
-                EditorGrid                 & grid     = _world.GetSingleton<EditorGrid>();
-
-                ( *guiInfo.onGui )( _world, grid );
+                const fan::GuiSingletonInfo* guiInfo  = settings.GetSingletonInfo( EditorGrid::Info::sType );
+                if( guiInfo != nullptr )
+                {
+                    EditorGrid& grid = _world.GetSingleton<EditorGrid>();
+                    ( *guiInfo->onGui )( _world, grid );
+                }
                 ImGui::PopItemWidth();
 
                 ImGui::EndMenu();

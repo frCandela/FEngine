@@ -36,22 +36,22 @@ namespace fan
         const std::vector<EcsSingletonInfo>& infos    = _world.GetVectorSingletonInfo();
         for( const EcsSingletonInfo        & info : infos )
         {
-            const fan::GuiSingletonInfo& guiInfo = settings.GetSingletonInfo( info.mType );
-            if( guiInfo.onGui != nullptr && guiInfo.mType == GuiSingletonInfo::Type::Default )
+            const fan::GuiSingletonInfo* guiInfo = settings.GetSingletonInfo( info.mType );
+            if( guiInfo != nullptr && guiInfo->onGui != nullptr && guiInfo->mType == GuiSingletonInfo::Type::Default )
             {
                 ImGui::SetCursorPosY( ImGui::GetCursorPosY() + 3 ); // moves cursor lower to center the icon
-                ImGui::Icon( guiInfo.mIcon, { 16, 16 }, settings.mData->mGroupsColors.GetColor( guiInfo.mGroup ) );
+                ImGui::Icon( guiInfo->mIcon, { 16, 16 }, settings.mData->mGroupsColors.GetColor( guiInfo->mGroup ) );
                 ImGui::SameLine();
                 ImGui::SetCursorPosY( ImGui::GetCursorPosY() - 3 );        // resets the cursor
                 if( ImGui::CollapsingHeader( info.mName.c_str() ) )
                 {
                     ImGui::FanBeginDragDropSourceSingleton( _world, info.mType );
                     // draws gui
-                    if( guiInfo.onGui != nullptr )
+                    if( guiInfo->onGui != nullptr )
                     {
                         ImGui::Indent();
                         ImGui::Indent();
-                        guiInfo.onGui( _world, _world.GetSingleton( info.mType ) );
+                        guiInfo->onGui( _world, _world.GetSingleton( info.mType ) );
                         ImGui::Unindent();
                         ImGui::Unindent();
                     }

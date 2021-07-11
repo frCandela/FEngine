@@ -587,8 +587,11 @@ namespace fan
         EditorSettings   & settings    = _world.GetSingleton<EditorSettings>();
 
         // Draw main menu bar
-        GuiSingletonInfo& mainMenuBarInfo = settings.GetSingletonInfo( EditorMainMenuBar::Info::sType );
-        ( *mainMenuBarInfo.onGui )( _world, mainMenuBar );
+        const GuiSingletonInfo* mainMenuBarInfo = settings.GetSingletonInfo( EditorMainMenuBar::Info::sType );
+        if( mainMenuBarInfo != nullptr )
+        {
+            ( *mainMenuBarInfo->onGui )( _world, mainMenuBar );
+        }
 
         // Draw imgui demo window
         if( mainMenuBar.mShowImguiDemoWindow )

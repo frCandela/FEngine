@@ -10,7 +10,6 @@
 #include "editor/fanResourceInfos.hpp"
 #include "editor/singletons/fanEditorSettings.hpp"
 
-
 namespace ImGui
 {
     //==================================================================================================================================================================================================
@@ -19,7 +18,7 @@ namespace ImGui
     {
         if( ImGui::BeginDragDropSource( _flags ) )
         {
-            const fan::EditorResourceInfo& resourceInfo = fan::EditorResourceInfo::sResourceInfos.at(_infoType);
+            const fan::EditorResourceInfo& resourceInfo = fan::EditorResourceInfo::sResourceInfos.at( _infoType );
             ImGui::SetDragDropPayload( resourceInfo.mResourceName, &_resourcePtrData, sizeof( fan::ResourcePtrData ) );
             ImGui::Icon( resourceInfo.mIcon, { 16, 16 } );
             ImGui::SameLine();
@@ -30,13 +29,13 @@ namespace ImGui
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    fan::ResourcePtrData FanBeginDragDropTargetResource( const uint32_t _infoType  )
+    fan::ResourcePtrData FanBeginDragDropTargetResource( const uint32_t _infoType )
     {
         fan::ResourcePtrData resourcePtrData;
         if( ImGui::BeginDragDropTarget() )
         {
-            const fan::EditorResourceInfo& resourceInfo = fan::EditorResourceInfo::sResourceInfos.at(_infoType);
-            if( const ImGuiPayload* payload = ImGui::AcceptDragDropPayload( resourceInfo.mResourceName ) )
+            const fan::EditorResourceInfo& resourceInfo = fan::EditorResourceInfo::sResourceInfos.at( _infoType );
+            if( const ImGuiPayload       * payload      = ImGui::AcceptDragDropPayload( resourceInfo.mResourceName ) )
             {
                 fanAssert( payload->DataSize == sizeof( fan::ResourcePtrData ) );
                 resourcePtrData = *(fan::ResourcePtrData*)payload->Data;
@@ -77,15 +76,18 @@ namespace ImGui
         {
             const fan::EcsSingletonInfo& info     = _world.GetSingletonInfo( _type );
             const fan::EditorSettings  & settings = _world.GetSingleton<fan::EditorSettings>();
-            const fan::GuiSingletonInfo& guiInfo  = settings.GetSingletonInfo( info.mType );
+            const fan::GuiSingletonInfo* guiInfo  = settings.GetSingletonInfo( info.mType );
 
-            std::string      nameid  = SingletonPayload::sPrefix + std::to_string( info.mType );
-            SingletonPayload payload = { _type };
-            ImGui::SetDragDropPayload( nameid.c_str(), &payload, sizeof( payload ) );
-            ImGui::Icon( guiInfo.mIcon, { 16, 16 }, settings.mData->mGroupsColors.GetColor( guiInfo.mGroup ) );
-            ImGui::SameLine();
-            ImGui::Text( "%s", info.mName.c_str() );
-            ImGui::EndDragDropSource();
+            if( guiInfo != nullptr )
+            {
+                std::string      nameid  = SingletonPayload::sPrefix + std::to_string( info.mType );
+                SingletonPayload payload = { _type };
+                ImGui::SetDragDropPayload( nameid.c_str(), &payload, sizeof( payload ) );
+                ImGui::Icon( guiInfo->mIcon, { 16, 16 }, settings.mData->mGroupsColors.GetColor( guiInfo->mGroup ) );
+                ImGui::SameLine();
+                ImGui::Text( "%s", info.mName.c_str() );
+                ImGui::EndDragDropSource();
+            }
         }
     }
 
