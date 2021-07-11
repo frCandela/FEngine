@@ -540,6 +540,7 @@ namespace fan
         }
 
         // load components
+        std::vector<const EcsComponentInfo*> postInitList;
         for( int childIndex = 0; childIndex < (int)jComponents.size(); childIndex++ )
         {
             const Json& jComponent_i = jComponents[childIndex];
@@ -551,7 +552,18 @@ namespace fan
             {
                 EcsComponent& component = world.AddComponent( entity, staticIndex );
                 info->load( component, jComponent_i );
+
+                if( info->postInit != nullptr )
+                {
+                    postInitList.push_back(info);
+                }
             }
+        }
+
+        // post init components
+        for( const EcsComponentInfo* info : postInitList )
+        {
+            info->postInit( world, entity );
         }
 
         // Load childs

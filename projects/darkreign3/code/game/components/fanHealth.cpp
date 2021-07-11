@@ -1,42 +1,39 @@
-#include "game/components/fanUnit.hpp"
+#include "game/components/fanHealth.hpp"
 #include "engine/fanEngineSerializable.hpp"
 
 namespace fan
 {
-
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void Unit::SetInfo( EcsComponentInfo& _info )
+    void Health::SetInfo( EcsComponentInfo& _info )
     {
-        _info.load = &Unit::Load;
-        _info.save = &Unit::Save;
+        _info.load = &Health::Load;
+        _info.save = &Health::Save;
     }
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void Unit::Init( EcsWorld& /*_world*/, EcsEntity /*_entity*/, EcsComponent& _component )
+    void Health::Init( EcsWorld& /*_world*/, EcsEntity /*_entity*/, EcsComponent& _component )
     {
-        Unit& unit = static_cast<Unit&>( _component );
-        unit.mAttackRange   = 1;
-        unit.mState         = State::Wait;
-        unit.mLastOrder     = {};
-        unit.mDeathDelegate = nullptr;
-        unit.mFireDelegate    = nullptr;
+        Health& health = static_cast<Health&>( _component );
+        health.mMaxHealth = 100;
+        health.mHealth = health.mMaxHealth;
     }
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void Unit::Save( const EcsComponent& _component, Json& _json )
+    void Health::Save( const EcsComponent& _component, Json& _json )
     {
-        const Unit& unit = static_cast<const Unit&>( _component );
-        Serializable::SaveFixed( _json, "attack_range", unit.mAttackRange );
+        const Health& health = static_cast<const Health&>( _component );
+        Serializable::SaveFixed( _json, "health", health.mMaxHealth );
     }
 
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    void Unit::Load( EcsComponent& _component, const Json& _json )
+    void Health::Load( EcsComponent& _component, const Json& _json )
     {
-        Unit& unit = static_cast<Unit&>( _component );
-        Serializable::LoadFixed( _json, "attack_range", unit.mAttackRange );
+        Health& health = static_cast<Health&>( _component );
+        Serializable::LoadFixed( _json, "health", health.mMaxHealth );
+        health.mHealth = health.mMaxHealth;
     }
 }

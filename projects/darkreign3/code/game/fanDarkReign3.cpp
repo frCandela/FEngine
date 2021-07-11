@@ -23,7 +23,10 @@
 #include "game/components/fanUnit.hpp"
 #include "game/components/fanAnimScale.hpp"
 #include "game/components/fanTerrainAgent.hpp"
+#include "game/components/fanHealth.hpp"
+#include "game/components/fanWeapon.hpp"
 #include "game/units/fanJudas.hpp"
+#include "game/units/fanTank.hpp"
 #include "game/singletons/fanSelection.hpp"
 #include "game/singletons/fanRTSCamera.hpp"
 #include "game/singletons/fanPauseMenu.hpp"
@@ -33,6 +36,7 @@
 #include "game/systems/fanUpdateAgents.hpp"
 #include "game/systems/fanUpdateUnits.hpp"
 #include "game/systems/fanUpdateJudas.hpp"
+#include "game/systems/fanUpdateWeapons.hpp"
 #include "game/fanDR3Tags.hpp"
 
 #ifdef FAN_EDITOR
@@ -44,6 +48,9 @@
 #include "editor/fanGuiAnimScale.hpp"
 #include "editor/fanGuiTerrainAgent.hpp"
 #include "editor/fanGuiJudas.hpp"
+#include "editor/fanGuiTank.hpp"
+#include "editor/fanGuiHealth.hpp"
+#include "editor/fanGuiWeapon.hpp"
 
 #endif
 
@@ -59,6 +66,9 @@ namespace fan
         mWorld.AddComponentType<TerrainAgent>();
         mWorld.AddComponentType<AnimScale>();
         mWorld.AddComponentType<Judas>();
+        mWorld.AddComponentType<Tank>();
+        mWorld.AddComponentType<Health>();
+        mWorld.AddComponentType<Weapon>();
         mWorld.AddSingletonType<Selection>();
         mWorld.AddSingletonType<RTSCamera>();
         mWorld.AddSingletonType<PauseMenu>();
@@ -76,6 +86,9 @@ namespace fan
         settings.mComponentInfos[AnimScale::Info::sType]    = GuiAnimScale::GetInfo();
         settings.mComponentInfos[TerrainAgent::Info::sType] = GuiTerrainAgent::GetInfo();
         settings.mComponentInfos[Judas::Info::sType]        = GuiJudas::GetInfo();
+        settings.mComponentInfos[Tank::Info::sType]         = GuiTank::GetInfo();
+        settings.mComponentInfos[Health::Info::sType]       = GuiHealth::GetInfo();
+        settings.mComponentInfos[Weapon::Info::sType]       = GuiWeapon::GetInfo();
         mWorld.GetSingleton<Application>().mOnEditorUseGameCamera.Connect( &DarkReign3::OnEditorUseGameCamera, this );
 #endif
 
@@ -179,7 +192,9 @@ namespace fan
         mWorld.Run<SUpdateUnitsData>();
         mWorld.Run<SUpdateUnitsState>();
         mWorld.Run<SPlayUnitState>();
+        mWorld.Run<SFireWeapons>( _delta );
         mWorld.Run<SMoveAgents>( _delta );
+        mWorld.Run<SUpdateDeadUnits>();
 
         // set cursor
         Application& app = mWorld.GetSingleton<Application>();

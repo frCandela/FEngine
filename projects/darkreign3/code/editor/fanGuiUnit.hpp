@@ -45,6 +45,9 @@ namespace fan
             }
             ImGui::PopReadOnly();
 
+            if( unit.mFireDelegate == nullptr ){ ImGui::FanError(  "fire delegate is null" ); }
+            if( unit.mDeathDelegate == nullptr ){ ImGui::FanError( "death delegate is null" ); }
+
             ImGui::PopID();
         }
     };

@@ -15,7 +15,7 @@ namespace fan
         static void Save( const EcsComponent& _component, Json& _json );
         static void Load( EcsComponent& _component, const Json& _json );
 
-        bool DestinationIsInRange() const { return mSqrDistanceFromDestination < mRange * mRange; }
+        bool TargetIsInRange() const { return mSqrDistanceFromTarget < mRange * mRange; }
 
         enum State
         {
@@ -26,8 +26,8 @@ namespace fan
 
         // serialized
         Fixed mHeightOffset;
-        Fixed mMoveSpeed;     // unit/s
-        Fixed mRotationSpeed; // degrees/s
+        Fixed mMaxMoveSpeed;     // unit/s
+        Fixed mMaxRotationSpeed; // degrees/s
         Fixed mRange;         // distance of target at which the unit will stop moving
         bool  mAlignWithTerrain;
 
@@ -36,7 +36,7 @@ namespace fan
         Vector3 mTargetPosition;
         Vector3 mPositionOnTerrain;
         Vector3 mTerrainNormal;
-        Fixed   mSqrDistanceFromDestination;
+        Fixed   mSqrDistanceFromTarget;
         Fixed   mForwardAngle;
     };
 }

@@ -16,6 +16,8 @@ namespace ImGui
     bool SliderFixed( const char* label, fan::Fixed* v,  fan::Fixed v_min = 0, fan::Fixed v_max = 0, const char* format = "%.3f", ImGuiSliderFlags flags = 0 );
 
     void FanShowHelpMarker( const char* _desc );
+    void FanError( const char * _text );
+
     void FanToolTip( const char* _desc );
     bool FanSaveFileModal( const char* _popupName, const std::set<std::string>& _extensionWhiteList, std::string& _outCurrentPath );
     bool FanLoadFileModal( const char* _popupName, const std::set<std::string>& _extensionWhiteList, std::string& _path );

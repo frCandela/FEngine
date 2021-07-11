@@ -4,6 +4,7 @@
 #include "engine/fanEngineSerializable.hpp"
 #include "engine/physics/fanTransform.hpp"
 #include "game/fanDR3Tags.hpp"
+#include "game/components/fanUnit.hpp"
 
 namespace fan
 {

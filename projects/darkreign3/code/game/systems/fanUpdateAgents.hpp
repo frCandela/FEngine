@@ -33,14 +33,13 @@ namespace fan
             {
                 Transform   & transform = *transformIt;
                 TerrainAgent& agent     = *terrainAgentIt;
-
                 switch( agent.mState )
                 {
                     case TerrainAgent::Stay:
                         break;
                     case TerrainAgent::Move:
                         UpdateTerrainInformation( _world, agent, transform );
-                        if( MoveAgent( agent, transform, agent.mMoveSpeed, _delta ) )
+                        if( MoveAgent( agent, transform, agent.mMaxMoveSpeed, _delta ) )
                         {
                             _world.AddTag<TagUnitStateNeedsUpdate>( transformIt.GetEntity() );
                         }
@@ -103,7 +102,7 @@ namespace fan
             _agent.mForwardAngle = Vector3::SignedAngle( forward, targetForward, up );
             if( Fixed::Abs( _agent.mForwardAngle ) > 5 )
             {
-                const Fixed angleDelta = Fixed::Sign( _agent.mForwardAngle ) * _agent.mRotationSpeed * _delta;
+                const Fixed angleDelta = Fixed::Sign( _agent.mForwardAngle ) * _agent.mMaxRotationSpeed * _delta;
                 forward = Quaternion::AngleAxis( angleDelta, up ) * forward;
             }
 
@@ -119,7 +118,7 @@ namespace fan
             }
 
             // stops when reaching the target
-            if(  _agent.DestinationIsInRange() )// _agent.mSqrDistanceFromDestination < ( _agent.mRange - FIXED( 1 ) ) * ( _agent.mRange - FIXED( 1 ) ) )
+            if( _agent.TargetIsInRange() )// _agent.mSqrDistanceFromDestination < ( _agent.mRange - FIXED( 1 ) ) * ( _agent.mRange - FIXED( 1 ) ) )
             {
                 return true;
             }

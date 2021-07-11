@@ -2,7 +2,7 @@
 
 #include "game/components/fanUnit.hpp"
 #include "game/components/fanTerrainAgent.hpp"
-#include "game/singletons/fanAIWorld.hpp"
+#include "game/components/fanHealth.hpp"
 #include "core/fanDebug.hpp"
 
 namespace fan
@@ -19,8 +19,8 @@ namespace fan
             auto agentIt = _view.begin<TerrainAgent>();
             for( ; unitIt != _view.end<Unit>(); ++unitIt, ++agentIt )
             {
-                Unit        & unit                = *unitIt;
-                TerrainAgent& agent               = *agentIt;
+                Unit        & unit           = *unitIt;
+                TerrainAgent& agent          = *agentIt;
 
                 if( unit.HasTarget() && !_world.HandleExists( unit.mLastOrder.mTargetEntity ) )
                 {
@@ -32,7 +32,7 @@ namespace fan
                     Transform& transformTarget = _world.GetComponent<Transform>( _world.GetEntity( unit.mLastOrder.mTargetEntity ) );
                     agent.mTargetPosition = transformTarget.mPosition;
                 }
-                agent.mSqrDistanceFromDestination = Vector3::SqrDistance( agent.mPositionOnTerrain, agent.mTargetPosition );
+                agent.mSqrDistanceFromTarget = Vector3::SqrDistance( agent.mPositionOnTerrain, agent.mTargetPosition );
             }
         }
     };
@@ -64,7 +64,7 @@ namespace fan
                     case Unit::Wait:
                         break;
                     case Unit::Move:
-                        if( agent.DestinationIsInRange() )
+                        if( agent.TargetIsInRange() )
                         {
                             if( unit.mLastOrder.mType == UnitOrder::Attack && unit.HasTarget() )
                             {
@@ -85,7 +85,7 @@ namespace fan
                         {
                             unit.mState = Unit::Move;
                         }
-                        else if( !agent.DestinationIsInRange() )
+                        else if( !agent.TargetIsInRange() )
                         {
                             unit.mState = Unit::Move;
                         }
@@ -109,9 +109,9 @@ namespace fan
                 {
                     case UnitOrder::Attack:
                     case UnitOrder::Move:
-                        _unit.mState                       = Unit::Move;
-                        _agent.mTargetPosition             = _order.mTargetPosition;
-                        _agent.mSqrDistanceFromDestination = Fixed::sMaxValue;
+                        _unit.mState                  = Unit::Move;
+                        _agent.mTargetPosition        = _order.mTargetPosition;
+                        _agent.mSqrDistanceFromTarget = Fixed::sMaxValue;
                         return true;
                     default:
                         fanAssert( false );
@@ -178,11 +178,40 @@ namespace fan
                         {
                             _world.AddTag<TagUnitStateNeedsUpdate>( unitIt.GetEntity() );
                         }
-                        else if( agent.mSqrDistanceFromDestination > unit.mAttackRange * unit.mAttackRange ) // out of range
+                        else if( agent.mSqrDistanceFromTarget > unit.mAttackRange * unit.mAttackRange ) // out of range
                         {
                             _world.AddTag<TagUnitStateNeedsUpdate>( unitIt.GetEntity() );
                         }
                         break;
+                }
+            }
+        }
+    };
+
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
+    struct SUpdateDeadUnits : EcsSystem
+    {
+        static EcsSignature GetSignature( const EcsWorld& _world )
+        {
+            return _world.GetSignature<Unit, Health>();
+        }
+
+        static void Run( EcsWorld& _world, const EcsView& _view )
+        {
+            auto unitIt   = _view.begin<Unit>();
+            auto healthIt = _view.begin<Health>();
+            for( ; unitIt != _view.end<Unit>(); ++unitIt, ++healthIt )
+            {
+                Health& health = *healthIt;
+                Unit  & unit   = *unitIt;
+                if( health.mHealth <= 0 )
+                {
+                    _world.Kill( healthIt.GetEntity() );
+                    if( unit.mDeathDelegate != nullptr )
+                    {
+                        ( *unit.mDeathDelegate )( _world, unitIt.GetEntity() );
+                    }
                 }
             }
         }

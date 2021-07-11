@@ -5,47 +5,19 @@
 
 namespace fan
 {
-    struct UnitOrder
-    {
-        enum Type
-        {
-            None,
-            Attack,
-            Move
-        };
-        Type      mType         = Type::None;
-        bool      mWasExecuted  = false;
-        Vector3   mTargetPosition;
-        EcsHandle mTargetEntity = 0;
-    };
-
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    struct Unit : public EcsComponent
+    struct Health : public EcsComponent
     {
-    ECS_COMPONENT( Unit )
+    ECS_COMPONENT( Health )
         static void SetInfo( EcsComponentInfo& _info );
         static void Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component );
         static void Save( const EcsComponent& _component, Json& _json );
         static void Load( EcsComponent& _component, const Json& _json );
 
-        bool HasTarget() const { return mLastOrder.mTargetEntity != 0; }
-        EcsHandle GetTarget() const { return mLastOrder.mTargetEntity; }
-
-        enum State
-        {
-            Wait,
-            Move,
-            Attack,
-        };
-
-        Fixed mAttackRange;
+        Fixed mMaxHealth;
 
         // non serialized
-        State     mState;
-        UnitOrder mLastOrder;
-
-        void (* mFireDelegate)( EcsWorld& _world, EcsEntity _entity );
-        void (* mDeathDelegate )( EcsWorld& _world, EcsEntity _entity );
+        Fixed mHealth;
     };
 }

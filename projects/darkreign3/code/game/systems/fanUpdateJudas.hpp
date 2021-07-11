@@ -34,7 +34,7 @@ namespace fan
                         animator.mAnimation = judas.mAnimIdle;
                         break;
                     case Unit::Move:
-                        if( agent.mSqrDistanceFromDestination < distanceWalk * distanceWalk || Fixed::Abs( agent.mForwardAngle ) > 30 )
+                        if( agent.mSqrDistanceFromTarget < distanceWalk * distanceWalk || Fixed::Abs( agent.mForwardAngle ) > 30 )
                         {
                             animator.mAnimation = judas.mAnimWalk;
                         }

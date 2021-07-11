@@ -9,9 +9,9 @@ namespace fan
 {
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    struct Judas : public EcsComponent
+    struct Tank : public EcsComponent
     {
-    ECS_COMPONENT( Judas )
+    ECS_COMPONENT( Tank )
         static void SetInfo( EcsComponentInfo& _info );
         static void Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component );
         static void PostInit( EcsWorld& _world, EcsEntity _entity );
@@ -21,10 +21,6 @@ namespace fan
         static void OnFire( EcsWorld& _world, EcsEntity _unitEntity );
         static void OnDeath( EcsWorld& _world, EcsEntity _unitEntity );
 
-        ResourcePtr <Animation> mAnimIdle;
-        ResourcePtr <Animation> mAnimWalk;
-        ResourcePtr <Animation> mAnimRun;
-        ResourcePtr <Animation> mAnimFire;
         ResourcePtr <Prefab>    mFireFx;
         ResourcePtr <Prefab>    mDeathFx;
     };

@@ -2,30 +2,27 @@
 
 #include "ecs/fanEcsComponent.hpp"
 #include "core/math/fanVector3.hpp"
-#include "core/resources/fanResourcePtr.hpp"
-#include "render/resources/fanAnimation.hpp"
 
 namespace fan
 {
+    class Prefab;
+
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
-    struct Judas : public EcsComponent
+    struct Weapon : public EcsComponent
     {
-    ECS_COMPONENT( Judas )
+    ECS_COMPONENT( Weapon )
         static void SetInfo( EcsComponentInfo& _info );
         static void Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component );
-        static void PostInit( EcsWorld& _world, EcsEntity _entity );
         static void Save( const EcsComponent& _component, Json& _json );
         static void Load( EcsComponent& _component, const Json& _json );
 
-        static void OnFire( EcsWorld& _world, EcsEntity _unitEntity );
-        static void OnDeath( EcsWorld& _world, EcsEntity _unitEntity );
+        static void FireLaser(EcsWorld& _world, Prefab& _prefab, const Vector3& _origin, const Vector3& _target );
 
-        ResourcePtr <Animation> mAnimIdle;
-        ResourcePtr <Animation> mAnimWalk;
-        ResourcePtr <Animation> mAnimRun;
-        ResourcePtr <Animation> mAnimFire;
-        ResourcePtr <Prefab>    mFireFx;
-        ResourcePtr <Prefab>    mDeathFx;
+        Fixed mDamage;      // hp
+        Fixed mRateOfFire;  // round/s
+
+        // non serialized
+        Fixed mTimeAccumulator;
     };
 }

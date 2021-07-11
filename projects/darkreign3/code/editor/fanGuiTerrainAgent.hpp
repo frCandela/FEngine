@@ -25,13 +25,14 @@ namespace fan
         {
             TerrainAgent& agent = static_cast<TerrainAgent&>( _component );
             ImGui::DragFixed( "height offset", &agent.mHeightOffset, 0.05f, -2, 20 );
-            ImGui::DragFixed( "move speed", &agent.mMoveSpeed, 0.1f, 0, 100 );
-            ImGui::DragFixed( "rotation speed", &agent.mRotationSpeed, 0.1f, 0, 720 );
+            ImGui::DragFixed( "max move speed", &agent.mMaxMoveSpeed, 0.1f, 0, 100 );
+            ImGui::DragFixed( "max rotation speed", &agent.mMaxRotationSpeed, 0.1f, 0, 720 );
             ImGui::DragFixed( "range", &agent.mRange );
             ImGui::Checkbox( "align with terrain", &agent.mAlignWithTerrain );
+
             ImGui::PushReadOnly();
             ImGui::DragFixed3( "target position", &agent.mTargetPosition.x );
-            Fixed distanceFromDestination = Fixed::Sqrt( agent.mSqrDistanceFromDestination );
+            Fixed distanceFromDestination = Fixed::Sqrt( agent.mSqrDistanceFromTarget );
             ImGui::DragFixed( "distance from destination", &distanceFromDestination );
             switch( agent.mState )
             {

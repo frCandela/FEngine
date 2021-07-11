@@ -57,15 +57,16 @@ namespace fan
         uint32_t               mAlignment;
         int                    mFlags = ComponentFlags::None;
 
+        void ( * setInfo )( EcsComponentInfo& ) = nullptr;                             // called once at startup
         void ( * init )( EcsWorld&, EcsEntity, EcsComponent& ) = nullptr;              // called once at creation
-        void ( * setInfo )( EcsComponentInfo& ) = nullptr;                            // called once at startup
-        void ( * destroy )( EcsWorld&, EcsEntity, EcsComponent& ) = nullptr;              // called at destruction
-        void ( * save )( const EcsComponent&, Json& ) = nullptr;                          // Serialize to json
-        void ( * load )( EcsComponent&, const Json& ) = nullptr;                          // Deserialize from json
+        void ( * postInit )( EcsWorld& _world, EcsEntity ) = nullptr;                  // called once after all components have been initialized
+        void ( * save )( const EcsComponent&, Json& ) = nullptr;                       // Serialize to json
+        void ( * load )( EcsComponent&, const Json& ) = nullptr;                       // deserialize from json
+        void ( * destroy )( EcsWorld&, EcsEntity, EcsComponent& ) = nullptr;           // called at destruction
         void ( * netSave )( const EcsComponent&, sf::Packet& _packet ) = nullptr;      // Serialize to packet
-        void ( * netLoad )( EcsComponent&, sf::Packet& _packet ) = nullptr;              // Deserialize from packet
-        void ( * rollbackSave )( const EcsComponent&, sf::Packet& _packet ) = nullptr;// Serializes rollback
-        void ( * rollbackLoad )( EcsComponent&, sf::Packet& _packet ) = nullptr;      // Deserializes rollback
+        void ( * netLoad )( EcsComponent&, sf::Packet& _packet ) = nullptr;            // Deserialize from packet
+        void ( * rollbackSave )( const EcsComponent&, sf::Packet& _packet ) = nullptr; // Serializes rollback
+        void ( * rollbackLoad )( EcsComponent&, sf::Packet& _packet ) = nullptr;       // Deserializes rollback
         EcsComponent& ( * construct )( void* ) = nullptr;
         void* ( * copy )( void* _dst, const void* _src, size_t _count ) = nullptr;
     };
