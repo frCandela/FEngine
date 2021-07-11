@@ -13,9 +13,10 @@ namespace fan
             Attack,
             Move
         };
-        Type    mType = Type::None;
-        bool    mWasExecuted = false;
-        Vector3 mPosition;
+        Type      mType        = Type::None;
+        bool      mWasExecuted = false;
+        Vector3   mPosition;
+        EcsHandle mTarget = 0;
     };
 
     //==================================================================================================================================================================================================

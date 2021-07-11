@@ -18,6 +18,7 @@ namespace fan
         int  mNumSelected       = 0;
         bool mHoveringOverAlly  = false;
         bool mHoveringOverEnemy = false;
+        EcsHandle  mHoveredEntity = 0;
     };
 
     //==================================================================================================================================================================================================

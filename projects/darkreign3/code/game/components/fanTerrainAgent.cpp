@@ -20,13 +20,13 @@ namespace fan
         agent.mHeightOffset     = 0;
         agent.mMoveSpeed        = 10;
         agent.mRotationSpeed    = 180;
-        agent.mRange            = 10;
+        agent.mRange            = 2;
         agent.mAlignWithTerrain = true;
 
         agent.mState                      = State::Stay;
-        agent.mDestination                = Vector3::sZero;
-        agent.mTerrainPosition            = Vector3::sZero;
-        agent.mTerrainNormal              = Vector3::sUp;
+        agent.mDestination       = Vector3::sZero;
+        agent.mPositionOnTerrain = Vector3::sZero;
+        agent.mTerrainNormal     = Vector3::sUp;
         agent.mSqrDistanceFromDestination = 0;
         agent.mForwardAngle               = 0;
     }

@@ -17,7 +17,9 @@ namespace fan
 
         enum State
         {
-            Stay, Move
+            Stay, // do nothing
+            Move, // move towards mDestination
+            Face  // rotate to face mTarget ( or mDestination if unavailable )
         };
 
         // Serialized
@@ -30,7 +32,7 @@ namespace fan
         // runtime only
         State   mState;
         Vector3 mDestination;
-        Vector3 mTerrainPosition;
+        Vector3 mPositionOnTerrain;
         Vector3 mTerrainNormal;
         Fixed   mSqrDistanceFromDestination;
         Fixed   mForwardAngle;

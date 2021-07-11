@@ -14,9 +14,7 @@ namespace fan
     {
         static EcsSignature GetSignature( const EcsWorld& _world )
         {
-            return _world.GetSignature<Transform>() |
-                   _world.GetSignature<SceneNode>() |
-                   _world.GetSignature<FollowTransform>();
+            return _world.GetSignature<Transform, SceneNode, FollowTransform>();
         }
 
         static void Run( EcsWorld& _world, const EcsView& _view )

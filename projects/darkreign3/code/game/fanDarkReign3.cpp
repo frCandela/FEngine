@@ -27,6 +27,7 @@
 #include "game/singletons/fanSelection.hpp"
 #include "game/singletons/fanRTSCamera.hpp"
 #include "game/singletons/fanPauseMenu.hpp"
+#include "game/singletons/fanAIWorld.hpp"
 #include "game/systems/fanUpdateSelection.hpp"
 #include "game/systems/fanUpdateAnimScale.hpp"
 #include "game/systems/fanUpdateAgents.hpp"
@@ -43,6 +44,7 @@
 #include "editor/fanGuiAnimScale.hpp"
 #include "editor/fanGuiTerrainAgent.hpp"
 #include "editor/fanGuiJudas.hpp"
+
 #endif
 
 #include "render/fanWindow.hpp"
@@ -60,6 +62,7 @@ namespace fan
         mWorld.AddSingletonType<Selection>();
         mWorld.AddSingletonType<RTSCamera>();
         mWorld.AddSingletonType<PauseMenu>();
+        mWorld.AddSingletonType<AIWorld>();
         mWorld.AddTagType<TagSelected>();
         mWorld.AddTagType<TagEnemy>();
         mWorld.AddTagType<TagUnitStateNeedsUpdate>();
@@ -114,7 +117,6 @@ namespace fan
     //==================================================================================================================================================================================================
     void DarkReign3::OnTogglePause()
     {
-        Debug::Log( "DarkReign3::OnTogglePause" );
         if( mPaused )
         {
             OnResume();
@@ -173,9 +175,12 @@ namespace fan
 
         RTSCamera::Update( mWorld, _delta );
 
+        AIWorld::UpdateEnemiesLists( mWorld );
+
         // update selection
         const SelectionStatus selectionStatus = Selection::SelectUnits( mWorld, _delta );
         mWorld.Run<SUpdateUnitsState>();
+        mWorld.Run<SPlayUnitState>();
         mWorld.Run<SMoveAgents>( _delta );
 
         // set cursor

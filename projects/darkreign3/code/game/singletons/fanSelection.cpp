@@ -71,6 +71,7 @@ namespace fan
             {
                 selectionStatus.mHoveringOverAlly = true;
             }
+            selectionStatus.mHoveredEntity = _world.GetHandle(entity);
         }
 
         // select / deselect on left click
@@ -117,6 +118,7 @@ namespace fan
                         UnitOrder order;
                         order.mType = UnitOrder::Attack;
                         order.mPosition = results[0].mData.mPosition ;
+                        order.mTarget = selectionStatus.mHoveredEntity;
                         _world.Run<SGiveOrderToSelectedUnits>( order );
                     }
                     else

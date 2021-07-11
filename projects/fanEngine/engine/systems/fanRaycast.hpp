@@ -90,24 +90,6 @@ namespace fan
         }
     };
 
-    namespace impl
-    {
-        template< class FirstType, class... NextTypes >
-        struct AccumulateSignature;
-
-        template< class FirstType, class... NextTypes >
-        struct AccumulateSignature
-        {
-            static EcsSignature Get( EcsWorld& _world ) { return _world.GetSignature<FirstType>() | AccumulateSignature<NextTypes...>::Get( _world ); }
-        };
-
-        template< class LastType >
-        struct AccumulateSignature<LastType>
-        {
-            static EcsSignature Get( EcsWorld& _world ) { return _world.GetSignature<LastType>(); }
-        };
-    }
-
     //return _world.GetSignature<FirstType>() | AccumulateSignature<NextTypes...>( _world );
 
     //==================================================================================================================================================================================================

@@ -26,9 +26,25 @@ namespace fan
             Unit& unit = static_cast<Unit&>( _component );
             ImGui::PushID( "Unit" );
             ImGui::DragFixed( "attack range", &unit.mAttackRange );
+
             ImGui::PushReadOnly();
-            ImGui::DragInt( "state", (int*)&unit.mState );
+            switch( unit.mState )
+            {
+                case Unit::Wait:
+                    ImGui::Text( "<wait>" );
+                    break;
+                case Unit::Move:
+                    ImGui::Text( "<move>" );
+                    break;
+                case Unit::Attack:
+                    ImGui::Text( "<attack>" );
+                    break;
+                default:
+                    fanAssert( false );
+                    break;
+            }
             ImGui::PopReadOnly();
+
             ImGui::PopID();
         }
     };
