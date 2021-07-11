@@ -64,7 +64,8 @@ namespace fan
     public:
         static std::vector<TestMethod> GetTests()
         {
-            return { { &UnitTestEcs::TestAddTagType,          "tag add types " },
+            return { { &UnitTestEcs::TestGetSignature,        "get signature " },
+                     { &UnitTestEcs::TestAddTagType,          "tag add types " },
                      { &UnitTestEcs::TestAddRemoveTags,       "tag add/remove " },
                      { &UnitTestEcs::TestFaultyAddRemoveTags, "tag multiple add/remove" },
             };
@@ -80,6 +81,49 @@ namespace fan
         void Destroy() override {}
 
         EcsWorld mWorld;
+
+        void TestGetSignature()
+        {
+            EcsWorld world;
+            world.AddComponentType<TestEcsComponent>();
+            world.AddTagType<TagTest>();
+            world.AddTagType<TagTest2>();
+
+            const EcsSignature signatureComponent = EcsSignature( 1 );
+            const EcsSignature signatureTag       = EcsSignature( 1 ) << ( ecsSignatureLength - 1 );
+            const EcsSignature signatureTag2      = EcsSignature( 1 ) << ( ecsSignatureLength - 2 );
+
+            // single components signatures
+            TEST_ASSERT( world.GetSignature<TestEcsComponent>() == signatureComponent );
+            TEST_ASSERT( world.GetSignature<TagTest>() == signatureTag );
+            TEST_ASSERT( world.GetSignature<TagTest2>() == signatureTag2 );
+
+            // multi components signatures
+            const EcsSignature componentTag = world.GetSignature<TestEcsComponent,TagTest>();
+            TEST_ASSERT( componentTag == ( signatureComponent | signatureTag ) );
+
+            const EcsSignature componentTag2 = world.GetSignature<TestEcsComponent,TagTest2>();
+            TEST_ASSERT( componentTag2 == ( signatureComponent | signatureTag2 ) );
+
+            const EcsSignature tagTag2 = world.GetSignature<TagTest,TagTest2>();
+            TEST_ASSERT( tagTag2 == ( signatureTag | signatureTag2 ) );
+
+            const EcsSignature componentTagTag2 = world.GetSignature<TestEcsComponent, TagTest2, TagTest>();
+            TEST_ASSERT( componentTagTag2 == ( signatureComponent | signatureTag | signatureTag2 ) );
+
+            // permutations
+            const EcsSignature tagComponent = world.GetSignature<TagTest,TestEcsComponent>();
+            TEST_ASSERT( tagComponent == ( signatureComponent | signatureTag ) );
+
+            const EcsSignature tag2Component = world.GetSignature<TagTest2, TestEcsComponent>();
+            TEST_ASSERT( tag2Component == ( signatureComponent | signatureTag2 ) );
+
+            const EcsSignature tag2Tag = world.GetSignature<TagTest2,TagTest>();
+            TEST_ASSERT( tag2Tag == ( signatureTag | signatureTag2 ) );
+
+            const EcsSignature tagComponentTag2 = world.GetSignature<TagTest, TestEcsComponent, TagTest2>();
+            TEST_ASSERT( tagComponentTag2 == ( signatureComponent | signatureTag | signatureTag2 ) );
+        }
 
         void TestAddTagType()
         {

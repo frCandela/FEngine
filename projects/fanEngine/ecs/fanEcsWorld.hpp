@@ -1,6 +1,7 @@
 #pragma once
 
 #include <unordered_map>
+#include <functional>
 #include "core/fanHash.hpp"
 #include "core/fanAssert.hpp"
 #include "ecs/fanEcsEntity.hpp"
@@ -132,13 +133,21 @@ namespace fan
         EcsEntity CreateEntity();
         void Kill( const EcsEntity _entity );
         bool IsAlive( const EcsEntity _entity ) const;
-
-        template< typename _tagOrComponentType >
+        template< class FirstComponent, class... NextComponents >
         EcsSignature GetSignature() const;
+
         template< typename _SystemType, typename... _Args >
         void Run( _Args&& ... _args );
+
         template< typename _SystemType, typename... _Args >
         void ForceRun( _Args&& ... _args );
+
+        template<typename... ComponentsOrTags >
+        void RunLambda( std::function<void( EcsWorld&, const EcsView& )> _lambda, const EcsSignature& _signatureExclude = EcsSignature(0) );
+
+        template<typename... ComponentsOrTags >
+        void ForceRunLambda( std::function<void( EcsWorld&, const EcsView& )> _lambda, const EcsSignature& _signatureExclude = EcsSignature(0) );
+
         template< typename _SystemType >
         EcsView Match() const;
         EcsView Match( const EcsSignature& _include, const EcsSignature& _exclude ) const;
@@ -175,202 +184,6 @@ namespace fan
         std::vector<EcsTransition>                      mTransitions;
         std::vector<DestroyedComponent>                 mDestroyedComponents;
     };
-
-    //==================================================================================================================================================================================================
-    //==================================================================================================================================================================================================
-    template< typename _SingletonType >
-    void EcsWorld::AddSingletonType()
-    {
-        static_assert( std::is_base_of<EcsSingleton, _SingletonType>::value );
-        fanAssert( mSingletons.find( _SingletonType::Info::sType ) == mSingletons.end() );
-
-        // Creates the singleton component
-        _SingletonType* singleton = new _SingletonType {};
-        mSingletons[_SingletonType::Info::sType] = singleton;
-
-        // Registers singleton info
-        EcsSingletonInfo info;
-        info.setInfo = &_SingletonType::SetInfo;
-        info.mName   = _SingletonType::Info::sName;
-        _SingletonType::SetInfo( info );
-        info.init  = &_SingletonType::Init;
-        info.mType = _SingletonType::Info::sType;
-        mSingletonInfos[_SingletonType::Info::sType] = info;
-        info.init( *this, *singleton );
-    }
-
-    //==================================================================================================================================================================================================
-    //==================================================================================================================================================================================================
-    template< typename _SingletonType >
-    _SingletonType& EcsWorld::GetSingleton()
-    {
-        static_assert( std::is_base_of<EcsSingleton, _SingletonType>::value );
-        return static_cast<_SingletonType&>( GetSingleton( _SingletonType::Info::sType ) );
-    }
-
-    //==================================================================================================================================================================================================
-    //==================================================================================================================================================================================================
-    template< typename _TagType >
-    void EcsWorld::AddTagType()
-    {
-        static_assert( std::is_base_of<EcsTag, _TagType>::value );
-        fanAssert( mNextTagIndex >= NumComponents() );
-        fanAssert( mTypeToIndex.find( _TagType::Info::sType ) == mTypeToIndex.end() );
-        const int newTagIndex = mNextTagIndex--;
-        mTypeToIndex[_TagType::Info::sType] = newTagIndex;
-
-        mTagsMask[newTagIndex] = 1;
-        EcsTagInfo info;
-        info.mName = _TagType::Info::sName;
-        info.mType = _TagType::Info::sType;
-        mTagsInfo.push_back( info );
-    }
-
-    //==================================================================================================================================================================================================
-    //==================================================================================================================================================================================================
-    template< typename _TagType >
-    void EcsWorld::AddTag( const EcsEntity _entity )
-    {
-        static_assert( std::is_base_of<EcsTag, _TagType>::value );
-        AddTag( _entity, _TagType::Info::sType );
-    }
-
-    //==================================================================================================================================================================================================
-    //==================================================================================================================================================================================================
-    template< typename _TagType >
-    void EcsWorld::RemoveTag( const EcsEntity _entity )
-    {
-        static_assert( std::is_base_of<EcsTag, _TagType>::value );
-        RemoveTag( _entity, _TagType::Info::sType );
-    }
-
-    //==================================================================================================================================================================================================
-    //==================================================================================================================================================================================================
-    template< typename _TagType >
-    bool EcsWorld::HasTag( const EcsEntity _entity )
-    {
-        static_assert( std::is_base_of<EcsTag, _TagType>::value );
-        return HasTag( _entity, _TagType::Info::sType );
-    }
-
-    //==================================================================================================================================================================================================
-    //==================================================================================================================================================================================================
-    template< typename _ComponentType >
-    void EcsWorld::AddComponentType()
-    {
-        static_assert( std::is_base_of<EcsComponent, _ComponentType>::value );
-
-        fanAssert( mTypeToIndex.find( _ComponentType::Info::sType ) == mTypeToIndex.end() );
-        const int nextTypeIndex = NumComponents();
-        fanAssert( mNextTagIndex >= nextTypeIndex );
-
-        // Set component info
-        EcsComponentInfo info;
-        info.mName      = _ComponentType::Info::sName;
-        info.construct  = &_ComponentType::Info::Instanciate;
-        info.copy       = std::is_trivially_copyable<_ComponentType>::value
-                ? &std::memcpy
-                : &_ComponentType::Info::Memcpy;
-        info.init       = &_ComponentType::Init;
-        info.mSize      = _ComponentType::Info::sSize;
-        info.mAlignment = _ComponentType::Info::sAlignment;
-        info.mType      = _ComponentType::Info::sType;
-        info.mIndex     = nextTypeIndex;
-        info.setInfo    = &_ComponentType::SetInfo;
-        _ComponentType::SetInfo( info );
-        mComponentsInfo.push_back( info );
-
-        mTypeToIndex[_ComponentType::Info::sType] = nextTypeIndex;
-
-        mTransitionArchetype.AddComponentType( info );
-    }
-
-    //==================================================================================================================================================================================================
-    //==================================================================================================================================================================================================
-    template< typename _ComponentType >
-    _ComponentType& EcsWorld::AddComponent( const EcsEntity _entity )
-    {
-        static_assert( std::is_base_of<EcsComponent, _ComponentType>::value );
-        return static_cast<_ComponentType&>( AddComponent( _entity, _ComponentType::Info::sType ) );
-    }
-
-    //==================================================================================================================================================================================================
-    //==================================================================================================================================================================================================
-    template< typename _ComponentType >
-    void EcsWorld::RemoveComponent( const EcsEntity _entity )
-    {
-        static_assert( std::is_base_of<EcsComponent, _ComponentType>::value );
-        RemoveComponent( _entity, _ComponentType::Info::sType );
-    }
-
-    //==================================================================================================================================================================================================
-    //==================================================================================================================================================================================================
-    template< typename _ComponentType >
-    bool EcsWorld::HasComponent( const EcsEntity _entity )
-    {
-        static_assert( std::is_base_of<EcsComponent, _ComponentType>::value );
-        return HasComponent( _entity, _ComponentType::Info::sType );
-    }
-
-    //==================================================================================================================================================================================================
-    //==================================================================================================================================================================================================
-    template< typename _ComponentType >
-    _ComponentType& EcsWorld::GetComponent( const EcsEntity _entity )
-    {
-        static_assert( std::is_base_of<EcsComponent, _ComponentType>::value );
-        return static_cast<_ComponentType&> ( GetComponent( _entity, _ComponentType::Info::sType ) );
-    }
-
-    //==================================================================================================================================================================================================
-    //==================================================================================================================================================================================================
-    template< typename _ComponentType >
-    _ComponentType* EcsWorld::SafeGetComponent( const EcsEntity _entity )
-    {
-        static_assert( std::is_base_of<EcsComponent, _ComponentType>::value );
-        return static_cast<_ComponentType*> ( SafeGetComponent( _entity, _ComponentType::Info::sType ) );
-    }
-
-    //==================================================================================================================================================================================================
-    //==================================================================================================================================================================================================
-    template< typename _SystemType, typename... _Args >
-    void EcsWorld::Run( _Args&& ... _args )
-    {
-        static_assert( std::is_base_of<EcsSystem, _SystemType>::value );
-        EcsView view = Match<_SystemType>();
-        if( !view.Empty() )
-        {
-            _SystemType::Run( *this, view, _args... );
-        }
-    }
-
-    //==================================================================================================================================================================================================
-    // runs even if the view is empty
-    //==================================================================================================================================================================================================
-    template< typename _SystemType, typename... _Args >
-    void EcsWorld::ForceRun( _Args&& ... _args )
-    {
-        static_assert( std::is_base_of<EcsSystem, _SystemType>::value );
-        EcsView view = Match<_SystemType>();
-        _SystemType::Run( *this, view, _args... );
-    }
-
-    //==================================================================================================================================================================================================
-    //==================================================================================================================================================================================================
-    template< typename _tagOrComponentType >
-    EcsSignature EcsWorld::GetSignature() const
-    {
-        static_assert( std::is_base_of<EcsTag, _tagOrComponentType>::value || std::is_base_of<EcsComponent, _tagOrComponentType>::value );
-        return EcsSignature( 1 ) << mTypeToIndex.at( _tagOrComponentType::Info::sType );
-    }
-
-    //==================================================================================================================================================================================================
-    // returns an ecs view matching a system signature
-    //==================================================================================================================================================================================================
-    template< typename _SystemType >
-    EcsView EcsWorld::Match() const
-    {
-        static_assert( std::is_base_of<EcsSystem, _SystemType>::value );
-        const EcsSignature signature = _SystemType::GetSignature( *this );
-        return Match( signature, EcsSignature( 0 ) );
-    }
 }
+
+#include "ecs/fanEcsWorld.inl"
