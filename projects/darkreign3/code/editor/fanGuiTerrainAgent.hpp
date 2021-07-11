@@ -30,7 +30,7 @@ namespace fan
             ImGui::DragFixed( "range", &agent.mRange );
             ImGui::Checkbox( "align with terrain", &agent.mAlignWithTerrain );
             ImGui::PushReadOnly();
-            ImGui::DragFixed3( "target position", &agent.mDestination.x );
+            ImGui::DragFixed3( "target position", &agent.mTargetPosition.x );
             Fixed distanceFromDestination = Fixed::Sqrt( agent.mSqrDistanceFromDestination );
             ImGui::DragFixed( "distance from destination", &distanceFromDestination );
             switch( agent.mState )

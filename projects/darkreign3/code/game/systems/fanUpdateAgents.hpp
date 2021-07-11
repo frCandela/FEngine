@@ -44,7 +44,7 @@ namespace fan
                         {
                             _world.AddTag<TagUnitStateNeedsUpdate>( transformIt.GetEntity() );
                         }
-                        rd.DrawLine( agent.mPositionOnTerrain, agent.mDestination, Color::sCyan );
+                        rd.DrawLine( agent.mPositionOnTerrain, agent.mTargetPosition, Color::sCyan );
                         break;
                     case TerrainAgent::Face:
                         MoveAgent( agent, transform, 0, _delta );
@@ -97,7 +97,7 @@ namespace fan
             }
 
             // slowly rotates the forwards vector toward the target position
-            const Vector3 moveDirection = ( _agent.mDestination - _transform.mPosition ).Normalized();
+            const Vector3 moveDirection = ( _agent.mTargetPosition - _transform.mPosition ).Normalized();
             Vector3       forward       = _transform.Forward();
             const Vector3 targetForward = ( moveDirection - Vector3::Dot( moveDirection, up ) * up ).Normalized();
             _agent.mForwardAngle = Vector3::SignedAngle( forward, targetForward, up );
@@ -119,7 +119,7 @@ namespace fan
             }
 
             // stops when reaching the target
-            if( _agent.mSqrDistanceFromDestination < ( _agent.mRange - FIXED( 1 ) ) * ( _agent.mRange - FIXED( 1 ) ) )
+            if(  _agent.DestinationIsInRange() )// _agent.mSqrDistanceFromDestination < ( _agent.mRange - FIXED( 1 ) ) * ( _agent.mRange - FIXED( 1 ) ) )
             {
                 return true;
             }

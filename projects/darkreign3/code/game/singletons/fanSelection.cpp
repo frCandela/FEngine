@@ -116,17 +116,17 @@ namespace fan
                     if( selectionStatus.mHoveringOverEnemy )
                     {
                         UnitOrder order;
-                        order.mType = UnitOrder::Attack;
-                        order.mPosition = results[0].mData.mPosition ;
-                        order.mTarget = selectionStatus.mHoveredEntity;
+                        order.mType           = UnitOrder::Attack;
+                        order.mTargetPosition = results[0].mData.mPosition ;
+                        order.mTargetEntity   = selectionStatus.mHoveredEntity;
                         _world.Run<SGiveOrderToSelectedUnits>( order );
                     }
                     else
                     {
                         Selection::InstantiateMoveToFx( _world, mousePosRay, results[0].mData );
                         UnitOrder order;
-                        order.mType = UnitOrder::Move;
-                        order.mPosition = results[0].mData.mPosition ;
+                        order.mType           = UnitOrder::Move;
+                        order.mTargetPosition = results[0].mData.mPosition ;
                         _world.Run<SGiveOrderToSelectedUnits>( order );
                     }
                 }

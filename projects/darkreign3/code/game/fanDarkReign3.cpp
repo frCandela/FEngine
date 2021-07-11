@@ -175,10 +175,8 @@ namespace fan
 
         RTSCamera::Update( mWorld, _delta );
 
-        AIWorld::UpdateEnemiesLists( mWorld );
-
-        // update selection
         const SelectionStatus selectionStatus = Selection::SelectUnits( mWorld, _delta );
+        mWorld.Run<SUpdateUnitsData>();
         mWorld.Run<SUpdateUnitsState>();
         mWorld.Run<SPlayUnitState>();
         mWorld.Run<SMoveAgents>( _delta );

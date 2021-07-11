@@ -9,6 +9,36 @@ namespace fan
 {
     //==================================================================================================================================================================================================
     //==================================================================================================================================================================================================
+    struct SUpdateUnitsData : EcsSystem
+    {
+        static EcsSignature GetSignature( const EcsWorld& _world ) { return _world.GetSignature<Unit, TerrainAgent>(); }
+
+        static void Run( EcsWorld& _world, const EcsView& _view )
+        {
+            auto unitIt  = _view.begin<Unit>();
+            auto agentIt = _view.begin<TerrainAgent>();
+            for( ; unitIt != _view.end<Unit>(); ++unitIt, ++agentIt )
+            {
+                Unit        & unit                = *unitIt;
+                TerrainAgent& agent               = *agentIt;
+
+                if( unit.HasTarget() && !_world.HandleExists( unit.mLastOrder.mTargetEntity ) )
+                {
+                    unit.mLastOrder.mTargetEntity = 0;
+                }
+
+                if( unit.HasTarget() )
+                {
+                    Transform& transformTarget = _world.GetComponent<Transform>( _world.GetEntity( unit.mLastOrder.mTargetEntity ) );
+                    agent.mTargetPosition = transformTarget.mPosition;
+                }
+                agent.mSqrDistanceFromDestination = Vector3::SqrDistance( agent.mPositionOnTerrain, agent.mTargetPosition );
+            }
+        }
+    };
+
+    //==================================================================================================================================================================================================
+    //==================================================================================================================================================================================================
     struct SUpdateUnitsState : EcsSystem
     {
         static EcsSignature GetSignature( const EcsWorld& _world )
@@ -27,7 +57,6 @@ namespace fan
 
                 ApplyOrder( unit.mLastOrder, unit, agent );
 
-                Debug::Log( "state update" );
                 _world.RemoveTag<TagUnitStateNeedsUpdate>( unitIt.GetEntity() );
 
                 switch( unit.mState )
@@ -35,49 +64,34 @@ namespace fan
                     case Unit::Wait:
                         break;
                     case Unit::Move:
-                        if( agent.mSqrDistanceFromDestination < agent.mRange * agent.mRange ) // arrived to destination
+                        if( agent.DestinationIsInRange() )
                         {
-                            if( unit.mLastOrder.mType == UnitOrder::Attack && unit.mLastOrder.mTarget != 0 ) // go back to attacking
+                            if( unit.mLastOrder.mType == UnitOrder::Attack && unit.HasTarget() )
                             {
                                 unit.mState = Unit::Attack;
-                                agent.mState = TerrainAgent::Face;
                             }
                             else
                             {
                                 unit.mState = Unit::Wait;
-                                agent.mState = TerrainAgent::Stay;
                             }
                         }
                         else
                         {
-                            Debug::Log("prout");
+                            // keep moving
                         }
                         break;
                     case Unit::Attack:
-                        if( unit.mLastOrder.mTarget == 0 ) // target dead or out of sight
+                        if( !unit.HasTarget() ) // target is dead
                         {
-                            fanAssert( unit.mLastOrder.mType == UnitOrder::Attack );
-                            unit.mLastOrder.mWasExecuted = false;
-                            ApplyOrder( unit.mLastOrder, unit, agent );
+                            unit.mState = Unit::Move;
                         }
-                        else if( agent.mSqrDistanceFromDestination > unit.mAttackRange * unit.mAttackRange ) // out of range
+                        else if( !agent.DestinationIsInRange() )
                         {
-                            if( _world.HandleExists( unit.mLastOrder.mTarget ) )
-                            {
-                                fanAssert( unit.mLastOrder.mType == UnitOrder::Attack );
-                                unit.mLastOrder.mWasExecuted = false;
-                                unit.mLastOrder.mPosition    = _world.GetComponent<Transform>( _world.GetEntity( unit.mLastOrder.mTarget ) ).mPosition    ;
-                                ApplyOrder( unit.mLastOrder, unit, agent );
-                            }
-                            else // target was killed
-                            {
-                                unit.mState = Unit::Wait;
-                                agent.mState = TerrainAgent::Stay;
-                            }
+                            unit.mState = Unit::Move;
                         }
                         else
                         {
-                            agent.mState = TerrainAgent::Face;
+                            // keep attacking
                         }
                         break;
                     default:
@@ -90,17 +104,14 @@ namespace fan
         {
             if( !_order.mWasExecuted )
             {
-                Debug::Log( "order" );
                 _order.mWasExecuted = true;
                 switch( _order.mType )
                 {
                     case UnitOrder::Attack:
                     case UnitOrder::Move:
                         _unit.mState                       = Unit::Move;
-                        _agent.mState                      = TerrainAgent::Move;
-                        _agent.mRange                      = _order.mType == UnitOrder::Attack ? _unit.mAttackRange : 2;
+                        _agent.mTargetPosition             = _order.mTargetPosition;
                         _agent.mSqrDistanceFromDestination = Fixed::sMaxValue;
-                        _agent.mDestination                = _unit.mLastOrder.mPosition;
                         return true;
                     default:
                         fanAssert( false );
@@ -151,22 +162,19 @@ namespace fan
                 Unit        & unit  = *unitIt;
                 TerrainAgent& agent = *agentIt;
 
-                if( unit.mLastOrder.mTarget != 0 && !_world.HandleExists( unit.mLastOrder.mTarget ) )
-                {
-                    unit.mLastOrder.mTarget = 0;
-                }
-
-                if( unit.mLastOrder.mTarget != 0 )
-                {
-                    Transform& transformTarget = _world.GetComponent<Transform>( _world.GetEntity( unit.mLastOrder.mTarget ) );
-                    agent.mDestination = transformTarget.mPosition;
-                }
-                agent.mSqrDistanceFromDestination = Vector3::SqrDistance( agent.mPositionOnTerrain, agent.mDestination );
-
                 switch( unit.mState )
                 {
+                    case Unit::Wait:
+                        agent.mState = TerrainAgent::Stay;
+                        break;
+                    case Unit::Move:
+                        agent.mState = TerrainAgent::Move;
+                        agent.mRange = unit.mLastOrder.mType == UnitOrder::Attack ? unit.mAttackRange : 2;
+                        break;
                     case Unit::Attack:
-                        if( unit.mLastOrder.mTarget == 0 ) // enemy dead or out of sight
+                        agent.mState = TerrainAgent::Face;
+                        agent.mRange = unit.mAttackRange;
+                        if( unit.mLastOrder.mTargetEntity == 0 ) // enemy dead or out of sight
                         {
                             _world.AddTag<TagUnitStateNeedsUpdate>( unitIt.GetEntity() );
                         }

@@ -23,10 +23,10 @@ namespace fan
         agent.mRange            = 2;
         agent.mAlignWithTerrain = true;
 
-        agent.mState                      = State::Stay;
-        agent.mDestination       = Vector3::sZero;
+        agent.mState             = State::Stay;
+        agent.mTargetPosition    = Vector3::sZero;
         agent.mPositionOnTerrain = Vector3::sZero;
-        agent.mTerrainNormal     = Vector3::sUp;
+        agent.mTerrainNormal              = Vector3::sUp;
         agent.mSqrDistanceFromDestination = 0;
         agent.mForwardAngle               = 0;
     }

@@ -36,7 +36,6 @@ namespace fan
             ImGui::Text( "tags: " );
             if( ImGui::IsItemClicked( ImGuiMouseButton_Right ) )
             {
-                Debug::Log( "test" );
                 ImGui::OpenPopup( "set_tag_popup_menu" );
             }
 

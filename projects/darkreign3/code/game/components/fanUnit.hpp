@@ -13,10 +13,10 @@ namespace fan
             Attack,
             Move
         };
-        Type      mType        = Type::None;
-        bool      mWasExecuted = false;
-        Vector3   mPosition;
-        EcsHandle mTarget = 0;
+        Type      mType         = Type::None;
+        bool      mWasExecuted  = false;
+        Vector3   mTargetPosition;
+        EcsHandle mTargetEntity = 0;
     };
 
     //==================================================================================================================================================================================================
@@ -28,6 +28,8 @@ namespace fan
         static void Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component );
         static void Save( const EcsComponent& _component, Json& _json );
         static void Load( EcsComponent& _component, const Json& _json );
+
+        bool HasTarget() const { return mLastOrder.mTargetEntity != 0; }
 
         enum State
         {
