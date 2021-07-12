@@ -30,8 +30,10 @@ namespace fan
     {
         Selection& selection = static_cast<Selection&>( _singleton );
         selection.mSelectionFramePrefab = nullptr;
-        selection.mMoveToFxPrefab       = nullptr;
+        selection.mMoveToFxPrefab  = nullptr;
+        selection.mHealthBarPrefab = nullptr;
         selection.mSelectionFrames.clear();
+        selection.mHealthBars.clear();
     }
 
     //==================================================================================================================================================================================================
@@ -62,7 +64,7 @@ namespace fan
         // set hover target type
         if( !results.empty() )
         {
-            EcsEntity entity = results[0].mEntity;
+            EcsEntity entity               = results[0].mEntity;
             if( _world.HasTag<TagEnemy>( entity ) )
             {
                 selectionStatus.mHoveringOverEnemy = true;
@@ -71,7 +73,7 @@ namespace fan
             {
                 selectionStatus.mHoveringOverAlly = true;
             }
-            selectionStatus.mHoveredEntity = _world.GetHandle(entity);
+            selectionStatus.mHoveredEntity = _world.GetHandle( entity );
         }
 
         // select / deselect on left click
@@ -117,7 +119,7 @@ namespace fan
                     {
                         UnitOrder order;
                         order.mType           = UnitOrder::Attack;
-                        order.mTargetPosition = results[0].mData.mPosition ;
+                        order.mTargetPosition = results[0].mData.mPosition;
                         order.mTargetEntity   = selectionStatus.mHoveredEntity;
                         _world.Run<SGiveOrderToSelectedUnits>( order );
                     }
@@ -126,7 +128,7 @@ namespace fan
                         Selection::InstantiateMoveToFx( _world, mousePosRay, results[0].mData );
                         UnitOrder order;
                         order.mType           = UnitOrder::Move;
-                        order.mTargetPosition = results[0].mData.mPosition ;
+                        order.mTargetPosition = results[0].mData.mPosition;
                         _world.Run<SGiveOrderToSelectedUnits>( order );
                     }
                 }
@@ -159,6 +161,7 @@ namespace fan
         const Selection& selection = static_cast<const Selection&>( _singleton );
         Serializable::SaveResourcePtr( _json, "selection_frame", selection.mSelectionFramePrefab );
         Serializable::SaveResourcePtr( _json, "move_to", selection.mMoveToFxPrefab );
+        Serializable::SaveResourcePtr( _json, "health_bar", selection.mHealthBarPrefab );
     }
 
     //==================================================================================================================================================================================================
@@ -168,5 +171,6 @@ namespace fan
         Selection& selection = static_cast<Selection&>( _singleton );
         Serializable::LoadResourcePtr( _json, "selection_frame", selection.mSelectionFramePrefab );
         Serializable::LoadResourcePtr( _json, "move_to", selection.mMoveToFxPrefab );
+        Serializable::LoadResourcePtr( _json, "health_bar", selection.mHealthBarPrefab );
     }
 }

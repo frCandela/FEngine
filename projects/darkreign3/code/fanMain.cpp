@@ -22,12 +22,14 @@ int main( int _argc, char* _argv[] )
     // force arguments into the command line
     //args.push_back( "-livepp" );
     //args.push_back( "0" );
-    #ifndef FAN_EDITOR
-    args.push_back( "-autoplay" );
-    args.push_back( "1" );
+
+    //#ifdef FAN_EDITOR
+    //args.push_back( "-autoplay" );
+    //args.push_back( "1" );
+    //#endif
+
     args.push_back( "-scene" );
-    args.push_back( "scenes/voxel.scene" );
-    #endif
+    args.push_back( "scenes/floor.scene" );
 
     // generates a list of strings from the command line arguments
     for( int i             = 1; i < _argc; i++ ){ args.push_back( _argv[i] ); }

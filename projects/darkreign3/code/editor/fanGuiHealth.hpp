@@ -25,16 +25,11 @@ namespace fan
         {
             Health& health = static_cast<Health&>( _component );
             ImGui::PushID( "Weapon" );
-            ImGui::DragFixed( "max health", &health.mMaxHealth, 1, 0, 100 );
-            ImGui::PushReadOnly();
-            ImGui::DragFixed( "health", &health.mHealth );
-            ImGui::PopReadOnly();
-
-            if( ImGui::Button("kill"))
+            if( ImGui::DragFixed( "max health", &health.mMaxHealth, 1, 1, 100 ) )
             {
-                health.mHealth = 0;
+                health.mHealth = health.mMaxHealth;
             }
-
+            ImGui::DragFixed( "health", &health.mHealth, 1, 0, health.mMaxHealth.ToFloat() );
             ImGui::PopID();
         }
     };

@@ -18,6 +18,7 @@
 #include "engine/systems/fanUpdateUIText.hpp"
 #include "engine/systems/fanUpdateUILayouts.hpp"
 #include "engine/systems/fanUpdateUIAlign.hpp"
+#include "engine/systems/fanUpdateProgressBars.hpp"
 #include "engine/systems/fanUpdateBounds.hpp"
 #include "engine/systems/fanUpdateTimers.hpp"
 #include "engine/systems/fanUpdateParticles.hpp"
@@ -249,13 +250,14 @@ namespace fan
                 world.Run<SAlignUI>();
                 world.Run<SUpdateUILayouts>();
                 world.Run<SHoverButtons>();
+                world.Run<SUpdateProgressBars>();
                 world.Run<SHighlightButtons>();
 
                 // gameplay
                 world.Run<SUpdateExpirationTimes>( scaledDelta.ToFloat() );
                 world.Run<SUpdateParticles>( scaledDelta.ToFloat() );
                 world.Run<SEmitParticles>( scaledDelta.ToFloat() );
-                world.Run<SGenerateParticles>( scaledDelta.ToFloat() );
+                world.ForceRun<SGenerateParticles>( scaledDelta.ToFloat() );
 
                 world.ApplyTransitions();
 

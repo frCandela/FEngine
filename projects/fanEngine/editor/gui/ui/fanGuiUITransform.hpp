@@ -33,13 +33,13 @@ namespace fan
 
                 if( ImGui::Button( "##resetUIsize" ) )
                 {
-                    if( _world.HasComponent<UIRenderer>(_entity))
+                    if( _world.HasComponent<UIRenderer>( _entity ) )
                     {
                         UIRenderer renderer = _world.GetComponent<UIRenderer>( _entity );
                         if( renderer.mTexture != nullptr )
                         {
-                            transform.mSize.x = renderer.mTexture->mExtent.width;
-                            transform.mSize.y = renderer.mTexture->mExtent.height;
+                            transform.mSize.x = renderer.mTexture->mExtent.width / renderer.mTiling.x;
+                            transform.mSize.y = renderer.mTexture->mExtent.height / renderer.mTiling.y;
                         }
                     }
                     else

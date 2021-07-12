@@ -142,15 +142,15 @@ namespace fan
         template< typename _SystemType, typename... _Args >
         void ForceRun( _Args&& ... _args );
 
-        template<typename... ComponentsOrTags >
-        void RunLambda( std::function<void( EcsWorld&, const EcsView& )> _lambda, const EcsSignature& _signatureExclude = EcsSignature(0) );
+        template< typename... ComponentsOrTags >
+        void RunLambda( std::function<void( EcsWorld&, const EcsView& )> _lambda, const EcsSignature& _signatureExclude = EcsSignature( 0 ) );
 
-        template<typename... ComponentsOrTags >
-        void ForceRunLambda( std::function<void( EcsWorld&, const EcsView& )> _lambda, const EcsSignature& _signatureExclude = EcsSignature(0) );
+        template< typename... ComponentsOrTags >
+        void ForceRunLambda( std::function<void( EcsWorld&, const EcsView& )> _lambda, const EcsSignature& _signatureExclude = EcsSignature( 0 ) );
 
         template< typename _SystemType >
         EcsView Match() const;
-        EcsView Match( const EcsSignature& _include, const EcsSignature& _exclude ) const;
+        EcsView Match( const EcsSignature& _include, const EcsSignature& _exclude = EcsSignature( 0 ) ) const;
 
         // Const accessors
         const std::unordered_map<EcsHandle, EcsEntity>& GetHandles() const { return mHandles; }

@@ -36,7 +36,10 @@ namespace fan
 
         ResourcePtr<Prefab> mSelectionFramePrefab;
         ResourcePtr<Prefab> mMoveToFxPrefab;
+        ResourcePtr<Prefab> mHealthBarPrefab;
+
         std::vector<EcsHandle> mSelectionFrames;
+        std::vector<EcsHandle> mHealthBars;
     };
 
 

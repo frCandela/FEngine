@@ -206,6 +206,7 @@ namespace fan
         // ui
         mWorld.Run<SUpdateAnimScale>( _delta );
         mWorld.ForceRun<SPlaceSelectionFrames>( _delta );
+        mWorld.ForceRun<SPlaceHealthBars>( _delta );
     }
 
     //==================================================================================================================================================================================================
